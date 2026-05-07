@@ -26,8 +26,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -40,108 +38,108 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DeviceCommandDTO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Type
-     */
-    private DeviceCommandTypeEnum type;
+	/**
+	 * Type
+	 */
+	private DeviceCommandTypeEnum type;
 
-    /**
-     *
-     */
-    private String content;
+	/**
+	 *
+	 */
+	private String content;
 
-    /**
-     * Create Time
-     */
-    private LocalDateTime createTime;
+	/**
+	 * Create Time
+	 */
+	private LocalDateTime createTime;
 
-    public DeviceCommandDTO(DeviceCommandTypeEnum type, String content) {
-        this.type = type;
-        this.content = content;
-        this.createTime = LocalDateTimeUtil.now();
-    }
+	public DeviceCommandDTO(DeviceCommandTypeEnum type, String content) {
+		this.type = type;
+		this.content = content;
+		this.createTime = LocalDateTimeUtil.now();
+	}
 
-    /**
-     *
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DeviceRead implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
+	/**
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class DeviceRead implements Serializable {
 
-        /**
-         * Device ID
-         */
-        private Long deviceId;
+		@Serial
+		private static final long serialVersionUID = 1L;
 
-        /**
-         * Point ID
-         */
-        private Long pointId;
+		/**
+		 * Device ID
+		 */
+		private Long deviceId;
 
+		/**
+		 * Point ID
+		 */
+		private Long pointId;
 
-        /**
-         * Create Time
-         */
-        private LocalDateTime createTime;
+		/**
+		 * Create Time
+		 */
+		private LocalDateTime createTime;
 
-        public DeviceRead(Long deviceId, Long pointId) {
-            this.deviceId = deviceId;
-            this.pointId = pointId;
-            this.createTime = LocalDateTimeUtil.now();
-        }
-    }
+		public DeviceRead(Long deviceId, Long pointId) {
+			this.deviceId = deviceId;
+			this.pointId = pointId;
+			this.createTime = LocalDateTimeUtil.now();
+		}
 
-    /**
-     *
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DeviceWrite implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
+	}
 
-        /**
-         * Device ID
-         */
-        private Long deviceId;
+	/**
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class DeviceWrite implements Serializable {
 
-        /**
-         * Point ID
-         */
-        private Long pointId;
+		@Serial
+		private static final long serialVersionUID = 1L;
 
-        /**
-         *
-         */
-        private String value;
+		/**
+		 * Device ID
+		 */
+		private Long deviceId;
 
-        /**
-         * Create Time
-         */
-        private LocalDateTime createTime;
+		/**
+		 * Point ID
+		 */
+		private Long pointId;
 
-        public DeviceWrite(Long deviceId, Long pointId, String value) {
-            this.deviceId = deviceId;
-            this.pointId = pointId;
-            this.value = value;
-            this.createTime = LocalDateTimeUtil.now();
-        }
-    }
+		/**
+		 *
+		 */
+		private String value;
+
+		/**
+		 * Create Time
+		 */
+		private LocalDateTime createTime;
+
+		public DeviceWrite(Long deviceId, Long pointId, String value) {
+			this.deviceId = deviceId;
+			this.pointId = pointId;
+			this.value = value;
+			this.createTime = LocalDateTimeUtil.now();
+		}
+
+	}
+
 }

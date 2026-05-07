@@ -22,59 +22,64 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>WriteCoilResponse class.</p>
+ * <p>
+ * WriteCoilResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class WriteCoilResponse extends ModbusResponse {
-    private int writeOffset;
-    private boolean writeValue;
 
+	private int writeOffset;
 
-    WriteCoilResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	private boolean writeValue;
 
-    WriteCoilResponse(int slaveId, int writeOffset, boolean writeValue) throws ModbusTransportException {
-        super(slaveId);
-        this.writeOffset = writeOffset;
-        this.writeValue = writeValue;
-    }
+	WriteCoilResponse(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_COIL;
-    }
+	WriteCoilResponse(int slaveId, int writeOffset, boolean writeValue) throws ModbusTransportException {
+		super(slaveId);
+		this.writeOffset = writeOffset;
+		this.writeValue = writeValue;
+	}
 
-    @Override
-    protected void writeResponse(ByteQueue queue) {
-        ModbusUtils.pushShort(queue, writeOffset);
-        ModbusUtils.pushShort(queue, writeValue ? 0xff00 : 0);
-    }
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.WRITE_COIL;
+	}
 
+	@Override
+	protected void writeResponse(ByteQueue queue) {
+		ModbusUtils.pushShort(queue, writeOffset);
+		ModbusUtils.pushShort(queue, writeValue ? 0xff00 : 0);
+	}
 
-    @Override
-    protected void readResponse(ByteQueue queue) {
-        writeOffset = ModbusUtils.popUnsignedShort(queue);
-        writeValue = ModbusUtils.popUnsignedShort(queue) == 0xff00;
-    }
+	@Override
+	protected void readResponse(ByteQueue queue) {
+		writeOffset = ModbusUtils.popUnsignedShort(queue);
+		writeValue = ModbusUtils.popUnsignedShort(queue) == 0xff00;
+	}
 
-    /**
-     * <p>Getter for the field <code>writeOffset</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getWriteOffset() {
-        return writeOffset;
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>writeOffset</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getWriteOffset() {
+		return writeOffset;
+	}
 
-    /**
-     * <p>isWriteValue.</p>
-     *
-     * @return a boolean.
-     */
-    public boolean isWriteValue() {
-        return writeValue;
-    }
+	/**
+	 * <p>
+	 * isWriteValue.
+	 * </p>
+	 * @return a boolean.
+	 */
+	public boolean isWriteValue() {
+		return writeValue;
+	}
+
 }

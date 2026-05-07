@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @since 2022.1.0
  */
 @Service
-public class PointValueBoolManagerImpl extends ServiceImpl<PointValueBoolMapper, PointValueBoolDO> implements PointValueBoolManager {
+public class PointValueBoolManagerImpl extends ServiceImpl<PointValueBoolMapper, PointValueBoolDO>
+		implements PointValueBoolManager {
 
 }

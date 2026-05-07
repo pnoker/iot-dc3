@@ -27,8 +27,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Listens for internal metadata events and forwards the relevant device and point changes to the
- * custom driver service.
+ * Listens for internal metadata events and forwards the relevant device and point changes
+ * to the custom driver service.
  *
  * @author zhangzi
  * @version 2025.9.0
@@ -38,28 +38,30 @@ import org.springframework.stereotype.Component;
 @Component
 public class MetadataEventListener implements ApplicationListener<MetadataEvent> {
 
-    private final DriverCustomService driverCustomService;
+	private final DriverCustomService driverCustomService;
 
-    public MetadataEventListener(DriverCustomService driverCustomService) {
-        this.driverCustomService = driverCustomService;
-    }
+	public MetadataEventListener(DriverCustomService driverCustomService) {
+		this.driverCustomService = driverCustomService;
+	}
 
-    @Override
-    public void onApplicationEvent(MetadataEvent metadataEvent) {
-        log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
-        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            MetadataEventDTO entityEvent = new MetadataEventDTO();
-            entityEvent.setId(metadataEvent.getId());
-            entityEvent.setMetadataType(MetadataTypeEnum.DEVICE);
-            entityEvent.setOperateType(metadataEvent.getOperateType());
-            driverCustomService.event(entityEvent);
-        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            MetadataEventDTO entityEvent = new MetadataEventDTO();
-            entityEvent.setId(metadataEvent.getId());
-            entityEvent.setMetadataType(MetadataTypeEnum.POINT);
-            entityEvent.setOperateType(metadataEvent.getOperateType());
-            driverCustomService.event(entityEvent);
-        }
-    }
+	@Override
+	public void onApplicationEvent(MetadataEvent metadataEvent) {
+		log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
+		MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+		if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+			MetadataEventDTO entityEvent = new MetadataEventDTO();
+			entityEvent.setId(metadataEvent.getId());
+			entityEvent.setMetadataType(MetadataTypeEnum.DEVICE);
+			entityEvent.setOperateType(metadataEvent.getOperateType());
+			driverCustomService.event(entityEvent);
+		}
+		else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+			MetadataEventDTO entityEvent = new MetadataEventDTO();
+			entityEvent.setId(metadataEvent.getId());
+			entityEvent.setMetadataType(MetadataTypeEnum.POINT);
+			entityEvent.setOperateType(metadataEvent.getOperateType());
+			driverCustomService.event(entityEvent);
+		}
+	}
+
 }

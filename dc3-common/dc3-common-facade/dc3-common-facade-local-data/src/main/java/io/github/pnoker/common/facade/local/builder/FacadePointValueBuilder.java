@@ -29,26 +29,27 @@ import java.time.ZoneOffset;
 /**
  * Converts between the facade-api shapes and {@code dc3-common-data} internals.
  * <p>
- * Maps {@code calValue} to {@code value}, converts {@code LocalDateTime createTime}
- * to epoch seconds.
+ * Maps {@code calValue} to {@code value}, converts {@code LocalDateTime createTime} to
+ * epoch seconds.
  *
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface FacadePointValueBuilder {
 
-    @Mapping(source = "calValue", target = "value")
-    @Mapping(source = "createTime", target = "createTime")
-    FacadePointValueBO toFacadeBO(PointValueBO bo);
+	@Mapping(source = "calValue", target = "value")
+	@Mapping(source = "createTime", target = "createTime")
+	FacadePointValueBO toFacadeBO(PointValueBO bo);
 
-    /**
-     * Convert LocalDateTime to epoch seconds.
-     */
-    default long map(LocalDateTime value) {
-        if (value == null) {
-            return 0L;
-        }
-        return value.toEpochSecond(ZoneOffset.UTC);
-    }
+	/**
+	 * Convert LocalDateTime to epoch seconds.
+	 */
+	default long map(LocalDateTime value) {
+		if (value == null) {
+			return 0L;
+		}
+		return value.toEpochSecond(ZoneOffset.UTC);
+	}
+
 }

@@ -38,25 +38,26 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class LabelBindQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    /**
-     * Tenant ID.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID.
+	 */
+	private Long tenantId;
 
-    // Query fields
+	// Query fields
 
-    /**
-     * Label ID.
-     */
-    private Long labelId;
+	/**
+	 * Label ID.
+	 */
+	private Long labelId;
 
-    /**
-     * Entity ID.
-     */
-    private Long entityId;
+	/**
+	 * Entity ID.
+	 */
+	private Long entityId;
+
 }

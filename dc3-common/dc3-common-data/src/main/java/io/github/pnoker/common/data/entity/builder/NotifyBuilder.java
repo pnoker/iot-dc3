@@ -45,155 +45,146 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface NotifyBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    @Mapping(target = "tenantId", ignore = true)
-    NotifyBO buildBOByVO(NotifyVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "tenantId", ignore = true)
+	NotifyBO buildBOByVO(NotifyVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<NotifyBO> buildBOListByVOList(List<NotifyVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<NotifyBO> buildBOListByVOList(List<NotifyVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "notifyExt", ignore = true)
-    @Mapping(target = "autoConfirmFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    NotifyDO buildDOByBO(NotifyBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "notifyExt", ignore = true)
+	@Mapping(target = "autoConfirmFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "deleted", ignore = true)
+	NotifyDO buildDOByBO(NotifyBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(NotifyBO entityBO, @MappingTarget NotifyDO entityDO) {
-        // Code
-        if (StringUtils.isEmpty(entityBO.getNotifyCode())) {
-            entityDO.setNotifyCode(CodeUtil.getCode());
-        }
+	@AfterMapping
+	default void afterProcess(NotifyBO entityBO, @MappingTarget NotifyDO entityDO) {
+		// Code
+		if (StringUtils.isEmpty(entityBO.getNotifyCode())) {
+			entityDO.setNotifyCode(CodeUtil.getCode());
+		}
 
-// Json Ext
-        NotifyExt entityExt = entityBO.getNotifyExt();
-        JsonExt ext = new JsonExt();
-        if (Objects.nonNull(entityExt)) {
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-        }
-        entityDO.setNotifyExt(ext);
+		// Json Ext
+		NotifyExt entityExt = entityBO.getNotifyExt();
+		JsonExt ext = new JsonExt();
+		if (Objects.nonNull(entityExt)) {
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+		}
+		entityDO.setNotifyExt(ext);
 
-        // AutoConfirm Flag
-        AutoConfirmFlagEnum autoConfirmFlag = entityBO.getAutoConfirmFlag();
-        Optional.ofNullable(autoConfirmFlag).ifPresent(value -> entityDO.setAutoConfirmFlag(value.getIndex()));
+		// AutoConfirm Flag
+		AutoConfirmFlagEnum autoConfirmFlag = entityBO.getAutoConfirmFlag();
+		Optional.ofNullable(autoConfirmFlag).ifPresent(value -> entityDO.setAutoConfirmFlag(value.getIndex()));
 
-        // Enable Flag
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
+		// Enable Flag
+		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+	}
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<NotifyDO> buildDOListByBOList(List<NotifyBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<NotifyDO> buildDOListByBOList(List<NotifyBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "notifyExt", ignore = true)
-    @Mapping(target = "autoConfirmFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    NotifyBO buildBOByDO(NotifyDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "notifyExt", ignore = true)
+	@Mapping(target = "autoConfirmFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	NotifyBO buildBOByDO(NotifyDO entityDO);
 
-    @AfterMapping
-    default void afterProcess(NotifyDO entityDO, @MappingTarget NotifyBO entityBO) {
-        // Json Ext
-        JsonExt entityExt = entityDO.getNotifyExt();
-        if (Objects.nonNull(entityExt)) {
-            NotifyExt ext = new NotifyExt();
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), NotifyExt.Content.class));
-            entityBO.setNotifyExt(ext);
-        }
+	@AfterMapping
+	default void afterProcess(NotifyDO entityDO, @MappingTarget NotifyBO entityBO) {
+		// Json Ext
+		JsonExt entityExt = entityDO.getNotifyExt();
+		if (Objects.nonNull(entityExt)) {
+			NotifyExt ext = new NotifyExt();
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), NotifyExt.Content.class));
+			entityBO.setNotifyExt(ext);
+		}
 
-        // AutoConfirm Flag
-        Byte autoConfirmFlag = entityDO.getAutoConfirmFlag();
-        entityBO.setAutoConfirmFlag(AutoConfirmFlagEnum.ofIndex(autoConfirmFlag));
+		// AutoConfirm Flag
+		Byte autoConfirmFlag = entityDO.getAutoConfirmFlag();
+		entityBO.setAutoConfirmFlag(AutoConfirmFlagEnum.ofIndex(autoConfirmFlag));
 
-        // Enable Flag
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
+		// Enable Flag
+		Byte enableFlag = entityDO.getEnableFlag();
+		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+	}
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<NotifyBO> buildBOListByDOList(List<NotifyDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<NotifyBO> buildBOListByDOList(List<NotifyDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    NotifyVO buildVOByBO(NotifyBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	NotifyVO buildVOByBO(NotifyBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<NotifyVO> buildVOListByBOList(List<NotifyBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<NotifyVO> buildVOListByBOList(List<NotifyBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<NotifyBO> buildBOPageByDOPage(Page<NotifyDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<NotifyBO> buildBOPageByDOPage(Page<NotifyDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<NotifyVO> buildVOPageByBOPage(Page<NotifyBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<NotifyVO> buildVOPageByBOPage(Page<NotifyBO> entityPageBO);
+
 }

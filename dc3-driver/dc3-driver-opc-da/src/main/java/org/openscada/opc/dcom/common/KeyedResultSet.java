@@ -22,14 +22,15 @@ import java.util.ArrayList;
 
 public class KeyedResultSet<K, V> extends ArrayList<KeyedResult<K, V>> {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    public KeyedResultSet() {
-        super();
-    }
+	public KeyedResultSet() {
+		super();
+	}
 
-    public KeyedResultSet(final int size) {
-        super(size); // me
-    }
+	public KeyedResultSet(final int size) {
+		super(size); // me
+	}
+
 }

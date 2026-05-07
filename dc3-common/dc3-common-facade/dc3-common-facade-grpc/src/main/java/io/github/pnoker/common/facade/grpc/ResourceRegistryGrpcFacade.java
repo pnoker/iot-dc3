@@ -43,37 +43,38 @@ import java.util.Objects;
 @Component
 public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
 
-    @Resource
-    private ResourceRegistryApiGrpc.ResourceRegistryApiBlockingStub resourceRegistryApiBlockingStub;
+	@Resource
+	private ResourceRegistryApiGrpc.ResourceRegistryApiBlockingStub resourceRegistryApiBlockingStub;
 
-    @Override
-    public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
-        GrpcSyncRequest.Builder request = GrpcSyncRequest.newBuilder()
-                .setServiceName(Objects.requireNonNullElse(command.getServiceName(), ""))
-                .setDeleteMissing(command.isDeleteMissing());
-        List<FacadeScannedApiBO> apis = command.getApis();
-        if (apis != null) {
-            for (FacadeScannedApiBO api : apis) {
-                request.addApis(GrpcScannedApiDTO.newBuilder()
-                        .setMethod(Objects.requireNonNullElse(api.getMethod(), ""))
-                        .setPath(Objects.requireNonNullElse(api.getPath(), ""))
-                        .setApiName(Objects.requireNonNullElse(api.getApiName(), ""))
-                        .setTitle(Objects.requireNonNullElse(api.getTitle(), ""))
-                        .setRemark(Objects.requireNonNullElse(api.getRemark(), ""))
-                        .setApiGroup(Objects.requireNonNullElse(api.getApiGroup(), ""))
-                        .build());
-            }
-        }
-        GrpcRSyncResult response = resourceRegistryApiBlockingStub.sync(request.build());
-        if (!response.getResult().getOk()) {
-            throw new ServiceException("ResourceRegistryFacade.sync failed: ["
-                    + response.getResult().getCode() + "] " + response.getResult().getMessage());
-        }
-        return FacadeResourceRegistrySyncResultBO.builder()
-                .inserted(response.getData().getInserted())
-                .updated(response.getData().getUpdated())
-                .deleted(response.getData().getDeleted())
-                .unchanged(response.getData().getUnchanged())
-                .build();
-    }
+	@Override
+	public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
+		GrpcSyncRequest.Builder request = GrpcSyncRequest.newBuilder()
+			.setServiceName(Objects.requireNonNullElse(command.getServiceName(), ""))
+			.setDeleteMissing(command.isDeleteMissing());
+		List<FacadeScannedApiBO> apis = command.getApis();
+		if (apis != null) {
+			for (FacadeScannedApiBO api : apis) {
+				request.addApis(GrpcScannedApiDTO.newBuilder()
+					.setMethod(Objects.requireNonNullElse(api.getMethod(), ""))
+					.setPath(Objects.requireNonNullElse(api.getPath(), ""))
+					.setApiName(Objects.requireNonNullElse(api.getApiName(), ""))
+					.setTitle(Objects.requireNonNullElse(api.getTitle(), ""))
+					.setRemark(Objects.requireNonNullElse(api.getRemark(), ""))
+					.setApiGroup(Objects.requireNonNullElse(api.getApiGroup(), ""))
+					.build());
+			}
+		}
+		GrpcRSyncResult response = resourceRegistryApiBlockingStub.sync(request.build());
+		if (!response.getResult().getOk()) {
+			throw new ServiceException("ResourceRegistryFacade.sync failed: [" + response.getResult().getCode() + "] "
+					+ response.getResult().getMessage());
+		}
+		return FacadeResourceRegistrySyncResultBO.builder()
+			.inserted(response.getData().getInserted())
+			.updated(response.getData().getUpdated())
+			.deleted(response.getData().getDeleted())
+			.unchanged(response.getData().getUnchanged())
+			.build();
+	}
+
 }

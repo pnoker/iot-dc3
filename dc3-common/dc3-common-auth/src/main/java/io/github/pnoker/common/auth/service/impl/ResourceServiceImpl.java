@@ -50,178 +50,188 @@ import java.util.*;
 @Service
 public class ResourceServiceImpl implements ResourceService {
 
-    @Resource
-    private ResourceBuilder resourceBuilder;
+	@Resource
+	private ResourceBuilder resourceBuilder;
 
-    @Resource
-    private ResourceManager resourceManager;
+	@Resource
+	private ResourceManager resourceManager;
 
-    @Override
-    public void save(ResourceBO entityBO) {
-        if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("Failed to create resource: resource has been duplicated");
-        }
+	@Override
+	public void save(ResourceBO entityBO) {
+		if (checkDuplicate(entityBO, false)) {
+			throw new DuplicateException("Failed to create resource: resource has been duplicated");
+		}
 
-        ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
-        if (!resourceManager.save(entityDO)) {
-            throw new AddException("Failed to create resource");
-        }
-    }
+		ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
+		if (!resourceManager.save(entityDO)) {
+			throw new AddException("Failed to create resource");
+		}
+	}
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-        if (!resourceManager.removeById(id)) {
-            throw new DeleteException("Failed to remove resource");
-        }
-    }
+		if (!resourceManager.removeById(id)) {
+			throw new DeleteException("Failed to remove resource");
+		}
+	}
 
-    @Override
-    public void update(ResourceBO entityBO) {
-        getDOById(entityBO.getId(), true);
+	@Override
+	public void update(ResourceBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
-        if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("Failed to update resource: resource has been duplicated");
-        }
+		if (checkDuplicate(entityBO, true)) {
+			throw new DuplicateException("Failed to update resource: resource has been duplicated");
+		}
 
-        ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!resourceManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update resource");
-        }
-    }
+		ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!resourceManager.updateById(entityDO)) {
+			throw new UpdateException("Failed to update resource");
+		}
+	}
 
-    @Override
-    public ResourceBO selectById(Long id) {
-        ResourceDO entityDO = getDOById(id, true);
-        return resourceBuilder.buildBOByDO(entityDO);
-    }
+	@Override
+	public ResourceBO selectById(Long id) {
+		ResourceDO entityDO = getDOById(id, true);
+		return resourceBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public Page<ResourceBO> selectByPage(ResourceQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<ResourceDO> entityPageDO = resourceManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return resourceBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	@Override
+	public Page<ResourceBO> selectByPage(ResourceQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<ResourceDO> entityPageDO = resourceManager.page(PageUtil.page(entityQuery.getPage()),
+				fuzzyQuery(entityQuery));
+		return resourceBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link ResourceQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<ResourceDO> fuzzyQuery(ResourceQuery entityQuery) {
-        LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getResourceName()), ResourceDO::getResourceName, entityQuery.getResourceName());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode, entityQuery.getResourceCode());
-        // Type: multi-select wins when present; fall back to single value.
-        if (CollectionUtils.isNotEmpty(entityQuery.getResourceTypeFlags())) {
-            List<Byte> typeIndexes = entityQuery.getResourceTypeFlags().stream()
-                    .filter(Objects::nonNull).map(ResourceTypeFlagEnum::getIndex).toList();
-            if (!typeIndexes.isEmpty()) {
-                wrapper.in(ResourceDO::getResourceTypeFlag, typeIndexes);
-            }
-        } else if (Objects.nonNull(entityQuery.getResourceTypeFlag())) {
-            wrapper.eq(ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag().getIndex());
-        }
-        // Scope: multi-select wins when present; fall back to single value.
-        if (CollectionUtils.isNotEmpty(entityQuery.getResourceScopeFlags())) {
-            List<Byte> scopeIndexes = entityQuery.getResourceScopeFlags().stream()
-                    .filter(Objects::nonNull).map(ResourceScopeFlagEnum::getIndex).toList();
-            if (!scopeIndexes.isEmpty()) {
-                wrapper.in(ResourceDO::getResourceScopeFlag, scopeIndexes);
-            }
-        } else if (Objects.nonNull(entityQuery.getResourceScopeFlag())) {
-            wrapper.eq(ResourceDO::getResourceScopeFlag, entityQuery.getResourceScopeFlag());
-        }
-        wrapper.eq(Objects.nonNull(entityQuery.getParentResourceId()), ResourceDO::getParentResourceId, entityQuery.getParentResourceId());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
-        return wrapper;
-    }
+	/**
+	 * @param entityQuery {@link ResourceQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<ResourceDO> fuzzyQuery(ResourceQuery entityQuery) {
+		LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getResourceName()), ResourceDO::getResourceName,
+				entityQuery.getResourceName());
+		wrapper.eq(StringUtils.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode,
+				entityQuery.getResourceCode());
+		// Type: multi-select wins when present; fall back to single value.
+		if (CollectionUtils.isNotEmpty(entityQuery.getResourceTypeFlags())) {
+			List<Byte> typeIndexes = entityQuery.getResourceTypeFlags()
+				.stream()
+				.filter(Objects::nonNull)
+				.map(ResourceTypeFlagEnum::getIndex)
+				.toList();
+			if (!typeIndexes.isEmpty()) {
+				wrapper.in(ResourceDO::getResourceTypeFlag, typeIndexes);
+			}
+		}
+		else if (Objects.nonNull(entityQuery.getResourceTypeFlag())) {
+			wrapper.eq(ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag().getIndex());
+		}
+		// Scope: multi-select wins when present; fall back to single value.
+		if (CollectionUtils.isNotEmpty(entityQuery.getResourceScopeFlags())) {
+			List<Byte> scopeIndexes = entityQuery.getResourceScopeFlags()
+				.stream()
+				.filter(Objects::nonNull)
+				.map(ResourceScopeFlagEnum::getIndex)
+				.toList();
+			if (!scopeIndexes.isEmpty()) {
+				wrapper.in(ResourceDO::getResourceScopeFlag, scopeIndexes);
+			}
+		}
+		else if (Objects.nonNull(entityQuery.getResourceScopeFlag())) {
+			wrapper.eq(ResourceDO::getResourceScopeFlag, entityQuery.getResourceScopeFlag());
+		}
+		wrapper.eq(Objects.nonNull(entityQuery.getParentResourceId()), ResourceDO::getParentResourceId,
+				entityQuery.getParentResourceId());
+		wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag,
+				entityQuery.getEnableFlag());
+		return wrapper;
+	}
 
-    @Override
-    public List<ResourceTreeBO> selectTree(ResourceQuery entityQuery) {
-        ResourceQuery effective = Objects.requireNonNullElseGet(entityQuery, ResourceQuery::new);
-        LambdaQueryWrapper<ResourceDO> wrapper = fuzzyQuery(effective);
-        // Load everything that matches, then assemble in memory by parent_resource_id.
-        List<ResourceDO> rows = resourceManager.list(wrapper);
-        return assembleTree(rows);
-    }
+	@Override
+	public List<ResourceTreeBO> selectTree(ResourceQuery entityQuery) {
+		ResourceQuery effective = Objects.requireNonNullElseGet(entityQuery, ResourceQuery::new);
+		LambdaQueryWrapper<ResourceDO> wrapper = fuzzyQuery(effective);
+		// Load everything that matches, then assemble in memory by parent_resource_id.
+		List<ResourceDO> rows = resourceManager.list(wrapper);
+		return assembleTree(rows);
+	}
 
-    private List<ResourceTreeBO> assembleTree(List<ResourceDO> rows) {
-        if (CollectionUtils.isEmpty(rows)) {
-            return List.of();
-        }
-        Map<Long, ResourceTreeBO> byId = new HashMap<>(rows.size());
-        for (ResourceDO row : rows) {
-            ResourceTreeBO node = ResourceTreeBO.fromBO(resourceBuilder.buildBOByDO(row));
-            byId.put(node.getId(), node);
-        }
-        List<ResourceTreeBO> roots = new ArrayList<>();
-        for (ResourceTreeBO node : byId.values()) {
-            Long parentId = node.getParentResourceId();
-            ResourceTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
-            if (parent == null) {
-                roots.add(node);
-            } else {
-                parent.addChild(node);
-            }
-        }
-        Comparator<ResourceTreeBO> order = Comparator
-                .comparing(ResourceTreeBO::getResourceTypeFlag, Comparator.nullsLast(Comparator.naturalOrder()))
-                .thenComparing(ResourceTreeBO::getResourceName, Comparator.nullsLast(Comparator.naturalOrder()));
-        sortRecursive(roots, order);
-        return roots;
-    }
+	private List<ResourceTreeBO> assembleTree(List<ResourceDO> rows) {
+		if (CollectionUtils.isEmpty(rows)) {
+			return List.of();
+		}
+		Map<Long, ResourceTreeBO> byId = new HashMap<>(rows.size());
+		for (ResourceDO row : rows) {
+			ResourceTreeBO node = ResourceTreeBO.fromBO(resourceBuilder.buildBOByDO(row));
+			byId.put(node.getId(), node);
+		}
+		List<ResourceTreeBO> roots = new ArrayList<>();
+		for (ResourceTreeBO node : byId.values()) {
+			Long parentId = node.getParentResourceId();
+			ResourceTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
+			if (parent == null) {
+				roots.add(node);
+			}
+			else {
+				parent.addChild(node);
+			}
+		}
+		Comparator<ResourceTreeBO> order = Comparator
+			.comparing(ResourceTreeBO::getResourceTypeFlag, Comparator.nullsLast(Comparator.naturalOrder()))
+			.thenComparing(ResourceTreeBO::getResourceName, Comparator.nullsLast(Comparator.naturalOrder()));
+		sortRecursive(roots, order);
+		return roots;
+	}
 
-    private void sortRecursive(List<ResourceTreeBO> nodes, Comparator<ResourceTreeBO> order) {
-        if (CollectionUtils.isEmpty(nodes)) {
-            return;
-        }
-        nodes.sort(order);
-        for (ResourceTreeBO node : nodes) {
-            sortRecursive(node.getChildren(), order);
-        }
-    }
+	private void sortRecursive(List<ResourceTreeBO> nodes, Comparator<ResourceTreeBO> order) {
+		if (CollectionUtils.isEmpty(nodes)) {
+			return;
+		}
+		nodes.sort(order);
+		for (ResourceTreeBO node : nodes) {
+			sortRecursive(node.getChildren(), order);
+		}
+	}
 
-    /**
-     *
-     *
-     * @param entityBO {@link ResourceBO}
-     * @param isUpdate
-     * @return
-     */
-    private boolean checkDuplicate(ResourceBO entityBO, boolean isUpdate) {
-        LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
-        wrapper.eq(ResourceDO::getParentResourceId, entityBO.getParentResourceId());
-        wrapper.eq(ResourceDO::getResourceName, entityBO.getResourceName());
-        wrapper.eq(ResourceDO::getResourceCode, entityBO.getResourceCode());
-        wrapper.eq(ResourceDO::getResourceTypeFlag, entityBO.getResourceTypeFlag());
-        wrapper.eq(ResourceDO::getResourceScopeFlag, entityBO.getResourceScopeFlag());
-        wrapper.eq(ResourceDO::getEntityId, entityBO.getEntityId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        ResourceDO one = resourceManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        return !isUpdate || !one.getId().equals(entityBO.getId());
-    }
+	/**
+	 * @param entityBO {@link ResourceBO}
+	 * @param isUpdate
+	 * @return
+	 */
+	private boolean checkDuplicate(ResourceBO entityBO, boolean isUpdate) {
+		LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
+		wrapper.eq(ResourceDO::getParentResourceId, entityBO.getParentResourceId());
+		wrapper.eq(ResourceDO::getResourceName, entityBO.getResourceName());
+		wrapper.eq(ResourceDO::getResourceCode, entityBO.getResourceCode());
+		wrapper.eq(ResourceDO::getResourceTypeFlag, entityBO.getResourceTypeFlag());
+		wrapper.eq(ResourceDO::getResourceScopeFlag, entityBO.getResourceScopeFlag());
+		wrapper.eq(ResourceDO::getEntityId, entityBO.getEntityId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		ResourceDO one = resourceManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		return !isUpdate || !one.getId().equals(entityBO.getId());
+	}
 
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link ResourceDO}
-     */
-    private ResourceDO getDOById(Long id, boolean throwException) {
-        ResourceDO entityDO = resourceManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Resource does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link ResourceDO}
+	 */
+	private ResourceDO getDOById(Long id, boolean throwException) {
+		ResourceDO entityDO = resourceManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Resource does not exist");
+		}
+		return entityDO;
+	}
+
 }

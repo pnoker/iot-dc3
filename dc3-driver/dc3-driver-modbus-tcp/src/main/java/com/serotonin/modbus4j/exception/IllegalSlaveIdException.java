@@ -17,20 +17,25 @@
 package com.serotonin.modbus4j.exception;
 
 /**
- * <p>IllegalSlaveIdException class.</p>
+ * <p>
+ * IllegalSlaveIdException class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class IllegalSlaveIdException extends ModbusIdException {
-    private static final long serialVersionUID = -1;
 
-    /**
-     * <p>Constructor for IllegalSlaveIdException.</p>
-     *
-     * @param message a {@link String} object.
-     */
-    public IllegalSlaveIdException(String message) {
-        super(message);
-    }
+	private static final long serialVersionUID = -1;
+
+	/**
+	 * <p>
+	 * Constructor for IllegalSlaveIdException.
+	 * </p>
+	 * @param message a {@link String} object.
+	 */
+	public IllegalSlaveIdException(String message) {
+		super(message);
+	}
+
 }

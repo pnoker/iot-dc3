@@ -39,17 +39,16 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class TenantBindVO extends BaseVO {
 
-    /**
-     * Tenant ID
-     */
-    @NotNull(message = "Tenant id can't be empty",
-            groups = {Add.class, Update.class})
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	@NotNull(message = "Tenant id can't be empty", groups = { Add.class, Update.class })
+	private Long tenantId;
 
-    /**
-     * ID
-     */
-    @NotNull(message = "User id can't be empty",
-            groups = {Add.class, Update.class})
-    private Long userId;
+	/**
+	 * ID
+	 */
+	@NotNull(message = "User id can't be empty", groups = { Add.class, Update.class })
+	private Long userId;
+
 }

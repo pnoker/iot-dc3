@@ -22,57 +22,64 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>WriteRegistersResponse class.</p>
+ * <p>
+ * WriteRegistersResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class WriteRegistersResponse extends ModbusResponse {
-    private int startOffset;
-    private int numberOfRegisters;
 
-    WriteRegistersResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	private int startOffset;
 
-    WriteRegistersResponse(int slaveId, int startOffset, int numberOfRegisters) throws ModbusTransportException {
-        super(slaveId);
-        this.startOffset = startOffset;
-        this.numberOfRegisters = numberOfRegisters;
-    }
+	private int numberOfRegisters;
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_REGISTERS;
-    }
+	WriteRegistersResponse(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    protected void writeResponse(ByteQueue queue) {
-        ModbusUtils.pushShort(queue, startOffset);
-        ModbusUtils.pushShort(queue, numberOfRegisters);
-    }
+	WriteRegistersResponse(int slaveId, int startOffset, int numberOfRegisters) throws ModbusTransportException {
+		super(slaveId);
+		this.startOffset = startOffset;
+		this.numberOfRegisters = numberOfRegisters;
+	}
 
-    @Override
-    protected void readResponse(ByteQueue queue) {
-        startOffset = ModbusUtils.popUnsignedShort(queue);
-        numberOfRegisters = ModbusUtils.popUnsignedShort(queue);
-    }
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.WRITE_REGISTERS;
+	}
 
-    /**
-     * <p>Getter for the field <code>startOffset</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getStartOffset() {
-        return startOffset;
-    }
+	@Override
+	protected void writeResponse(ByteQueue queue) {
+		ModbusUtils.pushShort(queue, startOffset);
+		ModbusUtils.pushShort(queue, numberOfRegisters);
+	}
 
-    /**
-     * <p>Getter for the field <code>numberOfRegisters</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getNumberOfRegisters() {
-        return numberOfRegisters;
-    }
+	@Override
+	protected void readResponse(ByteQueue queue) {
+		startOffset = ModbusUtils.popUnsignedShort(queue);
+		numberOfRegisters = ModbusUtils.popUnsignedShort(queue);
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>startOffset</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getStartOffset() {
+		return startOffset;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>numberOfRegisters</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getNumberOfRegisters() {
+		return numberOfRegisters;
+	}
+
 }

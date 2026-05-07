@@ -40,28 +40,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserGrpcFacade implements UserFacade {
 
-    @Resource
-    private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
+	@Resource
+	private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcUserBuilder facadeGrpcUserBuilder;
+	@Resource
+	private FacadeGrpcUserBuilder facadeGrpcUserBuilder;
 
-    @Override
-    public FacadeUserBO selectById(Long id) {
-        GrpcRUserDTO response = userApiBlockingStub.selectById(GrpcIdQuery.newBuilder().setId(id).build());
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectById");
-            return null;
-        }
-        return facadeGrpcUserBuilder.toFacadeBO(response.getData());
-    }
+	@Override
+	public FacadeUserBO selectById(Long id) {
+		GrpcRUserDTO response = userApiBlockingStub.selectById(GrpcIdQuery.newBuilder().setId(id).build());
+		if (!response.getResult().getOk()) {
+			guardOrThrow(response.getResult(), "selectById");
+			return null;
+		}
+		return facadeGrpcUserBuilder.toFacadeBO(response.getData());
+	}
 
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
-            log.debug("UserGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("UserFacade." + op + " failed: [" + code + "] " + result.getMessage());
-    }
+	private void guardOrThrow(GrpcR result, String op) {
+		String code = result.getCode();
+		if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+			log.debug("UserGrpcFacade.{} => no resource", op);
+			return;
+		}
+		throw new ServiceException("UserFacade." + op + " failed: [" + code + "] " + result.getMessage());
+	}
+
 }

@@ -45,155 +45,146 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface RuleBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    @Mapping(target = "tenantId", ignore = true)
-    RuleBO buildBOByVO(RuleVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "tenantId", ignore = true)
+	RuleBO buildBOByVO(RuleVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<RuleBO> buildBOListByVOList(List<RuleVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<RuleBO> buildBOListByVOList(List<RuleVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "ruleExt", ignore = true)
-    @Mapping(target = "entityTypeFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    RuleDO buildDOByBO(RuleBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "ruleExt", ignore = true)
+	@Mapping(target = "entityTypeFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "deleted", ignore = true)
+	RuleDO buildDOByBO(RuleBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(RuleBO entityBO, @MappingTarget RuleDO entityDO) {
-        // Code
-        if (StringUtils.isEmpty(entityBO.getRuleCode())) {
-            entityDO.setRuleCode(CodeUtil.getCode());
-        }
+	@AfterMapping
+	default void afterProcess(RuleBO entityBO, @MappingTarget RuleDO entityDO) {
+		// Code
+		if (StringUtils.isEmpty(entityBO.getRuleCode())) {
+			entityDO.setRuleCode(CodeUtil.getCode());
+		}
 
-        // Json Ext
-        RuleExt entityExt = entityBO.getRuleExt();
-        JsonExt ext = new JsonExt();
-        if (Objects.nonNull(entityExt)) {
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-        }
-        entityDO.setRuleExt(ext);
+		// Json Ext
+		RuleExt entityExt = entityBO.getRuleExt();
+		JsonExt ext = new JsonExt();
+		if (Objects.nonNull(entityExt)) {
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+		}
+		entityDO.setRuleExt(ext);
 
-        // AlarmType Flag
-        AlarmTypeFlagEnum alarmTypeFlag = entityBO.getEntityTypeFlag();
-        Optional.ofNullable(alarmTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
+		// AlarmType Flag
+		AlarmTypeFlagEnum alarmTypeFlag = entityBO.getEntityTypeFlag();
+		Optional.ofNullable(alarmTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
 
-        // Enable Flag
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
+		// Enable Flag
+		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+	}
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<RuleDO> buildDOListByBOList(List<RuleBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<RuleDO> buildDOListByBOList(List<RuleBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "ruleExt", ignore = true)
-    @Mapping(target = "entityTypeFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    RuleBO buildBOByDO(RuleDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "ruleExt", ignore = true)
+	@Mapping(target = "entityTypeFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	RuleBO buildBOByDO(RuleDO entityDO);
 
-    @AfterMapping
-    default void afterProcess(RuleDO entityDO, @MappingTarget RuleBO entityBO) {
-        // Json Ext
-        JsonExt entityExt = entityDO.getRuleExt();
-        if (Objects.nonNull(entityExt)) {
-            RuleExt ext = new RuleExt();
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), RuleExt.Content.class));
-            entityBO.setRuleExt(ext);
-        }
+	@AfterMapping
+	default void afterProcess(RuleDO entityDO, @MappingTarget RuleBO entityBO) {
+		// Json Ext
+		JsonExt entityExt = entityDO.getRuleExt();
+		if (Objects.nonNull(entityExt)) {
+			RuleExt ext = new RuleExt();
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), RuleExt.Content.class));
+			entityBO.setRuleExt(ext);
+		}
 
-        // AlarmType Flag
-        Byte alarmTypeFlag = entityDO.getEntityTypeFlag();
-        entityBO.setEntityTypeFlag(AlarmTypeFlagEnum.ofIndex(alarmTypeFlag));
+		// AlarmType Flag
+		Byte alarmTypeFlag = entityDO.getEntityTypeFlag();
+		entityBO.setEntityTypeFlag(AlarmTypeFlagEnum.ofIndex(alarmTypeFlag));
 
-        // Enable Flag
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
+		// Enable Flag
+		Byte enableFlag = entityDO.getEnableFlag();
+		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+	}
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<RuleBO> buildBOListByDOList(List<RuleDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<RuleBO> buildBOListByDOList(List<RuleDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    RuleVO buildVOByBO(RuleBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	RuleVO buildVOByBO(RuleBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<RuleVO> buildVOListByBOList(List<RuleBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<RuleVO> buildVOListByBOList(List<RuleBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<RuleBO> buildBOPageByDOPage(Page<RuleDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<RuleBO> buildBOPageByDOPage(Page<RuleDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<RuleVO> buildVOPageByBOPage(Page<RuleBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<RuleVO> buildVOPageByBOPage(Page<RuleBO> entityPageBO);
+
 }

@@ -38,117 +38,133 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * <p>UdpSlave class.</p>
+ * <p>
+ * UdpSlave class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class UdpSlave extends ModbusSlaveSet {
-    final BaseMessageParser messageParser;
-    final BaseRequestHandler requestHandler;
-    // Configuration fields
-    private final int port;
-    private final ExecutorService executorService;
-    // Runtime fields.
-    DatagramSocket datagramSocket;
 
-    /**
-     * <p>Constructor for UdpSlave.</p>
-     *
-     * @param encapsulated a boolean.
-     */
-    public UdpSlave(boolean encapsulated) {
-        this(ModbusUtils.TCP_PORT, encapsulated);
-    }
+	final BaseMessageParser messageParser;
 
-    /**
-     * <p>Constructor for UdpSlave.</p>
-     *
-     * @param port         a int.
-     * @param encapsulated a boolean.
-     */
-    public UdpSlave(int port, boolean encapsulated) {
-        this.port = port;
+	final BaseRequestHandler requestHandler;
 
-        if (encapsulated) {
-            messageParser = new EncapMessageParser(false);
-            requestHandler = new EncapRequestHandler(this);
-        } else {
-            messageParser = new XaMessageParser(false);
-            requestHandler = new XaRequestHandler(this);
-        }
+	// Configuration fields
+	private final int port;
 
-        executorService = Executors.newCachedThreadPool();
-    }
+	private final ExecutorService executorService;
 
-    @Override
-    public void start() throws ModbusInitException {
-        try {
-            datagramSocket = new DatagramSocket(port);
+	// Runtime fields.
+	DatagramSocket datagramSocket;
 
-            DatagramPacket datagramPacket;
-            while (true) {
-                datagramPacket = new DatagramPacket(new byte[1028], 1028);
-                datagramSocket.receive(datagramPacket);
+	/**
+	 * <p>
+	 * Constructor for UdpSlave.
+	 * </p>
+	 * @param encapsulated a boolean.
+	 */
+	public UdpSlave(boolean encapsulated) {
+		this(ModbusUtils.TCP_PORT, encapsulated);
+	}
 
-                UdpConnectionHandler handler = new UdpConnectionHandler(datagramPacket);
-                executorService.execute(handler);
-            }
-        } catch (IOException e) {
-            throw new ModbusInitException(e);
-        }
-    }
+	/**
+	 * <p>
+	 * Constructor for UdpSlave.
+	 * </p>
+	 * @param port a int.
+	 * @param encapsulated a boolean.
+	 */
+	public UdpSlave(int port, boolean encapsulated) {
+		this.port = port;
 
-    @Override
-    public void stop() {
-        // Close the socket first to prevent new messages.
-        datagramSocket.close();
+		if (encapsulated) {
+			messageParser = new EncapMessageParser(false);
+			requestHandler = new EncapRequestHandler(this);
+		}
+		else {
+			messageParser = new XaMessageParser(false);
+			requestHandler = new XaRequestHandler(this);
+		}
 
-        // Close the executor service.
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(3, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            getExceptionHandler().receivedException(e);
-        }
-    }
+		executorService = Executors.newCachedThreadPool();
+	}
 
-    // int getSlaveId() {
-    // return slaveId;
-    // }
-    //
-    // ProcessImage getProcessImage() {
-    // return processImage;
-    // }
+	@Override
+	public void start() throws ModbusInitException {
+		try {
+			datagramSocket = new DatagramSocket(port);
 
-    class UdpConnectionHandler implements Runnable {
-        private final DatagramPacket requestPacket;
+			DatagramPacket datagramPacket;
+			while (true) {
+				datagramPacket = new DatagramPacket(new byte[1028], 1028);
+				datagramSocket.receive(datagramPacket);
 
-        UdpConnectionHandler(DatagramPacket requestPacket) {
-            this.requestPacket = requestPacket;
-        }
+				UdpConnectionHandler handler = new UdpConnectionHandler(datagramPacket);
+				executorService.execute(handler);
+			}
+		}
+		catch (IOException e) {
+			throw new ModbusInitException(e);
+		}
+	}
 
-        public void run() {
-            try {
-                ByteQueue requestQueue = new ByteQueue(requestPacket.getData(), 0, requestPacket.getLength());
+	@Override
+	public void stop() {
+		// Close the socket first to prevent new messages.
+		datagramSocket.close();
 
-                // Parse the request data and get the response.
-                IncomingMessage request = messageParser.parseMessage(requestQueue);
-                OutgoingResponseMessage response = requestHandler.handleRequest((IncomingRequestMessage) request);
+		// Close the executor service.
+		executorService.shutdown();
+		try {
+			executorService.awaitTermination(3, TimeUnit.SECONDS);
+		}
+		catch (InterruptedException e) {
+			getExceptionHandler().receivedException(e);
+		}
+	}
 
-                if (response == null)
-                    return;
+	// int getSlaveId() {
+	// return slaveId;
+	// }
+	//
+	// ProcessImage getProcessImage() {
+	// return processImage;
+	// }
 
-                // Create a response packet.
-                byte[] responseData = response.getMessageData();
-                DatagramPacket responsePacket = new DatagramPacket(responseData, responseData.length,
-                        requestPacket.getAddress(), requestPacket.getPort());
+	class UdpConnectionHandler implements Runnable {
 
-                // Send the response back.
-                datagramSocket.send(responsePacket);
-            } catch (Exception e) {
-                getExceptionHandler().receivedException(e);
-            }
-        }
-    }
+		private final DatagramPacket requestPacket;
+
+		UdpConnectionHandler(DatagramPacket requestPacket) {
+			this.requestPacket = requestPacket;
+		}
+
+		public void run() {
+			try {
+				ByteQueue requestQueue = new ByteQueue(requestPacket.getData(), 0, requestPacket.getLength());
+
+				// Parse the request data and get the response.
+				IncomingMessage request = messageParser.parseMessage(requestQueue);
+				OutgoingResponseMessage response = requestHandler.handleRequest((IncomingRequestMessage) request);
+
+				if (response == null)
+					return;
+
+				// Create a response packet.
+				byte[] responseData = response.getMessageData();
+				DatagramPacket responsePacket = new DatagramPacket(responseData, responseData.length,
+						requestPacket.getAddress(), requestPacket.getPort());
+
+				// Send the response back.
+				datagramSocket.send(responsePacket);
+			}
+			catch (Exception e) {
+				getExceptionHandler().receivedException(e);
+			}
+		}
+
+	}
+
 }

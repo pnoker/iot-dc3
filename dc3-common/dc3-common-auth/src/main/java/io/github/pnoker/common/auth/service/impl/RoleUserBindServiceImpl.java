@@ -58,170 +58,173 @@ import java.util.Objects;
 @Service
 public class RoleUserBindServiceImpl implements RoleUserBindService {
 
-    @Resource
-    private RoleUserBindBuilder roleUserBindBuilder;
-    @Resource
-    private RoleBuilder roleBuilder;
-    @Resource
-    private UserBuilder userBuilder;
+	@Resource
+	private RoleUserBindBuilder roleUserBindBuilder;
 
-    @Resource
-    private RoleUserBindManager roleUserBindManager;
+	@Resource
+	private RoleBuilder roleBuilder;
 
-    @Resource
-    private RoleManager roleManager;
+	@Resource
+	private UserBuilder userBuilder;
 
-    @Resource
-    private UserManager userManager;
+	@Resource
+	private RoleUserBindManager roleUserBindManager;
 
+	@Resource
+	private RoleManager roleManager;
 
-    @Override
-    public void save(RoleUserBindBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+	@Resource
+	private UserManager userManager;
 
-        RoleUserBindDO entityDO = roleUserBindBuilder.buildDOByBO(entityBO);
-        if (!roleUserBindManager.save(entityDO)) {
-            throw new AddException("Failed to create role user bind");
-        }
-    }
+	@Override
+	public void save(RoleUserBindBO entityBO) {
+		checkDuplicate(entityBO, false, true);
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+		RoleUserBindDO entityDO = roleUserBindBuilder.buildDOByBO(entityBO);
+		if (!roleUserBindManager.save(entityDO)) {
+			throw new AddException("Failed to create role user bind");
+		}
+	}
 
-        if (!roleUserBindManager.removeById(id)) {
-            throw new DeleteException("Failed to remove role user bind");
-        }
-    }
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-    @Override
-    public void update(RoleUserBindBO entityBO) {
-        getDOById(entityBO.getId(), true);
+		if (!roleUserBindManager.removeById(id)) {
+			throw new DeleteException("Failed to remove role user bind");
+		}
+	}
 
-        checkDuplicate(entityBO, true, true);
+	@Override
+	public void update(RoleUserBindBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
-        RoleUserBindDO entityDO = roleUserBindBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!roleUserBindManager.updateById(entityDO)) {
-            throw new UpdateException("The role user bind update failed");
-        }
-    }
+		checkDuplicate(entityBO, true, true);
 
-    @Override
-    public RoleUserBindBO selectById(Long id) {
-        RoleUserBindDO entityDO = getDOById(id, true);
-        return roleUserBindBuilder.buildBOByDO(entityDO);
-    }
+		RoleUserBindDO entityDO = roleUserBindBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!roleUserBindManager.updateById(entityDO)) {
+			throw new UpdateException("The role user bind update failed");
+		}
+	}
 
-    @Override
-    public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery) {
-        return selectByPage(entityQuery, null);
-    }
+	@Override
+	public RoleUserBindBO selectById(Long id) {
+		RoleUserBindDO entityDO = getDOById(id, true);
+		return roleUserBindBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery, Long tenantId) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<RoleUserBindDO> entityPageDO = roleUserBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery, tenantId));
-        return roleUserBindBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	@Override
+	public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery) {
+		return selectByPage(entityQuery, null);
+	}
 
-    @Override
-    public List<UserBO> listUserByRoleId(Long roleId) {
-        if (Objects.isNull(roleId)) {
-            return Collections.emptyList();
-        }
-        LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
-        wrapper.eq(RoleUserBindDO::getRoleId, roleId);
-        wrapper.select(RoleUserBindDO::getUserId);
-        List<Long> userIds = roleUserBindManager.listObjs(wrapper, o -> (Long) o);
-        if (CollectionUtils.isEmpty(userIds)) {
-            return Collections.emptyList();
-        }
-        List<UserDO> enabled = userManager.listByIds(userIds).stream()
-                .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
-                .toList();
-        return userBuilder.buildBOListByDOList(enabled);
-    }
+	@Override
+	public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery, Long tenantId) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<RoleUserBindDO> entityPageDO = roleUserBindManager.page(PageUtil.page(entityQuery.getPage()),
+				fuzzyQuery(entityQuery, tenantId));
+		return roleUserBindBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    @Override
-    public List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId) {
-        LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
-        wrapper.eq(RoleUserBindDO::getUserId, userId);
-        List<RoleUserBindDO> roleUserBindBOList = roleUserBindManager.list(wrapper);
-        if (CollectionUtils.isNotEmpty(roleUserBindBOList)) {
-            List<RoleDO> roleBOList = roleManager.listByIds(roleUserBindBOList.stream().map(RoleUserBindDO::getRoleId)
-                    .toList());
-            List<RoleDO> collect = roleBOList.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag())
-                            && (Objects.isNull(tenantId) || tenantId.equals(e.getTenantId())))
-                    .toList();
-            return roleBuilder.buildBOListByDOList(collect);
-        }
+	@Override
+	public List<UserBO> listUserByRoleId(Long roleId) {
+		if (Objects.isNull(roleId)) {
+			return Collections.emptyList();
+		}
+		LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
+		wrapper.eq(RoleUserBindDO::getRoleId, roleId);
+		wrapper.select(RoleUserBindDO::getUserId);
+		List<Long> userIds = roleUserBindManager.listObjs(wrapper, o -> (Long) o);
+		if (CollectionUtils.isEmpty(userIds)) {
+			return Collections.emptyList();
+		}
+		List<UserDO> enabled = userManager.listByIds(userIds)
+			.stream()
+			.filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+			.toList();
+		return userBuilder.buildBOListByDOList(enabled);
+	}
 
-        return null;
-    }
+	@Override
+	public List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId) {
+		LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
+		wrapper.eq(RoleUserBindDO::getUserId, userId);
+		List<RoleUserBindDO> roleUserBindBOList = roleUserBindManager.list(wrapper);
+		if (CollectionUtils.isNotEmpty(roleUserBindBOList)) {
+			List<RoleDO> roleBOList = roleManager
+				.listByIds(roleUserBindBOList.stream().map(RoleUserBindDO::getRoleId).toList());
+			List<RoleDO> collect = roleBOList.stream()
+				.filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag())
+						&& (Objects.isNull(tenantId) || tenantId.equals(e.getTenantId())))
+				.toList();
+			return roleBuilder.buildBOListByDOList(collect);
+		}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link RoleUserBindQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<RoleUserBindDO> fuzzyQuery(RoleUserBindQuery entityQuery, Long tenantId) {
-        LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleUserBindDO::getRoleId, entityQuery.getRoleId());
-        if (Objects.nonNull(tenantId)) {
-            LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
-            roleWrapper.eq(RoleDO::getTenantId, tenantId);
-            roleWrapper.select(RoleDO::getId);
-            List<Long> roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
-            if (CollectionUtils.isEmpty(roleIds)) {
-                wrapper.apply("1 = 0");
-            } else {
-                wrapper.in(RoleUserBindDO::getRoleId, roleIds);
-            }
-        }
-        return wrapper;
-    }
+		return null;
+	}
 
-    /**
-     *
-     *
-     * @param entityBO       {@link RoleUserBindBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
-     */
-    private boolean checkDuplicate(RoleUserBindBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
-        wrapper.eq(RoleUserBindDO::getRoleId, entityBO.getRoleId());
-        wrapper.eq(RoleUserBindDO::getUserId, entityBO.getUserId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        RoleUserBindDO one = roleUserBindManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Role user bind has been duplicated");
-        }
-        return duplicate;
-    }
+	/**
+	 * @param entityQuery {@link RoleUserBindQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<RoleUserBindDO> fuzzyQuery(RoleUserBindQuery entityQuery, Long tenantId) {
+		LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
+		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), RoleUserBindDO::getUserId,
+				entityQuery.getUserId());
+		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleUserBindDO::getRoleId,
+				entityQuery.getRoleId());
+		if (Objects.nonNull(tenantId)) {
+			LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
+			roleWrapper.eq(RoleDO::getTenantId, tenantId);
+			roleWrapper.select(RoleDO::getId);
+			List<Long> roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
+			if (CollectionUtils.isEmpty(roleIds)) {
+				wrapper.apply("1 = 0");
+			}
+			else {
+				wrapper.in(RoleUserBindDO::getRoleId, roleIds);
+			}
+		}
+		return wrapper;
+	}
 
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link RoleUserBindDO}
-     */
-    private RoleUserBindDO getDOById(Long id, boolean throwException) {
-        RoleUserBindDO entityDO = roleUserBindManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Role user bind does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * @param entityBO {@link RoleUserBindBO}
+	 * @param isUpdate
+	 * @param throwException
+	 * @return
+	 */
+	private boolean checkDuplicate(RoleUserBindBO entityBO, boolean isUpdate, boolean throwException) {
+		LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
+		wrapper.eq(RoleUserBindDO::getRoleId, entityBO.getRoleId());
+		wrapper.eq(RoleUserBindDO::getUserId, entityBO.getUserId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		RoleUserBindDO one = roleUserBindManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+		if (throwException && duplicate) {
+			throw new DuplicateException("Role user bind has been duplicated");
+		}
+		return duplicate;
+	}
+
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link RoleUserBindDO}
+	 */
+	private RoleUserBindDO getDOById(Long id, boolean throwException) {
+		RoleUserBindDO entityDO = roleUserBindManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Role user bind does not exist");
+		}
+		return entityDO;
+	}
+
 }

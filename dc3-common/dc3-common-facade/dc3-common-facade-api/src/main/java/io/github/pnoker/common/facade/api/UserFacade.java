@@ -27,8 +27,9 @@ import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
  */
 public interface UserFacade {
 
-    /**
-     * @return the user, or {@code null} when the id does not match any user.
-     */
-    FacadeUserBO selectById(Long id);
+	/**
+	 * @return the user, or {@code null} when the id does not match any user.
+	 */
+	FacadeUserBO selectById(Long id);
+
 }

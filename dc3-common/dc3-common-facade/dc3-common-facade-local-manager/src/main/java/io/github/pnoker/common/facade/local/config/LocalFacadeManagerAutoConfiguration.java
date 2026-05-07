@@ -27,39 +27,31 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
 /**
- * Auto-configuration for the manager-domain local facade implementations.
- * Active only when {@code dc3.facade.mode=local}. Scans the facade-local package
- * but restricts registration to the manager-domain classes carried by this
- * module so it remains deterministic alongside the auth-domain module.
- * MapStruct-generated {@code *BuilderImpl} classes are picked up via their
- * interfaces (AssignableTypeFilter matches concrete implementations).
+ * Auto-configuration for the manager-domain local facade implementations. Active only
+ * when {@code dc3.facade.mode=local}. Scans the facade-local package but restricts
+ * registration to the manager-domain classes carried by this module so it remains
+ * deterministic alongside the auth-domain module. MapStruct-generated
+ * {@code *BuilderImpl} classes are picked up via their interfaces (AssignableTypeFilter
+ * matches concrete implementations).
  *
  * @author pnoker
  * @since 2026.5.5
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
-@ComponentScan(
-        basePackages = "io.github.pnoker.common.facade.local",
-        useDefaultFilters = false,
-        includeFilters = @ComponentScan.Filter(
-                type = FilterType.ASSIGNABLE_TYPE,
-                classes = {
-                        io.github.pnoker.common.facade.local.DeviceLocalFacade.class,
-                        io.github.pnoker.common.facade.local.DriverLocalFacade.class,
-                        io.github.pnoker.common.facade.local.PointLocalFacade.class,
-                        FacadeDeviceBuilder.class,
-                        FacadeDriverBuilder.class,
-                        FacadePointBuilder.class,
-                }
-        )
-)
+@ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
+		includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+				classes = { io.github.pnoker.common.facade.local.DeviceLocalFacade.class,
+						io.github.pnoker.common.facade.local.DriverLocalFacade.class,
+						io.github.pnoker.common.facade.local.PointLocalFacade.class, FacadeDeviceBuilder.class,
+						FacadeDriverBuilder.class, FacadePointBuilder.class, }))
 public class LocalFacadeManagerAutoConfiguration {
 
-    /**
-     * Referenced only to ensure the {@link DeviceLocalFacade} symbol is linked against this
-     * module's compiled classes at AutoConfiguration load time.
-     */
-    @SuppressWarnings("unused")
-    private static final Class<?> CANARY = DeviceLocalFacade.class;
+	/**
+	 * Referenced only to ensure the {@link DeviceLocalFacade} symbol is linked against
+	 * this module's compiled classes at AutoConfiguration load time.
+	 */
+	@SuppressWarnings("unused")
+	private static final Class<?> CANARY = DeviceLocalFacade.class;
+
 }

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.mqtt.service;
 
-
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 
 import java.util.List;
@@ -25,9 +24,9 @@ import java.util.List;
 /**
  * MQTT Receive Service Interface
  * <p>
- * Service interface for handling received MQTT messages in IoT DC3 platform.
- * Provides methods for single and batch message processing with
- * data parsing and publishing capabilities.
+ * Service interface for handling received MQTT messages in IoT DC3 platform. Provides
+ * methods for single and batch message processing with data parsing and publishing
+ * capabilities.
  * </p>
  *
  * @author pnoker
@@ -36,25 +35,24 @@ import java.util.List;
  */
 public interface MqttReceiveService {
 
-    /**
-     * Must implement single-point processing logic
-     * <p>
-     * Parse incoming data into io.github.pnoker.common.bean.point.PointValue
-     * then call driverService.pointValueSender(pointValue) to publish data
-     * Tip: Refer to the dc3-driver-listening-virtual driver for examples
-     *
-     * @param mqttMessage MqttMessage
-     */
-    void receiveValue(MqttMessage mqttMessage);
+	/**
+	 * Must implement single-point processing logic
+	 * <p>
+	 * Parse incoming data into io.github.pnoker.common.bean.point.PointValue then call
+	 * driverService.pointValueSender(pointValue) to publish data Tip: Refer to the
+	 * dc3-driver-listening-virtual driver for examples
+	 * @param mqttMessage MqttMessage
+	 */
+	void receiveValue(MqttMessage mqttMessage);
 
-    /**
-     * Must implement batch processing logic
-     * <p>
-     * Parse incoming data into io.github.pnoker.common.bean.point.PointValue
-     * then call driverService.pointValueSender(pointValue) to publish data
-     * Tip: Refer to the dc3-driver-listening-virtual driver for examples
-     *
-     * @param mqttMessageList String Array List
-     */
-    void receiveValues(List<MqttMessage> mqttMessageList);
+	/**
+	 * Must implement batch processing logic
+	 * <p>
+	 * Parse incoming data into io.github.pnoker.common.bean.point.PointValue then call
+	 * driverService.pointValueSender(pointValue) to publish data Tip: Refer to the
+	 * dc3-driver-listening-virtual driver for examples
+	 * @param mqttMessageList String Array List
+	 */
+	void receiveValues(List<MqttMessage> mqttMessageList);
+
 }

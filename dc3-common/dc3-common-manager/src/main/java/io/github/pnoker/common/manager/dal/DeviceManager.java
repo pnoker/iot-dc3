@@ -32,21 +32,17 @@ import io.github.pnoker.common.manager.entity.model.DeviceDO;
  */
 public interface DeviceManager extends IService<DeviceDO> {
 
-    /**
-     *
-     *
-     * @param entityDO {@link DeviceDO}
-     * @param isUpdate
-     * @return
-     */
-    boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate);
+	/**
+	 * @param entityDO {@link DeviceDO}
+	 * @param isUpdate
+	 * @return
+	 */
+	boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate);
 
-    /**
-     *
-     *
-     * @param entityDO {@link DeviceBO}
-     * @return {@link DeviceDO}
-     */
-    DeviceDO innerSave(DeviceDO entityDO);
+	/**
+	 * @param entityDO {@link DeviceBO}
+	 * @return {@link DeviceDO}
+	 */
+	DeviceDO innerSave(DeviceDO entityDO);
 
 }

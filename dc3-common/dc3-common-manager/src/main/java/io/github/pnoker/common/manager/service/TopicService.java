@@ -33,9 +33,8 @@ import java.util.List;
  * @since 2022.1.0
  */
 
-
 public interface TopicService extends IService<DeviceDO> {
 
-    Page<List<TopicVO>> query(TopicQuery topicQuery);
+	Page<List<TopicVO>> query(TopicQuery topicQuery);
 
 }

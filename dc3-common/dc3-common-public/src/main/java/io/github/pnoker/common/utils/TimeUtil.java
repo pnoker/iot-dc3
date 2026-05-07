@@ -29,8 +29,8 @@ import java.util.Date;
 /**
  * Time Related Utility Class
  * <p>
- * Utility class for time-related operations and formatting.
- * Provides thread-safe date formatting and time calculation methods.
+ * Utility class for time-related operations and formatting. Provides thread-safe date
+ * formatting and time calculation methods.
  * </p>
  *
  * @author pnoker
@@ -40,104 +40,102 @@ import java.util.Date;
 @Slf4j
 public class TimeUtil {
 
-    /**
-     * ThreadLocal SimpleDateFormat to ensure thread safety
-     */
-    private static final ThreadLocal<SimpleDateFormat> DEFAULT_DATE_FORMAT_THREAD_LOCAL = ThreadLocal.withInitial(() -> new SimpleDateFormat(TimeConstant.DEFAULT_DATE_FORMAT));
-    private static final ThreadLocal<SimpleDateFormat> COMPLETE_DATE_FORMAT_THREAD_LOCAL = ThreadLocal.withInitial(() -> new SimpleDateFormat(TimeConstant.COMPLETE_DATE_FORMAT));
+	/**
+	 * ThreadLocal SimpleDateFormat to ensure thread safety
+	 */
+	private static final ThreadLocal<SimpleDateFormat> DEFAULT_DATE_FORMAT_THREAD_LOCAL = ThreadLocal
+		.withInitial(() -> new SimpleDateFormat(TimeConstant.DEFAULT_DATE_FORMAT));
 
-    private TimeUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private static final ThreadLocal<SimpleDateFormat> COMPLETE_DATE_FORMAT_THREAD_LOCAL = ThreadLocal
+		.withInitial(() -> new SimpleDateFormat(TimeConstant.COMPLETE_DATE_FORMAT));
 
-    /**
-     * Get milliseconds from Date
-     *
-     * @param date {@link Date}
-     * @return Milliseconds since epoch
-     */
-    public static long milliSeconds(Date date) {
-        return date.getTime();
-    }
+	private TimeUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Get Date from milliseconds
-     *
-     * @param milliSeconds Milliseconds since epoch
-     * @return Date {@link Date}
-     */
-    public static Date localDateTime(long milliSeconds) {
-        return new Date(milliSeconds);
-    }
+	/**
+	 * Get milliseconds from Date
+	 * @param date {@link Date}
+	 * @return Milliseconds since epoch
+	 */
+	public static long milliSeconds(Date date) {
+		return date.getTime();
+	}
 
-    /**
-     * Calculate expire time by adding amount to specified calendar field
-     *
-     * @param amount Integer amount to add
-     * @param field  Calendar field : {@link Calendar Calendar.HOUR/MINUTE/...}
-     * @return Date with calculated expire time
-     */
-    public static Date expireTime(int amount, int field) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(field, amount);
-        return calendar.getTime();
-    }
+	/**
+	 * Get Date from milliseconds
+	 * @param milliSeconds Milliseconds since epoch
+	 * @return Date {@link Date}
+	 */
+	public static Date localDateTime(long milliSeconds) {
+		return new Date(milliSeconds);
+	}
 
-    /**
-     * Format date using yyyy-MM-dd HH:mm:ss pattern
-     *
-     * @param date {@link Date}
-     * @return Formatted date string
-     */
-    public static String defaultFormat(Date date) {
-        return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().format(date);
-    }
+	/**
+	 * Calculate expire time by adding amount to specified calendar field
+	 * @param amount Integer amount to add
+	 * @param field Calendar field : {@link Calendar Calendar.HOUR/MINUTE/...}
+	 * @return Date with calculated expire time
+	 */
+	public static Date expireTime(int amount, int field) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(field, amount);
+		return calendar.getTime();
+	}
 
-    /**
-     * Format date using yyyy-MM-dd HH:mm:ss.SSS pattern
-     *
-     * @param date {@link Date}
-     * @return Formatted date string with milliseconds
-     */
-    public static String completeFormat(Date date) {
-        return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().format(date);
-    }
+	/**
+	 * Format date using yyyy-MM-dd HH:mm:ss pattern
+	 * @param date {@link Date}
+	 * @return Formatted date string
+	 */
+	public static String defaultFormat(Date date) {
+		return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().format(date);
+	}
 
-    /**
-     * Parse date string yyyy-MM-dd HH:mm:ss to Date
-     *
-     * @param dateString Date string in yyyy-MM-dd HH:mm:ss format
-     * @return Date object
-     */
-    public static Date defaultDate(String dateString) {
-        try {
-            return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
-        } catch (ParseException e) {
-            return null;
-        }
-    }
+	/**
+	 * Format date using yyyy-MM-dd HH:mm:ss.SSS pattern
+	 * @param date {@link Date}
+	 * @return Formatted date string with milliseconds
+	 */
+	public static String completeFormat(Date date) {
+		return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().format(date);
+	}
 
-    /**
-     * Parse date string yyyy-MM-dd HH:mm:ss.SSS to Date
-     *
-     * @param dateString Date string in yyyy-MM-dd HH:mm:ss.SSS format
-     * @return Date object
-     */
-    public static Date completeDate(String dateString) {
-        try {
-            return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
-        } catch (ParseException e) {
-            return null;
-        }
-    }
+	/**
+	 * Parse date string yyyy-MM-dd HH:mm:ss to Date
+	 * @param dateString Date string in yyyy-MM-dd HH:mm:ss format
+	 * @return Date object
+	 */
+	public static Date defaultDate(String dateString) {
+		try {
+			return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
+		}
+		catch (ParseException e) {
+			return null;
+		}
+	}
 
-    /**
-     * Remove the current thread's values from the ThreadLocal variables.
-     */
-    public static void clean() {
-        DEFAULT_DATE_FORMAT_THREAD_LOCAL.remove();
-        COMPLETE_DATE_FORMAT_THREAD_LOCAL.remove();
-    }
+	/**
+	 * Parse date string yyyy-MM-dd HH:mm:ss.SSS to Date
+	 * @param dateString Date string in yyyy-MM-dd HH:mm:ss.SSS format
+	 * @return Date object
+	 */
+	public static Date completeDate(String dateString) {
+		try {
+			return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
+		}
+		catch (ParseException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Remove the current thread's values from the ThreadLocal variables.
+	 */
+	public static void clean() {
+		DEFAULT_DATE_FORMAT_THREAD_LOCAL.remove();
+		COMPLETE_DATE_FORMAT_THREAD_LOCAL.remove();
+	}
 
 }

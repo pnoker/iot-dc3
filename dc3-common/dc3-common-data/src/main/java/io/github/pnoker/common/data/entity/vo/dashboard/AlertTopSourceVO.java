@@ -37,12 +37,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AlertTopSourceVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String source;
+	private String source;
 
-    private long sourceId;
+	private long sourceId;
 
-    private long count;
+	private long count;
+
 }

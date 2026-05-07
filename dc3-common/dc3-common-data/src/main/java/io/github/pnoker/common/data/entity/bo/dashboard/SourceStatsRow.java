@@ -28,7 +28,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class SourceStatsRow {
-    private String source;
-    private long total;
-    private long unconfirmed;
+
+	private String source;
+
+	private long total;
+
+	private long unconfirmed;
+
 }

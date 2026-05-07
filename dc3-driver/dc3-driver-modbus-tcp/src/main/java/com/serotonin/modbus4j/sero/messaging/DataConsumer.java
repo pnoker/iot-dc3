@@ -20,24 +20,28 @@ package com.serotonin.modbus4j.sero.messaging;
 import java.io.IOException;
 
 /**
- * <p>DataConsumer interface.</p>
+ * <p>
+ * DataConsumer interface.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public interface DataConsumer {
-    /**
-     * Notifies the consumer that new data is available
-     *
-     * @param b   array of bytes representing the incoming information
-     * @param len length of the data
-     */
-    public void data(byte[] b, int len);
 
-    /**
-     * <p>handleIOException.</p>
-     *
-     * @param e a {@link IOException} object.
-     */
-    public void handleIOException(IOException e);
+	/**
+	 * Notifies the consumer that new data is available
+	 * @param b array of bytes representing the incoming information
+	 * @param len length of the data
+	 */
+	public void data(byte[] b, int len);
+
+	/**
+	 * <p>
+	 * handleIOException.
+	 * </p>
+	 * @param e a {@link IOException} object.
+	 */
+	public void handleIOException(IOException e);
+
 }

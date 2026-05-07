@@ -24,28 +24,32 @@ import com.serotonin.modbus4j.sero.messaging.IncomingRequestMessage;
 import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
 
 /**
- * <p>AsciiRequestHandler class.</p>
+ * <p>
+ * AsciiRequestHandler class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class AsciiRequestHandler extends BaseRequestHandler {
-    /**
-     * <p>Constructor for AsciiRequestHandler.</p>
-     *
-     * @param slave a {@link ModbusSlaveSet} object.
-     */
-    public AsciiRequestHandler(ModbusSlaveSet slave) {
-        super(slave);
-    }
 
+	/**
+	 * <p>
+	 * Constructor for AsciiRequestHandler.
+	 * </p>
+	 * @param slave a {@link ModbusSlaveSet} object.
+	 */
+	public AsciiRequestHandler(ModbusSlaveSet slave) {
+		super(slave);
+	}
 
-    public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
-        AsciiMessageRequest asciiRequest = (AsciiMessageRequest) req;
-        ModbusRequest request = asciiRequest.getModbusRequest();
-        ModbusResponse response = handleRequestImpl(request);
-        if (response == null)
-            return null;
-        return new AsciiMessageResponse(response);
-    }
+	public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
+		AsciiMessageRequest asciiRequest = (AsciiMessageRequest) req;
+		ModbusRequest request = asciiRequest.getModbusRequest();
+		ModbusResponse response = handleRequestImpl(request);
+		if (response == null)
+			return null;
+		return new AsciiMessageResponse(response);
+	}
+
 }

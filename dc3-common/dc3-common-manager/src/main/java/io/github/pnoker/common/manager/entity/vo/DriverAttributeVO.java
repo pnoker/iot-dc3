@@ -44,60 +44,56 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DriverAttributeVO extends BaseVO {
 
-    /**
-     * Name
-     */
-    @NotBlank(message = "属性名称不能为空",
-            groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "属性名称格式无效",
-            groups = {Add.class, Update.class})
-    private String attributeName;
+	/**
+	 * Name
+	 */
+	@NotBlank(message = "属性名称不能为空", groups = { Add.class })
+	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "属性名称格式无效",
+			groups = { Add.class, Update.class })
+	private String attributeName;
 
-    /**
-     * Code
-     */
-    @NotBlank(message = "属性编号不能为空",
-            groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "属性编号格式无效",
-            groups = {Add.class, Update.class})
-    private String attributeCode;
+	/**
+	 * Code
+	 */
+	@NotBlank(message = "属性编号不能为空", groups = { Add.class })
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "属性编号格式无效",
+			groups = { Add.class, Update.class })
+	private String attributeCode;
 
-    /**
-     * Type
-     */
-    private AttributeTypeFlagEnum attributeTypeFlag;
+	/**
+	 * Type
+	 */
+	private AttributeTypeFlagEnum attributeTypeFlag;
 
-    /**
-     *
-     */
-    private String defaultValue;
+	/**
+	 *
+	 */
+	private String defaultValue;
 
-    /**
-     * Driver ID
-     */
-    @NotNull(message = "驱动ID不能为空"
-            , groups = {Add.class, Update.class})
-    private Long driverId;
+	/**
+	 * Driver ID
+	 */
+	@NotNull(message = "驱动ID不能为空", groups = { Add.class, Update.class })
+	private Long driverId;
 
-    /**
-     *
-     */
-    private DriverAttributeExt attributeExt;
+	/**
+	 *
+	 */
+	private DriverAttributeExt attributeExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     *
-     */
-    private String signature;
+	/**
+	 *
+	 */
+	private String signature;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
+
 }

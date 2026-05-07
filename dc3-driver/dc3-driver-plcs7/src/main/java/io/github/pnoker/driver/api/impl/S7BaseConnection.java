@@ -22,112 +22,114 @@ import io.github.pnoker.driver.api.impl.nodave.Nodave;
 import io.github.pnoker.driver.api.impl.nodave.S7Connection;
 
 /**
- * Base connection implementation for the S7 PLC communication using the Libnodave library.
- * Libnodave is an open-source library for communicating with Siemens S7 PLCs.
+ * Base connection implementation for the S7 PLC communication using the Libnodave
+ * library. Libnodave is an open-source library for communicating with Siemens S7 PLCs.
  * For more information, visit: http://libnodave.sourceforge.net/
  *
  * @author Thomas Rudin
  */
 public abstract class S7BaseConnection implements S7Connector {
 
-    /**
-     * The Constant PROPERTY_AREA.
-     */
-    public static final String PROPERTY_AREA = "area";
-    /**
-     * The Constant PROPERTY_AREANUMBER.
-     */
-    public static final String PROPERTY_AREANUMBER = "areanumber";
-    /**
-     * The Constant PROPERTY_BYTES.
-     */
-    public static final String PROPERTY_BYTES = "bytes";
-    /**
-     * The Constant PROPERTY_OFFSET.
-     */
-    public static final String PROPERTY_OFFSET = "offset";
-    /**
-     * The Constant MAX_SIZE.
-     */
-    private static final int MAX_SIZE = 96;
-    /**
-     * The dc.
-     */
-    private S7Connection dc;
+	/**
+	 * The Constant PROPERTY_AREA.
+	 */
+	public static final String PROPERTY_AREA = "area";
 
-    /**
-     * Checks the Result.
-     *
-     * @param libnodaveResult the libnodave result
-     */
-    public static void checkResult(final int libnodaveResult) {
-        if (libnodaveResult != Nodave.RESULT_OK) {
-            final String msg = Nodave.strerror(libnodaveResult);
-            throw new IllegalArgumentException("Result: " + msg);
-        }
-    }
+	/**
+	 * The Constant PROPERTY_AREANUMBER.
+	 */
+	public static final String PROPERTY_AREANUMBER = "areanumber";
 
-    /**
-     * Dump data
-     *
-     * @param b the byte stream
-     */
-    protected static void dump(final byte[] b) {
-        for (final byte element : b) {
-            System.out.print(Integer.toHexString(element & 0xFF) + ",");
-        }
-    }
+	/**
+	 * The Constant PROPERTY_BYTES.
+	 */
+	public static final String PROPERTY_BYTES = "bytes";
 
-    /**
-     * Initialize the connection
-     *
-     * @param dc the connection instance
-     */
-    protected void init(final S7Connection dc) {
-        this.dc = dc;
-    }
+	/**
+	 * The Constant PROPERTY_OFFSET.
+	 */
+	public static final String PROPERTY_OFFSET = "offset";
 
-    @Override
-    public synchronized byte[] read(final DaveArea area, final int areaNumber, final int bytes, final int offset) {
-        if (bytes > MAX_SIZE) {
-            final byte[] ret = new byte[bytes];
+	/**
+	 * The Constant MAX_SIZE.
+	 */
+	private static final int MAX_SIZE = 96;
 
-            final byte[] currentBuffer = this.read(area, areaNumber, MAX_SIZE, offset);
-            System.arraycopy(currentBuffer, 0, ret, 0, currentBuffer.length);
+	/**
+	 * The dc.
+	 */
+	private S7Connection dc;
 
-            final byte[] nextBuffer = this.read(area, areaNumber, bytes - MAX_SIZE, offset + MAX_SIZE);
-            System.arraycopy(nextBuffer, 0, ret, currentBuffer.length, nextBuffer.length);
+	/**
+	 * Checks the Result.
+	 * @param libnodaveResult the libnodave result
+	 */
+	public static void checkResult(final int libnodaveResult) {
+		if (libnodaveResult != Nodave.RESULT_OK) {
+			final String msg = Nodave.strerror(libnodaveResult);
+			throw new IllegalArgumentException("Result: " + msg);
+		}
+	}
 
-            return ret;
-        } else {
-            final byte[] buffer = new byte[bytes];
-            final int ret = this.dc.readBytes(area, areaNumber, offset, bytes, buffer);
+	/**
+	 * Dump data
+	 * @param b the byte stream
+	 */
+	protected static void dump(final byte[] b) {
+		for (final byte element : b) {
+			System.out.print(Integer.toHexString(element & 0xFF) + ",");
+		}
+	}
 
-            checkResult(ret);
-            return buffer;
-        }
-    }
+	/**
+	 * Initialize the connection
+	 * @param dc the connection instance
+	 */
+	protected void init(final S7Connection dc) {
+		this.dc = dc;
+	}
 
+	@Override
+	public synchronized byte[] read(final DaveArea area, final int areaNumber, final int bytes, final int offset) {
+		if (bytes > MAX_SIZE) {
+			final byte[] ret = new byte[bytes];
 
-    @Override
-    public synchronized void write(final DaveArea area, final int areaNumber, final int offset, final byte[] buffer) {
-        if (buffer.length > MAX_SIZE) {
-            // Split buffer
-            final byte[] subBuffer = new byte[MAX_SIZE];
-            final byte[] nextBuffer = new byte[buffer.length - subBuffer.length];
+			final byte[] currentBuffer = this.read(area, areaNumber, MAX_SIZE, offset);
+			System.arraycopy(currentBuffer, 0, ret, 0, currentBuffer.length);
 
-            System.arraycopy(buffer, 0, subBuffer, 0, subBuffer.length);
-            System.arraycopy(buffer, MAX_SIZE, nextBuffer, 0, nextBuffer.length);
+			final byte[] nextBuffer = this.read(area, areaNumber, bytes - MAX_SIZE, offset + MAX_SIZE);
+			System.arraycopy(nextBuffer, 0, ret, currentBuffer.length, nextBuffer.length);
 
-            this.write(area, areaNumber, offset, subBuffer);
-            this.write(area, areaNumber, offset + subBuffer.length, nextBuffer);
-        } else {
-            // Size fits
-            final int ret = this.dc.writeBytes(area, areaNumber, offset, buffer.length, buffer);
-            // Check return-value
-            checkResult(ret);
-        }
-    }
+			return ret;
+		}
+		else {
+			final byte[] buffer = new byte[bytes];
+			final int ret = this.dc.readBytes(area, areaNumber, offset, bytes, buffer);
 
+			checkResult(ret);
+			return buffer;
+		}
+	}
+
+	@Override
+	public synchronized void write(final DaveArea area, final int areaNumber, final int offset, final byte[] buffer) {
+		if (buffer.length > MAX_SIZE) {
+			// Split buffer
+			final byte[] subBuffer = new byte[MAX_SIZE];
+			final byte[] nextBuffer = new byte[buffer.length - subBuffer.length];
+
+			System.arraycopy(buffer, 0, subBuffer, 0, subBuffer.length);
+			System.arraycopy(buffer, MAX_SIZE, nextBuffer, 0, nextBuffer.length);
+
+			this.write(area, areaNumber, offset, subBuffer);
+			this.write(area, areaNumber, offset + subBuffer.length, nextBuffer);
+		}
+		else {
+			// Size fits
+			final int ret = this.dc.writeBytes(area, areaNumber, offset, buffer.length, buffer);
+			// Check return-value
+			checkResult(ret);
+		}
+	}
 
 }

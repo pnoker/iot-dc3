@@ -34,57 +34,61 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum GroupTypeFlagEnum {
-    ;
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index index
-     * @return {@link GroupTypeFlagEnum}
-     */
-    public static GroupTypeFlagEnum ofIndex(Byte index) {
-        Optional<GroupTypeFlagEnum> any = Arrays.stream(GroupTypeFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code code
-     * @return {@link GroupTypeFlagEnum}
-     */
-    public static GroupTypeFlagEnum ofCode(String code) {
-        Optional<GroupTypeFlagEnum> any = Arrays.stream(GroupTypeFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index index
+	 * @return {@link GroupTypeFlagEnum}
+	 */
+	public static GroupTypeFlagEnum ofIndex(Byte index) {
+		Optional<GroupTypeFlagEnum> any = Arrays.stream(GroupTypeFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name enum name
-     * @return {@link GroupTypeFlagEnum}
-     */
-    public static GroupTypeFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code code
+	 * @return {@link GroupTypeFlagEnum}
+	 */
+	public static GroupTypeFlagEnum ofCode(String code) {
+		Optional<GroupTypeFlagEnum> any = Arrays.stream(GroupTypeFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name enum name
+	 * @return {@link GroupTypeFlagEnum}
+	 */
+	public static GroupTypeFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

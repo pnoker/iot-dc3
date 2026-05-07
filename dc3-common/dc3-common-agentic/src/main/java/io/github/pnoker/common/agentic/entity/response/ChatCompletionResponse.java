@@ -24,7 +24,8 @@ import java.util.List;
 /**
  * OpenAI-compatible non-streaming chat completion response.
  *
- * @see <a href="https://platform.openai.com/docs/api-reference/chat/object">OpenAI Chat Object</a>
+ * @see <a href="https://platform.openai.com/docs/api-reference/chat/object">OpenAI Chat
+ * Object</a>
  */
 @Getter
 @Setter
@@ -34,40 +35,57 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatCompletionResponse {
 
-    private String id;
-    private String object;
-    private long created;
-    private String model;
-    private List<Choice> choices;
-    private Usage usage;
+	private String id;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class Choice {
-        private int index;
-        private Message message;
-        private String finishReason;
-    }
+	private String object;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Message {
-        private String role;
-        private String content;
-    }
+	private long created;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Usage {
-        private int promptTokens;
-        private int completionTokens;
-        private int totalTokens;
-    }
+	private String model;
+
+	private List<Choice> choices;
+
+	private Usage usage;
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class Choice {
+
+		private int index;
+
+		private Message message;
+
+		private String finishReason;
+
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Message {
+
+		private String role;
+
+		private String content;
+
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Usage {
+
+		private int promptTokens;
+
+		private int completionTokens;
+
+		private int totalTokens;
+
+	}
+
 }

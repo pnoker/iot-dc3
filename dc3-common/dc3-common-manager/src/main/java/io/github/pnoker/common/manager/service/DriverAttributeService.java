@@ -32,21 +32,19 @@ import java.util.List;
  */
 public interface DriverAttributeService extends BaseService<DriverAttributeBO, DriverAttributeQuery> {
 
+	/**
+	 * Driver ID
+	 * @param driverId Driver ID
+	 * @return Array
+	 */
+	List<DriverAttributeBO> selectByDriverId(Long driverId);
 
-    /**
-     * Driver ID
-     *
-     * @param driverId Driver ID
-     * @return Array
-     */
-    List<DriverAttributeBO> selectByDriverId(Long driverId);
+	/**
+	 * Code Driver ID
+	 * @param name Code
+	 * @param driverId Driver ID
+	 * @return DriverAttribute
+	 */
+	DriverAttributeBO selectByNameAndDriverId(String name, Long driverId);
 
-    /**
-     * Code Driver ID
-     *
-     * @param name     Code
-     * @param driverId Driver ID
-     * @return DriverAttribute
-     */
-    DriverAttributeBO selectByNameAndDriverId(String name, Long driverId);
 }

@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tree-shaped variant of {@link MenuVO} — used by GET /menu/tree so the frontend
- * can render directly into el-table / sidebar trees without re-assembling flat rows.
+ * Tree-shaped variant of {@link MenuVO} — used by GET /menu/tree so the frontend can
+ * render directly into el-table / sidebar trees without re-assembling flat rows.
  *
  * @author pnoker
  * @version 2026.5.5
@@ -39,5 +39,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MenuTreeVO extends MenuVO {
 
-    private List<MenuTreeVO> children = new ArrayList<>();
+	private List<MenuTreeVO> children = new ArrayList<>();
+
 }

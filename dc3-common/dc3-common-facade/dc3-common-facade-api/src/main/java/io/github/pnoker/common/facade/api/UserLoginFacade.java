@@ -27,8 +27,9 @@ import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
  */
 public interface UserLoginFacade {
 
-    /**
-     * @return the user-login record, or {@code null} when the login name does not exist.
-     */
-    FacadeUserLoginBO selectByName(String name);
+	/**
+	 * @return the user-login record, or {@code null} when the login name does not exist.
+	 */
+	FacadeUserLoginBO selectByName(String name);
+
 }

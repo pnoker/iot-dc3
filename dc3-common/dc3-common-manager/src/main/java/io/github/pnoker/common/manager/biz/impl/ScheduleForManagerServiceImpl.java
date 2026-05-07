@@ -35,18 +35,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScheduleForManagerServiceImpl implements ScheduleForManagerService {
 
-    @Resource
-    private QuartzService quartzService;
+	@Resource
+	private QuartzService quartzService;
 
-    @Override
-    public void initial() {
-        try {
-            // Custom schedule
-            quartzService.createJobWithCron(ScheduleConstant.MANAGER_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?", HourlyJobForManager.class);
+	@Override
+	public void initial() {
+		try {
+			// Custom schedule
+			quartzService.createJobWithCron(ScheduleConstant.MANAGER_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?",
+					HourlyJobForManager.class);
 
-            quartzService.startScheduler();
-        } catch (SchedulerException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
+			quartzService.startScheduler();
+		}
+		catch (SchedulerException e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
 }

@@ -28,59 +28,60 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Default {@link DriverRegisterService} implementation that builds the registration payload from
- * {@link io.github.pnoker.common.driver.entity.property.DriverProperties} and submits it to the manager center.
+ * Default {@link DriverRegisterService} implementation that builds the registration
+ * payload from {@link io.github.pnoker.common.driver.entity.property.DriverProperties}
+ * and submits it to the manager center.
  */
 @Slf4j
 @Service
 public class DriverRegisterServiceImpl implements DriverRegisterService {
 
-    @Resource
-    private DriverProperties driverProperties;
+	@Resource
+	private DriverProperties driverProperties;
 
-    @Resource
-    private DriverClient driverClient;
+	@Resource
+	private DriverClient driverClient;
 
-    @Override
-    public void initial() {
-        try {
-            // Build driver registration information from properties
-            RegisterBO entityBO = buildRegisterBOByProperty();
-            // Log driver information for debugging
-            log.info("The driver information is: {}", JsonUtil.toJsonString(entityBO));
-            // Register driver with the driver client
-            driverClient.driverRegister(entityBO);
-        } catch (Exception e) {
-            // Log error and exit if initialization fails
-            log.error("Driver initialization failed: {}", e.getMessage(), e);
-            System.exit(1);
-        }
-    }
+	@Override
+	public void initial() {
+		try {
+			// Build driver registration information from properties
+			RegisterBO entityBO = buildRegisterBOByProperty();
+			// Log driver information for debugging
+			log.info("The driver information is: {}", JsonUtil.toJsonString(entityBO));
+			// Register driver with the driver client
+			driverClient.driverRegister(entityBO);
+		}
+		catch (Exception e) {
+			// Log error and exit if initialization fails
+			log.error("Driver initialization failed: {}", e.getMessage(), e);
+			System.exit(1);
+		}
+	}
 
-    /**
-     *
-     * Build driver registration information from properties
-     *
-     * @return DriverRegisterBO Driver registration business object
-     */
-    private RegisterBO buildRegisterBOByProperty() {
-        // Create and populate driver business object with properties
-        DriverBO driverBO = new DriverBO();
-        driverBO.setDriverName(driverProperties.getName());
-        driverBO.setDriverCode(driverProperties.getCode());
-        driverBO.setServiceName(driverProperties.getService());
-        driverBO.setServiceHost(driverProperties.getHost());
-        driverBO.setDriverTypeFlag(driverProperties.getType());
-        driverBO.setRemark(driverProperties.getRemark());
+	/**
+	 *
+	 * Build driver registration information from properties
+	 * @return DriverRegisterBO Driver registration business object
+	 */
+	private RegisterBO buildRegisterBOByProperty() {
+		// Create and populate driver business object with properties
+		DriverBO driverBO = new DriverBO();
+		driverBO.setDriverName(driverProperties.getName());
+		driverBO.setDriverCode(driverProperties.getCode());
+		driverBO.setServiceName(driverProperties.getService());
+		driverBO.setServiceHost(driverProperties.getHost());
+		driverBO.setDriverTypeFlag(driverProperties.getType());
+		driverBO.setRemark(driverProperties.getRemark());
 
-        // Create and populate registration business object
-        RegisterBO entityBO = new RegisterBO();
-        entityBO.setDriver(driverBO);
-        entityBO.setTenant(driverProperties.getTenant());
-        entityBO.setClient(driverProperties.getClient());
-        entityBO.setDriverAttributes(driverProperties.getDriverAttribute());
-        entityBO.setPointAttributes(driverProperties.getPointAttribute());
-        return entityBO;
-    }
+		// Create and populate registration business object
+		RegisterBO entityBO = new RegisterBO();
+		entityBO.setDriver(driverBO);
+		entityBO.setTenant(driverProperties.getTenant());
+		entityBO.setClient(driverProperties.getClient());
+		entityBO.setDriverAttributes(driverProperties.getDriverAttribute());
+		entityBO.setPointAttributes(driverProperties.getPointAttribute());
+		return entityBO;
+	}
 
 }

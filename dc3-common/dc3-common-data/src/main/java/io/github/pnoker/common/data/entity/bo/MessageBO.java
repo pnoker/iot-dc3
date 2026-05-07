@@ -39,33 +39,34 @@ import lombok.*;
 @ToString(callSuper = true)
 public class MessageBO extends BaseBO {
 
-    /**
-     * Alarm message template title
-     */
-    private String messageName;
+	/**
+	 * Alarm message template title
+	 */
+	private String messageName;
 
-    /**
-     * Alarm message template code
-     */
-    private String messageCode;
+	/**
+	 * Alarm message template code
+	 */
+	private String messageCode;
 
-    /**
-     * Alarm message template level
-     */
-    private AlarmMessageLevelFlagEnum messageLevel;
+	/**
+	 * Alarm message template level
+	 */
+	private AlarmMessageLevelFlagEnum messageLevel;
 
-    /**
-     * Alarm message template content
-     */
-    private MessageExt messageExt;
+	/**
+	 * Alarm message template content
+	 */
+	private MessageExt messageExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
+
 }

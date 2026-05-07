@@ -32,59 +32,58 @@ import java.util.Objects;
 /**
  * Auth-domain tools exposed to the LLM via Spring AI @Tool.
  * <p>
- * These tools allow the model to query tenant, user, and login information
- * by calling the existing facade interfaces (routed via gRPC or local depending
- * on dc3.facade.mode).
+ * These tools allow the model to query tenant, user, and login information by calling the
+ * existing facade interfaces (routed via gRPC or local depending on dc3.facade.mode).
  */
 @Slf4j
 @Component
 public class AuthToolSet {
 
-    private final TenantFacade tenantFacade;
-    private final UserFacade userFacade;
-    private final UserLoginFacade userLoginFacade;
+	private final TenantFacade tenantFacade;
 
-    public AuthToolSet(TenantFacade tenantFacade,
-                       UserFacade userFacade,
-                       UserLoginFacade userLoginFacade) {
-        this.tenantFacade = tenantFacade;
-        this.userFacade = userFacade;
-        this.userLoginFacade = userLoginFacade;
-    }
+	private final UserFacade userFacade;
 
-    @Tool(description = "Look up a tenant by its unique code. Returns tenant name, code, and enable status.")
-    public String lookupTenantByCode(
-            @ToolParam(description = "The unique tenant code, e.g. 'default'") String tenantCode) {
-        log.debug("Tool: lookupTenantByCode({})", tenantCode);
-        FacadeTenantBO bo = tenantFacade.selectByCode(tenantCode);
-        if (Objects.isNull(bo)) {
-            return "Tenant not found for code: " + tenantCode;
-        }
-        return String.format("Tenant: name=%s, code=%s, enabled=%s",
-                bo.getTenantName(), bo.getTenantCode(), bo.getEnableFlag());
-    }
+	private final UserLoginFacade userLoginFacade;
 
-    @Tool(description = "Look up a user by their numeric ID. Returns nickname, username, email, and phone.")
-    public String lookupUserById(
-            @ToolParam(description = "The numeric user ID") Long userId) {
-        log.debug("Tool: lookupUserById({})", userId);
-        FacadeUserBO bo = userFacade.selectById(userId);
-        if (Objects.isNull(bo)) {
-            return "User not found for ID: " + userId;
-        }
-        return String.format("User: nickname=%s, username=%s, phone=%s, email=%s",
-                bo.getNickName(), bo.getUserName(), bo.getPhone(), bo.getEmail());
-    }
+	public AuthToolSet(TenantFacade tenantFacade, UserFacade userFacade, UserLoginFacade userLoginFacade) {
+		this.tenantFacade = tenantFacade;
+		this.userFacade = userFacade;
+		this.userLoginFacade = userLoginFacade;
+	}
 
-    @Tool(description = "Look up a user login record by login name. Returns the login name, associated user ID, and enable status.")
-    public String lookupUserLoginByName(
-            @ToolParam(description = "The login name (username used for authentication)") String loginName) {
-        log.debug("Tool: lookupUserLoginByName({})", loginName);
-        FacadeUserLoginBO bo = userLoginFacade.selectByName(loginName);
-        if (Objects.isNull(bo)) {
-            return "User login not found for name: " + loginName;
-        }
-        return String.format("UserLogin: loginName=%s, userId=%d, enabled=%s",
-                bo.getLoginName(), bo.getUserId(), bo.getEnableFlag());
-    }
+	@Tool(description = "Look up a tenant by its unique code. Returns tenant name, code, and enable status.")
+	public String lookupTenantByCode(
+			@ToolParam(description = "The unique tenant code, e.g. 'default'") String tenantCode) {
+		log.debug("Tool: lookupTenantByCode({})", tenantCode);
+		FacadeTenantBO bo = tenantFacade.selectByCode(tenantCode);
+		if (Objects.isNull(bo)) {
+			return "Tenant not found for code: " + tenantCode;
+		}
+		return String.format("Tenant: name=%s, code=%s, enabled=%s", bo.getTenantName(), bo.getTenantCode(),
+				bo.getEnableFlag());
+	}
+
+	@Tool(description = "Look up a user by their numeric ID. Returns nickname, username, email, and phone.")
+	public String lookupUserById(@ToolParam(description = "The numeric user ID") Long userId) {
+		log.debug("Tool: lookupUserById({})", userId);
+		FacadeUserBO bo = userFacade.selectById(userId);
+		if (Objects.isNull(bo)) {
+			return "User not found for ID: " + userId;
+		}
+		return String.format("User: nickname=%s, username=%s, phone=%s, email=%s", bo.getNickName(), bo.getUserName(),
+				bo.getPhone(), bo.getEmail());
+	}
+
+	@Tool(description = "Look up a user login record by login name. Returns the login name, associated user ID, and enable status.")
+	public String lookupUserLoginByName(
+			@ToolParam(description = "The login name (username used for authentication)") String loginName) {
+		log.debug("Tool: lookupUserLoginByName({})", loginName);
+		FacadeUserLoginBO bo = userLoginFacade.selectByName(loginName);
+		if (Objects.isNull(bo)) {
+			return "User login not found for name: " + loginName;
+		}
+		return String.format("UserLogin: loginName=%s, userId=%d, enabled=%s", bo.getLoginName(), bo.getUserId(),
+				bo.getEnableFlag());
+	}
+
 }

@@ -24,33 +24,35 @@ package org.openscada.opc.dcom.list;
  * @since 0.1.8
  */
 public class ClassDetails {
-    private String _clsId;
 
-    private String _progId;
+	private String _clsId;
 
-    private String _description;
+	private String _progId;
 
-    public String getClsId() {
-        return this._clsId;
-    }
+	private String _description;
 
-    public void setClsId(final String clsId) {
-        this._clsId = clsId;
-    }
+	public String getClsId() {
+		return this._clsId;
+	}
 
-    public String getDescription() {
-        return this._description;
-    }
+	public void setClsId(final String clsId) {
+		this._clsId = clsId;
+	}
 
-    public void setDescription(final String description) {
-        this._description = description;
-    }
+	public String getDescription() {
+		return this._description;
+	}
 
-    public String getProgId() {
-        return this._progId;
-    }
+	public void setDescription(final String description) {
+		this._description = description;
+	}
 
-    public void setProgId(final String progId) {
-        this._progId = progId;
-    }
+	public String getProgId() {
+		return this._progId;
+	}
+
+	public void setProgId(final String progId) {
+		this._progId = progId;
+	}
+
 }

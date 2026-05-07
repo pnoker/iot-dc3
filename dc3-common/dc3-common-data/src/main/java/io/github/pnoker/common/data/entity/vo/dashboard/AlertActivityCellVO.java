@@ -26,8 +26,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * One cell in the event-overview alarm heatmap (dow × hour). Service layer
- * always returns a fully-padded 7 × 24 grid.
+ * One cell in the event-overview alarm heatmap (dow × hour). Service layer always returns
+ * a fully-padded 7 × 24 grid.
  *
  * @author pnoker
  * @since 2026.5.3
@@ -38,21 +38,22 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AlertActivityCellVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Day of week, 0..6 matching Postgres EXTRACT(DOW) (0 = Sunday).
-     */
-    private int dow;
+	/**
+	 * Day of week, 0..6 matching Postgres EXTRACT(DOW) (0 = Sunday).
+	 */
+	private int dow;
 
-    /**
-     * Hour of day, 0..23.
-     */
-    private int hour;
+	/**
+	 * Hour of day, 0..23.
+	 */
+	private int hour;
 
-    /**
-     * Alarm count in that cell.
-     */
-    private long count;
+	/**
+	 * Alarm count in that cell.
+	 */
+	private long count;
+
 }

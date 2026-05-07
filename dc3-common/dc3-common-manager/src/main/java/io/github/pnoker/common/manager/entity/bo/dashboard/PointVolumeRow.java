@@ -22,14 +22,18 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Volume aggregate row for topology's volume mode — one (device_id,
- * point_id) pair + its pv sample count over the query window.
+ * Volume aggregate row for topology's volume mode — one (device_id, point_id) pair + its
+ * pv sample count over the query window.
  */
 @Getter
 @Setter
 @ToString
 public class PointVolumeRow {
-    private long deviceId;
-    private long pointId;
-    private long cnt;
+
+	private long deviceId;
+
+	private long pointId;
+
+	private long cnt;
+
 }

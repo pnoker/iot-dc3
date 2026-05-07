@@ -28,105 +28,104 @@ import io.github.pnoker.driver.api.impl.S7TCPConnection;
  */
 public class S7ConnectorFactory {
 
-    private S7ConnectorFactory() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private S7ConnectorFactory() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * @param type the Siemens PLC model
-     * @return a new TCP connection builder
-     */
-    public static TCPConnectionBuilder buildTCPConnector(SiemensPLCS type) {
-        return new TCPConnectionBuilder(type);
-    }
+	/**
+	 * @param type the Siemens PLC model
+	 * @return a new TCP connection builder
+	 */
+	public static TCPConnectionBuilder buildTCPConnector(SiemensPLCS type) {
+		return new TCPConnectionBuilder(type);
+	}
 
-    /**
-     * @return a TCP connection builder defaulting to non-200 series
-     */
-    public static TCPConnectionBuilder buildTCPConnector() {
-        return new TCPConnectionBuilder(SiemensPLCS.S_NON_200);
-    }
+	/**
+	 * @return a TCP connection builder defaulting to non-200 series
+	 */
+	public static TCPConnectionBuilder buildTCPConnector() {
+		return new TCPConnectionBuilder(SiemensPLCS.S_NON_200);
+	}
 
-    /**
-     * Builder for configuring and creating S7 TCP connections.
-     */
-    public static class TCPConnectionBuilder {
+	/**
+	 * Builder for configuring and creating S7 TCP connections.
+	 */
+	public static class TCPConnectionBuilder {
 
-        private final SiemensPLCS plcsType;
-        private String host;
-        private int rack = 0;
-        private int slot = 2;
-        private int port = 102;
-        private int timeout = 2000;
+		private final SiemensPLCS plcsType;
 
-        TCPConnectionBuilder(SiemensPLCS type) {
-            this.plcsType = type;
-        }
+		private String host;
 
-        /**
-         * Builds a connection with given params
-         *
-         * @return S7Connector
-         */
-        public S7Connector build() {
-            return new S7TCPConnection(this.host, this.rack, this.slot, this.port, this.timeout, this.plcsType);
-        }
+		private int rack = 0;
 
-        /**
-         * use hostname/ip
-         *
-         * @param host Host
-         * @return TCPConnectionBuilder
-         */
-        public TCPConnectionBuilder withHost(final String host) {
-            this.host = host;
-            return this;
-        }
+		private int slot = 2;
 
-        /**
-         * use port, default is 102
-         *
-         * @param port Port
-         * @return TCPConnectionBuilder
-         */
-        public TCPConnectionBuilder withPort(final int port) {
-            this.port = port;
-            return this;
-        }
+		private int port = 102;
 
-        /**
-         * use rack, default is 0
-         *
-         * @param rack Rack
-         * @return TCPConnectionBuilder
-         */
-        public TCPConnectionBuilder withRack(final int rack) {
-            this.rack = rack;
-            return this;
-        }
+		private int timeout = 2000;
 
-        /**
-         * use slot, default is 2
-         *
-         * @param slot Slot
-         * @return TCPConnectionBuilder
-         */
-        public TCPConnectionBuilder withSlot(final int slot) {
-            this.slot = slot;
-            return this;
-        }
+		TCPConnectionBuilder(SiemensPLCS type) {
+			this.plcsType = type;
+		}
 
-        /**
-         * use timeout, default is 2000
-         *
-         * @param timeout Timeout
-         * @return TCPConnectionBuilder
-         */
-        public TCPConnectionBuilder withTimeout(final int timeout) {
-            this.timeout = timeout;
-            return this;
-        }
+		/**
+		 * Builds a connection with given params
+		 * @return S7Connector
+		 */
+		public S7Connector build() {
+			return new S7TCPConnection(this.host, this.rack, this.slot, this.port, this.timeout, this.plcsType);
+		}
 
-    }
+		/**
+		 * use hostname/ip
+		 * @param host Host
+		 * @return TCPConnectionBuilder
+		 */
+		public TCPConnectionBuilder withHost(final String host) {
+			this.host = host;
+			return this;
+		}
+
+		/**
+		 * use port, default is 102
+		 * @param port Port
+		 * @return TCPConnectionBuilder
+		 */
+		public TCPConnectionBuilder withPort(final int port) {
+			this.port = port;
+			return this;
+		}
+
+		/**
+		 * use rack, default is 0
+		 * @param rack Rack
+		 * @return TCPConnectionBuilder
+		 */
+		public TCPConnectionBuilder withRack(final int rack) {
+			this.rack = rack;
+			return this;
+		}
+
+		/**
+		 * use slot, default is 2
+		 * @param slot Slot
+		 * @return TCPConnectionBuilder
+		 */
+		public TCPConnectionBuilder withSlot(final int slot) {
+			this.slot = slot;
+			return this;
+		}
+
+		/**
+		 * use timeout, default is 2000
+		 * @param timeout Timeout
+		 * @return TCPConnectionBuilder
+		 */
+		public TCPConnectionBuilder withTimeout(final int timeout) {
+			this.timeout = timeout;
+			return this;
+		}
+
+	}
 
 }

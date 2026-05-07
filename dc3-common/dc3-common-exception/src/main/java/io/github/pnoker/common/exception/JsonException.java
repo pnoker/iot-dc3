@@ -27,15 +27,17 @@ import java.text.MessageFormat;
  * @since 2022.1.0
  */
 public class JsonException extends RuntimeException {
-    public JsonException() {
-        this(null);
-    }
 
-    public JsonException(Throwable cause) {
-        super(cause);
-    }
+	public JsonException() {
+		this(null);
+	}
 
-    public JsonException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public JsonException(Throwable cause) {
+		super(cause);
+	}
+
+	public JsonException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

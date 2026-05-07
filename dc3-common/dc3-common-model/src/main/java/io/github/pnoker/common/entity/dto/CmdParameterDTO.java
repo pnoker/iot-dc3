@@ -23,8 +23,6 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -37,21 +35,22 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CmdParameterDTO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Device ID
-     */
-    private Long deviceId;
+	/**
+	 * Device ID
+	 */
+	private Long deviceId;
 
-    /**
-     * Point ID
-     */
-    private Long pointId;
+	/**
+	 * Point ID
+	 */
+	private Long pointId;
 
-    /**
-     *
-     */
-    private String value;
+	/**
+	 *
+	 */
+	private String value;
+
 }

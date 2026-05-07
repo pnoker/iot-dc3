@@ -39,8 +39,8 @@ import java.util.Optional;
 /**
  * Hand-rolled conversion between facade shapes and protobuf driver types.
  * <p>
- * Driver uses {@code NULL_INT = -1} as the "not set" marker for
- * {@code driverTypeFlag} (unlike Device, which piggy-backs on {@code DEFAULT_INT = 0}).
+ * Driver uses {@code NULL_INT = -1} as the "not set" marker for {@code driverTypeFlag}
+ * (unlike Device, which piggy-backs on {@code DEFAULT_INT = 0}).
  *
  * @author pnoker
  * @since 2026.5.5
@@ -48,61 +48,58 @@ import java.util.Optional;
 @Component
 public class FacadeGrpcDriverBuilder {
 
-    public GrpcPageDriverQuery toGrpcPageQuery(FacadeDriverQuery query) {
-        GrpcPageDriverQuery.Builder builder = GrpcPageDriverQuery.newBuilder();
+	public GrpcPageDriverQuery toGrpcPageQuery(FacadeDriverQuery query) {
+		GrpcPageDriverQuery.Builder builder = GrpcPageDriverQuery.newBuilder();
 
-        Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
-        GrpcPage.Builder page = GrpcPage.newBuilder()
-                .setCurrent(pages.getCurrent())
-                .setSize(pages.getSize());
-        builder.setPage(page);
+		Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
+		GrpcPage.Builder page = GrpcPage.newBuilder().setCurrent(pages.getCurrent()).setSize(pages.getSize());
+		builder.setPage(page);
 
-        LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
-        StringOptional.ofNullable(query.getDriverName()).ifPresent(builder::setDriverName);
-        StringOptional.ofNullable(query.getDriverCode()).ifPresent(builder::setDriverCode);
-        StringOptional.ofNullable(query.getServiceName()).ifPresent(builder::setServiceName);
-        StringOptional.ofNullable(query.getServiceHost()).ifPresent(builder::setServiceHost);
-        Optional.ofNullable(query.getDriverTypeFlag()).ifPresentOrElse(
-                value -> builder.setDriverTypeFlag(value.getIndex()),
-                () -> builder.setDriverTypeFlag(DefaultConstant.NULL_INT)
-        );
-        Optional.ofNullable(query.getEnableFlag()).ifPresentOrElse(
-                value -> builder.setEnableFlag(value.getIndex()),
-                () -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT)
-        );
+		LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
+		StringOptional.ofNullable(query.getDriverName()).ifPresent(builder::setDriverName);
+		StringOptional.ofNullable(query.getDriverCode()).ifPresent(builder::setDriverCode);
+		StringOptional.ofNullable(query.getServiceName()).ifPresent(builder::setServiceName);
+		StringOptional.ofNullable(query.getServiceHost()).ifPresent(builder::setServiceHost);
+		Optional.ofNullable(query.getDriverTypeFlag())
+			.ifPresentOrElse(value -> builder.setDriverTypeFlag(value.getIndex()),
+					() -> builder.setDriverTypeFlag(DefaultConstant.NULL_INT));
+		Optional.ofNullable(query.getEnableFlag())
+			.ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
+					() -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT));
 
-        return builder.build();
-    }
+		return builder.build();
+	}
 
-    public FacadeDriverBO toFacadeBO(GrpcDriverDTO dto) {
-        if (Objects.isNull(dto)) {
-            return null;
-        }
+	public FacadeDriverBO toFacadeBO(GrpcDriverDTO dto) {
+		if (Objects.isNull(dto)) {
+			return null;
+		}
 
-        FacadeDriverBO bo = new FacadeDriverBO();
-        GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
+		FacadeDriverBO bo = new FacadeDriverBO();
+		GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
 
-        StringOptional.ofNullable(dto.getDriverName()).ifPresent(bo::setDriverName);
-        StringOptional.ofNullable(dto.getDriverCode()).ifPresent(bo::setDriverCode);
-        StringOptional.ofNullable(dto.getServiceName()).ifPresent(bo::setServiceName);
-        StringOptional.ofNullable(dto.getServiceHost()).ifPresent(bo::setServiceHost);
-        StringOptional.ofNullable(dto.getSignature()).ifPresent(bo::setSignature);
-        LongOptional.ofNullable(dto.getTenantId()).ifPresent(bo::setTenantId);
+		StringOptional.ofNullable(dto.getDriverName()).ifPresent(bo::setDriverName);
+		StringOptional.ofNullable(dto.getDriverCode()).ifPresent(bo::setDriverCode);
+		StringOptional.ofNullable(dto.getServiceName()).ifPresent(bo::setServiceName);
+		StringOptional.ofNullable(dto.getServiceHost()).ifPresent(bo::setServiceHost);
+		StringOptional.ofNullable(dto.getSignature()).ifPresent(bo::setSignature);
+		LongOptional.ofNullable(dto.getTenantId()).ifPresent(bo::setTenantId);
 
-        if (dto.getVersion() != DefaultConstant.DEFAULT_INT) {
-            bo.setVersion(dto.getVersion());
-        }
+		if (dto.getVersion() != DefaultConstant.DEFAULT_INT) {
+			bo.setVersion(dto.getVersion());
+		}
 
-        int driverType = dto.getDriverTypeFlag();
-        if (driverType != DefaultConstant.NULL_INT) {
-            Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) driverType)).ifPresent(bo::setDriverTypeFlag);
-        }
+		int driverType = dto.getDriverTypeFlag();
+		if (driverType != DefaultConstant.NULL_INT) {
+			Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) driverType)).ifPresent(bo::setDriverTypeFlag);
+		}
 
-        Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
+		Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
 
-        StringOptional.ofNullable(dto.getDriverExt())
-                .ifPresent(value -> bo.setDriverExt(JsonUtil.parseObject(value, DriverExt.class)));
+		StringOptional.ofNullable(dto.getDriverExt())
+			.ifPresent(value -> bo.setDriverExt(JsonUtil.parseObject(value, DriverExt.class)));
 
-        return bo;
-    }
+		return bo;
+	}
+
 }

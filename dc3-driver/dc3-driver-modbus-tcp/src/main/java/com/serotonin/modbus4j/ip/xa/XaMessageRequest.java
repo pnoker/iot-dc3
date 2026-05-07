@@ -24,46 +24,52 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingRequestMessage;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>XaMessageRequest class.</p>
+ * <p>
+ * XaMessageRequest class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class XaMessageRequest extends XaMessage implements OutgoingRequestMessage, IncomingRequestMessage {
-    /**
-     * <p>Constructor for XaMessageRequest.</p>
-     *
-     * @param modbusRequest a {@link ModbusRequest} object.
-     * @param transactionId a int.
-     */
-    public XaMessageRequest(ModbusRequest modbusRequest, int transactionId) {
-        super(modbusRequest, transactionId);
-    }
 
-    static XaMessageRequest createXaMessageRequest(ByteQueue queue) throws ModbusTransportException {
-        // Remove the XA header
-        int transactionId = ModbusUtils.popShort(queue);
-        int protocolId = ModbusUtils.popShort(queue);
-        if (protocolId != ModbusUtils.IP_PROTOCOL_ID)
-            throw new ModbusTransportException("Unsupported IP protocol id: " + protocolId);
-        ModbusUtils.popShort(queue); // Length, which we don't care about.
+	/**
+	 * <p>
+	 * Constructor for XaMessageRequest.
+	 * </p>
+	 * @param modbusRequest a {@link ModbusRequest} object.
+	 * @param transactionId a int.
+	 */
+	public XaMessageRequest(ModbusRequest modbusRequest, int transactionId) {
+		super(modbusRequest, transactionId);
+	}
 
-        // Create the modbus response.
-        ModbusRequest request = ModbusRequest.createModbusRequest(queue);
-        return new XaMessageRequest(request, transactionId);
-    }
+	static XaMessageRequest createXaMessageRequest(ByteQueue queue) throws ModbusTransportException {
+		// Remove the XA header
+		int transactionId = ModbusUtils.popShort(queue);
+		int protocolId = ModbusUtils.popShort(queue);
+		if (protocolId != ModbusUtils.IP_PROTOCOL_ID)
+			throw new ModbusTransportException("Unsupported IP protocol id: " + protocolId);
+		ModbusUtils.popShort(queue); // Length, which we don't care about.
 
-    @Override
-    public boolean expectsResponse() {
-        return modbusMessage.getSlaveId() != 0;
-    }
+		// Create the modbus response.
+		ModbusRequest request = ModbusRequest.createModbusRequest(queue);
+		return new XaMessageRequest(request, transactionId);
+	}
 
-    /**
-     * <p>getModbusRequest.</p>
-     *
-     * @return a {@link ModbusRequest} object.
-     */
-    public ModbusRequest getModbusRequest() {
-        return (ModbusRequest) modbusMessage;
-    }
+	@Override
+	public boolean expectsResponse() {
+		return modbusMessage.getSlaveId() != 0;
+	}
+
+	/**
+	 * <p>
+	 * getModbusRequest.
+	 * </p>
+	 * @return a {@link ModbusRequest} object.
+	 */
+	public ModbusRequest getModbusRequest() {
+		return (ModbusRequest) modbusMessage;
+	}
+
 }

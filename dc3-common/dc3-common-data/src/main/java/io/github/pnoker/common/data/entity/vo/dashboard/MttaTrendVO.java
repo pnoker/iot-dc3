@@ -26,26 +26,31 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * One day's MTTA (mean time to acknowledge) statistic, computed as
- * (operate_time - create_time) on confirm_flag=1 events. Event table has
- * an UPDATE trigger that stamps operate_time on confirm, so the diff is
- * the ack latency.
+ * One day's MTTA (mean time to acknowledge) statistic, computed as (operate_time -
+ * create_time) on confirm_flag=1 events. Event table has an UPDATE trigger that stamps
+ * operate_time on confirm, so the diff is the ack latency.
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class MttaTrendVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    /**
-     * ISO date.
-     */
-    private String date;
-    private long p50Ms;
-    private long p95Ms;
-    /**
-     * Count of confirmed events used in the percentile calc for this day.
-     */
-    private long confirmedCount;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * ISO date.
+	 */
+	private String date;
+
+	private long p50Ms;
+
+	private long p95Ms;
+
+	/**
+	 * Count of confirmed events used in the percentile calc for this day.
+	 */
+	private long confirmedCount;
+
 }

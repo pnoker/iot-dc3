@@ -34,7 +34,8 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Quartz job that iterates through enabled devices and points and triggers periodic reads.
+ * Quartz job that iterates through enabled devices and points and triggers periodic
+ * reads.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,38 +45,40 @@ import java.util.Set;
 @Component
 public class DriverReadScheduleJob extends QuartzJobBean {
 
-    @Resource
-    private DriverMetadata driverMetadata;
-    @Resource
-    private DeviceMetadata deviceMetadata;
-    @Resource
-    private DriverReadService driverReadService;
+	@Resource
+	private DriverMetadata driverMetadata;
 
-    @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) {
-        Set<Long> deviceIds = driverMetadata.getDeviceIds();
-        if (CollectionUtils.isEmpty(deviceIds)) {
-            return;
-        }
+	@Resource
+	private DeviceMetadata deviceMetadata;
 
-        for (Long deviceId : deviceIds) {
-            DeviceBO entityBO = deviceMetadata.getCache(deviceId);
-            if (Objects.nonNull(entityBO)
-                    && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
-                    && CollectionUtils.isNotEmpty(entityBO.getProfileIds())
-                    && CollectionUtils.isNotEmpty(entityBO.getPointIds())
-                    && MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
-                    && MapUtils.isNotEmpty(entityBO.getPointAttributeConfigIdMap())
-            ) {
-                Set<Long> pointIds = entityBO.getPointIds();
-                for (Long pointId : pointIds) {
-                    try {
-                        driverReadService.read(deviceId, pointId);
-                    } catch (Exception e) {
-                        log.error("Read device[{}], point[{}] error: {}", deviceId, pointId, e.getMessage(), e);
-                    }
-                }
-            }
-        }
-    }
+	@Resource
+	private DriverReadService driverReadService;
+
+	@Override
+	protected void executeInternal(JobExecutionContext jobExecutionContext) {
+		Set<Long> deviceIds = driverMetadata.getDeviceIds();
+		if (CollectionUtils.isEmpty(deviceIds)) {
+			return;
+		}
+
+		for (Long deviceId : deviceIds) {
+			DeviceBO entityBO = deviceMetadata.getCache(deviceId);
+			if (Objects.nonNull(entityBO) && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
+					&& CollectionUtils.isNotEmpty(entityBO.getProfileIds())
+					&& CollectionUtils.isNotEmpty(entityBO.getPointIds())
+					&& MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
+					&& MapUtils.isNotEmpty(entityBO.getPointAttributeConfigIdMap())) {
+				Set<Long> pointIds = entityBO.getPointIds();
+				for (Long pointId : pointIds) {
+					try {
+						driverReadService.read(deviceId, pointId);
+					}
+					catch (Exception e) {
+						log.error("Read device[{}], point[{}] error: {}", deviceId, pointId, e.getMessage(), e);
+					}
+				}
+			}
+		}
+	}
+
 }

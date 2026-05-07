@@ -22,14 +22,20 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Device row for the topology L2 column: id + name + parent driverId + profile-bind count.
+ * Device row for the topology L2 column: id + name + parent driverId + profile-bind
+ * count.
  */
 @Getter
 @Setter
 @ToString
 public class TopologyDeviceRow {
-    private long id;
-    private String deviceName;
-    private long driverId;
-    private long profileCount;
+
+	private long id;
+
+	private String deviceName;
+
+	private long driverId;
+
+	private long profileCount;
+
 }

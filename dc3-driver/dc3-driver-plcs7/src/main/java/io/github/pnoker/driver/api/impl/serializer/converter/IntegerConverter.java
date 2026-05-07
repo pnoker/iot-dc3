@@ -29,42 +29,43 @@ import io.github.pnoker.driver.api.S7Type;
 
 public class IntegerConverter implements S7Serializable {
 
-    private static final int OFFSET_HIGH_BYTE = 0;
-    private static final int OFFSET_LOW_BYTE = 1;
+	private static final int OFFSET_HIGH_BYTE = 0;
 
-    @Override
-    public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
-        final byte lower = buffer[byteOffset + OFFSET_LOW_BYTE];
-        final byte higher = buffer[byteOffset + OFFSET_HIGH_BYTE];
+	private static final int OFFSET_LOW_BYTE = 1;
 
-        final Integer i = (lower & 0xFF) | ((higher << 8) & 0xFF00);
+	@Override
+	public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
+		final byte lower = buffer[byteOffset + OFFSET_LOW_BYTE];
+		final byte higher = buffer[byteOffset + OFFSET_HIGH_BYTE];
 
-        return targetClass.cast(i);
-    }
+		final Integer i = (lower & 0xFF) | ((higher << 8) & 0xFF00);
 
-    @Override
-    public S7Type getS7Type() {
-        return S7Type.WORD;
-    }
+		return targetClass.cast(i);
+	}
 
-    @Override
-    public int getSizeInBits() {
-        return 0;
-    }
+	@Override
+	public S7Type getS7Type() {
+		return S7Type.WORD;
+	}
 
-    @Override
-    public int getSizeInBytes() {
-        return 2;
-    }
+	@Override
+	public int getSizeInBits() {
+		return 0;
+	}
 
-    @Override
-    public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
-                       final int size) {
-        final Integer value = (Integer) javaType;
-        final byte lower = (byte) ((value) & 0xFF);
-        final byte higher = (byte) ((value >> 8) & 0xFF);
-        buffer[byteOffset + OFFSET_LOW_BYTE] = lower;
-        buffer[byteOffset + OFFSET_HIGH_BYTE] = higher;
-    }
+	@Override
+	public int getSizeInBytes() {
+		return 2;
+	}
+
+	@Override
+	public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
+			final int size) {
+		final Integer value = (Integer) javaType;
+		final byte lower = (byte) ((value) & 0xFF);
+		final byte higher = (byte) ((value >> 8) & 0xFF);
+		buffer[byteOffset + OFFSET_LOW_BYTE] = lower;
+		buffer[byteOffset + OFFSET_HIGH_BYTE] = higher;
+	}
 
 }

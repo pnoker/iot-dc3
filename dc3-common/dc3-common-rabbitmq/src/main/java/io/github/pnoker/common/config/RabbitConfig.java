@@ -33,9 +33,9 @@ import org.springframework.context.annotation.Configuration;
 /**
  * RabbitMQ Configuration Class
  * <p>
- * Configuration class for RabbitMQ messaging in Spring Boot applications.
- * Configures RabbitTemplate, listener container factory, and message converter
- * for reliable message publishing and consumption with proper error handling.
+ * Configuration class for RabbitMQ messaging in Spring Boot applications. Configures
+ * RabbitTemplate, listener container factory, and message converter for reliable message
+ * publishing and consumption with proper error handling.
  * </p>
  *
  * @author pnoker
@@ -46,57 +46,58 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    private final ConnectionFactory connectionFactory;
+	private final ConnectionFactory connectionFactory;
 
-    public RabbitConfig(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
+	public RabbitConfig(ConnectionFactory connectionFactory) {
+		this.connectionFactory = connectionFactory;
+	}
 
-    /**
-     * Configure RabbitTemplate for message publishing
-     *
-     * @param messageConverter Message converter for JSON serialization
-     * @return Configured RabbitTemplate bean
-     */
-    @Bean
-    RabbitTemplate rabbitTemplate(MessageConverter messageConverter) {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(messageConverter);
-        rabbitTemplate.setMandatory(true);
-        rabbitTemplate.setReturnsCallback(message -> log.error("Send message[{}] to exchange[{}], routingKey[{}] failed: {}", message.getMessage(), message.getExchange(), message.getRoutingKey(), message.getReplyText()));
-        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
-            if (!ack) {
-                log.error("CorrelationData[{}] ack failed: {}", correlationData, cause);
-            }
-        });
-        return rabbitTemplate;
-    }
+	/**
+	 * Configure RabbitTemplate for message publishing
+	 * @param messageConverter Message converter for JSON serialization
+	 * @return Configured RabbitTemplate bean
+	 */
+	@Bean
+	RabbitTemplate rabbitTemplate(MessageConverter messageConverter) {
+		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+		rabbitTemplate.setMessageConverter(messageConverter);
+		rabbitTemplate.setMandatory(true);
+		rabbitTemplate
+			.setReturnsCallback(message -> log.error("Send message[{}] to exchange[{}], routingKey[{}] failed: {}",
+					message.getMessage(), message.getExchange(), message.getRoutingKey(), message.getReplyText()));
+		rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+			if (!ack) {
+				log.error("CorrelationData[{}] ack failed: {}", correlationData, cause);
+			}
+		});
+		return rabbitTemplate;
+	}
 
-    /**
-     * Configure Rabbit listener container factory
-     *
-     * @param messageConverter Message converter for JSON deserialization
-     * @return Configured RabbitListenerContainerFactory bean
-     */
-    @Bean
-    public RabbitListenerContainerFactory<SimpleMessageListenerContainer> rabbitListenerContainerFactory(MessageConverter messageConverter) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(messageConverter);
-        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-        factory.setConcurrentConsumers(2);
-        factory.setMaxConcurrentConsumers(8);
-        factory.setPrefetchCount(10);
-        return factory;
-    }
+	/**
+	 * Configure Rabbit listener container factory
+	 * @param messageConverter Message converter for JSON deserialization
+	 * @return Configured RabbitListenerContainerFactory bean
+	 */
+	@Bean
+	public RabbitListenerContainerFactory<SimpleMessageListenerContainer> rabbitListenerContainerFactory(
+			MessageConverter messageConverter) {
+		SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+		factory.setConnectionFactory(connectionFactory);
+		factory.setMessageConverter(messageConverter);
+		factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+		factory.setConcurrentConsumers(2);
+		factory.setMaxConcurrentConsumers(8);
+		factory.setPrefetchCount(10);
+		return factory;
+	}
 
-    /**
-     * Configure message converter for JSON serialization/deserialization
-     *
-     * @return JacksonJsonMessageConverter bean
-     */
-    @Bean
-    public MessageConverter messageConverter() {
-        return new JacksonJsonMessageConverter(JsonUtil.getJsonMapper());
-    }
+	/**
+	 * Configure message converter for JSON serialization/deserialization
+	 * @return JacksonJsonMessageConverter bean
+	 */
+	@Bean
+	public MessageConverter messageConverter() {
+		return new JacksonJsonMessageConverter(JsonUtil.getJsonMapper());
+	}
+
 }

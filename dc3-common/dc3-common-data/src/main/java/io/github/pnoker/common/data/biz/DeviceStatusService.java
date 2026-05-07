@@ -30,19 +30,20 @@ import java.util.Map;
  */
 public interface DeviceStatusService {
 
-    /**
-     * Paged query of device status, used in conjunction with paged query of devices
-     *
-     * @param deviceQuery DeviceQuery, including pagination parameters
-     * @return Map Long:String, where Long is the device ID and String is the device status
-     */
-    Map<Long, String> selectByPage(DeviceQuery deviceQuery);
+	/**
+	 * Paged query of device status, used in conjunction with paged query of devices
+	 * @param deviceQuery DeviceQuery, including pagination parameters
+	 * @return Map Long:String, where Long is the device ID and String is the device
+	 * status
+	 */
+	Map<Long, String> selectByPage(DeviceQuery deviceQuery);
 
-    /**
-     * Query device status by profile ID
-     *
-     * @param profileId Profile ID
-     * @return Map Long:String, where Long is the device ID and String is the device status
-     */
-    Map<Long, String> selectByProfileId(Long profileId);
+	/**
+	 * Query device status by profile ID
+	 * @param profileId Profile ID
+	 * @return Map Long:String, where Long is the device ID and String is the device
+	 * status
+	 */
+	Map<Long, String> selectByProfileId(Long profileId);
+
 }

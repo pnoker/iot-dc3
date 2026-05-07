@@ -43,62 +43,57 @@ import java.util.List;
 @Component
 public class DriverGrpcFacade implements DriverFacade {
 
-    @Resource
-    private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
+	@Resource
+	private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcDriverBuilder facadeGrpcDriverBuilder;
+	@Resource
+	private FacadeGrpcDriverBuilder facadeGrpcDriverBuilder;
 
-    @Override
-    public FacadeDriverBO selectById(Long id) {
-        GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(id).build();
-        GrpcRDriverDTO response = driverApiBlockingStub.selectByDriverId(request);
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectById");
-            return null;
-        }
-        return facadeGrpcDriverBuilder.toFacadeBO(response.getData());
-    }
+	@Override
+	public FacadeDriverBO selectById(Long id) {
+		GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(id).build();
+		GrpcRDriverDTO response = driverApiBlockingStub.selectByDriverId(request);
+		if (!response.getResult().getOk()) {
+			guardOrThrow(response.getResult(), "selectById");
+			return null;
+		}
+		return facadeGrpcDriverBuilder.toFacadeBO(response.getData());
+	}
 
-    @Override
-    public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
-        GrpcPageDriverQuery request = facadeGrpcDriverBuilder.toGrpcPageQuery(query);
-        GrpcRPageDriverDTO response = driverApiBlockingStub.selectByPage(request);
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByPage");
-            return FacadePage.empty();
-        }
+	@Override
+	public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
+		GrpcPageDriverQuery request = facadeGrpcDriverBuilder.toGrpcPageQuery(query);
+		GrpcRPageDriverDTO response = driverApiBlockingStub.selectByPage(request);
+		if (!response.getResult().getOk()) {
+			guardOrThrow(response.getResult(), "selectByPage");
+			return FacadePage.empty();
+		}
 
-        GrpcPageDriverDTO pageDTO = response.getData();
-        List<FacadeDriverBO> records = pageDTO.getDataList().stream()
-                .map(facadeGrpcDriverBuilder::toFacadeBO)
-                .toList();
+		GrpcPageDriverDTO pageDTO = response.getData();
+		List<FacadeDriverBO> records = pageDTO.getDataList().stream().map(facadeGrpcDriverBuilder::toFacadeBO).toList();
 
-        return new FacadePage<>(
-                pageDTO.getPage().getCurrent(),
-                pageDTO.getPage().getSize(),
-                pageDTO.getPage().getTotal(),
-                pageDTO.getPage().getPages(),
-                records);
-    }
+		return new FacadePage<>(pageDTO.getPage().getCurrent(), pageDTO.getPage().getSize(),
+				pageDTO.getPage().getTotal(), pageDTO.getPage().getPages(), records);
+	}
 
-    @Override
-    public FacadeDriverBO selectByDeviceId(Long deviceId) {
-        GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
-        GrpcRDriverDTO response = driverApiBlockingStub.selectByDeviceId(request);
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByDeviceId");
-            return null;
-        }
-        return facadeGrpcDriverBuilder.toFacadeBO(response.getData());
-    }
+	@Override
+	public FacadeDriverBO selectByDeviceId(Long deviceId) {
+		GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
+		GrpcRDriverDTO response = driverApiBlockingStub.selectByDeviceId(request);
+		if (!response.getResult().getOk()) {
+			guardOrThrow(response.getResult(), "selectByDeviceId");
+			return null;
+		}
+		return facadeGrpcDriverBuilder.toFacadeBO(response.getData());
+	}
 
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
-            log.debug("DriverGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("DriverFacade." + op + " failed: [" + code + "] " + result.getMessage());
-    }
+	private void guardOrThrow(GrpcR result, String op) {
+		String code = result.getCode();
+		if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+			log.debug("DriverGrpcFacade.{} => no resource", op);
+			return;
+		}
+		throw new ServiceException("DriverFacade." + op + " failed: [" + code + "] " + result.getMessage());
+	}
+
 }

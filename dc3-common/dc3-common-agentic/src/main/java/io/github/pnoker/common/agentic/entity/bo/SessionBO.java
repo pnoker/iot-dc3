@@ -28,19 +28,20 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class SessionBO extends BaseBO {
 
-    private String conversationId;
+	private String conversationId;
 
-    private String title;
+	private String title;
 
-    private String skill;
+	private String skill;
 
-    private Byte status;
+	private Byte status;
 
-    private LocalDateTime expireTime;
+	private LocalDateTime expireTime;
 
-    private Long tenantId;
+	private Long tenantId;
 
-    private Long userId;
+	private Long userId;
 
-    private Byte enableFlag;
+	private Byte enableFlag;
+
 }

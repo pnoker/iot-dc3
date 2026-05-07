@@ -49,40 +49,43 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticGatewayFilter implements GatewayFilter {
 
-    private final FilterService filterService;
+	private final FilterService filterService;
 
-    public AuthenticGatewayFilter(FilterService filterService) {
-        this.filterService = filterService;
-    }
+	public AuthenticGatewayFilter(FilterService filterService) {
+		this.filterService = filterService;
+	}
 
-    @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
+	@Override
+	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+		ServerHttpRequest request = exchange.getRequest();
 
-        try {
-            FacadeTenantBO tenant = filterService.getTenant(request);
-            FacadeUserLoginBO userLogin = filterService.getUserLogin(request);
-            filterService.checkValid(request, tenant, userLogin);
+		try {
+			FacadeTenantBO tenant = filterService.getTenant(request);
+			FacadeUserLoginBO userLogin = filterService.getUserLogin(request);
+			filterService.checkValid(request, tenant, userLogin);
 
-            RequestHeader.UserHeader userHeader = filterService.getUser(userLogin, tenant);
-            ServerHttpRequest build = request.mutate()
-                    .headers(headers -> headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(userHeader)))
-                    .build();
-            return chain.filter(exchange.mutate().request(build).build());
-        } catch (UnAuthorizedException e) {
-            log.warn("AuthenticGatewayFilter unauthorized: {}, Url: {}", e.getMessage(), request.getURI());
-            return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
-        } catch (Exception e) {
-            log.error("AuthenticGatewayFilter unexpected error, Url: {}", request.getURI(), e);
-            return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
-        }
-    }
+			RequestHeader.UserHeader userHeader = filterService.getUser(userLogin, tenant);
+			ServerHttpRequest build = request.mutate()
+				.headers(headers -> headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(userHeader)))
+				.build();
+			return chain.filter(exchange.mutate().request(build).build());
+		}
+		catch (UnAuthorizedException e) {
+			log.warn("AuthenticGatewayFilter unauthorized: {}, Url: {}", e.getMessage(), request.getURI());
+			return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
+		}
+		catch (Exception e) {
+			log.error("AuthenticGatewayFilter unexpected error, Url: {}", request.getURI(), e);
+			return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+		}
+	}
 
-    private Mono<Void> writeErrorResponse(ServerWebExchange exchange, HttpStatus status, String message) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        response.setStatusCode(status);
-        DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(message)));
-        return response.writeWith(Mono.just(dataBuffer));
-    }
+	private Mono<Void> writeErrorResponse(ServerWebExchange exchange, HttpStatus status, String message) {
+		ServerHttpResponse response = exchange.getResponse();
+		response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+		response.setStatusCode(status);
+		DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(message)));
+		return response.writeWith(Mono.just(dataBuffer));
+	}
+
 }

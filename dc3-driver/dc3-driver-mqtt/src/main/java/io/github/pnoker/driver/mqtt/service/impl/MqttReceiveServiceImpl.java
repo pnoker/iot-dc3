@@ -45,46 +45,44 @@ import java.util.List;
 @Service
 public class MqttReceiveServiceImpl implements MqttReceiveService {
 
-    @Resource
-    private DriverSenderService driverSenderService;
+	@Resource
+	private DriverSenderService driverSenderService;
 
-    /**
-     * Processes a single MQTT message received from the broker.
-     * <p>
-     * This method parses the MQTT message payload into a PointValue object,
-     * sets the creation time, and forwards it to the platform.
-     * </p>
-     *
-     * @param mqttMessage the MQTT message containing topic, payload, and metadata
-     */
-    @Override
-    public void receiveValue(MqttMessage mqttMessage) {
-        // do something to process your mqtt messages
-        log.info(JsonUtil.toJsonString(mqttMessage));
-        PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
-        pointValue.setCreateTime(LocalDateTimeUtil.now());
-        driverSenderService.pointValueSender(pointValue);
-    }
+	/**
+	 * Processes a single MQTT message received from the broker.
+	 * <p>
+	 * This method parses the MQTT message payload into a PointValue object, sets the
+	 * creation time, and forwards it to the platform.
+	 * </p>
+	 * @param mqttMessage the MQTT message containing topic, payload, and metadata
+	 */
+	@Override
+	public void receiveValue(MqttMessage mqttMessage) {
+		// do something to process your mqtt messages
+		log.info(JsonUtil.toJsonString(mqttMessage));
+		PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
+		pointValue.setCreateTime(LocalDateTimeUtil.now());
+		driverSenderService.pointValueSender(pointValue);
+	}
 
-    /**
-     * Processes a batch of MQTT messages received from the broker.
-     * <p>
-     * This method parses multiple MQTT messages into PointValue objects,
-     * sets their creation times, and forwards them as a batch to the platform.
-     * </p>
-     *
-     * @param mqttMessageList list of MQTT messages to process
-     */
-    @Override
-    public void receiveValues(List<MqttMessage> mqttMessageList) {
-        // do something to process your mqtt messages
-        log.info(JsonUtil.toJsonString(mqttMessageList));
-        List<PointValue> pointValues = mqttMessageList.stream()
-                .map(mqttMessage -> {
-                    PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
-                    pointValue.setCreateTime(LocalDateTimeUtil.now());
-                    return pointValue;
-                }).toList();
-        driverSenderService.pointValueSender(pointValues);
-    }
+	/**
+	 * Processes a batch of MQTT messages received from the broker.
+	 * <p>
+	 * This method parses multiple MQTT messages into PointValue objects, sets their
+	 * creation times, and forwards them as a batch to the platform.
+	 * </p>
+	 * @param mqttMessageList list of MQTT messages to process
+	 */
+	@Override
+	public void receiveValues(List<MqttMessage> mqttMessageList) {
+		// do something to process your mqtt messages
+		log.info(JsonUtil.toJsonString(mqttMessageList));
+		List<PointValue> pointValues = mqttMessageList.stream().map(mqttMessage -> {
+			PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
+			pointValue.setCreateTime(LocalDateTimeUtil.now());
+			return pointValue;
+		}).toList();
+		driverSenderService.pointValueSender(pointValues);
+	}
+
 }

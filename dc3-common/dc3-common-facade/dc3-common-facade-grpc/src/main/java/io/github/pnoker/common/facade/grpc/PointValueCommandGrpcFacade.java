@@ -30,8 +30,8 @@ import org.springframework.stereotype.Component;
  * gRPC implementation: forwards command calls to Data Center via
  * {@link PointValueApiGrpc.PointValueApiBlockingStub}.
  * <p>
- * Selected when {@code dc3.facade.mode=grpc} (or unset — grpc is the default
- * in the auto-configuration declaration).
+ * Selected when {@code dc3.facade.mode=grpc} (or unset — grpc is the default in the
+ * auto-configuration declaration).
  *
  * @author pnoker
  * @since 2026.5.5
@@ -40,27 +40,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class PointValueCommandGrpcFacade implements PointValueCommandFacade {
 
-    @Resource
-    private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
+	@Resource
+	private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
 
-    @Override
-    public boolean read(Long deviceId, Long pointId) {
-        GrpcPointValueCommandQuery request = GrpcPointValueCommandQuery.newBuilder()
-                .setDeviceId(deviceId)
-                .setPointId(pointId)
-                .build();
-        GrpcRBoolean response = pointValueApiBlockingStub.readCommand(request);
-        return response.getResult().getOk() && response.getData();
-    }
+	@Override
+	public boolean read(Long deviceId, Long pointId) {
+		GrpcPointValueCommandQuery request = GrpcPointValueCommandQuery.newBuilder()
+			.setDeviceId(deviceId)
+			.setPointId(pointId)
+			.build();
+		GrpcRBoolean response = pointValueApiBlockingStub.readCommand(request);
+		return response.getResult().getOk() && response.getData();
+	}
 
-    @Override
-    public boolean write(Long deviceId, Long pointId, String value) {
-        GrpcPointValueWriteCommand request = GrpcPointValueWriteCommand.newBuilder()
-                .setDeviceId(deviceId)
-                .setPointId(pointId)
-                .setValue(value)
-                .build();
-        GrpcRBoolean response = pointValueApiBlockingStub.writeCommand(request);
-        return response.getResult().getOk() && response.getData();
-    }
+	@Override
+	public boolean write(Long deviceId, Long pointId, String value) {
+		GrpcPointValueWriteCommand request = GrpcPointValueWriteCommand.newBuilder()
+			.setDeviceId(deviceId)
+			.setPointId(pointId)
+			.setValue(value)
+			.build();
+		GrpcRBoolean response = pointValueApiBlockingStub.writeCommand(request);
+		return response.getResult().getOk() && response.getData();
+	}
+
 }

@@ -43,53 +43,55 @@ import java.util.List;
 @Service
 public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegistryApiImplBase {
 
-    @Resource
-    private ResourceRegistrySyncService resourceRegistrySyncService;
+	@Resource
+	private ResourceRegistrySyncService resourceRegistrySyncService;
 
-    private static List<ResourceRegistryScannedApi> toScannedApis(List<GrpcScannedApiDTO> dtos) {
-        List<ResourceRegistryScannedApi> apis = new ArrayList<>(dtos.size());
-        for (GrpcScannedApiDTO dto : dtos) {
-            apis.add(ResourceRegistryScannedApi.builder()
-                    .method(dto.getMethod())
-                    .path(dto.getPath())
-                    .apiName(dto.getApiName())
-                    .title(dto.getTitle())
-                    .remark(dto.getRemark())
-                    .apiGroup(dto.getApiGroup())
-                    .build());
-        }
-        return apis;
-    }
+	private static List<ResourceRegistryScannedApi> toScannedApis(List<GrpcScannedApiDTO> dtos) {
+		List<ResourceRegistryScannedApi> apis = new ArrayList<>(dtos.size());
+		for (GrpcScannedApiDTO dto : dtos) {
+			apis.add(ResourceRegistryScannedApi.builder()
+				.method(dto.getMethod())
+				.path(dto.getPath())
+				.apiName(dto.getApiName())
+				.title(dto.getTitle())
+				.remark(dto.getRemark())
+				.apiGroup(dto.getApiGroup())
+				.build());
+		}
+		return apis;
+	}
 
-    @Override
-    public void sync(GrpcSyncRequest request, StreamObserver<GrpcRSyncResult> responseObserver) {
-        GrpcRSyncResult.Builder builder = GrpcRSyncResult.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
-        try {
-            ResourceRegistrySyncCommand command = ResourceRegistrySyncCommand.builder()
-                    .serviceName(request.getServiceName())
-                    .deleteMissing(request.getDeleteMissing())
-                    .apis(toScannedApis(request.getApisList()))
-                    .build();
-            ResourceRegistrySyncResult result = resourceRegistrySyncService.sync(command);
+	@Override
+	public void sync(GrpcSyncRequest request, StreamObserver<GrpcRSyncResult> responseObserver) {
+		GrpcRSyncResult.Builder builder = GrpcRSyncResult.newBuilder();
+		GrpcR.Builder rBuilder = GrpcR.newBuilder();
+		try {
+			ResourceRegistrySyncCommand command = ResourceRegistrySyncCommand.builder()
+				.serviceName(request.getServiceName())
+				.deleteMissing(request.getDeleteMissing())
+				.apis(toScannedApis(request.getApisList()))
+				.build();
+			ResourceRegistrySyncResult result = resourceRegistrySyncService.sync(command);
 
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
-            builder.setData(GrpcSyncResultDTO.newBuilder()
-                    .setInserted(result.getInserted())
-                    .setUpdated(result.getUpdated())
-                    .setDeleted(result.getDeleted())
-                    .setUnchanged(result.getUnchanged())
-                    .build());
-        } catch (Exception e) {
-            log.error("Resource registry sync failed for service [{}]", request.getServiceName(), e);
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(e.getMessage() != null ? e.getMessage() : ResponseEnum.FAILURE.getText());
-        }
-        builder.setResult(rBuilder);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
-    }
+			rBuilder.setOk(true);
+			rBuilder.setCode(ResponseEnum.OK.getCode());
+			rBuilder.setMessage(ResponseEnum.OK.getText());
+			builder.setData(GrpcSyncResultDTO.newBuilder()
+				.setInserted(result.getInserted())
+				.setUpdated(result.getUpdated())
+				.setDeleted(result.getDeleted())
+				.setUnchanged(result.getUnchanged())
+				.build());
+		}
+		catch (Exception e) {
+			log.error("Resource registry sync failed for service [{}]", request.getServiceName(), e);
+			rBuilder.setOk(false);
+			rBuilder.setCode(ResponseEnum.FAILURE.getCode());
+			rBuilder.setMessage(e.getMessage() != null ? e.getMessage() : ResponseEnum.FAILURE.getText());
+		}
+		builder.setResult(rBuilder);
+		responseObserver.onNext(builder.build());
+		responseObserver.onCompleted();
+	}
+
 }

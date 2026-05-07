@@ -40,28 +40,30 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserLoginGrpcFacade implements UserLoginFacade {
 
-    @Resource
-    private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
+	@Resource
+	private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcUserLoginBuilder facadeGrpcUserLoginBuilder;
+	@Resource
+	private FacadeGrpcUserLoginBuilder facadeGrpcUserLoginBuilder;
 
-    @Override
-    public FacadeUserLoginBO selectByName(String name) {
-        GrpcRUserLoginDTO response = userLoginApiBlockingStub.selectByName(GrpcNameQuery.newBuilder().setName(name).build());
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByName");
-            return null;
-        }
-        return facadeGrpcUserLoginBuilder.toFacadeBO(response.getData());
-    }
+	@Override
+	public FacadeUserLoginBO selectByName(String name) {
+		GrpcRUserLoginDTO response = userLoginApiBlockingStub
+			.selectByName(GrpcNameQuery.newBuilder().setName(name).build());
+		if (!response.getResult().getOk()) {
+			guardOrThrow(response.getResult(), "selectByName");
+			return null;
+		}
+		return facadeGrpcUserLoginBuilder.toFacadeBO(response.getData());
+	}
 
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
-            log.debug("UserLoginGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("UserLoginFacade." + op + " failed: [" + code + "] " + result.getMessage());
-    }
+	private void guardOrThrow(GrpcR result, String op) {
+		String code = result.getCode();
+		if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+			log.debug("UserLoginGrpcFacade.{} => no resource", op);
+			return;
+		}
+		throw new ServiceException("UserLoginFacade." + op + " failed: [" + code + "] " + result.getMessage());
+	}
+
 }

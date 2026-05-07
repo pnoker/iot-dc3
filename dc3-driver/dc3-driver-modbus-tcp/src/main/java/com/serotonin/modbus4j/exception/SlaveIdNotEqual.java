@@ -25,15 +25,16 @@ package com.serotonin.modbus4j.exception;
  */
 
 public class SlaveIdNotEqual extends ModbusTransportException {
-    private static final long serialVersionUID = -1;
 
-    /**
-     * Exception to show that the requested slave id is not what was received
-     *
-     * @param requestSlaveId  - slave id requested
-     * @param responseSlaveId - slave id of response
-     */
-    public SlaveIdNotEqual(int requestSlaveId, int responseSlaveId) {
-        super("Response slave id different from requested id", requestSlaveId);
-    }
+	private static final long serialVersionUID = -1;
+
+	/**
+	 * Exception to show that the requested slave id is not what was received
+	 * @param requestSlaveId - slave id requested
+	 * @param responseSlaveId - slave id of response
+	 */
+	public SlaveIdNotEqual(int requestSlaveId, int responseSlaveId) {
+		super("Response slave id different from requested id", requestSlaveId);
+	}
+
 }

@@ -28,9 +28,9 @@ import java.io.Serializable;
 /**
  * Unified Response Wrapper Class
  * <p>
- * Generic response wrapper class for API responses in IoT DC3 platform.
- * Provides standardized response format with status, code, message, and data fields.
- * Supports both success and failure response scenarios.
+ * Generic response wrapper class for API responses in IoT DC3 platform. Provides
+ * standardized response format with status, code, message, and data fields. Supports both
+ * success and failure response scenarios.
  * </p>
  *
  * @author pnoker
@@ -43,255 +43,236 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class R<T> implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Response status flag
-     */
-    private boolean ok = false;
+	/**
+	 * Response status flag
+	 */
+	private boolean ok = false;
 
-    /**
-     * Response status code
-     */
-    private String code = ResponseEnum.OK.getCode();
+	/**
+	 * Response status code
+	 */
+	private String code = ResponseEnum.OK.getCode();
 
-    /**
-     * Response message
-     */
-    private String message = ResponseEnum.OK.getText();
+	/**
+	 * Response message
+	 */
+	private String message = ResponseEnum.OK.getText();
 
-    /**
-     * Response data payload
-     */
-    @SuppressWarnings("all")
-    private T data;
+	/**
+	 * Response data payload
+	 */
+	@SuppressWarnings("all")
+	private T data;
 
-    /**
-     * Private default constructor
-     */
-    private R() {
-    }
+	/**
+	 * Private default constructor
+	 */
+	private R() {
+	}
 
-    /**
-     * Private constructor with data
-     *
-     * @param data Response data payload
-     */
-    private R(T data) {
-        this.data = data;
-    }
+	/**
+	 * Private constructor with data
+	 * @param data Response data payload
+	 */
+	private R(T data) {
+		this.data = data;
+	}
 
-    /**
-     * Create success response with default settings
-     *
-     * @param <T> Response data type
-     * @return Response with success status
-     */
-    public static <T> R<T> ok() {
-        return new R<T>().success();
-    }
+	/**
+	 * Create success response with default settings
+	 * @param <T> Response data type
+	 * @return Response with success status
+	 */
+	public static <T> R<T> ok() {
+		return new R<T>().success();
+	}
 
-    /**
-     * Create success response with custom message
-     *
-     * @param <T>     Response data type
-     * @param message Custom success message
-     * @return Response with success status and custom message
-     */
-    public static <T> R<T> ok(String message) {
-        return new R<T>().success(message);
-    }
+	/**
+	 * Create success response with custom message
+	 * @param <T> Response data type
+	 * @param message Custom success message
+	 * @return Response with success status and custom message
+	 */
+	public static <T> R<T> ok(String message) {
+		return new R<T>().success(message);
+	}
 
-    /**
-     * Create success response with custom code and message
-     *
-     * @param <T>  Response data type
-     * @param code {@link ResponseEnum} custom response code
-     * @return Response with success status and custom code/message
-     */
-    public static <T> R<T> ok(ResponseEnum code) {
-        return new R<T>().success(code.getCode(), code.getText());
-    }
+	/**
+	 * Create success response with custom code and message
+	 * @param <T> Response data type
+	 * @param code {@link ResponseEnum} custom response code
+	 * @return Response with success status and custom code/message
+	 */
+	public static <T> R<T> ok(ResponseEnum code) {
+		return new R<T>().success(code.getCode(), code.getText());
+	}
 
-    /**
-     * Success response with custom code and message.
-     *
-     * @param <T>     Object
-     * @param code    {@link ResponseEnum}
-     * @param message Success message
-     * @return Response
-     */
-    public static <T> R<T> ok(ResponseEnum code, String message) {
-        return new R<T>().success(code.getCode(), message);
-    }
+	/**
+	 * Success response with custom code and message.
+	 * @param <T> Object
+	 * @param code {@link ResponseEnum}
+	 * @param message Success message
+	 * @return Response
+	 */
+	public static <T> R<T> ok(ResponseEnum code, String message) {
+		return new R<T>().success(code.getCode(), message);
+	}
 
-    /**
-     * Success response with data.
-     *
-     * @param <T>  Object
-     * @param data Response data
-     * @return Response
-     */
-    public static <T> R<T> ok(T data) {
-        return new R<T>(data).success();
-    }
+	/**
+	 * Success response with data.
+	 * @param <T> Object
+	 * @param data Response data
+	 * @return Response
+	 */
+	public static <T> R<T> ok(T data) {
+		return new R<T>(data).success();
+	}
 
-    /**
-     * Success response with data and custom message.
-     *
-     * @param <T>     Object
-     * @param data    Response data
-     * @param message Success message
-     * @return Response
-     */
-    public static <T> R<T> ok(T data, String message) {
-        return new R<T>(data).success(message);
-    }
+	/**
+	 * Success response with data and custom message.
+	 * @param <T> Object
+	 * @param data Response data
+	 * @param message Success message
+	 * @return Response
+	 */
+	public static <T> R<T> ok(T data, String message) {
+		return new R<T>(data).success(message);
+	}
 
-    /**
-     * Failure response with default settings.
-     *
-     * @param <T> Object
-     * @return Response
-     */
-    public static <T> R<T> fail() {
-        return new R<T>().failure();
-    }
+	/**
+	 * Failure response with default settings.
+	 * @param <T> Object
+	 * @return Response
+	 */
+	public static <T> R<T> fail() {
+		return new R<T>().failure();
+	}
 
-    /**
-     * Failure response with custom message.
-     *
-     * @param <T>     Object
-     * @param message Failure message
-     * @return Response
-     */
-    public static <T> R<T> fail(String message) {
-        return new R<T>().failure(message);
-    }
+	/**
+	 * Failure response with custom message.
+	 * @param <T> Object
+	 * @param message Failure message
+	 * @return Response
+	 */
+	public static <T> R<T> fail(String message) {
+		return new R<T>().failure(message);
+	}
 
-    /**
-     * Failure response with custom code.
-     *
-     * @param <T>  Object
-     * @param code {@link ResponseEnum}
-     * @return Response
-     */
-    public static <T> R<T> fail(ResponseEnum code) {
-        return new R<T>().failure(code.getCode(), code.getText());
-    }
+	/**
+	 * Failure response with custom code.
+	 * @param <T> Object
+	 * @param code {@link ResponseEnum}
+	 * @return Response
+	 */
+	public static <T> R<T> fail(ResponseEnum code) {
+		return new R<T>().failure(code.getCode(), code.getText());
+	}
 
-    /**
-     * Failure response with custom code and message.
-     *
-     * @param <T>     Object
-     * @param code    {@link ResponseEnum}
-     * @param message Failure message
-     * @return Response
-     */
-    public static <T> R<T> fail(ResponseEnum code, String message) {
-        return new R<T>().failure(code.getCode(), message);
-    }
+	/**
+	 * Failure response with custom code and message.
+	 * @param <T> Object
+	 * @param code {@link ResponseEnum}
+	 * @param message Failure message
+	 * @return Response
+	 */
+	public static <T> R<T> fail(ResponseEnum code, String message) {
+		return new R<T>().failure(code.getCode(), message);
+	}
 
-    /**
-     * Failure response with data.
-     *
-     * @param <T>  Object
-     * @param data Response data
-     * @return Response
-     */
-    public static <T> R<T> fail(T data) {
-        return new R<T>(data).failure();
-    }
+	/**
+	 * Failure response with data.
+	 * @param <T> Object
+	 * @param data Response data
+	 * @return Response
+	 */
+	public static <T> R<T> fail(T data) {
+		return new R<T>(data).failure();
+	}
 
-    /**
-     * Failure response with data and custom message.
-     *
-     * @param <T>     Object
-     * @param data    Response data
-     * @param message Failure message
-     * @return Response
-     */
-    public static <T> R<T> fail(T data, String message) {
-        return new R<T>(data).failure(message);
-    }
+	/**
+	 * Failure response with data and custom message.
+	 * @param <T> Object
+	 * @param data Response data
+	 * @param message Failure message
+	 * @return Response
+	 */
+	public static <T> R<T> fail(T data, String message) {
+		return new R<T>(data).failure(message);
+	}
 
-    /**
-     * Internal success handler with default settings.
-     *
-     * @return Response
-     */
-    private R<T> success() {
-        this.ok = true;
-        this.code = ResponseEnum.OK.getCode();
-        this.message = ResponseEnum.OK.getText();
-        return this;
-    }
+	/**
+	 * Internal success handler with default settings.
+	 * @return Response
+	 */
+	private R<T> success() {
+		this.ok = true;
+		this.code = ResponseEnum.OK.getCode();
+		this.message = ResponseEnum.OK.getText();
+		return this;
+	}
 
-    /**
-     * Internal success handler with custom message.
-     *
-     * @param message Success message
-     * @return Response
-     */
-    private R<T> success(String message) {
-        this.ok = true;
-        this.code = ResponseEnum.OK.getCode();
-        this.message = message;
-        return this;
-    }
+	/**
+	 * Internal success handler with custom message.
+	 * @param message Success message
+	 * @return Response
+	 */
+	private R<T> success(String message) {
+		this.ok = true;
+		this.code = ResponseEnum.OK.getCode();
+		this.message = message;
+		return this;
+	}
 
-    /**
-     * Internal success handler with custom code and message.
-     *
-     * @param code    Code
-     * @param message Success message
-     * @return Response
-     */
-    private R<T> success(String code, String message) {
-        this.ok = true;
-        this.code = code;
-        this.message = message;
-        return this;
-    }
+	/**
+	 * Internal success handler with custom code and message.
+	 * @param code Code
+	 * @param message Success message
+	 * @return Response
+	 */
+	private R<T> success(String code, String message) {
+		this.ok = true;
+		this.code = code;
+		this.message = message;
+		return this;
+	}
 
-    /**
-     * Internal failure handler with default settings.
-     *
-     * @return Response
-     */
-    private R<T> failure() {
-        this.ok = false;
-        this.code = ResponseEnum.FAILURE.getCode();
-        this.message = ResponseEnum.FAILURE.getText();
-        return this;
-    }
+	/**
+	 * Internal failure handler with default settings.
+	 * @return Response
+	 */
+	private R<T> failure() {
+		this.ok = false;
+		this.code = ResponseEnum.FAILURE.getCode();
+		this.message = ResponseEnum.FAILURE.getText();
+		return this;
+	}
 
-    /**
-     * Internal failure handler with custom message.
-     *
-     * @param message Error message
-     * @return Response
-     */
-    private R<T> failure(String message) {
-        this.ok = false;
-        this.code = ResponseEnum.FAILURE.getCode();
-        this.message = message;
-        return this;
-    }
+	/**
+	 * Internal failure handler with custom message.
+	 * @param message Error message
+	 * @return Response
+	 */
+	private R<T> failure(String message) {
+		this.ok = false;
+		this.code = ResponseEnum.FAILURE.getCode();
+		this.message = message;
+		return this;
+	}
 
-    /**
-     * Internal failure handler with custom code and message.
-     *
-     * @param code    Code
-     * @param message Error message
-     * @return Response
-     */
-    private R<T> failure(String code, String message) {
-        this.ok = false;
-        this.code = code;
-        this.message = message;
-        return this;
-    }
+	/**
+	 * Internal failure handler with custom code and message.
+	 * @param code Code
+	 * @param message Error message
+	 * @return Response
+	 */
+	private R<T> failure(String code, String message) {
+		this.ok = false;
+		this.code = code;
+		this.message = message;
+		return this;
+	}
 
 }

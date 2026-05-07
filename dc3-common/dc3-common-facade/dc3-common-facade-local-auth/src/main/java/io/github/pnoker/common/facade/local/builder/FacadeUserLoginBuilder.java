@@ -28,8 +28,9 @@ import org.mapstruct.Mapper;
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface FacadeUserLoginBuilder {
 
-    FacadeUserLoginBO toFacadeBO(UserLoginBO authBO);
+	FacadeUserLoginBO toFacadeBO(UserLoginBO authBO);
+
 }

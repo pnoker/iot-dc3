@@ -19,34 +19,32 @@ package io.github.pnoker.driver.api;
 import java.io.Closeable;
 
 /**
- * Interface for connecting to Siemens S7 PLCs.
- * This interface provides methods to read from and write to different memory areas
- * in Siemens S7 programmable logic controllers.
+ * Interface for connecting to Siemens S7 PLCs. This interface provides methods to read
+ * from and write to different memory areas in Siemens S7 programmable logic controllers.
  *
  * @author Thomas Rudin
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public interface S7Connector extends Closeable {
-    /**
-     * Read bytes from a PLC memory area.
-     *
-     * @param area       the memory area type
-     * @param areaNumber area number (e.g. DB number)
-     * @param bytes      number of bytes to read
-     * @param offset     byte offset within the area
-     * @return the bytes read from the PLC
-     */
-    public byte[] read(DaveArea area, int areaNumber, int bytes, int offset);
 
-    /**
-     * Write bytes to a PLC memory area.
-     *
-     * @param area       the memory area type
-     * @param areaNumber area number (e.g. DB number)
-     * @param offset     byte offset within the area
-     * @param buffer     the byte array to write
-     */
-    public void write(DaveArea area, int areaNumber, int offset, byte[] buffer);
+	/**
+	 * Read bytes from a PLC memory area.
+	 * @param area the memory area type
+	 * @param areaNumber area number (e.g. DB number)
+	 * @param bytes number of bytes to read
+	 * @param offset byte offset within the area
+	 * @return the bytes read from the PLC
+	 */
+	byte[] read(DaveArea area, int areaNumber, int bytes, int offset);
+
+	/**
+	 * Write bytes to a PLC memory area.
+	 * @param area the memory area type
+	 * @param areaNumber area number (e.g. DB number)
+	 * @param offset byte offset within the area
+	 * @param buffer the byte array to write
+	 */
+	void write(DaveArea area, int areaNumber, int offset, byte[] buffer);
 
 }

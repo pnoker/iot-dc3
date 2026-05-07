@@ -43,121 +43,122 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_point_attribute", autoResultMap = true)
 public class PointAttributeDO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Primary key ID
-     */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private Long id;
+	/**
+	 * Primary key ID
+	 */
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
+	private Long id;
 
-    /**
-     * Name
-     */
-    @TableField("attribute_name")
-    private String attributeName;
+	/**
+	 * Name
+	 */
+	@TableField("attribute_name")
+	private String attributeName;
 
-    /**
-     * Code
-     */
-    @TableField("attribute_code")
-    private String attributeCode;
+	/**
+	 * Code
+	 */
+	@TableField("attribute_code")
+	private String attributeCode;
 
-    /**
-     * Type
-     */
-    @TableField("attribute_type_flag")
-    private Byte attributeTypeFlag;
+	/**
+	 * Type
+	 */
+	@TableField("attribute_type_flag")
+	private Byte attributeTypeFlag;
 
-    /**
-     *
-     */
-    @TableField("default_value")
-    private String defaultValue;
+	/**
+	 *
+	 */
+	@TableField("default_value")
+	private String defaultValue;
 
-    /**
-     * Driver ID
-     */
-    @TableField("driver_id")
-    private Long driverId;
+	/**
+	 * Driver ID
+	 */
+	@TableField("driver_id")
+	private Long driverId;
 
-    /**
-     *
-     */
-    @TableField(value = "attribute_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt attributeExt;
+	/**
+	 *
+	 */
+	@TableField(value = "attribute_ext", typeHandler = JacksonTypeHandler.class)
+	private JsonExt attributeExt;
 
-    /**
-     * Enable flag, 0:, 1:Disable
-     */
-    @TableField("enable_flag")
-    private Byte enableFlag;
+	/**
+	 * Enable flag, 0:, 1:Disable
+	 */
+	@TableField("enable_flag")
+	private Byte enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    @TableField("tenant_id")
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	@TableField("tenant_id")
+	private Long tenantId;
 
-    /**
-     * Description
-     */
-    @TableField("remark")
-    private String remark;
+	/**
+	 * Description
+	 */
+	@TableField("remark")
+	private String remark;
 
-    /**
-     *
-     */
-    @TableField("signature")
-    private String signature;
+	/**
+	 *
+	 */
+	@TableField("signature")
+	private String signature;
 
-    /**
-     *
-     */
-    @TableField("version")
-    private Integer version;
+	/**
+	 *
+	 */
+	@TableField("version")
+	private Integer version;
 
-    /**
-     * Creator ID
-     */
-    @TableField("creator_id")
-    private Long creatorId;
+	/**
+	 * Creator ID
+	 */
+	@TableField("creator_id")
+	private Long creatorId;
 
-    /**
-     * Creator Name
-     */
-    @TableField("creator_name")
-    private String creatorName;
+	/**
+	 * Creator Name
+	 */
+	@TableField("creator_name")
+	private String creatorName;
 
-    /**
-     * Create Time
-     */
-    @TableField("create_time")
-    private LocalDateTime createTime;
+	/**
+	 * Create Time
+	 */
+	@TableField("create_time")
+	private LocalDateTime createTime;
 
-    /**
-     * Operator ID
-     */
-    @TableField("operator_id")
-    private Long operatorId;
+	/**
+	 * Operator ID
+	 */
+	@TableField("operator_id")
+	private Long operatorId;
 
-    /**
-     * Operator Name
-     */
-    @TableField("operator_name")
-    private String operatorName;
+	/**
+	 * Operator Name
+	 */
+	@TableField("operator_name")
+	private String operatorName;
 
-    /**
-     * Operate Time
-     */
-    @TableField("operate_time")
-    private LocalDateTime operateTime;
+	/**
+	 * Operate Time
+	 */
+	@TableField("operate_time")
+	private LocalDateTime operateTime;
 
-    /**
-     * Logical delete flag, 0:not deleted, 1:deleted
-     */
-    @TableLogic
-    @TableField("deleted")
-    private Byte deleted;
+	/**
+	 * Logical delete flag, 0:not deleted, 1:deleted
+	 */
+	@TableLogic
+	@TableField("deleted")
+	private Byte deleted;
+
 }

@@ -25,9 +25,9 @@ import java.io.Serializable;
 /**
  * Point Query Business Object
  * <p>
- * Business object for point queries in IoT DC3 platform.
- * Contains device ID and point ID for querying specific point data.
- * Used for retrieving point information from the repository layer.
+ * Business object for point queries in IoT DC3 platform. Contains device ID and point ID
+ * for querying specific point data. Used for retrieving point information from the
+ * repository layer.
  * </p>
  *
  * @author pnoker
@@ -42,16 +42,17 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PointQueryBO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Device ID for querying point data
-     */
-    private Long deviceId;
+	/**
+	 * Device ID for querying point data
+	 */
+	private Long deviceId;
 
-    /**
-     * Point ID for querying specific point
-     */
-    private Long pointId;
+	/**
+	 * Point ID for querying specific point
+	 */
+	private Long pointId;
+
 }

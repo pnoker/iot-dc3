@@ -29,36 +29,39 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Application startup runner that completes the standard driver bootstrap sequence: registration,
- * custom initialization, and schedule initialization.
+ * Application startup runner that completes the standard driver bootstrap sequence:
+ * registration, custom initialization, and schedule initialization.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.driver"
-})
-@EnableConfigurationProperties({DriverProperties.class})
+@ComponentScan(basePackages = { "io.github.pnoker.common.driver" })
+@EnableConfigurationProperties({ DriverProperties.class })
 public class DriverInitRunner implements ApplicationRunner {
 
-    @Resource
-    private DriverRegisterService driverRegisterService;
-    @Resource
-    private DriverCustomService driverCustomService;
-    @Resource
-    private DriverScheduleService driverScheduleService;
+	@Resource
+	private DriverRegisterService driverRegisterService;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // Initialize driver registration and synchronize basic information with the platform
-        driverRegisterService.initial();
+	@Resource
+	private DriverCustomService driverCustomService;
 
-        // Execute custom initialization functions specific to this driver module
-        driverCustomService.initial();
+	@Resource
+	private DriverScheduleService driverScheduleService;
 
-        // Initialize driver tasks including status monitoring, reading operations and custom tasks
-        driverScheduleService.initial();
-    }
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		// Initialize driver registration and synchronize basic information with the
+		// platform
+		driverRegisterService.initial();
+
+		// Execute custom initialization functions specific to this driver module
+		driverCustomService.initial();
+
+		// Initialize driver tasks including status monitoring, reading operations and
+		// custom tasks
+		driverScheduleService.initial();
+	}
+
 }

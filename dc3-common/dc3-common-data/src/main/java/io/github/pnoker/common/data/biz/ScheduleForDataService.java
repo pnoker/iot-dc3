@@ -25,8 +25,10 @@ package io.github.pnoker.common.data.biz;
  * @since 2022.1.0
  */
 public interface ScheduleForDataService {
-    /**
-     * Initialize schedule tasks for data processing
-     */
-    void initial();
+
+	/**
+	 * Initialize schedule tasks for data processing
+	 */
+	void initial();
+
 }

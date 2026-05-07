@@ -28,11 +28,19 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CorrelationPairRow {
-    private String aSource;
-    private long aSourceId;
-    private int aEventType;
-    private String bSource;
-    private long bSourceId;
-    private int bEventType;
-    private long coCount;
+
+	private String aSource;
+
+	private long aSourceId;
+
+	private int aEventType;
+
+	private String bSource;
+
+	private long bSourceId;
+
+	private int bEventType;
+
+	private long coCount;
+
 }

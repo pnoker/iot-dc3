@@ -50,180 +50,181 @@ import java.util.stream.Collectors;
 @Service
 public class PointValueServiceImpl implements PointValueService {
 
-    @Resource
-    private PointFacade pointFacade;
+	@Resource
+	private PointFacade pointFacade;
 
-    @Resource
-    private PointValueLocalCacheService pointValueLocalCacheService;
+	@Resource
+	private PointValueLocalCacheService pointValueLocalCacheService;
 
-    @Override
-    public void save(PointValueBO pointValueBO) {
-        if (Objects.isNull(pointValueBO)) {
-            return;
-        }
+	@Override
+	public void save(PointValueBO pointValueBO) {
+		if (Objects.isNull(pointValueBO)) {
+			return;
+		}
 
-        // create_time carries the driver's acquisition timestamp; operate_time
-        // is stamped at persistence. Keeping them distinct lets the dashboard
-        // measure the collect→store pipeline latency.
-        if (Objects.isNull(pointValueBO.getCreateTime())) {
-            pointValueBO.setCreateTime(LocalDateTimeUtil.now());
-        }
-        pointValueBO.setOperateTime(LocalDateTimeUtil.now());
-        savePointValueToRepository(pointValueBO);
-    }
+		// create_time carries the driver's acquisition timestamp; operate_time
+		// is stamped at persistence. Keeping them distinct lets the dashboard
+		// measure the collect→store pipeline latency.
+		if (Objects.isNull(pointValueBO.getCreateTime())) {
+			pointValueBO.setCreateTime(LocalDateTimeUtil.now());
+		}
+		pointValueBO.setOperateTime(LocalDateTimeUtil.now());
+		savePointValueToRepository(pointValueBO);
+	}
 
-    @Override
-    public void save(List<PointValueBO> pointValueBOList) {
-        if (CollectionUtils.isEmpty(pointValueBOList)) {
-            return;
-        }
+	@Override
+	public void save(List<PointValueBO> pointValueBOList) {
+		if (CollectionUtils.isEmpty(pointValueBOList)) {
+			return;
+		}
 
-        final Map<Long, List<PointValueBO>> group = pointValueBOList.stream()
-                .map(pointValue -> {
-                    if (Objects.isNull(pointValue.getCreateTime())) {
-                        pointValue.setCreateTime(LocalDateTimeUtil.now());
-                    }
-                    // See single-row save() — operate_time is the persistence
-                    // timestamp, not a mirror of create_time.
-                    pointValue.setOperateTime(LocalDateTimeUtil.now());
-                    return pointValue;
-                })
-                .collect(Collectors.groupingBy(PointValueBO::getDeviceId));
+		final Map<Long, List<PointValueBO>> group = pointValueBOList.stream().map(pointValue -> {
+			if (Objects.isNull(pointValue.getCreateTime())) {
+				pointValue.setCreateTime(LocalDateTimeUtil.now());
+			}
+			// See single-row save() — operate_time is the persistence
+			// timestamp, not a mirror of create_time.
+			pointValue.setOperateTime(LocalDateTimeUtil.now());
+			return pointValue;
+		}).collect(Collectors.groupingBy(PointValueBO::getDeviceId));
 
-        group.forEach(this::savePointValuesToRepository);
-    }
+		group.forEach(this::savePointValuesToRepository);
+	}
 
-    @Override
-    public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
-        if (Objects.isNull(tenantId) || Objects.isNull(deviceId) || Objects.isNull(pointId)) {
-            return Collections.emptyList();
-        }
-        if (count < 1) {
-            count = 100;
-        }
-        if (count > 500) {
-            count = 500;
-        }
+	@Override
+	public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
+		if (Objects.isNull(tenantId) || Objects.isNull(deviceId) || Objects.isNull(pointId)) {
+			return Collections.emptyList();
+		}
+		if (count < 1) {
+			count = 100;
+		}
+		if (count > 500) {
+			count = 500;
+		}
 
-        RepositoryService repositoryService = getFirstRepositoryService();
-        return repositoryService.selectHistoryPointValue(tenantId, deviceId, pointId, count);
-    }
+		RepositoryService repositoryService = getFirstRepositoryService();
+		return repositoryService.selectHistoryPointValue(tenantId, deviceId, pointId, count);
+	}
 
-    @Override
-    public Page<PointValueBO> latest(PointValueQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
+	@Override
+	public Page<PointValueBO> latest(PointValueQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
 
-        Page<PointValueBO> entityPageBO = new Page<>();
-        entityPageBO.setCurrent(entityQuery.getPage().getCurrent()).setSize(entityQuery.getPage().getSize());
+		Page<PointValueBO> entityPageBO = new Page<>();
+		entityPageBO.setCurrent(entityQuery.getPage().getCurrent()).setSize(entityQuery.getPage().getSize());
 
-        FacadePointQuery facadeQuery = FacadePointQuery.builder()
-                .page(entityQuery.getPage())
-                .pointName(entityQuery.getPointName())
-                .tenantId(entityQuery.getTenantId())
-                .deviceId(entityQuery.getDeviceId())
-                .enableFlag(entityQuery.getEnableFlag())
-                .build();
+		FacadePointQuery facadeQuery = FacadePointQuery.builder()
+			.page(entityQuery.getPage())
+			.pointName(entityQuery.getPointName())
+			.tenantId(entityQuery.getTenantId())
+			.deviceId(entityQuery.getDeviceId())
+			.enableFlag(entityQuery.getEnableFlag())
+			.build();
 
-        FacadePage<FacadePointBO> page = pointFacade.selectByPage(facadeQuery);
-        List<Long> pointIds = page.getRecords().stream().map(FacadePointBO::getId).toList();
+		FacadePage<FacadePointBO> page = pointFacade.selectByPage(facadeQuery);
+		List<Long> pointIds = page.getRecords().stream().map(FacadePointBO::getId).toList();
 
-        if (pointIds.isEmpty()) {
-            return entityPageBO;
-        }
+		if (pointIds.isEmpty()) {
+			return entityPageBO;
+		}
 
-        Long tenantId = entityQuery.getTenantId();
-        Map<Long, PointValueBO> pointValueBOMap = pointValueLocalCacheService.selectLatestPointValue(tenantId, entityQuery.getDeviceId(), pointIds);
-        RepositoryService repositoryService = getFirstRepositoryService();
-        List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
-            PointValueBO value = pointValueBOMap.get(id);
-            return Objects.isNull(value) ? repositoryService.selectLatestPointValue(tenantId, entityQuery.getDeviceId(), id) : value;
-        }).filter(Objects::nonNull).toList();
+		Long tenantId = entityQuery.getTenantId();
+		Map<Long, PointValueBO> pointValueBOMap = pointValueLocalCacheService.selectLatestPointValue(tenantId,
+				entityQuery.getDeviceId(), pointIds);
+		RepositoryService repositoryService = getFirstRepositoryService();
+		List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
+			PointValueBO value = pointValueBOMap.get(id);
+			return Objects.isNull(value)
+					? repositoryService.selectLatestPointValue(tenantId, entityQuery.getDeviceId(), id) : value;
+		}).filter(Objects::nonNull).toList();
 
-        entityPageBO.setCurrent(page.getCurrent())
-                .setSize(page.getSize())
-                .setTotal(page.getTotal())
-                .setRecords(pointValueBOList);
+		entityPageBO.setCurrent(page.getCurrent())
+			.setSize(page.getSize())
+			.setTotal(page.getTotal())
+			.setRecords(pointValueBOList);
 
-        return entityPageBO;
-    }
+		return entityPageBO;
+	}
 
-    @Override
-    @SneakyThrows
-    public Page<PointValueBO> page(PointValueQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        if (entityQuery.getCreateTimeFrom() == null) {
-            java.time.LocalDateTime from = io.github.pnoker.common.utils.TimeRangeUtil
-                    .resolveFrom(entityQuery.getRangeKey(), entityQuery.getRangeHours());
-            if (from != null) {
-                entityQuery.setCreateTimeFrom(from);
-            }
-        }
+	@Override
+	@SneakyThrows
+	public Page<PointValueBO> page(PointValueQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		if (entityQuery.getCreateTimeFrom() == null) {
+			java.time.LocalDateTime from = io.github.pnoker.common.utils.TimeRangeUtil
+				.resolveFrom(entityQuery.getRangeKey(), entityQuery.getRangeHours());
+			if (from != null) {
+				entityQuery.setCreateTimeFrom(from);
+			}
+		}
 
-        RepositoryService repositoryService = getFirstRepositoryService();
-        return repositoryService.selectPagePointValue(entityQuery);
-    }
+		RepositoryService repositoryService = getFirstRepositoryService();
+		return repositoryService.selectPagePointValue(entityQuery);
+	}
 
-    /**
-     * Save PointValue to the specified storage service
-     *
-     * @param pointValueBO PointValue
-     */
-    private void savePointValueToRepository(PointValueBO pointValueBO) {
-        try {
-            // local hot cache
-            pointValueLocalCacheService.savePointValue(pointValueBO);
+	/**
+	 * Save PointValue to the specified storage service
+	 * @param pointValueBO PointValue
+	 */
+	private void savePointValueToRepository(PointValueBO pointValueBO) {
+		try {
+			// local hot cache
+			pointValueLocalCacheService.savePointValue(pointValueBO);
 
-            // other repository
-            RepositoryService repositoryService = getFirstRepositoryService();
-            repositoryService.savePointValue(pointValueBO);
-        } catch (Exception e) {
-            log.error("Save point value to error {}", e.getMessage());
-        }
-    }
+			// other repository
+			RepositoryService repositoryService = getFirstRepositoryService();
+			repositoryService.savePointValue(pointValueBO);
+		}
+		catch (Exception e) {
+			log.error("Save point value to error {}", e.getMessage());
+		}
+	}
 
-    /**
-     * Save PointValues to the specified storage service
-     *
-     * @param deviceId         Device ID
-     * @param pointValueBOList Array
-     */
-    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOList) {
-        try {
-            // local hot cache
-            pointValueLocalCacheService.savePointValue(deviceId, pointValueBOList);
+	/**
+	 * Save PointValues to the specified storage service
+	 * @param deviceId Device ID
+	 * @param pointValueBOList Array
+	 */
+	private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOList) {
+		try {
+			// local hot cache
+			pointValueLocalCacheService.savePointValue(deviceId, pointValueBOList);
 
-            // other repository
-            RepositoryService repositoryService = getFirstRepositoryService();
-            List<List<PointValueBO>> splitPointValueBOList = ListUtils.partition(pointValueBOList, 100);
-            for (List<PointValueBO> splitPointValueBO : splitPointValueBOList) {
-                repositoryService.savePointValues(splitPointValueBO);
-            }
-        } catch (Exception e) {
-            log.error("Save point values to error {}", e.getMessage());
-        }
-    }
+			// other repository
+			RepositoryService repositoryService = getFirstRepositoryService();
+			List<List<PointValueBO>> splitPointValueBOList = ListUtils.partition(pointValueBOList, 100);
+			for (List<PointValueBO> splitPointValueBO : splitPointValueBOList) {
+				repositoryService.savePointValues(splitPointValueBO);
+			}
+		}
+		catch (Exception e) {
+			log.error("Save point values to error {}", e.getMessage());
+		}
+	}
 
-    /**
-     * Get data storage service
-     *
-     * @return RepositoryService
-     */
-    private RepositoryService getFirstRepositoryService() {
-        List<RepositoryService> repositoryServices = RepositoryStrategyFactory.get();
-        if (!repositoryServices.isEmpty() && repositoryServices.size() > 1) {
-            throw new RepositoryException("Save point values to repository error: There are multiple repository, only one is supported.");
-        }
+	/**
+	 * Get data storage service
+	 * @return RepositoryService
+	 */
+	private RepositoryService getFirstRepositoryService() {
+		List<RepositoryService> repositoryServices = RepositoryStrategyFactory.get();
+		if (!repositoryServices.isEmpty() && repositoryServices.size() > 1) {
+			throw new RepositoryException(
+					"Save point values to repository error: There are multiple repository, only one is supported.");
+		}
 
-        Optional<RepositoryService> first = repositoryServices.stream().findFirst();
-        if (first.isEmpty()) {
-            throw new RepositoryException("Save point values to repository error: Please configure at least one repository.");
-        }
+		Optional<RepositoryService> first = repositoryServices.stream().findFirst();
+		if (first.isEmpty()) {
+			throw new RepositoryException(
+					"Save point values to repository error: Please configure at least one repository.");
+		}
 
-        return first.get();
-    }
+		return first.get();
+	}
 
 }

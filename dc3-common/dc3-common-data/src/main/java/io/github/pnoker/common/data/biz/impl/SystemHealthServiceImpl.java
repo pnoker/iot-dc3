@@ -49,15 +49,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Probes each dependency with a bounded, catch-all wrapper so a single flaky
- * dependency doesn't break the whole snapshot. Each probe returns "up" or
- * "down" — ambiguous states are treated as "down".
+ * Probes each dependency with a bounded, catch-all wrapper so a single flaky dependency
+ * doesn't break the whole snapshot. Each probe returns "up" or "down" — ambiguous states
+ * are treated as "down".
  *
- * <p>Driver / device summaries have to live in this service: the
- * online-status cache in {@link LocalCacheService} is populated by the
- * heartbeat receivers here, not in manager. The fleet facades are called
- * with a tenantId so the manager-side query filters to the caller's tenant
- * (leaving it null routes through gRPC as 0 and matches no rows).</p>
+ * <p>
+ * Driver / device summaries have to live in this service: the online-status cache in
+ * {@link LocalCacheService} is populated by the heartbeat receivers here, not in manager.
+ * The fleet facades are called with a tenantId so the manager-side query filters to the
+ * caller's tenant (leaving it null routes through gRPC as 0 and matches no rows).
+ * </p>
  *
  * @author pnoker
  * @since 2026.5.2
@@ -66,171 +67,175 @@ import java.util.concurrent.TimeoutException;
 @Service
 public class SystemHealthServiceImpl implements SystemHealthService {
 
-    private static final String UP = "up";
-    private static final String DOWN = "down";
+	private static final String UP = "up";
 
-    /**
-     * Per-probe hard deadline. gRPC facades don't set a client-side timeout
-     * by default, so a dead sibling would otherwise stall the whole banner.
-     */
-    private static final long PROBE_TIMEOUT_MS = 2000L;
+	private static final String DOWN = "down";
 
-    @Resource
-    private DataSource dataSource;
+	/**
+	 * Per-probe hard deadline. gRPC facades don't set a client-side timeout by default,
+	 * so a dead sibling would otherwise stall the whole banner.
+	 */
+	private static final long PROBE_TIMEOUT_MS = 2000L;
 
-    @Resource
-    private ConnectionFactory rabbitConnectionFactory;
+	@Resource
+	private DataSource dataSource;
 
-    @Resource
-    private TenantFacade tenantFacade;
+	@Resource
+	private ConnectionFactory rabbitConnectionFactory;
 
-    @Resource
-    private DriverFacade driverFacade;
+	@Resource
+	private TenantFacade tenantFacade;
 
-    @Resource
-    private DeviceFacade deviceFacade;
+	@Resource
+	private DriverFacade driverFacade;
 
-    @Resource
-    private LocalCacheService localCacheService;
+	@Resource
+	private DeviceFacade deviceFacade;
 
-    private static Pages firstPage(int size) {
-        Pages p = new Pages();
-        p.setCurrent(1L);
-        p.setSize((long) size);
-        return p;
-    }
+	@Resource
+	private LocalCacheService localCacheService;
 
-    /**
-     * Runs a truthy probe on the common ForkJoinPool with a hard timeout.
-     * Any exception, false return, or timeout maps to "down".
-     */
-    private static String probe(Probe probe) {
-        CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return probe.check();
-            } catch (Exception e) {
-                log.debug("Probe failed: {}", e.getMessage());
-                return false;
-            }
-        });
-        try {
-            return future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS) ? UP : DOWN;
-        } catch (TimeoutException e) {
-            future.cancel(true);
-            log.debug("Probe timed out after {}ms", PROBE_TIMEOUT_MS);
-            return DOWN;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return DOWN;
-        } catch (ExecutionException e) {
-            log.debug("Probe execution failed: {}", e.getMessage());
-            return DOWN;
-        }
-    }
+	private static Pages firstPage(int size) {
+		Pages p = new Pages();
+		p.setCurrent(1L);
+		p.setSize((long) size);
+		return p;
+	}
 
-    @Override
-    public SystemHealthVO snapshot(Long tenantId) {
-        SystemHealthVO vo = new SystemHealthVO();
-        vo.setCenter(probeCenter());
-        vo.setInfra(probeInfra());
-        vo.setDrivers(summariseDrivers(tenantId));
-        vo.setDevices(summariseDevices(tenantId));
-        return vo;
-    }
+	/**
+	 * Runs a truthy probe on the common ForkJoinPool with a hard timeout. Any exception,
+	 * false return, or timeout maps to "down".
+	 */
+	private static String probe(Probe probe) {
+		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> {
+			try {
+				return probe.check();
+			}
+			catch (Exception e) {
+				log.debug("Probe failed: {}", e.getMessage());
+				return false;
+			}
+		});
+		try {
+			return future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS) ? UP : DOWN;
+		}
+		catch (TimeoutException e) {
+			future.cancel(true);
+			log.debug("Probe timed out after {}ms", PROBE_TIMEOUT_MS);
+			return DOWN;
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			return DOWN;
+		}
+		catch (ExecutionException e) {
+			log.debug("Probe execution failed: {}", e.getMessage());
+			return DOWN;
+		}
+	}
 
-    private Map<String, String> probeCenter() {
-        Map<String, String> out = new LinkedHashMap<>();
-        out.put("auth", probe(() -> tenantFacade.selectByCode("default") != null));
-        out.put("data", UP); // reaching this code == data is up
-        out.put("manager", probe(() -> {
-            FacadeDriverQuery q = FacadeDriverQuery.builder().page(firstPage(1)).build();
-            return driverFacade.selectByPage(q) != null;
-        }));
-        return out;
-    }
+	@Override
+	public SystemHealthVO snapshot(Long tenantId) {
+		SystemHealthVO vo = new SystemHealthVO();
+		vo.setCenter(probeCenter());
+		vo.setInfra(probeInfra());
+		vo.setDrivers(summariseDrivers(tenantId));
+		vo.setDevices(summariseDevices(tenantId));
+		return vo;
+	}
 
-    private Map<String, String> probeInfra() {
-        Map<String, String> out = new LinkedHashMap<>();
-        out.put("database", probe(() -> {
-            try (Connection conn = dataSource.getConnection()) {
-                return conn.isValid(1);
-            }
-        }));
-        out.put("mq", probe(() -> {
-            try (var connection = rabbitConnectionFactory.createConnection()) {
-                return connection.isOpen();
-            }
-        }));
-        out.put("gateway", UP); // the request reached this server via gateway
-        return out;
-    }
+	private Map<String, String> probeCenter() {
+		Map<String, String> out = new LinkedHashMap<>();
+		out.put("auth", probe(() -> tenantFacade.selectByCode("default") != null));
+		out.put("data", UP); // reaching this code == data is up
+		out.put("manager", probe(() -> {
+			FacadeDriverQuery q = FacadeDriverQuery.builder().page(firstPage(1)).build();
+			return driverFacade.selectByPage(q) != null;
+		}));
+		return out;
+	}
 
-    private SystemHealthVO.FleetSummary summariseDrivers(Long tenantId) {
-        SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
-        CompletableFuture<List<FacadeDriverBO>> future = CompletableFuture.supplyAsync(() -> {
-            FacadeDriverQuery q = FacadeDriverQuery.builder()
-                    .page(firstPage(1000))
-                    .tenantId(tenantId)
-                    .build();
-            FacadePage<FacadeDriverBO> page = driverFacade.selectByPage(q);
-            return page != null ? page.getRecords() : List.<FacadeDriverBO>of();
-        });
-        List<FacadeDriverBO> drivers;
-        try {
-            drivers = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-            log.warn("Driver summary failed: {}", e.getMessage(), e);
-            return summary;
-        }
-        int online = 0;
-        String onlineCode = DriverStatusEnum.ONLINE.getCode();
-        for (FacadeDriverBO d : drivers) {
-            String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + d.getId();
-            String status = localCacheService.getKey(key);
-            if (Objects.equals(status, onlineCode)) {
-                online++;
-            }
-        }
-        summary.setTotal(drivers.size());
-        summary.setOnline(online);
-        return summary;
-    }
+	private Map<String, String> probeInfra() {
+		Map<String, String> out = new LinkedHashMap<>();
+		out.put("database", probe(() -> {
+			try (Connection conn = dataSource.getConnection()) {
+				return conn.isValid(1);
+			}
+		}));
+		out.put("mq", probe(() -> {
+			try (var connection = rabbitConnectionFactory.createConnection()) {
+				return connection.isOpen();
+			}
+		}));
+		out.put("gateway", UP); // the request reached this server via gateway
+		return out;
+	}
 
-    private SystemHealthVO.FleetSummary summariseDevices(Long tenantId) {
-        SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
-        CompletableFuture<List<FacadeDeviceBO>> future = CompletableFuture.supplyAsync(() -> {
-            FacadeDeviceQuery q = FacadeDeviceQuery.builder()
-                    .page(firstPage(5000))
-                    .tenantId(tenantId)
-                    .build();
-            FacadePage<FacadeDeviceBO> page = deviceFacade.selectByPage(q);
-            return page != null ? page.getRecords() : List.<FacadeDeviceBO>of();
-        });
-        List<FacadeDeviceBO> devices;
-        try {
-            devices = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-            log.warn("Device summary failed: {}", e.getMessage(), e);
-            return summary;
-        }
-        int online = 0;
-        String onlineCode = DeviceStatusEnum.ONLINE.getCode();
-        for (FacadeDeviceBO d : devices) {
-            String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + d.getId();
-            String status = localCacheService.getKey(key);
-            if (Objects.equals(status, onlineCode)) {
-                online++;
-            }
-        }
-        summary.setTotal(devices.size());
-        summary.setOnline(online);
-        return summary;
-    }
+	private SystemHealthVO.FleetSummary summariseDrivers(Long tenantId) {
+		SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
+		CompletableFuture<List<FacadeDriverBO>> future = CompletableFuture.supplyAsync(() -> {
+			FacadeDriverQuery q = FacadeDriverQuery.builder().page(firstPage(1000)).tenantId(tenantId).build();
+			FacadePage<FacadeDriverBO> page = driverFacade.selectByPage(q);
+			return page != null ? page.getRecords() : List.<FacadeDriverBO>of();
+		});
+		List<FacadeDriverBO> drivers;
+		try {
+			drivers = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+		}
+		catch (Exception e) {
+			future.cancel(true);
+			log.warn("Driver summary failed: {}", e.getMessage(), e);
+			return summary;
+		}
+		int online = 0;
+		String onlineCode = DriverStatusEnum.ONLINE.getCode();
+		for (FacadeDriverBO d : drivers) {
+			String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + d.getId();
+			String status = localCacheService.getKey(key);
+			if (Objects.equals(status, onlineCode)) {
+				online++;
+			}
+		}
+		summary.setTotal(drivers.size());
+		summary.setOnline(online);
+		return summary;
+	}
 
-    @FunctionalInterface
-    private interface Probe {
-        boolean check() throws Exception;
-    }
+	private SystemHealthVO.FleetSummary summariseDevices(Long tenantId) {
+		SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
+		CompletableFuture<List<FacadeDeviceBO>> future = CompletableFuture.supplyAsync(() -> {
+			FacadeDeviceQuery q = FacadeDeviceQuery.builder().page(firstPage(5000)).tenantId(tenantId).build();
+			FacadePage<FacadeDeviceBO> page = deviceFacade.selectByPage(q);
+			return page != null ? page.getRecords() : List.<FacadeDeviceBO>of();
+		});
+		List<FacadeDeviceBO> devices;
+		try {
+			devices = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+		}
+		catch (Exception e) {
+			future.cancel(true);
+			log.warn("Device summary failed: {}", e.getMessage(), e);
+			return summary;
+		}
+		int online = 0;
+		String onlineCode = DeviceStatusEnum.ONLINE.getCode();
+		for (FacadeDeviceBO d : devices) {
+			String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + d.getId();
+			String status = localCacheService.getKey(key);
+			if (Objects.equals(status, onlineCode)) {
+				online++;
+			}
+		}
+		summary.setTotal(devices.size());
+		summary.setOnline(online);
+		return summary;
+	}
+
+	@FunctionalInterface
+	private interface Probe {
+
+		boolean check() throws Exception;
+
+	}
+
 }

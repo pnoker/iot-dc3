@@ -46,8 +46,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Implementation of custom driver service for the listening virtual driver.
  * <p>
- * This service handles driver initialization, scheduling, metadata events,
- * and read/write operations for devices that communicate via TCP/UDP.
+ * This service handles driver initialization, scheduling, metadata events, and read/write
+ * operations for devices that communicate via TCP/UDP.
  * </p>
  *
  * @author pnoker
@@ -58,116 +58,121 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DriverCustomServiceImpl implements DriverCustomService {
 
-    @Resource
-    DriverMetadata driverMetadata;
-    @Value("${driver.custom.tcp.port}")
-    private Integer tcpPort;
-    @Value("${driver.custom.udp.port}")
-    private Integer udpPort;
-    @Resource
-    private DriverSenderService driverSenderService;
-    @Resource
-    private NettyTcpServer nettyTcpServer;
-    @Resource
-    private NettyUdpServer nettyUdpServer;
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
+	@Resource
+	DriverMetadata driverMetadata;
 
-    /**
-     * Initializes the driver by starting TCP and UDP listening services.
-     * <p>
-     * This method is automatically called when the driver starts. It launches
-     * separate threads to listen for incoming TCP and UDP connections on the
-     * configured ports.
-     * </p>
-     */
-    @Override
-    public void initial() {
-        threadPoolExecutor.execute(() -> {
-            log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
-            nettyTcpServer.start(tcpPort);
-        });
-        threadPoolExecutor.execute(() -> {
-            log.debug("Virtual Listening Driver Starting(UDP::{}) incoming data listener", udpPort);
-            nettyUdpServer.start(udpPort);
-        });
-    }
+	@Value("${driver.custom.tcp.port}")
+	private Integer tcpPort;
 
-    /**
-     * Scheduled task to report device status.
-     * <p>
-     * Sets all devices to ONLINE status with a validity period of 25 seconds.
-     * This method is called periodically by the driver framework.
-     * </p>
-     */
-    @Override
-    public void schedule() {
-        driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
-    }
+	@Value("${driver.custom.udp.port}")
+	private Integer udpPort;
 
-    /**
-     * Handles metadata events for drivers, devices, and points.
-     * <p>
-     * Processes addition, update, and deletion events for metadata.
-     * Currently, logs device and point metadata events for monitoring purposes.
-     * </p>
-     *
-     * @param metadataEvent The metadata event containing type and operation details
-     */
-    @Override
-    public void event(MetadataEventDTO metadataEvent) {
-        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-        MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
-        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
-        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
-        }
-    }
+	@Resource
+	private DriverSenderService driverSenderService;
 
-    /**
-     * Reads data from a device point.
-     * <p>
-     * Since this driver passively receives data via TCP/UDP, this method
-     * returns null. Actual data reading is handled by the TCP and UDP
-     * server handlers in their respective channelRead methods.
-     * </p>
-     *
-     * @param driverConfig Driver configuration attributes
-     * @param pointConfig  Point configuration attributes
-     * @param device       The device to read from
-     * @param point        The point to read
-     * @return null as data is received passively
-     */
-    @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
-        return null;
-    }
+	@Resource
+	private NettyTcpServer nettyTcpServer;
 
-    /**
-     * Writes data to a device point.
-     * <p>
-     * Writes the specified value to the device by sending it through the
-     * Netty TCP channel associated with the device. If the device channel
-     * exists in the device-channel mapping, the value is converted to bytes
-     * and sent to the device.
-     * </p>
-     *
-     * @param driverConfig Driver configuration attributes
-     * @param pointConfig  Point configuration attributes
-     * @param device       The device to write to
-     * @param point        The point to write
-     * @param wValue       The value to write
-     * @return true if the write operation was processed
-     */
-    @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
-        Long deviceId = device.getId();
-        Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
-        if (Objects.nonNull(channel)) {
-            channel.writeAndFlush(DecodeUtil.stringToByte(wValue.getValue()));
-        }
-        return true;
-    }
+	@Resource
+	private NettyUdpServer nettyUdpServer;
+
+	@Resource
+	private ThreadPoolExecutor threadPoolExecutor;
+
+	/**
+	 * Initializes the driver by starting TCP and UDP listening services.
+	 * <p>
+	 * This method is automatically called when the driver starts. It launches separate
+	 * threads to listen for incoming TCP and UDP connections on the configured ports.
+	 * </p>
+	 */
+	@Override
+	public void initial() {
+		threadPoolExecutor.execute(() -> {
+			log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
+			nettyTcpServer.start(tcpPort);
+		});
+		threadPoolExecutor.execute(() -> {
+			log.debug("Virtual Listening Driver Starting(UDP::{}) incoming data listener", udpPort);
+			nettyUdpServer.start(udpPort);
+		});
+	}
+
+	/**
+	 * Scheduled task to report device status.
+	 * <p>
+	 * Sets all devices to ONLINE status with a validity period of 25 seconds. This method
+	 * is called periodically by the driver framework.
+	 * </p>
+	 */
+	@Override
+	public void schedule() {
+		driverMetadata.getDeviceIds()
+			.forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+	}
+
+	/**
+	 * Handles metadata events for drivers, devices, and points.
+	 * <p>
+	 * Processes addition, update, and deletion events for metadata. Currently, logs
+	 * device and point metadata events for monitoring purposes.
+	 * </p>
+	 * @param metadataEvent The metadata event containing type and operation details
+	 */
+	@Override
+	public void event(MetadataEventDTO metadataEvent) {
+		MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+		MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
+		if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+			log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
+		}
+		else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+			log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
+		}
+	}
+
+	/**
+	 * Reads data from a device point.
+	 * <p>
+	 * Since this driver passively receives data via TCP/UDP, this method returns null.
+	 * Actual data reading is handled by the TCP and UDP server handlers in their
+	 * respective channelRead methods.
+	 * </p>
+	 * @param driverConfig Driver configuration attributes
+	 * @param pointConfig Point configuration attributes
+	 * @param device The device to read from
+	 * @param point The point to read
+	 * @return null as data is received passively
+	 */
+	@Override
+	public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+			PointBO point) {
+		return null;
+	}
+
+	/**
+	 * Writes data to a device point.
+	 * <p>
+	 * Writes the specified value to the device by sending it through the Netty TCP
+	 * channel associated with the device. If the device channel exists in the
+	 * device-channel mapping, the value is converted to bytes and sent to the device.
+	 * </p>
+	 * @param driverConfig Driver configuration attributes
+	 * @param pointConfig Point configuration attributes
+	 * @param device The device to write to
+	 * @param point The point to write
+	 * @param wValue The value to write
+	 * @return true if the write operation was processed
+	 */
+	@Override
+	public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+			PointBO point, WValue wValue) {
+		Long deviceId = device.getId();
+		Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
+		if (Objects.nonNull(channel)) {
+			channel.writeAndFlush(DecodeUtil.stringToByte(wValue.getValue()));
+		}
+		return true;
+	}
 
 }

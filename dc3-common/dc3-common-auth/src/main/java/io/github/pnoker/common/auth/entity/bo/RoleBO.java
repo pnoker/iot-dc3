@@ -36,33 +36,34 @@ import lombok.*;
 @ToString(callSuper = true)
 public class RoleBO extends BaseBO {
 
-    /**
-     * ID
-     */
-    private String parentRoleId;
+	/**
+	 * ID
+	 */
+	private String parentRoleId;
 
-    /**
-     * Name
-     */
-    private String roleName;
+	/**
+	 * Name
+	 */
+	private String roleName;
 
-    /**
-     * Code
-     */
-    private String roleCode;
+	/**
+	 * Code
+	 */
+	private String roleCode;
 
-    /**
-     *
-     */
-    private RoleExt roleExt;
+	/**
+	 *
+	 */
+	private RoleExt roleExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
+
 }

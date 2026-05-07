@@ -35,18 +35,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenGrpcFacade implements TokenFacade {
 
-    @Resource
-    private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
+	@Resource
+	private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
 
-    @Override
-    public boolean checkValid(String tenant, String name, String salt, String token) {
-        GrpcLoginQuery login = GrpcLoginQuery.newBuilder()
-                .setTenant(tenant)
-                .setName(name)
-                .setSalt(salt)
-                .setToken(token)
-                .build();
-        GrpcRTokenDTO response = tokenApiBlockingStub.checkValid(login);
-        return response.getResult().getOk();
-    }
+	@Override
+	public boolean checkValid(String tenant, String name, String salt, String token) {
+		GrpcLoginQuery login = GrpcLoginQuery.newBuilder()
+			.setTenant(tenant)
+			.setName(name)
+			.setSalt(salt)
+			.setToken(token)
+			.build();
+		GrpcRTokenDTO response = tokenApiBlockingStub.checkValid(login);
+		return response.getResult().getOk();
+	}
+
 }

@@ -25,7 +25,9 @@ import org.openscada.opc.dcom.da.Constants;
 import java.net.UnknownHostException;
 
 public class OPCBrowse extends BaseCOMObject {
-    public OPCBrowse(final IJIComObject opcServer) throws IllegalArgumentException, UnknownHostException, JIException {
-        super(opcServer.queryInterface(Constants.IOPCBrowse_IID));
-    }
+
+	public OPCBrowse(final IJIComObject opcServer) throws IllegalArgumentException, UnknownHostException, JIException {
+		super(opcServer.queryInterface(Constants.IOPCBrowse_IID));
+	}
+
 }

@@ -28,7 +28,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class AlertTrendRow {
-    private String date;
-    private long deviceCount;
-    private long driverCount;
+
+	private String date;
+
+	private long deviceCount;
+
+	private long driverCount;
+
 }

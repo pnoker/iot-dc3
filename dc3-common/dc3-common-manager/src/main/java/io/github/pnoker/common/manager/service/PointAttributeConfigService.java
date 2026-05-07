@@ -33,46 +33,41 @@ import java.util.List;
  */
 public interface PointAttributeConfigService extends BaseService<PointAttributeConfigBO, PointAttributeConfigQuery> {
 
-    /**
-     * Device ID
-     *
-     * @param deviceId Device ID
-     * @return PointConfig
-     */
-    List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
+	/**
+	 * Device ID
+	 * @param deviceId Device ID
+	 * @return PointConfig
+	 */
+	List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
 
-    /**
-     * ID
-     *
-     * @param attributeId ID
-     * @return PointConfig
-     */
-    List<PointAttributeConfigBO> selectByAttributeId(Long attributeId);
+	/**
+	 * ID
+	 * @param attributeId ID
+	 * @return PointConfig
+	 */
+	List<PointAttributeConfigBO> selectByAttributeId(Long attributeId);
 
-    /**
-     * Device ID Point ID
-     *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @return PointConfig
-     */
-    List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
+	/**
+	 * Device ID Point ID
+	 * @param deviceId Device ID
+	 * @param pointId Point ID
+	 * @return PointConfig
+	 */
+	List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
 
-    /**
-     * ID Device ID Point ID
-     *
-     * @param attributeId ID
-     * @param deviceId    Device ID
-     * @param pointId     Point ID
-     * @return PointConfig
-     */
-    PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
+	/**
+	 * ID Device ID Point ID
+	 * @param attributeId ID
+	 * @param deviceId Device ID
+	 * @param pointId Point ID
+	 * @return PointConfig
+	 */
+	PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
 
-    /**
-     *
-     *
-     * @param entityBO {@link PointAttributeConfigBO}
-     * @return {@link DeviceBO}
-     */
-    PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO);
+	/**
+	 * @param entityBO {@link PointAttributeConfigBO}
+	 * @return {@link DeviceBO}
+	 */
+	PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO);
+
 }

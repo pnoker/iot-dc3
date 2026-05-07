@@ -36,8 +36,8 @@ import java.util.Optional;
 /**
  * Web Filter Configuration Class
  * <p>
- * Configuration class for custom web filters in reactive applications.
- * Configures context path filter and user header interceptor for request processing.
+ * Configuration class for custom web filters in reactive applications. Configures context
+ * path filter and user header interceptor for request processing.
  * </p>
  *
  * @author pnoker
@@ -48,57 +48,59 @@ import java.util.Optional;
 @Configuration
 public class WebFilterConfig {
 
-    @Resource
-    private ServerProperties serverProperties;
+	@Resource
+	private ServerProperties serverProperties;
 
-    /**
-     * Custom context path filter
-     *
-     * @return WebFilter for handling context path
-     */
-    @Bean
-    public WebFilter contextPathWebFilter() {
-        String contextPath = Optional.ofNullable(serverProperties.getServlet().getContextPath()).orElse("/");
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            if (request.getURI().getPath().startsWith(contextPath)) {
-                return chain.filter(
-                        exchange.mutate()
-                                .request(request.mutate().contextPath(contextPath).build())
-                                .build());
-            }
-            return chain.filter(exchange);
-        };
-    }
+	/**
+	 * Custom context path filter
+	 * @return WebFilter for handling context path
+	 */
+	@Bean
+	public WebFilter contextPathWebFilter() {
+		String contextPath = Optional.ofNullable(serverProperties.getServlet().getContextPath()).orElse("/");
+		return (exchange, chain) -> {
+			ServerHttpRequest request = exchange.getRequest();
+			if (request.getURI().getPath().startsWith(contextPath)) {
+				return chain
+					.filter(exchange.mutate().request(request.mutate().contextPath(contextPath).build()).build());
+			}
+			return chain.filter(exchange);
+		};
+	}
 
-    /**
-     * Custom user header interceptor filter
-     *
-     * @return WebFilter for intercepting and processing user headers
-     */
-    @Bean
-    public WebFilter interceptor() {
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
+	/**
+	 * Custom user header interceptor filter
+	 * @return WebFilter for intercepting and processing user headers
+	 */
+	@Bean
+	public WebFilter interceptor() {
+		return (exchange, chain) -> {
+			ServerHttpRequest request = exchange.getRequest();
+			String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
 
-            if (StringUtils.isNotEmpty(user)) {
-                try {
-                    RequestHeader.UserHeader userHeader = JsonUtil.parseObject(user, RequestHeader.UserHeader.class);
+			if (StringUtils.isNotEmpty(user)) {
+				try {
+					RequestHeader.UserHeader userHeader = JsonUtil.parseObject(user, RequestHeader.UserHeader.class);
 
-                    if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId()) || Objects.isNull(userHeader.getUserId())) {
-                        log.warn("Invalid user header: {}", JsonUtil.toJsonString(userHeader));
-                        return chain.filter(exchange).contextWrite(context -> context.delete(RequestConstant.Key.USER_HEADER));
-                    } else {
-                        log.debug("User header: {}", JsonUtil.toJsonString(userHeader));
-                        return chain.filter(exchange).contextWrite(context -> context.put(RequestConstant.Key.USER_HEADER, userHeader));
-                    }
-                } catch (Exception e) {
-                    log.error("Error parsing user header", e);
-                }
-            }
+					if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId())
+							|| Objects.isNull(userHeader.getUserId())) {
+						log.warn("Invalid user header: {}", JsonUtil.toJsonString(userHeader));
+						return chain.filter(exchange)
+							.contextWrite(context -> context.delete(RequestConstant.Key.USER_HEADER));
+					}
+					else {
+						log.debug("User header: {}", JsonUtil.toJsonString(userHeader));
+						return chain.filter(exchange)
+							.contextWrite(context -> context.put(RequestConstant.Key.USER_HEADER, userHeader));
+					}
+				}
+				catch (Exception e) {
+					log.error("Error parsing user header", e);
+				}
+			}
 
-            return chain.filter(exchange);
-        };
-    }
+			return chain.filter(exchange);
+		};
+	}
+
 }

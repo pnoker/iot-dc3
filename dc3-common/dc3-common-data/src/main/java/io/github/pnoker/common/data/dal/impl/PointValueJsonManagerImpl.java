@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @since 2022.1.0
  */
 @Service
-public class PointValueJsonManagerImpl extends ServiceImpl<PointValueJsonMapper, PointValueJsonDO> implements PointValueJsonManager {
+public class PointValueJsonManagerImpl extends ServiceImpl<PointValueJsonMapper, PointValueJsonDO>
+		implements PointValueJsonManager {
 
 }

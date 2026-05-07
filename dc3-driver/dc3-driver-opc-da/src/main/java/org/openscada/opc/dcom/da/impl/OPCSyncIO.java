@@ -31,66 +31,71 @@ import org.openscada.opc.dcom.da.OPCITEMSTATE;
 import org.openscada.opc.dcom.da.WriteRequest;
 
 public class OPCSyncIO extends BaseCOMObject {
-    public OPCSyncIO(final IJIComObject opcSyncIO) throws JIException {
-        super(opcSyncIO.queryInterface(Constants.IOPCSyncIO_IID));
-    }
 
-    public KeyedResultSet<Integer, OPCITEMSTATE> read(final OPCDATASOURCE source, final Integer... serverHandles) throws JIException {
-        if (serverHandles == null || serverHandles.length == 0) {
-            return new KeyedResultSet<Integer, OPCITEMSTATE>();
-        }
+	public OPCSyncIO(final IJIComObject opcSyncIO) throws JIException {
+		super(opcSyncIO.queryInterface(Constants.IOPCSyncIO_IID));
+	}
 
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(0);
+	public KeyedResultSet<Integer, OPCITEMSTATE> read(final OPCDATASOURCE source, final Integer... serverHandles)
+			throws JIException {
+		if (serverHandles == null || serverHandles.length == 0) {
+			return new KeyedResultSet<Integer, OPCITEMSTATE>();
+		}
 
-        callObject.addInParamAsShort((short) source.id(), JIFlags.FLAG_NULL);
-        callObject.addInParamAsInt(serverHandles.length, JIFlags.FLAG_NULL);
-        callObject.addInParamAsArray(new JIArray(serverHandles, true), JIFlags.FLAG_NULL);
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(0);
 
-        callObject.addOutParamAsObject(new JIPointer(new JIArray(OPCITEMSTATE.getStruct(), null, 1, true)), JIFlags.FLAG_NULL);
-        callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
+		callObject.addInParamAsShort((short) source.id(), JIFlags.FLAG_NULL);
+		callObject.addInParamAsInt(serverHandles.length, JIFlags.FLAG_NULL);
+		callObject.addInParamAsArray(new JIArray(serverHandles, true), JIFlags.FLAG_NULL);
 
-        Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
+		callObject.addOutParamAsObject(new JIPointer(new JIArray(OPCITEMSTATE.getStruct(), null, 1, true)),
+				JIFlags.FLAG_NULL);
+		callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
 
-        KeyedResultSet<Integer, OPCITEMSTATE> results = new KeyedResultSet<Integer, OPCITEMSTATE>();
-        JIStruct[] states = (JIStruct[]) ((JIArray) ((JIPointer) result[0]).getReferent()).getArrayInstance();
-        Integer[] errorCodes = (Integer[]) ((JIArray) ((JIPointer) result[1]).getReferent()).getArrayInstance();
+		Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
 
-        for (int i = 0; i < serverHandles.length; i++) {
-            results.add(new KeyedResult<Integer, OPCITEMSTATE>(serverHandles[i], OPCITEMSTATE.fromStruct(states[i]), errorCodes[i]));
-        }
+		KeyedResultSet<Integer, OPCITEMSTATE> results = new KeyedResultSet<Integer, OPCITEMSTATE>();
+		JIStruct[] states = (JIStruct[]) ((JIArray) ((JIPointer) result[0]).getReferent()).getArrayInstance();
+		Integer[] errorCodes = (Integer[]) ((JIArray) ((JIPointer) result[1]).getReferent()).getArrayInstance();
 
-        return results;
-    }
+		for (int i = 0; i < serverHandles.length; i++) {
+			results.add(new KeyedResult<Integer, OPCITEMSTATE>(serverHandles[i], OPCITEMSTATE.fromStruct(states[i]),
+					errorCodes[i]));
+		}
 
-    public ResultSet<WriteRequest> write(final WriteRequest... requests) throws JIException {
-        if (requests.length == 0) {
-            return new ResultSet<WriteRequest>();
-        }
+		return results;
+	}
 
-        Integer[] items = new Integer[requests.length];
-        JIVariant[] values = new JIVariant[requests.length];
-        for (int i = 0; i < requests.length; i++) {
-            items[i] = requests[i].getServerHandle();
-            values[i] = Helper.fixVariant(requests[i].getValue());
-        }
+	public ResultSet<WriteRequest> write(final WriteRequest... requests) throws JIException {
+		if (requests.length == 0) {
+			return new ResultSet<WriteRequest>();
+		}
 
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(1);
+		Integer[] items = new Integer[requests.length];
+		JIVariant[] values = new JIVariant[requests.length];
+		for (int i = 0; i < requests.length; i++) {
+			items[i] = requests[i].getServerHandle();
+			values[i] = Helper.fixVariant(requests[i].getValue());
+		}
 
-        callObject.addInParamAsInt(requests.length, JIFlags.FLAG_NULL);
-        callObject.addInParamAsArray(new JIArray(items, true), JIFlags.FLAG_NULL);
-        callObject.addInParamAsArray(new JIArray(values, true), JIFlags.FLAG_NULL);
-        callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(1);
 
-        Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
+		callObject.addInParamAsInt(requests.length, JIFlags.FLAG_NULL);
+		callObject.addInParamAsArray(new JIArray(items, true), JIFlags.FLAG_NULL);
+		callObject.addInParamAsArray(new JIArray(values, true), JIFlags.FLAG_NULL);
+		callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
 
-        Integer[] errorCodes = (Integer[]) ((JIArray) ((JIPointer) result[0]).getReferent()).getArrayInstance();
+		Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
 
-        ResultSet<WriteRequest> results = new ResultSet<WriteRequest>();
-        for (int i = 0; i < requests.length; i++) {
-            results.add(new Result<WriteRequest>(requests[i], errorCodes[i]));
-        }
-        return results;
-    }
+		Integer[] errorCodes = (Integer[]) ((JIArray) ((JIPointer) result[0]).getReferent()).getArrayInstance();
+
+		ResultSet<WriteRequest> results = new ResultSet<WriteRequest>();
+		for (int i = 0; i < requests.length; i++) {
+			results.add(new Result<WriteRequest>(requests[i], errorCodes[i]));
+		}
+		return results;
+	}
+
 }

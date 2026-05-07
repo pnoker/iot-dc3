@@ -32,4 +32,3 @@ import io.github.pnoker.common.auth.entity.model.TenantDO;
 public interface TenantMapper extends BaseMapper<TenantDO> {
 
 }
-

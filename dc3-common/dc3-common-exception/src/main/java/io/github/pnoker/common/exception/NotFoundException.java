@@ -27,15 +27,17 @@ import java.text.MessageFormat;
  * @since 2022.1.0
  */
 public class NotFoundException extends RuntimeException {
-    public NotFoundException() {
-        this(null);
-    }
 
-    public NotFoundException(Throwable cause) {
-        super(cause);
-    }
+	public NotFoundException() {
+		this(null);
+	}
 
-    public NotFoundException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public NotFoundException(Throwable cause) {
+		super(cause);
+	}
+
+	public NotFoundException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

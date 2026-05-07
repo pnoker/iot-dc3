@@ -24,44 +24,50 @@ import com.serotonin.modbus4j.sero.messaging.MessageControl;
 import java.io.IOException;
 
 /**
- * <p>AsciiSlave class.</p>
+ * <p>
+ * AsciiSlave class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class AsciiSlave extends SerialSlave {
-    private MessageControl conn;
 
-    /**
-     * <p>Constructor for AsciiSlave.</p>
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
-     */
-    public AsciiSlave(SerialPortWrapper wrapper) {
-        super(wrapper);
-    }
+	private MessageControl conn;
 
-    @Override
-    public void start() throws ModbusInitException {
-        super.start();
+	/**
+	 * <p>
+	 * Constructor for AsciiSlave.
+	 * </p>
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 */
+	public AsciiSlave(SerialPortWrapper wrapper) {
+		super(wrapper);
+	}
 
-        AsciiMessageParser asciiMessageParser = new AsciiMessageParser(false);
-        AsciiRequestHandler asciiRequestHandler = new AsciiRequestHandler(this);
+	@Override
+	public void start() throws ModbusInitException {
+		super.start();
 
-        conn = new MessageControl();
-        conn.setExceptionHandler(getExceptionHandler());
+		AsciiMessageParser asciiMessageParser = new AsciiMessageParser(false);
+		AsciiRequestHandler asciiRequestHandler = new AsciiRequestHandler(this);
 
-        try {
-            conn.start(transport, asciiMessageParser, asciiRequestHandler, null);
-            transport.start("Modbus ASCII slave");
-        } catch (IOException e) {
-            throw new ModbusInitException(e);
-        }
-    }
+		conn = new MessageControl();
+		conn.setExceptionHandler(getExceptionHandler());
 
-    @Override
-    public void stop() {
-        conn.close();
-        super.stop();
-    }
+		try {
+			conn.start(transport, asciiMessageParser, asciiRequestHandler, null);
+			transport.start("Modbus ASCII slave");
+		}
+		catch (IOException e) {
+			throw new ModbusInitException(e);
+		}
+	}
+
+	@Override
+	public void stop() {
+		conn.close();
+		super.stop();
+	}
+
 }

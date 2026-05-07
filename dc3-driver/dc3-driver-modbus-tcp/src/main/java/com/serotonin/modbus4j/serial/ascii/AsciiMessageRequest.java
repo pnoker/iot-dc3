@@ -24,41 +24,47 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingRequestMessage;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>AsciiMessageRequest class.</p>
+ * <p>
+ * AsciiMessageRequest class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class AsciiMessageRequest extends AsciiMessage implements OutgoingRequestMessage, IncomingRequestMessage {
-    /**
-     * <p>Constructor for AsciiMessageRequest.</p>
-     *
-     * @param modbusMessage a {@link ModbusMessage} object.
-     */
-    public AsciiMessageRequest(ModbusMessage modbusMessage) {
-        super(modbusMessage);
-    }
 
-    static AsciiMessageRequest createAsciiMessageRequest(ByteQueue queue) throws ModbusTransportException {
-        ByteQueue msgQueue = getUnasciiMessage(queue);
-        ModbusRequest request = ModbusRequest.createModbusRequest(msgQueue);
-        AsciiMessageRequest asciiRequest = new AsciiMessageRequest(request);
+	/**
+	 * <p>
+	 * Constructor for AsciiMessageRequest.
+	 * </p>
+	 * @param modbusMessage a {@link ModbusMessage} object.
+	 */
+	public AsciiMessageRequest(ModbusMessage modbusMessage) {
+		super(modbusMessage);
+	}
 
-        // Return the data.
-        return asciiRequest;
-    }
+	static AsciiMessageRequest createAsciiMessageRequest(ByteQueue queue) throws ModbusTransportException {
+		ByteQueue msgQueue = getUnasciiMessage(queue);
+		ModbusRequest request = ModbusRequest.createModbusRequest(msgQueue);
+		AsciiMessageRequest asciiRequest = new AsciiMessageRequest(request);
 
-    @Override
-    public boolean expectsResponse() {
-        return modbusMessage.getSlaveId() != 0;
-    }
+		// Return the data.
+		return asciiRequest;
+	}
 
-    /**
-     * <p>getModbusRequest.</p>
-     *
-     * @return a {@link ModbusRequest} object.
-     */
-    public ModbusRequest getModbusRequest() {
-        return (ModbusRequest) modbusMessage;
-    }
+	@Override
+	public boolean expectsResponse() {
+		return modbusMessage.getSlaveId() != 0;
+	}
+
+	/**
+	 * <p>
+	 * getModbusRequest.
+	 * </p>
+	 * @return a {@link ModbusRequest} object.
+	 */
+	public ModbusRequest getModbusRequest() {
+		return (ModbusRequest) modbusMessage;
+	}
+
 }

@@ -24,8 +24,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Main application class for the MQTT driver.
  * <p>
  * This driver enables communication with MQTT brokers and devices, providing
- * bi-directional data exchange capabilities. It supports subscribing to MQTT topics
- * for data collection and publishing messages to MQTT topics for device control.
+ * bi-directional data exchange capabilities. It supports subscribing to MQTT topics for
+ * data collection and publishing messages to MQTT topics for device control.
  * </p>
  *
  * @author pnoker
@@ -35,13 +35,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class MqttDriverApplication {
 
-    /**
-     * Main entry point for the MQTT driver application.
-     *
-     * @param args command line arguments passed to the application
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(MqttDriverApplication.class, args);
-    }
-}
+	/**
+	 * Main entry point for the MQTT driver application.
+	 * @param args command line arguments passed to the application
+	 */
+	public static void main(String[] args) {
+		SpringApplication.run(MqttDriverApplication.class, args);
+	}
 
+}

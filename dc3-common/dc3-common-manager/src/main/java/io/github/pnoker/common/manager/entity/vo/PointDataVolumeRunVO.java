@@ -38,6 +38,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PointDataVolumeRunVO {
 
-    private String deviceName;
-    private List<Long> total;
+	private String deviceName;
+
+	private List<Long> total;
+
 }

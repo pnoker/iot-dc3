@@ -22,10 +22,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * Auto-configuration for the gRPC facade implementation. Active by default
- * (when {@code dc3.facade.mode} is absent) or when explicitly set to
- * {@code grpc}. Scans the facade-grpc package so the {@code @Component} beans
- * are registered.
+ * Auto-configuration for the gRPC facade implementation. Active by default (when
+ * {@code dc3.facade.mode} is absent) or when explicitly set to {@code grpc}. Scans the
+ * facade-grpc package so the {@code @Component} beans are registered.
  *
  * @author pnoker
  * @since 2026.5.5
@@ -34,4 +33,5 @@ import org.springframework.context.annotation.ComponentScan;
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "grpc", matchIfMissing = true)
 @ComponentScan("io.github.pnoker.common.facade.grpc")
 public class GrpcFacadeAutoConfiguration {
+
 }

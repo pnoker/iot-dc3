@@ -27,9 +27,8 @@ import java.net.InetSocketAddress;
 import java.util.Objects;
 
 /**
- * Utility class for handling HTTP request operations.
- * Provides methods to extract information from ServerHttpRequest objects
- * such as IP addresses, headers and cookies.
+ * Utility class for handling HTTP request operations. Provides methods to extract
+ * information from ServerHttpRequest objects such as IP addresses, headers and cookies.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,76 +37,76 @@ import java.util.Objects;
 @Slf4j
 public class RequestUtil {
 
-    private RequestUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private RequestUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Extracts the first valid IP address from a comma-separated list of IPs.
-     * Used for handling X-Forwarded-For and similar headers in reverse proxy scenarios.
-     *
-     * @param ip Comma-separated list of IP addresses
-     * @return The first valid IP address found, or null if none is valid
-     */
-    public static String getMultistageReverseProxyIp(String ip) {
-        if (ip == null) return null;
-        String[] ips = ip.split(",");
-        for (String s : ips) {
-            s = s.trim();
-            if (!s.isEmpty() && !"unknown".equalsIgnoreCase(s)) {
-                return s;
-            }
-        }
-        return null;
-    }
+	/**
+	 * Extracts the first valid IP address from a comma-separated list of IPs. Used for
+	 * handling X-Forwarded-For and similar headers in reverse proxy scenarios.
+	 * @param ip Comma-separated list of IP addresses
+	 * @return The first valid IP address found, or null if none is valid
+	 */
+	public static String getMultistageReverseProxyIp(String ip) {
+		if (ip == null) {
+			return null;
+		}
+		String[] ips = ip.split(",");
+		for (String s : ips) {
+			s = s.trim();
+			if (!s.isEmpty() && !"unknown".equalsIgnoreCase(s)) {
+				return s;
+			}
+		}
+		return null;
+	}
 
-    /**
-     * Gets the remote client IP address from the request.
-     * Checks various headers commonly used in proxy scenarios before falling back to the remote address.
-     * Headers checked: X-Original-Forwarded-For, X-Forwarded-For, X-Real-IP,
-     * Proxy-Client-IP, WL-Proxy-Client-IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR
-     *
-     * @param request ServerHttpRequest object containing the request information
-     * @return The client's IP address as a string
-     */
-    public static String getRemoteIp(ServerHttpRequest request) {
-        String ip = StringUtils.EMPTY;
-        String[] headers = {"X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
-        for (String header : headers) {
-            ip = request.getHeaders().getFirst(header);
-            if (!(ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))) {
-                return getMultistageReverseProxyIp(ip);
-            }
-        }
-        InetSocketAddress remoteAddress = request.getRemoteAddress();
-        if (Objects.nonNull(remoteAddress)) {
-            ip = remoteAddress.getHostString();
-        }
-        return getMultistageReverseProxyIp(ip);
-    }
+	/**
+	 * Gets the remote client IP address from the request. Checks various headers commonly
+	 * used in proxy scenarios before falling back to the remote address. Headers checked:
+	 * X-Original-Forwarded-For, X-Forwarded-For, X-Real-IP, Proxy-Client-IP,
+	 * WL-Proxy-Client-IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR
+	 * @param request ServerHttpRequest object containing the request information
+	 * @return The client's IP address as a string
+	 */
+	public static String getRemoteIp(ServerHttpRequest request) {
+		String ip = StringUtils.EMPTY;
+		String[] headers = { "X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP",
+				"WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR" };
+		for (String header : headers) {
+			ip = request.getHeaders().getFirst(header);
+			if (!(ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))) {
+				return getMultistageReverseProxyIp(ip);
+			}
+		}
+		InetSocketAddress remoteAddress = request.getRemoteAddress();
+		if (Objects.nonNull(remoteAddress)) {
+			ip = remoteAddress.getHostString();
+		}
+		return getMultistageReverseProxyIp(ip);
+	}
 
-    /**
-     * Retrieves a specific header value from the request.
-     * Returns the first value if multiple values exist for the same header.
-     *
-     * @param request ServerHttpRequest object containing the request information
-     * @param key     The name of the header to retrieve
-     * @return The value of the specified header, or null if not present
-     */
-    public static String getRequestHeader(ServerHttpRequest request, String key) {
-        return request.getHeaders().getFirst(key);
-    }
+	/**
+	 * Retrieves a specific header value from the request. Returns the first value if
+	 * multiple values exist for the same header.
+	 * @param request ServerHttpRequest object containing the request information
+	 * @param key The name of the header to retrieve
+	 * @return The value of the specified header, or null if not present
+	 */
+	public static String getRequestHeader(ServerHttpRequest request, String key) {
+		return request.getHeaders().getFirst(key);
+	}
 
-    /**
-     * Retrieves a specific cookie value from the request.
-     * Returns empty string if the cookie is not present.
-     *
-     * @param request ServerHttpRequest object containing the request information
-     * @param key     The name of the cookie to retrieve
-     * @return The value of the specified cookie, or empty string if not present
-     */
-    public static String getRequestCookie(ServerHttpRequest request, String key) {
-        HttpCookie cookie = request.getCookies().getFirst(key);
-        return Objects.isNull(cookie) ? StringUtils.EMPTY : cookie.getValue();
-    }
+	/**
+	 * Retrieves a specific cookie value from the request. Returns empty string if the
+	 * cookie is not present.
+	 * @param request ServerHttpRequest object containing the request information
+	 * @param key The name of the cookie to retrieve
+	 * @return The value of the specified cookie, or empty string if not present
+	 */
+	public static String getRequestCookie(ServerHttpRequest request, String key) {
+		HttpCookie cookie = request.getCookies().getFirst(key);
+		return Objects.isNull(cookie) ? StringUtils.EMPTY : cookie.getValue();
+	}
+
 }

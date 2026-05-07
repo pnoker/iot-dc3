@@ -38,50 +38,51 @@ import java.util.List;
 @ToString(callSuper = true)
 public class DeviceBO extends BaseBO {
 
-    /**
-     * Device Name
-     */
-    private String deviceName;
+	/**
+	 * Device Name
+	 */
+	private String deviceName;
 
-    /**
-     * Device ID
-     */
-    private String deviceCode;
+	/**
+	 * Device ID
+	 */
+	private String deviceCode;
 
-    /**
-     * Driver ID
-     */
-    private Long driverId;
+	/**
+	 * Driver ID
+	 */
+	private Long driverId;
 
-    /**
-     *
-     */
-    private DeviceExt deviceExt;
+	/**
+	 *
+	 */
+	private DeviceExt deviceExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
 
-    /**
-     *
-     */
-    private String signature;
+	/**
+	 *
+	 */
+	private String signature;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
 
-    // 
+	//
 
-    /**
-     * ID
-     */
-    private List<Long> profileIds;
+	/**
+	 * ID
+	 */
+	private List<Long> profileIds;
+
 }

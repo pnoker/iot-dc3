@@ -40,33 +40,34 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DriverTokenVO extends BaseVO {
 
-    /**
-     * Driver ID
-     */
-    private String driverCode;
+	/**
+	 * Driver ID
+	 */
+	private String driverCode;
 
-    /**
-     * AppID
-     */
-    private String driverAppId;
+	/**
+	 * AppID
+	 */
+	private String driverAppId;
 
-    /**
-     * AppKey
-     */
-    private String driverAppKey;
+	/**
+	 * AppKey
+	 */
+	private String driverAppKey;
 
-    /**
-     *
-     */
-    private ExpireFlagEnum expireFlag;
+	/**
+	 *
+	 */
+	private ExpireFlagEnum expireFlag;
 
-    /**
-     *
-     */
-    private LocalDateTime expireTime;
+	/**
+	 *
+	 */
+	private LocalDateTime expireTime;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

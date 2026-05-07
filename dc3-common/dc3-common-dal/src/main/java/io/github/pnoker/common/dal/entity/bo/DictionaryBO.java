@@ -38,36 +38,37 @@ import java.util.List;
 @AllArgsConstructor
 public class DictionaryBO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Dictionary type.
-     */
-    private String type;
+	/**
+	 * Dictionary type.
+	 */
+	private String type;
 
-    /**
-     * Dictionary label name.
-     */
-    private String label;
+	/**
+	 * Dictionary label name.
+	 */
+	private String label;
 
-    /**
-     * Dictionary label value.
-     */
-    private String value;
+	/**
+	 * Dictionary label value.
+	 */
+	private String value;
 
-    /**
-     * Whether the dictionary item is disabled.
-     */
-    private boolean disabled;
+	/**
+	 * Whether the dictionary item is disabled.
+	 */
+	private boolean disabled;
 
-    /**
-     * Whether the dictionary node is expanded.
-     */
-    private boolean expand;
+	/**
+	 * Whether the dictionary node is expanded.
+	 */
+	private boolean expand;
 
-    /**
-     * Child dictionary nodes.
-     */
-    private List<DictionaryBO> children;
+	/**
+	 * Child dictionary nodes.
+	 */
+	private List<DictionaryBO> children;
+
 }

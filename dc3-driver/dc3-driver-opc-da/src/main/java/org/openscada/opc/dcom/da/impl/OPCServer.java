@@ -30,136 +30,143 @@ import org.openscada.opc.dcom.da.OPCSERVERSTATUS;
 import java.net.UnknownHostException;
 
 public class OPCServer extends BaseCOMObject {
-    public OPCServer(final IJIComObject opcServer) throws IllegalArgumentException, UnknownHostException, JIException {
-        super(opcServer.queryInterface(Constants.IOPCServer_IID));
-    }
 
-    /**
-     * Retrieve the current server status
-     *
-     * @return the current server status
-     * @throws JIException JIException
-     */
-    public OPCSERVERSTATUS getStatus() throws JIException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(3);
+	public OPCServer(final IJIComObject opcServer) throws IllegalArgumentException, UnknownHostException, JIException {
+		super(opcServer.queryInterface(Constants.IOPCServer_IID));
+	}
 
-        callObject.addOutParamAsObject(new JIPointer(OPCSERVERSTATUS.getStruct()), JIFlags.FLAG_NULL);
+	/**
+	 * Retrieve the current server status
+	 * @return the current server status
+	 * @throws JIException JIException
+	 */
+	public OPCSERVERSTATUS getStatus() throws JIException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(3);
 
-        Object[] result = getCOMObject().call(callObject);
+		callObject.addOutParamAsObject(new JIPointer(OPCSERVERSTATUS.getStruct()), JIFlags.FLAG_NULL);
 
-        return OPCSERVERSTATUS.fromStruct((JIStruct) ((JIPointer) result[0]).getReferent());
-    }
+		Object[] result = getCOMObject().call(callObject);
 
-    public OPCGroupStateMgt addGroup(final String name, final boolean active, final int updateRate, final int clientHandle, final Integer timeBias, final Float percentDeadband, final int localeID) throws JIException, IllegalArgumentException, UnknownHostException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(0);
+		return OPCSERVERSTATUS.fromStruct((JIStruct) ((JIPointer) result[0]).getReferent());
+	}
 
-        callObject.addInParamAsString(name, JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
-        callObject.addInParamAsInt(active ? 1 : 0, JIFlags.FLAG_NULL);
-        callObject.addInParamAsInt(updateRate, JIFlags.FLAG_NULL);
-        callObject.addInParamAsInt(clientHandle, JIFlags.FLAG_NULL);
-        callObject.addInParamAsPointer(new JIPointer(timeBias), JIFlags.FLAG_NULL);
-        callObject.addInParamAsPointer(new JIPointer(percentDeadband), JIFlags.FLAG_NULL);
-        callObject.addInParamAsInt(localeID, JIFlags.FLAG_NULL);
-        callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
-        callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
-        callObject.addInParamAsUUID(Constants.IOPCGroupStateMgt_IID, JIFlags.FLAG_NULL);
-        callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
+	public OPCGroupStateMgt addGroup(final String name, final boolean active, final int updateRate,
+			final int clientHandle, final Integer timeBias, final Float percentDeadband, final int localeID)
+			throws JIException, IllegalArgumentException, UnknownHostException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(0);
 
-        Object[] result = getCOMObject().call(callObject);
+		callObject.addInParamAsString(name, JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
+		callObject.addInParamAsInt(active ? 1 : 0, JIFlags.FLAG_NULL);
+		callObject.addInParamAsInt(updateRate, JIFlags.FLAG_NULL);
+		callObject.addInParamAsInt(clientHandle, JIFlags.FLAG_NULL);
+		callObject.addInParamAsPointer(new JIPointer(timeBias), JIFlags.FLAG_NULL);
+		callObject.addInParamAsPointer(new JIPointer(percentDeadband), JIFlags.FLAG_NULL);
+		callObject.addInParamAsInt(localeID, JIFlags.FLAG_NULL);
+		callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
+		callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
+		callObject.addInParamAsUUID(Constants.IOPCGroupStateMgt_IID, JIFlags.FLAG_NULL);
+		callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
 
-        return new OPCGroupStateMgt((IJIComObject) result[2]);
-    }
+		Object[] result = getCOMObject().call(callObject);
 
-    public void removeGroup(final int serverHandle, final boolean force) throws JIException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(4);
+		return new OPCGroupStateMgt((IJIComObject) result[2]);
+	}
 
-        callObject.addInParamAsInt(serverHandle, JIFlags.FLAG_NULL);
-        callObject.addInParamAsInt(force ? 1 : 0, JIFlags.FLAG_NULL);
+	public void removeGroup(final int serverHandle, final boolean force) throws JIException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(4);
 
-        getCOMObject().call(callObject);
-    }
+		callObject.addInParamAsInt(serverHandle, JIFlags.FLAG_NULL);
+		callObject.addInParamAsInt(force ? 1 : 0, JIFlags.FLAG_NULL);
 
-    public void removeGroup(final OPCGroupStateMgt group, final boolean force) throws JIException {
-        removeGroup(group.getState().getServerHandle(), force);
-    }
+		getCOMObject().call(callObject);
+	}
 
-    public OPCGroupStateMgt getGroupByName(final String name) throws JIException, IllegalArgumentException, UnknownHostException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(2);
+	public void removeGroup(final OPCGroupStateMgt group, final boolean force) throws JIException {
+		removeGroup(group.getState().getServerHandle(), force);
+	}
 
-        callObject.addInParamAsString(name, JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
-        callObject.addInParamAsUUID(Constants.IOPCGroupStateMgt_IID, JIFlags.FLAG_NULL);
-        callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
+	public OPCGroupStateMgt getGroupByName(final String name)
+			throws JIException, IllegalArgumentException, UnknownHostException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(2);
 
-        Object[] result = getCOMObject().call(callObject);
+		callObject.addInParamAsString(name, JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
+		callObject.addInParamAsUUID(Constants.IOPCGroupStateMgt_IID, JIFlags.FLAG_NULL);
+		callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
 
-        return new OPCGroupStateMgt((IJIComObject) result[0]);
-    }
+		Object[] result = getCOMObject().call(callObject);
 
-    /**
-     * Get the groups
-     *
-     * @param scope The scope to get
-     * @return A string enumerator with the groups
-     * @throws JIException              JIException
-     * @throws IllegalArgumentException IllegalArgumentException
-     * @throws UnknownHostException     UnknownHostException
-     */
-    public EnumString getGroups(final OPCENUMSCOPE scope) throws JIException, IllegalArgumentException, UnknownHostException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(5);
+		return new OPCGroupStateMgt((IJIComObject) result[0]);
+	}
 
-        callObject.addInParamAsShort((short) scope.id(), JIFlags.FLAG_NULL);
-        callObject.addInParamAsUUID(org.openscada.opc.dcom.common.Constants.IEnumString_IID, JIFlags.FLAG_NULL);
-        callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
+	/**
+	 * Get the groups
+	 * @param scope The scope to get
+	 * @return A string enumerator with the groups
+	 * @throws JIException JIException
+	 * @throws IllegalArgumentException IllegalArgumentException
+	 * @throws UnknownHostException UnknownHostException
+	 */
+	public EnumString getGroups(final OPCENUMSCOPE scope)
+			throws JIException, IllegalArgumentException, UnknownHostException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(5);
 
-        Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
+		callObject.addInParamAsShort((short) scope.id(), JIFlags.FLAG_NULL);
+		callObject.addInParamAsUUID(org.openscada.opc.dcom.common.Constants.IEnumString_IID, JIFlags.FLAG_NULL);
+		callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
 
-        return new EnumString((IJIComObject) result[0]);
-    }
+		Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
 
-    public OPCItemProperties getItemPropertiesService() {
-        try {
-            return new OPCItemProperties(getCOMObject());
-        } catch (Exception e) {
-            return null;
-        }
-    }
+		return new EnumString((IJIComObject) result[0]);
+	}
 
-    public OPCItemIO getItemIOService() {
-        try {
-            return new OPCItemIO(getCOMObject());
-        } catch (Exception e) {
-            return null;
-        }
-    }
+	public OPCItemProperties getItemPropertiesService() {
+		try {
+			return new OPCItemProperties(getCOMObject());
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
 
-    /**
-     * Get the browser object (<code>IOPCBrowseServerAddressSpace</code>) from the server instance
-     *
-     * @return the browser object
-     */
-    public OPCBrowseServerAddressSpace getBrowser() {
-        try {
-            return new OPCBrowseServerAddressSpace(getCOMObject());
-        } catch (Exception e) {
-            return null;
-        }
-    }
+	public OPCItemIO getItemIOService() {
+		try {
+			return new OPCItemIO(getCOMObject());
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
 
-    /**
-     * Get the common interface if supported
-     *
-     * @return the common interface or <code>null</code> if it is not supported
-     */
-    public OPCCommon getCommon() {
-        try {
-            return new OPCCommon(getCOMObject());
-        } catch (Exception e) {
-            return null;
-        }
-    }
+	/**
+	 * Get the browser object (<code>IOPCBrowseServerAddressSpace</code>) from the server
+	 * instance
+	 * @return the browser object
+	 */
+	public OPCBrowseServerAddressSpace getBrowser() {
+		try {
+			return new OPCBrowseServerAddressSpace(getCOMObject());
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Get the common interface if supported
+	 * @return the common interface or <code>null</code> if it is not supported
+	 */
+	public OPCCommon getCommon() {
+		try {
+			return new OPCCommon(getCOMObject());
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
 }

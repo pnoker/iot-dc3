@@ -55,99 +55,106 @@ import java.util.Objects;
 @RequestMapping(AuthConstant.ROLE_RESOURCE_URL_PREFIX)
 public class RoleResourceBindController implements BaseController {
 
-    private final RoleResourceBindBuilder roleResourceBindBuilder;
-    private final RoleResourceBindService roleResourceBindService;
-    private final ResourceBuilder resourceBuilder;
-    private final RoleBuilder roleBuilder;
+	private final RoleResourceBindBuilder roleResourceBindBuilder;
 
-    public RoleResourceBindController(RoleResourceBindBuilder roleResourceBindBuilder,
-                                      RoleResourceBindService roleResourceBindService,
-                                      ResourceBuilder resourceBuilder,
-                                      RoleBuilder roleBuilder) {
-        this.roleResourceBindBuilder = roleResourceBindBuilder;
-        this.roleResourceBindService = roleResourceBindService;
-        this.resourceBuilder = resourceBuilder;
-        this.roleBuilder = roleBuilder;
-    }
+	private final RoleResourceBindService roleResourceBindService;
 
-    @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleResourceBindVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                RoleResourceBindBO entityBO = roleResourceBindBuilder.buildBOByVO(entityVO);
-                roleResourceBindService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	private final ResourceBuilder resourceBuilder;
 
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            roleResourceBindService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	private final RoleBuilder roleBuilder;
 
-    @PostMapping("/list")
-    public Mono<R<Page<RoleResourceBindVO>>> list(@RequestBody(required = false) RoleResourceBindQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                RoleResourceBindQuery query = Objects.isNull(entityQuery) ? new RoleResourceBindQuery() : entityQuery;
-                Page<RoleResourceBindBO> entityPageBO = roleResourceBindService.selectByPage(query, tenantId);
-                Page<RoleResourceBindVO> entityPageVO = roleResourceBindBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	public RoleResourceBindController(RoleResourceBindBuilder roleResourceBindBuilder,
+			RoleResourceBindService roleResourceBindService, ResourceBuilder resourceBuilder, RoleBuilder roleBuilder) {
+		this.roleResourceBindBuilder = roleResourceBindBuilder;
+		this.roleResourceBindService = roleResourceBindService;
+		this.resourceBuilder = resourceBuilder;
+		this.roleBuilder = roleBuilder;
+	}
 
-    @GetMapping("/list-resource-by-role/{roleId}")
-    public Mono<R<List<ResourceVO>>> listResourceByRole(@NotNull @PathVariable(value = "roleId") Long roleId) {
-        try {
-            List<ResourceBO> entityBOList = roleResourceBindService.listResourceByRoleId(roleId);
-            List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	@PostMapping("/add")
+	public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleResourceBindVO entityVO) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				RoleResourceBindBO entityBO = roleResourceBindBuilder.buildBOByVO(entityVO);
+				roleResourceBindService.save(entityBO);
+				return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    @GetMapping("/list-resource-by-user/{userId}")
-    public Mono<R<List<ResourceVO>>> listResourceByUser(@NotNull @PathVariable(value = "userId") Long userId) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                List<ResourceBO> entityBOList = roleResourceBindService.listResourceByUserId(userId, tenantId);
-                List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
-                return Mono.just(R.ok(entityVOList));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	@PostMapping("/delete/{id}")
+	public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			roleResourceBindService.remove(id);
+			return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    @GetMapping("/list-role-by-resource/{resourceId}")
-    public Mono<R<List<RoleVO>>> listRoleByResource(@NotNull @PathVariable(value = "resourceId") Long resourceId) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                List<RoleBO> entityBOList = roleResourceBindService.listRoleByResourceId(resourceId, tenantId);
-                List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);
-                return Mono.just(R.ok(entityVOList));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	@PostMapping("/list")
+	public Mono<R<Page<RoleResourceBindVO>>> list(@RequestBody(required = false) RoleResourceBindQuery entityQuery) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				RoleResourceBindQuery query = Objects.isNull(entityQuery) ? new RoleResourceBindQuery() : entityQuery;
+				Page<RoleResourceBindBO> entityPageBO = roleResourceBindService.selectByPage(query, tenantId);
+				Page<RoleResourceBindVO> entityPageVO = roleResourceBindBuilder.buildVOPageByBOPage(entityPageBO);
+				return Mono.just(R.ok(entityPageVO));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
+
+	@GetMapping("/list-resource-by-role/{roleId}")
+	public Mono<R<List<ResourceVO>>> listResourceByRole(@NotNull @PathVariable(value = "roleId") Long roleId) {
+		try {
+			List<ResourceBO> entityBOList = roleResourceBindService.listResourceByRoleId(roleId);
+			List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
+			return Mono.just(R.ok(entityVOList));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
+
+	@GetMapping("/list-resource-by-user/{userId}")
+	public Mono<R<List<ResourceVO>>> listResourceByUser(@NotNull @PathVariable(value = "userId") Long userId) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				List<ResourceBO> entityBOList = roleResourceBindService.listResourceByUserId(userId, tenantId);
+				List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
+				return Mono.just(R.ok(entityVOList));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
+
+	@GetMapping("/list-role-by-resource/{resourceId}")
+	public Mono<R<List<RoleVO>>> listRoleByResource(@NotNull @PathVariable(value = "resourceId") Long resourceId) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				List<RoleBO> entityBOList = roleResourceBindService.listRoleByResourceId(resourceId, tenantId);
+				List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);
+				return Mono.just(R.ok(entityVOList));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
 }

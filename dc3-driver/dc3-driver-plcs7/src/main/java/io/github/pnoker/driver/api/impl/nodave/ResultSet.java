@@ -20,26 +20,29 @@ package io.github.pnoker.driver.api.impl.nodave;
  * @author Thomas Hergenhahn
  */
 public final class ResultSet {
-    public Result[] results;
-    private int errorState, numResults;
 
-    public int getErrorState() {
-        return this.errorState;
-    }
+	public Result[] results;
 
-    public void setErrorState(final int error) {
-        this.errorState = error;
-    }
+	private int errorState, numResults;
 
-    ;
+	public int getErrorState() {
+		return this.errorState;
+	}
 
-    public int getNumResults() {
-        return this.numResults;
-    }
+	public void setErrorState(final int error) {
+		this.errorState = error;
+	}
 
-    public void setNumResults(final int nr) {
-        this.numResults = nr;
-    }
+	;
 
-    ;
+	public int getNumResults() {
+		return this.numResults;
+	}
+
+	public void setNumResults(final int nr) {
+		this.numResults = nr;
+	}
+
+	;
+
 }

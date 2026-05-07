@@ -37,46 +37,40 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(AgenticProperties.class)
 public class ChatClientConfig {
 
-    private static final String SYSTEM_PROMPT = """
-            You are an intelligent assistant for the IoT DC3 platform.
-            
-            You can help users manage IoT devices, query real-time and historical data,
-            and perform device operations. You have access to the following capabilities:
-            
-            - **Auth tools**: Look up tenants, users, and login records.
-            - **Manager tools**: Query devices, drivers, and data points (metrics).
-            - **Data tools**: Read real-time point values, query historical data, and send read/write commands to devices.
-            
-            Guidelines:
-            - Always confirm before sending write commands to physical devices.
-            - Present data in a clear, structured format.
-            - If a query fails, explain the error and suggest alternatives.
-            - Use the tools to fetch real data rather than making up values.
-            """;
+	private static final String SYSTEM_PROMPT = """
+			You are an intelligent assistant for the IoT DC3 platform.
 
-    @Bean
-    @ConditionalOnMissingBean
-    public ChatMemory agenticChatMemory(ChatMemoryRepository chatMemoryRepository,
-                                        AgenticProperties properties) {
-        return MessageWindowChatMemory.builder()
-                .chatMemoryRepository(chatMemoryRepository)
-                .maxMessages(properties.getMemoryMaxMessages())
-                .build();
-    }
+			You can help users manage IoT devices, query real-time and historical data,
+			and perform device operations. You have access to the following capabilities:
 
-    @Bean
-    public ChatClient agenticChatClient(ChatClient.Builder builder,
-                                        AuthToolSet authToolSet,
-                                        ManagerToolSet managerToolSet,
-                                        DataToolSet dataToolSet,
-                                        ChatMemory agenticChatMemory,
-                                        SkillRegistry skillRegistry) {
-        return builder
-                .defaultSystem(SYSTEM_PROMPT)
-                .defaultTools(authToolSet, managerToolSet, dataToolSet)
-                .defaultAdvisors(
-                        MessageChatMemoryAdvisor.builder(agenticChatMemory).build()
-                )
-                .build();
-    }
+			- **Auth tools**: Look up tenants, users, and login records.
+			- **Manager tools**: Query devices, drivers, and data points (metrics).
+			- **Data tools**: Read real-time point values, query historical data, and send read/write commands to devices.
+
+			Guidelines:
+			- Always confirm before sending write commands to physical devices.
+			- Present data in a clear, structured format.
+			- If a query fails, explain the error and suggest alternatives.
+			- Use the tools to fetch real data rather than making up values.
+			""";
+
+	@Bean
+	@ConditionalOnMissingBean
+	public ChatMemory agenticChatMemory(ChatMemoryRepository chatMemoryRepository, AgenticProperties properties) {
+		return MessageWindowChatMemory.builder()
+			.chatMemoryRepository(chatMemoryRepository)
+			.maxMessages(properties.getMemoryMaxMessages())
+			.build();
+	}
+
+	@Bean
+	public ChatClient agenticChatClient(ChatClient.Builder builder, AuthToolSet authToolSet,
+			ManagerToolSet managerToolSet, DataToolSet dataToolSet, ChatMemory agenticChatMemory,
+			SkillRegistry skillRegistry) {
+		return builder.defaultSystem(SYSTEM_PROMPT)
+			.defaultTools(authToolSet, managerToolSet, dataToolSet)
+			.defaultAdvisors(MessageChatMemoryAdvisor.builder(agenticChatMemory).build())
+			.build();
+	}
+
 }

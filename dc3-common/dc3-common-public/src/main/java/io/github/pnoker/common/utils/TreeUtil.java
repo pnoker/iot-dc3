@@ -26,9 +26,8 @@ import java.util.List;
 /**
  * Tree Utility Class
  * <p>
- * Utility class for tree structure operations in IoT DC3 platform.
- * Provides methods for building tree structures from flat lists
- * and converting trees back to lists.
+ * Utility class for tree structure operations in IoT DC3 platform. Provides methods for
+ * building tree structures from flat lists and converting trees back to lists.
  * </p>
  *
  * @author pnoker
@@ -38,68 +37,65 @@ import java.util.List;
 @Slf4j
 public class TreeUtil {
 
-    /**
-     * Build a tree structure using a two-level loop.
-     *
-     * @param <T>       Object type extending {@link TreeNode}
-     * @param treeNodes List of tree nodes to be processed
-     * @param root      Root node identifier
-     * @return T Tree
-     */
-    public <T extends TreeNode> List<T> buildByLoop(List<T> treeNodes, Object root) {
-        List<T> trees = new ArrayList<>(16);
-        for (T treeNode : treeNodes) {
-            if (root.equals(treeNode.getParentId())) {
-                trees.add(treeNode);
-            }
-            for (T it : treeNodes) {
-                if (it.getParentId() == treeNode.getId()) {
-                    if (treeNode.getChildren() == null) {
-                        treeNode.setChildren(new ArrayList<>(16));
-                    }
-                    treeNode.add(it);
-                }
-            }
-        }
-        return trees;
-    }
+	/**
+	 * Build a tree structure using a two-level loop.
+	 * @param <T> Object type extending {@link TreeNode}
+	 * @param treeNodes List of tree nodes to be processed
+	 * @param root Root node identifier
+	 * @return T Tree
+	 */
+	public <T extends TreeNode> List<T> buildByLoop(List<T> treeNodes, Object root) {
+		List<T> trees = new ArrayList<>(16);
+		for (T treeNode : treeNodes) {
+			if (root.equals(treeNode.getParentId())) {
+				trees.add(treeNode);
+			}
+			for (T it : treeNodes) {
+				if (it.getParentId() == treeNode.getId()) {
+					if (treeNode.getChildren() == null) {
+						treeNode.setChildren(new ArrayList<>(16));
+					}
+					treeNode.add(it);
+				}
+			}
+		}
+		return trees;
+	}
 
-    /**
-     * Build a tree structure using recursive calls.
-     *
-     * @param <T>       Object type extending {@link TreeNode}
-     * @param treeNodes List of tree nodes to be processed
-     * @param root      Root node identifier
-     * @return T Tree
-     */
-    public <T extends TreeNode> List<T> buildByRecursive(List<T> treeNodes, Object root) {
-        List<T> trees = new ArrayList<>(16);
-        for (T treeNode : treeNodes) {
-            if (root.equals(treeNode.getParentId())) {
-                trees.add(findChildren(treeNode, treeNodes));
-            }
-        }
-        return trees;
-    }
+	/**
+	 * Build a tree structure using recursive calls.
+	 * @param <T> Object type extending {@link TreeNode}
+	 * @param treeNodes List of tree nodes to be processed
+	 * @param root Root node identifier
+	 * @return T Tree
+	 */
+	public <T extends TreeNode> List<T> buildByRecursive(List<T> treeNodes, Object root) {
+		List<T> trees = new ArrayList<>(16);
+		for (T treeNode : treeNodes) {
+			if (root.equals(treeNode.getParentId())) {
+				trees.add(findChildren(treeNode, treeNodes));
+			}
+		}
+		return trees;
+	}
 
-    /**
-     * Recursively find and attach child nodes.
-     *
-     * @param <T>       Object type extending {@link TreeNode}
-     * @param treeNode  Current node
-     * @param treeNodes List of all tree nodes
-     * @return T Tree
-     */
-    public <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
-        for (T it : treeNodes) {
-            if (treeNode.getId() == it.getParentId()) {
-                if (treeNode.getChildren() == null) {
-                    treeNode.setChildren(new ArrayList<>(16));
-                }
-                treeNode.add(findChildren(it, treeNodes));
-            }
-        }
-        return treeNode;
-    }
+	/**
+	 * Recursively find and attach child nodes.
+	 * @param <T> Object type extending {@link TreeNode}
+	 * @param treeNode Current node
+	 * @param treeNodes List of all tree nodes
+	 * @return T Tree
+	 */
+	public <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
+		for (T it : treeNodes) {
+			if (treeNode.getId() == it.getParentId()) {
+				if (treeNode.getChildren() == null) {
+					treeNode.setChildren(new ArrayList<>(16));
+				}
+				treeNode.add(findChildren(it, treeNodes));
+			}
+		}
+		return treeNode;
+	}
 
 }

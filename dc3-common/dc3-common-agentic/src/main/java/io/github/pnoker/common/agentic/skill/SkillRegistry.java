@@ -21,57 +21,54 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 /**
- * Central registry that holds all {@link SkillDefinition} instances loaded
- * at startup. Supports lookup by name and enumeration of all registered skills.
+ * Central registry that holds all {@link SkillDefinition} instances loaded at startup.
+ * Supports lookup by name and enumeration of all registered skills.
  */
 @Component
 public class SkillRegistry {
 
-    private final Map<String, SkillDefinition> skills = new LinkedHashMap<>();
+	private final Map<String, SkillDefinition> skills = new LinkedHashMap<>();
 
-    /**
-     * Register a skill definition. Overwrites any existing skill with the same name.
-     *
-     * @param skill the skill to register
-     */
-    public void register(SkillDefinition skill) {
-        skills.put(skill.getName(), skill);
-    }
+	/**
+	 * Register a skill definition. Overwrites any existing skill with the same name.
+	 * @param skill the skill to register
+	 */
+	public void register(SkillDefinition skill) {
+		skills.put(skill.getName(), skill);
+	}
 
-    /**
-     * Look up a skill by name.
-     *
-     * @param name the skill name
-     * @return the matching skill, or {@code null} if not found
-     */
-    public SkillDefinition get(String name) {
-        return skills.get(name);
-    }
+	/**
+	 * Look up a skill by name.
+	 * @param name the skill name
+	 * @return the matching skill, or {@code null} if not found
+	 */
+	public SkillDefinition get(String name) {
+		return skills.get(name);
+	}
 
-    /**
-     * Return all registered skills in insertion order.
-     *
-     * @return unmodifiable collection of all skills
-     */
-    public Collection<SkillDefinition> all() {
-        return Collections.unmodifiableCollection(skills.values());
-    }
+	/**
+	 * Return all registered skills in insertion order.
+	 * @return unmodifiable collection of all skills
+	 */
+	public Collection<SkillDefinition> all() {
+		return Collections.unmodifiableCollection(skills.values());
+	}
 
-    /**
-     * Return the tool names associated with the given skill.
-     * <p>
-     * Returns {@code null} (meaning "all tools available") when the skill
-     * is not found or the skill's tool list is empty.
-     *
-     * @param skillName the skill to look up
-     * @return list of allowed tool names, or {@code null} for unrestricted
-     */
-    public List<String> getEnabledToolNames(String skillName) {
-        SkillDefinition skill = skills.get(skillName);
-        if (skill == null) {
-            return null;
-        }
-        List<String> tools = skill.getTools();
-        return (tools == null || tools.isEmpty()) ? null : tools;
-    }
+	/**
+	 * Return the tool names associated with the given skill.
+	 * <p>
+	 * Returns {@code null} (meaning "all tools available") when the skill is not found or
+	 * the skill's tool list is empty.
+	 * @param skillName the skill to look up
+	 * @return list of allowed tool names, or {@code null} for unrestricted
+	 */
+	public List<String> getEnabledToolNames(String skillName) {
+		SkillDefinition skill = skills.get(skillName);
+		if (skill == null) {
+			return null;
+		}
+		List<String> tools = skill.getTools();
+		return (tools == null || tools.isEmpty()) ? null : tools;
+	}
+
 }

@@ -34,76 +34,79 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum AlarmMessageLevelFlagEnum {
-    /**
-     * P0
-     */
-    P0((byte) 0, "p0", "P0"),
 
-    /**
-     * P1
-     */
-    P1((byte) 1, "p1", "P1"),
+	/**
+	 * P0
+	 */
+	P0((byte) 0, "p0", "P0"),
 
-    /**
-     * P2
-     */
-    P2((byte) 2, "p2", "P2"),
+	/**
+	 * P1
+	 */
+	P1((byte) 1, "p1", "P1"),
 
-    /**
-     * P3
-     */
-    P3((byte) 3, "p3", "P3"),
-    ;
+	/**
+	 * P2
+	 */
+	P2((byte) 2, "p2", "P2"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * P3
+	 */
+	P3((byte) 3, "p3", "P3"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link AlarmMessageLevelFlagEnum}
-     */
-    public static AlarmMessageLevelFlagEnum ofIndex(Byte index) {
-        Optional<AlarmMessageLevelFlagEnum> any = Arrays.stream(AlarmMessageLevelFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link AlarmMessageLevelFlagEnum}
-     */
-    public static AlarmMessageLevelFlagEnum ofCode(String code) {
-        Optional<AlarmMessageLevelFlagEnum> any = Arrays.stream(AlarmMessageLevelFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link AlarmMessageLevelFlagEnum}
+	 */
+	public static AlarmMessageLevelFlagEnum ofIndex(Byte index) {
+		Optional<AlarmMessageLevelFlagEnum> any = Arrays.stream(AlarmMessageLevelFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link AlarmMessageLevelFlagEnum}
-     */
-    public static AlarmMessageLevelFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link AlarmMessageLevelFlagEnum}
+	 */
+	public static AlarmMessageLevelFlagEnum ofCode(String code) {
+		Optional<AlarmMessageLevelFlagEnum> any = Arrays.stream(AlarmMessageLevelFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link AlarmMessageLevelFlagEnum}
+	 */
+	public static AlarmMessageLevelFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

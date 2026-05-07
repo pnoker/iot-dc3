@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @since 2022.1.0
  */
 @Service
-public class RoleUserBindManagerImpl extends ServiceImpl<RoleUserBindMapper, RoleUserBindDO> implements RoleUserBindManager {
+public class RoleUserBindManagerImpl extends ServiceImpl<RoleUserBindMapper, RoleUserBindDO>
+		implements RoleUserBindManager {
 
 }

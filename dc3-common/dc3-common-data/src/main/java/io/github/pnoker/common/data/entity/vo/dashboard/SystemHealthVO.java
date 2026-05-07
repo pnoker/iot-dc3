@@ -29,9 +29,11 @@ import java.util.Map;
 /**
  * Aggregate system health for the dashboard banner.
  *
- * <p>{@code center} / {@code infra} values are {@code "up"} or {@code "down"}.
- * Kept as Maps (not typed fields) so the frontend can render whatever keys
- * the backend decides to expose without a coordinated deploy.</p>
+ * <p>
+ * {@code center} / {@code infra} values are {@code "up"} or {@code "down"}. Kept as Maps
+ * (not typed fields) so the frontend can render whatever keys the backend decides to
+ * expose without a coordinated deploy.
+ * </p>
  *
  * @author pnoker
  * @since 2026.5.2
@@ -42,51 +44,54 @@ import java.util.Map;
 @NoArgsConstructor
 public class SystemHealthVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Center service reachability (auth, data, manager).
-     */
-    private Map<String, String> center;
+	/**
+	 * Center service reachability (auth, data, manager).
+	 */
+	private Map<String, String> center;
 
-    /**
-     * Infrastructure reachability (database, mq, gateway).
-     */
-    private Map<String, String> infra;
+	/**
+	 * Infrastructure reachability (database, mq, gateway).
+	 */
+	private Map<String, String> infra;
 
-    /**
-     * Driver population summary.
-     */
-    private FleetSummary drivers;
+	/**
+	 * Driver population summary.
+	 */
+	private FleetSummary drivers;
 
-    /**
-     * Device population summary.
-     */
-    private FleetSummary devices;
+	/**
+	 * Device population summary.
+	 */
+	private FleetSummary devices;
 
-    /**
-     * Population summary shared by drivers and devices: count of records in
-     * the DB, how many of them reported ONLINE to the status cache, and how
-     * many rows resolved to a cache miss (never heartbeated since startup).
-     */
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    public static class FleetSummary implements Serializable {
+	/**
+	 * Population summary shared by drivers and devices: count of records in the DB, how
+	 * many of them reported ONLINE to the status cache, and how many rows resolved to a
+	 * cache miss (never heartbeated since startup).
+	 */
+	@Getter
+	@Setter
+	@ToString
+	@NoArgsConstructor
+	public static class FleetSummary implements Serializable {
 
-        @Serial
-        private static final long serialVersionUID = 1L;
+		@Serial
+		private static final long serialVersionUID = 1L;
 
-        private int total;
+		private int total;
 
-        private int online;
-    }
+		private int online;
 
-    /**
-     * Backwards-compat alias — drivers used to be typed as DriverSummary.
-     */
-    public static class DriverSummary extends FleetSummary {
-    }
+	}
+
+	/**
+	 * Backwards-compat alias — drivers used to be typed as DriverSummary.
+	 */
+	public static class DriverSummary extends FleetSummary {
+
+	}
+
 }

@@ -32,4 +32,3 @@ import io.github.pnoker.common.manager.entity.model.PointAttributeDO;
 public interface PointAttributeMapper extends BaseMapper<PointAttributeDO> {
 
 }
-

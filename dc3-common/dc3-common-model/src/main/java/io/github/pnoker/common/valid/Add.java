@@ -20,12 +20,13 @@ package io.github.pnoker.common.valid;
 /**
  * Add validation group.
  * <p>
- * Used with {@link org.springframework.validation.annotation.Validated}
- * to specify validation groups for different scenarios.
+ * Used with {@link org.springframework.validation.annotation.Validated} to specify
+ * validation groups for different scenarios.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public interface Add {
+
 }

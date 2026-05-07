@@ -37,123 +37,117 @@ import java.time.temporal.ChronoUnit;
 @Slf4j
 public class ZoneDateTimeUtil {
 
-    private ZoneDateTimeUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private ZoneDateTimeUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Get the default date-time format.
-     * <p>
-     * Pattern: yyyy-MM-dd HH:mm:ss
-     *
-     * @return {@link DateTimeFormatter}
-     */
-    public static DateTimeFormatter getDefaultDateTimeFormatter() {
-        return DateTimeFormatter.ofPattern(TimeConstant.DEFAULT_DATE_FORMAT).withZone(TimeConstant.DEFAULT_ZONEID);
-    }
+	/**
+	 * Get the default date-time format.
+	 * <p>
+	 * Pattern: yyyy-MM-dd HH:mm:ss
+	 * @return {@link DateTimeFormatter}
+	 */
+	public static DateTimeFormatter getDefaultDateTimeFormatter() {
+		return DateTimeFormatter.ofPattern(TimeConstant.DEFAULT_DATE_FORMAT).withZone(TimeConstant.DEFAULT_ZONEID);
+	}
 
-    /**
-     * Get the complete date-time format.
-     * <p>
-     * Pattern: yyyy-MM-dd HH:mm:ss.SSS
-     *
-     * @return {@link DateTimeFormatter}
-     */
-    public static DateTimeFormatter getCompleteDateTimeFormatter() {
-        return DateTimeFormatter.ofPattern(TimeConstant.COMPLETE_DATE_FORMAT).withZone(TimeConstant.DEFAULT_ZONEID);
-    }
+	/**
+	 * Get the complete date-time format.
+	 * <p>
+	 * Pattern: yyyy-MM-dd HH:mm:ss.SSS
+	 * @return {@link DateTimeFormatter}
+	 */
+	public static DateTimeFormatter getCompleteDateTimeFormatter() {
+		return DateTimeFormatter.ofPattern(TimeConstant.COMPLETE_DATE_FORMAT).withZone(TimeConstant.DEFAULT_ZONEID);
+	}
 
-    /**
-     * Get the current time with default time zone.
-     *
-     * @return ZonedDateTime {@link ZonedDateTime}
-     */
-    public static ZonedDateTime now() {
-        return ZonedDateTime.now(TimeConstant.DEFAULT_ZONEID);
-    }
+	/**
+	 * Get the current time with default time zone.
+	 * @return ZonedDateTime {@link ZonedDateTime}
+	 */
+	public static ZonedDateTime now() {
+		return ZonedDateTime.now(TimeConstant.DEFAULT_ZONEID);
+	}
 
-    /**
-     * Get milliseconds from the given {@link ZonedDateTime}.
-     *
-     * @param zonedDateTime {@link ZonedDateTime}
-     * @return Milliseconds
-     */
-    public static long milliSeconds(ZonedDateTime zonedDateTime) {
-        return zonedDateTime.toInstant().toEpochMilli();
-    }
+	/**
+	 * Get milliseconds from the given {@link ZonedDateTime}.
+	 * @param zonedDateTime {@link ZonedDateTime}
+	 * @return Milliseconds
+	 */
+	public static long milliSeconds(ZonedDateTime zonedDateTime) {
+		return zonedDateTime.toInstant().toEpochMilli();
+	}
 
-    /**
-     * Get a {@link ZonedDateTime} from milliseconds.
-     *
-     * @param milliSeconds Milliseconds
-     * @return ZonedDateTime {@link ZonedDateTime}
-     */
-    public static ZonedDateTime dateTime(long milliSeconds) {
-        Instant instant = Instant.ofEpochMilli(milliSeconds);
-        return ZonedDateTime.ofInstant(instant, TimeConstant.DEFAULT_ZONEID);
-    }
+	/**
+	 * Get a {@link ZonedDateTime} from milliseconds.
+	 * @param milliSeconds Milliseconds
+	 * @return ZonedDateTime {@link ZonedDateTime}
+	 */
+	public static ZonedDateTime dateTime(long milliSeconds) {
+		Instant instant = Instant.ofEpochMilli(milliSeconds);
+		return ZonedDateTime.ofInstant(instant, TimeConstant.DEFAULT_ZONEID);
+	}
 
-    /**
-     * Delay time by the specified amount and unit, e.g., HOUR/MINUTE/...
-     *
-     * @param amount Integer
-     * @param field  ChronoUnit field : {@link ChronoUnit ChronoUnit.HOUR/MINUTE/...}
-     * @return ZonedDateTime
-     */
-    public static ZonedDateTime expireTime(int amount, ChronoUnit field) {
-        ZonedDateTime zonedDateTime = ZoneDateTimeUtil.now();
-        return zonedDateTime.plus(amount, field);
-    }
+	/**
+	 * Delay time by the specified amount and unit, e.g., HOUR/MINUTE/...
+	 * @param amount Integer
+	 * @param field ChronoUnit field : {@link ChronoUnit ChronoUnit.HOUR/MINUTE/...}
+	 * @return ZonedDateTime
+	 */
+	public static ZonedDateTime expireTime(int amount, ChronoUnit field) {
+		ZonedDateTime zonedDateTime = ZoneDateTimeUtil.now();
+		return zonedDateTime.plus(amount, field);
+	}
 
-    /**
-     * Format time using the pattern yyyy-MM-dd HH:mm:ss.
-     *
-     * @param zonedDateTime {@link ZonedDateTime}
-     * @return Formatted time string
-     */
-    public static String defaultFormat(ZonedDateTime zonedDateTime) {
-        DateTimeFormatter formatter = getDefaultDateTimeFormatter();
-        return zonedDateTime.format(formatter);
-    }
+	/**
+	 * Format time using the pattern yyyy-MM-dd HH:mm:ss.
+	 * @param zonedDateTime {@link ZonedDateTime}
+	 * @return Formatted time string
+	 */
+	public static String defaultFormat(ZonedDateTime zonedDateTime) {
+		DateTimeFormatter formatter = getDefaultDateTimeFormatter();
+		return zonedDateTime.format(formatter);
+	}
 
-    /**
-     * Format time using the pattern yyyy-MM-dd HH:mm:ss.SSS.
-     *
-     * @param zonedDateTime {@link ZonedDateTime}
-     * @return Formatted time string
-     */
-    public static String completeFormat(ZonedDateTime zonedDateTime) {
-        DateTimeFormatter formatter = getCompleteDateTimeFormatter();
-        return zonedDateTime.format(formatter);
-    }
+	/**
+	 * Format time using the pattern yyyy-MM-dd HH:mm:ss.SSS.
+	 * @param zonedDateTime {@link ZonedDateTime}
+	 * @return Formatted time string
+	 */
+	public static String completeFormat(ZonedDateTime zonedDateTime) {
+		DateTimeFormatter formatter = getCompleteDateTimeFormatter();
+		return zonedDateTime.format(formatter);
+	}
 
-    /**
-     * Parse a time string in the pattern yyyy-MM-dd HH:mm:ss to {@link ZonedDateTime}.
-     *
-     * @param dateString yyyy-MM-dd HH:mm:ss
-     * @return ZonedDateTime or {@code null} if parsing fails
-     */
-    public static ZonedDateTime defaultDate(String dateString) {
-        try {
-            DateTimeFormatter formatter = getDefaultDateTimeFormatter();
-            return ZonedDateTime.parse(dateString, formatter);
-        } catch (DateTimeParseException e) {
-            return null;
-        }
-    }
+	/**
+	 * Parse a time string in the pattern yyyy-MM-dd HH:mm:ss to {@link ZonedDateTime}.
+	 * @param dateString yyyy-MM-dd HH:mm:ss
+	 * @return ZonedDateTime or {@code null} if parsing fails
+	 */
+	public static ZonedDateTime defaultDate(String dateString) {
+		try {
+			DateTimeFormatter formatter = getDefaultDateTimeFormatter();
+			return ZonedDateTime.parse(dateString, formatter);
+		}
+		catch (DateTimeParseException e) {
+			return null;
+		}
+	}
 
-    /**
-     * Parse a time string in the pattern yyyy-MM-dd HH:mm:ss.SSS to {@link ZonedDateTime}.
-     *
-     * @param dateString Date string
-     * @return ZonedDateTime or {@code null} if parsing fails
-     */
-    public static ZonedDateTime completeDate(String dateString) {
-        try {
-            DateTimeFormatter formatter = getCompleteDateTimeFormatter();
-            return ZonedDateTime.parse(dateString, formatter);
-        } catch (DateTimeParseException e) {
-            return null;
-        }
-    }
+	/**
+	 * Parse a time string in the pattern yyyy-MM-dd HH:mm:ss.SSS to
+	 * {@link ZonedDateTime}.
+	 * @param dateString Date string
+	 * @return ZonedDateTime or {@code null} if parsing fails
+	 */
+	public static ZonedDateTime completeDate(String dateString) {
+		try {
+			DateTimeFormatter formatter = getCompleteDateTimeFormatter();
+			return ZonedDateTime.parse(dateString, formatter);
+		}
+		catch (DateTimeParseException e) {
+			return null;
+		}
+	}
+
 }

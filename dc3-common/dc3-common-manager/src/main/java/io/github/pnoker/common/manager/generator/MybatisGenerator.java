@@ -34,40 +34,30 @@ import io.github.pnoker.common.utils.MybatisUtil;
  * @since 2022.1.0
  */
 public class MybatisGenerator {
-    public static void main(String[] args) {
-        generator();
-    }
 
-    public static void generator() {
-        String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-manager/src/main";
-        MybatisUtil.defaultGenerator("dc3-postgres", "35432", "dc3", "dc3_manager", "dc3", "dc3dc3dc3")
-                .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
-                .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
-                .packageConfig(builder -> builder
-                        .parent("io.github.pnoker.common.manager")
-                        .entity("entity.model")
-                        .service("dal")
-                        .serviceImpl("dal.impl")
-                        .mapper("mapper")
-                        .pathInfo(ImmutableMap.of(
-                                OutputFile.service, path + "/java/io/github/pnoker/common/manager/dal",
-                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/manager/dal/impl",
-                                OutputFile.xml, path + "/resources/mapping"))
-                )
-                .templateEngine(new FreemarkerTemplateEngine())
-                .strategyConfig(MybatisUtil::defaultStrategyConfig)
-                .strategyConfig(builder -> builder
-                        .addInclude(
-                                "dc3_device",
-                                "dc3_driver",
-                                "dc3_driver_attribute",
-                                "dc3_driver_attribute_config",
-                                "dc3_point",
-                                "dc3_point_attribute",
-                                "dc3_point_attribute_config",
-                                "dc3_profile",
-                                "dc3_profile_bind"
-                        )
-                ).execute();
-    }
+	public static void main(String[] args) {
+		generator();
+	}
+
+	public static void generator() {
+		String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-manager/src/main";
+		MybatisUtil.defaultGenerator("dc3-postgres", "35432", "dc3", "dc3_manager", "dc3", "dc3dc3dc3")
+			.globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
+			.dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
+			.packageConfig(builder -> builder.parent("io.github.pnoker.common.manager")
+				.entity("entity.model")
+				.service("dal")
+				.serviceImpl("dal.impl")
+				.mapper("mapper")
+				.pathInfo(ImmutableMap.of(OutputFile.service, path + "/java/io/github/pnoker/common/manager/dal",
+						OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/manager/dal/impl", OutputFile.xml,
+						path + "/resources/mapping")))
+			.templateEngine(new FreemarkerTemplateEngine())
+			.strategyConfig(MybatisUtil::defaultStrategyConfig)
+			.strategyConfig(builder -> builder.addInclude("dc3_device", "dc3_driver", "dc3_driver_attribute",
+					"dc3_driver_attribute_config", "dc3_point", "dc3_point_attribute", "dc3_point_attribute_config",
+					"dc3_profile", "dc3_profile_bind"))
+			.execute();
+	}
+
 }

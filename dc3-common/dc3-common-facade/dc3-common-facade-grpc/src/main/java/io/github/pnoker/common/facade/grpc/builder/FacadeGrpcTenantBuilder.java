@@ -36,18 +36,19 @@ import java.util.Optional;
 @Component
 public class FacadeGrpcTenantBuilder {
 
-    public FacadeTenantBO toFacadeBO(GrpcTenantDTO dto) {
-        if (Objects.isNull(dto)) {
-            return null;
-        }
+	public FacadeTenantBO toFacadeBO(GrpcTenantDTO dto) {
+		if (Objects.isNull(dto)) {
+			return null;
+		}
 
-        FacadeTenantBO bo = new FacadeTenantBO();
-        GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
+		FacadeTenantBO bo = new FacadeTenantBO();
+		GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
 
-        StringOptional.ofNullable(dto.getTenantName()).ifPresent(bo::setTenantName);
-        StringOptional.ofNullable(dto.getTenantCode()).ifPresent(bo::setTenantCode);
-        Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
+		StringOptional.ofNullable(dto.getTenantName()).ifPresent(bo::setTenantName);
+		StringOptional.ofNullable(dto.getTenantCode()).ifPresent(bo::setTenantCode);
+		Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
 
-        return bo;
-    }
+		return bo;
+	}
+
 }

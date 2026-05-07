@@ -25,8 +25,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * One row in the dashboard live-data feed — the most recent N point-value
- * entries across every typed hypertable.
+ * One row in the dashboard live-data feed — the most recent N point-value entries across
+ * every typed hypertable.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -38,43 +38,42 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class LatestPointValueVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Long deviceId;
+	private Long deviceId;
 
-    private Long pointId;
+	private Long pointId;
 
-    private Long driverId;
+	private Long driverId;
 
-    /**
-     * Display name for the device, resolved via {@code DeviceFacade}. May be
-     * {@code null} when the device has been deleted but historical point
-     * values still reference it.
-     */
-    private String deviceName;
+	/**
+	 * Display name for the device, resolved via {@code DeviceFacade}. May be {@code null}
+	 * when the device has been deleted but historical point values still reference it.
+	 */
+	private String deviceName;
 
-    /**
-     * Display name for the point.
-     */
-    private String pointName;
+	/**
+	 * Display name for the point.
+	 */
+	private String pointName;
 
-    /**
-     * Display name for the driver that owns the device.
-     */
-    private String driverName;
+	/**
+	 * Display name for the driver that owns the device.
+	 */
+	private String driverName;
 
-    private String rawValue;
+	private String rawValue;
 
-    private String calValue;
+	private String calValue;
 
-    /**
-     * Which hypertable the row came from: STRING / INT / LONG / BOOL /
-     * FLOAT / DOUBLE / JSON. Lets the UI pick formatting without fetching
-     * the point's metadata.
-     */
-    private String valueType;
+	/**
+	 * Which hypertable the row came from: STRING / INT / LONG / BOOL / FLOAT / DOUBLE /
+	 * JSON. Lets the UI pick formatting without fetching the point's metadata.
+	 */
+	private String valueType;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime createTime;
+
 }

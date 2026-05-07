@@ -32,538 +32,579 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>BasicProcessImage class.</p>
+ * <p>
+ * BasicProcessImage class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class BasicProcessImage implements ProcessImage {
-    private final int slaveId;
-    private final Map<Integer, Boolean> coils = new HashMap<>();
-    private final Map<Integer, Boolean> inputs = new HashMap<>();
-    private final Map<Integer, Short> holdingRegisters = new HashMap<>();
-    private final Map<Integer, Short> inputRegisters = new HashMap<>();
-    private final List<ProcessImageListener> writeListeners = new ArrayList<>();
-    private boolean allowInvalidAddress = false;
-    private short invalidAddressValue = 0;
-    private byte exceptionStatus;
 
-    /**
-     * <p>Constructor for BasicProcessImage.</p>
-     *
-     * @param slaveId a int.
-     */
-    public BasicProcessImage(int slaveId) {
-        ModbusUtils.validateSlaveId(slaveId, false);
-        this.slaveId = slaveId;
-    }
+	private final int slaveId;
 
-    @Override
-    public int getSlaveId() {
-        return slaveId;
-    }
+	private final Map<Integer, Boolean> coils = new HashMap<>();
 
-    /**
-     * <p>addListener.</p>
-     *
-     * @param l a {@link ProcessImageListener} object.
-     */
-    public synchronized void addListener(ProcessImageListener l) {
-        writeListeners.add(l);
-    }
+	private final Map<Integer, Boolean> inputs = new HashMap<>();
 
-    /**
-     * <p>removeListener.</p>
-     *
-     * @param l a {@link ProcessImageListener} object.
-     */
-    public synchronized void removeListener(ProcessImageListener l) {
-        writeListeners.remove(l);
-    }
+	private final Map<Integer, Short> holdingRegisters = new HashMap<>();
 
-    /**
-     * <p>isAllowInvalidAddress.</p>
-     *
-     * @return a boolean.
-     */
-    public boolean isAllowInvalidAddress() {
-        return allowInvalidAddress;
-    }
+	private final Map<Integer, Short> inputRegisters = new HashMap<>();
 
-    /**
-     * <p>Setter for the field <code>allowInvalidAddress</code>.</p>
-     *
-     * @param allowInvalidAddress a boolean.
-     */
-    public void setAllowInvalidAddress(boolean allowInvalidAddress) {
-        this.allowInvalidAddress = allowInvalidAddress;
-    }
+	private final List<ProcessImageListener> writeListeners = new ArrayList<>();
 
-    /**
-     * <p>Getter for the field <code>invalidAddressValue</code>.</p>
-     *
-     * @return a short.
-     */
-    public short getInvalidAddressValue() {
-        return invalidAddressValue;
-    }
+	private boolean allowInvalidAddress = false;
 
-    /**
-     * <p>Setter for the field <code>invalidAddressValue</code>.</p>
-     *
-     * @param invalidAddressValue a short.
-     */
-    public void setInvalidAddressValue(short invalidAddressValue) {
-        this.invalidAddressValue = invalidAddressValue;
-    }
+	private short invalidAddressValue = 0;
 
-    //
-    // /
-    // / Additional convenience methods.
-    // /
-    //
+	private byte exceptionStatus;
 
-    /**
-     * <p>setBinary.</p>
-     *
-     * @param registerId a int.
-     * @param value      a boolean.
-     */
-    public void setBinary(int registerId, boolean value) {
-        RangeAndOffset rao = new RangeAndOffset(registerId);
-        setBinary(rao.getRange(), rao.getOffset(), value);
-    }
+	/**
+	 * <p>
+	 * Constructor for BasicProcessImage.
+	 * </p>
+	 * @param slaveId a int.
+	 */
+	public BasicProcessImage(int slaveId) {
+		ModbusUtils.validateSlaveId(slaveId, false);
+		this.slaveId = slaveId;
+	}
 
-    //
-    // Binaries
+	@Override
+	public int getSlaveId() {
+		return slaveId;
+	}
 
-    /**
-     * <p>setBinary.</p>
-     *
-     * @param range  a int.
-     * @param offset a int.
-     * @param value  a boolean.
-     */
-    public void setBinary(int range, int offset, boolean value) {
-        if (range == RegisterRange.COIL_STATUS)
-            setCoil(offset, value);
-        else if (range == RegisterRange.INPUT_STATUS)
-            setInput(offset, value);
-        else
-            throw new ModbusIdException("Invalid range to set binary: " + range);
-    }
+	/**
+	 * <p>
+	 * addListener.
+	 * </p>
+	 * @param l a {@link ProcessImageListener} object.
+	 */
+	public synchronized void addListener(ProcessImageListener l) {
+		writeListeners.add(l);
+	}
 
-    /**
-     * <p>setNumeric.</p>
-     *
-     * @param registerId a int.
-     * @param dataType   a int.
-     * @param value      a {@link Number} object.
-     */
-    public synchronized void setNumeric(int registerId, int dataType, Number value) {
-        RangeAndOffset rao = new RangeAndOffset(registerId);
-        setNumeric(rao.getRange(), rao.getOffset(), dataType, value);
-    }
+	/**
+	 * <p>
+	 * removeListener.
+	 * </p>
+	 * @param l a {@link ProcessImageListener} object.
+	 */
+	public synchronized void removeListener(ProcessImageListener l) {
+		writeListeners.remove(l);
+	}
 
-    //
-    // Numerics
+	/**
+	 * <p>
+	 * isAllowInvalidAddress.
+	 * </p>
+	 * @return a boolean.
+	 */
+	public boolean isAllowInvalidAddress() {
+		return allowInvalidAddress;
+	}
 
-    /**
-     * <p>setNumeric.</p>
-     *
-     * @param range    a int.
-     * @param offset   a int.
-     * @param dataType a int.
-     * @param value    a {@link Number} object.
-     */
-    public synchronized void setNumeric(int range, int offset, int dataType, Number value) {
-        short[] registers = new NumericLocator(slaveId, range, offset, dataType).valueToShorts(value);
+	/**
+	 * <p>
+	 * Setter for the field <code>allowInvalidAddress</code>.
+	 * </p>
+	 * @param allowInvalidAddress a boolean.
+	 */
+	public void setAllowInvalidAddress(boolean allowInvalidAddress) {
+		this.allowInvalidAddress = allowInvalidAddress;
+	}
 
-        // Write the value.
-        if (range == RegisterRange.HOLDING_REGISTER)
-            setHoldingRegister(offset, registers);
-        else if (range == RegisterRange.INPUT_REGISTER)
-            setInputRegister(offset, registers);
-        else
-            throw new ModbusIdException("Invalid range to set register: " + range);
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>invalidAddressValue</code>.
+	 * </p>
+	 * @return a short.
+	 */
+	public short getInvalidAddressValue() {
+		return invalidAddressValue;
+	}
 
-    /**
-     * <p>setString.</p>
-     *
-     * @param range         a int.
-     * @param offset        a int.
-     * @param dataType      a int.
-     * @param registerCount a int.
-     * @param s             a {@link String} object.
-     */
-    public synchronized void setString(int range, int offset, int dataType, int registerCount, String s) {
-        setString(range, offset, dataType, registerCount, StringLocator.ASCII, s);
-    }
+	/**
+	 * <p>
+	 * Setter for the field <code>invalidAddressValue</code>.
+	 * </p>
+	 * @param invalidAddressValue a short.
+	 */
+	public void setInvalidAddressValue(short invalidAddressValue) {
+		this.invalidAddressValue = invalidAddressValue;
+	}
 
-    //
-    // Strings
+	//
+	// /
+	// / Additional convenience methods.
+	// /
+	//
 
-    /**
-     * <p>setString.</p>
-     *
-     * @param range         a int.
-     * @param offset        a int.
-     * @param dataType      a int.
-     * @param registerCount a int.
-     * @param charset       a {@link Charset} object.
-     * @param s             a {@link String} object.
-     */
-    public synchronized void setString(int range, int offset, int dataType, int registerCount, Charset charset, String s) {
-        short[] registers = new StringLocator(slaveId, range, offset, dataType, registerCount, charset)
-                .valueToShorts(s);
+	/**
+	 * <p>
+	 * setBinary.
+	 * </p>
+	 * @param registerId a int.
+	 * @param value a boolean.
+	 */
+	public void setBinary(int registerId, boolean value) {
+		RangeAndOffset rao = new RangeAndOffset(registerId);
+		setBinary(rao.getRange(), rao.getOffset(), value);
+	}
 
-        // Write the value.
-        if (range == RegisterRange.HOLDING_REGISTER)
-            setHoldingRegister(offset, registers);
-        else if (range == RegisterRange.INPUT_REGISTER)
-            setInputRegister(offset, registers);
-        else
-            throw new ModbusIdException("Invalid range to set register: " + range);
-    }
+	//
+	// Binaries
 
-    /**
-     * <p>setHoldingRegister.</p>
-     *
-     * @param offset    a int.
-     * @param registers an array of {@link short} objects.
-     */
-    public synchronized void setHoldingRegister(int offset, short[] registers) {
-        validateOffset(offset);
-        for (int i = 0; i < registers.length; i++)
-            setHoldingRegister(offset + i, registers[i]);
-    }
+	/**
+	 * <p>
+	 * setBinary.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param value a boolean.
+	 */
+	public void setBinary(int range, int offset, boolean value) {
+		if (range == RegisterRange.COIL_STATUS)
+			setCoil(offset, value);
+		else if (range == RegisterRange.INPUT_STATUS)
+			setInput(offset, value);
+		else
+			throw new ModbusIdException("Invalid range to set binary: " + range);
+	}
 
-    /**
-     * <p>setInputRegister.</p>
-     *
-     * @param offset    a int.
-     * @param registers an array of {@link short} objects.
-     */
-    public synchronized void setInputRegister(int offset, short[] registers) {
-        validateOffset(offset);
-        for (int i = 0; i < registers.length; i++)
-            setInputRegister(offset + i, registers[i]);
-    }
+	/**
+	 * <p>
+	 * setNumeric.
+	 * </p>
+	 * @param registerId a int.
+	 * @param dataType a int.
+	 * @param value a {@link Number} object.
+	 */
+	public synchronized void setNumeric(int registerId, int dataType, Number value) {
+		RangeAndOffset rao = new RangeAndOffset(registerId);
+		setNumeric(rao.getRange(), rao.getOffset(), dataType, value);
+	}
 
-    /**
-     * <p>setBit.</p>
-     *
-     * @param range  a int.
-     * @param offset a int.
-     * @param bit    a int.
-     * @param value  a boolean.
-     */
-    public synchronized void setBit(int range, int offset, int bit, boolean value) {
-        if (range == RegisterRange.HOLDING_REGISTER)
-            setHoldingRegisterBit(offset, bit, value);
-        else if (range == RegisterRange.INPUT_REGISTER)
-            setInputRegisterBit(offset, bit, value);
-        else
-            throw new ModbusIdException("Invalid range to set register: " + range);
-    }
+	//
+	// Numerics
 
-    //
-    // Bits
+	/**
+	 * <p>
+	 * setNumeric.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param dataType a int.
+	 * @param value a {@link Number} object.
+	 */
+	public synchronized void setNumeric(int range, int offset, int dataType, Number value) {
+		short[] registers = new NumericLocator(slaveId, range, offset, dataType).valueToShorts(value);
 
-    /**
-     * <p>setHoldingRegisterBit.</p>
-     *
-     * @param offset a int.
-     * @param bit    a int.
-     * @param value  a boolean.
-     */
-    public synchronized void setHoldingRegisterBit(int offset, int bit, boolean value) {
-        validateBit(bit);
-        short s;
-        try {
-            s = getHoldingRegister(offset);
-        } catch (IllegalDataAddressException e) {
-            s = 0;
-        }
-        setHoldingRegister(offset, setBit(s, bit, value));
-    }
+		// Write the value.
+		if (range == RegisterRange.HOLDING_REGISTER)
+			setHoldingRegister(offset, registers);
+		else if (range == RegisterRange.INPUT_REGISTER)
+			setInputRegister(offset, registers);
+		else
+			throw new ModbusIdException("Invalid range to set register: " + range);
+	}
 
-    /**
-     * <p>setInputRegisterBit.</p>
-     *
-     * @param offset a int.
-     * @param bit    a int.
-     * @param value  a boolean.
-     */
-    public synchronized void setInputRegisterBit(int offset, int bit, boolean value) {
-        validateBit(bit);
-        short s;
-        try {
-            s = getInputRegister(offset);
-        } catch (IllegalDataAddressException e) {
-            s = 0;
-        }
-        setInputRegister(offset, setBit(s, bit, value));
-    }
+	/**
+	 * <p>
+	 * setString.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param dataType a int.
+	 * @param registerCount a int.
+	 * @param s a {@link String} object.
+	 */
+	public synchronized void setString(int range, int offset, int dataType, int registerCount, String s) {
+		setString(range, offset, dataType, registerCount, StringLocator.ASCII, s);
+	}
 
-    /**
-     * <p>getBit.</p>
-     *
-     * @param range  a int.
-     * @param offset a int.
-     * @param bit    a int.
-     * @return a boolean.
-     * @throws IllegalDataAddressException if any.
-     */
-    public boolean getBit(int range, int offset, int bit) throws IllegalDataAddressException {
-        if (range == RegisterRange.HOLDING_REGISTER)
-            return getHoldingRegisterBit(offset, bit);
-        if (range == RegisterRange.INPUT_REGISTER)
-            return getInputRegisterBit(offset, bit);
-        throw new ModbusIdException("Invalid range to get register: " + range);
-    }
+	//
+	// Strings
 
-    /**
-     * <p>getHoldingRegisterBit.</p>
-     *
-     * @param offset a int.
-     * @param bit    a int.
-     * @return a boolean.
-     * @throws IllegalDataAddressException if any.
-     */
-    public boolean getHoldingRegisterBit(int offset, int bit) throws IllegalDataAddressException {
-        validateBit(bit);
-        return getBit(getHoldingRegister(offset), bit);
-    }
+	/**
+	 * <p>
+	 * setString.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param dataType a int.
+	 * @param registerCount a int.
+	 * @param charset a {@link Charset} object.
+	 * @param s a {@link String} object.
+	 */
+	public synchronized void setString(int range, int offset, int dataType, int registerCount, Charset charset,
+			String s) {
+		short[] registers = new StringLocator(slaveId, range, offset, dataType, registerCount, charset)
+			.valueToShorts(s);
 
-    /**
-     * <p>getInputRegisterBit.</p>
-     *
-     * @param offset a int.
-     * @param bit    a int.
-     * @return a boolean.
-     * @throws IllegalDataAddressException if any.
-     */
-    public boolean getInputRegisterBit(int offset, int bit) throws IllegalDataAddressException {
-        validateBit(bit);
-        return getBit(getInputRegister(offset), bit);
-    }
+		// Write the value.
+		if (range == RegisterRange.HOLDING_REGISTER)
+			setHoldingRegister(offset, registers);
+		else if (range == RegisterRange.INPUT_REGISTER)
+			setInputRegister(offset, registers);
+		else
+			throw new ModbusIdException("Invalid range to set register: " + range);
+	}
 
-    /**
-     * <p>getNumeric.</p>
-     *
-     * @param range    a int.
-     * @param offset   a int.
-     * @param dataType a int.
-     * @return a {@link Number} object.
-     * @throws IllegalDataAddressException if any.
-     */
-    public Number getNumeric(int range, int offset, int dataType) throws IllegalDataAddressException {
-        return getRegister(new NumericLocator(slaveId, range, offset, dataType));
-    }
+	/**
+	 * <p>
+	 * setHoldingRegister.
+	 * </p>
+	 * @param offset a int.
+	 * @param registers an array of {@link short} objects.
+	 */
+	public synchronized void setHoldingRegister(int offset, short[] registers) {
+		validateOffset(offset);
+		for (int i = 0; i < registers.length; i++)
+			setHoldingRegister(offset + i, registers[i]);
+	}
 
-    /**
-     * <p>getString.</p>
-     *
-     * @param range         a int.
-     * @param offset        a int.
-     * @param dataType      a int.
-     * @param registerCount a int.
-     * @return a {@link String} object.
-     * @throws IllegalDataAddressException if any.
-     */
-    public String getString(int range, int offset, int dataType, int registerCount) throws IllegalDataAddressException {
-        return getRegister(new StringLocator(slaveId, range, offset, dataType, registerCount, null));
-    }
+	/**
+	 * <p>
+	 * setInputRegister.
+	 * </p>
+	 * @param offset a int.
+	 * @param registers an array of {@link short} objects.
+	 */
+	public synchronized void setInputRegister(int offset, short[] registers) {
+		validateOffset(offset);
+		for (int i = 0; i < registers.length; i++)
+			setInputRegister(offset + i, registers[i]);
+	}
 
-    /**
-     * <p>getString.</p>
-     *
-     * @param range         a int.
-     * @param offset        a int.
-     * @param dataType      a int.
-     * @param registerCount a int.
-     * @param charset       a {@link Charset} object.
-     * @return a {@link String} object.
-     * @throws IllegalDataAddressException if any.
-     */
-    public String getString(int range, int offset, int dataType, int registerCount, Charset charset)
-            throws IllegalDataAddressException {
-        return getRegister(new StringLocator(slaveId, range, offset, dataType, registerCount, charset));
-    }
+	/**
+	 * <p>
+	 * setBit.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param bit a int.
+	 * @param value a boolean.
+	 */
+	public synchronized void setBit(int range, int offset, int bit, boolean value) {
+		if (range == RegisterRange.HOLDING_REGISTER)
+			setHoldingRegisterBit(offset, bit, value);
+		else if (range == RegisterRange.INPUT_REGISTER)
+			setInputRegisterBit(offset, bit, value);
+		else
+			throw new ModbusIdException("Invalid range to set register: " + range);
+	}
 
-    /**
-     * <p>getRegister.</p>
-     *
-     * @param locator a {@link BaseLocator} object.
-     * @param <T>     a T object.
-     * @return a T object.
-     * @throws IllegalDataAddressException if any.
-     */
-    public synchronized <T> T getRegister(BaseLocator<T> locator) throws IllegalDataAddressException {
-        int words = locator.getRegisterCount();
-        byte[] b = new byte[locator.getRegisterCount() * 2];
-        for (int i = 0; i < words; i++) {
-            short s;
-            if (locator.getRange() == RegisterRange.INPUT_REGISTER)
-                s = getInputRegister(locator.getOffset() + i);
-            else if (locator.getRange() == RegisterRange.HOLDING_REGISTER)
-                s = getHoldingRegister(locator.getOffset() + i);
-            else if (allowInvalidAddress)
-                s = invalidAddressValue;
-            else
-                throw new IllegalDataAddressException();
-            b[i * 2] = ModbusUtils.toByte(s, true);
-            b[i * 2 + 1] = ModbusUtils.toByte(s, false);
-        }
+	//
+	// Bits
 
-        return locator.bytesToValueRealOffset(b, 0);
-    }
+	/**
+	 * <p>
+	 * setHoldingRegisterBit.
+	 * </p>
+	 * @param offset a int.
+	 * @param bit a int.
+	 * @param value a boolean.
+	 */
+	public synchronized void setHoldingRegisterBit(int offset, int bit, boolean value) {
+		validateBit(bit);
+		short s;
+		try {
+			s = getHoldingRegister(offset);
+		}
+		catch (IllegalDataAddressException e) {
+			s = 0;
+		}
+		setHoldingRegister(offset, setBit(s, bit, value));
+	}
 
-    @Override
-    public synchronized boolean getCoil(int offset) throws IllegalDataAddressException {
-        return getBoolean(offset, coils);
-    }
+	/**
+	 * <p>
+	 * setInputRegisterBit.
+	 * </p>
+	 * @param offset a int.
+	 * @param bit a int.
+	 * @param value a boolean.
+	 */
+	public synchronized void setInputRegisterBit(int offset, int bit, boolean value) {
+		validateBit(bit);
+		short s;
+		try {
+			s = getInputRegister(offset);
+		}
+		catch (IllegalDataAddressException e) {
+			s = 0;
+		}
+		setInputRegister(offset, setBit(s, bit, value));
+	}
 
-    //
-    //
-    // ProcessImage interface
-    //
+	/**
+	 * <p>
+	 * getBit.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param bit a int.
+	 * @return a boolean.
+	 * @throws IllegalDataAddressException if any.
+	 */
+	public boolean getBit(int range, int offset, int bit) throws IllegalDataAddressException {
+		if (range == RegisterRange.HOLDING_REGISTER)
+			return getHoldingRegisterBit(offset, bit);
+		if (range == RegisterRange.INPUT_REGISTER)
+			return getInputRegisterBit(offset, bit);
+		throw new ModbusIdException("Invalid range to get register: " + range);
+	}
 
-    //
-    // Coils
+	/**
+	 * <p>
+	 * getHoldingRegisterBit.
+	 * </p>
+	 * @param offset a int.
+	 * @param bit a int.
+	 * @return a boolean.
+	 * @throws IllegalDataAddressException if any.
+	 */
+	public boolean getHoldingRegisterBit(int offset, int bit) throws IllegalDataAddressException {
+		validateBit(bit);
+		return getBit(getHoldingRegister(offset), bit);
+	}
 
-    @Override
-    public synchronized void setCoil(int offset, boolean value) {
-        validateOffset(offset);
-        coils.put(offset, value);
-    }
+	/**
+	 * <p>
+	 * getInputRegisterBit.
+	 * </p>
+	 * @param offset a int.
+	 * @param bit a int.
+	 * @return a boolean.
+	 * @throws IllegalDataAddressException if any.
+	 */
+	public boolean getInputRegisterBit(int offset, int bit) throws IllegalDataAddressException {
+		validateBit(bit);
+		return getBit(getInputRegister(offset), bit);
+	}
 
-    @Override
-    public synchronized void writeCoil(int offset, boolean value) throws IllegalDataAddressException {
-        boolean old = getBoolean(offset, coils);
-        setCoil(offset, value);
+	/**
+	 * <p>
+	 * getNumeric.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param dataType a int.
+	 * @return a {@link Number} object.
+	 * @throws IllegalDataAddressException if any.
+	 */
+	public Number getNumeric(int range, int offset, int dataType) throws IllegalDataAddressException {
+		return getRegister(new NumericLocator(slaveId, range, offset, dataType));
+	}
 
-        for (ProcessImageListener l : writeListeners)
-            l.coilWrite(offset, old, value);
-    }
+	/**
+	 * <p>
+	 * getString.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param dataType a int.
+	 * @param registerCount a int.
+	 * @return a {@link String} object.
+	 * @throws IllegalDataAddressException if any.
+	 */
+	public String getString(int range, int offset, int dataType, int registerCount) throws IllegalDataAddressException {
+		return getRegister(new StringLocator(slaveId, range, offset, dataType, registerCount, null));
+	}
 
-    @Override
-    public synchronized boolean getInput(int offset) throws IllegalDataAddressException {
-        return getBoolean(offset, inputs);
-    }
+	/**
+	 * <p>
+	 * getString.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param dataType a int.
+	 * @param registerCount a int.
+	 * @param charset a {@link Charset} object.
+	 * @return a {@link String} object.
+	 * @throws IllegalDataAddressException if any.
+	 */
+	public String getString(int range, int offset, int dataType, int registerCount, Charset charset)
+			throws IllegalDataAddressException {
+		return getRegister(new StringLocator(slaveId, range, offset, dataType, registerCount, charset));
+	}
 
-    //
-    // Inputs
+	/**
+	 * <p>
+	 * getRegister.
+	 * </p>
+	 * @param locator a {@link BaseLocator} object.
+	 * @param <T> a T object.
+	 * @return a T object.
+	 * @throws IllegalDataAddressException if any.
+	 */
+	public synchronized <T> T getRegister(BaseLocator<T> locator) throws IllegalDataAddressException {
+		int words = locator.getRegisterCount();
+		byte[] b = new byte[locator.getRegisterCount() * 2];
+		for (int i = 0; i < words; i++) {
+			short s;
+			if (locator.getRange() == RegisterRange.INPUT_REGISTER)
+				s = getInputRegister(locator.getOffset() + i);
+			else if (locator.getRange() == RegisterRange.HOLDING_REGISTER)
+				s = getHoldingRegister(locator.getOffset() + i);
+			else if (allowInvalidAddress)
+				s = invalidAddressValue;
+			else
+				throw new IllegalDataAddressException();
+			b[i * 2] = ModbusUtils.toByte(s, true);
+			b[i * 2 + 1] = ModbusUtils.toByte(s, false);
+		}
 
-    @Override
-    public synchronized void setInput(int offset, boolean value) {
-        validateOffset(offset);
-        inputs.put(offset, value);
-    }
+		return locator.bytesToValueRealOffset(b, 0);
+	}
 
-    @Override
-    public synchronized short getHoldingRegister(int offset) throws IllegalDataAddressException {
-        return getShort(offset, holdingRegisters);
-    }
+	@Override
+	public synchronized boolean getCoil(int offset) throws IllegalDataAddressException {
+		return getBoolean(offset, coils);
+	}
 
-    //
-    // Holding registers
+	//
+	//
+	// ProcessImage interface
+	//
 
-    @Override
-    public synchronized void setHoldingRegister(int offset, short value) {
-        validateOffset(offset);
-        holdingRegisters.put(offset, value);
-    }
+	//
+	// Coils
 
-    @Override
-    public synchronized void writeHoldingRegister(int offset, short value) throws IllegalDataAddressException {
-        short old = getShort(offset, holdingRegisters);
-        setHoldingRegister(offset, value);
+	@Override
+	public synchronized void setCoil(int offset, boolean value) {
+		validateOffset(offset);
+		coils.put(offset, value);
+	}
 
-        for (ProcessImageListener l : writeListeners)
-            l.holdingRegisterWrite(offset, old, value);
-    }
+	@Override
+	public synchronized void writeCoil(int offset, boolean value) throws IllegalDataAddressException {
+		boolean old = getBoolean(offset, coils);
+		setCoil(offset, value);
 
-    @Override
-    public synchronized short getInputRegister(int offset) throws IllegalDataAddressException {
-        return getShort(offset, inputRegisters);
-    }
+		for (ProcessImageListener l : writeListeners)
+			l.coilWrite(offset, old, value);
+	}
 
-    //
-    // Input registers
+	@Override
+	public synchronized boolean getInput(int offset) throws IllegalDataAddressException {
+		return getBoolean(offset, inputs);
+	}
 
-    @Override
-    public synchronized void setInputRegister(int offset, short value) {
-        validateOffset(offset);
-        inputRegisters.put(offset, value);
-    }
+	//
+	// Inputs
 
-    @Override
-    public byte getExceptionStatus() {
-        return exceptionStatus;
-    }
+	@Override
+	public synchronized void setInput(int offset, boolean value) {
+		validateOffset(offset);
+		inputs.put(offset, value);
+	}
 
-    //
-    // Exception status
+	@Override
+	public synchronized short getHoldingRegister(int offset) throws IllegalDataAddressException {
+		return getShort(offset, holdingRegisters);
+	}
 
-    /**
-     * <p>Setter for the field <code>exceptionStatus</code>.</p>
-     *
-     * @param exceptionStatus a byte.
-     */
-    public void setExceptionStatus(byte exceptionStatus) {
-        this.exceptionStatus = exceptionStatus;
-    }
+	//
+	// Holding registers
 
-    //
-    // Report slave id
+	@Override
+	public synchronized void setHoldingRegister(int offset, short value) {
+		validateOffset(offset);
+		holdingRegisters.put(offset, value);
+	}
 
-    @Override
-    public byte[] getReportSlaveIdData() {
-        return new byte[0];
-    }
+	@Override
+	public synchronized void writeHoldingRegister(int offset, short value) throws IllegalDataAddressException {
+		short old = getShort(offset, holdingRegisters);
+		setHoldingRegister(offset, value);
 
-    //
-    //
-    // Private
-    //
-    private short getShort(int offset, Map<Integer, Short> map) throws IllegalDataAddressException {
-        Short value = map.get(offset);
-        if (value == null) {
-            if (allowInvalidAddress)
-                return invalidAddressValue;
-            throw new IllegalDataAddressException();
-        }
-        return value.shortValue();
-    }
+		for (ProcessImageListener l : writeListeners)
+			l.holdingRegisterWrite(offset, old, value);
+	}
 
-    private boolean getBoolean(int offset, Map<Integer, Boolean> map) throws IllegalDataAddressException {
-        Boolean value = map.get(offset);
-        if (value == null) {
-            if (allowInvalidAddress)
-                return false;
-            throw new IllegalDataAddressException();
-        }
-        return value.booleanValue();
-    }
+	@Override
+	public synchronized short getInputRegister(int offset) throws IllegalDataAddressException {
+		return getShort(offset, inputRegisters);
+	}
 
-    private void validateOffset(int offset) {
-        if (offset < 0 || offset > 65535)
-            throw new ModbusIdException("Invalid offset: " + offset);
-    }
+	//
+	// Input registers
 
-    private void validateBit(int bit) {
-        if (bit < 0 || bit > 15)
-            throw new ModbusIdException("Invalid bit: " + bit);
-    }
+	@Override
+	public synchronized void setInputRegister(int offset, short value) {
+		validateOffset(offset);
+		inputRegisters.put(offset, value);
+	}
 
-    private short setBit(short s, int bit, boolean value) {
-        return (short) (s | ((value ? 1 : 0) << bit));
-    }
+	@Override
+	public byte getExceptionStatus() {
+		return exceptionStatus;
+	}
 
-    private boolean getBit(short s, int bit) {
-        return ((s >> bit) & 0x1) == 1;
-    }
+	//
+	// Exception status
+
+	/**
+	 * <p>
+	 * Setter for the field <code>exceptionStatus</code>.
+	 * </p>
+	 * @param exceptionStatus a byte.
+	 */
+	public void setExceptionStatus(byte exceptionStatus) {
+		this.exceptionStatus = exceptionStatus;
+	}
+
+	//
+	// Report slave id
+
+	@Override
+	public byte[] getReportSlaveIdData() {
+		return new byte[0];
+	}
+
+	//
+	//
+	// Private
+	//
+	private short getShort(int offset, Map<Integer, Short> map) throws IllegalDataAddressException {
+		Short value = map.get(offset);
+		if (value == null) {
+			if (allowInvalidAddress)
+				return invalidAddressValue;
+			throw new IllegalDataAddressException();
+		}
+		return value.shortValue();
+	}
+
+	private boolean getBoolean(int offset, Map<Integer, Boolean> map) throws IllegalDataAddressException {
+		Boolean value = map.get(offset);
+		if (value == null) {
+			if (allowInvalidAddress)
+				return false;
+			throw new IllegalDataAddressException();
+		}
+		return value.booleanValue();
+	}
+
+	private void validateOffset(int offset) {
+		if (offset < 0 || offset > 65535)
+			throw new ModbusIdException("Invalid offset: " + offset);
+	}
+
+	private void validateBit(int bit) {
+		if (bit < 0 || bit > 15)
+			throw new ModbusIdException("Invalid bit: " + bit);
+	}
+
+	private short setBit(short s, int bit, boolean value) {
+		return (short) (s | ((value ? 1 : 0) << bit));
+	}
+
+	private boolean getBit(short s, int bit) {
+		return ((s >> bit) & 0x1) == 1;
+	}
+
 }

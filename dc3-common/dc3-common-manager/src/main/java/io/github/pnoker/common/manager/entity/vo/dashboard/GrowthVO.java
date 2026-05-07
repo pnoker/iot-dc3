@@ -27,8 +27,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Daily new-row counts for each stat-card entity, fixed length = days. Used
- * by the home page sparklines. Zero-padded missing days, oldest first.
+ * Daily new-row counts for each stat-card entity, fixed length = days. Used by the home
+ * page sparklines. Zero-padded missing days, oldest first.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -39,14 +39,15 @@ import java.util.List;
 @NoArgsConstructor
 public class GrowthVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<Long> driver;
+	private List<Long> driver;
 
-    private List<Long> device;
+	private List<Long> device;
 
-    private List<Long> point;
+	private List<Long> point;
 
-    private List<Long> profile;
+	private List<Long> profile;
+
 }

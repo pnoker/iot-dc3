@@ -32,35 +32,38 @@ import java.time.OffsetDateTime;
 /**
  * Bridges {@link LocalDateTime} entity fields and PostgreSQL {@code TIMESTAMPTZ} columns.
  * <p>
- * PostgreSQL JDBC 42.7+ refuses to coerce {@code TIMESTAMPTZ} directly into {@link LocalDateTime};
- * we read via {@link OffsetDateTime} and convert to the platform's {@link TimeConstant#DEFAULT_ZONEID}.
- * Writes go out as {@link OffsetDateTime} anchored to the same zone so round-trips are stable.
- * This replaces MyBatis's built-in {@code LocalDateTimeTypeHandler}.
+ * PostgreSQL JDBC 42.7+ refuses to coerce {@code TIMESTAMPTZ} directly into
+ * {@link LocalDateTime}; we read via {@link OffsetDateTime} and convert to the platform's
+ * {@link TimeConstant#DEFAULT_ZONEID}. Writes go out as {@link OffsetDateTime} anchored
+ * to the same zone so round-trips are stable. This replaces MyBatis's built-in
+ * {@code LocalDateTimeTypeHandler}.
  */
 @MappedTypes(LocalDateTime.class)
 public class TimestamptzLocalDateTimeTypeHandler extends BaseTypeHandler<LocalDateTime> {
 
-    @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, LocalDateTime parameter, JdbcType jdbcType) throws SQLException {
-        ps.setObject(i, parameter.atZone(TimeConstant.DEFAULT_ZONEID).toOffsetDateTime());
-    }
+	@Override
+	public void setNonNullParameter(PreparedStatement ps, int i, LocalDateTime parameter, JdbcType jdbcType)
+			throws SQLException {
+		ps.setObject(i, parameter.atZone(TimeConstant.DEFAULT_ZONEID).toOffsetDateTime());
+	}
 
-    @Override
-    public LocalDateTime getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return toLocalDateTime(rs.getObject(columnName, OffsetDateTime.class));
-    }
+	@Override
+	public LocalDateTime getNullableResult(ResultSet rs, String columnName) throws SQLException {
+		return toLocalDateTime(rs.getObject(columnName, OffsetDateTime.class));
+	}
 
-    @Override
-    public LocalDateTime getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        return toLocalDateTime(rs.getObject(columnIndex, OffsetDateTime.class));
-    }
+	@Override
+	public LocalDateTime getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+		return toLocalDateTime(rs.getObject(columnIndex, OffsetDateTime.class));
+	}
 
-    @Override
-    public LocalDateTime getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        return toLocalDateTime(cs.getObject(columnIndex, OffsetDateTime.class));
-    }
+	@Override
+	public LocalDateTime getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+		return toLocalDateTime(cs.getObject(columnIndex, OffsetDateTime.class));
+	}
 
-    private LocalDateTime toLocalDateTime(OffsetDateTime odt) {
-        return odt == null ? null : odt.atZoneSameInstant(TimeConstant.DEFAULT_ZONEID).toLocalDateTime();
-    }
+	private LocalDateTime toLocalDateTime(OffsetDateTime odt) {
+		return odt == null ? null : odt.atZoneSameInstant(TimeConstant.DEFAULT_ZONEID).toLocalDateTime();
+	}
+
 }

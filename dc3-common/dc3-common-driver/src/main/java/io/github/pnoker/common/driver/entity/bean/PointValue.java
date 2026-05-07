@@ -26,8 +26,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Message payload that carries a point reading, including the raw value, the calculated value,
- * and the timestamp when the reading was produced.
+ * Message payload that carries a point reading, including the raw value, the calculated
+ * value, and the timestamp when the reading was produced.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,49 +42,52 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PointValue implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Driver ID that collected the data. Populated by the sender before the message is published.
-     */
-    private Long driverId;
+	/**
+	 * Driver ID that collected the data. Populated by the sender before the message is
+	 * published.
+	 */
+	private Long driverId;
 
-    /**
-     * Tenant ID the data belongs to. Populated by the sender before the message is published.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID the data belongs to. Populated by the sender before the message is
+	 * published.
+	 */
+	private Long tenantId;
 
-    /**
-     * Device ID
-     */
-    private Long deviceId;
+	/**
+	 * Device ID
+	 */
+	private Long deviceId;
 
-    /**
-     * Point ID
-     */
-    private Long pointId;
+	/**
+	 * Point ID
+	 */
+	private Long pointId;
 
-    /**
-     * Raw value
-     */
-    private String rawValue;
+	/**
+	 * Raw value
+	 */
+	private String rawValue;
 
-    /**
-     * Calculated point value after applying scaling and type conversion.
-     */
-    private String calValue;
+	/**
+	 * Calculated point value after applying scaling and type conversion.
+	 */
+	private String calValue;
 
-    /**
-     * Time when the point value message was created.
-     */
-    private LocalDateTime createTime;
+	/**
+	 * Time when the point value message was created.
+	 */
+	private LocalDateTime createTime;
 
-    public PointValue(RValue calValue) {
-        this.deviceId = calValue.getDevice().getId();
-        this.pointId = calValue.getPoint().getId();
-        this.rawValue = calValue.getValue();
-        this.calValue = calValue.getFinalValue();
-        this.createTime = LocalDateTimeUtil.now();
-    }
+	public PointValue(RValue calValue) {
+		this.deviceId = calValue.getDevice().getId();
+		this.pointId = calValue.getPoint().getId();
+		this.rawValue = calValue.getValue();
+		this.calValue = calValue.getFinalValue();
+		this.createTime = LocalDateTimeUtil.now();
+	}
+
 }

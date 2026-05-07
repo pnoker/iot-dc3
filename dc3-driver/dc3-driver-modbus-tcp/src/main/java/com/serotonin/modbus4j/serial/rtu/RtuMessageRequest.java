@@ -30,37 +30,41 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 2025.9.0
  */
 public class RtuMessageRequest extends RtuMessage implements OutgoingRequestMessage, IncomingRequestMessage {
-    /**
-     * <p>Constructor for RtuMessageRequest.</p>
-     *
-     * @param modbusRequest a {@link ModbusRequest} object.
-     */
-    public RtuMessageRequest(ModbusRequest modbusRequest) {
-        super(modbusRequest);
-    }
 
-    static RtuMessageRequest createRtuMessageRequest(ByteQueue queue) throws ModbusTransportException {
-        ModbusRequest request = ModbusRequest.createModbusRequest(queue);
-        RtuMessageRequest rtuRequest = new RtuMessageRequest(request);
+	/**
+	 * <p>
+	 * Constructor for RtuMessageRequest.
+	 * </p>
+	 * @param modbusRequest a {@link ModbusRequest} object.
+	 */
+	public RtuMessageRequest(ModbusRequest modbusRequest) {
+		super(modbusRequest);
+	}
 
-        // Check the CRC
-        ModbusUtils.checkCRC(rtuRequest.modbusMessage, queue);
+	static RtuMessageRequest createRtuMessageRequest(ByteQueue queue) throws ModbusTransportException {
+		ModbusRequest request = ModbusRequest.createModbusRequest(queue);
+		RtuMessageRequest rtuRequest = new RtuMessageRequest(request);
 
-        // Return the data.
-        return rtuRequest;
-    }
+		// Check the CRC
+		ModbusUtils.checkCRC(rtuRequest.modbusMessage, queue);
 
-    @Override
-    public boolean expectsResponse() {
-        return modbusMessage.getSlaveId() != 0;
-    }
+		// Return the data.
+		return rtuRequest;
+	}
 
-    /**
-     * <p>getModbusRequest.</p>
-     *
-     * @return a {@link ModbusRequest} object.
-     */
-    public ModbusRequest getModbusRequest() {
-        return (ModbusRequest) modbusMessage;
-    }
+	@Override
+	public boolean expectsResponse() {
+		return modbusMessage.getSlaveId() != 0;
+	}
+
+	/**
+	 * <p>
+	 * getModbusRequest.
+	 * </p>
+	 * @return a {@link ModbusRequest} object.
+	 */
+	public ModbusRequest getModbusRequest() {
+		return (ModbusRequest) modbusMessage;
+	}
+
 }

@@ -27,8 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Data Storage Strategy Factory
- * Used to manage and store different repository services
+ * Data Storage Strategy Factory Used to manage and store different repository services
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,40 +35,38 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RepositoryStrategyFactory {
 
-    // Map to store repository services with name as key
-    private static final Map<String, RepositoryService> savingStrategyServiceMap = new ConcurrentHashMap<>();
+	// Map to store repository services with name as key
+	private static final Map<String, RepositoryService> savingStrategyServiceMap = new ConcurrentHashMap<>();
 
-    // Private constructor to prevent instantiation
-    private RepositoryStrategyFactory() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	// Private constructor to prevent instantiation
+	private RepositoryStrategyFactory() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Get all registered repository services
-     *
-     * @return List of all repository services
-     */
-    public static List<RepositoryService> get() {
-        return new ArrayList<>(savingStrategyServiceMap.values());
-    }
+	/**
+	 * Get all registered repository services
+	 * @return List of all repository services
+	 */
+	public static List<RepositoryService> get() {
+		return new ArrayList<>(savingStrategyServiceMap.values());
+	}
 
-    /**
-     * Get repository service by name
-     *
-     * @param name Name of the repository service
-     * @return RepositoryService instance for the given name
-     */
-    public static RepositoryService get(String name) {
-        return savingStrategyServiceMap.get(StrategyConstant.Storage.REPOSITORY_PREFIX + name);
-    }
+	/**
+	 * Get repository service by name
+	 * @param name Name of the repository service
+	 * @return RepositoryService instance for the given name
+	 */
+	public static RepositoryService get(String name) {
+		return savingStrategyServiceMap.get(StrategyConstant.Storage.REPOSITORY_PREFIX + name);
+	}
 
-    /**
-     * Register a new repository service
-     *
-     * @param name    Name of the repository service
-     * @param service RepositoryService instance to register
-     */
-    public static void put(String name, RepositoryService service) {
-        savingStrategyServiceMap.put(StrategyConstant.Storage.REPOSITORY_PREFIX + name, service);
-    }
+	/**
+	 * Register a new repository service
+	 * @param name Name of the repository service
+	 * @param service RepositoryService instance to register
+	 */
+	public static void put(String name, RepositoryService service) {
+		savingStrategyServiceMap.put(StrategyConstant.Storage.REPOSITORY_PREFIX + name, service);
+	}
+
 }

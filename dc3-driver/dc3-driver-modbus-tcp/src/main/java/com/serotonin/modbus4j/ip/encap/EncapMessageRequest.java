@@ -24,43 +24,49 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingRequestMessage;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>EncapMessageRequest class.</p>
+ * <p>
+ * EncapMessageRequest class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class EncapMessageRequest extends EncapMessage implements OutgoingRequestMessage, IncomingRequestMessage {
-    /**
-     * <p>Constructor for EncapMessageRequest.</p>
-     *
-     * @param modbusRequest a {@link ModbusRequest} object.
-     */
-    public EncapMessageRequest(ModbusRequest modbusRequest) {
-        super(modbusRequest);
-    }
 
-    static EncapMessageRequest createEncapMessageRequest(ByteQueue queue) throws ModbusTransportException {
-        // Create the modbus response.
-        ModbusRequest request = ModbusRequest.createModbusRequest(queue);
-        EncapMessageRequest encapRequest = new EncapMessageRequest(request);
+	/**
+	 * <p>
+	 * Constructor for EncapMessageRequest.
+	 * </p>
+	 * @param modbusRequest a {@link ModbusRequest} object.
+	 */
+	public EncapMessageRequest(ModbusRequest modbusRequest) {
+		super(modbusRequest);
+	}
 
-        // Check the CRC
-        ModbusUtils.checkCRC(encapRequest.modbusMessage, queue);
+	static EncapMessageRequest createEncapMessageRequest(ByteQueue queue) throws ModbusTransportException {
+		// Create the modbus response.
+		ModbusRequest request = ModbusRequest.createModbusRequest(queue);
+		EncapMessageRequest encapRequest = new EncapMessageRequest(request);
 
-        return encapRequest;
-    }
+		// Check the CRC
+		ModbusUtils.checkCRC(encapRequest.modbusMessage, queue);
 
-    @Override
-    public boolean expectsResponse() {
-        return modbusMessage.getSlaveId() != 0;
-    }
+		return encapRequest;
+	}
 
-    /**
-     * <p>getModbusRequest.</p>
-     *
-     * @return a {@link ModbusRequest} object.
-     */
-    public ModbusRequest getModbusRequest() {
-        return (ModbusRequest) modbusMessage;
-    }
+	@Override
+	public boolean expectsResponse() {
+		return modbusMessage.getSlaveId() != 0;
+	}
+
+	/**
+	 * <p>
+	 * getModbusRequest.
+	 * </p>
+	 * @return a {@link ModbusRequest} object.
+	 */
+	public ModbusRequest getModbusRequest() {
+		return (ModbusRequest) modbusMessage;
+	}
+
 }

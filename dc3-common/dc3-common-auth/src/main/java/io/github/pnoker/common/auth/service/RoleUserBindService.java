@@ -35,31 +35,30 @@ import java.util.List;
  */
 public interface RoleUserBindService extends BaseService<RoleUserBindBO, RoleUserBindQuery> {
 
-    /**
-     * Paginated query filtered by tenant: only bindings whose role belongs to the given tenant.
-     *
-     * @param entityQuery Query conditions
-     * @param tenantId    Tenant ID, null means no tenant filtering
-     * @return Paginated bindings
-     */
-    Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery, Long tenantId);
+	/**
+	 * Paginated query filtered by tenant: only bindings whose role belongs to the given
+	 * tenant.
+	 * @param entityQuery Query conditions
+	 * @param tenantId Tenant ID, null means no tenant filtering
+	 * @return Paginated bindings
+	 */
+	Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery, Long tenantId);
 
-    /**
-     * Tenantid id
-     *
-     * @param tenantId Tenantid
-     * @param userId   id
-     * @return Role list
-     */
-    List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId);
+	/**
+	 * Tenantid id
+	 * @param tenantId Tenantid
+	 * @param userId id
+	 * @return Role list
+	 */
+	List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId);
 
-    /**
-     * List enabled users bound to the given role. Mirror of
-     * {@link #listRoleByTenantIdAndUserId}: look up user_ids via
-     * dc3_role_user_bind, then fetch + enable-filter users.
-     *
-     * @param roleId role scope
-     * @return users bound to the role; empty list if none
-     */
-    List<UserBO> listUserByRoleId(Long roleId);
+	/**
+	 * List enabled users bound to the given role. Mirror of
+	 * {@link #listRoleByTenantIdAndUserId}: look up user_ids via dc3_role_user_bind, then
+	 * fetch + enable-filter users.
+	 * @param roleId role scope
+	 * @return users bound to the role; empty list if none
+	 */
+	List<UserBO> listUserByRoleId(Long roleId);
+
 }

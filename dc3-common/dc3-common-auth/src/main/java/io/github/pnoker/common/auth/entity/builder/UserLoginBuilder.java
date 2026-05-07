@@ -38,115 +38,106 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface UserLoginBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    UserLoginBO buildBOByVO(UserLoginVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	UserLoginBO buildBOByVO(UserLoginVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO collection
-     * @return EntityBO collection
-     */
-    List<UserLoginBO> buildBOListByVOList(List<UserLoginVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO collection
+	 * @return EntityBO collection
+	 */
+	List<UserLoginBO> buildBOListByVOList(List<UserLoginVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    UserLoginDO buildDOByBO(UserLoginBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "deleted", ignore = true)
+	UserLoginDO buildDOByBO(UserLoginBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(UserLoginBO entityBO, @MappingTarget UserLoginDO entityDO) {
-        // Enable Flag
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
+	@AfterMapping
+	default void afterProcess(UserLoginBO entityBO, @MappingTarget UserLoginDO entityDO) {
+		// Enable Flag
+		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+	}
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO collection
-     * @return EntityDO collection
-     */
-    List<UserLoginDO> buildDOListByBOList(List<UserLoginBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO collection
+	 * @return EntityDO collection
+	 */
+	List<UserLoginDO> buildDOListByBOList(List<UserLoginBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "enableFlag", ignore = true)
-    UserLoginBO buildBOByDO(UserLoginDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "enableFlag", ignore = true)
+	UserLoginBO buildBOByDO(UserLoginDO entityDO);
 
-    @AfterMapping
-    default void afterProcess(UserLoginDO entityDO, @MappingTarget UserLoginBO entityBO) {
-        // Enable Flag
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
+	@AfterMapping
+	default void afterProcess(UserLoginDO entityDO, @MappingTarget UserLoginBO entityBO) {
+		// Enable Flag
+		Byte enableFlag = entityDO.getEnableFlag();
+		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+	}
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO collection
-     * @return EntityBO collection
-     */
-    List<UserLoginBO> buildBOListByDOList(List<UserLoginDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO collection
+	 * @return EntityBO collection
+	 */
+	List<UserLoginBO> buildBOListByDOList(List<UserLoginDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    UserLoginVO buildVOByBO(UserLoginBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	UserLoginVO buildVOByBO(UserLoginBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO collection
-     * @return EntityVO Array
-     */
-    List<UserLoginVO> buildVOListByBOList(List<UserLoginBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO collection
+	 * @return EntityVO Array
+	 */
+	List<UserLoginVO> buildVOListByBOList(List<UserLoginBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<UserLoginBO> buildBOPageByDOPage(Page<UserLoginDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<UserLoginBO> buildBOPageByDOPage(Page<UserLoginDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<UserLoginVO> buildVOPageByBOPage(Page<UserLoginBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<UserLoginVO> buildVOPageByBOPage(Page<UserLoginBO> entityPageBO);
+
 }

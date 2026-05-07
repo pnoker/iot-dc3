@@ -34,71 +34,74 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum ProfileShareFlagEnum {
-    /**
-     * Shared profile under tenant
-     */
-    TENANT((byte) 0, "tenant", "Shared profile under tenant"),
 
-    /**
-     * Shared profile under driver
-     */
-    DRIVER((byte) 1, "driver", "Shared profile under driver"),
+	/**
+	 * Shared profile under tenant
+	 */
+	TENANT((byte) 0, "tenant", "Shared profile under tenant"),
 
-    /**
-     * Shared profile under user
-     */
-    USER((byte) 2, "user", "Shared profile under user"),
-    ;
+	/**
+	 * Shared profile under driver
+	 */
+	DRIVER((byte) 1, "driver", "Shared profile under driver"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Shared profile under user
+	 */
+	USER((byte) 2, "user", "Shared profile under user"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link ProfileShareFlagEnum}
-     */
-    public static ProfileShareFlagEnum ofIndex(Byte index) {
-        Optional<ProfileShareFlagEnum> any = Arrays.stream(ProfileShareFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link ProfileShareFlagEnum}
-     */
-    public static ProfileShareFlagEnum ofCode(String code) {
-        Optional<ProfileShareFlagEnum> any = Arrays.stream(ProfileShareFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link ProfileShareFlagEnum}
+	 */
+	public static ProfileShareFlagEnum ofIndex(Byte index) {
+		Optional<ProfileShareFlagEnum> any = Arrays.stream(ProfileShareFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link ProfileShareFlagEnum}
-     */
-    public static ProfileShareFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link ProfileShareFlagEnum}
+	 */
+	public static ProfileShareFlagEnum ofCode(String code) {
+		Optional<ProfileShareFlagEnum> any = Arrays.stream(ProfileShareFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link ProfileShareFlagEnum}
+	 */
+	public static ProfileShareFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

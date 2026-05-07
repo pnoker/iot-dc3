@@ -39,40 +39,41 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PointAttributeConfigQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
 
-    // 
+	//
 
-    /**
-     * ID
-     */
-    private Long attributeId;
+	/**
+	 * ID
+	 */
+	private Long attributeId;
 
-    /**
-     * Device ID
-     */
-    private Long deviceId;
+	/**
+	 * Device ID
+	 */
+	private Long deviceId;
 
-    /**
-     * Point ID
-     */
-    private Long pointId;
+	/**
+	 * Point ID
+	 */
+	private Long pointId;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
+
 }

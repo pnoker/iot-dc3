@@ -28,9 +28,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 /**
  * Active Quartz Profile Configuration
  * <p>
- * Environment post processor that automatically activates the "quartz" profile.
- * This configuration runs with highest precedence to ensure the quartz profile
- * is available during application startup for Quartz scheduler configurations.
+ * Environment post processor that automatically activates the "quartz" profile. This
+ * configuration runs with highest precedence to ensure the quartz profile is available
+ * during application startup for Quartz scheduler configurations.
  * </p>
  *
  * @author pnoker
@@ -42,14 +42,14 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveQuartzProfileConfig implements EnvironmentPostProcessor {
 
-    /**
-     * Post-process environment to add the "quartz" active profile
-     *
-     * @param environment ConfigurableEnvironment to modify
-     * @param application SpringApplication instance
-     */
-    @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("quartz");
-    }
+	/**
+	 * Post-process environment to add the "quartz" active profile
+	 * @param environment ConfigurableEnvironment to modify
+	 * @param application SpringApplication instance
+	 */
+	@Override
+	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+		environment.addActiveProfile("quartz");
+	}
+
 }

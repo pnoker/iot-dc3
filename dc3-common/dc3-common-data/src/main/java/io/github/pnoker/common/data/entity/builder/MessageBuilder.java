@@ -45,155 +45,146 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface MessageBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    @Mapping(target = "tenantId", ignore = true)
-    MessageBO buildBOByVO(MessageVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "tenantId", ignore = true)
+	MessageBO buildBOByVO(MessageVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<MessageBO> buildBOListByVOList(List<MessageVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<MessageBO> buildBOListByVOList(List<MessageVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "messageExt", ignore = true)
-    @Mapping(target = "messageLevel", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    MessageDO buildDOByBO(MessageBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "messageExt", ignore = true)
+	@Mapping(target = "messageLevel", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "deleted", ignore = true)
+	MessageDO buildDOByBO(MessageBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(MessageBO entityBO, @MappingTarget MessageDO entityDO) {
-        // Code
-        if (StringUtils.isEmpty(entityBO.getMessageCode())) {
-            entityDO.setMessageCode(CodeUtil.getCode());
-        }
+	@AfterMapping
+	default void afterProcess(MessageBO entityBO, @MappingTarget MessageDO entityDO) {
+		// Code
+		if (StringUtils.isEmpty(entityBO.getMessageCode())) {
+			entityDO.setMessageCode(CodeUtil.getCode());
+		}
 
-// Json Ext
-        MessageExt entityExt = entityBO.getMessageExt();
-        JsonExt ext = new JsonExt();
-        if (Objects.nonNull(entityExt)) {
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-        }
-        entityDO.setMessageExt(ext);
+		// Json Ext
+		MessageExt entityExt = entityBO.getMessageExt();
+		JsonExt ext = new JsonExt();
+		if (Objects.nonNull(entityExt)) {
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+		}
+		entityDO.setMessageExt(ext);
 
-        // AlarmMessageLevel Flag
-        AlarmMessageLevelFlagEnum alarmMessageLevel = entityBO.getMessageLevel();
-        Optional.ofNullable(alarmMessageLevel).ifPresent(value -> entityDO.setMessageLevel(value.getIndex()));
+		// AlarmMessageLevel Flag
+		AlarmMessageLevelFlagEnum alarmMessageLevel = entityBO.getMessageLevel();
+		Optional.ofNullable(alarmMessageLevel).ifPresent(value -> entityDO.setMessageLevel(value.getIndex()));
 
-        // Enable Flag
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
+		// Enable Flag
+		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+	}
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<MessageDO> buildDOListByBOList(List<MessageBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<MessageDO> buildDOListByBOList(List<MessageBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "messageExt", ignore = true)
-    @Mapping(target = "messageLevel", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    MessageBO buildBOByDO(MessageDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "messageExt", ignore = true)
+	@Mapping(target = "messageLevel", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	MessageBO buildBOByDO(MessageDO entityDO);
 
-    @AfterMapping
-    default void afterProcess(MessageDO entityDO, @MappingTarget MessageBO entityBO) {
-        // Json Ext
-        JsonExt entityExt = entityDO.getMessageExt();
-        if (Objects.nonNull(entityExt)) {
-            MessageExt ext = new MessageExt();
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), MessageExt.Content.class));
-            entityBO.setMessageExt(ext);
-        }
+	@AfterMapping
+	default void afterProcess(MessageDO entityDO, @MappingTarget MessageBO entityBO) {
+		// Json Ext
+		JsonExt entityExt = entityDO.getMessageExt();
+		if (Objects.nonNull(entityExt)) {
+			MessageExt ext = new MessageExt();
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), MessageExt.Content.class));
+			entityBO.setMessageExt(ext);
+		}
 
-        // AlarmMessageLevel Flag
-        Byte alarmMessageLevel = entityDO.getMessageLevel();
-        entityBO.setMessageLevel(AlarmMessageLevelFlagEnum.ofIndex(alarmMessageLevel));
+		// AlarmMessageLevel Flag
+		Byte alarmMessageLevel = entityDO.getMessageLevel();
+		entityBO.setMessageLevel(AlarmMessageLevelFlagEnum.ofIndex(alarmMessageLevel));
 
-        // Enable Flag
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
+		// Enable Flag
+		Byte enableFlag = entityDO.getEnableFlag();
+		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+	}
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<MessageBO> buildBOListByDOList(List<MessageDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<MessageBO> buildBOListByDOList(List<MessageDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    MessageVO buildVOByBO(MessageBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	MessageVO buildVOByBO(MessageBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<MessageVO> buildVOListByBOList(List<MessageBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<MessageVO> buildVOListByBOList(List<MessageBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<MessageBO> buildBOPageByDOPage(Page<MessageDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<MessageBO> buildBOPageByDOPage(Page<MessageDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<MessageVO> buildVOPageByBOPage(Page<MessageBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<MessageVO> buildVOPageByBOPage(Page<MessageBO> entityPageBO);
+
 }

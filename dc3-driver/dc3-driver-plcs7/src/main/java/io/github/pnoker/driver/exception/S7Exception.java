@@ -17,10 +17,9 @@
 package io.github.pnoker.driver.exception;
 
 /**
- * Exception class for handling S7 PLC communication errors.
- * This exception is thrown when errors occur during communication with
- * Siemens S7 PLCs, including connection issues, data conversion errors,
- * and protocol-specific problems.
+ * Exception class for handling S7 PLC communication errors. This exception is thrown when
+ * errors occur during communication with Siemens S7 PLCs, including connection issues,
+ * data conversion errors, and protocol-specific problems.
  *
  * @author Thomas Rudin
  * @version 2025.9.0
@@ -28,43 +27,40 @@ package io.github.pnoker.driver.exception;
  */
 public final class S7Exception extends RuntimeException {
 
-    /**
-     * The Constant serialVersionUID.
-     */
-    private static final long serialVersionUID = 1L;
+	/**
+	 * The Constant serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Instantiates a new s7 exception.
-     */
-    public S7Exception() {
-    }
+	/**
+	 * Instantiates a new s7 exception.
+	 */
+	public S7Exception() {
+	}
 
-    /**
-     * Instantiates a new s7 exception.
-     *
-     * @param message the message
-     */
-    public S7Exception(final String message) {
-        super(message);
-    }
+	/**
+	 * Instantiates a new s7 exception.
+	 * @param message the message
+	 */
+	public S7Exception(final String message) {
+		super(message);
+	}
 
-    /**
-     * Instantiates a new s7 exception.
-     *
-     * @param message the message
-     * @param cause   the cause
-     */
-    public S7Exception(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+	/**
+	 * Instantiates a new s7 exception.
+	 * @param message the message
+	 * @param cause the cause
+	 */
+	public S7Exception(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 
-    /**
-     * Instantiates a new s7 exception.
-     *
-     * @param cause the cause
-     */
-    public S7Exception(final Throwable cause) {
-        super(cause);
-    }
+	/**
+	 * Instantiates a new s7 exception.
+	 * @param cause the cause
+	 */
+	public S7Exception(final Throwable cause) {
+		super(cause);
+	}
 
 }

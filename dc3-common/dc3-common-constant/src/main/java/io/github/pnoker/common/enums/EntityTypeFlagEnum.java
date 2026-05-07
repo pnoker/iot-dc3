@@ -34,91 +34,94 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum EntityTypeFlagEnum {
-    /**
-     * System
-     */
-    SYSTEM((byte) 0, "system", "System"),
 
-    /**
-     * User
-     */
-    USER((byte) 1, "user", "User"),
+	/**
+	 * System
+	 */
+	SYSTEM((byte) 0, "system", "System"),
 
-    /**
-     * Group
-     */
-    GROUP((byte) 2, "group", "Group"),
+	/**
+	 * User
+	 */
+	USER((byte) 1, "user", "User"),
 
-    /**
-     * Driver
-     */
-    DRIVER((byte) 3, "driver", "Driver"),
+	/**
+	 * Group
+	 */
+	GROUP((byte) 2, "group", "Group"),
 
-    /**
-     * Profile
-     */
-    PROFILE((byte) 4, "profile", "Profile"),
+	/**
+	 * Driver
+	 */
+	DRIVER((byte) 3, "driver", "Driver"),
 
-    /**
-     * Point
-     */
-    POINT((byte) 5, "point", "Point"),
+	/**
+	 * Profile
+	 */
+	PROFILE((byte) 4, "profile", "Profile"),
 
-    /**
-     * Device
-     */
-    DEVICE((byte) 6, "device", "Device"),
-    ;
+	/**
+	 * Point
+	 */
+	POINT((byte) 5, "point", "Point"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Device
+	 */
+	DEVICE((byte) 6, "device", "Device"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link EntityTypeFlagEnum}
-     */
-    public static EntityTypeFlagEnum ofIndex(Byte index) {
-        Optional<EntityTypeFlagEnum> any = Arrays.stream(EntityTypeFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link EntityTypeFlagEnum}
-     */
-    public static EntityTypeFlagEnum ofCode(String code) {
-        Optional<EntityTypeFlagEnum> any = Arrays.stream(EntityTypeFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link EntityTypeFlagEnum}
+	 */
+	public static EntityTypeFlagEnum ofIndex(Byte index) {
+		Optional<EntityTypeFlagEnum> any = Arrays.stream(EntityTypeFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Enum name
-     * @return {@link EntityTypeFlagEnum}
-     */
-    public static EntityTypeFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link EntityTypeFlagEnum}
+	 */
+	public static EntityTypeFlagEnum ofCode(String code) {
+		Optional<EntityTypeFlagEnum> any = Arrays.stream(EntityTypeFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Enum name
+	 * @return {@link EntityTypeFlagEnum}
+	 */
+	public static EntityTypeFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

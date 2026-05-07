@@ -25,42 +25,37 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Data Initialization Runner for DC3 IoT Platform.
- * This class handles data initialization tasks during application startup,
- * configuring component scanning for data-related classes and MyBatis mappers.
+ * Data Initialization Runner for DC3 IoT Platform. This class handles data initialization
+ * tasks during application startup, configuring component scanning for data-related
+ * classes and MyBatis mappers.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.data"
-})
-@MapperScan(basePackages = {
-        "io.github.pnoker.common.data.mapper"
-})
+@ComponentScan(basePackages = { "io.github.pnoker.common.data" })
+@MapperScan(basePackages = { "io.github.pnoker.common.data.mapper" })
 public class DataInitRunner implements ApplicationRunner {
 
-    private final ScheduleForDataService scheduleForDataService;
+	private final ScheduleForDataService scheduleForDataService;
 
-    /**
-     * Constructor for DataInitRunner
-     *
-     * @param scheduleForDataService Service for handling data scheduling operations
-     */
-    public DataInitRunner(ScheduleForDataService scheduleForDataService) {
-        this.scheduleForDataService = scheduleForDataService;
-    }
+	/**
+	 * Constructor for DataInitRunner
+	 * @param scheduleForDataService Service for handling data scheduling operations
+	 */
+	public DataInitRunner(ScheduleForDataService scheduleForDataService) {
+		this.scheduleForDataService = scheduleForDataService;
+	}
 
-    /**
-     * Executes the data initialization process when the application starts
-     *
-     * @param args Application arguments passed during startup
-     * @throws Exception If an error occurs during initialization
-     */
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        scheduleForDataService.initial();
-    }
+	/**
+	 * Executes the data initialization process when the application starts
+	 * @param args Application arguments passed during startup
+	 * @throws Exception If an error occurs during initialization
+	 */
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		scheduleForDataService.initial();
+	}
+
 }

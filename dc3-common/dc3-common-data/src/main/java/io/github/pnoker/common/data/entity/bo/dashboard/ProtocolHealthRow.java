@@ -28,8 +28,13 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ProtocolHealthRow {
-    private String serviceName;
-    private long driverCount;
-    private long enabledCount;
-    private long deviceCount;
+
+	private String serviceName;
+
+	private long driverCount;
+
+	private long enabledCount;
+
+	private long deviceCount;
+
 }

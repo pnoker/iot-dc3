@@ -59,169 +59,172 @@ import java.util.stream.Collectors;
 @Service
 public class DriverServiceImpl implements DriverService {
 
-    @Resource
-    private DriverBuilder driverBuilder;
+	@Resource
+	private DriverBuilder driverBuilder;
 
-    @Resource
-    private DriverManager driverManager;
-    @Resource
-    private DeviceManager deviceManager;
-    @Resource
-    private PointManager pointManager;
+	@Resource
+	private DriverManager driverManager;
 
-    @Resource
-    private ProfileBindService profileBindService;
+	@Resource
+	private DeviceManager deviceManager;
 
-    @Override
-    public void save(DriverBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+	@Resource
+	private PointManager pointManager;
 
-        DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
-        if (!driverManager.save(entityDO)) {
-            throw new AddException("Failed to create driver");
-        }
-    }
+	@Resource
+	private ProfileBindService profileBindService;
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+	@Override
+	public void save(DriverBO entityBO) {
+		checkDuplicate(entityBO, false, true);
 
-        if (!driverManager.removeById(id)) {
-            throw new DeleteException("Failed to remove driver");
-        }
-    }
+		DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
+		if (!driverManager.save(entityDO)) {
+			throw new AddException("Failed to create driver");
+		}
+	}
 
-    @Override
-    public void update(DriverBO entityBO) {
-        getDOById(entityBO.getId(), true);
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-        checkDuplicate(entityBO, true, true);
+		if (!driverManager.removeById(id)) {
+			throw new DeleteException("Failed to remove driver");
+		}
+	}
 
-        DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!driverManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update point attribute config");
-        }
-    }
+	@Override
+	public void update(DriverBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
-    @Override
-    public DriverBO selectById(Long id) {
-        DriverDO entityDO = getDOById(id, true);
-        return driverBuilder.buildBOByDO(entityDO);
-    }
+		checkDuplicate(entityBO, true, true);
 
-    @Override
-    public Page<DriverBO> selectByPage(DriverQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<DriverDO> entityPageDO = driverManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return driverBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+		DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!driverManager.updateById(entityDO)) {
+			throw new UpdateException("Failed to update point attribute config");
+		}
+	}
 
-    @Override
-    public List<DriverBO> selectByIds(Set<Long> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        List<DriverDO> entityDOList = driverManager.listByIds(ids);
-        return driverBuilder.buildBOListByDOList(entityDOList);
-    }
+	@Override
+	public DriverBO selectById(Long id) {
+		DriverDO entityDO = getDOById(id, true);
+		return driverBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public DriverBO selectByServiceName(String serviceName, Long tenantId) {
-        LambdaQueryChainWrapper<DriverDO> wrapper = driverManager.lambdaQuery()
-                .eq(DriverDO::getServiceName, serviceName)
-                .eq(DriverDO::getTenantId, tenantId)
-                .last(QueryWrapperConstant.LIMIT_ONE);
-        DriverDO entityDO = wrapper.one();
-        return driverBuilder.buildBOByDO(entityDO);
-    }
+	@Override
+	public Page<DriverBO> selectByPage(DriverQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<DriverDO> entityPageDO = driverManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+		return driverBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    @Override
-    public List<DriverBO> selectByProfileId(Long profileId) {
-        List<Long> ids = profileBindService.selectDeviceIdsByProfileId(profileId);
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
+	@Override
+	public List<DriverBO> selectByIds(Set<Long> ids) {
+		if (CollectionUtils.isEmpty(ids)) {
+			return Collections.emptyList();
+		}
+		List<DriverDO> entityDOList = driverManager.listByIds(ids);
+		return driverBuilder.buildBOListByDOList(entityDOList);
+	}
 
-        List<DeviceDO> deviceDOList = deviceManager.listByIds(ids);
-        Set<Long> driverIds = deviceDOList.stream().map(DeviceDO::getDriverId).collect(Collectors.toSet());
-        List<DriverBO> entityDOList = selectByIds(driverIds);
-        if (CollectionUtils.isEmpty(entityDOList)) {
-            return Collections.emptyList();
-        }
+	@Override
+	public DriverBO selectByServiceName(String serviceName, Long tenantId) {
+		LambdaQueryChainWrapper<DriverDO> wrapper = driverManager.lambdaQuery()
+			.eq(DriverDO::getServiceName, serviceName)
+			.eq(DriverDO::getTenantId, tenantId)
+			.last(QueryWrapperConstant.LIMIT_ONE);
+		DriverDO entityDO = wrapper.one();
+		return driverBuilder.buildBOByDO(entityDO);
+	}
 
-        return entityDOList;
-    }
+	@Override
+	public List<DriverBO> selectByProfileId(Long profileId) {
+		List<Long> ids = profileBindService.selectDeviceIdsByProfileId(profileId);
+		if (CollectionUtils.isEmpty(ids)) {
+			return Collections.emptyList();
+		}
 
-    @Override
-    public List<DriverBO> selectByPointId(Long pointId) {
-        PointDO entityDO = pointManager.getById(pointId);
-        return selectByProfileId(entityDO.getProfileId());
-    }
+		List<DeviceDO> deviceDOList = deviceManager.listByIds(ids);
+		Set<Long> driverIds = deviceDOList.stream().map(DeviceDO::getDriverId).collect(Collectors.toSet());
+		List<DriverBO> entityDOList = selectByIds(driverIds);
+		if (CollectionUtils.isEmpty(entityDOList)) {
+			return Collections.emptyList();
+		}
 
-    @Override
-    public DriverBO selectByDeviceId(Long deviceId) {
-        DeviceDO entityDO = deviceManager.getById(deviceId);
-        return selectById(entityDO.getDriverId());
-    }
+		return entityDOList;
+	}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link DriverQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<DriverDO> fuzzyQuery(DriverQuery entityQuery) {
-        LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getDriverName()), DriverDO::getDriverName, entityQuery.getDriverName());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getDriverCode()), DriverDO::getDriverCode, entityQuery.getDriverCode());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceName()), DriverDO::getServiceName, entityQuery.getServiceName());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceHost()), DriverDO::getServiceHost, entityQuery.getServiceHost());
-        wrapper.eq(Objects.nonNull(entityQuery.getDriverTypeFlag()), DriverDO::getDriverTypeFlag, entityQuery.getDriverTypeFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverDO::getEnableFlag, entityQuery.getEnableFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverDO::getTenantId, entityQuery.getTenantId());
-        return wrapper;
-    }
+	@Override
+	public List<DriverBO> selectByPointId(Long pointId) {
+		PointDO entityDO = pointManager.getById(pointId);
+		return selectByProfileId(entityDO.getProfileId());
+	}
 
-    /**
-     *
-     *
-     * @param entityBO       {@link DriverBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
-     */
-    private boolean checkDuplicate(DriverBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
-        wrapper.eq(DriverDO::getDriverName, entityBO.getDriverName());
-        wrapper.eq(DriverDO::getDriverCode, entityBO.getDriverCode());
-        wrapper.eq(DriverDO::getTenantId, entityBO.getTenantId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        DriverDO one = driverManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Driver has been duplicated");
-        }
-        return duplicate;
-    }
+	@Override
+	public DriverBO selectByDeviceId(Long deviceId) {
+		DeviceDO entityDO = deviceManager.getById(deviceId);
+		return selectById(entityDO.getDriverId());
+	}
 
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link DriverDO}
-     */
-    private DriverDO getDOById(Long id, boolean throwException) {
-        DriverDO entityDO = driverManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Driver does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * @param entityQuery {@link DriverQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<DriverDO> fuzzyQuery(DriverQuery entityQuery) {
+		LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getDriverName()), DriverDO::getDriverName,
+				entityQuery.getDriverName());
+		wrapper.eq(StringUtils.isNotEmpty(entityQuery.getDriverCode()), DriverDO::getDriverCode,
+				entityQuery.getDriverCode());
+		wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceName()), DriverDO::getServiceName,
+				entityQuery.getServiceName());
+		wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceHost()), DriverDO::getServiceHost,
+				entityQuery.getServiceHost());
+		wrapper.eq(Objects.nonNull(entityQuery.getDriverTypeFlag()), DriverDO::getDriverTypeFlag,
+				entityQuery.getDriverTypeFlag());
+		wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverDO::getEnableFlag, entityQuery.getEnableFlag());
+		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverDO::getTenantId, entityQuery.getTenantId());
+		return wrapper;
+	}
+
+	/**
+	 * @param entityBO {@link DriverBO}
+	 * @param isUpdate
+	 * @param throwException
+	 * @return
+	 */
+	private boolean checkDuplicate(DriverBO entityBO, boolean isUpdate, boolean throwException) {
+		LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
+		wrapper.eq(DriverDO::getDriverName, entityBO.getDriverName());
+		wrapper.eq(DriverDO::getDriverCode, entityBO.getDriverCode());
+		wrapper.eq(DriverDO::getTenantId, entityBO.getTenantId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		DriverDO one = driverManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+		if (throwException && duplicate) {
+			throw new DuplicateException("Driver has been duplicated");
+		}
+		return duplicate;
+	}
+
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link DriverDO}
+	 */
+	private DriverDO getDOById(Long id, boolean throwException) {
+		DriverDO entityDO = driverManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Driver does not exist");
+		}
+		return entityDO;
+	}
+
 }

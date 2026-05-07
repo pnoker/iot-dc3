@@ -49,123 +49,130 @@ import java.util.List;
 @Service
 public class ImportDeviceServiceImpl implements ImportDeviceService {
 
-    @Resource
-    private DeviceBuilder deviceBuilder;
+	@Resource
+	private DeviceBuilder deviceBuilder;
 
-    @Resource
-    private DeviceManager deviceManager;
-    @Resource
-    private ProfileBindService profileBindService;
-    @Resource
-    private DriverAttributeConfigService driverAttributeConfigService;
-    @Resource
-    private PointAttributeConfigService pointAttributeConfigService;
+	@Resource
+	private DeviceManager deviceManager;
 
-    @Override
-    @Transactional
-    public DeviceBO importDevice(DeviceBO deviceBO, List<PointBO> pointBOList, List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet, int row) {
-        String deviceName = PoiUtil.getCellStringValue(sheet, row, 0);
-        if (StringUtils.isEmpty(deviceName)) {
-            throw new ImportException("The device name in line {} of the import file is empty", row + 1);
-        }
+	@Resource
+	private ProfileBindService profileBindService;
 
-        DeviceDO entityDO = new DeviceDO();
-        entityDO.setDeviceName(deviceName);
-        entityDO.setDriverId(deviceBO.getDriverId());
-        String deviceRemark = PoiUtil.getCellStringValue(sheet, row, 1);
-        entityDO.setDeviceExt(new JsonExt());
-        entityDO.setRemark(deviceRemark);
-        entityDO.setTenantId(deviceBO.getTenantId());
+	@Resource
+	private DriverAttributeConfigService driverAttributeConfigService;
 
-        // Import device
-        entityDO = deviceManager.innerSave(entityDO);
-        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
+	@Resource
+	private PointAttributeConfigService pointAttributeConfigService;
 
-        // Import device profile binding configuration
-        importProfileBind(entityBO, deviceBO.getProfileIds());
+	@Override
+	@Transactional
+	public DeviceBO importDevice(DeviceBO deviceBO, List<PointBO> pointBOList,
+			List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet,
+			int row) {
+		String deviceName = PoiUtil.getCellStringValue(sheet, row, 0);
+		if (StringUtils.isEmpty(deviceName)) {
+			throw new ImportException("The device name in line {} of the import file is empty", row + 1);
+		}
 
-        // Import driver attribute configuration
-        importDriverAttributeConfig(entityBO, driverAttributeBOList, sheet, row);
+		DeviceDO entityDO = new DeviceDO();
+		entityDO.setDeviceName(deviceName);
+		entityDO.setDriverId(deviceBO.getDriverId());
+		String deviceRemark = PoiUtil.getCellStringValue(sheet, row, 1);
+		entityDO.setDeviceExt(new JsonExt());
+		entityDO.setRemark(deviceRemark);
+		entityDO.setTenantId(deviceBO.getTenantId());
 
-        // Import point attribute configuration
-        importPointAttributeConfig(entityBO, pointBOList, driverAttributeBOList, pointAttributeBOList, sheet, row);
+		// Import device
+		entityDO = deviceManager.innerSave(entityDO);
+		DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
 
-        return entityBO;
-    }
+		// Import device profile binding configuration
+		importProfileBind(entityBO, deviceBO.getProfileIds());
 
-    /**
-     * Import device profile binding configuration
-     *
-     * @param deviceBO   Device
-     * @param profileIds Profile ID list
-     */
-    private void importProfileBind(DeviceBO deviceBO, List<Long> profileIds) {
-        if (CollectionUtils.isEmpty(profileIds)) {
-            return;
-        }
+		// Import driver attribute configuration
+		importDriverAttributeConfig(entityBO, driverAttributeBOList, sheet, row);
 
-        profileIds.forEach(profileId -> {
-            try {
-                ProfileBindBO entityBO = new ProfileBindBO();
-                entityBO.setProfileId(profileId);
-                entityBO.setDeviceId(deviceBO.getId());
-                entityBO.setTenantId(deviceBO.getTenantId());
-                profileBindService.save(entityBO);
-            } catch (Exception ignored) {
-                // nothing to do
-            }
-        });
+		// Import point attribute configuration
+		importPointAttributeConfig(entityBO, pointBOList, driverAttributeBOList, pointAttributeBOList, sheet, row);
 
-    }
+		return entityBO;
+	}
 
-    /**
-     * Import driver attribute configuration
-     *
-     * @param deviceBO              Device
-     * @param driverAttributeBOList DriverAttributeBO Array
-     * @param sheet                 Sheet
-     * @param row                   Row Index
-     */
-    private void importDriverAttributeConfig(DeviceBO deviceBO, List<DriverAttributeBO> driverAttributeBOList, Sheet sheet, int row) {
-        for (int j = 0; j < driverAttributeBOList.size(); j++) {
-            DriverAttributeConfigBO entityBO = new DriverAttributeConfigBO();
-            DriverAttributeBO driverAttributeBO = driverAttributeBOList.get(j);
-            entityBO.setAttributeId(driverAttributeBO.getId());
-            entityBO.setDeviceId(deviceBO.getId());
-            String attributeValue = PoiUtil.getCellStringValue(sheet, row, 2 + j);
-            entityBO.setConfigValue(attributeValue);
-            entityBO.setRemark(deviceBO.getRemark());
-            entityBO.setTenantId(deviceBO.getTenantId());
-            driverAttributeConfigService.innerSave(entityBO);
-        }
-    }
+	/**
+	 * Import device profile binding configuration
+	 * @param deviceBO Device
+	 * @param profileIds Profile ID list
+	 */
+	private void importProfileBind(DeviceBO deviceBO, List<Long> profileIds) {
+		if (CollectionUtils.isEmpty(profileIds)) {
+			return;
+		}
 
-    /**
-     * Import point attribute configuration
-     *
-     * @param deviceBO              Device
-     * @param driverAttributeBOList DriverAttributeBO Array
-     * @param pointAttributeBOList  PointAttributeBO Array
-     * @param pointBOList           PointBO Array
-     * @param sheet                 Sheet
-     * @param row                   Row Index
-     */
-    private void importPointAttributeConfig(DeviceBO deviceBO, List<PointBO> pointBOList, List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet, int row) {
-        for (int j = 0; j < pointBOList.size(); j++) {
-            for (int k = 0; k < pointAttributeBOList.size(); k++) {
-                PointAttributeConfigBO entityBO = new PointAttributeConfigBO();
-                PointBO pointBO = pointBOList.get(j);
-                PointAttributeBO pointAttributeBO = pointAttributeBOList.get(k);
-                entityBO.setAttributeId(pointAttributeBO.getId());
-                entityBO.setDeviceId(deviceBO.getId());
-                entityBO.setPointId(pointBO.getId());
-                String attributeValue = PoiUtil.getCellStringValue(sheet, row, 2 + driverAttributeBOList.size() + k * pointAttributeBOList.size() + j);
-                entityBO.setConfigValue(attributeValue);
-                entityBO.setRemark(deviceBO.getRemark());
-                entityBO.setTenantId(deviceBO.getTenantId());
-                pointAttributeConfigService.innerSave(entityBO);
-            }
-        }
-    }
+		profileIds.forEach(profileId -> {
+			try {
+				ProfileBindBO entityBO = new ProfileBindBO();
+				entityBO.setProfileId(profileId);
+				entityBO.setDeviceId(deviceBO.getId());
+				entityBO.setTenantId(deviceBO.getTenantId());
+				profileBindService.save(entityBO);
+			}
+			catch (Exception ignored) {
+				// nothing to do
+			}
+		});
+
+	}
+
+	/**
+	 * Import driver attribute configuration
+	 * @param deviceBO Device
+	 * @param driverAttributeBOList DriverAttributeBO Array
+	 * @param sheet Sheet
+	 * @param row Row Index
+	 */
+	private void importDriverAttributeConfig(DeviceBO deviceBO, List<DriverAttributeBO> driverAttributeBOList,
+			Sheet sheet, int row) {
+		for (int j = 0; j < driverAttributeBOList.size(); j++) {
+			DriverAttributeConfigBO entityBO = new DriverAttributeConfigBO();
+			DriverAttributeBO driverAttributeBO = driverAttributeBOList.get(j);
+			entityBO.setAttributeId(driverAttributeBO.getId());
+			entityBO.setDeviceId(deviceBO.getId());
+			String attributeValue = PoiUtil.getCellStringValue(sheet, row, 2 + j);
+			entityBO.setConfigValue(attributeValue);
+			entityBO.setRemark(deviceBO.getRemark());
+			entityBO.setTenantId(deviceBO.getTenantId());
+			driverAttributeConfigService.innerSave(entityBO);
+		}
+	}
+
+	/**
+	 * Import point attribute configuration
+	 * @param deviceBO Device
+	 * @param driverAttributeBOList DriverAttributeBO Array
+	 * @param pointAttributeBOList PointAttributeBO Array
+	 * @param pointBOList PointBO Array
+	 * @param sheet Sheet
+	 * @param row Row Index
+	 */
+	private void importPointAttributeConfig(DeviceBO deviceBO, List<PointBO> pointBOList,
+			List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet,
+			int row) {
+		for (int j = 0; j < pointBOList.size(); j++) {
+			for (int k = 0; k < pointAttributeBOList.size(); k++) {
+				PointAttributeConfigBO entityBO = new PointAttributeConfigBO();
+				PointBO pointBO = pointBOList.get(j);
+				PointAttributeBO pointAttributeBO = pointAttributeBOList.get(k);
+				entityBO.setAttributeId(pointAttributeBO.getId());
+				entityBO.setDeviceId(deviceBO.getId());
+				entityBO.setPointId(pointBO.getId());
+				String attributeValue = PoiUtil.getCellStringValue(sheet, row,
+						2 + driverAttributeBOList.size() + k * pointAttributeBOList.size() + j);
+				entityBO.setConfigValue(attributeValue);
+				entityBO.setRemark(deviceBO.getRemark());
+				entityBO.setTenantId(deviceBO.getTenantId());
+				pointAttributeConfigService.innerSave(entityBO);
+			}
+		}
+	}
 
 }

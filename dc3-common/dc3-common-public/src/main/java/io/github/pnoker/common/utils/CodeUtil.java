@@ -25,9 +25,8 @@ import java.util.UUID;
 /**
  * Code Generation Utility Class
  * <p>
- * Utility class for unique code generation.
- * Provides methods to generate unique identifiers
- * and validation codes for various purposes.
+ * Utility class for unique code generation. Provides methods to generate unique
+ * identifiers and validation codes for various purposes.
  * </p>
  *
  * @author pnoker
@@ -37,17 +36,16 @@ import java.util.UUID;
 @Slf4j
 public class CodeUtil {
 
-    private CodeUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private CodeUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
+	/**
+	 * Generate a simplified UUID as a unique code.
+	 * @return Simplified UUID string
+	 */
+	public static String getCode() {
+		return UUID.randomUUID().toString();
+	}
 
-    /**
-     * Generate a simplified UUID as a unique code.
-     *
-     * @return Simplified UUID string
-     */
-    public static String getCode() {
-        return UUID.randomUUID().toString();
-    }
 }

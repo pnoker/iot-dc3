@@ -46,57 +46,57 @@ import java.util.Objects;
 @RequestMapping(AuthConstant.TOKEN_URL_PREFIX)
 public class TokenController implements BaseController {
 
-    private final TokenService tokenService;
+	private final TokenService tokenService;
 
-    public TokenController(TokenService tokenService) {
-        this.tokenService = tokenService;
-    }
+	public TokenController(TokenService tokenService) {
+		this.tokenService = tokenService;
+	}
 
-    /**
-     *
-     *
-     * @param entityVO {@link TokenQuery}
-     * @return
-     */
-    @PostMapping("/salt")
-    public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
-        String salt = tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
-        return Objects.nonNull(salt) ? Mono.just(R.ok(salt, "The salt will expire in 5 minutes")) : Mono.just(R.fail());
-    }
+	/**
+	 * @param entityVO {@link TokenQuery}
+	 * @return
+	 */
+	@PostMapping("/salt")
+	public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
+		String salt = tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
+		return Objects.nonNull(salt) ? Mono.just(R.ok(salt, "The salt will expire in 5 minutes")) : Mono.just(R.fail());
+	}
 
-    /**
-     * Token
-     *
-     * @param entityVO {@link TokenQuery}
-     * @return Token
-     */
-    @PostMapping("/generate")
-    public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
-        String token = tokenService.generateToken(entityVO.getName(), entityVO.getSalt(), entityVO.getPassword(), entityVO.getTenant());
-        return Objects.nonNull(token) ? Mono.just(R.ok(token, "The token will expire in 12 hours.")) : Mono.just(R.fail());
-    }
+	/**
+	 * Token
+	 * @param entityVO {@link TokenQuery}
+	 * @return Token
+	 */
+	@PostMapping("/generate")
+	public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
+		String token = tokenService.generateToken(entityVO.getName(), entityVO.getSalt(), entityVO.getPassword(),
+				entityVO.getTenant());
+		return Objects.nonNull(token) ? Mono.just(R.ok(token, "The token will expire in 12 hours."))
+				: Mono.just(R.fail());
+	}
 
-    /**
-     * Token
-     *
-     * @param entityVO {@link TokenQuery}
-     * @return ,
-     */
-    @PostMapping("/check")
-    public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
-        TokenValid tokenValid = tokenService.checkValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(), entityVO.getTenant());
+	/**
+	 * Token
+	 * @param entityVO {@link TokenQuery}
+	 * @return ,
+	 */
+	@PostMapping("/check")
+	public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
+		TokenValid tokenValid = tokenService.checkValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(),
+				entityVO.getTenant());
 
-        boolean valid = tokenValid.isValid();
-        String message = "The token has expired";
-        if (valid && Objects.nonNull(tokenValid.getExpireTime())) {
-            String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
-            message = "The token will expire in " + expireTime;
-        } else if (!valid && Objects.nonNull(tokenValid.getExpireTime())) {
-            String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
-            message = "The token has expired in " + expireTime;
-        }
+		boolean valid = tokenValid.isValid();
+		String message = "The token has expired";
+		if (valid && Objects.nonNull(tokenValid.getExpireTime())) {
+			String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
+			message = "The token will expire in " + expireTime;
+		}
+		else if (!valid && Objects.nonNull(tokenValid.getExpireTime())) {
+			String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
+			message = "The token has expired in " + expireTime;
+		}
 
-        return Mono.just(R.ok(valid, message));
-    }
+		return Mono.just(R.ok(valid, message));
+	}
 
 }

@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @since 2022.1.0
  */
 @Service
-public class PointAttributeConfigManagerImpl extends ServiceImpl<PointAttributeConfigMapper, PointAttributeConfigDO> implements PointAttributeConfigManager {
+public class PointAttributeConfigManagerImpl extends ServiceImpl<PointAttributeConfigMapper, PointAttributeConfigDO>
+		implements PointAttributeConfigManager {
 
 }

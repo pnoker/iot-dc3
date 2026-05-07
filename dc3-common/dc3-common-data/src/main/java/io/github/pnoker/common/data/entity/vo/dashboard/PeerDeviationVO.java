@@ -26,22 +26,29 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * A device whose alarm rate deviates sharply from its profile peers. The
- * ratio field is alarmCount / peerMedian; service filters to ratio &gt;= 3.
+ * A device whose alarm rate deviates sharply from its profile peers. The ratio field is
+ * alarmCount / peerMedian; service filters to ratio &gt;= 3.
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class PeerDeviationVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private long profileId;
-    private long deviceId;
-    private long alarmCount;
-    private long peerMedian;
-    /**
-     * alarmCount / peerMedian, 2-decimal. 0 means peerMedian was 0 (fresh profile).
-     */
-    private double ratio;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private long profileId;
+
+	private long deviceId;
+
+	private long alarmCount;
+
+	private long peerMedian;
+
+	/**
+	 * alarmCount / peerMedian, 2-decimal. 0 means peerMedian was 0 (fresh profile).
+	 */
+	private double ratio;
+
 }

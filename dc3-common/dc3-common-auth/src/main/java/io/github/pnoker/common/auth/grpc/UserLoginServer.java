@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.grpc;
 
-
 import io.github.pnoker.api.center.auth.GrpcNameQuery;
 import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
 import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
@@ -44,32 +43,34 @@ import java.util.Objects;
 @Service
 public class UserLoginServer extends UserLoginApiGrpc.UserLoginApiImplBase {
 
-    @Resource
-    private GrpcUserLoginBuilder grpcUserLoginBuilder;
+	@Resource
+	private GrpcUserLoginBuilder grpcUserLoginBuilder;
 
-    @Resource
-    private UserLoginService userLoginService;
+	@Resource
+	private UserLoginService userLoginService;
 
-    @Override
-    public void selectByName(GrpcNameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {
-        GrpcRUserLoginDTO.Builder builder = GrpcRUserLoginDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+	@Override
+	public void selectByName(GrpcNameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {
+		GrpcRUserLoginDTO.Builder builder = GrpcRUserLoginDTO.newBuilder();
+		GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        UserLoginBO entityBO = userLoginService.selectByLoginName(request.getName(), false);
-        if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+		UserLoginBO entityBO = userLoginService.selectByLoginName(request.getName(), false);
+		if (Objects.isNull(entityBO)) {
+			rBuilder.setOk(false);
+			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+		}
+		else {
+			rBuilder.setOk(true);
+			rBuilder.setCode(ResponseEnum.OK.getCode());
+			rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            builder.setData(grpcUserLoginBuilder.buildGrpcDTOByBO(entityBO));
-        }
+			builder.setData(grpcUserLoginBuilder.buildGrpcDTOByBO(entityBO));
+		}
 
-        builder.setResult(rBuilder);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
-    }
+		builder.setResult(rBuilder);
+		responseObserver.onNext(builder.build());
+		responseObserver.onCompleted();
+	}
+
 }

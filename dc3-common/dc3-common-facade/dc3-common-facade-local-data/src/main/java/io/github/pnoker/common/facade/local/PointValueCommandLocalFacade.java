@@ -26,10 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * In-process implementation: routes command calls straight into {@link PointValueCommandService}.
+ * In-process implementation: routes command calls straight into
+ * {@link PointValueCommandService}.
  * <p>
- * Selected when {@code dc3.facade.mode=local}. Carries zero serialization cost
- * — the same JVM handles both caller and service.
+ * Selected when {@code dc3.facade.mode=local}. Carries zero serialization cost — the same
+ * JVM handles both caller and service.
  *
  * @author pnoker
  * @since 2026.5.5
@@ -38,25 +39,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class PointValueCommandLocalFacade implements PointValueCommandFacade {
 
-    @Resource
-    private PointValueCommandService pointValueCommandService;
+	@Resource
+	private PointValueCommandService pointValueCommandService;
 
-    @Override
-    public boolean read(Long deviceId, Long pointId) {
-        PointValueReadVO readVO = new PointValueReadVO();
-        readVO.setDeviceId(deviceId);
-        readVO.setPointId(pointId);
-        pointValueCommandService.read(readVO);
-        return true;
-    }
+	@Override
+	public boolean read(Long deviceId, Long pointId) {
+		PointValueReadVO readVO = new PointValueReadVO();
+		readVO.setDeviceId(deviceId);
+		readVO.setPointId(pointId);
+		pointValueCommandService.read(readVO);
+		return true;
+	}
 
-    @Override
-    public boolean write(Long deviceId, Long pointId, String value) {
-        PointValueWriteVO writeVO = new PointValueWriteVO();
-        writeVO.setDeviceId(deviceId);
-        writeVO.setPointId(pointId);
-        writeVO.setValue(value);
-        pointValueCommandService.write(writeVO);
-        return true;
-    }
+	@Override
+	public boolean write(Long deviceId, Long pointId, String value) {
+		PointValueWriteVO writeVO = new PointValueWriteVO();
+		writeVO.setDeviceId(deviceId);
+		writeVO.setPointId(pointId);
+		writeVO.setValue(value);
+		pointValueCommandService.write(writeVO);
+		return true;
+	}
+
 }

@@ -27,15 +27,17 @@ import java.text.MessageFormat;
  * @since 2022.1.0
  */
 public class CronException extends RuntimeException {
-    public CronException() {
-        this(null);
-    }
 
-    public CronException(Throwable cause) {
-        super(cause);
-    }
+	public CronException() {
+		this(null);
+	}
 
-    public CronException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public CronException(Throwable cause) {
+		super(cause);
+	}
+
+	public CronException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

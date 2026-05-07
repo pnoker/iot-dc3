@@ -37,33 +37,36 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface GrpcDriverAttributeConfigBuilder {
 
-    /**
-     * BO to Grpc DTO
-     *
-     * @param entityBO DriverAttributeConfigBO
-     * @return GrpcDriverAttributeConfigDTO
-     */
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "configValueBytes", ignore = true)
-    @Mapping(target = "signatureBytes", ignore = true)
-    @Mapping(target = "mergeFrom", ignore = true)
-    @Mapping(target = "clearField", ignore = true)
-    @Mapping(target = "clearOneof", ignore = true)
-    @Mapping(target = "base", ignore = true)
-    @Mapping(target = "mergeBase", ignore = true)
-    @Mapping(target = "unknownFields", ignore = true)
-    @Mapping(target = "mergeUnknownFields", ignore = true)
-    @Mapping(target = "allFields", ignore = true)
-    GrpcDriverAttributeConfigDTO buildGrpcDTOByBO(DriverAttributeConfigBO entityBO);
+	/**
+	 * BO to Grpc DTO
+	 * @param entityBO DriverAttributeConfigBO
+	 * @return GrpcDriverAttributeConfigDTO
+	 */
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "configValueBytes", ignore = true)
+	@Mapping(target = "signatureBytes", ignore = true)
+	@Mapping(target = "mergeFrom", ignore = true)
+	@Mapping(target = "clearField", ignore = true)
+	@Mapping(target = "clearOneof", ignore = true)
+	@Mapping(target = "base", ignore = true)
+	@Mapping(target = "mergeBase", ignore = true)
+	@Mapping(target = "unknownFields", ignore = true)
+	@Mapping(target = "mergeUnknownFields", ignore = true)
+	@Mapping(target = "allFields", ignore = true)
+	GrpcDriverAttributeConfigDTO buildGrpcDTOByBO(DriverAttributeConfigBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(DriverAttributeConfigBO entityBO, @MappingTarget GrpcDriverAttributeConfigDTO.Builder entityGrpc) {
-        GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
-        entityGrpc.setBase(grpcBase);
+	@AfterMapping
+	default void afterProcess(DriverAttributeConfigBO entityBO,
+			@MappingTarget GrpcDriverAttributeConfigDTO.Builder entityGrpc) {
+		GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
+		entityGrpc.setBase(grpcBase);
 
-        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
-    }
+		Optional.ofNullable(entityBO.getEnableFlag())
+			.ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+					() -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
+	}
+
 }

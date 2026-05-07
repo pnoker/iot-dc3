@@ -44,8 +44,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * gRPC client responsible for driver registration and for loading the metadata returned by the
- * manager center after registration succeeds.
+ * gRPC client responsible for driver registration and for loading the metadata returned
+ * by the manager center after registration succeeds.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -56,66 +56,77 @@ import java.util.stream.Collectors;
 @Component
 public class DriverClient {
 
-    @Resource
-    private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
+	@Resource
+	private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
-    @Resource
-    private DriverMetadata driverMetadata;
+	@Resource
+	private DriverMetadata driverMetadata;
 
-    @Resource
-    private DriverBuilder driverBuilder;
-    @Resource
-    private GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
-    @Resource
-    private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
+	@Resource
+	private DriverBuilder driverBuilder;
 
-    /**
-     * Registers the current driver and stores the returned metadata in the shared driver cache.
-     *
-     * @param entityBO driver registration payload
-     */
-    public void driverRegister(RegisterBO entityBO) {
-        // Build driver registration information
-        GrpcDriverRegisterDTO.Builder builder = GrpcDriverRegisterDTO.newBuilder();
-        GrpcDriverDTO grpcDriverDTO = driverBuilder.buildGrpcDTOByDTO(entityBO.getDriver());
-        builder.setTenant(entityBO.getTenant())
-                .setClient(entityBO.getClient())
-                .setDriver(grpcDriverDTO);
+	@Resource
+	private GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
 
-        CollectionOptional.ofNullable(entityBO.getDriverAttributes()).ifPresent(value -> {
-                    List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = value.stream().map(grpcDriverAttributeBuilder::buildGrpcDTOByDTO).toList();
-                    builder.addAllDriverAttributes(grpcDriverAttributeDTOList);
-                }
-        );
-        CollectionOptional.ofNullable(entityBO.getPointAttributes()).ifPresent(value -> {
-                    List<GrpcPointAttributeDTO> grpcPointAttributeDTOList = value.stream().map(grpcPointAttributeBuilder::buildGrpcDTOByDTO).toList();
-                    builder.addAllPointAttributes(grpcPointAttributeDTOList);
-                }
-        );
+	@Resource
+	private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
-        // Initiate driver registration
-        GrpcRDriverRegisterDTO rDriverRegisterDTO = driverApiBlockingStub.driverRegister(builder.build());
-        if (!rDriverRegisterDTO.getResult().getOk()) {
-            throw new RegisterException(rDriverRegisterDTO.getResult().getMessage());
-        }
+	/**
+	 * Registers the current driver and stores the returned metadata in the shared driver
+	 * cache.
+	 * @param entityBO driver registration payload
+	 */
+	public void driverRegister(RegisterBO entityBO) {
+		// Build driver registration information
+		GrpcDriverRegisterDTO.Builder builder = GrpcDriverRegisterDTO.newBuilder();
+		GrpcDriverDTO grpcDriverDTO = driverBuilder.buildGrpcDTOByDTO(entityBO.getDriver());
+		builder.setTenant(entityBO.getTenant()).setClient(entityBO.getClient()).setDriver(grpcDriverDTO);
 
-        DriverBO driverBO = driverBuilder.buildDTOByGrpcDTO(rDriverRegisterDTO.getDriver());
-        driverMetadata.setDriver(driverBO);
+		CollectionOptional.ofNullable(entityBO.getDriverAttributes()).ifPresent(value -> {
+			List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = value.stream()
+				.map(grpcDriverAttributeBuilder::buildGrpcDTOByDTO)
+				.toList();
+			builder.addAllDriverAttributes(grpcDriverAttributeDTOList);
+		});
+		CollectionOptional.ofNullable(entityBO.getPointAttributes()).ifPresent(value -> {
+			List<GrpcPointAttributeDTO> grpcPointAttributeDTOList = value.stream()
+				.map(grpcPointAttributeBuilder::buildGrpcDTOByDTO)
+				.toList();
+			builder.addAllPointAttributes(grpcPointAttributeDTOList);
+		});
 
-        driverMetadata.setDeviceIds(new HashSet<>(rDriverRegisterDTO.getDeviceIdsList()));
+		// Initiate driver registration
+		GrpcRDriverRegisterDTO rDriverRegisterDTO = driverApiBlockingStub.driverRegister(builder.build());
+		if (!rDriverRegisterDTO.getResult().getOk()) {
+			throw new RegisterException(rDriverRegisterDTO.getResult().getMessage());
+		}
 
-        List<GrpcDriverAttributeDTO> driverAttributesList = rDriverRegisterDTO.getDriverAttributesList();
-        Map<Long, DriverAttributeDTO> driverAttributeIdMap = driverAttributesList.stream().collect(Collectors.toMap(entity -> entity.getBase().getId(), grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
-        Map<String, DriverAttributeDTO> driverAttributeNameMap = driverAttributesList.stream().collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode, grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
-        driverMetadata.setDriverAttributeIdMap(driverAttributeIdMap);
-        driverMetadata.setDriverAttributeNameMap(driverAttributeNameMap);
+		DriverBO driverBO = driverBuilder.buildDTOByGrpcDTO(rDriverRegisterDTO.getDriver());
+		driverMetadata.setDriver(driverBO);
 
-        List<GrpcPointAttributeDTO> pointAttributesList = rDriverRegisterDTO.getPointAttributesList();
-        Map<Long, PointAttributeDTO> pointAttributeIdMap = pointAttributesList.stream().collect(Collectors.toMap(entity -> entity.getBase().getId(), grpcPointAttributeBuilder::buildDTOByGrpcDTO));
-        Map<String, PointAttributeDTO> pointAttributeNameMap = pointAttributesList.stream().collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode, grpcPointAttributeBuilder::buildDTOByGrpcDTO));
-        driverMetadata.setPointAttributeIdMap(pointAttributeIdMap);
-        driverMetadata.setPointAttributeNameMap(pointAttributeNameMap);
+		driverMetadata.setDeviceIds(new HashSet<>(rDriverRegisterDTO.getDeviceIdsList()));
 
-        driverMetadata.setDriverStatus(DriverStatusEnum.ONLINE);
-    }
+		List<GrpcDriverAttributeDTO> driverAttributesList = rDriverRegisterDTO.getDriverAttributesList();
+		Map<Long, DriverAttributeDTO> driverAttributeIdMap = driverAttributesList.stream()
+			.collect(Collectors.toMap(entity -> entity.getBase().getId(),
+					grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
+		Map<String, DriverAttributeDTO> driverAttributeNameMap = driverAttributesList.stream()
+			.collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode,
+					grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
+		driverMetadata.setDriverAttributeIdMap(driverAttributeIdMap);
+		driverMetadata.setDriverAttributeNameMap(driverAttributeNameMap);
+
+		List<GrpcPointAttributeDTO> pointAttributesList = rDriverRegisterDTO.getPointAttributesList();
+		Map<Long, PointAttributeDTO> pointAttributeIdMap = pointAttributesList.stream()
+			.collect(
+					Collectors.toMap(entity -> entity.getBase().getId(), grpcPointAttributeBuilder::buildDTOByGrpcDTO));
+		Map<String, PointAttributeDTO> pointAttributeNameMap = pointAttributesList.stream()
+			.collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode,
+					grpcPointAttributeBuilder::buildDTOByGrpcDTO));
+		driverMetadata.setPointAttributeIdMap(pointAttributeIdMap);
+		driverMetadata.setPointAttributeNameMap(pointAttributeNameMap);
+
+		driverMetadata.setDriverStatus(DriverStatusEnum.ONLINE);
+	}
+
 }

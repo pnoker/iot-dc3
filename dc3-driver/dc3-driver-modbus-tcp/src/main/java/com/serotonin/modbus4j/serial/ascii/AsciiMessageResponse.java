@@ -24,36 +24,42 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>AsciiMessageResponse class.</p>
+ * <p>
+ * AsciiMessageResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class AsciiMessageResponse extends AsciiMessage implements OutgoingResponseMessage, IncomingResponseMessage {
-    /**
-     * <p>Constructor for AsciiMessageResponse.</p>
-     *
-     * @param modbusMessage a {@link ModbusMessage} object.
-     */
-    public AsciiMessageResponse(ModbusMessage modbusMessage) {
-        super(modbusMessage);
-    }
 
-    static AsciiMessageResponse createAsciiMessageResponse(ByteQueue queue) throws ModbusTransportException {
-        ByteQueue msgQueue = getUnasciiMessage(queue);
-        ModbusResponse response = ModbusResponse.createModbusResponse(msgQueue);
-        AsciiMessageResponse asciiResponse = new AsciiMessageResponse(response);
+	/**
+	 * <p>
+	 * Constructor for AsciiMessageResponse.
+	 * </p>
+	 * @param modbusMessage a {@link ModbusMessage} object.
+	 */
+	public AsciiMessageResponse(ModbusMessage modbusMessage) {
+		super(modbusMessage);
+	}
 
-        // Return the data.
-        return asciiResponse;
-    }
+	static AsciiMessageResponse createAsciiMessageResponse(ByteQueue queue) throws ModbusTransportException {
+		ByteQueue msgQueue = getUnasciiMessage(queue);
+		ModbusResponse response = ModbusResponse.createModbusResponse(msgQueue);
+		AsciiMessageResponse asciiResponse = new AsciiMessageResponse(response);
 
-    /**
-     * <p>getModbusResponse.</p>
-     *
-     * @return a {@link ModbusResponse} object.
-     */
-    public ModbusResponse getModbusResponse() {
-        return (ModbusResponse) modbusMessage;
-    }
+		// Return the data.
+		return asciiResponse;
+	}
+
+	/**
+	 * <p>
+	 * getModbusResponse.
+	 * </p>
+	 * @return a {@link ModbusResponse} object.
+	 */
+	public ModbusResponse getModbusResponse() {
+		return (ModbusResponse) modbusMessage;
+	}
+
 }

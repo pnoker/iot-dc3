@@ -34,71 +34,74 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum RwFlagEnum {
-    /**
-     * Read only
-     */
-    R((byte) 0, "r", "Read only"),
 
-    /**
-     * Write only
-     */
-    W((byte) 1, "w", "Write only"),
+	/**
+	 * Read only
+	 */
+	R((byte) 0, "r", "Read only"),
 
-    /**
-     * Read and Write
-     */
-    RW((byte) 2, "rw", "Read and Write"),
-    ;
+	/**
+	 * Write only
+	 */
+	W((byte) 1, "w", "Write only"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Read and Write
+	 */
+	RW((byte) 2, "rw", "Read and Write"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link RwFlagEnum}
-     */
-    public static RwFlagEnum ofIndex(Byte index) {
-        Optional<RwFlagEnum> any = Arrays.stream(RwFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link RwFlagEnum}
-     */
-    public static RwFlagEnum ofCode(String code) {
-        Optional<RwFlagEnum> any = Arrays.stream(RwFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link RwFlagEnum}
+	 */
+	public static RwFlagEnum ofIndex(Byte index) {
+		Optional<RwFlagEnum> any = Arrays.stream(RwFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link RwFlagEnum}
-     */
-    public static RwFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link RwFlagEnum}
+	 */
+	public static RwFlagEnum ofCode(String code) {
+		Optional<RwFlagEnum> any = Arrays.stream(RwFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link RwFlagEnum}
+	 */
+	public static RwFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

@@ -28,7 +28,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class TopologyPointRow {
-    private long id;
-    private String pointName;
-    private long profileId;
+
+	private long id;
+
+	private String pointName;
+
+	private long profileId;
+
 }

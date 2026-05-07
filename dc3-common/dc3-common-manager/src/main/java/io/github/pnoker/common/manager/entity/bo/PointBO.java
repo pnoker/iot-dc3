@@ -40,86 +40,86 @@ import java.math.BigDecimal;
 @ToString(callSuper = true)
 public class PointBO extends BaseBO {
 
-    /**
-     * Name
-     */
-    private String pointName;
+	/**
+	 * Name
+	 */
+	private String pointName;
 
-    /**
-     * Code
-     */
-    private String pointCode;
+	/**
+	 * Code
+	 */
+	private String pointCode;
 
-    /**
-     * Type
-     */
-    private PointTypeFlagEnum pointTypeFlag;
+	/**
+	 * Type
+	 */
+	private PointTypeFlagEnum pointTypeFlag;
 
-    /**
-     *
-     */
-    private RwFlagEnum rwFlag;
+	/**
+	 *
+	 */
+	private RwFlagEnum rwFlag;
 
-    /**
-     *
-     */
-    private BigDecimal baseValue;
+	/**
+	 *
+	 */
+	private BigDecimal baseValue;
 
-    /**
-     *
-     */
-    private BigDecimal multiple;
+	/**
+	 *
+	 */
+	private BigDecimal multiple;
 
-    /**
-     *
-     */
-    private Byte valueDecimal;
+	/**
+	 *
+	 */
+	private Byte valueDecimal;
 
-    /**
-     *
-     */
-    private String unit;
+	/**
+	 *
+	 */
+	private String unit;
 
-    /**
-     * ID
-     */
-    private Long profileId;
+	/**
+	 * ID
+	 */
+	private Long profileId;
 
-    /**
-     *
-     */
-    private PointExt pointExt;
+	/**
+	 *
+	 */
+	private PointExt pointExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
 
-    /**
-     *
-     */
-    private String signature;
+	/**
+	 *
+	 */
+	private String signature;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
 
-    /**
-     *
-     */
-    public void setByDefault() {
-        this.pointTypeFlag = PointTypeFlagEnum.STRING;
-        this.rwFlag = RwFlagEnum.R;
-        this.baseValue = BigDecimal.valueOf(0);
-        this.multiple = BigDecimal.valueOf(1);
-        this.valueDecimal = 6;
-        this.unit = "";
-    }
+	/**
+	 *
+	 */
+	public void setByDefault() {
+		this.pointTypeFlag = PointTypeFlagEnum.STRING;
+		this.rwFlag = RwFlagEnum.R;
+		this.baseValue = BigDecimal.valueOf(0);
+		this.multiple = BigDecimal.valueOf(1);
+		this.valueDecimal = 6;
+		this.unit = "";
+	}
 
 }

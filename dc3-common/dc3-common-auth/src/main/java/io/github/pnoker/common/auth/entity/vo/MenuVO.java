@@ -45,50 +45,48 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MenuVO extends BaseVO {
 
-    /**
-     * ID
-     */
-    @NotBlank(message = "Menu parent id can't be empty",
-            groups = {Add.class, Update.class})
-    private Long parentMenuId;
+	/**
+	 * ID
+	 */
+	@NotBlank(message = "Menu parent id can't be empty", groups = { Add.class, Update.class })
+	private Long parentMenuId;
 
-    /**
-     * Type
-     */
-    private MenuTypeFlagEnum menuTypeFlag;
+	/**
+	 * Type
+	 */
+	private MenuTypeFlagEnum menuTypeFlag;
 
-    /**
-     * Name
-     */
-    @NotBlank(message = "Menu name can't be empty",
-            groups = {Add.class, Auth.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "Invalid menu name",
-            groups = {Add.class, Update.class})
-    private String menuName;
+	/**
+	 * Name
+	 */
+	@NotBlank(message = "Menu name can't be empty", groups = { Add.class, Auth.class })
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid menu name",
+			groups = { Add.class, Update.class })
+	private String menuName;
 
-    /**
-     * Code, URLMD5
-     */
-    private String menuCode;
+	/**
+	 * Code, URLMD5
+	 */
+	private String menuCode;
 
-    /**
-     *
-     */
-    private MenuLevelFlagEnum menuLevel;
+	/**
+	 *
+	 */
+	private MenuLevelFlagEnum menuLevel;
 
-    /**
-     *
-     */
-    private Integer menuIndex;
+	/**
+	 *
+	 */
+	private Integer menuIndex;
 
-    /**
-     *
-     */
-    private MenuExt menuExt;
+	/**
+	 *
+	 */
+	private MenuExt menuExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

@@ -32,8 +32,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Driver Event
- * : , , ,
+ * Driver Event : , , ,
  *
  * @author pnoker
  * @version 2025.9.0
@@ -43,38 +42,39 @@ import java.util.Objects;
 @Component
 public class DriverEventReceiver {
 
-    private final DriverEventService driverEventService;
+	private final DriverEventService driverEventService;
 
-    public DriverEventReceiver(DriverEventService driverEventService) {
-        this.driverEventService = driverEventService;
-    }
+	public DriverEventReceiver(DriverEventService driverEventService) {
+		this.driverEventService = driverEventService;
+	}
 
-    @RabbitHandler
-    @RabbitListener(queues = "#{driverEventQueue.name}")
-    public void driverEventReceive(Channel channel, Message message, DriverEventDTO entityDTO) {
-        try {
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Receive driver event: {}", JsonUtil.toJsonString(entityDTO));
-            if (Objects.isNull(entityDTO)
-                    || Objects.isNull(entityDTO.getType())
-                    || StringUtils.isEmpty(entityDTO.getContent())) {
-                log.error("Invalid driver event: {}", entityDTO);
-                return;
-            }
+	@RabbitHandler
+	@RabbitListener(queues = "#{driverEventQueue.name}")
+	public void driverEventReceive(Channel channel, Message message, DriverEventDTO entityDTO) {
+		try {
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+			log.debug("Receive driver event: {}", JsonUtil.toJsonString(entityDTO));
+			if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getType())
+					|| StringUtils.isEmpty(entityDTO.getContent())) {
+				log.error("Invalid driver event: {}", entityDTO);
+				return;
+			}
 
-            switch (entityDTO.getType()) {
-                case HEARTBEAT:
-                    driverEventService.heartbeatEvent(entityDTO);
-                    break;
-                case ALARM:
-                    driverEventService.alarmEvent(entityDTO);
-                    break;
-                default:
-                    log.error("Invalid event type, {}", entityDTO.getType());
-                    break;
-            }
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
+			switch (entityDTO.getType()) {
+				case HEARTBEAT:
+					driverEventService.heartbeatEvent(entityDTO);
+					break;
+				case ALARM:
+					driverEventService.alarmEvent(entityDTO);
+					break;
+				default:
+					log.error("Invalid event type, {}", entityDTO.getType());
+					break;
+			}
+		}
+		catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
 }

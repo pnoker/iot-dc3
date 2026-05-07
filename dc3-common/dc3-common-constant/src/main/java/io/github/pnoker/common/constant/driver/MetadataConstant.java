@@ -30,98 +30,113 @@ import io.github.pnoker.common.constant.common.SuffixConstant;
  */
 public class MetadataConstant {
 
-    private MetadataConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private MetadataConstant() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Profile metadata related constants
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    public static class Profile {
+	/**
+	 * Profile metadata related constants
+	 *
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	public static class Profile {
 
-        public static final String ADD = PrefixConstant.ADD + SuffixConstant.PROFILE;
-        public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.PROFILE;
-        public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.PROFILE;
+		public static final String ADD = PrefixConstant.ADD + SuffixConstant.PROFILE;
 
-        private Profile() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-        }
-    }
+		public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.PROFILE;
 
-    /**
-     * Point metadata related constants
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    public static class Point {
+		public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.PROFILE;
 
-        public static final String ADD = PrefixConstant.ADD + SuffixConstant.POINT;
-        public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.POINT;
-        public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.POINT;
+		private Profile() {
+			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+		}
 
-        private Point() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-        }
-    }
+	}
 
-    /**
-     * Device metadata related constants
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    public static class Device {
+	/**
+	 * Point metadata related constants
+	 *
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	public static class Point {
 
-        public static final String ADD = PrefixConstant.ADD + SuffixConstant.DEVICE;
-        public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.DEVICE;
-        public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.DEVICE;
+		public static final String ADD = PrefixConstant.ADD + SuffixConstant.POINT;
 
-        private Device() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-        }
-    }
+		public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.POINT;
 
-    /**
-     * Driver configuration metadata related constants
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    public static class DriverConfig {
+		public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.POINT;
 
-        public static final String ADD = PrefixConstant.ADD + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
-        public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
-        public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
+		private Point() {
+			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+		}
 
-        private DriverConfig() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-        }
-    }
+	}
 
-    /**
-     * Point configuration metadata related constants
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    public static class PointConfig {
+	/**
+	 * Device metadata related constants
+	 *
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	public static class Device {
 
-        public static final String ADD = PrefixConstant.ADD + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
-        public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
-        public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
+		public static final String ADD = PrefixConstant.ADD + SuffixConstant.DEVICE;
 
-        private PointConfig() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-        }
-    }
+		public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.DEVICE;
+
+		public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.DEVICE;
+
+		private Device() {
+			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+		}
+
+	}
+
+	/**
+	 * Driver configuration metadata related constants
+	 *
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	public static class DriverConfig {
+
+		public static final String ADD = PrefixConstant.ADD + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
+
+		public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
+
+		public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
+
+		private DriverConfig() {
+			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+		}
+
+	}
+
+	/**
+	 * Point configuration metadata related constants
+	 *
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	public static class PointConfig {
+
+		public static final String ADD = PrefixConstant.ADD + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
+
+		public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
+
+		public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
+
+		private PointConfig() {
+			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+		}
+
+	}
 
 }

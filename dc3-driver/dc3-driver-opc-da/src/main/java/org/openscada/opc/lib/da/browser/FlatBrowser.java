@@ -32,39 +32,44 @@ import java.util.EnumSet;
  * @author Jens Reimann jens.reimann@th4-systems.com
  */
 public class FlatBrowser extends BaseBrowser {
-    public FlatBrowser(final OPCBrowseServerAddressSpace browser) {
-        super(browser);
-    }
 
-    public FlatBrowser(final OPCBrowseServerAddressSpace browser, final int batchSize) {
-        super(browser, batchSize);
-    }
+	public FlatBrowser(final OPCBrowseServerAddressSpace browser) {
+		super(browser);
+	}
 
-    /**
-     * Perform a flat browse operation
-     *
-     * @param filterCriteria The filter criteria. Use an empty string if you don't need one.
-     * @param accessMask     The access mask. An empty set will search for all.
-     * @param variantType    The variant type. Must be one of the <code>VT_</code> constants of {@link JIVariant}. Use {@link JIVariant#VT_EMPTY} if you want to browse for all.
-     * @return The list of entries
-     * @throws IllegalArgumentException IllegalArgumentException
-     * @throws UnknownHostException     UnknownHostException
-     * @throws JIException              JIException
-     */
-    public Collection<String> browse(final String filterCriteria, final EnumSet<Access> accessMask, final int variantType) throws IllegalArgumentException, UnknownHostException, JIException {
-        return browse(OPCBROWSETYPE.OPC_FLAT, filterCriteria, accessMask, variantType);
-    }
+	public FlatBrowser(final OPCBrowseServerAddressSpace browser, final int batchSize) {
+		super(browser, batchSize);
+	}
 
-    public Collection<String> browse(final String filterCriteria) throws IllegalArgumentException, UnknownHostException, JIException {
-        return browse(filterCriteria, EnumSet.noneOf(Access.class), JIVariant.VT_EMPTY);
-    }
+	/**
+	 * Perform a flat browse operation
+	 * @param filterCriteria The filter criteria. Use an empty string if you don't need
+	 * one.
+	 * @param accessMask The access mask. An empty set will search for all.
+	 * @param variantType The variant type. Must be one of the <code>VT_</code> constants
+	 * of {@link JIVariant}. Use {@link JIVariant#VT_EMPTY} if you want to browse for all.
+	 * @return The list of entries
+	 * @throws IllegalArgumentException IllegalArgumentException
+	 * @throws UnknownHostException UnknownHostException
+	 * @throws JIException JIException
+	 */
+	public Collection<String> browse(final String filterCriteria, final EnumSet<Access> accessMask,
+			final int variantType) throws IllegalArgumentException, UnknownHostException, JIException {
+		return browse(OPCBROWSETYPE.OPC_FLAT, filterCriteria, accessMask, variantType);
+	}
 
-    public Collection<String> browse() throws IllegalArgumentException, UnknownHostException, JIException {
-        return browse("", EnumSet.noneOf(Access.class), JIVariant.VT_EMPTY);
-    }
+	public Collection<String> browse(final String filterCriteria)
+			throws IllegalArgumentException, UnknownHostException, JIException {
+		return browse(filterCriteria, EnumSet.noneOf(Access.class), JIVariant.VT_EMPTY);
+	}
 
-    public Collection<String> browse(final EnumSet<Access> accessMask) throws IllegalArgumentException, UnknownHostException, JIException {
-        return browse("", accessMask, JIVariant.VT_EMPTY);
-    }
+	public Collection<String> browse() throws IllegalArgumentException, UnknownHostException, JIException {
+		return browse("", EnumSet.noneOf(Access.class), JIVariant.VT_EMPTY);
+	}
+
+	public Collection<String> browse(final EnumSet<Access> accessMask)
+			throws IllegalArgumentException, UnknownHostException, JIException {
+		return browse("", accessMask, JIVariant.VT_EMPTY);
+	}
 
 }

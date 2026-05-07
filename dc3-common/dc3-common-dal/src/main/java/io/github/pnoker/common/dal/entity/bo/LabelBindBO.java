@@ -22,7 +22,8 @@ import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.*;
 
 /**
- * Label binding business object (BO) representing the association between labels and entities.
+ * Label binding business object (BO) representing the association between labels and
+ * entities.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,23 +36,24 @@ import lombok.*;
 @ToString(callSuper = true)
 public class LabelBindBO extends BaseBO {
 
-    /**
-     * Entity type flag.
-     */
-    private EntityTypeFlagEnum entityTypeFlag;
+	/**
+	 * Entity type flag.
+	 */
+	private EntityTypeFlagEnum entityTypeFlag;
 
-    /**
-     * Label ID.
-     */
-    private Long labelId;
+	/**
+	 * Label ID.
+	 */
+	private Long labelId;
 
-    /**
-     * Entity ID.
-     */
-    private Long entityId;
+	/**
+	 * Entity ID.
+	 */
+	private Long entityId;
 
-    /**
-     * Tenant ID.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID.
+	 */
+	private Long tenantId;
+
 }

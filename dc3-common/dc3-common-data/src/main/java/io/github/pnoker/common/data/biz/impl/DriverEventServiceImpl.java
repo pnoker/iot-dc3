@@ -35,11 +35,10 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * DriverEventService Impl. Mirrors {@link DeviceEventServiceImpl}: the
- * heartbeat path refreshes the status key in {@link LocalCacheService} and
- * writes one row per event to {@code dc3_driver_event}, plus a derived ALARM
- * row whenever the driver status flips between ONLINE/MAINTAIN and
- * OFFLINE/FAULT.
+ * DriverEventService Impl. Mirrors {@link DeviceEventServiceImpl}: the heartbeat path
+ * refreshes the status key in {@link LocalCacheService} and writes one row per event to
+ * {@code dc3_driver_event}, plus a derived ALARM row whenever the driver status flips
+ * between ONLINE/MAINTAIN and OFFLINE/FAULT.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -49,71 +48,77 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DriverEventServiceImpl implements DriverEventService {
 
-    // Driver status TTL must comfortably exceed the heartbeat cadence
-    // (ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON = 15s); otherwise the
-    // cache key expires before the next heartbeat lands, the offline-expiry
-    // listener fires on every healthy cycle, and each following heartbeat is
-    // interpreted as an OFFLINE→ONLINE flip — producing a 2-row/cycle alarm
-    // storm. 45s ≈ 3× the cron interval, which tolerates a couple of missed
-    // beats (network blip, GC pause) without flapping.
-    private static final int STATUS_TTL_SECONDS = 45;
+	// Driver status TTL must comfortably exceed the heartbeat cadence
+	// (ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON = 15s); otherwise the
+	// cache key expires before the next heartbeat lands, the offline-expiry
+	// listener fires on every healthy cycle, and each following heartbeat is
+	// interpreted as an OFFLINE→ONLINE flip — producing a 2-row/cycle alarm
+	// storm. 45s ≈ 3× the cron interval, which tolerates a couple of missed
+	// beats (network blip, GC pause) without flapping.
+	private static final int STATUS_TTL_SECONDS = 45;
 
-    @Resource
-    private LocalCacheService localCacheService;
+	@Resource
+	private LocalCacheService localCacheService;
 
-    @Resource
-    private DriverEventManager driverEventManager;
+	@Resource
+	private DriverEventManager driverEventManager;
 
-    private static boolean isFlip(String prev, String current) {
-        return online(prev) != online(current);
-    }
+	private static boolean isFlip(String prev, String current) {
+		return online(prev) != online(current);
+	}
 
-    private static boolean online(String code) {
-        return DriverStatusEnum.ONLINE.getCode().equals(code) || DriverStatusEnum.MAINTAIN.getCode().equals(code);
-    }
+	private static boolean online(String code) {
+		return DriverStatusEnum.ONLINE.getCode().equals(code) || DriverStatusEnum.MAINTAIN.getCode().equals(code);
+	}
 
-    @Override
-    public void heartbeatEvent(DriverEventDTO entityDTO) {
-        DriverEventDTO.DriverStatus payload = JsonUtil.parseObject(entityDTO.getContent(), DriverEventDTO.DriverStatus.class);
-        if (Objects.isNull(payload) || Objects.isNull(payload.getDriverId()) || Objects.isNull(payload.getStatus())) {
-            return;
-        }
+	@Override
+	public void heartbeatEvent(DriverEventDTO entityDTO) {
+		DriverEventDTO.DriverStatus payload = JsonUtil.parseObject(entityDTO.getContent(),
+				DriverEventDTO.DriverStatus.class);
+		if (Objects.isNull(payload) || Objects.isNull(payload.getDriverId()) || Objects.isNull(payload.getStatus())) {
+			return;
+		}
 
-        String statusKey = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + payload.getDriverId();
-        String prev = localCacheService.getKey(statusKey);
-        String current = payload.getStatus().getCode();
+		String statusKey = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + payload.getDriverId();
+		String prev = localCacheService.getKey(statusKey);
+		String current = payload.getStatus().getCode();
 
-        localCacheService.setKey(statusKey, current, STATUS_TTL_SECONDS, TimeUnit.SECONDS);
+		localCacheService.setKey(statusKey, current, STATUS_TTL_SECONDS, TimeUnit.SECONDS);
 
-        // Heartbeats no longer write to dc3_driver_event every tick — the cache TTL is the
-        // source of truth for "is the driver alive". An ALARM row lands on actual state
-        // flips below, and the matching removal hook (see OfflineExpiryListener) lands one
-        // when the TTL elapses without a fresh heartbeat.
-        if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {
-            String message = String.format("Driver status changed: %s -> %s", prev, current);
-            persist(payload, DriverEventTypeEnum.ALARM, "driver-state-flip", message);
-        }
-    }
+		// Heartbeats no longer write to dc3_driver_event every tick — the cache TTL is
+		// the
+		// source of truth for "is the driver alive". An ALARM row lands on actual state
+		// flips below, and the matching removal hook (see OfflineExpiryListener) lands
+		// one
+		// when the TTL elapses without a fresh heartbeat.
+		if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {
+			String message = String.format("Driver status changed: %s -> %s", prev, current);
+			persist(payload, DriverEventTypeEnum.ALARM, "driver-state-flip", message);
+		}
+	}
 
-    @Override
-    public void alarmEvent(DriverEventDTO entityDTO) {
-        DriverEventDTO.DriverStatus payload = JsonUtil.parseObject(entityDTO.getContent(), DriverEventDTO.DriverStatus.class);
-        if (Objects.isNull(payload) || Objects.isNull(payload.getDriverId())) {
-            log.warn("Drop driver alarm without driverId: {}", entityDTO.getContent());
-            return;
-        }
-        String msg = payload.getMessage() != null ? payload.getMessage() : entityDTO.getContent();
-        persist(payload, DriverEventTypeEnum.ALARM, "driver-alarm", msg);
-    }
+	@Override
+	public void alarmEvent(DriverEventDTO entityDTO) {
+		DriverEventDTO.DriverStatus payload = JsonUtil.parseObject(entityDTO.getContent(),
+				DriverEventDTO.DriverStatus.class);
+		if (Objects.isNull(payload) || Objects.isNull(payload.getDriverId())) {
+			log.warn("Drop driver alarm without driverId: {}", entityDTO.getContent());
+			return;
+		}
+		String msg = payload.getMessage() != null ? payload.getMessage() : entityDTO.getContent();
+		persist(payload, DriverEventTypeEnum.ALARM, "driver-alarm", msg);
+	}
 
-    private void persist(DriverEventDTO.DriverStatus payload, DriverEventTypeEnum type, String extType, String extContent) {
-        DriverEventDO entity = new DriverEventDO();
-        entity.setDriverId(payload.getDriverId());
-        entity.setEventTypeFlag(type.getIndex());
-        entity.setEventExt(JsonExt.builder().type(extType).content(extContent).version(1).build());
-        entity.setExpiredTime(0L);
-        entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
-        driverEventManager.save(entity);
-    }
+	private void persist(DriverEventDTO.DriverStatus payload, DriverEventTypeEnum type, String extType,
+			String extContent) {
+		DriverEventDO entity = new DriverEventDO();
+		entity.setDriverId(payload.getDriverId());
+		entity.setEventTypeFlag(type.getIndex());
+		entity.setEventExt(JsonExt.builder().type(extType).content(extContent).version(1).build());
+		entity.setExpiredTime(0L);
+		entity.setConfirmFlag((byte) 0);
+		entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
+		driverEventManager.save(entity);
+	}
+
 }

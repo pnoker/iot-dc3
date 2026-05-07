@@ -29,9 +29,10 @@ import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResult
  */
 public interface ResourceRegistryFacade {
 
-    /**
-     * Submit the caller's full API inventory. The auth-side server reconciles it
-     * against the dc3_api and dc3_resource tables and returns counters.
-     */
-    FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command);
+	/**
+	 * Submit the caller's full API inventory. The auth-side server reconciles it against
+	 * the dc3_api and dc3_resource tables and returns counters.
+	 */
+	FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command);
+
 }

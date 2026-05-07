@@ -38,48 +38,49 @@ import lombok.*;
 @ToString(callSuper = true)
 public class ProfileBO extends BaseBO {
 
-    /**
-     * Name
-     */
-    private String profileName;
+	/**
+	 * Name
+	 */
+	private String profileName;
 
-    /**
-     * Code
-     */
-    private String profileCode;
+	/**
+	 * Code
+	 */
+	private String profileCode;
 
-    /**
-     * Type
-     */
-    private ProfileShareFlagEnum profileShareFlag;
+	/**
+	 * Type
+	 */
+	private ProfileShareFlagEnum profileShareFlag;
 
-    /**
-     * Type
-     */
-    private ProfileTypeFlagEnum profileTypeFlag;
+	/**
+	 * Type
+	 */
+	private ProfileTypeFlagEnum profileTypeFlag;
 
-    /**
-     *
-     */
-    private ProfileExt profileExt;
+	/**
+	 *
+	 */
+	private ProfileExt profileExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
 
-    /**
-     *
-     */
-    private String signature;
+	/**
+	 *
+	 */
+	private String signature;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
+
 }

@@ -36,43 +36,44 @@ import lombok.*;
 @ToString(callSuper = true)
 public class GroupBO extends BaseBO {
 
-    /**
-     * Parent group ID.
-     */
-    private String parentGroupId;
+	/**
+	 * Parent group ID.
+	 */
+	private String parentGroupId;
 
-    /**
-     * Group type flag.
-     */
-    private GroupTypeFlagEnum groupTypeFlag;
+	/**
+	 * Group type flag.
+	 */
+	private GroupTypeFlagEnum groupTypeFlag;
 
-    /**
-     * Group name.
-     */
-    private String groupName;
+	/**
+	 * Group name.
+	 */
+	private String groupName;
 
-    /**
-     * Group code.
-     */
-    private String groupCode;
+	/**
+	 * Group code.
+	 */
+	private String groupCode;
 
-    /**
-     * Group level.
-     */
-    private Byte groupLevel;
+	/**
+	 * Group level.
+	 */
+	private Byte groupLevel;
 
-    /**
-     * Group index/order.
-     */
-    private Byte groupIndex;
+	/**
+	 * Group index/order.
+	 */
+	private Byte groupIndex;
 
-    /**
-     * Enable status flag.
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable status flag.
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID.
+	 */
+	private Long tenantId;
+
 }

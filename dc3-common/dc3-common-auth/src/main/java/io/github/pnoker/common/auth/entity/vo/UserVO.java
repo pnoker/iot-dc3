@@ -43,55 +43,48 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class UserVO extends BaseVO {
 
-    /**
-     *
-     */
-    @NotBlank(message = "Nick name can't be empty",
-            groups = {Add.class, Auth.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "Invalid nick name",
-            groups = {Add.class, Update.class})
-    private String nickName;
+	/**
+	 *
+	 */
+	@NotBlank(message = "Nick name can't be empty", groups = { Add.class, Auth.class })
+	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+			message = "Invalid nick name", groups = { Add.class, Update.class })
+	private String nickName;
 
-    /**
-     * Name
-     */
-    @NotBlank(message = "User name can't be empty",
-            groups = {Add.class, Auth.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "Invalid user name",
-            groups = {Add.class, Update.class})
-    private String userName;
+	/**
+	 * Name
+	 */
+	@NotBlank(message = "User name can't be empty", groups = { Add.class, Auth.class })
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid user name",
+			groups = { Add.class, Update.class })
+	private String userName;
 
-    /**
-     *
-     */
-    @Pattern(regexp = "^1([3-9])\\d{9}$",
-            message = "Invalid phone",
-            groups = {Add.class, Update.class})
-    private String phone;
+	/**
+	 *
+	 */
+	@Pattern(regexp = "^1([3-9])\\d{9}$", message = "Invalid phone", groups = { Add.class, Update.class })
+	private String phone;
 
-    /**
-     *
-     */
-    @Pattern(regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$",
-            message = "Invalid email",
-            groups = {Add.class, Update.class})
-    private String email;
+	/**
+	 *
+	 */
+	@Pattern(regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$", message = "Invalid email",
+			groups = { Add.class, Update.class })
+	private String email;
 
-    /**
-     *
-     */
-    private UserSocialExt socialExt;
+	/**
+	 *
+	 */
+	private UserSocialExt socialExt;
 
-    /**
-     *
-     */
-    private UserIdentityExt identityExt;
+	/**
+	 *
+	 */
+	private UserIdentityExt identityExt;
 
-    /**
-     * Enable flag, 0:, 1:Disable
-     */
-    private Byte enableFlag;
+	/**
+	 * Enable flag, 0:, 1:Disable
+	 */
+	private Byte enableFlag;
 
 }

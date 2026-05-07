@@ -28,6 +28,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CoverageGapRow {
-    private long pointId;
-    private long profileId;
+
+	private long pointId;
+
+	private long profileId;
+
 }

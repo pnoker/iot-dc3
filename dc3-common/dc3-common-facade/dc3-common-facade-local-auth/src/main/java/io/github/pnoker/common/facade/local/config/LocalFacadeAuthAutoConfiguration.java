@@ -27,41 +27,33 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
 /**
- * Auto-configuration for the auth-domain local facade implementations.
- * Active only when {@code dc3.facade.mode=local}. Scans the facade-local package
- * but restricts registration to the auth-domain classes carried by this module,
- * so the scan stays deterministic even when the manager-domain module is also on
- * the classpath. MapStruct-generated {@code *BuilderImpl} classes are picked up
- * via their interfaces (AssignableTypeFilter matches concrete implementations).
+ * Auto-configuration for the auth-domain local facade implementations. Active only when
+ * {@code dc3.facade.mode=local}. Scans the facade-local package but restricts
+ * registration to the auth-domain classes carried by this module, so the scan stays
+ * deterministic even when the manager-domain module is also on the classpath.
+ * MapStruct-generated {@code *BuilderImpl} classes are picked up via their interfaces
+ * (AssignableTypeFilter matches concrete implementations).
  *
  * @author pnoker
  * @since 2026.5.5
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
-@ComponentScan(
-        basePackages = "io.github.pnoker.common.facade.local",
-        useDefaultFilters = false,
-        includeFilters = @ComponentScan.Filter(
-                type = FilterType.ASSIGNABLE_TYPE,
-                classes = {
-                        io.github.pnoker.common.facade.local.TenantLocalFacade.class,
-                        io.github.pnoker.common.facade.local.TokenLocalFacade.class,
-                        io.github.pnoker.common.facade.local.UserLocalFacade.class,
-                        io.github.pnoker.common.facade.local.UserLoginLocalFacade.class,
-                        io.github.pnoker.common.facade.local.ResourceRegistryLocalFacade.class,
-                        FacadeTenantBuilder.class,
-                        FacadeUserBuilder.class,
-                        FacadeUserLoginBuilder.class,
-                }
-        )
-)
+@ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
+		includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+				classes = { io.github.pnoker.common.facade.local.TenantLocalFacade.class,
+						io.github.pnoker.common.facade.local.TokenLocalFacade.class,
+						io.github.pnoker.common.facade.local.UserLocalFacade.class,
+						io.github.pnoker.common.facade.local.UserLoginLocalFacade.class,
+						io.github.pnoker.common.facade.local.ResourceRegistryLocalFacade.class,
+						FacadeTenantBuilder.class, FacadeUserBuilder.class, FacadeUserLoginBuilder.class, }))
 public class LocalFacadeAuthAutoConfiguration {
 
-    /**
-     * Referenced only to ensure the {@link TenantLocalFacade} symbol is linked against this
-     * module's compiled classes at AutoConfiguration load time.
-     */
-    @SuppressWarnings("unused")
-    private static final Class<?> CANARY = TenantLocalFacade.class;
+	/**
+	 * Referenced only to ensure the {@link TenantLocalFacade} symbol is linked against
+	 * this module's compiled classes at AutoConfiguration load time.
+	 */
+	@SuppressWarnings("unused")
+	private static final Class<?> CANARY = TenantLocalFacade.class;
+
 }

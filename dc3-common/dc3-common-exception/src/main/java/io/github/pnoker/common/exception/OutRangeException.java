@@ -20,22 +20,22 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class OutRangeException extends RuntimeException {
-    public OutRangeException() {
-        this(null);
-    }
 
-    public OutRangeException(Throwable cause) {
-        super(cause);
-    }
+	public OutRangeException() {
+		this(null);
+	}
 
-    public OutRangeException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public OutRangeException(Throwable cause) {
+		super(cause);
+	}
+
+	public OutRangeException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

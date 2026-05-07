@@ -20,30 +20,34 @@ import com.serotonin.modbus4j.code.FunctionCode;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 
 /**
- * <p>ReadCoilsResponse class.</p>
+ * <p>
+ * ReadCoilsResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ReadCoilsResponse extends ReadResponse {
-    ReadCoilsResponse(int slaveId, byte[] data) throws ModbusTransportException {
-        super(slaveId, data);
-    }
 
-    ReadCoilsResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	ReadCoilsResponse(int slaveId, byte[] data) throws ModbusTransportException {
+		super(slaveId, data);
+	}
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.READ_COILS;
-    }
+	ReadCoilsResponse(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    public String toString() {
-        return "ReadCoilsResponse [exceptionCode=" + exceptionCode + ", slaveId=" + slaveId + ", getFunctionCode()="
-                + getFunctionCode() + ", isException()=" + isException() + ", getExceptionMessage()="
-                + getExceptionMessage() + ", getExceptionCode()=" + getExceptionCode() + ", toString()="
-                + super.toString(false) + "]";
-    }
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.READ_COILS;
+	}
+
+	@Override
+	public String toString() {
+		return "ReadCoilsResponse [exceptionCode=" + exceptionCode + ", slaveId=" + slaveId + ", getFunctionCode()="
+				+ getFunctionCode() + ", isException()=" + isException() + ", getExceptionMessage()="
+				+ getExceptionMessage() + ", getExceptionCode()=" + getExceptionCode() + ", toString()="
+				+ super.toString(false) + "]";
+	}
+
 }

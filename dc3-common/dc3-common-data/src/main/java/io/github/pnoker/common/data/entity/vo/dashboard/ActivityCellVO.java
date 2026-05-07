@@ -26,8 +26,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * One cell of the day-of-week × hour-of-day activity heatmap.
- * {@code dow} is 0=Sunday..6=Saturday; {@code hour} is 0..23.
+ * One cell of the day-of-week × hour-of-day activity heatmap. {@code dow} is
+ * 0=Sunday..6=Saturday; {@code hour} is 0..23.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -38,12 +38,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ActivityCellVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private int dow;
+	private int dow;
 
-    private int hour;
+	private int hour;
 
-    private long count;
+	private long count;
+
 }

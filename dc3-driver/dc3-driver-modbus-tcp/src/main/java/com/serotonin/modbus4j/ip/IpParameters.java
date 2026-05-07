@@ -19,89 +19,101 @@ package com.serotonin.modbus4j.ip;
 import com.serotonin.modbus4j.base.ModbusUtils;
 
 /**
- * <p>IpParameters class.</p>
+ * <p>
+ * IpParameters class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class IpParameters {
-    private String host;
-    private int port = ModbusUtils.TCP_PORT;
-    private boolean encapsulated;
-    private Integer lingerTime = -1;
 
+	private String host;
 
-    /**
-     * <p>Getter for the field <code>host</code>.</p>
-     *
-     * @return a {@link String} object.
-     */
-    public String getHost() {
-        return host;
-    }
+	private int port = ModbusUtils.TCP_PORT;
 
-    /**
-     * <p>Setter for the field <code>host</code>.</p>
-     *
-     * @param host a {@link String} object.
-     */
-    public void setHost(String host) {
-        this.host = host;
-    }
+	private boolean encapsulated;
 
-    /**
-     * <p>Getter for the field <code>port</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getPort() {
-        return port;
-    }
+	private Integer lingerTime = -1;
 
-    /**
-     * <p>Setter for the field <code>port</code>.</p>
-     *
-     * @param port a int.
-     */
-    public void setPort(int port) {
-        this.port = port;
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>host</code>.
+	 * </p>
+	 * @return a {@link String} object.
+	 */
+	public String getHost() {
+		return host;
+	}
 
-    /**
-     * <p>isEncapsulated.</p>
-     *
-     * @return a boolean.
-     */
-    public boolean isEncapsulated() {
-        return encapsulated;
-    }
+	/**
+	 * <p>
+	 * Setter for the field <code>host</code>.
+	 * </p>
+	 * @param host a {@link String} object.
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
 
-    /**
-     * <p>Setter for the field <code>encapsulated</code>.</p>
-     *
-     * @param encapsulated a boolean.
-     */
-    public void setEncapsulated(boolean encapsulated) {
-        this.encapsulated = encapsulated;
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>port</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getPort() {
+		return port;
+	}
 
-    /**
-     * <p>Getter for the field <code>linger</code>.</p>
-     *
-     * @return a int.
-     */
-    public Integer getLingerTime() {
-        return lingerTime;
-    }
+	/**
+	 * <p>
+	 * Setter for the field <code>port</code>.
+	 * </p>
+	 * @param port a int.
+	 */
+	public void setPort(int port) {
+		this.port = port;
+	}
 
-    /**
-     * <p>Setter for the field <code>linger</code>.</p>
-     *
-     * @param lingerTime a int.
-     */
-    public void setLingerTime(Integer lingerTime) {
-        this.lingerTime = lingerTime;
-    }
+	/**
+	 * <p>
+	 * isEncapsulated.
+	 * </p>
+	 * @return a boolean.
+	 */
+	public boolean isEncapsulated() {
+		return encapsulated;
+	}
 
+	/**
+	 * <p>
+	 * Setter for the field <code>encapsulated</code>.
+	 * </p>
+	 * @param encapsulated a boolean.
+	 */
+	public void setEncapsulated(boolean encapsulated) {
+		this.encapsulated = encapsulated;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>linger</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public Integer getLingerTime() {
+		return lingerTime;
+	}
+
+	/**
+	 * <p>
+	 * Setter for the field <code>linger</code>.
+	 * </p>
+	 * @param lingerTime a int.
+	 */
+	public void setLingerTime(Integer lingerTime) {
+		this.lingerTime = lingerTime;
+	}
 
 }

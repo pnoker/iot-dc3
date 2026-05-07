@@ -30,11 +30,11 @@ import io.github.pnoker.common.base.service.BaseService;
  */
 public interface TenantService extends BaseService<TenantBO, TenantQuery> {
 
-    /**
-     * TenantCodeTenant
-     *
-     * @param code TenantCode
-     * @return {@link TenantBO}
-     */
-    TenantBO selectByCode(String code);
+	/**
+	 * TenantCodeTenant
+	 * @param code TenantCode
+	 * @return {@link TenantBO}
+	 */
+	TenantBO selectByCode(String code);
+
 }
