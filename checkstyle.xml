@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+	"-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+	"https://checkstyle.org/dtds/configuration_1_3.dtd">
+<module name="com.puppycrawl.tools.checkstyle.Checker">
+
+	<!-- Exclude third-party and generated code -->
+	<module name="BeforeExecutionExclusionFileFilter">
+		<property name="fileNamePattern" value="[/\\](com[/\\]serotonin|org[/\\]openscada|io[/\\]github[/\\]pnoker[/\\]driver[/\\]api[/\\]impl[/\\]nodave)[/\\]" />
+	</module>
+
+	<module name="NewlineAtEndOfFileCheck" />
+
+	<module name="com.puppycrawl.tools.checkstyle.TreeWalker">
+
+		<!-- Block Checks -->
+		<module name="EmptyBlockCheck">
+			<property name="option" value="text" />
+		</module>
+		<module name="LeftCurlyCheck" />
+		<module name="RightCurlyCheck">
+			<property name="option" value="alone" />
+		</module>
+		<!-- NeedBracesCheck excluded — too many existing single-line if/for without braces, fix incrementally -->
+
+		<!-- Coding -->
+		<module name="CovariantEqualsCheck" />
+		<module name="EmptyStatementCheck" />
+		<module name="EqualsHashCodeCheck" />
+		<module name="InnerAssignmentCheck" />
+		<module name="SimplifyBooleanExpressionCheck" />
+		<module name="SimplifyBooleanReturnCheck" />
+		<module name="StringLiteralEqualityCheck" />
+		<module name="MultipleVariableDeclarationsCheck" />
+		<module name="OneStatementPerLineCheck" />
+
+		<!-- Imports (AvoidStarImportCheck excluded — too many existing star imports, fix incrementally) -->
+		<module name="RedundantImportCheck" />
+		<module name="UnusedImportsCheck">
+			<property name="processJavadoc" value="true" />
+		</module>
+
+		<!-- Miscellaneous -->
+		<module name="UpperEllCheck" />
+		<module name="ArrayTypeStyleCheck" />
+		<module name="OuterTypeFilenameCheck" />
+
+		<!-- Modifiers -->
+		<module name="RedundantModifierCheck" />
+		<module name="ModifierOrderCheck" />
+
+		<!-- Regexp -->
+		<module name="RegexpCheck">
+			<property name="format" value="[ \t]+$" />
+			<property name="illegalPattern" value="true" />
+			<property name="message" value="Trailing whitespace" />
+		</module>
+
+		<!-- Whitespace -->
+		<module name="GenericWhitespaceCheck" />
+		<module name="WhitespaceAfterCheck" />
+		<module name="WhitespaceAroundCheck" />
+
+	</module>
+</module>
