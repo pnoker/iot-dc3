@@ -65,19 +65,19 @@
 
     <dependencies>
 
-        <!-- Caffeine Cache -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-        </dependency>
-
-        <!-- Spring gRPC Starter (client + server) -->
+        <!-- gRPC Related -->
         <dependency>
             <groupId>org.springframework.grpc</groupId>
             <artifactId>spring-grpc-spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- DC3 Api Related -->
+        <!-- Utility Libraries -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
+        <!-- DC3 API Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-driver</artifactId>

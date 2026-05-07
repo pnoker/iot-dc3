@@ -98,7 +98,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring AI BOM -->
+            <!-- AI Related -->
             <dependency>
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
@@ -107,7 +107,7 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- DC3 Api Related -->
+            <!-- DC3 API Related -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-api-auth</artifactId>
@@ -130,6 +130,11 @@
             </dependency>
 
             <!-- DC3 Common Related -->
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-agentic</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-api</artifactId>
@@ -259,11 +264,6 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-web</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-agentic</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
         </dependencies>
