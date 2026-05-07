@@ -17,27 +17,34 @@
 package com.serotonin.modbus4j.exception;
 
 /**
- * <p>IllegalDataAddressException class.</p>
+ * <p>
+ * IllegalDataAddressException class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class IllegalDataAddressException extends ModbusTransportException {
-    private static final long serialVersionUID = -1;
 
-    /**
-     * <p>Constructor for IllegalDataAddressException.</p>
-     */
-    public IllegalDataAddressException() {
-        super();
-    }
+	private static final long serialVersionUID = -1;
 
-    /**
-     * <p>Constructor for IllegalDataAddressException.</p>
-     *
-     * @param slaveId a int.
-     */
-    public IllegalDataAddressException(int slaveId) {
-        super(slaveId);
-    }
+	/**
+	 * <p>
+	 * Constructor for IllegalDataAddressException.
+	 * </p>
+	 */
+	public IllegalDataAddressException() {
+		super();
+	}
+
+	/**
+	 * <p>
+	 * Constructor for IllegalDataAddressException.
+	 * </p>
+	 * @param slaveId a int.
+	 */
+	public IllegalDataAddressException(int slaveId) {
+		super(slaveId);
+	}
+
 }

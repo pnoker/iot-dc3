@@ -37,19 +37,20 @@ import java.util.Optional;
 @Component
 public class FacadeGrpcUserLoginBuilder {
 
-    public FacadeUserLoginBO toFacadeBO(GrpcUserLoginDTO dto) {
-        if (Objects.isNull(dto)) {
-            return null;
-        }
+	public FacadeUserLoginBO toFacadeBO(GrpcUserLoginDTO dto) {
+		if (Objects.isNull(dto)) {
+			return null;
+		}
 
-        FacadeUserLoginBO bo = new FacadeUserLoginBO();
-        GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
+		FacadeUserLoginBO bo = new FacadeUserLoginBO();
+		GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
 
-        StringOptional.ofNullable(dto.getLoginName()).ifPresent(bo::setLoginName);
-        LongOptional.ofNullable(dto.getUserId()).ifPresent(bo::setUserId);
-        LongOptional.ofNullable(dto.getUserPasswordId()).ifPresent(bo::setUserPasswordId);
-        Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
+		StringOptional.ofNullable(dto.getLoginName()).ifPresent(bo::setLoginName);
+		LongOptional.ofNullable(dto.getUserId()).ifPresent(bo::setUserId);
+		LongOptional.ofNullable(dto.getUserPasswordId()).ifPresent(bo::setUserPasswordId);
+		Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
 
-        return bo;
-    }
+		return bo;
+	}
+
 }

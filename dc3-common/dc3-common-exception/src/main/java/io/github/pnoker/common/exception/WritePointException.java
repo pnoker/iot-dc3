@@ -20,22 +20,22 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class WritePointException extends RuntimeException {
-    public WritePointException() {
-        this(null);
-    }
 
-    public WritePointException(Throwable cause) {
-        super(cause);
-    }
+	public WritePointException() {
+		this(null);
+	}
 
-    public WritePointException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public WritePointException(Throwable cause) {
+		super(cause);
+	}
+
+	public WritePointException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

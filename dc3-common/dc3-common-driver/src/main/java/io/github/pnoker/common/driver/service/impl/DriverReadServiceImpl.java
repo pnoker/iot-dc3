@@ -38,71 +38,76 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Default {@link DriverReadService} implementation that resolves metadata, delegates the actual read
- * operation to the custom driver, and publishes the resulting point value.
+ * Default {@link DriverReadService} implementation that resolves metadata, delegates the
+ * actual read operation to the custom driver, and publishes the resulting point value.
  */
 @Slf4j
 @Service
 public class DriverReadServiceImpl implements DriverReadService {
 
-    @Resource
-    private DeviceMetadata deviceMetadata;
-    @Resource
-    private PointMetadata pointMetadata;
-    @Resource
-    private DriverSenderService driverSenderService;
-    @Resource
-    private DriverCustomService driverCustomService;
+	@Resource
+	private DeviceMetadata deviceMetadata;
 
-    @Override
-    public void read(Long deviceId, Long pointId) {
-        // Get device from metadata cache
-        DeviceBO device = deviceMetadata.getCache(deviceId);
-        if (Objects.isNull(device)) {
-            throw new ReadPointException("Failed to read point value, device[{}] is null", deviceId);
-        }
+	@Resource
+	private PointMetadata pointMetadata;
 
-        // Check if device contains the specified point
-        if (!device.getPointIds().contains(pointId)) {
-            throw new ReadPointException("Failed to read point value, device[{}] not contained point[{}]", deviceId, pointId);
-        }
+	@Resource
+	private DriverSenderService driverSenderService;
 
-        // Get driver and point configurations
-        Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
-        Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
+	@Resource
+	private DriverCustomService driverCustomService;
 
-        // Get point from metadata cache
-        PointBO point = pointMetadata.getCache(pointId);
-        if (Objects.isNull(point)) {
-            throw new ReadPointException("Failed to read point value, point[{}] is null" + deviceId);
-        }
+	@Override
+	public void read(Long deviceId, Long pointId) {
+		// Get device from metadata cache
+		DeviceBO device = deviceMetadata.getCache(deviceId);
+		if (Objects.isNull(device)) {
+			throw new ReadPointException("Failed to read point value, device[{}] is null", deviceId);
+		}
 
-        // Read point value using custom driver service
-        RValue rValue = driverCustomService.read(driverConfig, pointConfig, device, point);
-        if (Objects.isNull(rValue)) {
-            throw new ReadPointException("Failed to read point value, point value is null");
-        }
+		// Check if device contains the specified point
+		if (!device.getPointIds().contains(pointId)) {
+			throw new ReadPointException("Failed to read point value, device[{}] not contained point[{}]", deviceId,
+					pointId);
+		}
 
-        // Send point value to message queue
-        driverSenderService.pointValueSender(new PointValue(rValue));
-    }
+		// Get driver and point configurations
+		Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
+		Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
 
-    @Override
-    public void read(DeviceCommandDTO commandDTO) {
-        // Parse device read command from command DTO
-        // Deserialize the command content into DeviceRead object
-        DeviceCommandDTO.DeviceRead deviceRead = JsonUtil.parseObject(commandDTO.getContent(), DeviceCommandDTO.DeviceRead.class);
-        if (Objects.isNull(deviceRead)) {
-            return;
-        }
+		// Get point from metadata cache
+		PointBO point = pointMetadata.getCache(pointId);
+		if (Objects.isNull(point)) {
+			throw new ReadPointException("Failed to read point value, point[{}] is null" + deviceId);
+		}
 
-        // Execute read command and log the process
-        // Log the start of command execution with command details
-        log.info("Start command of read: {}", JsonUtil.toJsonString(commandDTO));
-        // Call the read method with device and point IDs
-        read(deviceRead.getDeviceId(), deviceRead.getPointId());
-        // Log the completion of command execution
-        log.info("End command of read");
-    }
+		// Read point value using custom driver service
+		RValue rValue = driverCustomService.read(driverConfig, pointConfig, device, point);
+		if (Objects.isNull(rValue)) {
+			throw new ReadPointException("Failed to read point value, point value is null");
+		}
+
+		// Send point value to message queue
+		driverSenderService.pointValueSender(new PointValue(rValue));
+	}
+
+	@Override
+	public void read(DeviceCommandDTO commandDTO) {
+		// Parse device read command from command DTO
+		// Deserialize the command content into DeviceRead object
+		DeviceCommandDTO.DeviceRead deviceRead = JsonUtil.parseObject(commandDTO.getContent(),
+				DeviceCommandDTO.DeviceRead.class);
+		if (Objects.isNull(deviceRead)) {
+			return;
+		}
+
+		// Execute read command and log the process
+		// Log the start of command execution with command details
+		log.info("Start command of read: {}", JsonUtil.toJsonString(commandDTO));
+		// Call the read method with device and point IDs
+		read(deviceRead.getDeviceId(), deviceRead.getPointId());
+		// Log the completion of command execution
+		log.info("End command of read");
+	}
 
 }

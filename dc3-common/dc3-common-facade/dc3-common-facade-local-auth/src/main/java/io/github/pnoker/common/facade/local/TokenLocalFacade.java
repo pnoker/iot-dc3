@@ -37,12 +37,13 @@ import java.util.Objects;
 @Component
 public class TokenLocalFacade implements TokenFacade {
 
-    @Resource
-    private TokenService tokenService;
+	@Resource
+	private TokenService tokenService;
 
-    @Override
-    public boolean checkValid(String tenant, String name, String salt, String token) {
-        TokenValid entity = tokenService.checkValid(name, salt, token, tenant);
-        return Objects.nonNull(entity) && entity.isValid();
-    }
+	@Override
+	public boolean checkValid(String tenant, String name, String salt, String token) {
+		TokenValid entity = tokenService.checkValid(name, salt, token, tenant);
+		return Objects.nonNull(entity) && entity.isValid();
+	}
+
 }

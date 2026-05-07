@@ -35,121 +35,99 @@ import java.util.Set;
  */
 public interface PointService extends BaseService<PointBO, PointQuery> {
 
-    /**
-     * ID
-     *
-     * @param profileId Point ID
-     * @return Point
-     */
-    List<PointBO> selectByProfileId(Long profileId);
+	/**
+	 * ID
+	 * @param profileId Point ID
+	 * @return Point
+	 */
+	List<PointBO> selectByProfileId(Long profileId);
 
-    /**
-     * Device ID
-     *
-     * @param deviceId Device ID
-     * @return Point
-     */
-    List<PointBO> selectByDeviceId(Long deviceId);
+	/**
+	 * Device ID
+	 * @param deviceId Device ID
+	 * @return Point
+	 */
+	List<PointBO> selectByDeviceId(Long deviceId);
 
-    /**
-     * ID
-     *
-     * @param profileIds ID
-     * @return Point
-     */
-    List<PointBO> selectByProfileIds(List<Long> profileIds);
+	/**
+	 * ID
+	 * @param profileIds ID
+	 * @return Point
+	 */
+	List<PointBO> selectByProfileIds(List<Long> profileIds);
 
-    /**
-     * Device ID
-     *
-     * @param ids Point ID
-     * @return Point
-     */
-    List<PointBO> selectByIds(Set<Long> ids);
+	/**
+	 * Device ID
+	 * @param ids Point ID
+	 * @return Point
+	 */
+	List<PointBO> selectByIds(Set<Long> ids);
 
-    /**
-     *
-     *
-     * @param pointIds Point ID
-     * @return Map Long:Unit String
-     */
-    Map<Long, String> unit(Set<Long> pointIds);
+	/**
+	 * @param pointIds Point ID
+	 * @return Map Long:Unit String
+	 */
+	Map<Long, String> unit(Set<Long> pointIds);
 
-    /**
-     *
-     *
-     *
-     * @param pointId id
-     * @return {@link Set}<{@link Long}>
-     */
-    DeviceByPointBO selectPointStatisticsWithDevice(Long pointId);
+	/**
+	 * @param pointId id
+	 * @return {@link Set}<{@link Long}>
+	 */
+	DeviceByPointBO selectPointStatisticsWithDevice(Long pointId);
 
-    /**
-     *
-     * id
-     *
-     * @param pointId   id
-     * @param deviceIds id
-     * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
-     */
-    List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
+	/**
+	 *
+	 * id
+	 * @param pointId id
+	 * @param deviceIds id
+	 * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
+	 */
+	List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
 
+	/**
+	 *
+	 * id
+	 * @param pointId id
+	 * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
+	 */
+	PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId);
 
-    /**
-     *
-     * id
-     *
-     * @param pointId id
-     * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
-     */
-    PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId);
+	/**
+	 * @param deviceId
+	 * @return
+	 */
+	Long selectPointByDeviceId(Long deviceId);
 
-    /**
-     *
-     *
-     * @param deviceId
-     * @return
-     */
-    Long selectPointByDeviceId(Long deviceId);
+	/**
+	 * @param deviceId
+	 * @return
+	 */
+	PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId);
 
-    /**
-     *
-     *
-     * @param deviceId
-     * @return
-     */
-    PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId);
+	/**
+	 * @param deviceId
+	 * @param pointIds
+	 * @return
+	 */
+	List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds);
 
-    /**
-     *
-     *
-     * @param deviceId
-     * @param pointIds
-     * @return
-     */
-    List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds);
+	/**
+	 * @param driverId
+	 * @return
+	 */
+	PointDataVolumeRunDO selectPointDataByDriverId(Long driverId);
 
-    /**
-     *
-     *
-     * @param driverId
-     * @return
-     */
-    PointDataVolumeRunDO selectPointDataByDriverId(Long driverId);
+	/**
+	 * @param driverId
+	 * @return
+	 */
+	Long selectPointByDriverId(Long driverId);
 
-    /**
-     *
-     *
-     * @param driverId
-     * @return
-     */
-    Long selectPointByDriverId(Long driverId);
+	/**
+	 * 7 days
+	 * @param driverId
+	 * @return
+	 */
+	PointDataStatisticsByDriverIdBO selectPointDataStatisticsByDriverId(Long driverId);
 
-    /**
-     * 7 days
-     *
-     * @param driverId
-     * @return
-     */
-    PointDataStatisticsByDriverIdBO selectPointDataStatisticsByDriverId(Long driverId);
 }

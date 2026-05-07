@@ -40,22 +40,23 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class FacadeDeviceQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    private Long tenantId;
+	private Long tenantId;
 
-    private String deviceName;
+	private String deviceName;
 
-    private String deviceCode;
+	private String deviceCode;
 
-    private Long driverId;
+	private Long driverId;
 
-    private EnableFlagEnum enableFlag;
+	private EnableFlagEnum enableFlag;
 
-    private Integer version;
+	private Integer version;
 
-    private Long profileId;
+	private Long profileId;
+
 }

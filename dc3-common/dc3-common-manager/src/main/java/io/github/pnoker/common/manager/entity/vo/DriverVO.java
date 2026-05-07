@@ -43,63 +43,58 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DriverVO extends BaseVO {
 
-    /**
-     * Name
-     */
-    @NotBlank(message = "驱动名称不能为空",
-            groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "驱动名称格式无效",
-            groups = {Add.class, Update.class})
-    private String driverName;
+	/**
+	 * Name
+	 */
+	@NotBlank(message = "驱动名称不能为空", groups = { Add.class })
+	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "驱动名称格式无效",
+			groups = { Add.class, Update.class })
+	private String driverName;
 
-    /**
-     * Driver ID
-     */
-    private String driverCode;
+	/**
+	 * Driver ID
+	 */
+	private String driverCode;
 
-    /**
-     * Driver service name
-     */
-    @NotBlank(message = "服务名称不能为空",
-            groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$",
-            message = "服务名称格式无效",
-            groups = {Add.class, Update.class})
-    private String serviceName;
+	/**
+	 * Driver service name
+	 */
+	@NotBlank(message = "服务名称不能为空", groups = { Add.class })
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$", message = "服务名称格式无效",
+			groups = { Add.class, Update.class })
+	private String serviceName;
 
-    /**
-     *
-     */
-    @NotBlank(message = "服务主机不能为空",
-            groups = {Add.class})
-    @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
-            message = "服务主机格式无效",
-            groups = {Add.class, Update.class})
-    private String serviceHost;
+	/**
+	 *
+	 */
+	@NotBlank(message = "服务主机不能为空", groups = { Add.class })
+	@Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
+			message = "服务主机格式无效", groups = { Add.class, Update.class })
+	private String serviceHost;
 
-    /**
-     * Type
-     */
-    private DriverTypeFlagEnum driverTypeFlag;
+	/**
+	 * Type
+	 */
+	private DriverTypeFlagEnum driverTypeFlag;
 
-    /**
-     *
-     */
-    private DriverExt driverExt;
+	/**
+	 *
+	 */
+	private DriverExt driverExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     *
-     */
-    private String signature;
+	/**
+	 *
+	 */
+	private String signature;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
+
 }

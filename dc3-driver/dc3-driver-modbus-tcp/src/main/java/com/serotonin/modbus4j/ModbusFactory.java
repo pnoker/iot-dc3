@@ -34,151 +34,166 @@ import com.serotonin.modbus4j.serial.rtu.RtuMaster;
 import com.serotonin.modbus4j.serial.rtu.RtuSlave;
 
 /**
- * <p>ModbusFactory class.</p>
+ * <p>
+ * ModbusFactory class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ModbusFactory {
-    //
-    // Modbus masters
-    //
 
-    /**
-     * <p>createRtuMaster.</p>
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
-     * @return a {@link ModbusMaster} object.
-     */
-    public ModbusMaster createRtuMaster(SerialPortWrapper wrapper) {
-        return new RtuMaster(wrapper);
-    }
+	//
+	// Modbus masters
+	//
 
-    /**
-     * <p>createAsciiMaster.</p>
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
-     * @return a {@link ModbusMaster} object.
-     */
-    public ModbusMaster createAsciiMaster(SerialPortWrapper wrapper) {
-        return new AsciiMaster(wrapper);
-    }
+	/**
+	 * <p>
+	 * createRtuMaster.
+	 * </p>
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 * @return a {@link ModbusMaster} object.
+	 */
+	public ModbusMaster createRtuMaster(SerialPortWrapper wrapper) {
+		return new RtuMaster(wrapper);
+	}
 
-    /**
-     * <p>createTcpMaster.</p>
-     *
-     * @param params    a {@link IpParameters} object.
-     * @param keepAlive a boolean.
-     * @return a {@link ModbusMaster} object.
-     */
-    public ModbusMaster createTcpMaster(IpParameters params, boolean keepAlive) {
-        return new TcpMaster(params, keepAlive);
-    }
+	/**
+	 * <p>
+	 * createAsciiMaster.
+	 * </p>
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 * @return a {@link ModbusMaster} object.
+	 */
+	public ModbusMaster createAsciiMaster(SerialPortWrapper wrapper) {
+		return new AsciiMaster(wrapper);
+	}
 
-    /**
-     * <p>createTcpMaster.</p>
-     *
-     * @param params     a {@link IpParameters} object.
-     * @param keepAlive  a boolean.
-     * @param lingerTime an Integer.
-     * @return a {@link ModbusMaster} object.
-     */
-    public ModbusMaster createTcpMaster(IpParameters params, boolean keepAlive, Integer lingerTime) {
-        return new TcpMaster(params, keepAlive, lingerTime);
-    }
+	/**
+	 * <p>
+	 * createTcpMaster.
+	 * </p>
+	 * @param params a {@link IpParameters} object.
+	 * @param keepAlive a boolean.
+	 * @return a {@link ModbusMaster} object.
+	 */
+	public ModbusMaster createTcpMaster(IpParameters params, boolean keepAlive) {
+		return new TcpMaster(params, keepAlive);
+	}
 
-    /**
-     * <p>createUdpMaster.</p>
-     *
-     * @param params a {@link IpParameters} object.
-     * @return a {@link ModbusMaster} object.
-     */
-    public ModbusMaster createUdpMaster(IpParameters params) {
-        return new UdpMaster(params);
-    }
+	/**
+	 * <p>
+	 * createTcpMaster.
+	 * </p>
+	 * @param params a {@link IpParameters} object.
+	 * @param keepAlive a boolean.
+	 * @param lingerTime an Integer.
+	 * @return a {@link ModbusMaster} object.
+	 */
+	public ModbusMaster createTcpMaster(IpParameters params, boolean keepAlive, Integer lingerTime) {
+		return new TcpMaster(params, keepAlive, lingerTime);
+	}
 
-    /**
-     * <p>createTcpListener.</p>
-     *
-     * @param params a {@link IpParameters} object.
-     * @return a {@link ModbusMaster} object.
-     */
-    public ModbusMaster createTcpListener(IpParameters params) {
-        return new TcpListener(params);
-    }
+	/**
+	 * <p>
+	 * createUdpMaster.
+	 * </p>
+	 * @param params a {@link IpParameters} object.
+	 * @return a {@link ModbusMaster} object.
+	 */
+	public ModbusMaster createUdpMaster(IpParameters params) {
+		return new UdpMaster(params);
+	}
 
-    //
-    // Modbus slaves
-    //
+	/**
+	 * <p>
+	 * createTcpListener.
+	 * </p>
+	 * @param params a {@link IpParameters} object.
+	 * @return a {@link ModbusMaster} object.
+	 */
+	public ModbusMaster createTcpListener(IpParameters params) {
+		return new TcpListener(params);
+	}
 
-    /**
-     * <p>createRtuSlave.</p>
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
-     * @return a {@link ModbusSlaveSet} object.
-     */
-    public ModbusSlaveSet createRtuSlave(SerialPortWrapper wrapper) {
-        return new RtuSlave(wrapper);
-    }
+	//
+	// Modbus slaves
+	//
 
-    /**
-     * <p>createAsciiSlave.</p>
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
-     * @return a {@link ModbusSlaveSet} object.
-     */
-    public ModbusSlaveSet createAsciiSlave(SerialPortWrapper wrapper) {
-        return new AsciiSlave(wrapper);
-    }
+	/**
+	 * <p>
+	 * createRtuSlave.
+	 * </p>
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 * @return a {@link ModbusSlaveSet} object.
+	 */
+	public ModbusSlaveSet createRtuSlave(SerialPortWrapper wrapper) {
+		return new RtuSlave(wrapper);
+	}
 
-    /**
-     * <p>createTcpSlave.</p>
-     *
-     * @param encapsulated a boolean.
-     * @return a {@link ModbusSlaveSet} object.
-     */
-    public ModbusSlaveSet createTcpSlave(boolean encapsulated) {
-        return new TcpSlave(encapsulated);
-    }
+	/**
+	 * <p>
+	 * createAsciiSlave.
+	 * </p>
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 * @return a {@link ModbusSlaveSet} object.
+	 */
+	public ModbusSlaveSet createAsciiSlave(SerialPortWrapper wrapper) {
+		return new AsciiSlave(wrapper);
+	}
 
-    /**
-     * <p>createUdpSlave.</p>
-     *
-     * @param encapsulated a boolean.
-     * @return a {@link ModbusSlaveSet} object.
-     */
-    public ModbusSlaveSet createUdpSlave(boolean encapsulated) {
-        return new UdpSlave(encapsulated);
-    }
+	/**
+	 * <p>
+	 * createTcpSlave.
+	 * </p>
+	 * @param encapsulated a boolean.
+	 * @return a {@link ModbusSlaveSet} object.
+	 */
+	public ModbusSlaveSet createTcpSlave(boolean encapsulated) {
+		return new TcpSlave(encapsulated);
+	}
 
-    //
-    // Modbus requests
-    //
+	/**
+	 * <p>
+	 * createUdpSlave.
+	 * </p>
+	 * @param encapsulated a boolean.
+	 * @return a {@link ModbusSlaveSet} object.
+	 */
+	public ModbusSlaveSet createUdpSlave(boolean encapsulated) {
+		return new UdpSlave(encapsulated);
+	}
 
-    /**
-     * <p>createReadRequest.</p>
-     *
-     * @param slaveId a int.
-     * @param range   a int.
-     * @param offset  a int.
-     * @param length  a int.
-     * @return a {@link ModbusRequest} object.
-     * @throws ModbusTransportException if any.
-     * @throws ModbusIdException        if any.
-     */
-    public ModbusRequest createReadRequest(int slaveId, int range, int offset, int length)
-            throws ModbusTransportException, ModbusIdException {
-        ModbusUtils.validateRegisterRange(range);
+	//
+	// Modbus requests
+	//
 
-        if (range == RegisterRange.COIL_STATUS)
-            return new ReadCoilsRequest(slaveId, offset, length);
+	/**
+	 * <p>
+	 * createReadRequest.
+	 * </p>
+	 * @param slaveId a int.
+	 * @param range a int.
+	 * @param offset a int.
+	 * @param length a int.
+	 * @return a {@link ModbusRequest} object.
+	 * @throws ModbusTransportException if any.
+	 * @throws ModbusIdException if any.
+	 */
+	public ModbusRequest createReadRequest(int slaveId, int range, int offset, int length)
+			throws ModbusTransportException, ModbusIdException {
+		ModbusUtils.validateRegisterRange(range);
 
-        if (range == RegisterRange.INPUT_STATUS)
-            return new ReadDiscreteInputsRequest(slaveId, offset, length);
+		if (range == RegisterRange.COIL_STATUS)
+			return new ReadCoilsRequest(slaveId, offset, length);
 
-        if (range == RegisterRange.INPUT_REGISTER)
-            return new ReadInputRegistersRequest(slaveId, offset, length);
+		if (range == RegisterRange.INPUT_STATUS)
+			return new ReadDiscreteInputsRequest(slaveId, offset, length);
 
-        return new ReadHoldingRegistersRequest(slaveId, offset, length);
-    }
+		if (range == RegisterRange.INPUT_REGISTER)
+			return new ReadInputRegistersRequest(slaveId, offset, length);
+
+		return new ReadHoldingRegistersRequest(slaveId, offset, length);
+	}
+
 }

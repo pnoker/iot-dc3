@@ -25,9 +25,8 @@ import java.util.function.Consumer;
 /**
  * Custom JSON Optional Class
  * <p>
- * Optional wrapper class for JSON string operations.
- * Provides utility methods for parsing and validation
- * with null safety and empty checks.
+ * Optional wrapper class for JSON string operations. Provides utility methods for parsing
+ * and validation with null safety and empty checks.
  * </p>
  *
  * @author pnoker
@@ -36,27 +35,29 @@ import java.util.function.Consumer;
  */
 public final class JsonOptional {
 
-    private final String value;
+	private final String value;
 
-    private JsonOptional(String value) {
-        this.value = value;
-    }
+	private JsonOptional(String value) {
+		this.value = value;
+	}
 
-    public static JsonOptional ofNullable(String value) {
-        return new JsonOptional(value);
-    }
+	public static JsonOptional ofNullable(String value) {
+		return new JsonOptional(value);
+	}
 
-    public void ifPresent(Consumer<String> action) {
-        if (StringUtils.isNotEmpty(value) && JsonUtil.isJson(value)) {
-            action.accept(value);
-        }
-    }
+	public void ifPresent(Consumer<String> action) {
+		if (StringUtils.isNotEmpty(value) && JsonUtil.isJson(value)) {
+			action.accept(value);
+		}
+	}
 
-    public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
-        if (StringUtils.isNotEmpty(value) && JsonUtil.isJson(value)) {
-            action.accept(value);
-        } else {
-            emptyAction.run();
-        }
-    }
+	public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
+		if (StringUtils.isNotEmpty(value) && JsonUtil.isJson(value)) {
+			action.accept(value);
+		}
+		else {
+			emptyAction.run();
+		}
+	}
+
 }

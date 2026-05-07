@@ -32,8 +32,8 @@ import java.nio.file.Path;
 /**
  * HTTP Response Utility Class
  * <p>
- * Utility class for handling HTTP response operations.
- * Provides methods to create file download responses with proper headers and error handling.
+ * Utility class for handling HTTP response operations. Provides methods to create file
+ * download responses with proper headers and error handling.
  * </p>
  *
  * @author pnoker
@@ -43,34 +43,32 @@ import java.nio.file.Path;
 @Slf4j
 public class ResponseUtil {
 
-    private ResponseUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private ResponseUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Create file download response
-     *
-     * @param path File path to download
-     * @return ResponseEntity containing the file resource with proper headers
-     */
-    public static ResponseEntity<Resource> responseFile(Path path) {
-        try {
-            Resource resource = new UrlResource(path.toUri());
-            if (!resource.exists()) {
-                throw new NotFoundException("File not found: " + path.getFileName());
-            }
+	/**
+	 * Create file download response
+	 * @param path File path to download
+	 * @return ResponseEntity containing the file resource with proper headers
+	 */
+	public static ResponseEntity<Resource> responseFile(Path path) {
+		try {
+			Resource resource = new UrlResource(path.toUri());
+			if (!resource.exists()) {
+				throw new NotFoundException("File not found: " + path.getFileName());
+			}
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+			headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(resource.contentLength())
-                    .body(resource);
-        } catch (Exception e) {
-            log.error("Error occurred while response file: {}, {}", path.getFileName(), e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
+			return ResponseEntity.ok().headers(headers).contentLength(resource.contentLength()).body(resource);
+		}
+		catch (Exception e) {
+			log.error("Error occurred while response file: {}, {}", path.getFileName(), e.getMessage(), e);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
+
 }

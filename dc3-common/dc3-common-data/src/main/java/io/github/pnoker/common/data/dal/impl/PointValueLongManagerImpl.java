@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @since 2022.1.0
  */
 @Service
-public class PointValueLongManagerImpl extends ServiceImpl<PointValueLongMapper, PointValueLongDO> implements PointValueLongManager {
+public class PointValueLongManagerImpl extends ServiceImpl<PointValueLongMapper, PointValueLongDO>
+		implements PointValueLongManager {
 
 }

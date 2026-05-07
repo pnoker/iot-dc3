@@ -20,14 +20,20 @@ package io.github.pnoker.common.utils;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.*;
-import java.util.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Host Utility Class
  * <p>
- * Utility class for host and network operations in IoT DC3 platform.
- * Provides methods for getting IP addresses, hostnames, and network information.
+ * Utility class for host and network operations in IoT DC3 platform. Provides methods for
+ * getting IP addresses, hostnames, and network information.
  * </p>
  *
  * @author pnoker
@@ -37,137 +43,141 @@ import java.util.*;
 @Slf4j
 public class HostUtil {
 
-    private HostUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private HostUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Get the local host address of the current machine.
-     *
-     * @return Local host IP address as String, or {@code null} if unavailable
-     */
-    public static String localHost() {
-        try {
-            InetAddress address = InetAddress.getLocalHost();
-            return address.getHostAddress();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
-    }
+	/**
+	 * Get the local host address of the current machine.
+	 * @return Local host IP address as String, or {@code null} if unavailable
+	 */
+	public static String localHost() {
+		try {
+			InetAddress address = InetAddress.getLocalHost();
+			return address.getHostAddress();
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+		return null;
+	}
 
-    /**
-     * Given an address resolve it to as many unique addresses or hostnames as can be found.
-     *
-     * @param address the address to resolve.
-     * @return the addresses and hostnames that were resolved from {@code address}.
-     */
-    public static Set<String> getHostNames(String address) {
-        return getHostNames(address, true);
-    }
+	/**
+	 * Given an address resolve it to as many unique addresses or hostnames as can be
+	 * found.
+	 * @param address the address to resolve.
+	 * @return the addresses and hostnames that were resolved from {@code address}.
+	 */
+	public static Set<String> getHostNames(String address) {
+		return getHostNames(address, true);
+	}
 
-    /**
-     * Given an address resolve it to as many unique addresses or hostnames as can be found.
-     *
-     * @param address         the address to resolve.
-     * @param includeLoopBack if {@code true} loopback addresses will be included in the returned set.
-     * @return the addresses and hostnames that were resolved from {@code address}.
-     */
-    public static Set<String> getHostNames(String address, boolean includeLoopBack) {
-        Set<String> hostNames = new HashSet<>(4);
+	/**
+	 * Given an address resolve it to as many unique addresses or hostnames as can be
+	 * found.
+	 * @param address the address to resolve.
+	 * @param includeLoopBack if {@code true} loopback addresses will be included in the
+	 * returned set.
+	 * @return the addresses and hostnames that were resolved from {@code address}.
+	 */
+	public static Set<String> getHostNames(String address, boolean includeLoopBack) {
+		Set<String> hostNames = new HashSet<>(4);
 
-        try {
-            InetAddress inetAddress = InetAddress.getByName(address);
+		try {
+			InetAddress inetAddress = InetAddress.getByName(address);
 
-            if (inetAddress.isAnyLocalAddress()) {
-                loopBackAddresses(hostNames, includeLoopBack);
-            } else {
-                boolean loopback = inetAddress.isLoopbackAddress();
+			if (inetAddress.isAnyLocalAddress()) {
+				loopBackAddresses(hostNames, includeLoopBack);
+			}
+			else {
+				boolean loopback = inetAddress.isLoopbackAddress();
 
-                if (!loopback || includeLoopBack) {
-                    hostNames.add(inetAddress.getHostName());
-                    hostNames.add(inetAddress.getHostAddress());
-                    hostNames.add(inetAddress.getCanonicalHostName());
-                }
-            }
-        } catch (UnknownHostException | SocketException e) {
-            log.warn("Failed to get hostname for bind address: {}", address, e);
-        }
+				if (!loopback || includeLoopBack) {
+					hostNames.add(inetAddress.getHostName());
+					hostNames.add(inetAddress.getHostAddress());
+					hostNames.add(inetAddress.getCanonicalHostName());
+				}
+			}
+		}
+		catch (UnknownHostException | SocketException e) {
+			log.warn("Failed to get hostname for bind address: {}", address, e);
+		}
 
-        return hostNames;
-    }
+		return hostNames;
+	}
 
-    /**
-     * Get the list of MAC (physical) addresses of the current machine.
-     *
-     * @return List of MAC addresses
-     */
-    public static List<String> localMacList() {
-        ArrayList<String> macList = new ArrayList<>(16);
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = interfaces.nextElement();
-                lookupLocalMac(macList, networkInterface);
-            }
-            if (!macList.isEmpty()) {
-                return macList.stream().distinct().toList();
-            }
-        } catch (Exception e) {
-            log.warn("Failed to get local mac address");
-        }
-        return macList;
-    }
+	/**
+	 * Get the list of MAC (physical) addresses of the current machine.
+	 * @return List of MAC addresses
+	 */
+	public static List<String> localMacList() {
+		ArrayList<String> macList = new ArrayList<>(16);
+		try {
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			while (interfaces.hasMoreElements()) {
+				NetworkInterface networkInterface = interfaces.nextElement();
+				lookupLocalMac(macList, networkInterface);
+			}
+			if (!macList.isEmpty()) {
+				return macList.stream().distinct().toList();
+			}
+		}
+		catch (Exception e) {
+			log.warn("Failed to get local mac address");
+		}
+		return macList;
+	}
 
-    /**
-     * Get loopback addresses
-     *
-     * @param hostNames       HostName Set
-     * @param includeLoopBack includeLoopBack if {@code true} loopback addresses will be included in the returned set.
-     * @throws SocketException SocketException
-     */
-    private static void loopBackAddresses(Set<String> hostNames, boolean includeLoopBack) throws SocketException {
-        Enumeration<NetworkInterface> interfaceEnumeration = NetworkInterface.getNetworkInterfaces();
+	/**
+	 * Get loopback addresses
+	 * @param hostNames HostName Set
+	 * @param includeLoopBack includeLoopBack if {@code true} loopback addresses will be
+	 * included in the returned set.
+	 * @throws SocketException SocketException
+	 */
+	private static void loopBackAddresses(Set<String> hostNames, boolean includeLoopBack) throws SocketException {
+		Enumeration<NetworkInterface> interfaceEnumeration = NetworkInterface.getNetworkInterfaces();
 
-        for (NetworkInterface networkInterface : Collections.list(interfaceEnumeration)) {
-            Collections.list(networkInterface.getInetAddresses()).forEach(inetAddress -> {
-                if (inetAddress instanceof Inet4Address) {
-                    boolean loopback = inetAddress.isLoopbackAddress();
+		for (NetworkInterface networkInterface : Collections.list(interfaceEnumeration)) {
+			Collections.list(networkInterface.getInetAddresses()).forEach(inetAddress -> {
+				if (inetAddress instanceof Inet4Address) {
+					boolean loopback = inetAddress.isLoopbackAddress();
 
-                    if (!loopback || includeLoopBack) {
-                        hostNames.add(inetAddress.getHostName());
-                        hostNames.add(inetAddress.getHostAddress());
-                        hostNames.add(inetAddress.getCanonicalHostName());
-                    }
-                }
-            });
-        }
-    }
+					if (!loopback || includeLoopBack) {
+						hostNames.add(inetAddress.getHostName());
+						hostNames.add(inetAddress.getHostAddress());
+						hostNames.add(inetAddress.getCanonicalHostName());
+					}
+				}
+			});
+		}
+	}
 
-    /**
-     * Lookup local mac
-     *
-     * @param macList          Mac List
-     * @param networkInterface NetworkInterface
-     * @throws SocketException SocketException
-     */
-    private static void lookupLocalMac(ArrayList<String> macList, NetworkInterface networkInterface) throws SocketException {
-        List<InterfaceAddress> interfaceAddressList = networkInterface.getInterfaceAddresses();
-        for (InterfaceAddress interfaceAddress : interfaceAddressList) {
-            InetAddress inetAddress = interfaceAddress.getAddress();
-            NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
-            if (network == null) {
-                continue;
-            }
+	/**
+	 * Lookup local mac
+	 * @param macList Mac List
+	 * @param networkInterface NetworkInterface
+	 * @throws SocketException SocketException
+	 */
+	private static void lookupLocalMac(ArrayList<String> macList, NetworkInterface networkInterface)
+			throws SocketException {
+		List<InterfaceAddress> interfaceAddressList = networkInterface.getInterfaceAddresses();
+		for (InterfaceAddress interfaceAddress : interfaceAddressList) {
+			InetAddress inetAddress = interfaceAddress.getAddress();
+			NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
+			if (network == null) {
+				continue;
+			}
 
-            byte[] mac = network.getHardwareAddress();
-            if (mac != null) {
-                StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < mac.length; i++) {
-                    stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                }
-                macList.add(stringBuilder.toString());
-            }
-        }
-    }
+			byte[] mac = network.getHardwareAddress();
+			if (mac != null) {
+				StringBuilder stringBuilder = new StringBuilder();
+				for (int i = 0; i < mac.length; i++) {
+					stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+				}
+				macList.add(stringBuilder.toString());
+			}
+		}
+	}
+
 }

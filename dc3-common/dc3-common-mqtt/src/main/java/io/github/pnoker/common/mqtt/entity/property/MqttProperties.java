@@ -30,9 +30,9 @@ import java.util.List;
 /**
  * MQTT Properties Configuration Class
  * <p>
- * Configuration properties for MQTT connections in IoT DC3 platform.
- * Includes authentication settings, topic configurations, SSL certificates,
- * and connection parameters with validation constraints.
+ * Configuration properties for MQTT connections in IoT DC3 platform. Includes
+ * authentication settings, topic configurations, SSL certificates, and connection
+ * parameters with validation constraints.
  * </p>
  *
  * @author pnoker
@@ -44,61 +44,66 @@ import java.util.List;
 @Validated
 @ConfigurationProperties(prefix = "driver.mqtt")
 public class MqttProperties {
-    @NotBlank(message = "Url can't be empty, ssl://host:port")
-    private String url;
 
-    @NotNull(message = "Auth type can't be empty")
-    private AuthTypeEnum authType = AuthTypeEnum.NONE;
+	@NotBlank(message = "Url can't be empty, ssl://host:port")
+	private String url;
 
-    private String username;
-    private String password;
+	@NotNull(message = "Auth type can't be empty")
+	private AuthTypeEnum authType = AuthTypeEnum.NONE;
 
-    private String caCrt = "classpath:/certs/ca.crt";
-    private String clientKeyPass = "dc3-client";
-    private String clientKey = "classpath:/certs/client.key";
-    private String clientCrt = "classpath:/certs/client.crt";
+	private String username;
 
-    @NotBlank(message = "Client name can't be empty")
-    private String client;
+	private String password;
 
-    @NotBlank(message = "Topic prefix name can't be empty")
-    private String topicPrefix;
+	private String caCrt = "classpath:/certs/ca.crt";
 
-    @NotNull(message = "Default topic can't be empty")
-    private Topic defaultSendTopic = new Topic("dc3/d/v/dc3-driver-mqtt_default", 2);
+	private String clientKeyPass = "dc3-client";
 
-    @Size(min = 1, message = "Receive topic at least one topic")
-    private List<Topic> receiveTopics;
+	private String clientKey = "classpath:/certs/client.key";
 
-    @NotNull(message = "Keep alive interval can't be empty")
-    private Integer keepAlive = 15;
+	private String clientCrt = "classpath:/certs/client.crt";
 
-    @NotNull(message = "Completion timeout can't be empty")
-    private Integer completionTimeout = 3000;
+	@NotBlank(message = "Client name can't be empty")
+	private String client;
 
+	@NotBlank(message = "Topic prefix name can't be empty")
+	private String topicPrefix;
 
-    /**
-     * MQTT authentication type enum
-     */
-    @NoArgsConstructor
-    public enum AuthTypeEnum {
-        NONE,
-        CLIENT_ID,
-        USERNAME,
-        X509,
-    }
+	@NotNull(message = "Default topic can't be empty")
+	private Topic defaultSendTopic = new Topic("dc3/d/v/dc3-driver-mqtt_default", 2);
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Topic {
-        @NotBlank(message = "Topic name can't be empty")
-        private String name;
+	@Size(min = 1, message = "Receive topic at least one topic")
+	private List<Topic> receiveTopics;
 
-        @Min(0)
-        @Max(2)
-        private Integer qos;
-    }
+	@NotNull(message = "Keep alive interval can't be empty")
+	private Integer keepAlive = 15;
+
+	@NotNull(message = "Completion timeout can't be empty")
+	private Integer completionTimeout = 3000;
+
+	/**
+	 * MQTT authentication type enum
+	 */
+	@NoArgsConstructor
+	public enum AuthTypeEnum {
+
+		NONE, CLIENT_ID, USERNAME, X509,
+
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Topic {
+
+		@NotBlank(message = "Topic name can't be empty")
+		private String name;
+
+		@Min(0)
+		@Max(2)
+		private Integer qos;
+
+	}
 
 }

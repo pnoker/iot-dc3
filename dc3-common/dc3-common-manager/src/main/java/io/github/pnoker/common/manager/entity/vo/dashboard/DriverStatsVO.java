@@ -37,27 +37,28 @@ import java.util.List;
 @ToString
 public class DriverStatsVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private long total;
+	private long total;
 
-    /**
-     * Counts by enable flag. {@link BucketVO#getKey()} is "ENABLE" or "DISABLE".
-     */
-    private List<BucketVO> byEnable = new ArrayList<>();
+	/**
+	 * Counts by enable flag. {@link BucketVO#getKey()} is "ENABLE" or "DISABLE".
+	 */
+	private List<BucketVO> byEnable = new ArrayList<>();
 
-    /**
-     * Counts by driver_type_flag. Key is the enum name (DRIVER_CLIENT,
-     * DRIVER_SERVER, GATEWAY, CONNECT).
-     */
-    private List<BucketVO> byType = new ArrayList<>();
+	/**
+	 * Counts by driver_type_flag. Key is the enum name (DRIVER_CLIENT, DRIVER_SERVER,
+	 * GATEWAY, CONNECT).
+	 */
+	private List<BucketVO> byType = new ArrayList<>();
 
-    /**
-     * Counts by service_name — the real "protocol breakdown" the home
-     * dashboard exposes. Key is the raw service name (e.g.
-     * {@code dc3-driver-modbus-tcp}, {@code dc3-driver-mqtt}); the frontend
-     * strips the {@code dc3-driver-} prefix before rendering.
-     */
-    private List<BucketVO> byService = new ArrayList<>();
+	/**
+	 * Counts by service_name — the real "protocol breakdown" the home dashboard exposes.
+	 * Key is the raw service name (e.g. {@code dc3-driver-modbus-tcp},
+	 * {@code dc3-driver-mqtt}); the frontend strips the {@code dc3-driver-} prefix before
+	 * rendering.
+	 */
+	private List<BucketVO> byService = new ArrayList<>();
+
 }

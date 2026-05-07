@@ -20,14 +20,15 @@ package io.github.pnoker.common.facade.api;
 /**
  * Protocol-neutral point value command facade.
  * <p>
- * Mirrors the command RPCs on {@code api.center.data.PointValueApi} but returns
- * plain types so callers never have to touch gRPC or protobuf classes.
- * Two implementations back this interface:
+ * Mirrors the command RPCs on {@code api.center.data.PointValueApi} but returns plain
+ * types so callers never have to touch gRPC or protobuf classes. Two implementations back
+ * this interface:
  * <ul>
- *   <li>{@code PointValueCommandLocalFacade} — in-process call into {@code PointValueCommandService},
- *       selected when {@code dc3.facade.mode=local} (single deployment).</li>
- *   <li>{@code PointValueCommandGrpcFacade} — gRPC call against Data Center,
- *       selected when {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
+ * <li>{@code PointValueCommandLocalFacade} — in-process call into
+ * {@code PointValueCommandService}, selected when {@code dc3.facade.mode=local} (single
+ * deployment).</li>
+ * <li>{@code PointValueCommandGrpcFacade} — gRPC call against Data Center, selected when
+ * {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
  * </ul>
  *
  * @author pnoker
@@ -35,17 +36,16 @@ package io.github.pnoker.common.facade.api;
  */
 public interface PointValueCommandFacade {
 
-    /**
-     * Send a read command to a device for a specific point.
-     *
-     * @return {@code true} if the command was accepted.
-     */
-    boolean read(Long deviceId, Long pointId);
+	/**
+	 * Send a read command to a device for a specific point.
+	 * @return {@code true} if the command was accepted.
+	 */
+	boolean read(Long deviceId, Long pointId);
 
-    /**
-     * Send a write command to a device for a specific point.
-     *
-     * @return {@code true} if the command was accepted.
-     */
-    boolean write(Long deviceId, Long pointId, String value);
+	/**
+	 * Send a write command to a device for a specific point.
+	 * @return {@code true} if the command was accepted.
+	 */
+	boolean write(Long deviceId, Long pointId, String value);
+
 }

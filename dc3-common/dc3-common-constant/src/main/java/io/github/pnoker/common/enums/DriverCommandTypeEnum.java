@@ -34,61 +34,64 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum DriverCommandTypeEnum {
-    /**
-     * Driver config command
-     */
-    CONFIG((byte) 0, "config", "Driver config command"),
-    ;
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Driver config command
+	 */
+	CONFIG((byte) 0, "config", "Driver config command"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link DriverCommandTypeEnum}
-     */
-    public static DriverCommandTypeEnum ofIndex(Byte index) {
-        Optional<DriverCommandTypeEnum> any = Arrays.stream(DriverCommandTypeEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link DriverCommandTypeEnum}
-     */
-    public static DriverCommandTypeEnum ofCode(String code) {
-        Optional<DriverCommandTypeEnum> any = Arrays.stream(DriverCommandTypeEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link DriverCommandTypeEnum}
+	 */
+	public static DriverCommandTypeEnum ofIndex(Byte index) {
+		Optional<DriverCommandTypeEnum> any = Arrays.stream(DriverCommandTypeEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link DriverCommandTypeEnum}
-     */
-    public static DriverCommandTypeEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link DriverCommandTypeEnum}
+	 */
+	public static DriverCommandTypeEnum ofCode(String code) {
+		Optional<DriverCommandTypeEnum> any = Arrays.stream(DriverCommandTypeEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link DriverCommandTypeEnum}
+	 */
+	public static DriverCommandTypeEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

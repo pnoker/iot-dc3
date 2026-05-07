@@ -25,9 +25,8 @@ import org.mapstruct.Condition;
 /**
  * MapStruct Utility Class
  * <p>
- * Utility class for MapStruct mapping conditions.
- * Provides conditional mapping methods to handle null values
- * and invalid numbers during object mapping.
+ * Utility class for MapStruct mapping conditions. Provides conditional mapping methods to
+ * handle null values and invalid numbers during object mapping.
  * </p>
  *
  * @author pnoker
@@ -37,22 +36,23 @@ import org.mapstruct.Condition;
 @Slf4j
 public class MapStructUtil {
 
-    private MapStructUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private MapStructUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    @Condition
-    public static boolean isNotEmpty(String value) {
-        return StringUtils.isNotEmpty(value);
-    }
+	@Condition
+	public static boolean isNotEmpty(String value) {
+		return StringUtils.isNotEmpty(value);
+	}
 
-    @Condition
-    public static boolean isValidNumber(Number value) {
-        return switch (value) {
-            case null -> false;
-            case Double d -> !Double.isNaN(d) && !Double.isInfinite(d);
-            case Float f -> !Float.isNaN(f) && !Float.isInfinite(f);
-            default -> true;
-        };
-    }
+	@Condition
+	public static boolean isValidNumber(Number value) {
+		return switch (value) {
+			case null -> false;
+			case Double d -> !Double.isNaN(d) && !Double.isInfinite(d);
+			case Float f -> !Float.isNaN(f) && !Float.isInfinite(f);
+			default -> true;
+		};
+	}
+
 }

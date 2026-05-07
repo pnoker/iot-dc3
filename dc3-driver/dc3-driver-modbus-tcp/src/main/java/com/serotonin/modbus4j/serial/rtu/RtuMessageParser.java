@@ -21,32 +21,36 @@ import com.serotonin.modbus4j.sero.messaging.IncomingMessage;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * Message parser implementation for RTU encoding. Primary reference for the ordering of CRC bytes. Also provides
- * handling of incomplete messages.
+ * Message parser implementation for RTU encoding. Primary reference for the ordering of
+ * CRC bytes. Also provides handling of incomplete messages.
  *
  * @author mlohbihler
  * @version 2025.9.0
  */
 public class RtuMessageParser extends BaseMessageParser {
-    /**
-     * <p>Constructor for RtuMessageParser.</p>
-     *
-     * @param master a boolean.
-     */
-    public RtuMessageParser(boolean master) {
-        super(master);
-    }
 
-    @Override
-    protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception {
-        if (master)
-            return RtuMessageResponse.createRtuMessageResponse(queue);
-        return RtuMessageRequest.createRtuMessageRequest(queue);
-    }
-    //
-    // public static void main(String[] args) throws Exception {
-    // ByteQueue queue = new ByteQueue(new byte[] { 5, 3, 2, 0, (byte) 0xdc, (byte) 0x48, (byte) 0x1d, 0 });
-    // RtuMessageParser p = new RtuMessageParser(false);
-    // System.out.println(p.parseResponse(queue));
-    // }
+	/**
+	 * <p>
+	 * Constructor for RtuMessageParser.
+	 * </p>
+	 * @param master a boolean.
+	 */
+	public RtuMessageParser(boolean master) {
+		super(master);
+	}
+
+	@Override
+	protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception {
+		if (master)
+			return RtuMessageResponse.createRtuMessageResponse(queue);
+		return RtuMessageRequest.createRtuMessageRequest(queue);
+	}
+	//
+	// public static void main(String[] args) throws Exception {
+	// ByteQueue queue = new ByteQueue(new byte[] { 5, 3, 2, 0, (byte) 0xdc, (byte) 0x48,
+	// (byte) 0x1d, 0 });
+	// RtuMessageParser p = new RtuMessageParser(false);
+	// System.out.println(p.parseResponse(queue));
+	// }
+
 }

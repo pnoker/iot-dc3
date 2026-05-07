@@ -40,26 +40,30 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScheduleForDataServiceImpl implements ScheduleForDataService {
 
-    @Value("${data.point.batch.interval}")
-    private Integer interval;
+	@Value("${data.point.batch.interval}")
+	private Integer interval;
 
-    @Resource
-    private QuartzService quartzService;
+	@Resource
+	private QuartzService quartzService;
 
-    /**
-     * Initialize data scheduling
-     */
-    @Override
-    public void initial() {
-        try {
-            quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-point-value-schedule-job", interval, DateBuilder.IntervalUnit.SECOND, PointValueJob.class);
+	/**
+	 * Initialize data scheduling
+	 */
+	@Override
+	public void initial() {
+		try {
+			quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-point-value-schedule-job",
+					interval, DateBuilder.IntervalUnit.SECOND, PointValueJob.class);
 
-            // Custom scheduling
-            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?", HourlyJobForData.class);
+			// Custom scheduling
+			quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?",
+					HourlyJobForData.class);
 
-            quartzService.startScheduler();
-        } catch (SchedulerException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
+			quartzService.startScheduler();
+		}
+		catch (SchedulerException e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
 }

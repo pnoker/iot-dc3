@@ -17,29 +17,35 @@
 package com.serotonin.modbus4j.sero;
 
 /**
- * <p>ShouldNeverHappenException class.</p>
+ * <p>
+ * ShouldNeverHappenException class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ShouldNeverHappenException extends RuntimeException {
-    private static final long serialVersionUID = -1;
 
-    /**
-     * <p>Constructor for ShouldNeverHappenException.</p>
-     *
-     * @param message a {@link String} object.
-     */
-    public ShouldNeverHappenException(String message) {
-        super(message);
-    }
+	private static final long serialVersionUID = -1;
 
-    /**
-     * <p>Constructor for ShouldNeverHappenException.</p>
-     *
-     * @param cause a {@link Throwable} object.
-     */
-    public ShouldNeverHappenException(Throwable cause) {
-        super(cause);
-    }
+	/**
+	 * <p>
+	 * Constructor for ShouldNeverHappenException.
+	 * </p>
+	 * @param message a {@link String} object.
+	 */
+	public ShouldNeverHappenException(String message) {
+		super(message);
+	}
+
+	/**
+	 * <p>
+	 * Constructor for ShouldNeverHappenException.
+	 * </p>
+	 * @param cause a {@link Throwable} object.
+	 */
+	public ShouldNeverHappenException(Throwable cause) {
+		super(cause);
+	}
+
 }

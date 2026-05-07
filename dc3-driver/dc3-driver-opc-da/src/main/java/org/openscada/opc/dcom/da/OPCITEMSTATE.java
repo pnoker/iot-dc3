@@ -23,77 +23,79 @@ import org.jinterop.dcom.core.JIVariant;
 import org.openscada.opc.dcom.common.FILETIME;
 
 public class OPCITEMSTATE {
-    private int _clientHandle = 0;
 
-    private FILETIME _timestamp = null;
+	private int _clientHandle = 0;
 
-    private short _quality = 0;
+	private FILETIME _timestamp = null;
 
-    private short _reserved = 0;
+	private short _quality = 0;
 
-    private JIVariant _value = null;
+	private short _reserved = 0;
 
-    public static JIStruct getStruct() throws JIException {
-        JIStruct struct = new JIStruct();
+	private JIVariant _value = null;
 
-        struct.addMember(Integer.class);
-        struct.addMember(FILETIME.getStruct());
-        struct.addMember(Short.class);
-        struct.addMember(Short.class);
-        struct.addMember(JIVariant.class);
+	public static JIStruct getStruct() throws JIException {
+		JIStruct struct = new JIStruct();
 
-        return struct;
-    }
+		struct.addMember(Integer.class);
+		struct.addMember(FILETIME.getStruct());
+		struct.addMember(Short.class);
+		struct.addMember(Short.class);
+		struct.addMember(JIVariant.class);
 
-    public static OPCITEMSTATE fromStruct(final JIStruct struct) {
-        OPCITEMSTATE itemState = new OPCITEMSTATE();
+		return struct;
+	}
 
-        itemState.setClientHandle((Integer) struct.getMember(0));
-        itemState.setTimestamp(FILETIME.fromStruct((JIStruct) struct.getMember(1)));
-        itemState.setQuality((Short) struct.getMember(2));
-        itemState.setReserved((Short) struct.getMember(3));
-        itemState.setValue((JIVariant) struct.getMember(4));
+	public static OPCITEMSTATE fromStruct(final JIStruct struct) {
+		OPCITEMSTATE itemState = new OPCITEMSTATE();
 
-        return itemState;
-    }
+		itemState.setClientHandle((Integer) struct.getMember(0));
+		itemState.setTimestamp(FILETIME.fromStruct((JIStruct) struct.getMember(1)));
+		itemState.setQuality((Short) struct.getMember(2));
+		itemState.setReserved((Short) struct.getMember(3));
+		itemState.setValue((JIVariant) struct.getMember(4));
 
-    public int getClientHandle() {
-        return this._clientHandle;
-    }
+		return itemState;
+	}
 
-    public void setClientHandle(final int clientHandle) {
-        this._clientHandle = clientHandle;
-    }
+	public int getClientHandle() {
+		return this._clientHandle;
+	}
 
-    public short getQuality() {
-        return this._quality;
-    }
+	public void setClientHandle(final int clientHandle) {
+		this._clientHandle = clientHandle;
+	}
 
-    public void setQuality(final short quality) {
-        this._quality = quality;
-    }
+	public short getQuality() {
+		return this._quality;
+	}
 
-    public short getReserved() {
-        return this._reserved;
-    }
+	public void setQuality(final short quality) {
+		this._quality = quality;
+	}
 
-    public void setReserved(final short reserved) {
-        this._reserved = reserved;
-    }
+	public short getReserved() {
+		return this._reserved;
+	}
 
-    public FILETIME getTimestamp() {
-        return this._timestamp;
-    }
+	public void setReserved(final short reserved) {
+		this._reserved = reserved;
+	}
 
-    public void setTimestamp(final FILETIME timestamp) {
-        this._timestamp = timestamp;
-    }
+	public FILETIME getTimestamp() {
+		return this._timestamp;
+	}
 
-    public JIVariant getValue() {
-        return this._value;
-    }
+	public void setTimestamp(final FILETIME timestamp) {
+		this._timestamp = timestamp;
+	}
 
-    public void setValue(final JIVariant value) {
-        this._value = value;
-    }
+	public JIVariant getValue() {
+		return this._value;
+	}
+
+	public void setValue(final JIVariant value) {
+		this._value = value;
+	}
+
 }

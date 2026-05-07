@@ -37,53 +37,54 @@ import lombok.*;
 @ToString(callSuper = true)
 public class DriverBO extends BaseBO {
 
-    /**
-     * Driver display name.
-     */
-    private String driverName;
+	/**
+	 * Driver display name.
+	 */
+	private String driverName;
 
-    /**
-     * Driver code defined in configuration.
-     */
-    private String driverCode;
+	/**
+	 * Driver code defined in configuration.
+	 */
+	private String driverCode;
 
-    /**
-     * Driver service name used for registration and routing.
-     */
-    private String serviceName;
+	/**
+	 * Driver service name used for registration and routing.
+	 */
+	private String serviceName;
 
-    /**
-     * Driver service host address.
-     */
-    private String serviceHost;
+	/**
+	 * Driver service host address.
+	 */
+	private String serviceHost;
 
-    /**
-     * Driver runtime type.
-     */
-    private DriverTypeFlagEnum driverTypeFlag;
+	/**
+	 * Driver runtime type.
+	 */
+	private DriverTypeFlagEnum driverTypeFlag;
 
-    /**
-     * Extended driver metadata.
-     */
-    private DriverExt driverExt;
+	/**
+	 * Extended driver metadata.
+	 */
+	private DriverExt driverExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant identifier.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant identifier.
+	 */
+	private Long tenantId;
 
-    /**
-     * Data signature used for optimistic checks or synchronization.
-     */
-    private String signature;
+	/**
+	 * Data signature used for optimistic checks or synchronization.
+	 */
+	private String signature;
 
-    /**
-     * Data version.
-     */
-    private Integer version;
+	/**
+	 * Data version.
+	 */
+	private Integer version;
+
 }

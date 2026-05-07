@@ -21,38 +21,39 @@ import io.github.pnoker.driver.api.S7Type;
 import java.lang.annotation.*;
 
 /**
- * Annotation for mapping a Java field to an S7 PLC data block variable.
- * Specifies the S7 type, byte/bit offsets, and optional size for the mapping.
+ * Annotation for mapping a Java field to an S7 PLC data block variable. Specifies the S7
+ * type, byte/bit offsets, and optional size for the mapping.
  *
  * @author Thomas Rudin
  */
-@Target(value = {ElementType.FIELD})
+@Target(value = { ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface S7Variable {
-    /**
-     * @return number of elements (for array fields)
-     */
-    int arraySize() default 1;
 
-    /**
-     * @return bit offset within the byte
-     */
-    int bitOffset() default 0;
+	/**
+	 * @return number of elements (for array fields)
+	 */
+	int arraySize() default 1;
 
-    /**
-     * @return byte offset within the data block
-     */
-    int byteOffset();
+	/**
+	 * @return bit offset within the byte
+	 */
+	int bitOffset() default 0;
 
-    /**
-     * @return byte size (required for STRING type)
-     */
-    int size() default 0;
+	/**
+	 * @return byte offset within the data block
+	 */
+	int byteOffset();
 
-    /**
-     * @return the S7 data type
-     */
-    S7Type type();
+	/**
+	 * @return byte size (required for STRING type)
+	 */
+	int size() default 0;
+
+	/**
+	 * @return the S7 data type
+	 */
+	S7Type type();
 
 }

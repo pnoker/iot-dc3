@@ -34,70 +34,60 @@ import java.util.List;
  */
 public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
 
-    /**
-     * Name TenantId
-     *
-     * @param name     Device Name
-     * @param tenantId Tenant ID
-     * @return {@link DeviceBO}
-     */
-    DeviceBO selectByName(String name, Long tenantId);
+	/**
+	 * Name TenantId
+	 * @param name Device Name
+	 * @param tenantId Tenant ID
+	 * @return {@link DeviceBO}
+	 */
+	DeviceBO selectByName(String name, Long tenantId);
 
-    /**
-     * Name TenantId
-     *
-     * @param code     Device ID
-     * @param tenantId Tenant ID
-     * @return {@link DeviceBO}
-     */
-    DeviceBO selectByCode(String code, Long tenantId);
+	/**
+	 * Name TenantId
+	 * @param code Device ID
+	 * @param tenantId Tenant ID
+	 * @return {@link DeviceBO}
+	 */
+	DeviceBO selectByCode(String code, Long tenantId);
 
-    /**
-     * Driver ID
-     *
-     * @param driverId Driver ID
-     * @return {@link DeviceBO}
-     */
-    List<DeviceBO> selectByDriverId(Long driverId);
+	/**
+	 * Driver ID
+	 * @param driverId Driver ID
+	 * @return {@link DeviceBO}
+	 */
+	List<DeviceBO> selectByDriverId(Long driverId);
 
-    /**
-     * Driver ID Device ID
-     *
-     * @param driverId Driver ID
-     * @return {@link DeviceBO}
-     */
-    List<Long> selectIdsByDriverId(Long driverId);
+	/**
+	 * Driver ID Device ID
+	 * @param driverId Driver ID
+	 * @return {@link DeviceBO}
+	 */
+	List<Long> selectIdsByDriverId(Long driverId);
 
-    /**
-     * ID
-     *
-     * @param profileId ID
-     * @return {@link DeviceBO}
-     */
-    List<DeviceBO> selectByProfileId(Long profileId);
+	/**
+	 * ID
+	 * @param profileId ID
+	 * @return {@link DeviceBO}
+	 */
+	List<DeviceBO> selectByProfileId(Long profileId);
 
-    /**
-     * Device ID
-     *
-     * @param ids Device ID
-     * @return {@link DeviceBO}
-     */
-    List<DeviceBO> selectByIds(List<Long> ids);
+	/**
+	 * Device ID
+	 * @param ids Device ID
+	 * @return {@link DeviceBO}
+	 */
+	List<DeviceBO> selectByIds(List<Long> ids);
 
-    /**
-     *
-     *
-     * @param entityBO      {@link DeviceBO}
-     * @param multipartFile {@link File}
-     */
-    void importDevice(DeviceBO entityBO, File multipartFile);
+	/**
+	 * @param entityBO {@link DeviceBO}
+	 * @param multipartFile {@link File}
+	 */
+	void importDevice(DeviceBO entityBO, File multipartFile);
 
-    /**
-     *
-     *
-     * @param entityBO {@link DeviceBO}
-     * @return File Path
-     */
-    Path generateImportTemplate(DeviceBO entityBO);
+	/**
+	 * @param entityBO {@link DeviceBO}
+	 * @return File Path
+	 */
+	Path generateImportTemplate(DeviceBO entityBO);
 
 }

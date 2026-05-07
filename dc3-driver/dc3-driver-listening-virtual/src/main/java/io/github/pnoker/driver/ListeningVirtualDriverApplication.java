@@ -23,8 +23,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Entry point for the Listening Virtual Driver Application
  *
- * <p>This class serves as the main entry point for the Spring Boot application,
- * used to start the listening virtual driver application.</p>
+ * <p>
+ * This class serves as the main entry point for the Spring Boot application, used to
+ * start the listening virtual driver application.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,14 +35,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ListeningVirtualDriverApplication {
 
-    /**
-     * Main method to start the Spring Boot application
-     *
-     * @param args Command line arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(ListeningVirtualDriverApplication.class, args);
-    }
+	/**
+	 * Main method to start the Spring Boot application
+	 * @param args Command line arguments
+	 */
+	public static void main(String[] args) {
+		SpringApplication.run(ListeningVirtualDriverApplication.class, args);
+	}
 
 }
-

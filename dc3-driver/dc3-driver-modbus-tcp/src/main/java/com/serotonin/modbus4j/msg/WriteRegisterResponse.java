@@ -22,57 +22,64 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>WriteRegisterResponse class.</p>
+ * <p>
+ * WriteRegisterResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class WriteRegisterResponse extends ModbusResponse {
-    private int writeOffset;
-    private int writeValue;
 
-    WriteRegisterResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	private int writeOffset;
 
-    WriteRegisterResponse(int slaveId, int writeOffset, int writeValue) throws ModbusTransportException {
-        super(slaveId);
-        this.writeOffset = writeOffset;
-        this.writeValue = writeValue;
-    }
+	private int writeValue;
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_REGISTER;
-    }
+	WriteRegisterResponse(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    protected void writeResponse(ByteQueue queue) {
-        ModbusUtils.pushShort(queue, writeOffset);
-        ModbusUtils.pushShort(queue, writeValue);
-    }
+	WriteRegisterResponse(int slaveId, int writeOffset, int writeValue) throws ModbusTransportException {
+		super(slaveId);
+		this.writeOffset = writeOffset;
+		this.writeValue = writeValue;
+	}
 
-    @Override
-    protected void readResponse(ByteQueue queue) {
-        writeOffset = ModbusUtils.popUnsignedShort(queue);
-        writeValue = ModbusUtils.popUnsignedShort(queue);
-    }
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.WRITE_REGISTER;
+	}
 
-    /**
-     * <p>Getter for the field <code>writeOffset</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getWriteOffset() {
-        return writeOffset;
-    }
+	@Override
+	protected void writeResponse(ByteQueue queue) {
+		ModbusUtils.pushShort(queue, writeOffset);
+		ModbusUtils.pushShort(queue, writeValue);
+	}
 
-    /**
-     * <p>Getter for the field <code>writeValue</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getWriteValue() {
-        return writeValue;
-    }
+	@Override
+	protected void readResponse(ByteQueue queue) {
+		writeOffset = ModbusUtils.popUnsignedShort(queue);
+		writeValue = ModbusUtils.popUnsignedShort(queue);
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>writeOffset</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getWriteOffset() {
+		return writeOffset;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>writeValue</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getWriteValue() {
+		return writeValue;
+	}
+
 }

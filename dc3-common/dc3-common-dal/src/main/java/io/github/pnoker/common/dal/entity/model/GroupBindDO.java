@@ -41,85 +41,86 @@ import java.time.LocalDateTime;
 @TableName("dc3_group_bind")
 public class GroupBindDO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Primary key ID.
-     */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private Long id;
+	/**
+	 * Primary key ID.
+	 */
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
+	private Long id;
 
-    /**
-     * Entity type flag.
-     */
-    @TableField("entity_type_flag")
-    private Byte entityTypeFlag;
+	/**
+	 * Entity type flag.
+	 */
+	@TableField("entity_type_flag")
+	private Byte entityTypeFlag;
 
-    /**
-     * Group ID.
-     */
-    @TableField("group_id")
-    private Long groupId;
+	/**
+	 * Group ID.
+	 */
+	@TableField("group_id")
+	private Long groupId;
 
-    /**
-     * Entity ID.
-     */
-    @TableField("entity_id")
-    private Long entityId;
+	/**
+	 * Entity ID.
+	 */
+	@TableField("entity_id")
+	private Long entityId;
 
-    /**
-     * Tenant ID.
-     */
-    @TableField("tenant_id")
-    private Long tenantId;
+	/**
+	 * Tenant ID.
+	 */
+	@TableField("tenant_id")
+	private Long tenantId;
 
-    /**
-     * Remark or description.
-     */
-    @TableField("remark")
-    private String remark;
+	/**
+	 * Remark or description.
+	 */
+	@TableField("remark")
+	private String remark;
 
-    /**
-     * Creator ID.
-     */
-    @TableField("creator_id")
-    private Long creatorId;
+	/**
+	 * Creator ID.
+	 */
+	@TableField("creator_id")
+	private Long creatorId;
 
-    /**
-     * Creator name.
-     */
-    @TableField("creator_name")
-    private String creatorName;
+	/**
+	 * Creator name.
+	 */
+	@TableField("creator_name")
+	private String creatorName;
 
-    /**
-     * Creation time.
-     */
-    @TableField("create_time")
-    private LocalDateTime createTime;
+	/**
+	 * Creation time.
+	 */
+	@TableField("create_time")
+	private LocalDateTime createTime;
 
-    /**
-     * Operator ID.
-     */
-    @TableField("operator_id")
-    private Long operatorId;
+	/**
+	 * Operator ID.
+	 */
+	@TableField("operator_id")
+	private Long operatorId;
 
-    /**
-     * Operator name.
-     */
-    @TableField("operator_name")
-    private String operatorName;
+	/**
+	 * Operator name.
+	 */
+	@TableField("operator_name")
+	private String operatorName;
 
-    /**
-     * Operation time.
-     */
-    @TableField("operate_time")
-    private LocalDateTime operateTime;
+	/**
+	 * Operation time.
+	 */
+	@TableField("operate_time")
+	private LocalDateTime operateTime;
 
-    /**
-     * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
-     */
-    @TableLogic
-    @TableField("deleted")
-    private Byte deleted;
+	/**
+	 * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
+	 */
+	@TableLogic
+	@TableField("deleted")
+	private Byte deleted;
+
 }

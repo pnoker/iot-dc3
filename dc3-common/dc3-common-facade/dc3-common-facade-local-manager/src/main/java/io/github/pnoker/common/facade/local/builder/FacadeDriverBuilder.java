@@ -30,10 +30,11 @@ import org.mapstruct.Mapper;
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface FacadeDriverBuilder {
 
-    DriverQuery toManagerQuery(FacadeDriverQuery facadeQuery);
+	DriverQuery toManagerQuery(FacadeDriverQuery facadeQuery);
 
-    FacadeDriverBO toFacadeBO(DriverBO managerBO);
+	FacadeDriverBO toFacadeBO(DriverBO managerBO);
+
 }

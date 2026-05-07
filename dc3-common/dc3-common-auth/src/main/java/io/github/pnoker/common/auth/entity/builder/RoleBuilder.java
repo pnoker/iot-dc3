@@ -44,145 +44,136 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface RoleBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    @Mapping(target = "tenantId", ignore = true)
-    RoleBO buildBOByVO(RoleVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "tenantId", ignore = true)
+	RoleBO buildBOByVO(RoleVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<RoleBO> buildBOListByVOList(List<RoleVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<RoleBO> buildBOListByVOList(List<RoleVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "roleExt", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    RoleDO buildDOByBO(RoleBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "roleExt", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "deleted", ignore = true)
+	RoleDO buildDOByBO(RoleBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(RoleBO entityBO, @MappingTarget RoleDO entityDO) {
-        // Code
-        if (StringUtils.isEmpty(entityBO.getRoleCode())) {
-            entityDO.setRoleCode(CodeUtil.getCode());
-        }
+	@AfterMapping
+	default void afterProcess(RoleBO entityBO, @MappingTarget RoleDO entityDO) {
+		// Code
+		if (StringUtils.isEmpty(entityBO.getRoleCode())) {
+			entityDO.setRoleCode(CodeUtil.getCode());
+		}
 
-        // Json Ext
-        RoleExt entityExt = entityBO.getRoleExt();
-        JsonExt ext = new JsonExt();
-        if (Objects.nonNull(entityExt)) {
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-        }
-        entityDO.setRoleExt(ext);
+		// Json Ext
+		RoleExt entityExt = entityBO.getRoleExt();
+		JsonExt ext = new JsonExt();
+		if (Objects.nonNull(entityExt)) {
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+		}
+		entityDO.setRoleExt(ext);
 
-        // Enable Flag
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
+		// Enable Flag
+		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+	}
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<RoleDO> buildDOListByBOList(List<RoleBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<RoleDO> buildDOListByBOList(List<RoleBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "roleExt", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    RoleBO buildBOByDO(RoleDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "roleExt", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	RoleBO buildBOByDO(RoleDO entityDO);
 
-    @AfterMapping
-    default void afterProcess(RoleDO entityDO, @MappingTarget RoleBO entityBO) {
-        // Json Ext
-        JsonExt entityExt = entityDO.getRoleExt();
-        if (Objects.nonNull(entityExt)) {
-            RoleExt ext = new RoleExt();
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), RoleExt.Content.class));
-            entityBO.setRoleExt(ext);
-        }
+	@AfterMapping
+	default void afterProcess(RoleDO entityDO, @MappingTarget RoleBO entityBO) {
+		// Json Ext
+		JsonExt entityExt = entityDO.getRoleExt();
+		if (Objects.nonNull(entityExt)) {
+			RoleExt ext = new RoleExt();
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), RoleExt.Content.class));
+			entityBO.setRoleExt(ext);
+		}
 
-        // Enable Flag
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
+		// Enable Flag
+		Byte enableFlag = entityDO.getEnableFlag();
+		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+	}
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<RoleBO> buildBOListByDOList(List<RoleDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<RoleBO> buildBOListByDOList(List<RoleDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    RoleVO buildVOByBO(RoleBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	RoleVO buildVOByBO(RoleBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<RoleVO> buildVOListByBOList(List<RoleBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<RoleVO> buildVOListByBOList(List<RoleBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<RoleBO> buildBOPageByDOPage(Page<RoleDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<RoleBO> buildBOPageByDOPage(Page<RoleDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<RoleVO> buildVOPageByBOPage(Page<RoleBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<RoleVO> buildVOPageByBOPage(Page<RoleBO> entityPageBO);
+
 }

@@ -26,22 +26,29 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Count of still-unconfirmed alarms bucketed by how long they've been
- * sitting. The 24h+ bucket is the SLA breach indicator.
+ * Count of still-unconfirmed alarms bucketed by how long they've been sitting. The 24h+
+ * bucket is the SLA breach indicator.
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class AgingBacklogVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private long under1h;
-    private long h1to6;
-    private long h6to24;
-    private long over24h;
-    /**
-     * Convenience sum — equals the total unconfirmed count.
-     */
-    private long total;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private long under1h;
+
+	private long h1to6;
+
+	private long h6to24;
+
+	private long over24h;
+
+	/**
+	 * Convenience sum — equals the total unconfirmed count.
+	 */
+	private long total;
+
 }

@@ -43,9 +43,9 @@ import java.util.Objects;
 /**
  * Common message handler for processing incoming TCP/UDP data.
  * <p>
- * This service parses incoming byte buffers according to a specific format,
- * extracts device and point information, and sends point values to the
- * driver sender service for further processing.
+ * This service parses incoming byte buffers according to a specific format, extracts
+ * device and point information, and sends point values to the driver sender service for
+ * further processing.
  * </p>
  *
  * @author pnoker
@@ -56,63 +56,64 @@ import java.util.Objects;
 @Service
 public class NettyServerHandler {
 
-    @Resource
-    private DeviceMetadata deviceMetadata;
-    @Resource
-    private PointMetadata pointMetadata;
-    @Resource
-    private DriverSenderService driverSenderService;
+	@Resource
+	private DeviceMetadata deviceMetadata;
 
-    /**
-     * Processes incoming messages from TCP/UDP clients.
-     * <p>
-     * Parses the byte buffer to extract device information and point values.
-     * The message format is:
-     * <pre>
-     * - Device name: 22 bytes (converted to device ID)
-     * - Keyword: 1 byte (hex)
-     * - Point values: variable length based on point configuration
-     * </pre>
-     * </p>
-     *
-     * @param context The channel handler context for the current connection
-     * @param byteBuf The byte buffer containing the incoming message
-     */
-    public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
-        log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
-        String deviceName = byteBuf.toString(0, 22, StandardCharsets.UTF_8);
-        long deviceId = Long.parseLong(deviceName);
-        DeviceBO device = deviceMetadata.getCache(deviceId);
+	@Resource
+	private PointMetadata pointMetadata;
 
-        String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
-        NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
+	@Resource
+	private DriverSenderService driverSenderService;
 
-        Map<Long, Map<String, AttributeBO>> pointConfigMap = deviceMetadata.getPointConfig(deviceId);
+	/**
+	 * Processes incoming messages from TCP/UDP clients.
+	 * <p>
+	 * Parses the byte buffer to extract device information and point values. The message
+	 * format is: <pre>
+	 * - Device name: 22 bytes (converted to device ID)
+	 * - Keyword: 1 byte (hex)
+	 * - Point values: variable length based on point configuration
+	 * </pre>
+	 * </p>
+	 * @param context The channel handler context for the current connection
+	 * @param byteBuf The byte buffer containing the incoming message
+	 */
+	public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
+		log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
+		String deviceName = byteBuf.toString(0, 22, StandardCharsets.UTF_8);
+		long deviceId = Long.parseLong(deviceName);
+		DeviceBO device = deviceMetadata.getCache(deviceId);
 
-        List<PointValue> pointValues = new ArrayList<>(16);
-        for (Map.Entry<Long, Map<String, AttributeBO>> entry : pointConfigMap.entrySet()) {
-            PointBO point = pointMetadata.getCache(entry.getKey());
-            Map<String, AttributeBO> infoMap = pointConfigMap.get(entry.getKey());
-            int start = infoMap.get("start").getValue(Integer.class);
-            int end = infoMap.get("end").getValue(Integer.class);
+		String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
+		NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
-            if (infoMap.get("key").getValue().equals(hexKey) && Objects.nonNull(point)) {
-                String value = switch (point.getPointName()) {
-                    case "altitude" -> String.valueOf(byteBuf.getFloat(start));
-                    case "speed" -> String.valueOf(byteBuf.getDouble(start));
-                    case "level" -> String.valueOf(byteBuf.getLong(start));
-                    case "direction" -> String.valueOf(byteBuf.getInt(start));
-                    case "locked" -> String.valueOf(byteBuf.getBoolean(start));
-                    case "coordinate" -> byteBuf.toString(start, end, StandardCharsets.UTF_8).trim();
-                    default -> StringUtils.EMPTY;
-                };
+		Map<Long, Map<String, AttributeBO>> pointConfigMap = deviceMetadata.getPointConfig(deviceId);
 
-                if (StringUtils.isNotEmpty(value)) {
-                    pointValues.add(new PointValue(new RValue(device, point, value)));
-                }
-            }
-        }
+		List<PointValue> pointValues = new ArrayList<>(16);
+		for (Map.Entry<Long, Map<String, AttributeBO>> entry : pointConfigMap.entrySet()) {
+			PointBO point = pointMetadata.getCache(entry.getKey());
+			Map<String, AttributeBO> infoMap = pointConfigMap.get(entry.getKey());
+			int start = infoMap.get("start").getValue(Integer.class);
+			int end = infoMap.get("end").getValue(Integer.class);
 
-        driverSenderService.pointValueSender(pointValues);
-    }
+			if (infoMap.get("key").getValue().equals(hexKey) && Objects.nonNull(point)) {
+				String value = switch (point.getPointName()) {
+					case "altitude" -> String.valueOf(byteBuf.getFloat(start));
+					case "speed" -> String.valueOf(byteBuf.getDouble(start));
+					case "level" -> String.valueOf(byteBuf.getLong(start));
+					case "direction" -> String.valueOf(byteBuf.getInt(start));
+					case "locked" -> String.valueOf(byteBuf.getBoolean(start));
+					case "coordinate" -> byteBuf.toString(start, end, StandardCharsets.UTF_8).trim();
+					default -> StringUtils.EMPTY;
+				};
+
+				if (StringUtils.isNotEmpty(value)) {
+					pointValues.add(new PointValue(new RValue(device, point, value)));
+				}
+			}
+		}
+
+		driverSenderService.pointValueSender(pointValues);
+	}
+
 }

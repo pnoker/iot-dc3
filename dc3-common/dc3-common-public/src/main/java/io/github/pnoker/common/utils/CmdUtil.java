@@ -28,8 +28,8 @@ import java.io.OutputStreamWriter;
 /**
  * Command Line Utility Class Collection
  * <p>
- * Utility class for command line operations and process management.
- * Provides methods to safely terminate processes with exit commands.
+ * Utility class for command line operations and process management. Provides methods to
+ * safely terminate processes with exit commands.
  * </p>
  *
  * @author pnoker
@@ -39,29 +39,29 @@ import java.io.OutputStreamWriter;
 @Slf4j
 public class CmdUtil {
 
-    private CmdUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private CmdUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Destroy process with exit command
-     * Writes the command to process output stream and forcibly destroys the process
-     *
-     * @param process Process to destroy
-     * @param cmd     Exit command to send before destroying
-     */
-    public static void destroyProcessWithCmd(Process process, String cmd) {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-        try {
-            if (!cmd.equals(StringUtils.EMPTY)) {
-                writer.write(cmd);
-                writer.flush();
-                writer.close();
-            }
-            process.destroyForcibly();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
+	/**
+	 * Destroy process with exit command Writes the command to process output stream and
+	 * forcibly destroys the process
+	 * @param process Process to destroy
+	 * @param cmd Exit command to send before destroying
+	 */
+	public static void destroyProcessWithCmd(Process process, String cmd) {
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+		try {
+			if (!cmd.equals(StringUtils.EMPTY)) {
+				writer.write(cmd);
+				writer.flush();
+				writer.close();
+			}
+			process.destroyForcibly();
+		}
+		catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 
 }

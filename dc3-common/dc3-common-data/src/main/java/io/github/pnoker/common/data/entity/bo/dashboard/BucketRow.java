@@ -28,6 +28,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class BucketRow {
-    private Object key;
-    private long count;
+
+	private Object key;
+
+	private long count;
+
 }

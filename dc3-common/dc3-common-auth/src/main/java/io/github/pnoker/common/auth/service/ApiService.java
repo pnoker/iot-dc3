@@ -29,4 +29,5 @@ import io.github.pnoker.common.base.service.BaseService;
  * @since 2022.1.0
  */
 public interface ApiService extends BaseService<ApiBO, ApiQuery> {
+
 }

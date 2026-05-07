@@ -51,130 +51,131 @@ import java.util.Objects;
 @Service
 public class DriverAttributeServiceImpl implements DriverAttributeService {
 
-    @Resource
-    private DriverAttributeBuilder driverAttributeBuilder;
+	@Resource
+	private DriverAttributeBuilder driverAttributeBuilder;
 
-    @Resource
-    private DriverAttributeManager driverAttributeManager;
+	@Resource
+	private DriverAttributeManager driverAttributeManager;
 
-    @Override
-    public void save(DriverAttributeBO entityBO) {
-        if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("Failed to create driver attribute: driver attribute has been duplicated");
-        }
+	@Override
+	public void save(DriverAttributeBO entityBO) {
+		if (checkDuplicate(entityBO, false)) {
+			throw new DuplicateException("Failed to create driver attribute: driver attribute has been duplicated");
+		}
 
-        DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
-        if (!driverAttributeManager.save(entityDO)) {
-            throw new AddException("Failed to create driver attribute");
-        }
-    }
+		DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
+		if (!driverAttributeManager.save(entityDO)) {
+			throw new AddException("Failed to create driver attribute");
+		}
+	}
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-        if (!driverAttributeManager.removeById(id)) {
-            throw new DeleteException("Failed to remove driver attribute");
-        }
-    }
+		if (!driverAttributeManager.removeById(id)) {
+			throw new DeleteException("Failed to remove driver attribute");
+		}
+	}
 
-    @Override
-    public void update(DriverAttributeBO entityBO) {
-        getDOById(entityBO.getId(), true);
+	@Override
+	public void update(DriverAttributeBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
-        if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("Failed to update driver attribute: driver attribute has been duplicated");
-        }
+		if (checkDuplicate(entityBO, true)) {
+			throw new DuplicateException("Failed to update driver attribute: driver attribute has been duplicated");
+		}
 
-        DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!driverAttributeManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update driver attribute");
-        }
-    }
+		DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!driverAttributeManager.updateById(entityDO)) {
+			throw new UpdateException("Failed to update driver attribute");
+		}
+	}
 
-    @Override
-    public DriverAttributeBO selectById(Long id) {
-        DriverAttributeDO entityDO = getDOById(id, true);
-        return driverAttributeBuilder.buildBOByDO(entityDO);
-    }
+	@Override
+	public DriverAttributeBO selectById(Long id) {
+		DriverAttributeDO entityDO = getDOById(id, true);
+		return driverAttributeBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public DriverAttributeBO selectByNameAndDriverId(String name, Long driverId) {
-        LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery()
-                .eq(DriverAttributeDO::getAttributeCode, name)
-                .eq(DriverAttributeDO::getDriverId, driverId)
-                .last(QueryWrapperConstant.LIMIT_ONE);
-        DriverAttributeDO entityDO = wrapper.one();
-        return driverAttributeBuilder.buildBOByDO(entityDO);
-    }
+	@Override
+	public DriverAttributeBO selectByNameAndDriverId(String name, Long driverId) {
+		LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery()
+			.eq(DriverAttributeDO::getAttributeCode, name)
+			.eq(DriverAttributeDO::getDriverId, driverId)
+			.last(QueryWrapperConstant.LIMIT_ONE);
+		DriverAttributeDO entityDO = wrapper.one();
+		return driverAttributeBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public List<DriverAttributeBO> selectByDriverId(Long driverId) {
-        LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery()
-                .eq(DriverAttributeDO::getDriverId, driverId);
-        List<DriverAttributeDO> entityDO = wrapper.list();
-        return driverAttributeBuilder.buildBOListByDOList(entityDO);
-    }
+	@Override
+	public List<DriverAttributeBO> selectByDriverId(Long driverId) {
+		LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery()
+			.eq(DriverAttributeDO::getDriverId, driverId);
+		List<DriverAttributeDO> entityDO = wrapper.list();
+		return driverAttributeBuilder.buildBOListByDOList(entityDO);
+	}
 
-    @Override
-    public Page<DriverAttributeBO> selectByPage(DriverAttributeQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<DriverAttributeDO> entityPageDO = driverAttributeManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return driverAttributeBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	@Override
+	public Page<DriverAttributeBO> selectByPage(DriverAttributeQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<DriverAttributeDO> entityPageDO = driverAttributeManager.page(PageUtil.page(entityQuery.getPage()),
+				fuzzyQuery(entityQuery));
+		return driverAttributeBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link DriverAttributeQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery entityQuery) {
-        LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), DriverAttributeDO::getAttributeCode, entityQuery.getAttributeCode());
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
-        wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverAttributeDO::getTenantId, entityQuery.getTenantId());
-        return wrapper;
-    }
+	/**
+	 * @param entityQuery {@link DriverAttributeQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery entityQuery) {
+		LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), DriverAttributeDO::getAttributeCode,
+				entityQuery.getAttributeCode());
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName,
+				entityQuery.getAttributeName());
+		wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag,
+				entityQuery.getAttributeTypeFlag());
+		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), DriverAttributeDO::getDriverId,
+				entityQuery.getDriverId());
+		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverAttributeDO::getTenantId,
+				entityQuery.getTenantId());
+		return wrapper;
+	}
 
-    /**
-     *
-     *
-     * @param entityBO {@link DriverAttributeBO}
-     * @param isUpdate
-     * @return
-     */
-    private boolean checkDuplicate(DriverAttributeBO entityBO, boolean isUpdate) {
-        LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
-        wrapper.eq(DriverAttributeDO::getAttributeCode, entityBO.getAttributeCode());
-        wrapper.eq(DriverAttributeDO::getDriverId, entityBO.getDriverId());
-        wrapper.eq(DriverAttributeDO::getTenantId, entityBO.getTenantId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        DriverAttributeDO one = driverAttributeManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        return !isUpdate || !one.getId().equals(entityBO.getId());
-    }
+	/**
+	 * @param entityBO {@link DriverAttributeBO}
+	 * @param isUpdate
+	 * @return
+	 */
+	private boolean checkDuplicate(DriverAttributeBO entityBO, boolean isUpdate) {
+		LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
+		wrapper.eq(DriverAttributeDO::getAttributeCode, entityBO.getAttributeCode());
+		wrapper.eq(DriverAttributeDO::getDriverId, entityBO.getDriverId());
+		wrapper.eq(DriverAttributeDO::getTenantId, entityBO.getTenantId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		DriverAttributeDO one = driverAttributeManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		return !isUpdate || !one.getId().equals(entityBO.getId());
+	}
 
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link DriverAttributeDO}
-     */
-    private DriverAttributeDO getDOById(Long id, boolean throwException) {
-        DriverAttributeDO entityDO = driverAttributeManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Driver attribute does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link DriverAttributeDO}
+	 */
+	private DriverAttributeDO getDOById(Long id, boolean throwException) {
+		DriverAttributeDO entityDO = driverAttributeManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Driver attribute does not exist");
+		}
+		return entityDO;
+	}
 
 }

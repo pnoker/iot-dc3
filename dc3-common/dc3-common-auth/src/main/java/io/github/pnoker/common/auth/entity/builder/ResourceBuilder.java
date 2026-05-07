@@ -46,164 +46,155 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface ResourceBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    ResourceBO buildBOByVO(ResourceVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	ResourceBO buildBOByVO(ResourceVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<ResourceBO> buildBOListByVOList(List<ResourceVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<ResourceBO> buildBOListByVOList(List<ResourceVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "resourceExt", ignore = true)
-    @Mapping(target = "resourceTypeFlag", ignore = true)
-    @Mapping(target = "resourceScopeFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    ResourceDO buildDOByBO(ResourceBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "resourceExt", ignore = true)
+	@Mapping(target = "resourceTypeFlag", ignore = true)
+	@Mapping(target = "resourceScopeFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "deleted", ignore = true)
+	ResourceDO buildDOByBO(ResourceBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
-        // Code
-        if (StringUtils.isEmpty(entityBO.getResourceCode())) {
-            entityDO.setResourceCode(CodeUtil.getCode());
-        }
+	@AfterMapping
+	default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
+		// Code
+		if (StringUtils.isEmpty(entityBO.getResourceCode())) {
+			entityDO.setResourceCode(CodeUtil.getCode());
+		}
 
-        // Json Ext
-        ResourceExt entityExt = entityBO.getResourceExt();
-        JsonExt ext = new JsonExt();
-        if (Objects.nonNull(entityExt)) {
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-        }
-        entityDO.setResourceExt(ext);
+		// Json Ext
+		ResourceExt entityExt = entityBO.getResourceExt();
+		JsonExt ext = new JsonExt();
+		if (Objects.nonNull(entityExt)) {
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+		}
+		entityDO.setResourceExt(ext);
 
-        // ResourceType Flag
-        ResourceTypeFlagEnum resourceTypeFlag = entityBO.getResourceTypeFlag();
-        Optional.ofNullable(resourceTypeFlag).ifPresent(value -> entityDO.setResourceTypeFlag(value.getIndex()));
+		// ResourceType Flag
+		ResourceTypeFlagEnum resourceTypeFlag = entityBO.getResourceTypeFlag();
+		Optional.ofNullable(resourceTypeFlag).ifPresent(value -> entityDO.setResourceTypeFlag(value.getIndex()));
 
-        // ResourceScope Flag
-        ResourceScopeFlagEnum resourceScopeFlag = entityBO.getResourceScopeFlag();
-        Optional.ofNullable(resourceScopeFlag).ifPresent(value -> entityDO.setResourceScopeFlag(value.getIndex()));
+		// ResourceScope Flag
+		ResourceScopeFlagEnum resourceScopeFlag = entityBO.getResourceScopeFlag();
+		Optional.ofNullable(resourceScopeFlag).ifPresent(value -> entityDO.setResourceScopeFlag(value.getIndex()));
 
-        // Enable Flag
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
+		// Enable Flag
+		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+	}
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<ResourceDO> buildDOListByBOList(List<ResourceBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<ResourceDO> buildDOListByBOList(List<ResourceBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "resourceExt", ignore = true)
-    @Mapping(target = "resourceTypeFlag", ignore = true)
-    @Mapping(target = "resourceScopeFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    ResourceBO buildBOByDO(ResourceDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "resourceExt", ignore = true)
+	@Mapping(target = "resourceTypeFlag", ignore = true)
+	@Mapping(target = "resourceScopeFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	ResourceBO buildBOByDO(ResourceDO entityDO);
 
-    @AfterMapping
-    default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
-        // Json Ext
-        JsonExt entityExt = entityDO.getResourceExt();
-        if (Objects.nonNull(entityExt)) {
-            ResourceExt ext = new ResourceExt();
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ResourceExt.Content.class));
-            entityBO.setResourceExt(ext);
-        }
+	@AfterMapping
+	default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
+		// Json Ext
+		JsonExt entityExt = entityDO.getResourceExt();
+		if (Objects.nonNull(entityExt)) {
+			ResourceExt ext = new ResourceExt();
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ResourceExt.Content.class));
+			entityBO.setResourceExt(ext);
+		}
 
-        // ResourceType Flag
-        Byte resourceTypeFlag = entityDO.getResourceTypeFlag();
-        entityBO.setResourceTypeFlag(ResourceTypeFlagEnum.ofIndex(resourceTypeFlag));
+		// ResourceType Flag
+		Byte resourceTypeFlag = entityDO.getResourceTypeFlag();
+		entityBO.setResourceTypeFlag(ResourceTypeFlagEnum.ofIndex(resourceTypeFlag));
 
-        // ResourceScope Flag
-        Byte resourceScopeFlag = entityDO.getResourceScopeFlag();
-        entityBO.setResourceScopeFlag(ResourceScopeFlagEnum.ofIndex(resourceScopeFlag));
+		// ResourceScope Flag
+		Byte resourceScopeFlag = entityDO.getResourceScopeFlag();
+		entityBO.setResourceScopeFlag(ResourceScopeFlagEnum.ofIndex(resourceScopeFlag));
 
-        // Enable Flag
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
+		// Enable Flag
+		Byte enableFlag = entityDO.getEnableFlag();
+		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+	}
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<ResourceBO> buildBOListByDOList(List<ResourceDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<ResourceBO> buildBOListByDOList(List<ResourceDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    ResourceVO buildVOByBO(ResourceBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	ResourceVO buildVOByBO(ResourceBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<ResourceVO> buildVOListByBOList(List<ResourceBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<ResourceVO> buildVOListByBOList(List<ResourceBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ResourceBO> buildBOPageByDOPage(Page<ResourceDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<ResourceBO> buildBOPageByDOPage(Page<ResourceDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ResourceVO> buildVOPageByBOPage(Page<ResourceBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<ResourceVO> buildVOPageByBOPage(Page<ResourceBO> entityPageBO);
+
 }

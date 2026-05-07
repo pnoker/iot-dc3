@@ -42,38 +42,39 @@ import java.util.Objects;
 @Component
 public class DeviceEventReceiver {
 
-    private final DeviceEventService deviceEventService;
+	private final DeviceEventService deviceEventService;
 
-    public DeviceEventReceiver(DeviceEventService deviceEventService) {
-        this.deviceEventService = deviceEventService;
-    }
+	public DeviceEventReceiver(DeviceEventService deviceEventService) {
+		this.deviceEventService = deviceEventService;
+	}
 
-    @RabbitHandler
-    @RabbitListener(queues = "#{deviceEventQueue.name}")
-    public void deviceEventReceive(Channel channel, Message message, DeviceEventDTO entityDTO) {
-        try {
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Receive device event: {}", JsonUtil.toJsonString(entityDTO));
-            if (Objects.isNull(entityDTO)
-                    || Objects.isNull(entityDTO.getType())
-                    || StringUtils.isEmpty(entityDTO.getContent())) {
-                log.error("Invalid device event: {}", entityDTO);
-                return;
-            }
+	@RabbitHandler
+	@RabbitListener(queues = "#{deviceEventQueue.name}")
+	public void deviceEventReceive(Channel channel, Message message, DeviceEventDTO entityDTO) {
+		try {
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+			log.debug("Receive device event: {}", JsonUtil.toJsonString(entityDTO));
+			if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getType())
+					|| StringUtils.isEmpty(entityDTO.getContent())) {
+				log.error("Invalid device event: {}", entityDTO);
+				return;
+			}
 
-            switch (entityDTO.getType()) {
-                case HEARTBEAT:
-                    deviceEventService.heartbeatEvent(entityDTO);
-                    break;
-                case ALARM:
-                    deviceEventService.alarmEvent(entityDTO);
-                    break;
-                default:
-                    log.error("Invalid event type, {}", entityDTO.getType());
-                    break;
-            }
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
+			switch (entityDTO.getType()) {
+				case HEARTBEAT:
+					deviceEventService.heartbeatEvent(entityDTO);
+					break;
+				case ALARM:
+					deviceEventService.alarmEvent(entityDTO);
+					break;
+				default:
+					log.error("Invalid event type, {}", entityDTO.getType());
+					break;
+			}
+		}
+		catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
 }

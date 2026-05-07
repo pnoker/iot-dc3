@@ -21,84 +21,85 @@ import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.*;
 
 public class OPCITEMDEF {
-    private String accessPath = "";
 
-    private String itemID = "";
+	private String accessPath = "";
 
-    private boolean active = true;
+	private String itemID = "";
 
-    private int clientHandle;
+	private boolean active = true;
 
-    private short requestedDataType = JIVariant.VT_EMPTY;
+	private int clientHandle;
 
-    private short reserved;
+	private short requestedDataType = JIVariant.VT_EMPTY;
 
-    public String getAccessPath() {
-        return this.accessPath;
-    }
+	private short reserved;
 
-    public void setAccessPath(final String accessPath) {
-        this.accessPath = accessPath;
-    }
+	public String getAccessPath() {
+		return this.accessPath;
+	}
 
-    public int getClientHandle() {
-        return this.clientHandle;
-    }
+	public void setAccessPath(final String accessPath) {
+		this.accessPath = accessPath;
+	}
 
-    public void setClientHandle(final int clientHandle) {
-        this.clientHandle = clientHandle;
-    }
+	public int getClientHandle() {
+		return this.clientHandle;
+	}
 
-    public boolean isActive() {
-        return this.active;
-    }
+	public void setClientHandle(final int clientHandle) {
+		this.clientHandle = clientHandle;
+	}
 
-    public void setActive(final boolean active) {
-        this.active = active;
-    }
+	public boolean isActive() {
+		return this.active;
+	}
 
-    public String getItemID() {
-        return this.itemID;
-    }
+	public void setActive(final boolean active) {
+		this.active = active;
+	}
 
-    public void setItemID(final String itemID) {
-        this.itemID = itemID;
-    }
+	public String getItemID() {
+		return this.itemID;
+	}
 
-    public short getRequestedDataType() {
-        return this.requestedDataType;
-    }
+	public void setItemID(final String itemID) {
+		this.itemID = itemID;
+	}
 
-    public void setRequestedDataType(final short requestedDataType) {
-        this.requestedDataType = requestedDataType;
-    }
+	public short getRequestedDataType() {
+		return this.requestedDataType;
+	}
 
-    public short getReserved() {
-        return this.reserved;
-    }
+	public void setRequestedDataType(final short requestedDataType) {
+		this.requestedDataType = requestedDataType;
+	}
 
-    public void setReserved(final short reserved) {
-        this.reserved = reserved;
-    }
+	public short getReserved() {
+		return this.reserved;
+	}
 
-    /**
-     * Convert to structure to a J-Interop structure
-     *
-     * @return the j-interop structe
-     * @throws JIException JIException
-     */
-    public JIStruct toStruct() throws JIException {
-        final JIStruct struct = new JIStruct();
-        struct.addMember(new JIString(getAccessPath(), JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR));
-        struct.addMember(new JIString(getItemID(), JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR));
-        struct.addMember(isActive() ? 1 : 0);
-        struct.addMember(getClientHandle());
+	public void setReserved(final short reserved) {
+		this.reserved = reserved;
+	}
 
-        struct.addMember(0); // blob size
-        struct.addMember(new JIPointer(null)); // blob
+	/**
+	 * Convert to structure to a J-Interop structure
+	 * @return the j-interop structe
+	 * @throws JIException JIException
+	 */
+	public JIStruct toStruct() throws JIException {
+		final JIStruct struct = new JIStruct();
+		struct.addMember(new JIString(getAccessPath(), JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR));
+		struct.addMember(new JIString(getItemID(), JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR));
+		struct.addMember(isActive() ? 1 : 0);
+		struct.addMember(getClientHandle());
 
-        struct.addMember(getRequestedDataType());
-        struct.addMember(getReserved());
-        return struct;
-    }
+		struct.addMember(0); // blob size
+		struct.addMember(new JIPointer(null)); // blob
+
+		struct.addMember(getRequestedDataType());
+		struct.addMember(getReserved());
+		return struct;
+	}
+
 }

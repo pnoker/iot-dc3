@@ -32,4 +32,3 @@ import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 public interface ProfileBindMapper extends BaseMapper<ProfileBindDO> {
 
 }
-

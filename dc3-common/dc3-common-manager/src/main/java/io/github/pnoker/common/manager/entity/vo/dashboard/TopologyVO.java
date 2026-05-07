@@ -27,14 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Payload for GET /manager/dashboard/topology — a 4-column Sankey graph
- * (Driver → Device → Profile → Point) the home page uses to show how the
- * tenant's metadata and data flow wire together.
+ * Payload for GET /manager/dashboard/topology — a 4-column Sankey graph (Driver → Device
+ * → Profile → Point) the home page uses to show how the tenant's metadata and data flow
+ * wire together.
  *
- * <p>Top-N cropping happens server-side so large tenants don't blow up the
- * payload. Whatever was cropped rolls up into {@code others:*} nodes whose
- * {@link TopologyNodeVO#getHiddenChildren()} holds the real list for a
- * drill-in dialog.</p>
+ * <p>
+ * Top-N cropping happens server-side so large tenants don't blow up the payload. Whatever
+ * was cropped rolls up into {@code others:*} nodes whose
+ * {@link TopologyNodeVO#getHiddenChildren()} holds the real list for a drill-in dialog.
+ * </p>
  *
  * @author pnoker
  * @since 2026.5.4
@@ -44,10 +45,13 @@ import java.util.List;
 @ToString
 public class TopologyVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<TopologyNodeVO> nodes = new ArrayList<>();
-    private List<TopologyLinkVO> links = new ArrayList<>();
-    private TopologyStatsVO stats = new TopologyStatsVO();
+	private List<TopologyNodeVO> nodes = new ArrayList<>();
+
+	private List<TopologyLinkVO> links = new ArrayList<>();
+
+	private TopologyStatsVO stats = new TopologyStatsVO();
+
 }

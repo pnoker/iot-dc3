@@ -34,99 +34,90 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface TenantBindBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    TenantBindBO buildBOByVO(TenantBindVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	TenantBindBO buildBOByVO(TenantBindVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<TenantBindBO> buildBOListByVOList(List<TenantBindVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<TenantBindBO> buildBOListByVOList(List<TenantBindVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "deleted", ignore = true)
-    TenantBindDO buildDOByBO(TenantBindBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "deleted", ignore = true)
+	TenantBindDO buildDOByBO(TenantBindBO entityBO);
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<TenantBindDO> buildDOListByBOList(List<TenantBindBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<TenantBindDO> buildDOListByBOList(List<TenantBindBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    TenantBindBO buildBOByDO(TenantBindDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	TenantBindBO buildBOByDO(TenantBindDO entityDO);
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<TenantBindBO> buildBOListByDOList(List<TenantBindDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<TenantBindBO> buildBOListByDOList(List<TenantBindDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    TenantBindVO buildVOByBO(TenantBindBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	TenantBindVO buildVOByBO(TenantBindBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<TenantBindVO> buildVOListByBOList(List<TenantBindBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<TenantBindVO> buildVOListByBOList(List<TenantBindBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<TenantBindBO> buildBOPageByDOPage(Page<TenantBindDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<TenantBindBO> buildBOPageByDOPage(Page<TenantBindDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<TenantBindVO> buildVOPageByBOPage(Page<TenantBindBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<TenantBindVO> buildVOPageByBOPage(Page<TenantBindBO> entityPageBO);
+
 }

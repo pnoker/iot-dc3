@@ -53,132 +53,139 @@ import java.util.Objects;
 @RequestMapping(AuthConstant.ROLE_URL_PREFIX)
 public class RoleController implements BaseController {
 
-    private final RoleBuilder roleBuilder;
-    private final RoleService roleService;
+	private final RoleBuilder roleBuilder;
 
-    public RoleController(RoleBuilder roleBuilder, RoleService roleService) {
-        this.roleBuilder = roleBuilder;
-        this.roleService = roleService;
-    }
+	private final RoleService roleService;
 
-    @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(header.getTenantId());
-                entityBO.setCreatorId(header.getUserId());
-                entityBO.setCreatorName(header.getNickName());
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                roleService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	public RoleController(RoleBuilder roleBuilder, RoleService roleService) {
+		this.roleBuilder = roleBuilder;
+		this.roleService = roleService;
+	}
 
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            roleService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	@PostMapping("/add")
+	public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
+		return getUserHeader().flatMap(header -> {
+			try {
+				RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
+				entityBO.setTenantId(header.getTenantId());
+				entityBO.setCreatorId(header.getUserId());
+				entityBO.setCreatorName(header.getNickName());
+				entityBO.setOperatorId(header.getUserId());
+				entityBO.setOperatorName(header.getNickName());
+				roleService.save(entityBO);
+				return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(header.getTenantId());
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                roleService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	@PostMapping("/delete/{id}")
+	public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			roleService.remove(id);
+			return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    @GetMapping("/id/{id}")
-    public Mono<R<RoleVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            RoleBO entityBO = roleService.selectById(id);
-            RoleVO entityVO = roleBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	@PostMapping("/update")
+	public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
+		return getUserHeader().flatMap(header -> {
+			try {
+				RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
+				entityBO.setTenantId(header.getTenantId());
+				entityBO.setOperatorId(header.getUserId());
+				entityBO.setOperatorName(header.getNickName());
+				roleService.update(entityBO);
+				return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    @PostMapping("/list")
-    public Mono<R<Page<RoleVO>>> list(@RequestBody(required = false) RoleQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<RoleBO> entityPageBO = roleService.selectByPage(query);
-                Page<RoleVO> entityPageVO = roleBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	@GetMapping("/id/{id}")
+	public Mono<R<RoleVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			RoleBO entityBO = roleService.selectById(id);
+			RoleVO entityVO = roleBuilder.buildVOByBO(entityBO);
+			return Mono.just(R.ok(entityVO));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    @PostMapping("/tree")
-    public Mono<R<List<RoleTreeVO>>> tree(@RequestBody(required = false) RoleQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                List<RoleTreeBO> entityBOList = roleService.selectTree(query);
-                List<RoleTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
-                for (RoleTreeBO node : entityBOList) {
-                    entityVOList.add(toTreeVO(node));
-                }
-                return Mono.just(R.ok(entityVOList));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	@PostMapping("/list")
+	public Mono<R<Page<RoleVO>>> list(@RequestBody(required = false) RoleQuery entityQuery) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
+				query.setTenantId(tenantId);
+				Page<RoleBO> entityPageBO = roleService.selectByPage(query);
+				Page<RoleVO> entityPageVO = roleBuilder.buildVOPageByBOPage(entityPageBO);
+				return Mono.just(R.ok(entityPageVO));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    private RoleTreeVO toTreeVO(RoleTreeBO node) {
-        RoleVO flat = roleBuilder.buildVOByBO(node);
-        RoleTreeVO out = new RoleTreeVO();
-        out.setId(flat.getId());
-        out.setParentRoleId(flat.getParentRoleId());
-        out.setRoleName(flat.getRoleName());
-        out.setRoleCode(flat.getRoleCode());
-        out.setRoleExt(flat.getRoleExt());
-        out.setEnableFlag(flat.getEnableFlag());
-        out.setRemark(flat.getRemark());
-        out.setCreatorId(flat.getCreatorId());
-        out.setCreatorName(flat.getCreatorName());
-        out.setCreateTime(flat.getCreateTime());
-        out.setOperatorId(flat.getOperatorId());
-        out.setOperatorName(flat.getOperatorName());
-        out.setOperateTime(flat.getOperateTime());
-        if (node.getChildren() != null) {
-            List<RoleTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
-            for (RoleTreeBO child : node.getChildren()) {
-                childVOs.add(toTreeVO(child));
-            }
-            out.setChildren(childVOs);
-        }
-        return out;
-    }
+	@PostMapping("/tree")
+	public Mono<R<List<RoleTreeVO>>> tree(@RequestBody(required = false) RoleQuery entityQuery) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
+				query.setTenantId(tenantId);
+				List<RoleTreeBO> entityBOList = roleService.selectTree(query);
+				List<RoleTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
+				for (RoleTreeBO node : entityBOList) {
+					entityVOList.add(toTreeVO(node));
+				}
+				return Mono.just(R.ok(entityVOList));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
+
+	private RoleTreeVO toTreeVO(RoleTreeBO node) {
+		RoleVO flat = roleBuilder.buildVOByBO(node);
+		RoleTreeVO out = new RoleTreeVO();
+		out.setId(flat.getId());
+		out.setParentRoleId(flat.getParentRoleId());
+		out.setRoleName(flat.getRoleName());
+		out.setRoleCode(flat.getRoleCode());
+		out.setRoleExt(flat.getRoleExt());
+		out.setEnableFlag(flat.getEnableFlag());
+		out.setRemark(flat.getRemark());
+		out.setCreatorId(flat.getCreatorId());
+		out.setCreatorName(flat.getCreatorName());
+		out.setCreateTime(flat.getCreateTime());
+		out.setOperatorId(flat.getOperatorId());
+		out.setOperatorName(flat.getOperatorName());
+		out.setOperateTime(flat.getOperateTime());
+		if (node.getChildren() != null) {
+			List<RoleTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
+			for (RoleTreeBO child : node.getChildren()) {
+				childVOs.add(toTreeVO(child));
+			}
+			out.setChildren(childVOs);
+		}
+		return out;
+	}
 
 }

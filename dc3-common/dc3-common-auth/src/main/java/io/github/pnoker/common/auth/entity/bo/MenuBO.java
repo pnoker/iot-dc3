@@ -38,44 +38,44 @@ import lombok.*;
 @ToString(callSuper = true)
 public class MenuBO extends BaseBO {
 
-    /**
-     * ID
-     */
-    private Long parentMenuId;
+	/**
+	 * ID
+	 */
+	private Long parentMenuId;
 
-    /**
-     * Type
-     */
-    private MenuTypeFlagEnum menuTypeFlag;
+	/**
+	 * Type
+	 */
+	private MenuTypeFlagEnum menuTypeFlag;
 
-    /**
-     * Name
-     */
-    private String menuName;
+	/**
+	 * Name
+	 */
+	private String menuName;
 
-    /**
-     * Code, URLMD5
-     */
-    private String menuCode;
+	/**
+	 * Code, URLMD5
+	 */
+	private String menuCode;
 
-    /**
-     *
-     */
-    private MenuLevelFlagEnum menuLevel;
+	/**
+	 *
+	 */
+	private MenuLevelFlagEnum menuLevel;
 
-    /**
-     *
-     */
-    private Integer menuIndex;
+	/**
+	 *
+	 */
+	private Integer menuIndex;
 
-    /**
-     *
-     */
-    private MenuExt menuExt;
+	/**
+	 *
+	 */
+	private MenuExt menuExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
 }

@@ -36,23 +36,24 @@ import lombok.*;
 @ToString(callSuper = true)
 public class FacadeDriverBO extends BaseBO {
 
-    private String driverName;
+	private String driverName;
 
-    private String driverCode;
+	private String driverCode;
 
-    private String serviceName;
+	private String serviceName;
 
-    private String serviceHost;
+	private String serviceHost;
 
-    private DriverTypeFlagEnum driverTypeFlag;
+	private DriverTypeFlagEnum driverTypeFlag;
 
-    private DriverExt driverExt;
+	private DriverExt driverExt;
 
-    private EnableFlagEnum enableFlag;
+	private EnableFlagEnum enableFlag;
 
-    private Long tenantId;
+	private Long tenantId;
 
-    private String signature;
+	private String signature;
 
-    private Integer version;
+	private Integer version;
+
 }

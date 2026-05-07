@@ -37,46 +37,47 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BaseBO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Primary key ID
-     */
-    private Long id;
+	/**
+	 * Primary key ID
+	 */
+	private Long id;
 
-    /**
-     * Description
-     */
-    private String remark;
+	/**
+	 * Description
+	 */
+	private String remark;
 
-    /**
-     * Creator ID
-     */
-    private Long creatorId;
+	/**
+	 * Creator ID
+	 */
+	private Long creatorId;
 
-    /**
-     * Creator Name
-     */
-    private String creatorName;
+	/**
+	 * Creator Name
+	 */
+	private String creatorName;
 
-    /**
-     * Create Time
-     */
-    private LocalDateTime createTime;
+	/**
+	 * Create Time
+	 */
+	private LocalDateTime createTime;
 
-    /**
-     * Operator ID
-     */
-    private Long operatorId;
+	/**
+	 * Operator ID
+	 */
+	private Long operatorId;
 
-    /**
-     * Operator Name
-     */
-    private String operatorName;
+	/**
+	 * Operator Name
+	 */
+	private String operatorName;
 
-    /**
-     * Operate Time
-     */
-    private LocalDateTime operateTime;
+	/**
+	 * Operate Time
+	 */
+	private LocalDateTime operateTime;
+
 }

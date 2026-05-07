@@ -25,7 +25,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Data transfer object that stores the configured value of a driver attribute for a device.
+ * Data transfer object that stores the configured value of a driver attribute for a
+ * device.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,38 +38,39 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DriverAttributeConfigDTO extends BaseDTO {
 
-    /**
-     * Referenced attribute identifier.
-     */
-    private Long attributeId;
+	/**
+	 * Referenced attribute identifier.
+	 */
+	private Long attributeId;
 
-    /**
-     * Configured attribute value.
-     */
-    private String configValue;
+	/**
+	 * Configured attribute value.
+	 */
+	private String configValue;
 
-    /**
-     * Device ID
-     */
-    private Long deviceId;
+	/**
+	 * Device ID
+	 */
+	private Long deviceId;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant identifier.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant identifier.
+	 */
+	private Long tenantId;
 
-    /**
-     * Data signature used for optimistic checks or synchronization.
-     */
-    private String signature;
+	/**
+	 * Data signature used for optimistic checks or synchronization.
+	 */
+	private String signature;
 
-    /**
-     * Data version.
-     */
-    private Integer version;
+	/**
+	 * Data version.
+	 */
+	private Integer version;
+
 }

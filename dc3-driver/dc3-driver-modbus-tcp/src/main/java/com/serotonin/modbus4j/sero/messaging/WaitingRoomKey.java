@@ -18,12 +18,14 @@
 package com.serotonin.modbus4j.sero.messaging;
 
 /**
- * Waiting room keys are used to match requests with responses. Implementation need to have hashcode and equals
- * definitions.
+ * Waiting room keys are used to match requests with responses. Implementation need to
+ * have hashcode and equals definitions.
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public interface WaitingRoomKey {
-    // Implementation needs to have hashcode and equals implementations.
+
+	// Implementation needs to have hashcode and equals implementations.
+
 }

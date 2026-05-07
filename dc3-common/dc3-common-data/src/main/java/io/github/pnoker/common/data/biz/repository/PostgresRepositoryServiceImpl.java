@@ -48,93 +48,94 @@ import java.util.Objects;
 @Service("postgresRepositoryService")
 public class PostgresRepositoryServiceImpl implements RepositoryService, InitializingBean {
 
-    @Resource
-    private PointValueBuilder pointValueBuilder;
+	@Resource
+	private PointValueBuilder pointValueBuilder;
 
-    @Resource
-    private PointValueManager pointValueManager;
+	@Resource
+	private PointValueManager pointValueManager;
 
-    @Override
-    public String getRepositoryName() {
-        return StrategyConstant.Storage.POSTGRES;
-    }
+	@Override
+	public String getRepositoryName() {
+		return StrategyConstant.Storage.POSTGRES;
+	}
 
-    @Override
-    public void savePointValue(PointValueBO entityBO) {
-        PointValueDO entityDO = pointValueBuilder.buildDOByBO(entityBO);
-        if (!pointValueManager.save(entityDO)) {
-            throw new AddException("Failed to create point value");
-        }
-    }
+	@Override
+	public void savePointValue(PointValueBO entityBO) {
+		PointValueDO entityDO = pointValueBuilder.buildDOByBO(entityBO);
+		if (!pointValueManager.save(entityDO)) {
+			throw new AddException("Failed to create point value");
+		}
+	}
 
-    @Override
-    public void savePointValues(List<PointValueBO> entityBOList) {
-        List<PointValueDO> entityDOList = pointValueBuilder.buildDOListByBOList(entityBOList);
-        if (!pointValueManager.saveBatch(entityDOList)) {
-            throw new AddException("Failed to create point value list");
-        }
-    }
+	@Override
+	public void savePointValues(List<PointValueBO> entityBOList) {
+		List<PointValueDO> entityDOList = pointValueBuilder.buildDOListByBOList(entityBOList);
+		if (!pointValueManager.saveBatch(entityDOList)) {
+			throw new AddException("Failed to create point value list");
+		}
+	}
 
-    @Override
-    public List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
-        LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
-        wrapper.eq(PointValueDO::getTenantId, tenantId);
-        wrapper.eq(PointValueDO::getDeviceId, deviceId);
-        wrapper.eq(PointValueDO::getPointId, pointId);
-        wrapper.orderByDesc(PointValueDO::getCreateTime);
-        wrapper.last("limit %s".formatted(count));
+	@Override
+	public List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
+		LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
+		wrapper.eq(PointValueDO::getTenantId, tenantId);
+		wrapper.eq(PointValueDO::getDeviceId, deviceId);
+		wrapper.eq(PointValueDO::getPointId, pointId);
+		wrapper.orderByDesc(PointValueDO::getCreateTime);
+		wrapper.last("limit %s".formatted(count));
 
-        List<PointValueDO> entityPageDO = pointValueManager.list(wrapper);
-        return entityPageDO.stream().map(PointValueDO::getCalValue).toList();
-    }
+		List<PointValueDO> entityPageDO = pointValueManager.list(wrapper);
+		return entityPageDO.stream().map(PointValueDO::getCalValue).toList();
+	}
 
-    @Override
-    public PointValueBO selectLatestPointValue(Long tenantId, Long deviceId, Long pointId) {
-        LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
-        wrapper.eq(PointValueDO::getTenantId, tenantId);
-        wrapper.eq(PointValueDO::getDeviceId, deviceId);
-        wrapper.eq(PointValueDO::getPointId, pointId);
-        wrapper.orderByDesc(PointValueDO::getCreateTime);
-        wrapper.last("limit 1");
+	@Override
+	public PointValueBO selectLatestPointValue(Long tenantId, Long deviceId, Long pointId) {
+		LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
+		wrapper.eq(PointValueDO::getTenantId, tenantId);
+		wrapper.eq(PointValueDO::getDeviceId, deviceId);
+		wrapper.eq(PointValueDO::getPointId, pointId);
+		wrapper.orderByDesc(PointValueDO::getCreateTime);
+		wrapper.last("limit 1");
 
-        PointValueDO entityDO = pointValueManager.getOne(wrapper);
-        return pointValueBuilder.buildBOByDO(entityDO);
-    }
+		PointValueDO entityDO = pointValueManager.getOne(wrapper);
+		return pointValueBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds) {
-        throw new UnsupportedOperationException(
-                "selectLatestPointValues is not implemented; callers should use selectLatestPointValue in a loop "
-                        + "or the PointValueLocalCacheService batch API until a real batch query is wired up.");
-    }
+	@Override
+	public List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds) {
+		throw new UnsupportedOperationException(
+				"selectLatestPointValues is not implemented; callers should use selectLatestPointValue in a loop "
+						+ "or the PointValueLocalCacheService batch API until a real batch query is wired up.");
+	}
 
-    @Override
-    public Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<PointValueDO> entityPageDO = pointValueManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return pointValueBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	@Override
+	public Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<PointValueDO> entityPageDO = pointValueManager.page(PageUtil.page(entityQuery.getPage()),
+				fuzzyQuery(entityQuery));
+		return pointValueBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    /**
-     * Construct a fuzzy query wrapper for point value retrieval
-     *
-     * @param entityQuery {@link PointValueQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<PointValueDO> fuzzyQuery(PointValueQuery entityQuery) {
-        LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointValueDO::getTenantId, entityQuery.getTenantId());
-        wrapper.eq(Objects.nonNull(entityQuery.getDeviceId()), PointValueDO::getDeviceId, entityQuery.getDeviceId());
-        wrapper.eq(Objects.nonNull(entityQuery.getPointId()), PointValueDO::getPointId, entityQuery.getPointId());
-        wrapper.ge(Objects.nonNull(entityQuery.getCreateTimeFrom()), PointValueDO::getCreateTime, entityQuery.getCreateTimeFrom());
-        return wrapper;
-    }
+	/**
+	 * Construct a fuzzy query wrapper for point value retrieval
+	 * @param entityQuery {@link PointValueQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<PointValueDO> fuzzyQuery(PointValueQuery entityQuery) {
+		LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
+		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointValueDO::getTenantId, entityQuery.getTenantId());
+		wrapper.eq(Objects.nonNull(entityQuery.getDeviceId()), PointValueDO::getDeviceId, entityQuery.getDeviceId());
+		wrapper.eq(Objects.nonNull(entityQuery.getPointId()), PointValueDO::getPointId, entityQuery.getPointId());
+		wrapper.ge(Objects.nonNull(entityQuery.getCreateTimeFrom()), PointValueDO::getCreateTime,
+				entityQuery.getCreateTimeFrom());
+		return wrapper;
+	}
 
-    @Override
-    public void afterPropertiesSet() {
-        RepositoryStrategyFactory.put(StrategyConstant.Storage.POSTGRES, this);
-    }
+	@Override
+	public void afterPropertiesSet() {
+		RepositoryStrategyFactory.put(StrategyConstant.Storage.POSTGRES, this);
+	}
 
 }

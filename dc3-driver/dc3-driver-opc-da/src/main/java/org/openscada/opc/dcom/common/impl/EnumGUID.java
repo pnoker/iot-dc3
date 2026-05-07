@@ -30,89 +30,92 @@ import java.util.Collection;
 import java.util.List;
 
 public class EnumGUID extends BaseCOMObject {
-    public static final int DEFAULT_BATCH_SIZE = Integer.getInteger("openscada.dcom.enum-batch-size", 10);
 
-    public EnumGUID(final IJIComObject enumStringObject) throws IllegalArgumentException, UnknownHostException, JIException {
-        super(enumStringObject.queryInterface(org.openscada.opc.dcom.common.Constants.IEnumGUID_IID));
-    }
+	public static final int DEFAULT_BATCH_SIZE = Integer.getInteger("openscada.dcom.enum-batch-size", 10);
 
-    public int next(final List<UUID> list, final int num) throws JIException {
-        if (num <= 0) {
-            return 0;
-        }
+	public EnumGUID(final IJIComObject enumStringObject)
+			throws IllegalArgumentException, UnknownHostException, JIException {
+		super(enumStringObject.queryInterface(org.openscada.opc.dcom.common.Constants.IEnumGUID_IID));
+	}
 
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(0);
+	public int next(final List<UUID> list, final int num) throws JIException {
+		if (num <= 0) {
+			return 0;
+		}
 
-        callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
-        callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
-        callObject.addOutParamAsObject(new JIArray(UUID.class, null, 1, true, true), JIFlags.FLAG_NULL);
-        callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(0);
 
-        Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
+		callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
+		callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
+		callObject.addOutParamAsObject(new JIArray(UUID.class, null, 1, true, true), JIFlags.FLAG_NULL);
+		callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
 
-        UUID[] resultData = (UUID[]) ((JIArray) result[0]).getArrayInstance();
-        Integer cnt = (Integer) result[1];
+		Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
 
-        for (int i = 0; i < cnt; i++) {
-            list.add(resultData[i]);
-        }
-        return cnt;
-    }
+		UUID[] resultData = (UUID[]) ((JIArray) result[0]).getArrayInstance();
+		Integer cnt = (Integer) result[1];
 
-    public Collection<UUID> next(final int num) throws JIException {
-        List<UUID> list = new ArrayList<UUID>(num);
-        next(list, num);
-        return list;
-    }
+		for (int i = 0; i < cnt; i++) {
+			list.add(resultData[i]);
+		}
+		return cnt;
+	}
 
-    public void skip(final int num) throws JIException {
-        if (num <= 0) {
-            return;
-        }
+	public Collection<UUID> next(final int num) throws JIException {
+		List<UUID> list = new ArrayList<UUID>(num);
+		next(list, num);
+		return list;
+	}
 
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(1);
+	public void skip(final int num) throws JIException {
+		if (num <= 0) {
+			return;
+		}
 
-        callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(1);
 
-        getCOMObject().call(callObject);
-    }
+		callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
 
-    public void reset() throws JIException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(2);
+		getCOMObject().call(callObject);
+	}
 
-        getCOMObject().call(callObject);
-    }
+	public void reset() throws JIException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(2);
 
-    public EnumGUID cloneObject() throws JIException, IllegalArgumentException, UnknownHostException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(3);
+		getCOMObject().call(callObject);
+	}
 
-        callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
+	public EnumGUID cloneObject() throws JIException, IllegalArgumentException, UnknownHostException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(3);
 
-        Object[] result = getCOMObject().call(callObject);
+		callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
 
-        IJIComObject object = (IJIComObject) result[0];
+		Object[] result = getCOMObject().call(callObject);
 
-        return new EnumGUID(object);
-    }
+		IJIComObject object = (IJIComObject) result[0];
 
-    public Collection<UUID> asCollection(final int batchSize) throws JIException {
-        reset();
+		return new EnumGUID(object);
+	}
 
-        List<UUID> data = new ArrayList<UUID>();
-        int i = 0;
-        do {
-            i = next(data, batchSize);
-        } while (i == batchSize);
+	public Collection<UUID> asCollection(final int batchSize) throws JIException {
+		reset();
 
-        return data;
-    }
+		List<UUID> data = new ArrayList<UUID>();
+		int i = 0;
+		do {
+			i = next(data, batchSize);
+		}
+		while (i == batchSize);
 
-    public Collection<UUID> asCollection() throws JIException {
-        return asCollection(DEFAULT_BATCH_SIZE);
-    }
+		return data;
+	}
+
+	public Collection<UUID> asCollection() throws JIException {
+		return asCollection(DEFAULT_BATCH_SIZE);
+	}
 
 }

@@ -27,8 +27,9 @@ import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
  */
 public interface TenantFacade {
 
-    /**
-     * @return the tenant, or {@code null} when no tenant carries the given code.
-     */
-    FacadeTenantBO selectByCode(String code);
+	/**
+	 * @return the tenant, or {@code null} when no tenant carries the given code.
+	 */
+	FacadeTenantBO selectByCode(String code);
+
 }

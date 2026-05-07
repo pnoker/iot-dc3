@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.mapper;
 
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.pnoker.common.manager.entity.model.PointDataVolumeHistoryDO;
 

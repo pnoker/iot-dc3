@@ -26,7 +26,8 @@ import java.util.List;
 /**
  * OpenAI-compatible chat completion request body.
  *
- * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API Reference</a>
+ * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API
+ * Reference</a>
  */
 @Getter
 @Setter
@@ -34,43 +35,44 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatCompletionRequest {
 
-    /**
-     * Model identifier (advisory — the actual model is configured server-side).
-     */
-    private String model;
+	/**
+	 * Model identifier (advisory — the actual model is configured server-side).
+	 */
+	private String model;
 
-    /**
-     * Conversation messages in chronological order.
-     */
-    private List<ChatMessageDTO> messages;
+	/**
+	 * Conversation messages in chronological order.
+	 */
+	private List<ChatMessageDTO> messages;
 
-    /**
-     * Sampling temperature override (0.0–2.0). Null uses the server default.
-     */
-    private Double temperature;
+	/**
+	 * Sampling temperature override (0.0–2.0). Null uses the server default.
+	 */
+	private Double temperature;
 
-    /**
-     * Maximum tokens to generate. Null uses the server default.
-     */
-    private Integer maxTokens;
+	/**
+	 * Maximum tokens to generate. Null uses the server default.
+	 */
+	private Integer maxTokens;
 
-    /**
-     * Whether to stream the response as SSE events.
-     */
-    private Boolean stream;
+	/**
+	 * Whether to stream the response as SSE events.
+	 */
+	private Boolean stream;
 
-    /**
-     * Conversation ID for chat memory correlation.
-     * If omitted, a new conversation is started each request.
-     */
-    private String conversationId;
+	/**
+	 * Conversation ID for chat memory correlation. If omitted, a new conversation is
+	 * started each request.
+	 */
+	private String conversationId;
 
-    /**
-     * Skill name to activate for this request. Null = all tools available.
-     */
-    private String skill;
+	/**
+	 * Skill name to activate for this request. Null = all tools available.
+	 */
+	private String skill;
 
-    public boolean isStream() {
-        return Boolean.TRUE.equals(stream);
-    }
+	public boolean isStream() {
+		return Boolean.TRUE.equals(stream);
+	}
+
 }

@@ -24,29 +24,28 @@ import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 /**
  * Protocol-neutral driver facade.
  * <p>
- * Mirrors the three RPCs on {@code api.center.manager.DriverApi}.
- * Implementation selection follows the same {@code dc3.facade.mode} switch
- * used by {@link DeviceFacade}.
+ * Mirrors the three RPCs on {@code api.center.manager.DriverApi}. Implementation
+ * selection follows the same {@code dc3.facade.mode} switch used by {@link DeviceFacade}.
  *
  * @author pnoker
  * @since 2026.5.5
  */
 public interface DriverFacade {
 
-    /**
-     * @return the driver, or {@code null} when it does not exist.
-     */
-    FacadeDriverBO selectById(Long id);
+	/**
+	 * @return the driver, or {@code null} when it does not exist.
+	 */
+	FacadeDriverBO selectById(Long id);
 
-    /**
-     * @return a page of drivers (never {@code null}; empty page when nothing matches).
-     */
-    FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query);
+	/**
+	 * @return a page of drivers (never {@code null}; empty page when nothing matches).
+	 */
+	FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query);
 
-    /**
-     * Resolve the driver that owns a given device.
-     *
-     * @return the driver, or {@code null} when the device has no bound driver.
-     */
-    FacadeDriverBO selectByDeviceId(Long deviceId);
+	/**
+	 * Resolve the driver that owns a given device.
+	 * @return the driver, or {@code null} when the device has no bound driver.
+	 */
+	FacadeDriverBO selectByDeviceId(Long deviceId);
+
 }

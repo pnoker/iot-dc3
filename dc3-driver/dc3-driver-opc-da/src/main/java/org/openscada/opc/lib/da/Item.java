@@ -24,48 +24,49 @@ import org.jinterop.dcom.core.JIVariant;
 @Slf4j
 public class Item {
 
-    private Group _group = null;
+	private Group _group = null;
 
-    private int _serverHandle = 0;
+	private int _serverHandle = 0;
 
-    private int _clientHandle = 0;
+	private int _clientHandle = 0;
 
-    private String _id = null;
+	private String _id = null;
 
-    Item(final Group group, final int serverHandle, final int clientHandle, final String id) {
-        super();
-        log.debug(String.format("Adding new item '%s' (0x%08X) for group %s", id, serverHandle, group.toString()));
-        this._group = group;
-        this._serverHandle = serverHandle;
-        this._clientHandle = clientHandle;
-        this._id = id;
-    }
+	Item(final Group group, final int serverHandle, final int clientHandle, final String id) {
+		super();
+		log.debug(String.format("Adding new item '%s' (0x%08X) for group %s", id, serverHandle, group.toString()));
+		this._group = group;
+		this._serverHandle = serverHandle;
+		this._clientHandle = clientHandle;
+		this._id = id;
+	}
 
-    public Group getGroup() {
-        return this._group;
-    }
+	public Group getGroup() {
+		return this._group;
+	}
 
-    public int getServerHandle() {
-        return this._serverHandle;
-    }
+	public int getServerHandle() {
+		return this._serverHandle;
+	}
 
-    public int getClientHandle() {
-        return this._clientHandle;
-    }
+	public int getClientHandle() {
+		return this._clientHandle;
+	}
 
-    public String getId() {
-        return this._id;
-    }
+	public String getId() {
+		return this._id;
+	}
 
-    public void setActive(final boolean state) throws JIException {
-        this._group.setActive(state, this);
-    }
+	public void setActive(final boolean state) throws JIException {
+		this._group.setActive(state, this);
+	}
 
-    public ItemState read(final boolean device) throws JIException {
-        return this._group.read(device, this).get(this);
-    }
+	public ItemState read(final boolean device) throws JIException {
+		return this._group.read(device, this).get(this);
+	}
 
-    public Integer write(final JIVariant value) throws JIException {
-        return this._group.write(new WriteRequest[]{new WriteRequest(this, value)}).get(this);
-    }
+	public Integer write(final JIVariant value) throws JIException {
+		return this._group.write(new WriteRequest[] { new WriteRequest(this, value) }).get(this);
+	}
+
 }

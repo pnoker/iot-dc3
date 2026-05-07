@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Business object that describes a device assigned to the current driver, including the cached
- * point list and resolved attribute configurations.
+ * Business object that describes a device assigned to the current driver, including the
+ * cached point list and resolved attribute configurations.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,63 +42,65 @@ import java.util.Set;
 @ToString(callSuper = true)
 public class DeviceBO extends BaseBO {
 
-    /**
-     * Device display name.
-     */
-    private String deviceName;
+	/**
+	 * Device display name.
+	 */
+	private String deviceName;
 
-    /**
-     * Device code defined in the platform.
-     */
-    private String deviceCode;
+	/**
+	 * Device code defined in the platform.
+	 */
+	private String deviceCode;
 
-    /**
-     * Owning driver identifier.
-     */
-    private Long driverId;
+	/**
+	 * Owning driver identifier.
+	 */
+	private Long driverId;
 
-    /**
-     * Extended device metadata.
-     */
-    private DeviceExt deviceExt;
+	/**
+	 * Extended device metadata.
+	 */
+	private DeviceExt deviceExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant identifier.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant identifier.
+	 */
+	private Long tenantId;
 
-    /**
-     * Data signature used for optimistic checks or synchronization.
-     */
-    private String signature;
+	/**
+	 * Data signature used for optimistic checks or synchronization.
+	 */
+	private String signature;
 
-    /**
-     * Data version.
-     */
-    private Integer version;
+	/**
+	 * Data version.
+	 */
+	private Integer version;
 
-    /**
-     * Assigned profile identifiers.
-     */
-    private Set<Long> profileIds;
+	/**
+	 * Assigned profile identifiers.
+	 */
+	private Set<Long> profileIds;
 
-    /**
-     * Identifiers of points owned by the device.
-     */
-    private Set<Long> pointIds;
+	/**
+	 * Identifiers of points owned by the device.
+	 */
+	private Set<Long> pointIds;
 
-    /**
-     * Driver attribute configuration map keyed by attribute identifier.
-     */
-    private Map<Long, DriverAttributeConfigDTO> driverAttributeConfigIdMap;
+	/**
+	 * Driver attribute configuration map keyed by attribute identifier.
+	 */
+	private Map<Long, DriverAttributeConfigDTO> driverAttributeConfigIdMap;
 
-    /**
-     * Point attribute configuration map keyed by point identifier and then attribute identifier.
-     */
-    private Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigIdMap;
+	/**
+	 * Point attribute configuration map keyed by point identifier and then attribute
+	 * identifier.
+	 */
+	private Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigIdMap;
+
 }

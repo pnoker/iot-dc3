@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.grpc;
 
-
 import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
@@ -44,32 +43,34 @@ import java.util.Objects;
 @Service
 public class TenantServer extends TenantApiGrpc.TenantApiImplBase {
 
-    @Resource
-    private GrpcTenantBuilder grpcTenantBuilder;
+	@Resource
+	private GrpcTenantBuilder grpcTenantBuilder;
 
-    @Resource
-    private TenantService tenantService;
+	@Resource
+	private TenantService tenantService;
 
-    @Override
-    public void selectByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
-        GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+	@Override
+	public void selectByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
+		GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
+		GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        TenantBO entityBO = tenantService.selectByCode(request.getCode());
-        if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+		TenantBO entityBO = tenantService.selectByCode(request.getCode());
+		if (Objects.isNull(entityBO)) {
+			rBuilder.setOk(false);
+			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+		}
+		else {
+			rBuilder.setOk(true);
+			rBuilder.setCode(ResponseEnum.OK.getCode());
+			rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            builder.setData(grpcTenantBuilder.buildGrpcDTOByBO(entityBO));
-        }
+			builder.setData(grpcTenantBuilder.buildGrpcDTOByBO(entityBO));
+		}
 
-        builder.setResult(rBuilder);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
-    }
+		builder.setResult(rBuilder);
+		responseObserver.onNext(builder.build());
+		responseObserver.onCompleted();
+	}
+
 }

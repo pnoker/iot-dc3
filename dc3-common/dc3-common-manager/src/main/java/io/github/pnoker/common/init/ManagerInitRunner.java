@@ -25,45 +25,40 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Manager Initialization Runner for DC3 IoT Platform.
- * This class is responsible for initializing manager-related components and services
- * during application startup. It configures component scanning for manager packages
- * and sets up MyBatis mapper scanning.
+ * Manager Initialization Runner for DC3 IoT Platform. This class is responsible for
+ * initializing manager-related components and services during application startup. It
+ * configures component scanning for manager packages and sets up MyBatis mapper scanning.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.manager"
-})
-@MapperScan(basePackages = {
-        "io.github.pnoker.common.manager.mapper"
-})
+@ComponentScan(basePackages = { "io.github.pnoker.common.manager" })
+@MapperScan(basePackages = { "io.github.pnoker.common.manager.mapper" })
 public class ManagerInitRunner implements ApplicationRunner {
 
-    private final ScheduleForManagerService scheduleForManagerService;
+	private final ScheduleForManagerService scheduleForManagerService;
 
-    /**
-     * Constructs a new ManagerInitRunner with the required service dependency.
-     *
-     * @param scheduleForManagerService The service responsible for manager scheduling operations
-     */
-    public ManagerInitRunner(ScheduleForManagerService scheduleForManagerService) {
-        this.scheduleForManagerService = scheduleForManagerService;
-    }
+	/**
+	 * Constructs a new ManagerInitRunner with the required service dependency.
+	 * @param scheduleForManagerService The service responsible for manager scheduling
+	 * operations
+	 */
+	public ManagerInitRunner(ScheduleForManagerService scheduleForManagerService) {
+		this.scheduleForManagerService = scheduleForManagerService;
+	}
 
-    /**
-     * Executes the initialization process when the application starts.
-     * This method initializes the schedule manager service to set up necessary
-     * scheduling configurations and tasks.
-     *
-     * @param args Application arguments passed during startup
-     * @throws Exception If an error occurs during initialization
-     */
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        scheduleForManagerService.initial();
-    }
+	/**
+	 * Executes the initialization process when the application starts. This method
+	 * initializes the schedule manager service to set up necessary scheduling
+	 * configurations and tasks.
+	 * @param args Application arguments passed during startup
+	 * @throws Exception If an error occurs during initialization
+	 */
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		scheduleForManagerService.initial();
+	}
+
 }

@@ -34,76 +34,79 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum ApiTypeFlagEnum {
-    /**
-     * POST
-     */
-    POST((byte) 0, "post", "POST"),
 
-    /**
-     * DELETE
-     */
-    DELETE((byte) 1, "delete", "DELETE"),
+	/**
+	 * POST
+	 */
+	POST((byte) 0, "post", "POST"),
 
-    /**
-     * PUT
-     */
-    PUT((byte) 2, "put", "PUT"),
+	/**
+	 * DELETE
+	 */
+	DELETE((byte) 1, "delete", "DELETE"),
 
-    /**
-     * GET
-     */
-    GET((byte) 3, "get", "GET"),
-    ;
+	/**
+	 * PUT
+	 */
+	PUT((byte) 2, "put", "PUT"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * GET
+	 */
+	GET((byte) 3, "get", "GET"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link ApiTypeFlagEnum}
-     */
-    public static ApiTypeFlagEnum ofIndex(Byte index) {
-        Optional<ApiTypeFlagEnum> any = Arrays.stream(ApiTypeFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link ApiTypeFlagEnum}
-     */
-    public static ApiTypeFlagEnum ofCode(String code) {
-        Optional<ApiTypeFlagEnum> any = Arrays.stream(ApiTypeFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link ApiTypeFlagEnum}
+	 */
+	public static ApiTypeFlagEnum ofIndex(Byte index) {
+		Optional<ApiTypeFlagEnum> any = Arrays.stream(ApiTypeFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link ApiTypeFlagEnum}
-     */
-    public static ApiTypeFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link ApiTypeFlagEnum}
+	 */
+	public static ApiTypeFlagEnum ofCode(String code) {
+		Optional<ApiTypeFlagEnum> any = Arrays.stream(ApiTypeFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link ApiTypeFlagEnum}
+	 */
+	public static ApiTypeFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

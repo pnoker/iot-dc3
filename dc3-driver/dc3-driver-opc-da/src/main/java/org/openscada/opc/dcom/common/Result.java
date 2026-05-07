@@ -18,35 +18,37 @@
 package org.openscada.opc.dcom.common;
 
 public class Result<T> {
-    private T value;
 
-    private int errorCode;
+	private T value;
 
-    public Result() {
-    }
+	private int errorCode;
 
-    public Result(final T value, final int errorCode) {
-        this.value = value;
-        this.errorCode = errorCode;
-    }
+	public Result() {
+	}
 
-    public int getErrorCode() {
-        return this.errorCode;
-    }
+	public Result(final T value, final int errorCode) {
+		this.value = value;
+		this.errorCode = errorCode;
+	}
 
-    public void setErrorCode(final int errorCode) {
-        this.errorCode = errorCode;
-    }
+	public int getErrorCode() {
+		return this.errorCode;
+	}
 
-    public T getValue() {
-        return this.value;
-    }
+	public void setErrorCode(final int errorCode) {
+		this.errorCode = errorCode;
+	}
 
-    public void setValue(final T value) {
-        this.value = value;
-    }
+	public T getValue() {
+		return this.value;
+	}
 
-    public boolean isFailed() {
-        return this.errorCode != 0;
-    }
+	public void setValue(final T value) {
+		this.value = value;
+	}
+
+	public boolean isFailed() {
+		return this.errorCode != 0;
+	}
+
 }

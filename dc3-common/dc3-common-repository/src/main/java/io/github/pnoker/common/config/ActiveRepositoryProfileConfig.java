@@ -28,9 +28,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 /**
  * Active Repository Profile Configuration
  * <p>
- * Environment post processor that automatically activates the "repository" profile.
- * This configuration runs with highest precedence to ensure the repository profile
- * is available during application startup for repository-related configurations.
+ * Environment post processor that automatically activates the "repository" profile. This
+ * configuration runs with highest precedence to ensure the repository profile is
+ * available during application startup for repository-related configurations.
  * </p>
  *
  * @author pnoker
@@ -42,14 +42,14 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveRepositoryProfileConfig implements EnvironmentPostProcessor {
 
-    /**
-     * Post-process environment to add the "repository" active profile
-     *
-     * @param environment ConfigurableEnvironment to modify
-     * @param application SpringApplication instance
-     */
-    @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("repository");
-    }
+	/**
+	 * Post-process environment to add the "repository" active profile
+	 * @param environment ConfigurableEnvironment to modify
+	 * @param application SpringApplication instance
+	 */
+	@Override
+	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+		environment.addActiveProfile("repository");
+	}
+
 }

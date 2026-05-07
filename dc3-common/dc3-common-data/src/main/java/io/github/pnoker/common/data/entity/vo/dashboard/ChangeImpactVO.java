@@ -27,21 +27,26 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * One config-change event — a driver/device/profile row whose operate_time
- * differs from create_time (i.e. someone edited it). Overlaid on the
- * alarm trend chart so spikes can be attributed to recent changes.
+ * One config-change event — a driver/device/profile row whose operate_time differs from
+ * create_time (i.e. someone edited it). Overlaid on the alarm trend chart so spikes can
+ * be attributed to recent changes.
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class ChangeImpactVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    /**
-     * {@code driver} | {@code device} | {@code profile}.
-     */
-    private String kind;
-    private long entityId;
-    private LocalDateTime operateTime;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * {@code driver} | {@code device} | {@code profile}.
+	 */
+	private String kind;
+
+	private long entityId;
+
+	private LocalDateTime operateTime;
+
 }

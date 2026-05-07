@@ -40,29 +40,30 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class FacadePointQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    private Long tenantId;
+	private Long tenantId;
 
-    private String pointName;
+	private String pointName;
 
-    private String pointCode;
+	private String pointCode;
 
-    private PointTypeFlagEnum pointTypeFlag;
+	private PointTypeFlagEnum pointTypeFlag;
 
-    private RwFlagEnum rwFlag;
+	private RwFlagEnum rwFlag;
 
-    private Long profileId;
+	private Long profileId;
 
-    private EnableFlagEnum enableFlag;
+	private EnableFlagEnum enableFlag;
 
-    private Integer version;
+	private Integer version;
 
-    /**
-     * Device ID — filter points bound to a specific device.
-     */
-    private Long deviceId;
+	/**
+	 * Device ID — filter points bound to a specific device.
+	 */
+	private Long deviceId;
+
 }

@@ -26,14 +26,14 @@ import java.util.List;
 /**
  * Protocol-neutral device facade.
  * <p>
- * Mirrors the four RPCs on {@code api.center.manager.DeviceApi} but returns plain
- * BO/Page types so callers never have to touch gRPC or protobuf classes.
- * Two implementations back this interface:
+ * Mirrors the four RPCs on {@code api.center.manager.DeviceApi} but returns plain BO/Page
+ * types so callers never have to touch gRPC or protobuf classes. Two implementations back
+ * this interface:
  * <ul>
- *   <li>{@code DeviceLocalFacade} — in-process call into {@code DeviceService},
- *       selected when {@code dc3.facade.mode=local} (single deployment).</li>
- *   <li>{@code DeviceGrpcFacade} — gRPC call against Manager Center,
- *       selected when {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
+ * <li>{@code DeviceLocalFacade} — in-process call into {@code DeviceService}, selected
+ * when {@code dc3.facade.mode=local} (single deployment).</li>
+ * <li>{@code DeviceGrpcFacade} — gRPC call against Manager Center, selected when
+ * {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
  * </ul>
  *
  * @author pnoker
@@ -41,31 +41,28 @@ import java.util.List;
  */
 public interface DeviceFacade {
 
-    /**
-     * Query a single device by id.
-     *
-     * @return the device, or {@code null} when the device does not exist.
-     */
-    FacadeDeviceBO selectById(Long id);
+	/**
+	 * Query a single device by id.
+	 * @return the device, or {@code null} when the device does not exist.
+	 */
+	FacadeDeviceBO selectById(Long id);
 
-    /**
-     * Paginated query.
-     *
-     * @return a page of devices (never {@code null}; empty page when nothing matches).
-     */
-    FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query);
+	/**
+	 * Paginated query.
+	 * @return a page of devices (never {@code null}; empty page when nothing matches).
+	 */
+	FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query);
 
-    /**
-     * List devices attached to a given profile.
-     *
-     * @return an immutable list (never {@code null}; empty when nothing matches).
-     */
-    List<FacadeDeviceBO> selectByProfileId(Long profileId);
+	/**
+	 * List devices attached to a given profile.
+	 * @return an immutable list (never {@code null}; empty when nothing matches).
+	 */
+	List<FacadeDeviceBO> selectByProfileId(Long profileId);
 
-    /**
-     * List devices attached to a given driver.
-     *
-     * @return an immutable list (never {@code null}; empty when nothing matches).
-     */
-    List<FacadeDeviceBO> selectByDriverId(Long driverId);
+	/**
+	 * List devices attached to a given driver.
+	 * @return an immutable list (never {@code null}; empty when nothing matches).
+	 */
+	List<FacadeDeviceBO> selectByDriverId(Long driverId);
+
 }

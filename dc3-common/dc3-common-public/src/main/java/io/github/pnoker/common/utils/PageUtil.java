@@ -31,9 +31,8 @@ import java.util.Objects;
 /**
  * Pagination Utility Class
  * <p>
- * Utility class for pagination operations in IoT DC3 platform.
- * Provides methods for converting between MyBatis-Plus Page
- * and custom Pages objects.
+ * Utility class for pagination operations in IoT DC3 platform. Provides methods for
+ * converting between MyBatis-Plus Page and custom Pages objects.
  * </p>
  *
  * @author pnoker
@@ -43,42 +42,44 @@ import java.util.Objects;
 @Slf4j
 public class PageUtil {
 
-    private PageUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private PageUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Convert custom {@link Pages} object to MyBatis-Plus {@link Page}.
-     *
-     * @param pages {@link Pages}
-     * @param <T>   Entity type
-     * @return MyBatis-Plus {@link Page}
-     */
-    public static <T> Page<T> page(Pages pages) {
-        Page<T> page = new Page<>();
-        if (Objects.isNull(pages)) {
-            pages = new Pages();
-        }
+	/**
+	 * Convert custom {@link Pages} object to MyBatis-Plus {@link Page}.
+	 * @param pages {@link Pages}
+	 * @param <T> Entity type
+	 * @return MyBatis-Plus {@link Page}
+	 */
+	public static <T> Page<T> page(Pages pages) {
+		Page<T> page = new Page<>();
+		if (Objects.isNull(pages)) {
+			pages = new Pages();
+		}
 
-        if (pages.getCurrent() < DefaultConstant.ONE) {
-            pages.setCurrent(DefaultConstant.ONE);
-        }
-        page.setCurrent(pages.getCurrent());
+		if (pages.getCurrent() < DefaultConstant.ONE) {
+			pages.setCurrent(DefaultConstant.ONE);
+		}
+		page.setCurrent(pages.getCurrent());
 
-        if (pages.getSize() > DefaultConstant.MAX_PAGE_SIZE) {
-            pages.setSize(DefaultConstant.MAX_PAGE_SIZE);
-        }
-        page.setSize(pages.getSize());
+		if (pages.getSize() > DefaultConstant.MAX_PAGE_SIZE) {
+			pages.setSize(DefaultConstant.MAX_PAGE_SIZE);
+		}
+		page.setSize(pages.getSize());
 
-        List<OrderItem> orders = pages.getOrders();
-        boolean anyMatch = orders.stream()
-                .filter(order -> Objects.nonNull(order) && StringUtils.isNotEmpty(order.getColumn()))
-                .anyMatch(order -> "create_time".equals(order.getColumn()));
-        if (!anyMatch) {
-            orders.add(OrderItem.desc("create_time"));
-        }
-        List<OrderItem> orderItemList = orders.stream().filter(order -> Objects.nonNull(order) && StringUtils.isNotEmpty(order.getColumn())).toList();
-        page.setOrders(orderItemList);
-        return page;
-    }
+		List<OrderItem> orders = pages.getOrders();
+		boolean anyMatch = orders.stream()
+			.filter(order -> Objects.nonNull(order) && StringUtils.isNotEmpty(order.getColumn()))
+			.anyMatch(order -> "create_time".equals(order.getColumn()));
+		if (!anyMatch) {
+			orders.add(OrderItem.desc("create_time"));
+		}
+		List<OrderItem> orderItemList = orders.stream()
+			.filter(order -> Objects.nonNull(order) && StringUtils.isNotEmpty(order.getColumn()))
+			.toList();
+		page.setOrders(orderItemList);
+		return page;
+	}
+
 }

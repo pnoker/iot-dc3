@@ -30,30 +30,31 @@ import io.github.pnoker.common.base.service.BaseService;
  */
 public interface UserService extends BaseService<UserBO, UserQuery> {
 
-    /**
-     * Get user by username.
-     *
-     * @param userName       username
-     * @param throwException whether to throw exception when user does not exist
-     * @return {@link UserBO} or {@code null} when not found and {@code throwException} is false
-     */
-    UserBO selectByUserName(String userName, boolean throwException);
+	/**
+	 * Get user by username.
+	 * @param userName username
+	 * @param throwException whether to throw exception when user does not exist
+	 * @return {@link UserBO} or {@code null} when not found and {@code throwException} is
+	 * false
+	 */
+	UserBO selectByUserName(String userName, boolean throwException);
 
-    /**
-     * Get user by phone number.
-     *
-     * @param phone          phone number
-     * @param throwException whether to throw exception when user does not exist
-     * @return {@link UserBO} or {@code null} when not found and {@code throwException} is false
-     */
-    UserBO selectByPhone(String phone, boolean throwException);
+	/**
+	 * Get user by phone number.
+	 * @param phone phone number
+	 * @param throwException whether to throw exception when user does not exist
+	 * @return {@link UserBO} or {@code null} when not found and {@code throwException} is
+	 * false
+	 */
+	UserBO selectByPhone(String phone, boolean throwException);
 
-    /**
-     * Get user by email.
-     *
-     * @param email          email address
-     * @param throwException whether to throw exception when user does not exist
-     * @return {@link UserBO} or {@code null} when not found and {@code throwException} is false
-     */
-    UserBO selectByEmail(String email, boolean throwException);
+	/**
+	 * Get user by email.
+	 * @param email email address
+	 * @param throwException whether to throw exception when user does not exist
+	 * @return {@link UserBO} or {@code null} when not found and {@code throwException} is
+	 * false
+	 */
+	UserBO selectByEmail(String email, boolean throwException);
+
 }

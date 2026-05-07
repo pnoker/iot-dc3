@@ -43,66 +43,64 @@ import java.util.Map;
 @ConditionalOnClass(ExchangeConfig.class)
 public class DataTopicConfig {
 
-    private final TopicExchange eventExchange;
-    private final TopicExchange valueExchange;
+	private final TopicExchange eventExchange;
 
-    public DataTopicConfig(TopicExchange eventExchange, TopicExchange valueExchange) {
-        this.eventExchange = eventExchange;
-        this.valueExchange = valueExchange;
-    }
+	private final TopicExchange valueExchange;
 
-    @Bean
-    Queue driverEventQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 30 seconds: 30 * 1000 = 30000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DRIVER_EVENT, true, false, false, arguments);
-    }
+	public DataTopicConfig(TopicExchange eventExchange, TopicExchange valueExchange) {
+		this.eventExchange = eventExchange;
+		this.valueExchange = valueExchange;
+	}
 
-    @Bean
-    Binding driverEventBinding(Queue driverEventQueue) {
-        Binding binding = BindingBuilder
-                .bind(driverEventQueue)
-                .to(eventExchange)
-                .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
-        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
-        return binding;
-    }
+	@Bean
+	Queue driverEventQueue() {
+		Map<String, Object> arguments = new HashMap<>();
+		// 30 seconds: 30 * 1000 = 30000L
+		arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
+		return new Queue(RabbitConstant.QUEUE_DRIVER_EVENT, true, false, false, arguments);
+	}
 
-    @Bean
-    Queue deviceEventQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 30 seconds: 30 * 1000 = 30000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, false, arguments);
-    }
+	@Bean
+	Binding driverEventBinding(Queue driverEventQueue) {
+		Binding binding = BindingBuilder.bind(driverEventQueue)
+			.to(eventExchange)
+			.with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
+		binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+		return binding;
+	}
 
-    @Bean
-    Binding deviceEventBinding(Queue deviceEventQueue) {
-        Binding binding = BindingBuilder
-                .bind(deviceEventQueue)
-                .to(eventExchange)
-                .with(RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + SymbolConstant.ASTERISK);
-        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
-        return binding;
-    }
+	@Bean
+	Queue deviceEventQueue() {
+		Map<String, Object> arguments = new HashMap<>();
+		// 30 seconds: 30 * 1000 = 30000L
+		arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
+		return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, false, arguments);
+	}
 
-    @Bean
-    Queue pointValueQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 7 days:  7 * 24 * 60 * 60 * 1000 = 604800000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 604800000L);
-        return new Queue(RabbitConstant.QUEUE_POINT_VALUE, true, false, false, arguments);
-    }
+	@Bean
+	Binding deviceEventBinding(Queue deviceEventQueue) {
+		Binding binding = BindingBuilder.bind(deviceEventQueue)
+			.to(eventExchange)
+			.with(RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + SymbolConstant.ASTERISK);
+		binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+		return binding;
+	}
 
-    @Bean
-    Binding pointValueBinding(Queue pointValueQueue) {
-        Binding binding = BindingBuilder
-                .bind(pointValueQueue)
-                .to(valueExchange)
-                .with(RabbitConstant.ROUTING_POINT_VALUE_PREFIX + SymbolConstant.ASTERISK);
-        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
-        return binding;
-    }
+	@Bean
+	Queue pointValueQueue() {
+		Map<String, Object> arguments = new HashMap<>();
+		// 7 days: 7 * 24 * 60 * 60 * 1000 = 604800000L
+		arguments.put(RabbitConstant.MESSAGE_TTL, 604800000L);
+		return new Queue(RabbitConstant.QUEUE_POINT_VALUE, true, false, false, arguments);
+	}
+
+	@Bean
+	Binding pointValueBinding(Queue pointValueQueue) {
+		Binding binding = BindingBuilder.bind(pointValueQueue)
+			.to(valueExchange)
+			.with(RabbitConstant.ROUTING_POINT_VALUE_PREFIX + SymbolConstant.ASTERISK);
+		binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+		return binding;
+	}
 
 }

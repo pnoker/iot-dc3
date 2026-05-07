@@ -38,8 +38,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Default {@link DriverWriteService} implementation that resolves metadata, delegates the actual
- * write operation to the custom driver, and handles command payload execution.
+ * Default {@link DriverWriteService} implementation that resolves metadata, delegates the
+ * actual write operation to the custom driver, and handles command payload execution.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -49,60 +49,67 @@ import java.util.Objects;
 @Service
 public class DriverWriteServiceImpl implements DriverWriteService {
 
-    @Resource
-    private DriverMetadata driverMetadata;
-    @Resource
-    private DeviceMetadata deviceMetadata;
-    @Resource
-    private PointMetadata pointMetadata;
-    @Resource
-    private DriverCustomService driverCustomService;
+	@Resource
+	private DriverMetadata driverMetadata;
 
-    @Override
-    public void write(Long deviceId, Long pointId, String value) {
-        try {
-            // Get device from metadata cache
-            DeviceBO device = deviceMetadata.getCache(deviceId);
-            if (Objects.isNull(device)) {
-                throw new ReadPointException("Failed to write point value, device[{}] is null", deviceId);
-            }
+	@Resource
+	private DeviceMetadata deviceMetadata;
 
-            // Check if device contains the specified point
-            if (!device.getPointIds().contains(pointId)) {
-                throw new ReadPointException("Failed to write point value, device[{}] not contained point[{}]", deviceId, pointId);
-            }
+	@Resource
+	private PointMetadata pointMetadata;
 
-            // Get driver and point configurations
-            Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
-            Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
+	@Resource
+	private DriverCustomService driverCustomService;
 
-            // Get point from metadata cache
-            PointBO point = pointMetadata.getCache(pointId);
-            if (Objects.isNull(point)) {
-                throw new ReadPointException("Failed to write point value, point[{}] is null" + deviceId);
-            }
+	@Override
+	public void write(Long deviceId, Long pointId, String value) {
+		try {
+			// Get device from metadata cache
+			DeviceBO device = deviceMetadata.getCache(deviceId);
+			if (Objects.isNull(device)) {
+				throw new ReadPointException("Failed to write point value, device[{}] is null", deviceId);
+			}
 
-            // Write value to device through custom driver service
-            driverCustomService.write(driverConfig, pointConfig, device, point, new WValue(value, point.getPointTypeFlag()));
-        } catch (Exception e) {
-            throw new ServiceException(e.getMessage());
-        }
-    }
+			// Check if device contains the specified point
+			if (!device.getPointIds().contains(pointId)) {
+				throw new ReadPointException("Failed to write point value, device[{}] not contained point[{}]",
+						deviceId, pointId);
+			}
 
-    @Override
-    public void write(DeviceCommandDTO commandDTO) {
-        // Parse device write command from DTO content
-        DeviceCommandDTO.DeviceWrite deviceWrite = JsonUtil.parseObject(commandDTO.getContent(), DeviceCommandDTO.DeviceWrite.class);
-        if (Objects.isNull(deviceWrite)) {
-            return;
-        }
+			// Get driver and point configurations
+			Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
+			Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
 
-        // Log command execution start
-        log.info("Start command of write: {}", JsonUtil.toJsonString(commandDTO));
-        // Execute write operation
-        write(deviceWrite.getDeviceId(), deviceWrite.getPointId(), deviceWrite.getValue());
-        // Log command execution end
-        log.info("End command of write: write");
-    }
+			// Get point from metadata cache
+			PointBO point = pointMetadata.getCache(pointId);
+			if (Objects.isNull(point)) {
+				throw new ReadPointException("Failed to write point value, point[{}] is null" + deviceId);
+			}
+
+			// Write value to device through custom driver service
+			driverCustomService.write(driverConfig, pointConfig, device, point,
+					new WValue(value, point.getPointTypeFlag()));
+		}
+		catch (Exception e) {
+			throw new ServiceException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void write(DeviceCommandDTO commandDTO) {
+		// Parse device write command from DTO content
+		DeviceCommandDTO.DeviceWrite deviceWrite = JsonUtil.parseObject(commandDTO.getContent(),
+				DeviceCommandDTO.DeviceWrite.class);
+		if (Objects.isNull(deviceWrite)) {
+			return;
+		}
+
+		// Log command execution start
+		log.info("Start command of write: {}", JsonUtil.toJsonString(commandDTO));
+		// Execute write operation
+		write(deviceWrite.getDeviceId(), deviceWrite.getPointId(), deviceWrite.getValue());
+		// Log command execution end
+		log.info("End command of write: write");
+	}
 
 }

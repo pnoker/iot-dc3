@@ -43,32 +43,31 @@ import java.util.Objects;
 @Service
 public class DeviceManagerImpl extends ServiceImpl<DeviceMapper, DeviceDO> implements DeviceManager {
 
-    @Override
-    public boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate) {
-        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
-        wrapper.eq(DeviceDO::getDeviceName, entityDO.getDeviceName());
-        wrapper.eq(StringUtils.isNotEmpty(entityDO.getDeviceCode()), DeviceDO::getDeviceCode, entityDO.getDeviceCode());
-        wrapper.eq(DeviceDO::getTenantId, entityDO.getTenantId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        DeviceDO one = getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        return !isUpdate || !one.getId().equals(entityDO.getId());
-    }
+	@Override
+	public boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate) {
+		LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+		wrapper.eq(DeviceDO::getDeviceName, entityDO.getDeviceName());
+		wrapper.eq(StringUtils.isNotEmpty(entityDO.getDeviceCode()), DeviceDO::getDeviceCode, entityDO.getDeviceCode());
+		wrapper.eq(DeviceDO::getTenantId, entityDO.getTenantId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		DeviceDO one = getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		return !isUpdate || !one.getId().equals(entityDO.getId());
+	}
 
-    @Override
-    public DeviceDO innerSave(DeviceDO entityDO) {
-        boolean duplicate = checkDuplicate(entityDO, false);
-        if (duplicate) {
-            throw new DuplicateException("Failed to create device: device has been duplicated");
-        }
+	@Override
+	public DeviceDO innerSave(DeviceDO entityDO) {
+		boolean duplicate = checkDuplicate(entityDO, false);
+		if (duplicate) {
+			throw new DuplicateException("Failed to create device: device has been duplicated");
+		}
 
-        if (!save(entityDO)) {
-            throw new AddException("Failed to create device");
-        }
-        return entityDO;
-    }
-
+		if (!save(entityDO)) {
+			throw new AddException("Failed to create device");
+		}
+		return entityDO;
+	}
 
 }

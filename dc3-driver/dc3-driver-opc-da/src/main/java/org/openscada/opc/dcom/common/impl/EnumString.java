@@ -26,92 +26,99 @@ import java.util.Collection;
 import java.util.List;
 
 public class EnumString extends BaseCOMObject {
-    public static final int DEFAULT_BATCH_SIZE = Integer.getInteger("openscada.dcom.enum-batch-size", 10);
 
-    public EnumString(final IJIComObject enumStringObject) throws IllegalArgumentException, UnknownHostException, JIException {
-        super(enumStringObject.queryInterface(org.openscada.opc.dcom.common.Constants.IEnumString_IID));
-    }
+	public static final int DEFAULT_BATCH_SIZE = Integer.getInteger("openscada.dcom.enum-batch-size", 10);
 
-    public int next(final List<String> list, final int num) throws JIException {
-        if (num <= 0) {
-            return 0;
-        }
+	public EnumString(final IJIComObject enumStringObject)
+			throws IllegalArgumentException, UnknownHostException, JIException {
+		super(enumStringObject.queryInterface(org.openscada.opc.dcom.common.Constants.IEnumString_IID));
+	}
 
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(0);
+	public int next(final List<String> list, final int num) throws JIException {
+		if (num <= 0) {
+			return 0;
+		}
 
-        callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
-        //callObject.addInParamAsInt ( num, JIFlags.FLAG_NULL );
-        //callObject.addOutParamAsObject ( new JIArray ( new JIPointer ( new JIString (
-        //        JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR ) ), null, 1, true, true ), JIFlags.FLAG_NULL );
-        callObject.addOutParamAsObject(new JIArray(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR), null, 1, true, true), JIFlags.FLAG_NULL);
-        callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(0);
 
-        Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
+		callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
+		// callObject.addInParamAsInt ( num, JIFlags.FLAG_NULL );
+		// callObject.addOutParamAsObject ( new JIArray ( new JIPointer ( new JIString (
+		// JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR ) ), null, 1, true, true ),
+		// JIFlags.FLAG_NULL );
+		callObject.addOutParamAsObject(
+				new JIArray(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR), null, 1, true, true),
+				JIFlags.FLAG_NULL);
+		callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
 
-        //JIPointer[] resultData = (JIPointer[]) ( (JIArray) ( result[0] ) ).getArrayInstance ();
-        JIString[] resultData = (JIString[]) ((JIArray) result[0]).getArrayInstance();
-        Integer cnt = (Integer) result[1];
+		Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
 
-        for (int i = 0; i < cnt; i++) {
-            //list.add ( ( (JIString)resultData[i].getReferent () ).getString () );
-            list.add(resultData[i].getString());
-        }
-        return cnt;
-    }
+		// JIPointer[] resultData = (JIPointer[]) ( (JIArray) ( result[0] )
+		// ).getArrayInstance ();
+		JIString[] resultData = (JIString[]) ((JIArray) result[0]).getArrayInstance();
+		Integer cnt = (Integer) result[1];
 
-    public Collection<String> next(final int num) throws JIException {
-        List<String> list = new ArrayList<String>(num);
-        next(list, num);
-        return list;
-    }
+		for (int i = 0; i < cnt; i++) {
+			// list.add ( ( (JIString)resultData[i].getReferent () ).getString () );
+			list.add(resultData[i].getString());
+		}
+		return cnt;
+	}
 
-    public void skip(final int num) throws JIException {
-        if (num <= 0) {
-            return;
-        }
+	public Collection<String> next(final int num) throws JIException {
+		List<String> list = new ArrayList<String>(num);
+		next(list, num);
+		return list;
+	}
 
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(1);
+	public void skip(final int num) throws JIException {
+		if (num <= 0) {
+			return;
+		}
 
-        callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(1);
 
-        getCOMObject().call(callObject);
-    }
+		callObject.addInParamAsInt(num, JIFlags.FLAG_NULL);
 
-    public void reset() throws JIException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(2);
+		getCOMObject().call(callObject);
+	}
 
-        getCOMObject().call(callObject);
-    }
+	public void reset() throws JIException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(2);
 
-    public EnumString cloneObject() throws JIException, IllegalArgumentException, UnknownHostException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(3);
+		getCOMObject().call(callObject);
+	}
 
-        callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
+	public EnumString cloneObject() throws JIException, IllegalArgumentException, UnknownHostException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(3);
 
-        Object[] result = getCOMObject().call(callObject);
+		callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
 
-        IJIComObject object = (IJIComObject) result[0];
-        return new EnumString(object);
-    }
+		Object[] result = getCOMObject().call(callObject);
 
-    public Collection<String> asCollection(final int batchSize) throws JIException {
-        reset();
+		IJIComObject object = (IJIComObject) result[0];
+		return new EnumString(object);
+	}
 
-        List<String> data = new ArrayList<String>();
-        int i = 0;
-        do {
-            i = next(data, batchSize);
-        } while (i == batchSize);
+	public Collection<String> asCollection(final int batchSize) throws JIException {
+		reset();
 
-        return data;
-    }
+		List<String> data = new ArrayList<String>();
+		int i = 0;
+		do {
+			i = next(data, batchSize);
+		}
+		while (i == batchSize);
 
-    public Collection<String> asCollection() throws JIException {
-        return asCollection(DEFAULT_BATCH_SIZE);
-    }
+		return data;
+	}
+
+	public Collection<String> asCollection() throws JIException {
+		return asCollection(DEFAULT_BATCH_SIZE);
+	}
 
 }

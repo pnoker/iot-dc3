@@ -20,30 +20,34 @@ import com.serotonin.modbus4j.code.FunctionCode;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 
 /**
- * <p>ReadDiscreteInputsResponse class.</p>
+ * <p>
+ * ReadDiscreteInputsResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ReadDiscreteInputsResponse extends ReadResponse {
-    ReadDiscreteInputsResponse(int slaveId, byte[] data) throws ModbusTransportException {
-        super(slaveId, data);
-    }
 
-    ReadDiscreteInputsResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	ReadDiscreteInputsResponse(int slaveId, byte[] data) throws ModbusTransportException {
+		super(slaveId, data);
+	}
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.READ_DISCRETE_INPUTS;
-    }
+	ReadDiscreteInputsResponse(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    public String toString() {
-        return "ReadDiscreteInputsResponse [exceptionCode=" + exceptionCode + ", slaveId=" + slaveId
-                + ", getFunctionCode()=" + getFunctionCode() + ", isException()=" + isException()
-                + ", getExceptionMessage()=" + getExceptionMessage() + ", getExceptionCode()=" + getExceptionCode()
-                + super.toString(false) + "]";
-    }
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.READ_DISCRETE_INPUTS;
+	}
+
+	@Override
+	public String toString() {
+		return "ReadDiscreteInputsResponse [exceptionCode=" + exceptionCode + ", slaveId=" + slaveId
+				+ ", getFunctionCode()=" + getFunctionCode() + ", isException()=" + isException()
+				+ ", getExceptionMessage()=" + getExceptionMessage() + ", getExceptionCode()=" + getExceptionCode()
+				+ super.toString(false) + "]";
+	}
+
 }

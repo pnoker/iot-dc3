@@ -37,7 +37,8 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * RabbitMQ consumer that keeps local metadata caches in sync with platform metadata change events.
+ * RabbitMQ consumer that keeps local metadata caches in sync with platform metadata
+ * change events.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,69 +48,77 @@ import java.util.Objects;
 @Component
 public class MetadataReceiver {
 
-    @Resource
-    PointMetadata pointMetadata;
-    @Resource
-    private DriverMetadata driverMetadata;
-    @Resource
-    private DeviceMetadata deviceMetadata;
-    @Resource
-    private MetadataEventPublisher metadataEventPublisher;
+	@Resource
+	PointMetadata pointMetadata;
 
-    /**
-     * Receive and process metadata events from RabbitMQ queue
-     *
-     * @param channel   RabbitMQ channel
-     * @param message   RabbitMQ message
-     * @param entityDTO Metadata event data transfer object
-     */
-    @RabbitHandler
-    @RabbitListener(queues = "#{metadataQueue.name}")
-    public void metadataReceive(Channel channel, Message message, MetadataEventDTO entityDTO) {
-        try {
-            // Acknowledge message receipt
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.info("Receive driver metadata: {}", JsonUtil.toJsonString(entityDTO));
+	@Resource
+	private DriverMetadata driverMetadata;
 
-            // Validate metadata event
-            if (Objects.isNull(entityDTO)
-                    || Objects.isNull(entityDTO.getMetadataType())
-                    || Objects.isNull(entityDTO.getOperateType())) {
-                log.error("Invalid driver metadata: {}", entityDTO);
-                return;
-            }
+	@Resource
+	private DeviceMetadata deviceMetadata;
 
-            // Handle device metadata events
-            if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {
-                if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType()) || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.info("Upsert device: {}", entityDTO.getId());
-                    deviceMetadata.loadCache(entityDTO.getId());
-                    driverMetadata.getDeviceIds().add(entityDTO.getId());
-                } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.info("Delete device: {}", entityDTO.getId());
-                    deviceMetadata.removeCache(entityDTO.getId());
-                    driverMetadata.getDeviceIds().remove(entityDTO.getId());
-                }
+	@Resource
+	private MetadataEventPublisher metadataEventPublisher;
 
-                // Publish device metadata event
-                metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DEVICE, entityDTO.getOperateType()));
-            }
-            // Handle point metadata events
-            else if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
-                if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType()) || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.info("Upsert point: {}", entityDTO.getId());
-                    pointMetadata.loadCache(entityDTO.getId());
-                } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.info("Delete point: {}", entityDTO.getId());
-                    pointMetadata.removeCache(entityDTO.getId());
-                }
+	/**
+	 * Receive and process metadata events from RabbitMQ queue
+	 * @param channel RabbitMQ channel
+	 * @param message RabbitMQ message
+	 * @param entityDTO Metadata event data transfer object
+	 */
+	@RabbitHandler
+	@RabbitListener(queues = "#{metadataQueue.name}")
+	public void metadataReceive(Channel channel, Message message, MetadataEventDTO entityDTO) {
+		try {
+			// Acknowledge message receipt
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+			log.info("Receive driver metadata: {}", JsonUtil.toJsonString(entityDTO));
 
-                // Publish point metadata event
-                metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.POINT, entityDTO.getOperateType()));
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
+			// Validate metadata event
+			if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getMetadataType())
+					|| Objects.isNull(entityDTO.getOperateType())) {
+				log.error("Invalid driver metadata: {}", entityDTO);
+				return;
+			}
+
+			// Handle device metadata events
+			if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {
+				if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
+						|| MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
+					log.info("Upsert device: {}", entityDTO.getId());
+					deviceMetadata.loadCache(entityDTO.getId());
+					driverMetadata.getDeviceIds().add(entityDTO.getId());
+				}
+				else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
+					log.info("Delete device: {}", entityDTO.getId());
+					deviceMetadata.removeCache(entityDTO.getId());
+					driverMetadata.getDeviceIds().remove(entityDTO.getId());
+				}
+
+				// Publish device metadata event
+				metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DEVICE,
+						entityDTO.getOperateType()));
+			}
+			// Handle point metadata events
+			else if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
+				if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
+						|| MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
+					log.info("Upsert point: {}", entityDTO.getId());
+					pointMetadata.loadCache(entityDTO.getId());
+				}
+				else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
+					log.info("Delete point: {}", entityDTO.getId());
+					pointMetadata.removeCache(entityDTO.getId());
+				}
+
+				// Publish point metadata event
+				metadataEventPublisher.publishEvent(
+						new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.POINT, entityDTO.getOperateType()));
+			}
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 
 }

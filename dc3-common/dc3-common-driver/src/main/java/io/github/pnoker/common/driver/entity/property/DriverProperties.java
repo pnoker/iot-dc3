@@ -45,112 +45,116 @@ import java.util.List;
 @ConfigurationProperties(prefix = "driver")
 public class DriverProperties {
 
-    /**
-     * Tenant name of the driver instance.
-     */
-    @NotBlank(message = "租户不能为空")
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "无效的租户")
-    private String tenant;
+	/**
+	 * Tenant name of the driver instance.
+	 */
+	@NotBlank(message = "租户不能为空")
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "无效的租户")
+	private String tenant;
 
-    /**
-     * Driver runtime type.
-     */
-    @NotNull(message = "驱动类型不能为空")
-    private DriverTypeFlagEnum type = DriverTypeFlagEnum.DRIVER_CLIENT;
+	/**
+	 * Driver runtime type.
+	 */
+	@NotNull(message = "驱动类型不能为空")
+	private DriverTypeFlagEnum type = DriverTypeFlagEnum.DRIVER_CLIENT;
 
-    /**
-     * Driver display name.
-     */
-    @NotBlank(message = "驱动名称不能为空")
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "驱动名称格式无效")
-    private String name;
+	/**
+	 * Driver display name.
+	 */
+	@NotBlank(message = "驱动名称不能为空")
+	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "驱动名称格式无效")
+	private String name;
 
-    /**
-     * Driver code defined in configuration.
-     */
-    @NotBlank(message = "驱动编号不能为空")
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "无效的驱动编号")
-    private String code;
+	/**
+	 * Driver code defined in configuration.
+	 */
+	@NotBlank(message = "驱动编号不能为空")
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "无效的驱动编号")
+	private String code;
 
-    /**
-     * Description
-     */
-    private String remark;
+	/**
+	 * Description
+	 */
+	private String remark;
 
-    /**
-     * Schedule configuration for periodic driver tasks.
-     */
-    private ScheduleProperties schedule;
+	/**
+	 * Schedule configuration for periodic driver tasks.
+	 */
+	private ScheduleProperties schedule;
 
-    /**
-     * Driver-level attribute definitions declared in configuration.
-     */
-    private List<DriverAttributeDTO> driverAttribute;
+	/**
+	 * Driver-level attribute definitions declared in configuration.
+	 */
+	private List<DriverAttributeDTO> driverAttribute;
 
-    /**
-     * Point-level attribute definitions declared in configuration.
-     */
-    private List<PointAttributeDTO> pointAttribute;
+	/**
+	 * Point-level attribute definitions declared in configuration.
+	 */
+	private List<PointAttributeDTO> pointAttribute;
 
-    /**
-     * Generated or configured driver node identifier.
-     */
-    private String node;
+	/**
+	 * Generated or configured driver node identifier.
+	 */
+	private String node;
 
-    /**
-     * Driver service name, typically composed from tenant and application name.
-     */
-    private String service;
+	/**
+	 * Driver service name, typically composed from tenant and application name.
+	 */
+	private String service;
 
-    /**
-     * Host address exposed by the driver process.
-     */
-    private String host;
+	/**
+	 * Host address exposed by the driver process.
+	 */
+	private String host;
 
-    /**
-     * Service port exposed by the driver process.
-     */
-    private Integer port;
+	/**
+	 * Service port exposed by the driver process.
+	 */
+	private Integer port;
 
-    /**
-     * Driver client identifier used for queue and registration routing.
-     */
-    private String client;
+	/**
+	 * Driver client identifier used for queue and registration routing.
+	 */
+	private String client;
 
-    /**
-     * Scheduling options for built-in driver jobs.
-     */
-    @Getter
-    @Setter
-    public static class ScheduleProperties {
+	/**
+	 * Scheduling options for built-in driver jobs.
+	 */
+	@Getter
+	@Setter
+	public static class ScheduleProperties {
 
-        /**
-         * Periodic read job configuration.
-         */
-        private ScheduleConfig read;
+		/**
+		 * Periodic read job configuration.
+		 */
+		private ScheduleConfig read;
 
-        /**
-         * Custom job configuration.
-         */
-        private ScheduleConfig custom;
+		/**
+		 * Custom job configuration.
+		 */
+		private ScheduleConfig custom;
 
-        /**
-         * Cron-based schedule definition.
-         */
-        @Getter
-        @Setter
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class ScheduleConfig {
-            /**
-             * Whether the job is enabled.
-             */
-            private Boolean enable = false;
+		/**
+		 * Cron-based schedule definition.
+		 */
+		@Getter
+		@Setter
+		@NoArgsConstructor
+		@AllArgsConstructor
+		public static class ScheduleConfig {
 
-            /**
-             * Quartz cron expression used by the job.
-             */
-            private String cron = "* */15 * * * ?";
-        }
-    }
+			/**
+			 * Whether the job is enabled.
+			 */
+			private Boolean enable = false;
+
+			/**
+			 * Quartz cron expression used by the job.
+			 */
+			private String cron = "* */15 * * * ?";
+
+		}
+
+	}
+
 }

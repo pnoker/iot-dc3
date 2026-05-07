@@ -39,10 +39,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AlertTypeBucketVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String type;
+	private String type;
 
-    private long count;
+	private long count;
+
 }

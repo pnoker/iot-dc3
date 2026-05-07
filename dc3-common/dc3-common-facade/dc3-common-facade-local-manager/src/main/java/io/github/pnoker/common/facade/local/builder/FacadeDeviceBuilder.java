@@ -25,16 +25,17 @@ import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
 /**
- * Converts between the facade-api shapes and {@code dc3-common-manager} internals.
- * Field sets are aligned by design, so MapStruct auto-maps every property.
+ * Converts between the facade-api shapes and {@code dc3-common-manager} internals. Field
+ * sets are aligned by design, so MapStruct auto-maps every property.
  *
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface FacadeDeviceBuilder {
 
-    DeviceQuery toManagerQuery(FacadeDeviceQuery facadeQuery);
+	DeviceQuery toManagerQuery(FacadeDeviceQuery facadeQuery);
 
-    FacadeDeviceBO toFacadeBO(DeviceBO managerBO);
+	FacadeDeviceBO toFacadeBO(DeviceBO managerBO);
+
 }

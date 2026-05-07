@@ -28,9 +28,15 @@ import lombok.ToString;
 @Setter
 @ToString
 public class AgingBucketRow {
-    private long under1h;
-    private long h1to6;
-    private long h6to24;
-    private long over24h;
-    private long total;
+
+	private long under1h;
+
+	private long h1to6;
+
+	private long h6to24;
+
+	private long over24h;
+
+	private long total;
+
 }

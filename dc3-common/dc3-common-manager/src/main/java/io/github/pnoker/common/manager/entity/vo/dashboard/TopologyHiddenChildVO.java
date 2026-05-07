@@ -25,8 +25,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * One entity that got collapsed into an {@code others:*} bucket. Has enough
- * to route on click in the drill-in dialog — id prefix + display name.
+ * One entity that got collapsed into an {@code others:*} bucket. Has enough to route on
+ * click in the drill-in dialog — id prefix + display name.
  *
  * @author pnoker
  * @since 2026.5.4
@@ -36,18 +36,20 @@ import java.io.Serializable;
 @ToString
 public class TopologyHiddenChildVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Prefixed id, same scheme as {@link TopologyNodeVO#getId()} — {@code driver:{n}} / {@code device:{n}} / {@code point:{n}}.
-     */
-    private String id;
+	/**
+	 * Prefixed id, same scheme as {@link TopologyNodeVO#getId()} — {@code driver:{n}} /
+	 * {@code device:{n}} / {@code point:{n}}.
+	 */
+	private String id;
 
-    private String name;
+	private String name;
 
-    /**
-     * {@code driver | device | point}. Profile layer does not get collapsed.
-     */
-    private String type;
+	/**
+	 * {@code driver | device | point}. Profile layer does not get collapsed.
+	 */
+	private String type;
+
 }

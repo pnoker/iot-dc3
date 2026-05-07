@@ -23,7 +23,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Gateway Service Application Entry
  * <p>
- * This class serves as the entry point for the Gateway Service, responsible for initializing and launching the Spring Boot application.
+ * This class serves as the entry point for the Gateway Service, responsible for
+ * initializing and launching the Spring Boot application.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -32,13 +33,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class GatewayApplication {
 
-    /**
-     * Main method to launch Spring Boot application
-     *
-     * @param args Command line arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
-    }
+	/**
+	 * Main method to launch Spring Boot application
+	 * @param args Command line arguments
+	 */
+	public static void main(String[] args) {
+		SpringApplication.run(GatewayApplication.class, args);
+	}
 
 }

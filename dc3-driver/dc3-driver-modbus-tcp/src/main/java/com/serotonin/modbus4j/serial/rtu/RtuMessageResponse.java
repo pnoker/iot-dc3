@@ -30,32 +30,36 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 2025.9.0
  */
 public class RtuMessageResponse extends RtuMessage implements OutgoingResponseMessage, IncomingResponseMessage {
-    /**
-     * <p>Constructor for RtuMessageResponse.</p>
-     *
-     * @param modbusResponse a {@link ModbusResponse} object.
-     */
-    public RtuMessageResponse(ModbusResponse modbusResponse) {
-        super(modbusResponse);
-    }
 
-    static RtuMessageResponse createRtuMessageResponse(ByteQueue queue) throws ModbusTransportException {
-        ModbusResponse response = ModbusResponse.createModbusResponse(queue);
-        RtuMessageResponse rtuResponse = new RtuMessageResponse(response);
+	/**
+	 * <p>
+	 * Constructor for RtuMessageResponse.
+	 * </p>
+	 * @param modbusResponse a {@link ModbusResponse} object.
+	 */
+	public RtuMessageResponse(ModbusResponse modbusResponse) {
+		super(modbusResponse);
+	}
 
-        // Check the CRC
-        ModbusUtils.checkCRC(rtuResponse.modbusMessage, queue);
+	static RtuMessageResponse createRtuMessageResponse(ByteQueue queue) throws ModbusTransportException {
+		ModbusResponse response = ModbusResponse.createModbusResponse(queue);
+		RtuMessageResponse rtuResponse = new RtuMessageResponse(response);
 
-        // Return the data.
-        return rtuResponse;
-    }
+		// Check the CRC
+		ModbusUtils.checkCRC(rtuResponse.modbusMessage, queue);
 
-    /**
-     * <p>getModbusResponse.</p>
-     *
-     * @return a {@link ModbusResponse} object.
-     */
-    public ModbusResponse getModbusResponse() {
-        return (ModbusResponse) modbusMessage;
-    }
+		// Return the data.
+		return rtuResponse;
+	}
+
+	/**
+	 * <p>
+	 * getModbusResponse.
+	 * </p>
+	 * @return a {@link ModbusResponse} object.
+	 */
+	public ModbusResponse getModbusResponse() {
+		return (ModbusResponse) modbusMessage;
+	}
+
 }

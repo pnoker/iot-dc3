@@ -51,117 +51,114 @@ import java.util.Objects;
 @Service
 public class NotifyServiceImpl implements NotifyService {
 
-    @Resource
-    private NotifyBuilder notifyBuilder;
+	@Resource
+	private NotifyBuilder notifyBuilder;
 
-    @Resource
-    private NotifyManager notifyManager;
+	@Resource
+	private NotifyManager notifyManager;
 
-    @Override
-    public void save(NotifyBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+	@Override
+	public void save(NotifyBO entityBO) {
+		checkDuplicate(entityBO, false, true);
 
-        NotifyDO entityDO = notifyBuilder.buildDOByBO(entityBO);
-        if (!notifyManager.save(entityDO)) {
-            throw new AddException("Failed to create alarm notify profile");
-        }
-    }
+		NotifyDO entityDO = notifyBuilder.buildDOByBO(entityBO);
+		if (!notifyManager.save(entityDO)) {
+			throw new AddException("Failed to create alarm notify profile");
+		}
+	}
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-        // Alarm notificationAlarm notification
-        LambdaQueryChainWrapper<NotifyDO> wrapper = notifyManager.lambdaQuery().eq(NotifyDO::getTenantId, id);
-        long count = wrapper.count();
-        if (count > 0) {
-            throw new AssociatedException("Failed to remove alarm notify profile: some sub alarm notify profiles exists in the alarm notify profile");
-        }
+		// Alarm notificationAlarm notification
+		LambdaQueryChainWrapper<NotifyDO> wrapper = notifyManager.lambdaQuery().eq(NotifyDO::getTenantId, id);
+		long count = wrapper.count();
+		if (count > 0) {
+			throw new AssociatedException(
+					"Failed to remove alarm notify profile: some sub alarm notify profiles exists in the alarm notify profile");
+		}
 
-        if (!notifyManager.removeById(id)) {
-            throw new DeleteException("Failed to remove alarm notify profile");
-        }
-    }
+		if (!notifyManager.removeById(id)) {
+			throw new DeleteException("Failed to remove alarm notify profile");
+		}
+	}
 
-    @Override
-    public void update(NotifyBO entityBO) {
-        getDOById(entityBO.getId(), true);
+	@Override
+	public void update(NotifyBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+		checkDuplicate(entityBO, true, true);
 
-        NotifyDO entityDO = notifyBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!notifyManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update alarm notify profile");
-        }
-    }
+		NotifyDO entityDO = notifyBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!notifyManager.updateById(entityDO)) {
+			throw new UpdateException("Failed to update alarm notify profile");
+		}
+	}
 
-    @Override
-    public NotifyBO selectById(Long id) {
-        NotifyDO entityDO = getDOById(id, true);
-        return notifyBuilder.buildBOByDO(entityDO);
-    }
+	@Override
+	public NotifyBO selectById(Long id) {
+		NotifyDO entityDO = getDOById(id, true);
+		return notifyBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public Page<NotifyBO> selectByPage(NotifyQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<NotifyDO> entityPageDO = notifyManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return notifyBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	@Override
+	public Page<NotifyBO> selectByPage(NotifyQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<NotifyDO> entityPageDO = notifyManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+		return notifyBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link NotifyQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<NotifyDO> fuzzyQuery(NotifyQuery entityQuery) {
-        LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmNotifyName()), NotifyDO::getNotifyName, entityQuery.getAlarmNotifyName());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyDO::getTenantId, entityQuery.getTenantId());
-        return wrapper;
-    }
+	/**
+	 * @param entityQuery {@link NotifyQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<NotifyDO> fuzzyQuery(NotifyQuery entityQuery) {
+		LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmNotifyName()), NotifyDO::getNotifyName,
+				entityQuery.getAlarmNotifyName());
+		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyDO::getTenantId, entityQuery.getTenantId());
+		return wrapper;
+	}
 
-    /**
-     *
-     *
-     * @param entityBO       {@link NotifyBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
-     */
-    private boolean checkDuplicate(NotifyBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
-        wrapper.eq(NotifyDO::getNotifyName, entityBO.getNotifyName());
-        wrapper.eq(NotifyDO::getNotifyCode, entityBO.getNotifyCode());
-        wrapper.eq(NotifyDO::getTenantId, entityBO.getTenantId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        NotifyDO one = notifyManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Alarm notify profile has been duplicated");
-        }
-        return duplicate;
-    }
+	/**
+	 * @param entityBO {@link NotifyBO}
+	 * @param isUpdate
+	 * @param throwException
+	 * @return
+	 */
+	private boolean checkDuplicate(NotifyBO entityBO, boolean isUpdate, boolean throwException) {
+		LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
+		wrapper.eq(NotifyDO::getNotifyName, entityBO.getNotifyName());
+		wrapper.eq(NotifyDO::getNotifyCode, entityBO.getNotifyCode());
+		wrapper.eq(NotifyDO::getTenantId, entityBO.getTenantId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		NotifyDO one = notifyManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+		if (throwException && duplicate) {
+			throw new DuplicateException("Alarm notify profile has been duplicated");
+		}
+		return duplicate;
+	}
 
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link NotifyDO}
-     */
-    private NotifyDO getDOById(Long id, boolean throwException) {
-        NotifyDO entityDO = notifyManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Alarm notify profile does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link NotifyDO}
+	 */
+	private NotifyDO getDOById(Long id, boolean throwException) {
+		NotifyDO entityDO = notifyManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Alarm notify profile does not exist");
+		}
+		return entityDO;
+	}
 
 }

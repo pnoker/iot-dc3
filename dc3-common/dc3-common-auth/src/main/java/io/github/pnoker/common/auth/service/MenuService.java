@@ -33,11 +33,12 @@ import java.util.List;
  */
 public interface MenuService extends BaseService<MenuBO, MenuQuery> {
 
-    /**
-     * Return menus matching the filter, assembled into a parent/child tree ordered by menuIndex.
-     *
-     * @param entityQuery filter conditions; null disables filtering
-     * @return tree roots
-     */
-    List<MenuTreeBO> selectTree(MenuQuery entityQuery);
+	/**
+	 * Return menus matching the filter, assembled into a parent/child tree ordered by
+	 * menuIndex.
+	 * @param entityQuery filter conditions; null disables filtering
+	 * @return tree roots
+	 */
+	List<MenuTreeBO> selectTree(MenuQuery entityQuery);
+
 }

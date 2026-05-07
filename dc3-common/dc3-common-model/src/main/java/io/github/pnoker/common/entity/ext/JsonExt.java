@@ -37,28 +37,28 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class JsonExt implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Type, Json
-     */
-    private String type;
+	/**
+	 * Type, Json
+	 */
+	private String type;
 
-    /**
-     * , Json
-     */
-    private String content;
+	/**
+	 * , Json
+	 */
+	private String content;
 
-    /**
-     * ,
-     */
-    @Builder.Default
-    private Integer version = 1;
+	/**
+	 * ,
+	 */
+	@Builder.Default
+	private Integer version = 1;
 
-    /**
-     * Description
-     */
-    private String remark;
+	/**
+	 * Description
+	 */
+	private String remark;
 
 }

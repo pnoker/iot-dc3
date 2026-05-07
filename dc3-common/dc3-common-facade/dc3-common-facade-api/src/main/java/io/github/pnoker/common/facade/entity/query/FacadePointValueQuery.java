@@ -37,14 +37,15 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class FacadePointValueQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    private Long tenantId;
+	private Long tenantId;
 
-    private Long deviceId;
+	private Long deviceId;
 
-    private Long pointId;
+	private Long pointId;
+
 }

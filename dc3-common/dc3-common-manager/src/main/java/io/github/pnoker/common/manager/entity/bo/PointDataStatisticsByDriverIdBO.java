@@ -35,13 +35,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PointDataStatisticsByDriverIdBO {
-    /**
-     * Name
-     */
-    private String driverName;
 
-    /**
-     * 7 days
-     */
-    private List<Long> total;
+	/**
+	 * Name
+	 */
+	private String driverName;
+
+	/**
+	 * 7 days
+	 */
+	private List<Long> total;
+
 }

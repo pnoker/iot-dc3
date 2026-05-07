@@ -35,140 +35,157 @@ import java.io.IOException;
 import java.net.*;
 
 /**
- * <p>UdpMaster class.</p>
+ * <p>
+ * UdpMaster class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class UdpMaster extends ModbusMaster {
-    private static final int MESSAGE_LENGTH = 1024;
-    private final IpParameters ipParameters;
-    private short nextTransactionId = 0;
-    // Runtime fields.
-    private BaseMessageParser messageParser;
-    private DatagramSocket socket;
 
-    /**
-     * <p>Constructor for UdpMaster.</p>
-     * <p>
-     * Default to not validating the slave id in responses
-     *
-     * @param params a {@link IpParameters} object.
-     */
-    public UdpMaster(IpParameters params) {
-        this(params, false);
-    }
+	private static final int MESSAGE_LENGTH = 1024;
 
-    /**
-     * <p>Constructor for UdpMaster.</p>
-     *
-     * @param params
-     * @param validateResponse - confirm that requested slave id is the same in the response
-     */
-    public UdpMaster(IpParameters params, boolean validateResponse) {
-        ipParameters = params;
-        this.validateResponse = validateResponse;
-    }
+	private final IpParameters ipParameters;
 
-    /**
-     * <p>Getter for the field <code>nextTransactionId</code>.</p>
-     *
-     * @return a short.
-     */
-    protected short getNextTransactionId() {
-        return nextTransactionId++;
-    }
+	private short nextTransactionId = 0;
 
-    @Override
-    public void init() throws ModbusInitException {
-        if (ipParameters.isEncapsulated())
-            messageParser = new EncapMessageParser(true);
-        else
-            messageParser = new XaMessageParser(true);
+	// Runtime fields.
+	private BaseMessageParser messageParser;
 
-        try {
-            socket = new DatagramSocket();
-            socket.setSoTimeout(getTimeout());
-        } catch (SocketException e) {
-            throw new ModbusInitException(e);
-        }
-        initialized = true;
-    }
+	private DatagramSocket socket;
 
-    @Override
-    public void destroy() {
-        socket.close();
-        initialized = false;
-    }
+	/**
+	 * <p>
+	 * Constructor for UdpMaster.
+	 * </p>
+	 * <p>
+	 * Default to not validating the slave id in responses
+	 * @param params a {@link IpParameters} object.
+	 */
+	public UdpMaster(IpParameters params) {
+		this(params, false);
+	}
 
-    @Override
-    public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
-        // Wrap the modbus request in an ip request.
-        OutgoingRequestMessage ipRequest;
-        if (ipParameters.isEncapsulated())
-            ipRequest = new EncapMessageRequest(request);
-        else
-            ipRequest = new XaMessageRequest(request, getNextTransactionId());
+	/**
+	 * <p>
+	 * Constructor for UdpMaster.
+	 * </p>
+	 * @param params
+	 * @param validateResponse - confirm that requested slave id is the same in the
+	 * response
+	 */
+	public UdpMaster(IpParameters params, boolean validateResponse) {
+		ipParameters = params;
+		this.validateResponse = validateResponse;
+	}
 
-        IpMessageResponse ipResponse;
+	/**
+	 * <p>
+	 * Getter for the field <code>nextTransactionId</code>.
+	 * </p>
+	 * @return a short.
+	 */
+	protected short getNextTransactionId() {
+		return nextTransactionId++;
+	}
 
-        try {
-            int attempts = getRetries() + 1;
+	@Override
+	public void init() throws ModbusInitException {
+		if (ipParameters.isEncapsulated())
+			messageParser = new EncapMessageParser(true);
+		else
+			messageParser = new XaMessageParser(true);
 
-            while (true) {
-                // Send the request.
-                sendImpl(ipRequest);
+		try {
+			socket = new DatagramSocket();
+			socket.setSoTimeout(getTimeout());
+		}
+		catch (SocketException e) {
+			throw new ModbusInitException(e);
+		}
+		initialized = true;
+	}
 
-                if (!ipRequest.expectsResponse())
-                    return null;
+	@Override
+	public void destroy() {
+		socket.close();
+		initialized = false;
+	}
 
-                // Receive the response.
-                try {
-                    ipResponse = receiveImpl();
-                } catch (SocketTimeoutException e) {
-                    attempts--;
-                    if (attempts > 0)
-                        // Try again.
-                        continue;
+	@Override
+	public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
+		// Wrap the modbus request in an ip request.
+		OutgoingRequestMessage ipRequest;
+		if (ipParameters.isEncapsulated())
+			ipRequest = new EncapMessageRequest(request);
+		else
+			ipRequest = new XaMessageRequest(request, getNextTransactionId());
 
-                    throw new ModbusTransportException(e, request.getSlaveId());
-                }
+		IpMessageResponse ipResponse;
 
-                // We got the response
-                break;
-            }
+		try {
+			int attempts = getRetries() + 1;
 
-            return ipResponse.getModbusResponse();
-        } catch (IOException e) {
-            throw new ModbusTransportException(e, request.getSlaveId());
-        }
-    }
+			while (true) {
+				// Send the request.
+				sendImpl(ipRequest);
 
-    private void sendImpl(OutgoingRequestMessage request) throws IOException {
-        byte[] data = request.getMessageData();
-        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(ipParameters.getHost()),
-                ipParameters.getPort());
-        socket.send(packet);
-    }
+				if (!ipRequest.expectsResponse())
+					return null;
 
-    private IpMessageResponse receiveImpl() throws IOException, ModbusTransportException {
-        DatagramPacket packet = new DatagramPacket(new byte[MESSAGE_LENGTH], MESSAGE_LENGTH);
-        socket.receive(packet);
+				// Receive the response.
+				try {
+					ipResponse = receiveImpl();
+				}
+				catch (SocketTimeoutException e) {
+					attempts--;
+					if (attempts > 0)
+						// Try again.
+						continue;
 
-        // We could verify that the packet was received from the same address to which the request was sent,
-        // but let's not bother with that yet.
+					throw new ModbusTransportException(e, request.getSlaveId());
+				}
 
-        ByteQueue queue = new ByteQueue(packet.getData(), 0, packet.getLength());
-        IpMessageResponse response;
-        try {
-            response = (IpMessageResponse) messageParser.parseMessage(queue);
-        } catch (Exception e) {
-            throw new ModbusTransportException(e);
-        }
+				// We got the response
+				break;
+			}
 
-        if (response == null)
-            throw new ModbusTransportException("Invalid response received");
+			return ipResponse.getModbusResponse();
+		}
+		catch (IOException e) {
+			throw new ModbusTransportException(e, request.getSlaveId());
+		}
+	}
 
-        return response;
-    }
+	private void sendImpl(OutgoingRequestMessage request) throws IOException {
+		byte[] data = request.getMessageData();
+		DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(ipParameters.getHost()),
+				ipParameters.getPort());
+		socket.send(packet);
+	}
+
+	private IpMessageResponse receiveImpl() throws IOException, ModbusTransportException {
+		DatagramPacket packet = new DatagramPacket(new byte[MESSAGE_LENGTH], MESSAGE_LENGTH);
+		socket.receive(packet);
+
+		// We could verify that the packet was received from the same address to which the
+		// request was sent,
+		// but let's not bother with that yet.
+
+		ByteQueue queue = new ByteQueue(packet.getData(), 0, packet.getLength());
+		IpMessageResponse response;
+		try {
+			response = (IpMessageResponse) messageParser.parseMessage(queue);
+		}
+		catch (Exception e) {
+			throw new ModbusTransportException(e);
+		}
+
+		if (response == null)
+			throw new ModbusTransportException("Invalid response received");
+
+		return response;
+	}
+
 }

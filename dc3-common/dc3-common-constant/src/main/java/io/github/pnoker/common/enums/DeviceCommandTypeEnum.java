@@ -34,81 +34,84 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum DeviceCommandTypeEnum {
-    /**
-     * Read point value command
-     */
-    READ((byte) 0, "read", "Read point value command"),
 
-    /**
-     * Read point value batch command
-     */
-    READ_BATCH((byte) 1, "read_batch", "Read point value batch command"),
+	/**
+	 * Read point value command
+	 */
+	READ((byte) 0, "read", "Read point value command"),
 
-    /**
-     * Write point value command
-     */
-    WRITE((byte) 2, "write", "Write point value command"),
+	/**
+	 * Read point value batch command
+	 */
+	READ_BATCH((byte) 1, "read_batch", "Read point value batch command"),
 
-    /**
-     * Write point value batch command
-     */
-    WRITE_BATCH((byte) 3, "write_batch", "Write point value batch command"),
+	/**
+	 * Write point value command
+	 */
+	WRITE((byte) 2, "write", "Write point value command"),
 
-    /**
-     * Config device command
-     */
-    CONFIG((byte) 4, "config", "Config device command"),
-    ;
+	/**
+	 * Write point value batch command
+	 */
+	WRITE_BATCH((byte) 3, "write_batch", "Write point value batch command"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Config device command
+	 */
+	CONFIG((byte) 4, "config", "Config device command"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link DeviceCommandTypeEnum}
-     */
-    public static DeviceCommandTypeEnum ofIndex(Byte index) {
-        Optional<DeviceCommandTypeEnum> any = Arrays.stream(DeviceCommandTypeEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link DeviceCommandTypeEnum}
-     */
-    public static DeviceCommandTypeEnum ofCode(String code) {
-        Optional<DeviceCommandTypeEnum> any = Arrays.stream(DeviceCommandTypeEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link DeviceCommandTypeEnum}
+	 */
+	public static DeviceCommandTypeEnum ofIndex(Byte index) {
+		Optional<DeviceCommandTypeEnum> any = Arrays.stream(DeviceCommandTypeEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link DeviceCommandTypeEnum}
-     */
-    public static DeviceCommandTypeEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link DeviceCommandTypeEnum}
+	 */
+	public static DeviceCommandTypeEnum ofCode(String code) {
+		Optional<DeviceCommandTypeEnum> any = Arrays.stream(DeviceCommandTypeEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link DeviceCommandTypeEnum}
+	 */
+	public static DeviceCommandTypeEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

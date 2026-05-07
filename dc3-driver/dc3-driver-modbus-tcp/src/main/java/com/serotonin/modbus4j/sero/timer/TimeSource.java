@@ -18,17 +18,20 @@
 package com.serotonin.modbus4j.sero.timer;
 
 /**
- * An interface to abstract the source of current time away from System. This allows code to run in simulations where
- * the time is controlled explicitly.
+ * An interface to abstract the source of current time away from System. This allows code
+ * to run in simulations where the time is controlled explicitly.
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public interface TimeSource {
-    /**
-     * <p>currentTimeMillis.</p>
-     *
-     * @return a long.
-     */
-    long currentTimeMillis();
+
+	/**
+	 * <p>
+	 * currentTimeMillis.
+	 * </p>
+	 * @return a long.
+	 */
+	long currentTimeMillis();
+
 }

@@ -46,59 +46,56 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ResourceVO extends BaseVO {
 
-    /**
-     * ID
-     */
-    @NotBlank(message = "Resource parent id can't be empty",
-            groups = {Add.class, Update.class})
-    private Long parentResourceId;
+	/**
+	 * ID
+	 */
+	@NotBlank(message = "Resource parent id can't be empty", groups = { Add.class, Update.class })
+	private Long parentResourceId;
 
-    /**
-     * Name
-     */
-    @NotBlank(message = "Role name can't be empty",
-            groups = {Add.class, Auth.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "Invalid role name",
-            groups = {Add.class, Update.class})
-    private String resourceName;
+	/**
+	 * Name
+	 */
+	@NotBlank(message = "Role name can't be empty", groups = { Add.class, Auth.class })
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
+			groups = { Add.class, Update.class })
+	private String resourceName;
 
-    /**
-     * Code
-     */
-    private String resourceCode;
+	/**
+	 * Code
+	 */
+	private String resourceCode;
 
-    /**
-     * Type
-     */
-    private ResourceTypeFlagEnum resourceTypeFlag;
+	/**
+	 * Type
+	 */
+	private ResourceTypeFlagEnum resourceTypeFlag;
 
-    /**
-     * , : ResourceScopeFlagEnum
-     * <ul>
-     *   <li>0x01: </li>
-     *   <li>0x02: </li>
-     *   <li>0x04: </li>
-     *   <li>0x08: </li>
-     * </ul>
-     *
-     */
-    private ResourceScopeFlagEnum resourceScopeFlag;
+	/**
+	 * , : ResourceScopeFlagEnum
+	 * <ul>
+	 * <li>0x01:</li>
+	 * <li>0x02:</li>
+	 * <li>0x04:</li>
+	 * <li>0x08:</li>
+	 * </ul>
+	 *
+	 */
+	private ResourceScopeFlagEnum resourceScopeFlag;
 
-    /**
-     * Entity ID
-     */
-    @NotNull(message = "实体ID不能为空",
-            groups = {Add.class, Update.class})
-    private Long entityId;
+	/**
+	 * Entity ID
+	 */
+	@NotNull(message = "实体ID不能为空", groups = { Add.class, Update.class })
+	private Long entityId;
 
-    /**
-     *
-     */
-    private ResourceExt resourceExt;
+	/**
+	 *
+	 */
+	private ResourceExt resourceExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

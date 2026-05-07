@@ -32,4 +32,3 @@ import io.github.pnoker.common.auth.entity.model.UserLoginDO;
 public interface UserLoginMapper extends BaseMapper<UserLoginDO> {
 
 }
-

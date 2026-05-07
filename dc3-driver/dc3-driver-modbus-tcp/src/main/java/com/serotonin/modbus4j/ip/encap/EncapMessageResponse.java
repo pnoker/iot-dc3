@@ -23,38 +23,44 @@ import com.serotonin.modbus4j.msg.ModbusResponse;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>EncapMessageResponse class.</p>
+ * <p>
+ * EncapMessageResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class EncapMessageResponse extends EncapMessage implements IpMessageResponse {
-    /**
-     * <p>Constructor for EncapMessageResponse.</p>
-     *
-     * @param modbusResponse a {@link ModbusResponse} object.
-     */
-    public EncapMessageResponse(ModbusResponse modbusResponse) {
-        super(modbusResponse);
-    }
 
-    static EncapMessageResponse createEncapMessageResponse(ByteQueue queue) throws ModbusTransportException {
-        // Create the modbus response.
-        ModbusResponse response = ModbusResponse.createModbusResponse(queue);
-        EncapMessageResponse encapResponse = new EncapMessageResponse(response);
+	/**
+	 * <p>
+	 * Constructor for EncapMessageResponse.
+	 * </p>
+	 * @param modbusResponse a {@link ModbusResponse} object.
+	 */
+	public EncapMessageResponse(ModbusResponse modbusResponse) {
+		super(modbusResponse);
+	}
 
-        // Check the CRC
-        ModbusUtils.checkCRC(encapResponse.modbusMessage, queue);
+	static EncapMessageResponse createEncapMessageResponse(ByteQueue queue) throws ModbusTransportException {
+		// Create the modbus response.
+		ModbusResponse response = ModbusResponse.createModbusResponse(queue);
+		EncapMessageResponse encapResponse = new EncapMessageResponse(response);
 
-        return encapResponse;
-    }
+		// Check the CRC
+		ModbusUtils.checkCRC(encapResponse.modbusMessage, queue);
 
-    /**
-     * <p>getModbusResponse.</p>
-     *
-     * @return a {@link ModbusResponse} object.
-     */
-    public ModbusResponse getModbusResponse() {
-        return (ModbusResponse) modbusMessage;
-    }
+		return encapResponse;
+	}
+
+	/**
+	 * <p>
+	 * getModbusResponse.
+	 * </p>
+	 * @return a {@link ModbusResponse} object.
+	 */
+	public ModbusResponse getModbusResponse() {
+		return (ModbusResponse) modbusMessage;
+	}
+
 }

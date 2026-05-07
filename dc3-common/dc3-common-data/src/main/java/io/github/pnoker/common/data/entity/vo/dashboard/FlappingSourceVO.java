@@ -26,20 +26,25 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * A (source, eventType) pair that fired repeatedly in the window — i.e. is
- * "flapping". Different from Storm which is pure per-source volume; Flap
- * narrows the signal to one event-type so operators can tell whether the
- * same condition keeps re-tripping.
+ * A (source, eventType) pair that fired repeatedly in the window — i.e. is "flapping".
+ * Different from Storm which is pure per-source volume; Flap narrows the signal to one
+ * event-type so operators can tell whether the same condition keeps re-tripping.
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class FlappingSourceVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private String source;
-    private long sourceId;
-    private int eventTypeFlag;
-    private long count;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private String source;
+
+	private long sourceId;
+
+	private int eventTypeFlag;
+
+	private long count;
+
 }

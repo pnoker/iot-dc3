@@ -34,47 +34,52 @@ import reactor.core.publisher.Mono;
 @RequestMapping(AgenticConstant.SESSION_URL_PREFIX)
 public class SessionController implements BaseController {
 
-    private final SessionService sessionService;
-    private final SessionBuilder sessionBuilder;
+	private final SessionService sessionService;
 
-    public SessionController(SessionService sessionService, SessionBuilder sessionBuilder) {
-        this.sessionService = sessionService;
-        this.sessionBuilder = sessionBuilder;
-    }
+	private final SessionBuilder sessionBuilder;
 
-    @GetMapping
-    public Mono<R<Page<SessionVO>>> list(SessionQuery query) {
-        try {
-            Page<SessionBO> page = sessionService.selectByPage(query);
-            return Mono.just(R.ok(sessionBuilder.buildVOPageByBOPage(page)));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	public SessionController(SessionService sessionService, SessionBuilder sessionBuilder) {
+		this.sessionService = sessionService;
+		this.sessionBuilder = sessionBuilder;
+	}
 
-    @GetMapping("/{conversationId}")
-    public Mono<R<SessionVO>> get(@PathVariable String conversationId) {
-        try {
-            SessionBO session = sessionService.getByConversationId(conversationId);
-            if (session == null) {
-                return Mono.just(R.fail("Session not found"));
-            }
-            return Mono.just(R.ok(sessionBuilder.buildVOByBO(session)));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	@GetMapping
+	public Mono<R<Page<SessionVO>>> list(SessionQuery query) {
+		try {
+			Page<SessionBO> page = sessionService.selectByPage(query);
+			return Mono.just(R.ok(sessionBuilder.buildVOPageByBOPage(page)));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    @DeleteMapping("/{conversationId}")
-    public Mono<R<Boolean>> delete(@PathVariable String conversationId) {
-        try {
-            sessionService.removeByConversationId(conversationId);
-            return Mono.just(R.ok());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	@GetMapping("/{conversationId}")
+	public Mono<R<SessionVO>> get(@PathVariable String conversationId) {
+		try {
+			SessionBO session = sessionService.getByConversationId(conversationId);
+			if (session == null) {
+				return Mono.just(R.fail("Session not found"));
+			}
+			return Mono.just(R.ok(sessionBuilder.buildVOByBO(session)));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
+
+	@DeleteMapping("/{conversationId}")
+	public Mono<R<Boolean>> delete(@PathVariable String conversationId) {
+		try {
+			sessionService.removeByConversationId(conversationId);
+			return Mono.just(R.ok());
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
+
 }

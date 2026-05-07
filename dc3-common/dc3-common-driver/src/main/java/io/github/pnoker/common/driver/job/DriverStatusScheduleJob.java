@@ -40,19 +40,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class DriverStatusScheduleJob extends QuartzJobBean {
 
-    @Resource
-    DriverMetadata driverMetadata;
+	@Resource
+	DriverMetadata driverMetadata;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+	@Resource
+	private DriverSenderService driverSenderService;
 
-    @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) {
-        DriverBO driver = driverMetadata.getDriver();
-        DriverEventDTO.DriverStatus driverStatus = new DriverEventDTO.DriverStatus(driver.getId(), driverMetadata.getDriverStatus());
-        driverStatus.setTenantId(driver.getTenantId());
-        DriverEventDTO driverEventDTO = new DriverEventDTO(DriverEventTypeEnum.HEARTBEAT, JsonUtil.toJsonString(driverStatus));
-        log.info("Report driver event: {}, event content: {}", driverEventDTO.getType().getCode(), JsonUtil.toJsonString(driverEventDTO));
-        driverSenderService.driverEventSender(driverEventDTO);
-    }
+	@Override
+	protected void executeInternal(JobExecutionContext jobExecutionContext) {
+		DriverBO driver = driverMetadata.getDriver();
+		DriverEventDTO.DriverStatus driverStatus = new DriverEventDTO.DriverStatus(driver.getId(),
+				driverMetadata.getDriverStatus());
+		driverStatus.setTenantId(driver.getTenantId());
+		DriverEventDTO driverEventDTO = new DriverEventDTO(DriverEventTypeEnum.HEARTBEAT,
+				JsonUtil.toJsonString(driverStatus));
+		log.info("Report driver event: {}, event content: {}", driverEventDTO.getType().getCode(),
+				JsonUtil.toJsonString(driverEventDTO));
+		driverSenderService.driverEventSender(driverEventDTO);
+	}
+
 }

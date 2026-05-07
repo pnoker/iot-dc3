@@ -34,99 +34,90 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface RoleResourceBindBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    RoleResourceBindBO buildBOByVO(RoleResourceBindVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	RoleResourceBindBO buildBOByVO(RoleResourceBindVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<RoleResourceBindBO> buildBOListByVOList(List<RoleResourceBindVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<RoleResourceBindBO> buildBOListByVOList(List<RoleResourceBindVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "deleted", ignore = true)
-    RoleResourceBindDO buildDOByBO(RoleResourceBindBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "deleted", ignore = true)
+	RoleResourceBindDO buildDOByBO(RoleResourceBindBO entityBO);
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<RoleResourceBindDO> buildDOListByBOList(List<RoleResourceBindBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<RoleResourceBindDO> buildDOListByBOList(List<RoleResourceBindBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    RoleResourceBindBO buildBOByDO(RoleResourceBindDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	RoleResourceBindBO buildBOByDO(RoleResourceBindDO entityDO);
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<RoleResourceBindBO> buildBOListByDOList(List<RoleResourceBindDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<RoleResourceBindBO> buildBOListByDOList(List<RoleResourceBindDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    RoleResourceBindVO buildVOByBO(RoleResourceBindBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	RoleResourceBindVO buildVOByBO(RoleResourceBindBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<RoleResourceBindVO> buildVOListByBOList(List<RoleResourceBindBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<RoleResourceBindVO> buildVOListByBOList(List<RoleResourceBindBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<RoleResourceBindBO> buildBOPageByDOPage(Page<RoleResourceBindDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<RoleResourceBindBO> buildBOPageByDOPage(Page<RoleResourceBindDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<RoleResourceBindVO> buildVOPageByBOPage(Page<RoleResourceBindBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<RoleResourceBindVO> buildVOPageByBOPage(Page<RoleResourceBindBO> entityPageBO);
+
 }

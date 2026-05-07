@@ -23,18 +23,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Resolve UI-facing time-range inputs into a concrete {@code from}
- * {@link LocalDateTime} that queries can plug into {@code create_time >= ?}.
+ * Resolve UI-facing time-range inputs into a concrete {@code from} {@link LocalDateTime}
+ * that queries can plug into {@code create_time >= ?}.
  * <p>
  * Two parallel inputs are accepted:
  * <ul>
- *   <li>{@code rangeKey} — preferred, one of {@link TimeRangeKeyEnum} codes
- *       (e.g. {@code today}, {@code 24h}, {@code 7d}, {@code 30d}). {@code TODAY}
- *       anchors at local midnight; the rolling presets subtract a fixed
- *       number of hours from {@code now}.</li>
- *   <li>{@code rangeHours} — legacy integer, still honoured when {@code rangeKey}
- *       is absent. Positive values produce {@code now - rangeHours}. Zero or
- *       negative values mean "no lower bound".</li>
+ * <li>{@code rangeKey} — preferred, one of {@link TimeRangeKeyEnum} codes (e.g.
+ * {@code today}, {@code 24h}, {@code 7d}, {@code 30d}). {@code TODAY} anchors at local
+ * midnight; the rolling presets subtract a fixed number of hours from {@code now}.</li>
+ * <li>{@code rangeHours} — legacy integer, still honoured when {@code rangeKey} is
+ * absent. Positive values produce {@code now - rangeHours}. Zero or negative values mean
+ * "no lower bound".</li>
  * </ul>
  * When both are supplied, {@code rangeKey} wins.
  *
@@ -43,109 +42,110 @@ import java.time.LocalDateTime;
  */
 public final class TimeRangeUtil {
 
-    /**
-     * Default hour spans for each rolling preset.
-     */
-    public static final int HOURS_24H = 24;
-    public static final int HOURS_7D = 24 * 7;
-    public static final int HOURS_30D = 24 * 30;
+	/**
+	 * Default hour spans for each rolling preset.
+	 */
+	public static final int HOURS_24H = 24;
 
-    private TimeRangeUtil() {
-    }
+	public static final int HOURS_7D = 24 * 7;
 
-    /**
-     * Resolve the lower-bound timestamp for a range query.
-     *
-     * @param rangeKey   parsed key enum; {@code null} falls back to {@code rangeHours}
-     * @param rangeHours legacy integer fallback; {@code null} or non-positive means "no bound"
-     * @return lower-bound {@code LocalDateTime}, or {@code null} when the
-     * caller should not filter by {@code create_time}
-     */
-    public static LocalDateTime resolveFrom(TimeRangeKeyEnum rangeKey, Integer rangeHours) {
-        if (rangeKey != null) {
-            return switch (rangeKey) {
-                case TODAY -> LocalDate.now().atStartOfDay();
-                case H24 -> LocalDateTime.now().minusHours(HOURS_24H);
-                case D7 -> LocalDateTime.now().minusHours(HOURS_7D);
-                case D30 -> LocalDateTime.now().minusHours(HOURS_30D);
-            };
-        }
-        if (rangeHours != null && rangeHours > 0) {
-            return LocalDateTime.now().minusHours(rangeHours);
-        }
-        return null;
-    }
+	public static final int HOURS_30D = 24 * 30;
 
-    /**
-     * Convenience overload that accepts the raw wire-format code.
-     */
-    public static LocalDateTime resolveFrom(String rangeKeyCode, Integer rangeHours) {
-        return resolveFrom(TimeRangeKeyEnum.ofCode(rangeKeyCode), rangeHours);
-    }
+	private TimeRangeUtil() {
+	}
 
-    /**
-     * Convert a range key to the hour span it represents, so existing
-     * mappers that only accept {@code rangeHours} (e.g. {@code /top},
-     * {@code /stats/timeseries} granularity math) can keep working
-     * unchanged. {@code TODAY} is reported as the number of hours since
-     * local midnight rounded up to the next whole hour (minimum 1), which
-     * lines up with sparkline bucketing.
-     *
-     * @return effective hour span, or {@code null} when no bound applies
-     */
-    public static Integer resolveHours(TimeRangeKeyEnum rangeKey, Integer rangeHours) {
-        if (rangeKey != null) {
-            return switch (rangeKey) {
-                case TODAY -> {
-                    LocalDateTime midnight = LocalDate.now().atStartOfDay();
-                    long minutes = java.time.Duration.between(midnight, LocalDateTime.now()).toMinutes();
-                    // round up to the next whole hour so bucketed queries cover the full day so far
-                    int hours = (int) Math.max(1, (minutes + 59) / 60);
-                    yield hours;
-                }
-                case H24 -> HOURS_24H;
-                case D7 -> HOURS_7D;
-                case D30 -> HOURS_30D;
-            };
-        }
-        if (rangeHours != null && rangeHours > 0) {
-            return rangeHours;
-        }
-        return null;
-    }
+	/**
+	 * Resolve the lower-bound timestamp for a range query.
+	 * @param rangeKey parsed key enum; {@code null} falls back to {@code rangeHours}
+	 * @param rangeHours legacy integer fallback; {@code null} or non-positive means "no
+	 * bound"
+	 * @return lower-bound {@code LocalDateTime}, or {@code null} when the caller should
+	 * not filter by {@code create_time}
+	 */
+	public static LocalDateTime resolveFrom(TimeRangeKeyEnum rangeKey, Integer rangeHours) {
+		if (rangeKey != null) {
+			return switch (rangeKey) {
+				case TODAY -> LocalDate.now().atStartOfDay();
+				case H24 -> LocalDateTime.now().minusHours(HOURS_24H);
+				case D7 -> LocalDateTime.now().minusHours(HOURS_7D);
+				case D30 -> LocalDateTime.now().minusHours(HOURS_30D);
+			};
+		}
+		if (rangeHours != null && rangeHours > 0) {
+			return LocalDateTime.now().minusHours(rangeHours);
+		}
+		return null;
+	}
 
-    /**
-     * Convenience overload that accepts the raw wire-format code.
-     */
-    public static Integer resolveHours(String rangeKeyCode, Integer rangeHours) {
-        return resolveHours(TimeRangeKeyEnum.ofCode(rangeKeyCode), rangeHours);
-    }
+	/**
+	 * Convenience overload that accepts the raw wire-format code.
+	 */
+	public static LocalDateTime resolveFrom(String rangeKeyCode, Integer rangeHours) {
+		return resolveFrom(TimeRangeKeyEnum.ofCode(rangeKeyCode), rangeHours);
+	}
 
-    /**
-     * Convert a range key to a day count for endpoints that bucket by day
-     * (e.g. {@code /alert/trend?days=30}). {@code TODAY} and {@code H24}
-     * both map to 1 day; the legacy {@code days} integer passes through.
-     *
-     * @return effective day count, or {@code null} when no bound applies
-     */
-    public static Integer resolveDays(TimeRangeKeyEnum rangeKey, Integer days) {
-        if (rangeKey != null) {
-            return switch (rangeKey) {
-                case TODAY, H24 -> 1;
-                case D7 -> 7;
-                case D30 -> 30;
-            };
-        }
-        if (days != null && days > 0) {
-            return days;
-        }
-        return null;
-    }
+	/**
+	 * Convert a range key to the hour span it represents, so existing mappers that only
+	 * accept {@code rangeHours} (e.g. {@code /top}, {@code /stats/timeseries} granularity
+	 * math) can keep working unchanged. {@code TODAY} is reported as the number of hours
+	 * since local midnight rounded up to the next whole hour (minimum 1), which lines up
+	 * with sparkline bucketing.
+	 * @return effective hour span, or {@code null} when no bound applies
+	 */
+	public static Integer resolveHours(TimeRangeKeyEnum rangeKey, Integer rangeHours) {
+		if (rangeKey != null) {
+			return switch (rangeKey) {
+				case TODAY -> {
+					LocalDateTime midnight = LocalDate.now().atStartOfDay();
+					long minutes = java.time.Duration.between(midnight, LocalDateTime.now()).toMinutes();
+					// round up to the next whole hour so bucketed queries cover the full
+					// day so far
+					int hours = (int) Math.max(1, (minutes + 59) / 60);
+					yield hours;
+				}
+				case H24 -> HOURS_24H;
+				case D7 -> HOURS_7D;
+				case D30 -> HOURS_30D;
+			};
+		}
+		if (rangeHours != null && rangeHours > 0) {
+			return rangeHours;
+		}
+		return null;
+	}
 
-    /**
-     * Convenience overload that accepts the raw wire-format code.
-     */
-    public static Integer resolveDays(String rangeKeyCode, Integer days) {
-        return resolveDays(TimeRangeKeyEnum.ofCode(rangeKeyCode), days);
-    }
+	/**
+	 * Convenience overload that accepts the raw wire-format code.
+	 */
+	public static Integer resolveHours(String rangeKeyCode, Integer rangeHours) {
+		return resolveHours(TimeRangeKeyEnum.ofCode(rangeKeyCode), rangeHours);
+	}
+
+	/**
+	 * Convert a range key to a day count for endpoints that bucket by day (e.g.
+	 * {@code /alert/trend?days=30}). {@code TODAY} and {@code H24} both map to 1 day; the
+	 * legacy {@code days} integer passes through.
+	 * @return effective day count, or {@code null} when no bound applies
+	 */
+	public static Integer resolveDays(TimeRangeKeyEnum rangeKey, Integer days) {
+		if (rangeKey != null) {
+			return switch (rangeKey) {
+				case TODAY, H24 -> 1;
+				case D7 -> 7;
+				case D30 -> 30;
+			};
+		}
+		if (days != null && days > 0) {
+			return days;
+		}
+		return null;
+	}
+
+	/**
+	 * Convenience overload that accepts the raw wire-format code.
+	 */
+	public static Integer resolveDays(String rangeKeyCode, Integer days) {
+		return resolveDays(TimeRangeKeyEnum.ofCode(rangeKeyCode), days);
+	}
+
 }

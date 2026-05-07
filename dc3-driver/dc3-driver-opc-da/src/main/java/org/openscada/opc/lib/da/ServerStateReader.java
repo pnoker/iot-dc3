@@ -30,63 +30,66 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ServerStateReader {
 
-    private final List<ServerStateListener> _listeners = new CopyOnWriteArrayList<ServerStateListener>();
-    private Server _server = null;
-    private ScheduledExecutorService _scheduler = null;
-    private ScheduledFuture<?> _job = null;
+	private final List<ServerStateListener> _listeners = new CopyOnWriteArrayList<ServerStateListener>();
 
-    public ServerStateReader(final Server server) {
-        super();
-        this._server = server;
-        this._scheduler = this._server.getScheduler();
-    }
+	private Server _server = null;
 
-    /**
-     * Create a new server state reader. Please note that the scheduler might get
-     * blocked for a short period of time in case of a connection failure!
-     *
-     * @param server    the server to check
-     * @param scheduler the scheduler to use
-     */
-    public ServerStateReader(final Server server, final ScheduledExecutorService scheduler) {
-        super();
-        this._server = server;
-        this._scheduler = scheduler;
-    }
+	private ScheduledExecutorService _scheduler = null;
 
-    public synchronized void start() {
-        if (this._job != null) {
-            return;
-        }
+	private ScheduledFuture<?> _job = null;
 
-        this._job = this._scheduler.scheduleAtFixedRate(new Runnable() {
+	public ServerStateReader(final Server server) {
+		super();
+		this._server = server;
+		this._scheduler = this._server.getScheduler();
+	}
 
-            public void run() {
-                once();
-            }
-        }, 1000, 1000, TimeUnit.MILLISECONDS);
-    }
+	/**
+	 * Create a new server state reader. Please note that the scheduler might get blocked
+	 * for a short period of time in case of a connection failure!
+	 * @param server the server to check
+	 * @param scheduler the scheduler to use
+	 */
+	public ServerStateReader(final Server server, final ScheduledExecutorService scheduler) {
+		super();
+		this._server = server;
+		this._scheduler = scheduler;
+	}
 
-    public synchronized void stop() {
-        this._job.cancel(false);
-        this._job = null;
-    }
+	public synchronized void start() {
+		if (this._job != null) {
+			return;
+		}
 
-    protected void once() {
-        log.debug("Reading server state");
+		this._job = this._scheduler.scheduleAtFixedRate(new Runnable() {
 
-        final OPCSERVERSTATUS state = this._server.getServerState();
+			public void run() {
+				once();
+			}
+		}, 1000, 1000, TimeUnit.MILLISECONDS);
+	}
 
-        for (final ServerStateListener listener : new ArrayList<ServerStateListener>(this._listeners)) {
-            listener.stateUpdate(state);
-        }
-    }
+	public synchronized void stop() {
+		this._job.cancel(false);
+		this._job = null;
+	}
 
-    public void addListener(final ServerStateListener listener) {
-        this._listeners.add(listener);
-    }
+	protected void once() {
+		log.debug("Reading server state");
 
-    public void removeListener(final ServerStateListener listener) {
-        this._listeners.remove(listener);
-    }
+		final OPCSERVERSTATUS state = this._server.getServerState();
+
+		for (final ServerStateListener listener : new ArrayList<ServerStateListener>(this._listeners)) {
+			listener.stateUpdate(state);
+		}
+	}
+
+	public void addListener(final ServerStateListener listener) {
+		this._listeners.add(listener);
+	}
+
+	public void removeListener(final ServerStateListener listener) {
+		this._listeners.remove(listener);
+	}
+
 }

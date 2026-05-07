@@ -34,71 +34,74 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum AlarmTypeFlagEnum {
-    /**
-     * Point
-     */
-    POINT((byte) 0, "point", "Point"),
 
-    /**
-     * Device
-     */
-    DEVICE((byte) 1, "device", "Device"),
+	/**
+	 * Point
+	 */
+	POINT((byte) 0, "point", "Point"),
 
-    /**
-     * Driver
-     */
-    DRIVER((byte) 2, "driver", "Driver"),
-    ;
+	/**
+	 * Device
+	 */
+	DEVICE((byte) 1, "device", "Device"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Driver
+	 */
+	DRIVER((byte) 2, "driver", "Driver"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link AlarmTypeFlagEnum}
-     */
-    public static AlarmTypeFlagEnum ofIndex(Byte index) {
-        Optional<AlarmTypeFlagEnum> any = Arrays.stream(AlarmTypeFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link AlarmTypeFlagEnum}
-     */
-    public static AlarmTypeFlagEnum ofCode(String code) {
-        Optional<AlarmTypeFlagEnum> any = Arrays.stream(AlarmTypeFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link AlarmTypeFlagEnum}
+	 */
+	public static AlarmTypeFlagEnum ofIndex(Byte index) {
+		Optional<AlarmTypeFlagEnum> any = Arrays.stream(AlarmTypeFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link AlarmTypeFlagEnum}
-     */
-    public static AlarmTypeFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link AlarmTypeFlagEnum}
+	 */
+	public static AlarmTypeFlagEnum ofCode(String code) {
+		Optional<AlarmTypeFlagEnum> any = Arrays.stream(AlarmTypeFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link AlarmTypeFlagEnum}
+	 */
+	public static AlarmTypeFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

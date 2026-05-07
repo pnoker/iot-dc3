@@ -18,30 +18,29 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class ExceptionConstant {
 
-    /**
-     *
-     */
-    public static final String UTILITY_CLASS = "Utility class";
+	/**
+	 *
+	 */
+	public static final String UTILITY_CLASS = "Utility class";
 
-    /**
-     *
-     */
-    public static final String NO_AVAILABLE_SERVER = "No available server for client";
+	/**
+	 *
+	 */
+	public static final String NO_AVAILABLE_SERVER = "No available server for client";
 
-    /**
-     * Tenant,
-     */
-    public static final String NO_AVAILABLE_AUTH = "Tenant, user information does not match";
+	/**
+	 * Tenant,
+	 */
+	public static final String NO_AVAILABLE_AUTH = "Tenant, user information does not match";
 
-    private ExceptionConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private ExceptionConstant() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
+
 }

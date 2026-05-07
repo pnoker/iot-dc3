@@ -27,9 +27,9 @@ import java.io.Serializable;
 /**
  * Point Value Query Object
  * <p>
- * Query object for searching and filtering point values in the repository layer.
- * Supports filtering by tenant, device, point name, and enable status.
- * Includes pagination support for large datasets.
+ * Query object for searching and filtering point values in the repository layer. Supports
+ * filtering by tenant, device, point name, and enable status. Includes pagination support
+ * for large datasets.
  * </p>
  *
  * @author pnoker
@@ -44,61 +44,61 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PointValueQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    /**
-     * Tenant ID for multi-tenant data isolation
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID for multi-tenant data isolation
+	 */
+	private Long tenantId;
 
-    // Query fields
+	// Query fields
 
-    /**
-     * Device ID to filter by specific device
-     */
-    private Long deviceId;
+	/**
+	 * Device ID to filter by specific device
+	 */
+	private Long deviceId;
 
-    /**
-     * Device name for text-based filtering
-     */
-    private String deviceName;
+	/**
+	 * Device name for text-based filtering
+	 */
+	private String deviceName;
 
-    /**
-     * Point ID to filter by specific point
-     */
-    private Long pointId;
+	/**
+	 * Point ID to filter by specific point
+	 */
+	private Long pointId;
 
-    /**
-     * Point name for text-based filtering
-     */
-    private String pointName;
+	/**
+	 * Point name for text-based filtering
+	 */
+	private String pointName;
 
-    /**
-     * Enable flag to filter active/inactive points
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag to filter active/inactive points
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Optional lower bound for create_time filtering (time range feature).
-     */
-    private java.time.LocalDateTime createTimeFrom;
+	/**
+	 * Optional lower bound for create_time filtering (time range feature).
+	 */
+	private java.time.LocalDateTime createTimeFrom;
 
-    /**
-     * Convenience field: when set (e.g. 24, 168, 720), the service layer
-     * converts it to createTimeFrom = now - rangeHours. Retained for
-     * backward compatibility; new callers should set {@link #rangeKey}.
-     */
-    private Integer rangeHours;
+	/**
+	 * Convenience field: when set (e.g. 24, 168, 720), the service layer converts it to
+	 * createTimeFrom = now - rangeHours. Retained for backward compatibility; new callers
+	 * should set {@link #rangeKey}.
+	 */
+	private Integer rangeHours;
 
-    /**
-     * Preferred time-range selector. Accepts one of the {@link
-     * io.github.pnoker.common.enums.TimeRangeKeyEnum} codes ({@code today},
-     * {@code 24h}, {@code 7d}, {@code 30d}). Takes precedence over
-     * {@link #rangeHours} when both are supplied.
-     */
-    private String rangeKey;
+	/**
+	 * Preferred time-range selector. Accepts one of the
+	 * {@link io.github.pnoker.common.enums.TimeRangeKeyEnum} codes ({@code today},
+	 * {@code 24h}, {@code 7d}, {@code 30d}). Takes precedence over {@link #rangeHours}
+	 * when both are supplied.
+	 */
+	private String rangeKey;
 
 }

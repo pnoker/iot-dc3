@@ -23,52 +23,60 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <p>Abstract SerialSlave class.</p>
+ * <p>
+ * Abstract SerialSlave class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 abstract /**
- * Serial Slave
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
- */
+			 * Serial Slave
+			 *
+			 * @author pnoker
+			 * @version 2025.9.0
+			 * @since 2022.1.0
+			 */
 public class SerialSlave extends ModbusSlaveSet {
 
-    private final Log LOG = LogFactory.getLog(SerialSlave.class);
-    protected StreamTransport transport;
-    // Runtime fields
-    private SerialPortWrapper wrapper;
+	private final Log LOG = LogFactory.getLog(SerialSlave.class);
 
-    /**
-     * <p>Constructor for SerialSlave.</p>
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
-     */
-    public SerialSlave(SerialPortWrapper wrapper) {
-        this.wrapper = wrapper;
-    }
+	protected StreamTransport transport;
 
-    @Override
-    public void start() throws ModbusInitException {
-        try {
+	// Runtime fields
+	private SerialPortWrapper wrapper;
 
-            wrapper.open();
+	/**
+	 * <p>
+	 * Constructor for SerialSlave.
+	 * </p>
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 */
+	public SerialSlave(SerialPortWrapper wrapper) {
+		this.wrapper = wrapper;
+	}
 
-            transport = new StreamTransport(wrapper.getInputStream(), wrapper.getOutputStream());
-        } catch (Exception e) {
-            throw new ModbusInitException(e);
-        }
-    }
+	@Override
+	public void start() throws ModbusInitException {
+		try {
 
-    @Override
-    public void stop() {
-        try {
-            wrapper.close();
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
-    }
+			wrapper.open();
+
+			transport = new StreamTransport(wrapper.getInputStream(), wrapper.getOutputStream());
+		}
+		catch (Exception e) {
+			throw new ModbusInitException(e);
+		}
+	}
+
+	@Override
+	public void stop() {
+		try {
+			wrapper.close();
+		}
+		catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+	}
+
 }

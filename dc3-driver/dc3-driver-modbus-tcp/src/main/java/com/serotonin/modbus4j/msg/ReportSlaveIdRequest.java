@@ -23,49 +23,54 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>ReportSlaveIdRequest class.</p>
+ * <p>
+ * ReportSlaveIdRequest class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ReportSlaveIdRequest extends ModbusRequest {
-    /**
-     * <p>Constructor for ReportSlaveIdRequest.</p>
-     *
-     * @param slaveId a int.
-     * @throws ModbusTransportException if any.
-     */
-    public ReportSlaveIdRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
 
-    @Override
-    public void validate(Modbus modbus) {
-        // no op
-    }
+	/**
+	 * <p>
+	 * Constructor for ReportSlaveIdRequest.
+	 * </p>
+	 * @param slaveId a int.
+	 * @throws ModbusTransportException if any.
+	 */
+	public ReportSlaveIdRequest(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    protected void writeRequest(ByteQueue queue) {
-        // no op
-    }
+	@Override
+	public void validate(Modbus modbus) {
+		// no op
+	}
 
-    @Override
-    protected void readRequest(ByteQueue queue) {
-        // no op
-    }
+	@Override
+	protected void writeRequest(ByteQueue queue) {
+		// no op
+	}
 
-    @Override
-    ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
-        return new ReportSlaveIdResponse(slaveId);
-    }
+	@Override
+	protected void readRequest(ByteQueue queue) {
+		// no op
+	}
 
-    @Override
-    ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
-        return new ReportSlaveIdResponse(slaveId, processImage.getReportSlaveIdData());
-    }
+	@Override
+	ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
+		return new ReportSlaveIdResponse(slaveId);
+	}
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.REPORT_SLAVE_ID;
-    }
+	@Override
+	ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
+		return new ReportSlaveIdResponse(slaveId, processImage.getReportSlaveIdData());
+	}
+
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.REPORT_SLAVE_ID;
+	}
+
 }

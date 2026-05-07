@@ -21,24 +21,28 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * <p>NullWriter class.</p>
+ * <p>
+ * NullWriter class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class NullWriter extends Writer {
-    @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {
-        // no op
-    }
 
-    @Override
-    public void flush() throws IOException {
-        // no op
-    }
+	@Override
+	public void write(char[] cbuf, int off, int len) throws IOException {
+		// no op
+	}
 
-    @Override
-    public void close() throws IOException {
-        // no op
-    }
+	@Override
+	public void flush() throws IOException {
+		// no op
+	}
+
+	@Override
+	public void close() throws IOException {
+		// no op
+	}
+
 }

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.dal.impl;
 
-
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.pnoker.common.manager.dal.PointDataVolumeRunManager;
 import io.github.pnoker.common.manager.entity.model.PointDataVolumeRunDO;
@@ -34,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @since 2022.1.0
  */
 @Service
-public class PointDataVolumeRunManagerImpl extends ServiceImpl<PointDataVolumeRunMapper, PointDataVolumeRunDO> implements PointDataVolumeRunManager {
+public class PointDataVolumeRunManagerImpl extends ServiceImpl<PointDataVolumeRunMapper, PointDataVolumeRunDO>
+		implements PointDataVolumeRunManager {
 
 }

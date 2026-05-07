@@ -51,118 +51,114 @@ import java.util.Objects;
 @Service
 public class RuleServiceImpl implements RuleService {
 
-    @Resource
-    private RuleBuilder ruleBuilder;
+	@Resource
+	private RuleBuilder ruleBuilder;
 
-    @Resource
-    private RuleManager ruleManager;
+	@Resource
+	private RuleManager ruleManager;
 
-    @Override
-    public void save(RuleBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+	@Override
+	public void save(RuleBO entityBO) {
+		checkDuplicate(entityBO, false, true);
 
-        RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
-        if (!ruleManager.save(entityDO)) {
-            throw new AddException("Failed to create alarm rule");
-        }
-    }
+		RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
+		if (!ruleManager.save(entityDO)) {
+			throw new AddException("Failed to create alarm rule");
+		}
+	}
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-        // Alarm ruleAlarm rule
-        LambdaQueryChainWrapper<RuleDO> wrapper = ruleManager.lambdaQuery().eq(RuleDO::getEntityId, id);
-        long count = wrapper.count();
-        if (count > 0) {
-            throw new AssociatedException("Failed to remove alarm rule: some sub alarm rules exists in the alarm rule");
-        }
+		// Alarm ruleAlarm rule
+		LambdaQueryChainWrapper<RuleDO> wrapper = ruleManager.lambdaQuery().eq(RuleDO::getEntityId, id);
+		long count = wrapper.count();
+		if (count > 0) {
+			throw new AssociatedException("Failed to remove alarm rule: some sub alarm rules exists in the alarm rule");
+		}
 
-        if (!ruleManager.removeById(id)) {
-            throw new DeleteException("Failed to remove alarm rule");
-        }
-    }
+		if (!ruleManager.removeById(id)) {
+			throw new DeleteException("Failed to remove alarm rule");
+		}
+	}
 
-    @Override
-    public void update(RuleBO entityBO) {
-        getDOById(entityBO.getId(), true);
+	@Override
+	public void update(RuleBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+		checkDuplicate(entityBO, true, true);
 
-        RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!ruleManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update alarm rule");
-        }
-    }
+		RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!ruleManager.updateById(entityDO)) {
+			throw new UpdateException("Failed to update alarm rule");
+		}
+	}
 
-    @Override
-    public RuleBO selectById(Long id) {
-        RuleDO entityDO = getDOById(id, true);
-        return ruleBuilder.buildBOByDO(entityDO);
-    }
+	@Override
+	public RuleBO selectById(Long id) {
+		RuleDO entityDO = getDOById(id, true);
+		return ruleBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public Page<RuleBO> selectByPage(RuleQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<RuleDO> entityPageDO = ruleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return ruleBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	@Override
+	public Page<RuleBO> selectByPage(RuleQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<RuleDO> entityPageDO = ruleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+		return ruleBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link RuleQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<RuleDO> fuzzyQuery(RuleQuery entityQuery) {
-        LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmRuleName()), RuleDO::getRuleName, entityQuery.getAlarmRuleName());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleDO::getTenantId, entityQuery.getTenantId());
-        return wrapper;
-    }
+	/**
+	 * @param entityQuery {@link RuleQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<RuleDO> fuzzyQuery(RuleQuery entityQuery) {
+		LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmRuleName()), RuleDO::getRuleName,
+				entityQuery.getAlarmRuleName());
+		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleDO::getTenantId, entityQuery.getTenantId());
+		return wrapper;
+	}
 
-    /**
-     *
-     *
-     * @param entityBO       {@link RuleBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
-     */
-    private boolean checkDuplicate(RuleBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
-        wrapper.eq(RuleDO::getRuleName, entityBO.getRuleName());
-        wrapper.eq(RuleDO::getRuleCode, entityBO.getRuleCode());
-        wrapper.eq(RuleDO::getEntityId, entityBO.getEntityId());
-        wrapper.eq(RuleDO::getTenantId, entityBO.getTenantId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        RuleDO one = ruleManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Alarm rule has been duplicated");
-        }
-        return duplicate;
-    }
+	/**
+	 * @param entityBO {@link RuleBO}
+	 * @param isUpdate
+	 * @param throwException
+	 * @return
+	 */
+	private boolean checkDuplicate(RuleBO entityBO, boolean isUpdate, boolean throwException) {
+		LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
+		wrapper.eq(RuleDO::getRuleName, entityBO.getRuleName());
+		wrapper.eq(RuleDO::getRuleCode, entityBO.getRuleCode());
+		wrapper.eq(RuleDO::getEntityId, entityBO.getEntityId());
+		wrapper.eq(RuleDO::getTenantId, entityBO.getTenantId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		RuleDO one = ruleManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+		if (throwException && duplicate) {
+			throw new DuplicateException("Alarm rule has been duplicated");
+		}
+		return duplicate;
+	}
 
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link RuleDO}
-     */
-    private RuleDO getDOById(Long id, boolean throwException) {
-        RuleDO entityDO = ruleManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Alarm rule does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link RuleDO}
+	 */
+	private RuleDO getDOById(Long id, boolean throwException) {
+		RuleDO entityDO = ruleManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Alarm rule does not exist");
+		}
+		return entityDO;
+	}
 
 }

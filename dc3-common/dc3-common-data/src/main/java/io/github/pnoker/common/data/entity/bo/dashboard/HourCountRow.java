@@ -24,13 +24,16 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * Hourly bucket from {@code date_trunc('hour', …)} — bucket is the
- * top-of-hour timestamp, count is the number of events in that hour.
+ * Hourly bucket from {@code date_trunc('hour', …)} — bucket is the top-of-hour timestamp,
+ * count is the number of events in that hour.
  */
 @Getter
 @Setter
 @ToString
 public class HourCountRow {
-    private LocalDateTime bucket;
-    private long count;
+
+	private LocalDateTime bucket;
+
+	private long count;
+
 }

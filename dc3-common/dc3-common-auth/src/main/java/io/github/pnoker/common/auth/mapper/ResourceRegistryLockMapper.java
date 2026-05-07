@@ -21,8 +21,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * Postgres session-level advisory lock helper used by the resource registry sync
- * flow to serialize concurrent registrations of the same service.
+ * Postgres session-level advisory lock helper used by the resource registry sync flow to
+ * serialize concurrent registrations of the same service.
  *
  * @author pnoker
  * @version 2026.5.5
@@ -31,16 +31,17 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface ResourceRegistryLockMapper {
 
-    /**
-     * Acquire a transaction-scoped advisory lock keyed by the given string.
-     * The lock is automatically released when the enclosing transaction ends.
-     *
-     * <p>SQL lives in {@code resources/mapping/ResourceRegistryLockMapper.xml}.
-     * The return value is an empty string and is intentionally discarded by
-     * callers; it only exists so MyBatis can map the ResultSet produced by the
-     * {@code SELECT} statement. PostgreSQL's {@code pg_advisory_xact_lock}
-     * returns {@code void}, which is cast to {@code text} in the XML mapping to
-     * satisfy MyBatis' result-mapping contract.
-     */
-    String advisoryLock(@Param("key") String key);
+	/**
+	 * Acquire a transaction-scoped advisory lock keyed by the given string. The lock is
+	 * automatically released when the enclosing transaction ends.
+	 *
+	 * <p>
+	 * SQL lives in {@code resources/mapping/ResourceRegistryLockMapper.xml}. The return
+	 * value is an empty string and is intentionally discarded by callers; it only exists
+	 * so MyBatis can map the ResultSet produced by the {@code SELECT} statement.
+	 * PostgreSQL's {@code pg_advisory_xact_lock} returns {@code void}, which is cast to
+	 * {@code text} in the XML mapping to satisfy MyBatis' result-mapping contract.
+	 */
+	String advisoryLock(@Param("key") String key);
+
 }

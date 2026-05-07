@@ -23,76 +23,82 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * <p>EpollStreamTransportCharSpaced class.</p>
+ * <p>
+ * EpollStreamTransportCharSpaced class.
+ * </p>
  *
  * @author Terry Packer
  * @version 2025.9.0
  */
 public class EpollStreamTransportCharSpaced extends EpollStreamTransport {
 
-    private final long charSpacing; //Spacing for chars in nanoseconds
-    private final OutputStream out; //Since the subclass has private members
+	private final long charSpacing; // Spacing for chars in nanoseconds
 
-    /**
-     * <p>Constructor for EpollStreamTransportCharSpaced.</p>
-     *
-     * @param in          a {@link InputStream} object.
-     * @param out         a {@link OutputStream} object.
-     * @param epoll       a {@link InputStreamEPollWrapper} object.
-     * @param charSpacing a long.
-     */
-    public EpollStreamTransportCharSpaced(InputStream in, OutputStream out,
-                                          InputStreamEPollWrapper epoll, long charSpacing) {
-        super(in, out, epoll);
-        this.out = out;
-        this.charSpacing = charSpacing;
-    }
+	private final OutputStream out; // Since the subclass has private members
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Perform a write, ensure space between chars
-     */
-    @Override
-    public void write(byte[] data) throws IOException {
+	/**
+	 * <p>
+	 * Constructor for EpollStreamTransportCharSpaced.
+	 * </p>
+	 * @param in a {@link InputStream} object.
+	 * @param out a {@link OutputStream} object.
+	 * @param epoll a {@link InputStreamEPollWrapper} object.
+	 * @param charSpacing a long.
+	 */
+	public EpollStreamTransportCharSpaced(InputStream in, OutputStream out, InputStreamEPollWrapper epoll,
+			long charSpacing) {
+		super(in, out, epoll);
+		this.out = out;
+		this.charSpacing = charSpacing;
+	}
 
-        try {
-            long waited = 0, writeStart, writeEnd, waitRemaining;
-            for (byte b : data) {
-                writeStart = System.nanoTime();
-                out.write(b);
-                writeEnd = System.nanoTime();
-                waited = writeEnd - writeStart;
-                if (waited < this.charSpacing) {
-                    waitRemaining = this.charSpacing - waited;
-                    Thread.sleep(waitRemaining / 1000000, (int) (waitRemaining % 1000000));
-                }
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Perform a write, ensure space between chars
+	 */
+	@Override
+	public void write(byte[] data) throws IOException {
 
-            }
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
-        out.flush();
-    }
+		try {
+			long waited = 0, writeStart, writeEnd, waitRemaining;
+			for (byte b : data) {
+				writeStart = System.nanoTime();
+				out.write(b);
+				writeEnd = System.nanoTime();
+				waited = writeEnd - writeStart;
+				if (waited < this.charSpacing) {
+					waitRemaining = this.charSpacing - waited;
+					Thread.sleep(waitRemaining / 1000000, (int) (waitRemaining % 1000000));
+				}
 
+			}
+		}
+		catch (Exception e) {
+			throw new IOException(e);
+		}
+		out.flush();
+	}
 
-    public void write(byte[] data, int len) throws IOException {
-        try {
-            long waited = 0, writeStart, writeEnd, waitRemaining;
-            for (int i = 0; i < len; i++) {
-                writeStart = System.nanoTime();
-                out.write(data[i]);
-                writeEnd = System.nanoTime();
-                waited = writeEnd - writeStart;
-                if (waited < this.charSpacing) {
-                    waitRemaining = this.charSpacing - waited;
-                    Thread.sleep(waitRemaining / 1000000, (int) (waitRemaining % 1000000));
-                }
+	public void write(byte[] data, int len) throws IOException {
+		try {
+			long waited = 0, writeStart, writeEnd, waitRemaining;
+			for (int i = 0; i < len; i++) {
+				writeStart = System.nanoTime();
+				out.write(data[i]);
+				writeEnd = System.nanoTime();
+				waited = writeEnd - writeStart;
+				if (waited < this.charSpacing) {
+					waitRemaining = this.charSpacing - waited;
+					Thread.sleep(waitRemaining / 1000000, (int) (waitRemaining % 1000000));
+				}
 
-            }
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
-        out.flush();
-    }
+			}
+		}
+		catch (Exception e) {
+			throw new IOException(e);
+		}
+		out.flush();
+	}
+
 }

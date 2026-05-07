@@ -27,9 +27,9 @@ import java.util.UUID;
 /**
  * Environment Utility Class
  * <p>
- * Utility class for environment-related operations in IoT DC3 platform.
- * Provides methods for UUID generation and environment tag creation
- * based on environment and group identifiers.
+ * Utility class for environment-related operations in IoT DC3 platform. Provides methods
+ * for UUID generation and environment tag creation based on environment and group
+ * identifiers.
  * </p>
  *
  * @author pnoker
@@ -39,43 +39,40 @@ import java.util.UUID;
 @Slf4j
 public class EnvironmentUtil {
 
-    private EnvironmentUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private EnvironmentUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Get a unique node ID.
-     *
-     * @return Node ID string
-     */
-    public static String getNodeId() {
-        return UUID.randomUUID().toString();
-    }
+	/**
+	 * Get a unique node ID.
+	 * @return Node ID string
+	 */
+	public static String getNodeId() {
+		return UUID.randomUUID().toString();
+	}
 
-    /**
-     * Get the topic tag.
-     * In the development environment, it is used to distinguish multi-person development.
-     *
-     * @param env   Environment type
-     * @param group Group identifier
-     * @return Topic tag string
-     */
-    public static String getTag(String env, String group) {
-        String exchangeTag = "";
-        if (isDev(env)) {
-            exchangeTag = env.toLowerCase() + SymbolConstant.UNDERSCORE + group.toLowerCase() + SymbolConstant.DOT;
-        }
-        return exchangeTag;
-    }
+	/**
+	 * Get the topic tag. In the development environment, it is used to distinguish
+	 * multi-person development.
+	 * @param env Environment type
+	 * @param group Group identifier
+	 * @return Topic tag string
+	 */
+	public static String getTag(String env, String group) {
+		String exchangeTag = "";
+		if (isDev(env)) {
+			exchangeTag = env.toLowerCase() + SymbolConstant.UNDERSCORE + group.toLowerCase() + SymbolConstant.DOT;
+		}
+		return exchangeTag;
+	}
 
-    /**
-     * Check whether the current environment is a development environment.
-     *
-     * @param env Environment type
-     * @return true if it is a development environment, false otherwise
-     */
-    public static boolean isDev(String env) {
-        return EnvironmentConstant.ENV_DEV.equals(env);
-    }
+	/**
+	 * Check whether the current environment is a development environment.
+	 * @param env Environment type
+	 * @return true if it is a development environment, false otherwise
+	 */
+	public static boolean isDev(String env) {
+		return EnvironmentConstant.ENV_DEV.equals(env);
+	}
 
 }

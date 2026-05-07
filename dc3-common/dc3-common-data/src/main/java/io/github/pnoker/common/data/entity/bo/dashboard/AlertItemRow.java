@@ -30,12 +30,21 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 public class AlertItemRow {
-    private long id;
-    private String source;
-    private long sourceId;
-    private long pointId;
-    private int eventTypeFlag;
-    private int confirmFlag;
-    private LocalDateTime createTime;
-    private String message;
+
+	private long id;
+
+	private String source;
+
+	private long sourceId;
+
+	private long pointId;
+
+	private int eventTypeFlag;
+
+	private int confirmFlag;
+
+	private LocalDateTime createTime;
+
+	private String message;
+
 }

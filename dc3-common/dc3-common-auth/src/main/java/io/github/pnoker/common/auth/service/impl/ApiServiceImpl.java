@@ -50,117 +50,109 @@ import java.util.Objects;
 @Service
 public class ApiServiceImpl implements ApiService {
 
-    @Resource
-    private ApiBuilder apiBuilder;
+	@Resource
+	private ApiBuilder apiBuilder;
 
-    @Resource
-    private ApiManager apiManager;
+	@Resource
+	private ApiManager apiManager;
 
-    @Override
-    public void save(ApiBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+	@Override
+	public void save(ApiBO entityBO) {
+		checkDuplicate(entityBO, false, true);
 
-        ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
-        if (!apiManager.save(entityDO)) {
-            throw new AddException("Failed to create api");
-        }
-    }
+		ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
+		if (!apiManager.save(entityDO)) {
+			throw new AddException("Failed to create api");
+		}
+	}
 
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+		if (!apiManager.removeById(id)) {
+			throw new DeleteException("Failed to remove api");
+		}
+	}
 
-        if (!apiManager.removeById(id)) {
-            throw new DeleteException("Failed to remove api");
-        }
-    }
+	@Override
+	public void update(ApiBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
+		checkDuplicate(entityBO, true, true);
 
-    @Override
-    public void update(ApiBO entityBO) {
-        getDOById(entityBO.getId(), true);
+		ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!apiManager.updateById(entityDO)) {
+			throw new UpdateException("Failed to update api");
+		}
+	}
 
-        checkDuplicate(entityBO, true, true);
+	@Override
+	public ApiBO selectById(Long id) {
+		ApiDO entityDO = getDOById(id, true);
+		return apiBuilder.buildBOByDO(entityDO);
+	}
 
-        ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!apiManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update api");
-        }
-    }
+	@Override
+	public Page<ApiBO> selectByPage(ApiQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<ApiDO> entityPageDO = apiManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+		return apiBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
+	/**
+	 * @param entityQuery {@link ApiQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<ApiDO> fuzzyQuery(ApiQuery entityQuery) {
+		LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getApiName()), ApiDO::getApiName, entityQuery.getApiName());
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getApiCode()), ApiDO::getApiCode, entityQuery.getApiCode());
+		wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceName()), ApiDO::getServiceName,
+				entityQuery.getServiceName());
+		wrapper.eq(Objects.nonNull(entityQuery.getApiTypeFlag()), ApiDO::getApiTypeFlag, entityQuery.getApiTypeFlag());
+		wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ApiDO::getEnableFlag, entityQuery.getEnableFlag());
+		return wrapper;
+	}
 
-    @Override
-    public ApiBO selectById(Long id) {
-        ApiDO entityDO = getDOById(id, true);
-        return apiBuilder.buildBOByDO(entityDO);
-    }
+	/**
+	 * @param entityBO {@link ApiBO}
+	 * @param isUpdate
+	 * @param throwException
+	 * @return
+	 */
+	private boolean checkDuplicate(ApiBO entityBO, boolean isUpdate, boolean throwException) {
+		LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
+		wrapper.eq(ApiDO::getApiTypeFlag, entityBO.getApiTypeFlag());
+		wrapper.eq(ApiDO::getApiName, entityBO.getApiName());
+		wrapper.eq(ApiDO::getApiCode, entityBO.getApiCode());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		ApiDO one = apiManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+		if (throwException && duplicate) {
+			throw new DuplicateException("Api has been duplicated");
+		}
+		return duplicate;
+	}
 
-
-    @Override
-    public Page<ApiBO> selectByPage(ApiQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<ApiDO> entityPageDO = apiManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return apiBuilder.buildBOPageByDOPage(entityPageDO);
-    }
-
-    /**
-     *
-     *
-     * @param entityQuery {@link ApiQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<ApiDO> fuzzyQuery(ApiQuery entityQuery) {
-        LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getApiName()), ApiDO::getApiName, entityQuery.getApiName());
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getApiCode()), ApiDO::getApiCode, entityQuery.getApiCode());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceName()), ApiDO::getServiceName, entityQuery.getServiceName());
-        wrapper.eq(Objects.nonNull(entityQuery.getApiTypeFlag()), ApiDO::getApiTypeFlag, entityQuery.getApiTypeFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ApiDO::getEnableFlag, entityQuery.getEnableFlag());
-        return wrapper;
-    }
-
-    /**
-     *
-     *
-     * @param entityBO       {@link ApiBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
-     */
-    private boolean checkDuplicate(ApiBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
-        wrapper.eq(ApiDO::getApiTypeFlag, entityBO.getApiTypeFlag());
-        wrapper.eq(ApiDO::getApiName, entityBO.getApiName());
-        wrapper.eq(ApiDO::getApiCode, entityBO.getApiCode());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        ApiDO one = apiManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Api has been duplicated");
-        }
-        return duplicate;
-    }
-
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link ApiDO}
-     */
-    private ApiDO getDOById(Long id, boolean throwException) {
-        ApiDO entityDO = apiManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Api does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link ApiDO}
+	 */
+	private ApiDO getDOById(Long id, boolean throwException) {
+		ApiDO entityDO = apiManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Api does not exist");
+		}
+		return entityDO;
+	}
 
 }

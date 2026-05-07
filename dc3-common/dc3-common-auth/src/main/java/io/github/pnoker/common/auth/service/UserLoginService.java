@@ -30,20 +30,19 @@ import io.github.pnoker.common.base.service.BaseService;
  */
 public interface UserLoginService extends BaseService<UserLoginBO, UserLoginQuery> {
 
-    /**
-     * Name
-     *
-     * @param loginName      Name
-     * @param throwException Throw Exception
-     * @return User
-     */
-    UserLoginBO selectByLoginName(String loginName, boolean throwException);
+	/**
+	 * Name
+	 * @param loginName Name
+	 * @param throwException Throw Exception
+	 * @return User
+	 */
+	UserLoginBO selectByLoginName(String loginName, boolean throwException);
 
-    /**
-     * Name
-     *
-     * @param loginName Name
-     * @return Boolean
-     */
-    boolean checkLoginNameValid(String loginName);
+	/**
+	 * Name
+	 * @param loginName Name
+	 * @return Boolean
+	 */
+	boolean checkLoginNameValid(String loginName);
+
 }

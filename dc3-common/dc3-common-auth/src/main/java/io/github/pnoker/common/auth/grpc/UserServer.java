@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.grpc;
 
-
 import io.github.pnoker.api.center.auth.GrpcIdQuery;
 import io.github.pnoker.api.center.auth.GrpcRUserDTO;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
@@ -44,32 +43,34 @@ import java.util.Objects;
 @Service
 public class UserServer extends UserApiGrpc.UserApiImplBase {
 
-    @Resource
-    private GrpcUserBuilder grpcUserBuilder;
+	@Resource
+	private GrpcUserBuilder grpcUserBuilder;
 
-    @Resource
-    private UserService userService;
+	@Resource
+	private UserService userService;
 
-    @Override
-    public void selectById(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
-        GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+	@Override
+	public void selectById(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
+		GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
+		GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        UserBO entityBO = userService.selectById(request.getId());
-        if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+		UserBO entityBO = userService.selectById(request.getId());
+		if (Objects.isNull(entityBO)) {
+			rBuilder.setOk(false);
+			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+		}
+		else {
+			rBuilder.setOk(true);
+			rBuilder.setCode(ResponseEnum.OK.getCode());
+			rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            builder.setData(grpcUserBuilder.buildGrpcDTOByBO(entityBO));
-        }
+			builder.setData(grpcUserBuilder.buildGrpcDTOByBO(entityBO));
+		}
 
-        builder.setResult(rBuilder);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
-    }
+		builder.setResult(rBuilder);
+		responseObserver.onNext(builder.build());
+		responseObserver.onCompleted();
+	}
+
 }

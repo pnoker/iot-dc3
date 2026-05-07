@@ -20,40 +20,45 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>ExceptionResponse class.</p>
+ * <p>
+ * ExceptionResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ExceptionResponse extends ModbusResponse {
-    private final byte functionCode;
 
-    /**
-     * <p>Constructor for ExceptionResponse.</p>
-     *
-     * @param slaveId       a int.
-     * @param functionCode  a byte.
-     * @param exceptionCode a byte.
-     * @throws ModbusTransportException if any.
-     */
-    public ExceptionResponse(int slaveId, byte functionCode, byte exceptionCode) throws ModbusTransportException {
-        super(slaveId);
-        this.functionCode = functionCode;
-        setException(exceptionCode);
-    }
+	private final byte functionCode;
 
-    @Override
-    public byte getFunctionCode() {
-        return functionCode;
-    }
+	/**
+	 * <p>
+	 * Constructor for ExceptionResponse.
+	 * </p>
+	 * @param slaveId a int.
+	 * @param functionCode a byte.
+	 * @param exceptionCode a byte.
+	 * @throws ModbusTransportException if any.
+	 */
+	public ExceptionResponse(int slaveId, byte functionCode, byte exceptionCode) throws ModbusTransportException {
+		super(slaveId);
+		this.functionCode = functionCode;
+		setException(exceptionCode);
+	}
 
-    @Override
-    protected void readResponse(ByteQueue queue) {
-        // no op
-    }
+	@Override
+	public byte getFunctionCode() {
+		return functionCode;
+	}
 
-    @Override
-    protected void writeResponse(ByteQueue queue) {
-        // no op
-    }
+	@Override
+	protected void readResponse(ByteQueue queue) {
+		// no op
+	}
+
+	@Override
+	protected void writeResponse(ByteQueue queue) {
+		// no op
+	}
+
 }

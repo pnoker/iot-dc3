@@ -37,13 +37,11 @@ import org.springframework.messaging.MessageHandler;
 import java.util.ArrayList;
 import java.util.Objects;
 
-
 /**
  * MQTT Configuration Class
  * <p>
- * Configuration class for MQTT integration in IoT DC3 platform.
- * Configures MQTT client factory, inbound/outbound channels,
- * message handlers, and topic subscriptions.
+ * Configuration class for MQTT integration in IoT DC3 platform. Configures MQTT client
+ * factory, inbound/outbound channels, message handlers, and topic subscriptions.
  * </p>
  *
  * @author pnoker
@@ -54,94 +52,86 @@ import java.util.Objects;
 @Configuration
 public class MqttConfig {
 
-    private final MqttProperties mqttProperties;
+	private final MqttProperties mqttProperties;
 
-    /**
-     * Constructor for MQTT configuration
-     *
-     * @param mqttProperties MQTT configuration properties
-     */
-    public MqttConfig(MqttProperties mqttProperties) {
-        this.mqttProperties = mqttProperties;
-    }
+	/**
+	 * Constructor for MQTT configuration
+	 * @param mqttProperties MQTT configuration properties
+	 */
+	public MqttConfig(MqttProperties mqttProperties) {
+		this.mqttProperties = mqttProperties;
+	}
 
-    /**
-     * MQTT inbound message channel bean
-     *
-     * @return DirectChannel for inbound MQTT messages
-     */
-    @Bean
-    public MessageChannel mqttInboundChannel() {
-        return new DirectChannel();
-    }
+	/**
+	 * MQTT inbound message channel bean
+	 * @return DirectChannel for inbound MQTT messages
+	 */
+	@Bean
+	public MessageChannel mqttInboundChannel() {
+		return new DirectChannel();
+	}
 
-    /**
-     * MQTT outbound message channel bean
-     *
-     * @return DirectChannel for outbound MQTT messages
-     */
-    @Bean
-    public MessageChannel mqttOutboundChannel() {
-        return new DirectChannel();
-    }
+	/**
+	 * MQTT outbound message channel bean
+	 * @return DirectChannel for outbound MQTT messages
+	 */
+	@Bean
+	public MessageChannel mqttOutboundChannel() {
+		return new DirectChannel();
+	}
 
-    /**
-     * MQTT client factory bean configuration
-     *
-     * @return Configured MqttPahoClientFactory with connection options
-     */
-    @Bean
-    public MqttPahoClientFactory mqttClientFactory() {
-        DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
-        factory.setConnectionOptions(MqttUtil.getMqttConnectOptions(mqttProperties));
-        return factory;
-    }
+	/**
+	 * MQTT client factory bean configuration
+	 * @return Configured MqttPahoClientFactory with connection options
+	 */
+	@Bean
+	public MqttPahoClientFactory mqttClientFactory() {
+		DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
+		factory.setConnectionOptions(MqttUtil.getMqttConnectOptions(mqttProperties));
+		return factory;
+	}
 
-    /**
-     * MQTT inbound message producer bean configuration
-     *
-     * @param mqttClientFactory MQTT client factory
-     * @return Configured MessageProducer for MQTT inbound processing
-     */
-    @Bean
-    public MessageProducer mqttInbound(MqttPahoClientFactory mqttClientFactory) {
-        if (Objects.isNull(mqttProperties.getReceiveTopics())) {
-            mqttProperties.setReceiveTopics(new ArrayList<>());
-        }
+	/**
+	 * MQTT inbound message producer bean configuration
+	 * @param mqttClientFactory MQTT client factory
+	 * @return Configured MessageProducer for MQTT inbound processing
+	 */
+	@Bean
+	public MessageProducer mqttInbound(MqttPahoClientFactory mqttClientFactory) {
+		if (Objects.isNull(mqttProperties.getReceiveTopics())) {
+			mqttProperties.setReceiveTopics(new ArrayList<>());
+		}
 
-        mqttProperties.getReceiveTopics().forEach(topic -> topic.setName(mqttProperties.getTopicPrefix() + topic.getName()));
-        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
-                mqttProperties.getClient() + "_in",
-                mqttClientFactory,
-                mqttProperties.getReceiveTopics().stream().map(MqttProperties.Topic::getName).toArray(String[]::new)
-        );
-        adapter.setQos(mqttProperties.getReceiveTopics().stream().mapToInt(MqttProperties.Topic::getQos).toArray());
-        adapter.setOutputChannel(mqttInboundChannel());
-        adapter.setConverter(new DefaultPahoMessageConverter());
-        adapter.setCompletionTimeout(mqttProperties.getCompletionTimeout());
-        log.info("Set receive topics: {}", JsonUtil.toJsonString(mqttProperties.getReceiveTopics()));
-        return adapter;
-    }
+		mqttProperties.getReceiveTopics()
+			.forEach(topic -> topic.setName(mqttProperties.getTopicPrefix() + topic.getName()));
+		MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
+				mqttProperties.getClient() + "_in", mqttClientFactory,
+				mqttProperties.getReceiveTopics().stream().map(MqttProperties.Topic::getName).toArray(String[]::new));
+		adapter.setQos(mqttProperties.getReceiveTopics().stream().mapToInt(MqttProperties.Topic::getQos).toArray());
+		adapter.setOutputChannel(mqttInboundChannel());
+		adapter.setConverter(new DefaultPahoMessageConverter());
+		adapter.setCompletionTimeout(mqttProperties.getCompletionTimeout());
+		log.info("Set receive topics: {}", JsonUtil.toJsonString(mqttProperties.getReceiveTopics()));
+		return adapter;
+	}
 
-    /**
-     * MQTT outbound message handler bean configuration
-     *
-     * @param mqttClientFactory MQTT client factory
-     * @return Configured MessageHandler for MQTT outbound processing
-     */
-    @Bean
-    @ServiceActivator(inputChannel = "mqttOutboundChannel")
-    public MessageHandler mqttOutbound(MqttPahoClientFactory mqttClientFactory) {
-        mqttProperties.getDefaultSendTopic().setName(mqttProperties.getTopicPrefix() + mqttProperties.getDefaultSendTopic().getName());
-        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(
-                mqttProperties.getClient() + "_out",
-                mqttClientFactory
-        );
-        messageHandler.setAsync(true);
-        messageHandler.setDefaultQos(mqttProperties.getDefaultSendTopic().getQos());
-        messageHandler.setDefaultTopic(mqttProperties.getDefaultSendTopic().getName());
-        log.info("Set default send topic: {}", JsonUtil.toJsonString(mqttProperties.getDefaultSendTopic()));
-        return messageHandler;
-    }
+	/**
+	 * MQTT outbound message handler bean configuration
+	 * @param mqttClientFactory MQTT client factory
+	 * @return Configured MessageHandler for MQTT outbound processing
+	 */
+	@Bean
+	@ServiceActivator(inputChannel = "mqttOutboundChannel")
+	public MessageHandler mqttOutbound(MqttPahoClientFactory mqttClientFactory) {
+		mqttProperties.getDefaultSendTopic()
+			.setName(mqttProperties.getTopicPrefix() + mqttProperties.getDefaultSendTopic().getName());
+		MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(mqttProperties.getClient() + "_out",
+				mqttClientFactory);
+		messageHandler.setAsync(true);
+		messageHandler.setDefaultQos(mqttProperties.getDefaultSendTopic().getQos());
+		messageHandler.setDefaultTopic(mqttProperties.getDefaultSendTopic().getName());
+		log.info("Set default send topic: {}", JsonUtil.toJsonString(mqttProperties.getDefaultSendTopic()));
+		return messageHandler;
+	}
 
 }

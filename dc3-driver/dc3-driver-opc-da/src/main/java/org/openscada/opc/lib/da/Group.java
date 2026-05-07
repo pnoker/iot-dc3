@@ -32,327 +32,340 @@ import java.util.*;
 @Slf4j
 public class Group {
 
-    private static Random _random = new Random();
-    private final int _serverHandle;
-    private final Map<String, Integer> _itemHandleMap = new HashMap<String, Integer>();
-    private final Map<Integer, Item> _itemMap = new HashMap<Integer, Item>();
-    private final Map<Integer, Item> _itemClientMap = new HashMap<Integer, Item>();
-    private Server _server = null;
-    private OPCGroupStateMgt _group = null;
-    private OPCItemMgt _items = null;
-    private OPCSyncIO _syncIO = null;
+	private static Random _random = new Random();
 
-    Group(final Server server, final int serverHandle, final OPCGroupStateMgt group) throws IllegalArgumentException, UnknownHostException, JIException {
-        log.debug("Creating new group instance with COM group " + group);
-        this._server = server;
-        this._serverHandle = serverHandle;
-        this._group = group;
-        this._items = group.getItemManagement();
-        this._syncIO = group.getSyncIO();
-    }
+	private final int _serverHandle;
 
-    /**
-     * remove the group from the server
-     *
-     * @throws JIException JIException
-     */
-    public void remove() throws JIException {
-        this._server.removeGroup(this, true);
-    }
+	private final Map<String, Integer> _itemHandleMap = new HashMap<String, Integer>();
 
-    public boolean isActive() throws JIException {
-        return this._group.getState().isActive();
-    }
+	private final Map<Integer, Item> _itemMap = new HashMap<Integer, Item>();
 
-    public void setActive(final boolean state) throws JIException {
-        this._group.setState(null, state, null, null, null, null);
-    }
+	private final Map<Integer, Item> _itemClientMap = new HashMap<Integer, Item>();
 
-    /**
-     * Get the group name from the server
-     *
-     * @return The group name fetched from the server
-     * @throws JIException JIException
-     */
-    public String getName() throws JIException {
-        return this._group.getState().getName();
-    }
+	private Server _server = null;
 
-    /**
-     * Change the group name
-     *
-     * @param name the new name of the group
-     * @throws JIException JIException
-     */
-    public void setName(final String name) throws JIException {
-        this._group.setName(name);
-    }
+	private OPCGroupStateMgt _group = null;
 
-    /**
-     * Add a single item. Actually calls {@link #addItems(String[])} with only
-     * one paraemter
-     *
-     * @param item The item to add
-     * @return The added item
-     * @throws JIException        The add operation failed
-     * @throws AddFailedException The item was not added due to an error
-     */
-    public Item addItem(final String item) throws JIException, AddFailedException {
-        Map<String, Item> items = addItems(item);
-        return items.get(item);
-    }
+	private OPCItemMgt _items = null;
 
-    /**
-     * Validate item ids and get additional information to them.
-     * <br>
-     * According to the OPC specification you should first <em>validate</em>
-     * the items and the <em>add</em> them. The spec also says that when a server
-     * lets the item pass validation it must also let them pass the add operation.
-     *
-     * @param items The items to validate
-     * @return A result map of item id to result information (including error code).
-     * @throws JIException JIException
-     */
-    public synchronized Map<String, Result<OPCITEMRESULT>> validateItems(final String... items) throws JIException {
-        OPCITEMDEF[] defs = new OPCITEMDEF[items.length];
-        for (int i = 0; i < items.length; i++) {
-            defs[i] = new OPCITEMDEF();
-            defs[i].setItemID(items[i]);
-        }
+	private OPCSyncIO _syncIO = null;
 
-        KeyedResultSet<OPCITEMDEF, OPCITEMRESULT> result = this._items.validate(defs);
+	Group(final Server server, final int serverHandle, final OPCGroupStateMgt group)
+			throws IllegalArgumentException, UnknownHostException, JIException {
+		log.debug("Creating new group instance with COM group " + group);
+		this._server = server;
+		this._serverHandle = serverHandle;
+		this._group = group;
+		this._items = group.getItemManagement();
+		this._syncIO = group.getSyncIO();
+	}
 
-        Map<String, Result<OPCITEMRESULT>> resultMap = new HashMap<String, Result<OPCITEMRESULT>>();
-        for (KeyedResult<OPCITEMDEF, OPCITEMRESULT> resultEntry : result) {
-            resultMap.put(resultEntry.getKey().getItemID(), new Result<OPCITEMRESULT>(resultEntry.getValue(), resultEntry.getErrorCode()));
-        }
+	/**
+	 * remove the group from the server
+	 * @throws JIException JIException
+	 */
+	public void remove() throws JIException {
+		this._server.removeGroup(this, true);
+	}
 
-        return resultMap;
-    }
+	public boolean isActive() throws JIException {
+		return this._group.getState().isActive();
+	}
 
-    /**
-     * Add new items to the group
-     *
-     * @param items The items (by string id) to add
-     * @return A result map of id to item object
-     * @throws JIException        The add operation completely failed. No item was added.
-     * @throws AddFailedException If one or more item could not be added. Item without error where added.
-     */
-    public synchronized Map<String, Item> addItems(final String... items) throws JIException, AddFailedException {
-        // Find which items we already have
-        Map<String, Integer> handles = findItems(items);
+	public void setActive(final boolean state) throws JIException {
+		this._group.setState(null, state, null, null, null, null);
+	}
 
-        List<Integer> foundItems = new ArrayList<Integer>(items.length);
-        List<String> missingItems = new ArrayList<String>();
+	/**
+	 * Get the group name from the server
+	 * @return The group name fetched from the server
+	 * @throws JIException JIException
+	 */
+	public String getName() throws JIException {
+		return this._group.getState().getName();
+	}
 
-        // separate missing items from the found ones
-        for (Map.Entry<String, Integer> entry : handles.entrySet()) {
-            if (entry.getValue() == null) {
-                missingItems.add(entry.getKey());
-            } else {
-                foundItems.add(entry.getValue());
-            }
-        }
+	/**
+	 * Change the group name
+	 * @param name the new name of the group
+	 * @throws JIException JIException
+	 */
+	public void setName(final String name) throws JIException {
+		this._group.setName(name);
+	}
 
-        // now fetch missing items from OPC server
-        Set<Integer> newClientHandles = new HashSet<Integer>();
-        OPCITEMDEF[] itemDef = new OPCITEMDEF[missingItems.size()];
-        for (int i = 0; i < missingItems.size(); i++) {
-            OPCITEMDEF def = new OPCITEMDEF();
-            def.setItemID(missingItems.get(i));
-            def.setActive(true);
+	/**
+	 * Add a single item. Actually calls {@link #addItems(String[])} with only one
+	 * paraemter
+	 * @param item The item to add
+	 * @return The added item
+	 * @throws JIException The add operation failed
+	 * @throws AddFailedException The item was not added due to an error
+	 */
+	public Item addItem(final String item) throws JIException, AddFailedException {
+		Map<String, Item> items = addItems(item);
+		return items.get(item);
+	}
 
-            Integer clientHandle;
-            do {
-                clientHandle = _random.nextInt();
-            } while (this._itemClientMap.containsKey(clientHandle) || newClientHandles.contains(clientHandle));
-            newClientHandles.add(clientHandle);
-            def.setClientHandle(clientHandle);
+	/**
+	 * Validate item ids and get additional information to them. <br>
+	 * According to the OPC specification you should first <em>validate</em> the items and
+	 * the <em>add</em> them. The spec also says that when a server lets the item pass
+	 * validation it must also let them pass the add operation.
+	 * @param items The items to validate
+	 * @return A result map of item id to result information (including error code).
+	 * @throws JIException JIException
+	 */
+	public synchronized Map<String, Result<OPCITEMRESULT>> validateItems(final String... items) throws JIException {
+		OPCITEMDEF[] defs = new OPCITEMDEF[items.length];
+		for (int i = 0; i < items.length; i++) {
+			defs[i] = new OPCITEMDEF();
+			defs[i].setItemID(items[i]);
+		}
 
-            itemDef[i] = def;
-        }
+		KeyedResultSet<OPCITEMDEF, OPCITEMRESULT> result = this._items.validate(defs);
 
-        // check the result and add new items
-        Map<String, Integer> failedItems = new HashMap<String, Integer>();
-        KeyedResultSet<OPCITEMDEF, OPCITEMRESULT> result = this._items.add(itemDef);
-        int i = 0;
-        for (KeyedResult<OPCITEMDEF, OPCITEMRESULT> entry : result) {
-            if (entry.getErrorCode() == 0) {
-                Item item = new Item(this, entry.getValue().getServerHandle(), itemDef[i].getClientHandle(), entry.getKey().getItemID());
-                addItem(item);
-                foundItems.add(item.getServerHandle());
-            } else {
-                failedItems.put(entry.getKey().getItemID(), entry.getErrorCode());
-            }
-            i++;
-        }
+		Map<String, Result<OPCITEMRESULT>> resultMap = new HashMap<String, Result<OPCITEMRESULT>>();
+		for (KeyedResult<OPCITEMDEF, OPCITEMRESULT> resultEntry : result) {
+			resultMap.put(resultEntry.getKey().getItemID(),
+					new Result<OPCITEMRESULT>(resultEntry.getValue(), resultEntry.getErrorCode()));
+		}
 
-        // if we have failed items then throw an exception with the result
-        if (failedItems.size() != 0) {
-            throw new AddFailedException(failedItems, findItems(foundItems));
-        }
+		return resultMap;
+	}
 
-        // simply return the result in case of success
-        return findItems(foundItems);
-    }
+	/**
+	 * Add new items to the group
+	 * @param items The items (by string id) to add
+	 * @return A result map of id to item object
+	 * @throws JIException The add operation completely failed. No item was added.
+	 * @throws AddFailedException If one or more item could not be added. Item without
+	 * error where added.
+	 */
+	public synchronized Map<String, Item> addItems(final String... items) throws JIException, AddFailedException {
+		// Find which items we already have
+		Map<String, Integer> handles = findItems(items);
 
-    private synchronized void addItem(final Item item) {
-        log.debug(String.format("Adding item: '%s', %d", item.getId(), item.getServerHandle()));
+		List<Integer> foundItems = new ArrayList<Integer>(items.length);
+		List<String> missingItems = new ArrayList<String>();
 
-        this._itemHandleMap.put(item.getId(), item.getServerHandle());
-        this._itemMap.put(item.getServerHandle(), item);
-        this._itemClientMap.put(item.getClientHandle(), item);
-    }
+		// separate missing items from the found ones
+		for (Map.Entry<String, Integer> entry : handles.entrySet()) {
+			if (entry.getValue() == null) {
+				missingItems.add(entry.getKey());
+			}
+			else {
+				foundItems.add(entry.getValue());
+			}
+		}
 
-    private synchronized void removeItem(final Item item) {
-        this._itemHandleMap.remove(item.getId());
-        this._itemMap.remove(item.getServerHandle());
-        this._itemClientMap.remove(item.getClientHandle());
-    }
+		// now fetch missing items from OPC server
+		Set<Integer> newClientHandles = new HashSet<Integer>();
+		OPCITEMDEF[] itemDef = new OPCITEMDEF[missingItems.size()];
+		for (int i = 0; i < missingItems.size(); i++) {
+			OPCITEMDEF def = new OPCITEMDEF();
+			def.setItemID(missingItems.get(i));
+			def.setActive(true);
 
-    protected Item getItemByOPCItemId(final String opcItemId) {
-        Integer serverHandle = this._itemHandleMap.get(opcItemId);
-        if (serverHandle == null) {
-            log.debug(String.format("Failed to locate item with id '%s'", opcItemId));
-            return null;
-        }
-        log.debug(String.format("Item '%s' has server id '%d'", opcItemId, serverHandle));
-        return this._itemMap.get(serverHandle);
-    }
+			Integer clientHandle;
+			do {
+				clientHandle = _random.nextInt();
+			}
+			while (this._itemClientMap.containsKey(clientHandle) || newClientHandles.contains(clientHandle));
+			newClientHandles.add(clientHandle);
+			def.setClientHandle(clientHandle);
 
-    private synchronized Map<String, Integer> findItems(final String[] items) {
-        Map<String, Integer> data = new HashMap<String, Integer>();
+			itemDef[i] = def;
+		}
 
-        for (int i = 0; i < items.length; i++) {
-            data.put(items[i], this._itemHandleMap.get(items[i]));
-        }
+		// check the result and add new items
+		Map<String, Integer> failedItems = new HashMap<String, Integer>();
+		KeyedResultSet<OPCITEMDEF, OPCITEMRESULT> result = this._items.add(itemDef);
+		int i = 0;
+		for (KeyedResult<OPCITEMDEF, OPCITEMRESULT> entry : result) {
+			if (entry.getErrorCode() == 0) {
+				Item item = new Item(this, entry.getValue().getServerHandle(), itemDef[i].getClientHandle(),
+						entry.getKey().getItemID());
+				addItem(item);
+				foundItems.add(item.getServerHandle());
+			}
+			else {
+				failedItems.put(entry.getKey().getItemID(), entry.getErrorCode());
+			}
+			i++;
+		}
 
-        return data;
-    }
+		// if we have failed items then throw an exception with the result
+		if (failedItems.size() != 0) {
+			throw new AddFailedException(failedItems, findItems(foundItems));
+		}
 
-    private synchronized Map<String, Item> findItems(final Collection<Integer> handles) {
-        Map<String, Item> itemMap = new HashMap<String, Item>();
-        for (Integer i : handles) {
-            Item item = this._itemMap.get(i);
-            if (item != null) {
-                itemMap.put(item.getId(), item);
-            }
-        }
-        return itemMap;
-    }
+		// simply return the result in case of success
+		return findItems(foundItems);
+	}
 
-    protected void checkItems(final Item[] items) {
-        for (Item item : items) {
-            if (item.getGroup() != this) {
-                throw new IllegalArgumentException("Item doesn't belong to this group");
-            }
-        }
-    }
+	private synchronized void addItem(final Item item) {
+		log.debug(String.format("Adding item: '%s', %d", item.getId(), item.getServerHandle()));
 
-    public void setActive(final boolean state, final Item... items) throws JIException {
-        checkItems(items);
+		this._itemHandleMap.put(item.getId(), item.getServerHandle());
+		this._itemMap.put(item.getServerHandle(), item);
+		this._itemClientMap.put(item.getClientHandle(), item);
+	}
 
-        Integer[] handles = new Integer[items.length];
-        for (int i = 0; i < items.length; i++) {
-            handles[i] = items[i].getServerHandle();
-        }
+	private synchronized void removeItem(final Item item) {
+		this._itemHandleMap.remove(item.getId());
+		this._itemMap.remove(item.getServerHandle());
+		this._itemClientMap.remove(item.getClientHandle());
+	}
 
-        this._items.setActiveState(state, handles);
-    }
+	protected Item getItemByOPCItemId(final String opcItemId) {
+		Integer serverHandle = this._itemHandleMap.get(opcItemId);
+		if (serverHandle == null) {
+			log.debug(String.format("Failed to locate item with id '%s'", opcItemId));
+			return null;
+		}
+		log.debug(String.format("Item '%s' has server id '%d'", opcItemId, serverHandle));
+		return this._itemMap.get(serverHandle);
+	}
 
-    protected Integer[] getServerHandles(final Item[] items) {
-        checkItems(items);
+	private synchronized Map<String, Integer> findItems(final String[] items) {
+		Map<String, Integer> data = new HashMap<String, Integer>();
 
-        Integer[] handles = new Integer[items.length];
+		for (int i = 0; i < items.length; i++) {
+			data.put(items[i], this._itemHandleMap.get(items[i]));
+		}
 
-        for (int i = 0; i < items.length; i++) {
-            handles[i] = items[i].getServerHandle();
-        }
+		return data;
+	}
 
-        return handles;
-    }
+	private synchronized Map<String, Item> findItems(final Collection<Integer> handles) {
+		Map<String, Item> itemMap = new HashMap<String, Item>();
+		for (Integer i : handles) {
+			Item item = this._itemMap.get(i);
+			if (item != null) {
+				itemMap.put(item.getId(), item);
+			}
+		}
+		return itemMap;
+	}
 
-    public synchronized Map<Item, Integer> write(final WriteRequest... requests) throws JIException {
-        Item[] items = new Item[requests.length];
+	protected void checkItems(final Item[] items) {
+		for (Item item : items) {
+			if (item.getGroup() != this) {
+				throw new IllegalArgumentException("Item doesn't belong to this group");
+			}
+		}
+	}
 
-        for (int i = 0; i < requests.length; i++) {
-            items[i] = requests[i].getItem();
-        }
+	public void setActive(final boolean state, final Item... items) throws JIException {
+		checkItems(items);
 
-        Integer[] handles = getServerHandles(items);
+		Integer[] handles = new Integer[items.length];
+		for (int i = 0; i < items.length; i++) {
+			handles[i] = items[i].getServerHandle();
+		}
 
-        org.openscada.opc.dcom.da.WriteRequest[] wr = new org.openscada.opc.dcom.da.WriteRequest[items.length];
-        for (int i = 0; i < items.length; i++) {
-            wr[i] = new org.openscada.opc.dcom.da.WriteRequest(handles[i], requests[i].getValue());
-        }
+		this._items.setActiveState(state, handles);
+	}
 
-        ResultSet<org.openscada.opc.dcom.da.WriteRequest> resultSet = this._syncIO.write(wr);
+	protected Integer[] getServerHandles(final Item[] items) {
+		checkItems(items);
 
-        Map<Item, Integer> result = new HashMap<Item, Integer>();
-        for (int i = 0; i < requests.length; i++) {
-            Result<org.openscada.opc.dcom.da.WriteRequest> entry = resultSet.get(i);
-            result.put(requests[i].getItem(), entry.getErrorCode());
-        }
+		Integer[] handles = new Integer[items.length];
 
-        return result;
-    }
+		for (int i = 0; i < items.length; i++) {
+			handles[i] = items[i].getServerHandle();
+		}
 
-    public synchronized Map<Item, ItemState> read(final boolean device, final Item... items) throws JIException {
-        Integer[] handles = getServerHandles(items);
+		return handles;
+	}
 
-        KeyedResultSet<Integer, OPCITEMSTATE> states = this._syncIO.read(device ? OPCDATASOURCE.OPC_DS_DEVICE : OPCDATASOURCE.OPC_DS_CACHE, handles);
+	public synchronized Map<Item, Integer> write(final WriteRequest... requests) throws JIException {
+		Item[] items = new Item[requests.length];
 
-        Map<Item, ItemState> data = new HashMap<Item, ItemState>();
-        for (KeyedResult<Integer, OPCITEMSTATE> entry : states) {
-            Item item = this._itemMap.get(entry.getKey());
-            ItemState state = new ItemState(entry.getErrorCode(), entry.getValue().getValue(), entry.getValue().getTimestamp().asCalendar(), entry.getValue().getQuality());
-            data.put(item, state);
-        }
-        return data;
-    }
+		for (int i = 0; i < requests.length; i++) {
+			items[i] = requests[i].getItem();
+		}
 
-    public Server getServer() {
-        return this._server;
-    }
+		Integer[] handles = getServerHandles(items);
 
-    public synchronized void clear() throws JIException {
-        Integer[] handles = this._itemMap.keySet().toArray(new Integer[0]);
-        try {
-            this._items.remove(handles);
-        } finally {
-            // in any case clear our maps
-            this._itemHandleMap.clear();
-            this._itemMap.clear();
-            this._itemClientMap.clear();
-        }
-    }
+		org.openscada.opc.dcom.da.WriteRequest[] wr = new org.openscada.opc.dcom.da.WriteRequest[items.length];
+		for (int i = 0; i < items.length; i++) {
+			wr[i] = new org.openscada.opc.dcom.da.WriteRequest(handles[i], requests[i].getValue());
+		}
 
-    public synchronized OPCAsyncIO2 getAsyncIO20() {
-        return this._group.getAsyncIO2();
-    }
+		ResultSet<org.openscada.opc.dcom.da.WriteRequest> resultSet = this._syncIO.write(wr);
 
-    public synchronized EventHandler attach(final IOPCDataCallback dataCallback) throws JIException {
-        return this._group.attach(dataCallback);
-    }
+		Map<Item, Integer> result = new HashMap<Item, Integer>();
+		for (int i = 0; i < requests.length; i++) {
+			Result<org.openscada.opc.dcom.da.WriteRequest> entry = resultSet.get(i);
+			result.put(requests[i].getItem(), entry.getErrorCode());
+		}
 
-    public Item findItemByClientHandle(final int clientHandle) {
-        return this._itemClientMap.get(clientHandle);
-    }
+		return result;
+	}
 
-    public int getServerHandle() {
-        return this._serverHandle;
-    }
+	public synchronized Map<Item, ItemState> read(final boolean device, final Item... items) throws JIException {
+		Integer[] handles = getServerHandles(items);
 
-    public synchronized void removeItem(final String opcItemId) throws IllegalArgumentException, UnknownHostException, JIException {
-        log.debug(String.format("Removing item '%s'", opcItemId));
-        Item item = getItemByOPCItemId(opcItemId);
-        if (item != null) {
-            this._group.getItemManagement().remove(item.getServerHandle());
-            removeItem(item);
-            log.debug(String.format("Removed item '%s'", opcItemId));
-        } else {
-            log.warn(String.format("Unable to find item '%s'", opcItemId));
-        }
-    }
+		KeyedResultSet<Integer, OPCITEMSTATE> states = this._syncIO
+			.read(device ? OPCDATASOURCE.OPC_DS_DEVICE : OPCDATASOURCE.OPC_DS_CACHE, handles);
+
+		Map<Item, ItemState> data = new HashMap<Item, ItemState>();
+		for (KeyedResult<Integer, OPCITEMSTATE> entry : states) {
+			Item item = this._itemMap.get(entry.getKey());
+			ItemState state = new ItemState(entry.getErrorCode(), entry.getValue().getValue(),
+					entry.getValue().getTimestamp().asCalendar(), entry.getValue().getQuality());
+			data.put(item, state);
+		}
+		return data;
+	}
+
+	public Server getServer() {
+		return this._server;
+	}
+
+	public synchronized void clear() throws JIException {
+		Integer[] handles = this._itemMap.keySet().toArray(new Integer[0]);
+		try {
+			this._items.remove(handles);
+		}
+		finally {
+			// in any case clear our maps
+			this._itemHandleMap.clear();
+			this._itemMap.clear();
+			this._itemClientMap.clear();
+		}
+	}
+
+	public synchronized OPCAsyncIO2 getAsyncIO20() {
+		return this._group.getAsyncIO2();
+	}
+
+	public synchronized EventHandler attach(final IOPCDataCallback dataCallback) throws JIException {
+		return this._group.attach(dataCallback);
+	}
+
+	public Item findItemByClientHandle(final int clientHandle) {
+		return this._itemClientMap.get(clientHandle);
+	}
+
+	public int getServerHandle() {
+		return this._serverHandle;
+	}
+
+	public synchronized void removeItem(final String opcItemId)
+			throws IllegalArgumentException, UnknownHostException, JIException {
+		log.debug(String.format("Removing item '%s'", opcItemId));
+		Item item = getItemByOPCItemId(opcItemId);
+		if (item != null) {
+			this._group.getItemManagement().remove(item.getServerHandle());
+			removeItem(item);
+			log.debug(String.format("Removed item '%s'", opcItemId));
+		}
+		else {
+			log.warn(String.format("Unable to find item '%s'", opcItemId));
+		}
+	}
 
 }

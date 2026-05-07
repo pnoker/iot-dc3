@@ -23,9 +23,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Main application class for the Siemens S7 PLC driver.
  * <p>
- * This driver enables communication with Siemens S7 PLCs (S7-200, S7-300, S7-400, S7-1200, S7-1500)
- * using the S7 communication protocol. It provides read/write access to data blocks (DB),
- * memory areas, and I/O points with thread-safe connection management.
+ * This driver enables communication with Siemens S7 PLCs (S7-200, S7-300, S7-400,
+ * S7-1200, S7-1500) using the S7 communication protocol. It provides read/write access to
+ * data blocks (DB), memory areas, and I/O points with thread-safe connection management.
  * </p>
  *
  * @author pnoker
@@ -35,13 +35,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class PlcS7DriverApplication {
 
-    /**
-     * Main entry point for the Siemens S7 PLC driver application.
-     *
-     * @param args command line arguments passed to the application
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(PlcS7DriverApplication.class, args);
-    }
-}
+	/**
+	 * Main entry point for the Siemens S7 PLC driver application.
+	 * @param args command line arguments passed to the application
+	 */
+	public static void main(String[] args) {
+		SpringApplication.run(PlcS7DriverApplication.class, args);
+	}
 
+}

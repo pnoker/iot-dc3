@@ -25,9 +25,8 @@ import java.util.function.IntConsumer;
 /**
  * Custom Integer Optional Class
  * <p>
- * Optional wrapper class for integer operations.
- * Provides utility methods for null safety and empty checks
- * with consumer-based conditional operations.
+ * Optional wrapper class for integer operations. Provides utility methods for null safety
+ * and empty checks with consumer-based conditional operations.
  * </p>
  *
  * @author pnoker
@@ -36,27 +35,29 @@ import java.util.function.IntConsumer;
  */
 public final class IntegerOptional {
 
-    private final Integer value;
+	private final Integer value;
 
-    private IntegerOptional(Integer value) {
-        this.value = value;
-    }
+	private IntegerOptional(Integer value) {
+		this.value = value;
+	}
 
-    public static IntegerOptional ofNullable(Integer value) {
-        return new IntegerOptional(value);
-    }
+	public static IntegerOptional ofNullable(Integer value) {
+		return new IntegerOptional(value);
+	}
 
-    public void ifPresent(IntConsumer action) {
-        if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
-            action.accept(value);
-        }
-    }
+	public void ifPresent(IntConsumer action) {
+		if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
+			action.accept(value);
+		}
+	}
 
-    public void ifPresentOrElse(IntConsumer action, Runnable emptyAction) {
-        if (value > DefaultConstant.ZERO) {
-            action.accept(value);
-        } else {
-            emptyAction.run();
-        }
-    }
+	public void ifPresentOrElse(IntConsumer action, Runnable emptyAction) {
+		if (value > DefaultConstant.ZERO) {
+			action.accept(value);
+		}
+		else {
+			emptyAction.run();
+		}
+	}
+
 }

@@ -40,35 +40,36 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class LabelQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    /**
-     * Tenant ID.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID.
+	 */
+	private Long tenantId;
 
-    // Query fields
+	// Query fields
 
-    /**
-     * Label name.
-     */
-    private String labelName;
+	/**
+	 * Label name.
+	 */
+	private String labelName;
 
-    /**
-     * Label color.
-     */
-    private String color;
+	/**
+	 * Label color.
+	 */
+	private String color;
 
-    /**
-     * Entity type flag.
-     */
-    private EntityTypeFlagEnum entityTypeFlag;
+	/**
+	 * Entity type flag.
+	 */
+	private EntityTypeFlagEnum entityTypeFlag;
 
-    /**
-     * Enable status flag.
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable status flag.
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

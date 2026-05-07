@@ -34,13 +34,14 @@ import lombok.*;
 @ToString(callSuper = true)
 public class TenantBindBO extends BaseBO {
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
 
-    /**
-     * ID
-     */
-    private Long userId;
+	/**
+	 * ID
+	 */
+	private Long userId;
+
 }

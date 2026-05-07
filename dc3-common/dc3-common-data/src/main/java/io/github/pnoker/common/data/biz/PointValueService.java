@@ -32,45 +32,40 @@ import java.util.List;
  */
 public interface PointValueService {
 
-    /**
-     * Save point value
-     *
-     * @param pointValueBO PointValue
-     */
-    void save(PointValueBO pointValueBO);
+	/**
+	 * Save point value
+	 * @param pointValueBO PointValue
+	 */
+	void save(PointValueBO pointValueBO);
 
-    /**
-     * Batch save point values
-     *
-     * @param pointValueBOList Array
-     */
-    void save(List<PointValueBO> pointValueBOList);
+	/**
+	 * Batch save point values
+	 * @param pointValueBOList Array
+	 */
+	void save(List<PointValueBO> pointValueBOList);
 
-    /**
-     * Get historical point values within the tenant scope.
-     *
-     * @param tenantId Tenant ID (required for tenant isolation)
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @param count    Number of values to retrieve
-     * @return History Value Array
-     */
-    List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
+	/**
+	 * Get historical point values within the tenant scope.
+	 * @param tenantId Tenant ID (required for tenant isolation)
+	 * @param deviceId Device ID
+	 * @param pointId Point ID
+	 * @param count Number of values to retrieve
+	 * @return History Value Array
+	 */
+	List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
 
-    /**
-     * Get latest point values with pagination and sorting
-     *
-     * @param pointValueQuery Entry of Query
-     * @return Entity of BO Page
-     */
-    Page<PointValueBO> latest(PointValueQuery pointValueQuery);
+	/**
+	 * Get latest point values with pagination and sorting
+	 * @param pointValueQuery Entry of Query
+	 * @return Entity of BO Page
+	 */
+	Page<PointValueBO> latest(PointValueQuery pointValueQuery);
 
-    /**
-     * Get point values with pagination and sorting
-     *
-     * @param pointValueQuery Entry of Query
-     * @return Entity of BO Page
-     */
-    Page<PointValueBO> page(PointValueQuery pointValueQuery);
+	/**
+	 * Get point values with pagination and sorting
+	 * @param pointValueQuery Entry of Query
+	 * @return Entity of BO Page
+	 */
+	Page<PointValueBO> page(PointValueQuery pointValueQuery);
 
 }

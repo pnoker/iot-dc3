@@ -39,8 +39,6 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -49,137 +47,135 @@ import java.util.Objects;
 @Service
 public class UserLoginServiceImpl implements UserLoginService {
 
-    @Resource
-    private UserLoginBuilder userLoginBuilder;
+	@Resource
+	private UserLoginBuilder userLoginBuilder;
 
-    @Resource
-    private UserLoginManager userLoginManager;
+	@Resource
+	private UserLoginManager userLoginManager;
 
-    @Override
-    public void save(UserLoginBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+	@Override
+	public void save(UserLoginBO entityBO) {
+		checkDuplicate(entityBO, false, true);
 
-        UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
-        if (!userLoginManager.save(entityDO)) {
-            throw new AddException("Failed to create user: {}", entityBO.toString());
-        }
-    }
+		UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
+		if (!userLoginManager.save(entityDO)) {
+			throw new AddException("Failed to create user: {}", entityBO.toString());
+		}
+	}
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-        if (!userLoginManager.removeById(id)) {
-            throw new DeleteException("Failed to remove user login");
-        }
-    }
+		if (!userLoginManager.removeById(id)) {
+			throw new DeleteException("Failed to remove user login");
+		}
+	}
 
-    @Override
-    public void update(UserLoginBO entityBO) {
-        getDOById(entityBO.getId(), true);
+	@Override
+	public void update(UserLoginBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+		checkDuplicate(entityBO, true, true);
 
-        UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!userLoginManager.updateById(entityDO)) {
-            throw new UpdateException("The user login update failed");
-        }
-    }
+		UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!userLoginManager.updateById(entityDO)) {
+			throw new UpdateException("The user login update failed");
+		}
+	}
 
-    @Override
-    public UserLoginBO selectById(Long id) {
-        UserLoginDO entityDO = getDOById(id, true);
-        return userLoginBuilder.buildBOByDO(entityDO);
-    }
+	@Override
+	public UserLoginBO selectById(Long id) {
+		UserLoginDO entityDO = getDOById(id, true);
+		return userLoginBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public Page<UserLoginBO> selectByPage(UserLoginQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<UserLoginDO> entityPageBO = userLoginManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return userLoginBuilder.buildBOPageByDOPage(entityPageBO);
-    }
+	@Override
+	public Page<UserLoginBO> selectByPage(UserLoginQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<UserLoginDO> entityPageBO = userLoginManager.page(PageUtil.page(entityQuery.getPage()),
+				fuzzyQuery(entityQuery));
+		return userLoginBuilder.buildBOPageByDOPage(entityPageBO);
+	}
 
-    @Override
-    public UserLoginBO selectByLoginName(String loginName, boolean throwException) {
-        if (StringUtils.isEmpty(loginName)) {
-            if (throwException) {
-                throw new EmptyException("The login name is empty");
-            }
-            return null;
-        }
+	@Override
+	public UserLoginBO selectByLoginName(String loginName, boolean throwException) {
+		if (StringUtils.isEmpty(loginName)) {
+			if (throwException) {
+				throw new EmptyException("The login name is empty");
+			}
+			return null;
+		}
 
-        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
-        wrapper.eq(UserLoginDO::getLoginName, loginName);
-        wrapper.eq(UserLoginDO::getEnableFlag, EnableFlagEnum.ENABLE);
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        UserLoginDO userLogin = userLoginManager.getOne(wrapper);
-        if (Objects.isNull(userLogin)) {
-            throw new NotFoundException();
-        }
-        return userLoginBuilder.buildBOByDO(userLogin);
-    }
+		LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
+		wrapper.eq(UserLoginDO::getLoginName, loginName);
+		wrapper.eq(UserLoginDO::getEnableFlag, EnableFlagEnum.ENABLE);
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		UserLoginDO userLogin = userLoginManager.getOne(wrapper);
+		if (Objects.isNull(userLogin)) {
+			throw new NotFoundException();
+		}
+		return userLoginBuilder.buildBOByDO(userLogin);
+	}
 
-    @Override
-    public boolean checkLoginNameValid(String loginName) {
-        UserLoginBO userLogin = selectByLoginName(loginName, false);
-        if (Objects.nonNull(userLogin)) {
-            return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
-        }
+	@Override
+	public boolean checkLoginNameValid(String loginName) {
+		UserLoginBO userLogin = selectByLoginName(loginName, false);
+		if (Objects.nonNull(userLogin)) {
+			return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link UserLoginQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<UserLoginDO> fuzzyQuery(UserLoginQuery entityQuery) {
-        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getLoginName()), UserLoginDO::getLoginName, entityQuery.getLoginName());
-        return wrapper;
-    }
+	/**
+	 * @param entityQuery {@link UserLoginQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<UserLoginDO> fuzzyQuery(UserLoginQuery entityQuery) {
+		LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getLoginName()), UserLoginDO::getLoginName,
+				entityQuery.getLoginName());
+		return wrapper;
+	}
 
-    /**
-     *
-     *
-     * @param entityBO       {@link UserLoginBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
-     */
-    private boolean checkDuplicate(UserLoginBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
-        wrapper.eq(UserLoginDO::getLoginName, entityBO.getLoginName());
-        wrapper.eq(UserLoginDO::getUserId, entityBO.getUserId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        UserLoginDO one = userLoginManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("User login has been duplicated");
-        }
-        return duplicate;
-    }
+	/**
+	 * @param entityBO {@link UserLoginBO}
+	 * @param isUpdate
+	 * @param throwException
+	 * @return
+	 */
+	private boolean checkDuplicate(UserLoginBO entityBO, boolean isUpdate, boolean throwException) {
+		LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
+		wrapper.eq(UserLoginDO::getLoginName, entityBO.getLoginName());
+		wrapper.eq(UserLoginDO::getUserId, entityBO.getUserId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		UserLoginDO one = userLoginManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+		if (throwException && duplicate) {
+			throw new DuplicateException("User login has been duplicated");
+		}
+		return duplicate;
+	}
 
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link UserLoginDO}
-     */
-    private UserLoginDO getDOById(Long id, boolean throwException) {
-        UserLoginDO entityDO = userLoginManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("User login does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link UserLoginDO}
+	 */
+	private UserLoginDO getDOById(Long id, boolean throwException) {
+		UserLoginDO entityDO = userLoginManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("User login does not exist");
+		}
+		return entityDO;
+	}
+
 }

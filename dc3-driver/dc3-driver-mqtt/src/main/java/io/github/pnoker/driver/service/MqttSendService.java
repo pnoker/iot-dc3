@@ -22,10 +22,9 @@ import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 
 /**
- * Service for sending messages to MQTT topics.
- * This interface provides methods for publishing messages to MQTT brokers
- * with support for custom topics and Quality of Service (QoS) levels.
- * It is implemented as a Spring Integration messaging gateway.
+ * Service for sending messages to MQTT topics. This interface provides methods for
+ * publishing messages to MQTT brokers with support for custom topics and Quality of
+ * Service (QoS) levels. It is implemented as a Spring Integration messaging gateway.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,35 +32,33 @@ import org.springframework.messaging.handler.annotation.Header;
  */
 @MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")
 public interface MqttSendService {
-    /**
-     * Send data using the default topic and default QoS
-     *
-     * @param data string
-     */
-    void sendToMqtt(String data);
 
-    /**
-     * Send data using the default topic and a custom QoS
-     *
-     * @param qos  Custom QoS
-     * @param data string
-     */
-    void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
+	/**
+	 * Send data using the default topic and default QoS
+	 * @param data string
+	 */
+	void sendToMqtt(String data);
 
-    /**
-     * Send data using a custom topic and the default QoS
-     *
-     * @param topic Custom topic
-     * @param data  string
-     */
-    void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
+	/**
+	 * Send data using the default topic and a custom QoS
+	 * @param qos Custom QoS
+	 * @param data string
+	 */
+	void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
 
-    /**
-     * Send data using a custom topic and a custom QoS
-     *
-     * @param topic Custom topic
-     * @param qos   Custom QoS
-     * @param data  string
-     */
-    void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, @Header(MqttHeaders.QOS) Integer qos, String data);
+	/**
+	 * Send data using a custom topic and the default QoS
+	 * @param topic Custom topic
+	 * @param data string
+	 */
+	void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
+
+	/**
+	 * Send data using a custom topic and a custom QoS
+	 * @param topic Custom topic
+	 * @param qos Custom QoS
+	 * @param data string
+	 */
+	void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, @Header(MqttHeaders.QOS) Integer qos, String data);
+
 }

@@ -27,22 +27,28 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * A (device, point) pair that was active within the baseline window but
- * has gone silent for at least {@code silentMinutes}. The absence of data
- * is itself a signal — sensors don't self-report "I'm offline".
+ * A (device, point) pair that was active within the baseline window but has gone silent
+ * for at least {@code silentMinutes}. The absence of data is itself a signal — sensors
+ * don't self-report "I'm offline".
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class SilentSourceVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private long deviceId;
-    private long pointId;
-    private LocalDateTime lastSeen;
-    /**
-     * How many seconds since the last sample, rounded.
-     */
-    private long silentSeconds;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private long deviceId;
+
+	private long pointId;
+
+	private LocalDateTime lastSeen;
+
+	/**
+	 * How many seconds since the last sample, rounded.
+	 */
+	private long silentSeconds;
+
 }

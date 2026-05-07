@@ -33,30 +33,31 @@ import java.util.Objects;
 /**
  * FacadeUser ↔ auth UserBO mapper.
  * <p>
- * {@code UserBO} carries typed {@code UserSocialExt}/{@code UserIdentityExt}
- * objects, while the facade contract (matching {@code GrpcUserDTO}) carries
- * their JSON forms, so these two fields need an explicit conversion.
+ * {@code UserBO} carries typed {@code UserSocialExt}/{@code UserIdentityExt} objects,
+ * while the facade contract (matching {@code GrpcUserDTO}) carries their JSON forms, so
+ * these two fields need an explicit conversion.
  *
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface FacadeUserBuilder {
 
-    @Mapping(target = "socialExt", ignore = true)
-    @Mapping(target = "identityExt", ignore = true)
-    FacadeUserBO toFacadeBO(UserBO authBO);
+	@Mapping(target = "socialExt", ignore = true)
+	@Mapping(target = "identityExt", ignore = true)
+	FacadeUserBO toFacadeBO(UserBO authBO);
 
-    @AfterMapping
-    default void afterProcess(UserBO authBO, @MappingTarget FacadeUserBO facadeBO) {
-        UserSocialExt social = authBO.getSocialExt();
-        if (Objects.nonNull(social)) {
-            facadeBO.setSocialExt(JsonUtil.toJsonString(social));
-        }
+	@AfterMapping
+	default void afterProcess(UserBO authBO, @MappingTarget FacadeUserBO facadeBO) {
+		UserSocialExt social = authBO.getSocialExt();
+		if (Objects.nonNull(social)) {
+			facadeBO.setSocialExt(JsonUtil.toJsonString(social));
+		}
 
-        UserIdentityExt identity = authBO.getIdentityExt();
-        if (Objects.nonNull(identity)) {
-            facadeBO.setIdentityExt(JsonUtil.toJsonString(identity));
-        }
-    }
+		UserIdentityExt identity = authBO.getIdentityExt();
+		if (Objects.nonNull(identity)) {
+			facadeBO.setIdentityExt(JsonUtil.toJsonString(identity));
+		}
+	}
+
 }

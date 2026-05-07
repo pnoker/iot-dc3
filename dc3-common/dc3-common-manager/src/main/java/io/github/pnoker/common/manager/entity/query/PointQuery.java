@@ -41,58 +41,58 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PointQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
 
-    // 
+	//
 
-    /**
-     * Name
-     */
-    private String pointName;
+	/**
+	 * Name
+	 */
+	private String pointName;
 
-    /**
-     * Code
-     */
-    private String pointCode;
+	/**
+	 * Code
+	 */
+	private String pointCode;
 
-    /**
-     * Type
-     */
-    private PointTypeFlagEnum pointTypeFlag;
+	/**
+	 * Type
+	 */
+	private PointTypeFlagEnum pointTypeFlag;
 
-    /**
-     *
-     */
-    private RwFlagEnum rwFlag;
+	/**
+	 *
+	 */
+	private RwFlagEnum rwFlag;
 
-    /**
-     * ID
-     */
-    private Long profileId;
+	/**
+	 * ID
+	 */
+	private Long profileId;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
 
-    //
+	//
 
-    /**
-     * Device ID
-     */
-    private Long deviceId;
+	/**
+	 * Device ID
+	 */
+	private Long deviceId;
 
 }

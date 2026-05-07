@@ -38,74 +38,76 @@ import java.util.Objects;
 @Service
 public class SessionServiceImpl implements SessionService {
 
-    @Resource
-    private SessionBuilder sessionBuilder;
+	@Resource
+	private SessionBuilder sessionBuilder;
 
-    @Resource
-    private SessionManager sessionManager;
+	@Resource
+	private SessionManager sessionManager;
 
-    @Resource
-    private ChatMemory agenticChatMemory;
+	@Resource
+	private ChatMemory agenticChatMemory;
 
-    @Override
-    public SessionBO touch(String conversationId, String skill) {
-        SessionDO existing = findByConversationId(conversationId);
-        if (existing != null) {
-            if (StringUtils.isNotEmpty(skill)) {
-                existing.setSkill(skill);
-            }
-            sessionManager.updateById(existing);
-            return sessionBuilder.buildBOByDO(existing);
-        }
+	@Override
+	public SessionBO touch(String conversationId, String skill) {
+		SessionDO existing = findByConversationId(conversationId);
+		if (existing != null) {
+			if (StringUtils.isNotEmpty(skill)) {
+				existing.setSkill(skill);
+			}
+			sessionManager.updateById(existing);
+			return sessionBuilder.buildBOByDO(existing);
+		}
 
-        SessionDO entityDO = new SessionDO();
-        entityDO.setConversationId(conversationId);
-        entityDO.setTitle("New Conversation");
-        entityDO.setSkill(StringUtils.defaultString(skill, ""));
-        entityDO.setStatus((byte) 0);
-        entityDO.setEnableFlag((byte) 0);
-        sessionManager.save(entityDO);
-        return sessionBuilder.buildBOByDO(entityDO);
-    }
+		SessionDO entityDO = new SessionDO();
+		entityDO.setConversationId(conversationId);
+		entityDO.setTitle("New Conversation");
+		entityDO.setSkill(StringUtils.defaultString(skill, ""));
+		entityDO.setStatus((byte) 0);
+		entityDO.setEnableFlag((byte) 0);
+		sessionManager.save(entityDO);
+		return sessionBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public SessionBO getByConversationId(String conversationId) {
-        SessionDO entityDO = findByConversationId(conversationId);
-        return entityDO != null ? sessionBuilder.buildBOByDO(entityDO) : null;
-    }
+	@Override
+	public SessionBO getByConversationId(String conversationId) {
+		SessionDO entityDO = findByConversationId(conversationId);
+		return entityDO != null ? sessionBuilder.buildBOByDO(entityDO) : null;
+	}
 
-    @Override
-    public void removeByConversationId(String conversationId) {
-        SessionDO entityDO = findByConversationId(conversationId);
-        if (entityDO != null) {
-            sessionManager.removeById(entityDO.getId());
-            agenticChatMemory.clear(conversationId);
-        }
-    }
+	@Override
+	public void removeByConversationId(String conversationId) {
+		SessionDO entityDO = findByConversationId(conversationId);
+		if (entityDO != null) {
+			sessionManager.removeById(entityDO.getId());
+			agenticChatMemory.clear(conversationId);
+		}
+	}
 
-    @Override
-    public Page<SessionBO> selectByPage(SessionQuery query) {
-        if (Objects.isNull(query.getPage())) {
-            query.setPage(new io.github.pnoker.common.entity.common.Pages());
-        }
-        Page<SessionDO> entityPageDO = sessionManager.page(
-                PageUtil.page(query.getPage()), fuzzyQuery(query));
-        return sessionBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	@Override
+	public Page<SessionBO> selectByPage(SessionQuery query) {
+		if (Objects.isNull(query.getPage())) {
+			query.setPage(new io.github.pnoker.common.entity.common.Pages());
+		}
+		Page<SessionDO> entityPageDO = sessionManager.page(PageUtil.page(query.getPage()), fuzzyQuery(query));
+		return sessionBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    private SessionDO findByConversationId(String conversationId) {
-        LambdaQueryWrapper<SessionDO> wrapper = Wrappers.<SessionDO>query().lambda()
-                .eq(SessionDO::getConversationId, conversationId)
-                .last("LIMIT 1");
-        return sessionManager.getOne(wrapper);
-    }
+	private SessionDO findByConversationId(String conversationId) {
+		LambdaQueryWrapper<SessionDO> wrapper = Wrappers.<SessionDO>query()
+			.lambda()
+			.eq(SessionDO::getConversationId, conversationId)
+			.last("LIMIT 1");
+		return sessionManager.getOne(wrapper);
+	}
 
-    private LambdaQueryWrapper<SessionDO> fuzzyQuery(SessionQuery query) {
-        LambdaQueryWrapper<SessionDO> wrapper = Wrappers.<SessionDO>query().lambda();
-        wrapper.eq(Objects.nonNull(query.getTenantId()), SessionDO::getTenantId, query.getTenantId());
-        wrapper.eq(Objects.nonNull(query.getUserId()), SessionDO::getUserId, query.getUserId());
-        wrapper.eq(Objects.nonNull(query.getStatus()), SessionDO::getStatus, query.getStatus());
-        wrapper.like(StringUtils.isNotEmpty(query.getConversationId()), SessionDO::getConversationId, query.getConversationId());
-        return wrapper;
-    }
+	private LambdaQueryWrapper<SessionDO> fuzzyQuery(SessionQuery query) {
+		LambdaQueryWrapper<SessionDO> wrapper = Wrappers.<SessionDO>query().lambda();
+		wrapper.eq(Objects.nonNull(query.getTenantId()), SessionDO::getTenantId, query.getTenantId());
+		wrapper.eq(Objects.nonNull(query.getUserId()), SessionDO::getUserId, query.getUserId());
+		wrapper.eq(Objects.nonNull(query.getStatus()), SessionDO::getStatus, query.getStatus());
+		wrapper.like(StringUtils.isNotEmpty(query.getConversationId()), SessionDO::getConversationId,
+				query.getConversationId());
+		return wrapper;
+	}
+
 }

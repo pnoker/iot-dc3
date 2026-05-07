@@ -19,16 +19,21 @@ package com.serotonin.modbus4j;
 import com.serotonin.modbus4j.sero.util.ProgressiveTaskListener;
 
 /**
- * <p>NodeScanListener interface.</p>
+ * <p>
+ * NodeScanListener interface.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public interface NodeScanListener extends ProgressiveTaskListener {
-    /**
-     * <p>nodeFound.</p>
-     *
-     * @param nodeNumber a int.
-     */
-    void nodeFound(int nodeNumber);
+
+	/**
+	 * <p>
+	 * nodeFound.
+	 * </p>
+	 * @param nodeNumber a int.
+	 */
+	void nodeFound(int nodeNumber);
+
 }

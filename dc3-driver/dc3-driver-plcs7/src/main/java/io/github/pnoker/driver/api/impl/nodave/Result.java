@@ -23,7 +23,11 @@ package io.github.pnoker.driver.api.impl.nodave;
  * Window-Preferences-Java-Code Generation-Code and Comments
  */
 public final class Result {
-    public int bufferStart;
-    public int error;
-    public int length;
+
+	public int bufferStart;
+
+	public int error;
+
+	public int length;
+
 }

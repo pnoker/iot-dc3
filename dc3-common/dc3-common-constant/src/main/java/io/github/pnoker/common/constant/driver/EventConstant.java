@@ -28,57 +28,62 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
  */
 public class EventConstant {
 
-    private EventConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private EventConstant() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    /**
-     * Driver event related constants
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    public static class Driver {
+	/**
+	 * Driver event related constants
+	 *
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	public static class Driver {
 
-        /**
-         * Driver status event, used to send the current status of the driver to dc3-center-manager
-         */
-        public static final String STATUS = "driver_status";
-        /**
-         * Driver registration event, used to register driver configuration information to dc3-center-manager
-         */
-        public static final String REGISTER = "driver_register";
-        public static final String REGISTER_BACK = "driver_register_back";
+		/**
+		 * Driver status event, used to send the current status of the driver to
+		 * dc3-center-manager
+		 */
+		public static final String STATUS = "driver_status";
 
-        private Driver() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-        }
+		/**
+		 * Driver registration event, used to register driver configuration information to
+		 * dc3-center-manager
+		 */
+		public static final String REGISTER = "driver_register";
 
-    }
+		public static final String REGISTER_BACK = "driver_register_back";
 
-    /**
-     * Device event related constants
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    public static class Device {
+		private Driver() {
+			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+		}
 
-        /**
-         * Device status event
-         */
-        public static final String STATUS = "device_status";
-        /**
-         * Used to record error event type
-         */
-        public static final String ERROR = "device_error";
+	}
 
-        private Device() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-        }
+	/**
+	 * Device event related constants
+	 *
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	public static class Device {
 
-    }
+		/**
+		 * Device status event
+		 */
+		public static final String STATUS = "device_status";
+
+		/**
+		 * Used to record error event type
+		 */
+		public static final String ERROR = "device_error";
+
+		private Device() {
+			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+		}
+
+	}
 
 }

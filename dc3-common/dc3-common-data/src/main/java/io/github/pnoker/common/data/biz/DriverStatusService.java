@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.biz;
 
-
 import io.github.pnoker.common.data.entity.query.DriverQuery;
 
 import java.util.Map;
@@ -31,27 +30,26 @@ import java.util.Map;
  */
 public interface DriverStatusService {
 
-    /**
-     * Paged query of driver status, used in conjunction with paged query of drivers
-     *
-     * @param driverQuery DriverQuery, including pagination parameters
-     * @return Map Long:String, where Long is the driver ID and String is the driver status
-     */
-    Map<Long, String> selectByPage(DriverQuery driverQuery);
+	/**
+	 * Paged query of driver status, used in conjunction with paged query of drivers
+	 * @param driverQuery DriverQuery, including pagination parameters
+	 * @return Map Long:String, where Long is the driver ID and String is the driver
+	 * status
+	 */
+	Map<Long, String> selectByPage(DriverQuery driverQuery);
 
-    /**
-     * Count of currently online devices under the driver.
-     *
-     * @param driverId Driver ID
-     * @return Number of online devices, as a string
-     */
-    String getDeviceOnlineByDriverId(Long driverId);
+	/**
+	 * Count of currently online devices under the driver.
+	 * @param driverId Driver ID
+	 * @return Number of online devices, as a string
+	 */
+	String getDeviceOnlineByDriverId(Long driverId);
 
-    /**
-     * Count of currently offline devices under the driver.
-     *
-     * @param driverId Driver ID
-     * @return Number of offline devices, as a string
-     */
-    String getDeviceOfflineByDriverId(Long driverId);
+	/**
+	 * Count of currently offline devices under the driver.
+	 * @param driverId Driver ID
+	 * @return Number of offline devices, as a string
+	 */
+	String getDeviceOfflineByDriverId(Long driverId);
+
 }

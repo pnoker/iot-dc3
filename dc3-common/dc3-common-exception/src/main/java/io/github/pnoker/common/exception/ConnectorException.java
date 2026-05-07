@@ -20,22 +20,22 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class ConnectorException extends RuntimeException {
-    public ConnectorException() {
-        this(null);
-    }
 
-    public ConnectorException(Throwable cause) {
-        super(cause);
-    }
+	public ConnectorException() {
+		this(null);
+	}
 
-    public ConnectorException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public ConnectorException(Throwable cause) {
+		super(cause);
+	}
+
+	public ConnectorException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

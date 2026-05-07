@@ -27,15 +27,17 @@ import java.text.MessageFormat;
  * @since 2022.1.0
  */
 public class TypeException extends RuntimeException {
-    public TypeException() {
-        this(null);
-    }
 
-    public TypeException(Throwable cause) {
-        super(cause);
-    }
+	public TypeException() {
+		this(null);
+	}
 
-    public TypeException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public TypeException(Throwable cause) {
+		super(cause);
+	}
+
+	public TypeException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

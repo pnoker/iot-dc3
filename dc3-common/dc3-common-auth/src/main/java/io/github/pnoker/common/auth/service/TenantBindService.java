@@ -32,20 +32,19 @@ import java.util.List;
  */
 public interface TenantBindService extends BaseService<TenantBindBO, TenantBindQuery> {
 
-    /**
-     * Tenant ID ID
-     *
-     * @param tenantId Tenant ID
-     * @param userId   User ID
-     * @return TenantBind
-     */
-    TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId);
+	/**
+	 * Tenant ID ID
+	 * @param tenantId Tenant ID
+	 * @param userId User ID
+	 * @return TenantBind
+	 */
+	TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId);
 
-    /**
-     * List active user IDs bound to the given tenant.
-     *
-     * @param tenantId tenant scope; must be non-null
-     * @return user IDs (empty if the tenant has no members yet)
-     */
-    List<Long> listUserIdsByTenantId(Long tenantId);
+	/**
+	 * List active user IDs bound to the given tenant.
+	 * @param tenantId tenant scope; must be non-null
+	 * @return user IDs (empty if the tenant has no members yet)
+	 */
+	List<Long> listUserIdsByTenantId(Long tenantId);
+
 }

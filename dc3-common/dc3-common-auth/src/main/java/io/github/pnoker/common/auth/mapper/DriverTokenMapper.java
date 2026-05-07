@@ -32,4 +32,3 @@ import io.github.pnoker.common.auth.entity.model.DriverTokenDO;
 public interface DriverTokenMapper extends BaseMapper<DriverTokenDO> {
 
 }
-

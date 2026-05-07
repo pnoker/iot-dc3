@@ -24,47 +24,51 @@ import com.serotonin.modbus4j.sero.messaging.MessageControl;
 import java.io.IOException;
 
 /**
- * <p>RtuSlave class.</p>
+ * <p>
+ * RtuSlave class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class RtuSlave extends SerialSlave {
-    // Runtime fields
-    private MessageControl conn;
 
-    /**
-     * <p>Constructor for RtuSlave.</p>
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
-     */
-    public RtuSlave(SerialPortWrapper wrapper) {
-        super(wrapper);
-    }
+	// Runtime fields
+	private MessageControl conn;
 
+	/**
+	 * <p>
+	 * Constructor for RtuSlave.
+	 * </p>
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 */
+	public RtuSlave(SerialPortWrapper wrapper) {
+		super(wrapper);
+	}
 
-    @Override
-    public void start() throws ModbusInitException {
-        super.start();
+	@Override
+	public void start() throws ModbusInitException {
+		super.start();
 
-        RtuMessageParser rtuMessageParser = new RtuMessageParser(false);
-        RtuRequestHandler rtuRequestHandler = new RtuRequestHandler(this);
+		RtuMessageParser rtuMessageParser = new RtuMessageParser(false);
+		RtuRequestHandler rtuRequestHandler = new RtuRequestHandler(this);
 
-        conn = new MessageControl();
-        conn.setExceptionHandler(getExceptionHandler());
+		conn = new MessageControl();
+		conn.setExceptionHandler(getExceptionHandler());
 
-        try {
-            conn.start(transport, rtuMessageParser, rtuRequestHandler, null);
-            transport.start("Modbus RTU slave");
-        } catch (IOException e) {
-            throw new ModbusInitException(e);
-        }
-    }
+		try {
+			conn.start(transport, rtuMessageParser, rtuRequestHandler, null);
+			transport.start("Modbus RTU slave");
+		}
+		catch (IOException e) {
+			throw new ModbusInitException(e);
+		}
+	}
 
+	@Override
+	public void stop() {
+		conn.close();
+		super.stop();
+	}
 
-    @Override
-    public void stop() {
-        conn.close();
-        super.stop();
-    }
 }

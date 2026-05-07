@@ -17,30 +17,35 @@
 package com.serotonin.modbus4j.base;
 
 /**
- * Class for maintaining the profile of a slave device on the master side. Initially, we assume that the device is fully
- * featured, and then we note function failures so that we know how requests should subsequently be sent.
+ * Class for maintaining the profile of a slave device on the master side. Initially, we
+ * assume that the device is fully featured, and then we note function failures so that we
+ * know how requests should subsequently be sent.
  *
  * @author mlohbihler
  * @version 2025.9.0
  */
 public class SlaveProfile {
-    private boolean writeMaskRegister = true;
 
-    /**
-     * <p>Getter for the field <code>writeMaskRegister</code>.</p>
-     *
-     * @return a boolean.
-     */
-    public boolean getWriteMaskRegister() {
-        return writeMaskRegister;
-    }
+	private boolean writeMaskRegister = true;
 
-    /**
-     * <p>Setter for the field <code>writeMaskRegister</code>.</p>
-     *
-     * @param writeMaskRegister a boolean.
-     */
-    public void setWriteMaskRegister(boolean writeMaskRegister) {
-        this.writeMaskRegister = writeMaskRegister;
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>writeMaskRegister</code>.
+	 * </p>
+	 * @return a boolean.
+	 */
+	public boolean getWriteMaskRegister() {
+		return writeMaskRegister;
+	}
+
+	/**
+	 * <p>
+	 * Setter for the field <code>writeMaskRegister</code>.
+	 * </p>
+	 * @param writeMaskRegister a boolean.
+	 */
+	public void setWriteMaskRegister(boolean writeMaskRegister) {
+		this.writeMaskRegister = writeMaskRegister;
+	}
+
 }

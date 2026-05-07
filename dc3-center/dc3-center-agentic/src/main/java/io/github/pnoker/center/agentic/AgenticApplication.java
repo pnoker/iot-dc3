@@ -22,13 +22,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * AI Agentic Center entry point.
  * <p>
- * HTTP port 8600, context path /agentic.
- * No gRPC server — this service is a pure consumer of other center services.
+ * HTTP port 8600, context path /agentic. No gRPC server — this service is a pure consumer
+ * of other center services.
  */
 @SpringBootApplication
 public class AgenticApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(AgenticApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(AgenticApplication.class, args);
+	}
+
 }

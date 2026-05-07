@@ -21,9 +21,9 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.*;
 
 /**
- * Facade-level user BO. Field set matches {@code api.center.auth.UserApi} wire
- * shape — {@code enableFlag} is intentionally absent because the
- * {@code GrpcUserDTO} contract does not expose it.
+ * Facade-level user BO. Field set matches {@code api.center.auth.UserApi} wire shape —
+ * {@code enableFlag} is intentionally absent because the {@code GrpcUserDTO} contract
+ * does not expose it.
  *
  * @author pnoker
  * @since 2026.5.5
@@ -35,15 +35,16 @@ import lombok.*;
 @ToString(callSuper = true)
 public class FacadeUserBO extends BaseBO {
 
-    private String nickName;
+	private String nickName;
 
-    private String userName;
+	private String userName;
 
-    private String phone;
+	private String phone;
 
-    private String email;
+	private String email;
 
-    private String socialExt;
+	private String socialExt;
 
-    private String identityExt;
+	private String identityExt;
+
 }

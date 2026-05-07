@@ -38,7 +38,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PointDataStatisticsByDriverIdVO {
 
-    private String driverName;
+	private String driverName;
 
-    private List<Long> total;
+	private List<Long> total;
+
 }

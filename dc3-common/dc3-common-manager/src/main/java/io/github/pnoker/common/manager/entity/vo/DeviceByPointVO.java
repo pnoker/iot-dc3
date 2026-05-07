@@ -39,14 +39,14 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DeviceByPointVO {
 
-    /**
-     *
-     */
-    private Long count;
+	/**
+	 *
+	 */
+	private Long count;
 
-    /**
-     *
-     */
-    private List<DeviceDO> devices;
+	/**
+	 *
+	 */
+	private List<DeviceDO> devices;
 
 }

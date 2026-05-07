@@ -34,76 +34,79 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum DriverTypeFlagEnum {
-    /**
-     * Protocol driver, client mode
-     */
-    DRIVER_CLIENT((byte) 0, "driver_client", "Protocol driver, client mode"),
 
-    /**
-     * Protocol driver, server mode
-     */
-    DRIVER_SERVER((byte) 1, "driver_server", "Protocol driver, server mode"),
+	/**
+	 * Protocol driver, client mode
+	 */
+	DRIVER_CLIENT((byte) 0, "driver_client", "Protocol driver, client mode"),
 
-    /**
-     * Gateway driver
-     */
-    GATEWAY((byte) 2, "gateway", "Gateway driver"),
+	/**
+	 * Protocol driver, server mode
+	 */
+	DRIVER_SERVER((byte) 1, "driver_server", "Protocol driver, server mode"),
 
-    /**
-     * Connection driver
-     */
-    CONNECT((byte) 3, "connect", "Connection driver"),
-    ;
+	/**
+	 * Gateway driver
+	 */
+	GATEWAY((byte) 2, "gateway", "Gateway driver"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Connection driver
+	 */
+	CONNECT((byte) 3, "connect", "Connection driver"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link DriverTypeFlagEnum}
-     */
-    public static DriverTypeFlagEnum ofIndex(Byte index) {
-        Optional<DriverTypeFlagEnum> any = Arrays.stream(DriverTypeFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link DriverTypeFlagEnum}
-     */
-    public static DriverTypeFlagEnum ofCode(String code) {
-        Optional<DriverTypeFlagEnum> any = Arrays.stream(DriverTypeFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link DriverTypeFlagEnum}
+	 */
+	public static DriverTypeFlagEnum ofIndex(Byte index) {
+		Optional<DriverTypeFlagEnum> any = Arrays.stream(DriverTypeFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link DriverTypeFlagEnum}
-     */
-    public static DriverTypeFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link DriverTypeFlagEnum}
+	 */
+	public static DriverTypeFlagEnum ofCode(String code) {
+		Optional<DriverTypeFlagEnum> any = Arrays.stream(DriverTypeFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link DriverTypeFlagEnum}
+	 */
+	public static DriverTypeFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

@@ -21,14 +21,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Gateway Component Scan Configuration for DC3 IoT Platform.
- * Enables component scanning for gateway-related beans (filters, services, etc.).
+ * Gateway Component Scan Configuration for DC3 IoT Platform. Enables component scanning
+ * for gateway-related beans (filters, services, etc.).
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = {"io.github.pnoker.common.gateway"})
+@ComponentScan(basePackages = { "io.github.pnoker.common.gateway" })
 public class GatewayInitRunner {
+
 }

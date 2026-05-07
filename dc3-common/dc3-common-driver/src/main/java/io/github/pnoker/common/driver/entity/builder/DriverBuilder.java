@@ -36,64 +36,72 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * MapStruct mapper for converting driver objects between gRPC DTOs and internal business objects.
+ * MapStruct mapper for converting driver objects between gRPC DTOs and internal business
+ * objects.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface DriverBuilder {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "remark", ignore = true)
-    @Mapping(target = "creatorId", ignore = true)
-    @Mapping(target = "creatorName", ignore = true)
-    @Mapping(target = "createTime", ignore = true)
-    @Mapping(target = "operatorId", ignore = true)
-    @Mapping(target = "operatorName", ignore = true)
-    @Mapping(target = "operateTime", ignore = true)
-    @Mapping(target = "driverExt", ignore = true)
-    @Mapping(target = "driverTypeFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    DriverBO buildDTOByGrpcDTO(GrpcDriverDTO entityGrpc);
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "remark", ignore = true)
+	@Mapping(target = "creatorId", ignore = true)
+	@Mapping(target = "creatorName", ignore = true)
+	@Mapping(target = "createTime", ignore = true)
+	@Mapping(target = "operatorId", ignore = true)
+	@Mapping(target = "operatorName", ignore = true)
+	@Mapping(target = "operateTime", ignore = true)
+	@Mapping(target = "driverExt", ignore = true)
+	@Mapping(target = "driverTypeFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	DriverBO buildDTOByGrpcDTO(GrpcDriverDTO entityGrpc);
 
-    @AfterMapping
-    default void afterProcess(GrpcDriverDTO entityGrpc, @MappingTarget DriverBO entityBO) {
-        GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
+	@AfterMapping
+	default void afterProcess(GrpcDriverDTO entityGrpc, @MappingTarget DriverBO entityBO) {
+		GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
 
-        JsonOptional.ofNullable(entityGrpc.getDriverExt()).ifPresent(value -> entityBO.setDriverExt(JsonUtil.parseObject(value, DriverExt.class)));
-        Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag())).ifPresent(entityBO::setDriverTypeFlag);
-        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
-    }
+		JsonOptional.ofNullable(entityGrpc.getDriverExt())
+			.ifPresent(value -> entityBO.setDriverExt(JsonUtil.parseObject(value, DriverExt.class)));
+		Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag()))
+			.ifPresent(entityBO::setDriverTypeFlag);
+		EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
+	}
 
+	@Mapping(target = "driverExt", ignore = true)
+	@Mapping(target = "driverTypeFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "driverNameBytes", ignore = true)
+	@Mapping(target = "driverCodeBytes", ignore = true)
+	@Mapping(target = "serviceNameBytes", ignore = true)
+	@Mapping(target = "serviceHostBytes", ignore = true)
+	@Mapping(target = "driverExtBytes", ignore = true)
+	@Mapping(target = "signatureBytes", ignore = true)
+	@Mapping(target = "mergeFrom", ignore = true)
+	@Mapping(target = "clearField", ignore = true)
+	@Mapping(target = "clearOneof", ignore = true)
+	@Mapping(target = "base", ignore = true)
+	@Mapping(target = "mergeBase", ignore = true)
+	@Mapping(target = "unknownFields", ignore = true)
+	@Mapping(target = "mergeUnknownFields", ignore = true)
+	@Mapping(target = "allFields", ignore = true)
+	GrpcDriverDTO buildGrpcDTOByDTO(DriverBO entityDTO);
 
-    @Mapping(target = "driverExt", ignore = true)
-    @Mapping(target = "driverTypeFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "driverNameBytes", ignore = true)
-    @Mapping(target = "driverCodeBytes", ignore = true)
-    @Mapping(target = "serviceNameBytes", ignore = true)
-    @Mapping(target = "serviceHostBytes", ignore = true)
-    @Mapping(target = "driverExtBytes", ignore = true)
-    @Mapping(target = "signatureBytes", ignore = true)
-    @Mapping(target = "mergeFrom", ignore = true)
-    @Mapping(target = "clearField", ignore = true)
-    @Mapping(target = "clearOneof", ignore = true)
-    @Mapping(target = "base", ignore = true)
-    @Mapping(target = "mergeBase", ignore = true)
-    @Mapping(target = "unknownFields", ignore = true)
-    @Mapping(target = "mergeUnknownFields", ignore = true)
-    @Mapping(target = "allFields", ignore = true)
-    GrpcDriverDTO buildGrpcDTOByDTO(DriverBO entityDTO);
+	@AfterMapping
+	default void afterProcess(DriverBO entityDTO, @MappingTarget GrpcDriverDTO.Builder entityGrpc) {
+		GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityDTO);
+		entityGrpc.setBase(grpcBase);
 
-    @AfterMapping
-    default void afterProcess(DriverBO entityDTO, @MappingTarget GrpcDriverDTO.Builder entityGrpc) {
-        GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityDTO);
-        entityGrpc.setBase(grpcBase);
+		Optional.ofNullable(entityDTO.getDriverExt())
+			.ifPresent(value -> entityGrpc.setDriverExt(JsonUtil.toJsonString(value)));
+		Optional.ofNullable(entityDTO.getDriverTypeFlag())
+			.ifPresentOrElse(value -> entityGrpc.setDriverTypeFlag(value.getIndex()),
+					() -> entityGrpc.setDriverTypeFlag(DefaultConstant.NULL_INT));
+		Optional.ofNullable(entityDTO.getEnableFlag())
+			.ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+					() -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
+	}
 
-        Optional.ofNullable(entityDTO.getDriverExt()).ifPresent(value -> entityGrpc.setDriverExt(JsonUtil.toJsonString(value)));
-        Optional.ofNullable(entityDTO.getDriverTypeFlag()).ifPresentOrElse(value -> entityGrpc.setDriverTypeFlag(value.getIndex()), () -> entityGrpc.setDriverTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(entityDTO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
-    }
 }

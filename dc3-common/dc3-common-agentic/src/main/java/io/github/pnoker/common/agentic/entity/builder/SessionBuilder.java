@@ -26,39 +26,40 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface SessionBuilder {
 
-    SessionBO buildBOByVO(SessionVO entityVO);
+	SessionBO buildBOByVO(SessionVO entityVO);
 
-    List<SessionBO> buildBOListByVOList(List<SessionVO> entityVOList);
+	List<SessionBO> buildBOListByVOList(List<SessionVO> entityVOList);
 
-    SessionVO buildVOByBO(SessionBO entityBO);
+	SessionVO buildVOByBO(SessionBO entityBO);
 
-    List<SessionVO> buildVOListByBOList(List<SessionBO> entityBOList);
+	List<SessionVO> buildVOListByBOList(List<SessionBO> entityBOList);
 
-    SessionBO buildBOByDO(SessionDO entityDO);
+	SessionBO buildBOByDO(SessionDO entityDO);
 
-    List<SessionBO> buildBOListByDOList(List<SessionDO> entityDOList);
+	List<SessionBO> buildBOListByDOList(List<SessionDO> entityDOList);
 
-    @Mapping(target = "deleted", ignore = true)
-    SessionDO buildDOByBO(SessionBO entityBO);
+	@Mapping(target = "deleted", ignore = true)
+	SessionDO buildDOByBO(SessionBO entityBO);
 
-    List<SessionDO> buildDOListByBOList(List<SessionBO> entityBOList);
+	List<SessionDO> buildDOListByBOList(List<SessionBO> entityBOList);
 
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<SessionVO> buildVOPageByBOPage(Page<SessionBO> entityPageBO);
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<SessionVO> buildVOPageByBOPage(Page<SessionBO> entityPageBO);
 
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<SessionBO> buildBOPageByDOPage(Page<SessionDO> entityPageDO);
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<SessionBO> buildBOPageByDOPage(Page<SessionDO> entityPageDO);
+
 }

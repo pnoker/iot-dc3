@@ -32,4 +32,3 @@ import io.github.pnoker.common.dal.entity.model.GroupDO;
 public interface GroupMapper extends BaseMapper<GroupDO> {
 
 }
-

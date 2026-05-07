@@ -34,109 +34,113 @@ import java.net.UnknownHostException;
  * @author Jens Reimann &lt;jens.reimann@th4-systems.com&gt;
  */
 public class OPCServerList extends BaseCOMObject {
-    public OPCServerList(final IJIComObject listObject) throws JIException {
-        super(listObject.queryInterface(Constants.IOPCServerList_IID));
-    }
 
-    public JIClsid getCLSIDFromProgID(final String progId) throws JIException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(2);
+	public OPCServerList(final IJIComObject listObject) throws JIException {
+		super(listObject.queryInterface(Constants.IOPCServerList_IID));
+	}
 
-        callObject.addInParamAsString(progId, JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
-        callObject.addOutParamAsType(UUID.class, JIFlags.FLAG_NULL);
+	public JIClsid getCLSIDFromProgID(final String progId) throws JIException {
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(2);
 
-        try {
-            Object[] result = getCOMObject().call(callObject);
-            return JIClsid.valueOf(((UUID) result[0]).toString());
-        } catch (JIException e) {
-            if (e.getErrorCode() == 0x800401F3) {
-                return null;
-            }
-            throw e;
-        }
-    }
+		callObject.addInParamAsString(progId, JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
+		callObject.addOutParamAsType(UUID.class, JIFlags.FLAG_NULL);
 
-    /**
-     * Return details about a serve class
-     *
-     * @param clsId A server class
-     * @return ClassDetails
-     * @throws JIException JIException
-     */
-    public ClassDetails getClassDetails(final JIClsid clsId) throws JIException {
-        if (clsId == null) {
-            return null;
-        }
+		try {
+			Object[] result = getCOMObject().call(callObject);
+			return JIClsid.valueOf(((UUID) result[0]).toString());
+		}
+		catch (JIException e) {
+			if (e.getErrorCode() == 0x800401F3) {
+				return null;
+			}
+			throw e;
+		}
+	}
 
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(1);
+	/**
+	 * Return details about a serve class
+	 * @param clsId A server class
+	 * @return ClassDetails
+	 * @throws JIException JIException
+	 */
+	public ClassDetails getClassDetails(final JIClsid clsId) throws JIException {
+		if (clsId == null) {
+			return null;
+		}
 
-        callObject.addInParamAsUUID(clsId.getCLSID(), JIFlags.FLAG_NULL);
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(1);
 
-        callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), JIFlags.FLAG_NULL);
-        callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), JIFlags.FLAG_NULL);
+		callObject.addInParamAsUUID(clsId.getCLSID(), JIFlags.FLAG_NULL);
 
-        Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
+		callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)),
+				JIFlags.FLAG_NULL);
+		callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)),
+				JIFlags.FLAG_NULL);
 
-        ClassDetails cd = new ClassDetails();
-        cd.setClsId(clsId.getCLSID());
-        cd.setProgId(((JIString) ((JIPointer) result[0]).getReferent()).getString());
-        cd.setDescription(((JIString) ((JIPointer) result[1]).getReferent()).getString());
+		Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
 
-        return cd;
-    }
+		ClassDetails cd = new ClassDetails();
+		cd.setClsId(clsId.getCLSID());
+		cd.setProgId(((JIString) ((JIPointer) result[0]).getReferent()).getString());
+		cd.setDescription(((JIString) ((JIPointer) result[1]).getReferent()).getString());
 
-    /*
-     HRESULT EnumClassesOfCategories(
-     [in]                       ULONG        cImplemented,
-     [in,size_is(cImplemented)] CATID        rgcatidImpl[],
-     [in]                       ULONG        cRequired,
-     [in,size_is(cRequired)]    CATID        rgcatidReq[],
-     [out]                      IEnumGUID ** ppenumClsid
-     );
-     */
+		return cd;
+	}
 
-    public EnumGUID enumClassesOfCategories(final String[] implemented, final String[] required) throws IllegalArgumentException, UnknownHostException, JIException {
-        UUID[] u1 = new UUID[implemented.length];
-        UUID[] u2 = new UUID[required.length];
+	/*
+	 * HRESULT EnumClassesOfCategories( [in] ULONG cImplemented,
+	 * [in,size_is(cImplemented)] CATID rgcatidImpl[], [in] ULONG cRequired,
+	 * [in,size_is(cRequired)] CATID rgcatidReq[], [out] IEnumGUID ** ppenumClsid );
+	 */
 
-        for (int i = 0; i < implemented.length; i++) {
-            u1[i] = new UUID(implemented[i]);
-        }
+	public EnumGUID enumClassesOfCategories(final String[] implemented, final String[] required)
+			throws IllegalArgumentException, UnknownHostException, JIException {
+		UUID[] u1 = new UUID[implemented.length];
+		UUID[] u2 = new UUID[required.length];
 
-        for (int i = 0; i < required.length; i++) {
-            u2[i] = new UUID(required[i]);
-        }
+		for (int i = 0; i < implemented.length; i++) {
+			u1[i] = new UUID(implemented[i]);
+		}
 
-        return enumClassesOfCategories(u1, u2);
-    }
+		for (int i = 0; i < required.length; i++) {
+			u2[i] = new UUID(required[i]);
+		}
 
-    public EnumGUID enumClassesOfCategories(final UUID[] implemented, final UUID[] required) throws IllegalArgumentException, UnknownHostException, JIException {
-        // ** CALL
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(0);
+		return enumClassesOfCategories(u1, u2);
+	}
 
-        // ** IN
-        callObject.addInParamAsInt(implemented.length, JIFlags.FLAG_NULL);
-        if (implemented.length == 0) {
-            callObject.addInParamAsPointer(new JIPointer(null), JIFlags.FLAG_NULL);
-        } else {
-            callObject.addInParamAsArray(new JIArray(implemented, true), JIFlags.FLAG_NULL);
-        }
+	public EnumGUID enumClassesOfCategories(final UUID[] implemented, final UUID[] required)
+			throws IllegalArgumentException, UnknownHostException, JIException {
+		// ** CALL
+		JICallBuilder callObject = new JICallBuilder(true);
+		callObject.setOpnum(0);
 
-        callObject.addInParamAsInt(required.length, JIFlags.FLAG_NULL);
-        if (required.length == 0) {
-            callObject.addInParamAsPointer(new JIPointer(null), JIFlags.FLAG_NULL);
-        } else {
-            callObject.addInParamAsArray(new JIArray(required, true), JIFlags.FLAG_NULL);
-        }
+		// ** IN
+		callObject.addInParamAsInt(implemented.length, JIFlags.FLAG_NULL);
+		if (implemented.length == 0) {
+			callObject.addInParamAsPointer(new JIPointer(null), JIFlags.FLAG_NULL);
+		}
+		else {
+			callObject.addInParamAsArray(new JIArray(implemented, true), JIFlags.FLAG_NULL);
+		}
 
-        // ** OUT
-        callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
+		callObject.addInParamAsInt(required.length, JIFlags.FLAG_NULL);
+		if (required.length == 0) {
+			callObject.addInParamAsPointer(new JIPointer(null), JIFlags.FLAG_NULL);
+		}
+		else {
+			callObject.addInParamAsArray(new JIArray(required, true), JIFlags.FLAG_NULL);
+		}
 
-        // ** RESULT
-        Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
+		// ** OUT
+		callObject.addOutParamAsType(IJIComObject.class, JIFlags.FLAG_NULL);
 
-        return new EnumGUID((IJIComObject) result[0]);
-    }
+		// ** RESULT
+		Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
+
+		return new EnumGUID((IJIComObject) result[0]);
+	}
+
 }

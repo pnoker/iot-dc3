@@ -20,41 +20,47 @@ package com.serotonin.modbus4j.serial;
 import com.serotonin.modbus4j.msg.ModbusMessage;
 
 /**
- * <p>Abstract SerialMessage class.</p>
+ * <p>
+ * Abstract SerialMessage class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 abstract /**
- * Serial Message
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
- */
+			 * Serial Message
+			 *
+			 * @author pnoker
+			 * @version 2025.9.0
+			 * @since 2022.1.0
+			 */
 public class SerialMessage {
-    protected final ModbusMessage modbusMessage;
 
-    /**
-     * <p>Constructor for SerialMessage.</p>
-     *
-     * @param modbusMessage a {@link ModbusMessage} object.
-     */
-    public SerialMessage(ModbusMessage modbusMessage) {
-        this.modbusMessage = modbusMessage;
-    }
+	protected final ModbusMessage modbusMessage;
 
-    /**
-     * <p>Getter for the field <code>modbusMessage</code>.</p>
-     *
-     * @return a {@link ModbusMessage} object.
-     */
-    public ModbusMessage getModbusMessage() {
-        return modbusMessage;
-    }
+	/**
+	 * <p>
+	 * Constructor for SerialMessage.
+	 * </p>
+	 * @param modbusMessage a {@link ModbusMessage} object.
+	 */
+	public SerialMessage(ModbusMessage modbusMessage) {
+		this.modbusMessage = modbusMessage;
+	}
 
-    @Override
-    public String toString() {
-        return "SerialMessage [modbusMessage=" + modbusMessage + "]";
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>modbusMessage</code>.
+	 * </p>
+	 * @return a {@link ModbusMessage} object.
+	 */
+	public ModbusMessage getModbusMessage() {
+		return modbusMessage;
+	}
+
+	@Override
+	public String toString() {
+		return "SerialMessage [modbusMessage=" + modbusMessage + "]";
+	}
+
 }

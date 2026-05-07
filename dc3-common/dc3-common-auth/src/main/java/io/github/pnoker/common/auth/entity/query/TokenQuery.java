@@ -37,28 +37,32 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class TokenQuery {
-    /**
-     * Tenant
-     */
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "无效的租户编号")
-    private String tenant;
-    /**
-     *
-     */
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "无效的用户登录名")
-    private String name;
-    /**
-     *
-     */
-    private String salt;
-    /**
-     *
-     */
-    private String password;
-    /**
-     *
-     */
-    private String token;
+
+	/**
+	 * Tenant
+	 */
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "无效的租户编号")
+	private String tenant;
+
+	/**
+	 *
+	 */
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "无效的用户登录名")
+	private String name;
+
+	/**
+	 *
+	 */
+	private String salt;
+
+	/**
+	 *
+	 */
+	private String password;
+
+	/**
+	 *
+	 */
+	private String token;
+
 }

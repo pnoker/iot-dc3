@@ -29,142 +29,161 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * <p>Abstract BaseIOLog class.</p>
+ * <p>
+ * Abstract BaseIOLog class.
+ * </p>
  *
  * @author Terry Packer
  * @version 2025.9.0
  */
 public abstract class BaseIOLog {
 
-    /**
-     * Constant <code>DATE_FORMAT="yyyy/MM/dd-HH:mm:ss,SSS"</code>
-     */
-    protected static final String DATE_FORMAT = "yyyy/MM/dd-HH:mm:ss,SSS";
-    private static final Log LOG = LogFactory.getLog(BaseIOLog.class);
-    protected final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-    protected final File file;
-    protected final StringBuilder sb = new StringBuilder();
-    protected final Date date = new Date();
-    protected PrintWriter out;
+	/**
+	 * Constant <code>DATE_FORMAT="yyyy/MM/dd-HH:mm:ss,SSS"</code>
+	 */
+	protected static final String DATE_FORMAT = "yyyy/MM/dd-HH:mm:ss,SSS";
 
-    /**
-     * <p>Constructor for BaseIOLog.</p>
-     *
-     * @param logFile a {@link File} object.
-     */
-    public BaseIOLog(File logFile) {
-        this.file = logFile;
-        createOut();
-    }
+	private static final Log LOG = LogFactory.getLog(BaseIOLog.class);
 
-    /**
-     * Create the Print Writer output
-     */
-    protected void createOut() {
-        try {
-            out = new PrintWriter(new FileWriter(file, true));
-        } catch (IOException e) {
-            out = new PrintWriter(new NullWriter());
-            LOG.error("Error while creating process log", e);
-        }
-    }
+	protected final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 
-    /**
-     * <p>close.</p>
-     */
-    public void close() {
-        out.close();
-    }
+	protected final File file;
 
-    /**
-     * <p>input.</p>
-     *
-     * @param b an array of {@link byte} objects.
-     */
-    public void input(byte[] b) {
-        log(true, b, 0, b.length);
-    }
+	protected final StringBuilder sb = new StringBuilder();
 
-    /**
-     * <p>input.</p>
-     *
-     * @param b   an array of {@link byte} objects.
-     * @param pos a int.
-     * @param len a int.
-     */
-    public void input(byte[] b, int pos, int len) {
-        log(true, b, pos, len);
-    }
+	protected final Date date = new Date();
 
-    /**
-     * <p>output.</p>
-     *
-     * @param b an array of {@link byte} objects.
-     */
-    public void output(byte[] b) {
-        log(false, b, 0, b.length);
-    }
+	protected PrintWriter out;
 
-    /**
-     * <p>output.</p>
-     *
-     * @param b   an array of {@link byte} objects.
-     * @param pos a int.
-     * @param len a int.
-     */
-    public void output(byte[] b, int pos, int len) {
-        log(false, b, pos, len);
-    }
+	/**
+	 * <p>
+	 * Constructor for BaseIOLog.
+	 * </p>
+	 * @param logFile a {@link File} object.
+	 */
+	public BaseIOLog(File logFile) {
+		this.file = logFile;
+		createOut();
+	}
 
-    /**
-     * <p>log.</p>
-     *
-     * @param input a boolean.
-     * @param b     an array of {@link byte} objects.
-     */
-    public void log(boolean input, byte[] b) {
-        log(input, b, 0, b.length);
-    }
+	/**
+	 * Create the Print Writer output
+	 */
+	protected void createOut() {
+		try {
+			out = new PrintWriter(new FileWriter(file, true));
+		}
+		catch (IOException e) {
+			out = new PrintWriter(new NullWriter());
+			LOG.error("Error while creating process log", e);
+		}
+	}
 
-    /**
-     * <p>log.</p>
-     *
-     * @param input a boolean.
-     * @param b     an array of {@link byte} objects.
-     * @param pos   a int.
-     * @param len   a int.
-     */
-    public synchronized void log(boolean input, byte[] b, int pos, int len) {
-        sizeCheck();
+	/**
+	 * <p>
+	 * close.
+	 * </p>
+	 */
+	public void close() {
+		out.close();
+	}
 
-        sb.delete(0, sb.length());
-        date.setTime(System.currentTimeMillis());
-        sb.append(sdf.format(date)).append(" ");
-        sb.append(input ? "I" : "O").append(" ");
-        sb.append(StreamUtils.dumpHex(b, pos, len));
-        out.println(sb.toString());
-        out.flush();
-    }
+	/**
+	 * <p>
+	 * input.
+	 * </p>
+	 * @param b an array of {@link byte} objects.
+	 */
+	public void input(byte[] b) {
+		log(true, b, 0, b.length);
+	}
 
-    /**
-     * <p>log.</p>
-     *
-     * @param message a {@link String} object.
-     */
-    public synchronized void log(String message) {
-        sizeCheck();
+	/**
+	 * <p>
+	 * input.
+	 * </p>
+	 * @param b an array of {@link byte} objects.
+	 * @param pos a int.
+	 * @param len a int.
+	 */
+	public void input(byte[] b, int pos, int len) {
+		log(true, b, pos, len);
+	}
 
-        sb.delete(0, sb.length());
-        date.setTime(System.currentTimeMillis());
-        sb.append(sdf.format(date)).append(" ");
-        sb.append(message);
-        out.println(sb.toString());
-        out.flush();
-    }
+	/**
+	 * <p>
+	 * output.
+	 * </p>
+	 * @param b an array of {@link byte} objects.
+	 */
+	public void output(byte[] b) {
+		log(false, b, 0, b.length);
+	}
 
-    /**
-     * Check the size of the logfile and perform adjustments
-     * as necessary
-     */
-    protected abstract void sizeCheck();
+	/**
+	 * <p>
+	 * output.
+	 * </p>
+	 * @param b an array of {@link byte} objects.
+	 * @param pos a int.
+	 * @param len a int.
+	 */
+	public void output(byte[] b, int pos, int len) {
+		log(false, b, pos, len);
+	}
+
+	/**
+	 * <p>
+	 * log.
+	 * </p>
+	 * @param input a boolean.
+	 * @param b an array of {@link byte} objects.
+	 */
+	public void log(boolean input, byte[] b) {
+		log(input, b, 0, b.length);
+	}
+
+	/**
+	 * <p>
+	 * log.
+	 * </p>
+	 * @param input a boolean.
+	 * @param b an array of {@link byte} objects.
+	 * @param pos a int.
+	 * @param len a int.
+	 */
+	public synchronized void log(boolean input, byte[] b, int pos, int len) {
+		sizeCheck();
+
+		sb.delete(0, sb.length());
+		date.setTime(System.currentTimeMillis());
+		sb.append(sdf.format(date)).append(" ");
+		sb.append(input ? "I" : "O").append(" ");
+		sb.append(StreamUtils.dumpHex(b, pos, len));
+		out.println(sb.toString());
+		out.flush();
+	}
+
+	/**
+	 * <p>
+	 * log.
+	 * </p>
+	 * @param message a {@link String} object.
+	 */
+	public synchronized void log(String message) {
+		sizeCheck();
+
+		sb.delete(0, sb.length());
+		date.setTime(System.currentTimeMillis());
+		sb.append(sdf.format(date)).append(" ");
+		sb.append(message);
+		out.println(sb.toString());
+		out.flush();
+	}
+
+	/**
+	 * Check the size of the logfile and perform adjustments as necessary
+	 */
+	protected abstract void sizeCheck();
+
 }
