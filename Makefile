@@ -18,7 +18,7 @@
 # tip:
 # make -f ./Makefile help
 
-.PHONY: help clean package app app-all dev dev-all dev-db dev-optional build deploy tag \
+.PHONY: help clean package format format-check app app-all dev dev-all dev-db dev-optional build deploy tag \
 	check-compose compose-file compose-up compose-down compose-ps compose-config compose-build \
 	compose-logs compose-pull compose-restart
 
@@ -58,9 +58,11 @@ endif
 
 help:
 	echo 'You can use make to execute the following commands:' \
-	&& echo 'Usage: make [help | clean | package | app | app-all | dev-db | dev-optional | dev | dev-all | build | deploy | tag]' \
+	&& echo 'Usage: make [help | clean | package | format | format-check | app | app-all | dev-db | dev-optional | dev | dev-all | build | deploy | tag]' \
 	&& echo ' - make clean: clean Maven build artifacts' \
 	&& echo ' - make package: package all modules with Maven' \
+	&& echo ' - make format: apply Spring Java Format to all Java sources' \
+	&& echo ' - make format-check: validate code style without modifying files' \
 	&& echo ' - make tag: git tag' \
 	&& echo ' - make app: run the packaged application stack (docker-compose.yml)' \
 	&& echo ' - make app-all: run db + optional + packaged application stacks' \
@@ -94,6 +96,12 @@ clean:
 
 package:
 	$(MVN) clean package
+
+format:
+	$(MVN) io.spring.javaformat:spring-javaformat-maven-plugin:apply
+
+format-check:
+	$(MVN) io.spring.javaformat:spring-javaformat-maven-plugin:validate
 
 tag:
 	dc3/bin/tag.sh
