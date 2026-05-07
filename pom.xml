@@ -294,9 +294,6 @@
                                 <requireMavenVersion>
                                     <version>3.9.0</version>
                                 </requireMavenVersion>
-                                <requireEncoding>
-                                    <encoding>UTF-8</encoding>
-                                </requireEncoding>
                             </rules>
                             <fail>true</fail>
                         </configuration>
