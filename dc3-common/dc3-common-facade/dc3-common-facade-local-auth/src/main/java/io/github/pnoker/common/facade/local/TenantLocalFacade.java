@@ -38,15 +38,16 @@ import java.util.Objects;
 @Component
 public class TenantLocalFacade implements TenantFacade {
 
-    @Resource
-    private TenantService tenantService;
+	@Resource
+	private TenantService tenantService;
 
-    @Resource
-    private FacadeTenantBuilder facadeTenantBuilder;
+	@Resource
+	private FacadeTenantBuilder facadeTenantBuilder;
 
-    @Override
-    public FacadeTenantBO selectByCode(String code) {
-        TenantBO bo = tenantService.selectByCode(code);
-        return Objects.isNull(bo) ? null : facadeTenantBuilder.toFacadeBO(bo);
-    }
+	@Override
+	public FacadeTenantBO selectByCode(String code) {
+		TenantBO bo = tenantService.selectByCode(code);
+		return Objects.isNull(bo) ? null : facadeTenantBuilder.toFacadeBO(bo);
+	}
+
 }

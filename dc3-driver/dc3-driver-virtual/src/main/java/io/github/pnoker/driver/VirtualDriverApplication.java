@@ -22,8 +22,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Virtual Driver Application serves as the entry point for the DC3 Virtual Driver module.
- * This driver simulates various device behaviors and data generation for testing and development purposes.
- * It provides virtual implementations of different device protocols and communication patterns.
+ * This driver simulates various device behaviors and data generation for testing and
+ * development purposes. It provides virtual implementations of different device protocols
+ * and communication patterns.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -32,14 +33,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class VirtualDriverApplication {
 
-    /**
-     * Virtual Driver Application Main Method
-     * Start the Spring Boot application by passing the VirtualDriverApplication class and command line arguments
-     *
-     * @param args Command line arguments passed to the application
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(VirtualDriverApplication.class, args);
-    }
-}
+	/**
+	 * Virtual Driver Application Main Method Start the Spring Boot application by passing
+	 * the VirtualDriverApplication class and command line arguments
+	 * @param args Command line arguments passed to the application
+	 */
+	public static void main(String[] args) {
+		SpringApplication.run(VirtualDriverApplication.class, args);
+	}
 
+}

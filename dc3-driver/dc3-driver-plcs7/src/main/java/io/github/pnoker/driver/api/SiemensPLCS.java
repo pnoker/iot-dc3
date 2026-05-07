@@ -18,24 +18,21 @@
 package io.github.pnoker.driver.api;
 
 /**
- * Enum representing different models of Siemens PLC systems.
- * This enum defines the various Siemens PLC series that are supported
- * by the driver, including S7-200, S7-300, S7-400, S7-1200, and S7-1500 series.
- * Each series may have different communication characteristics and memory layouts.
+ * Enum representing different models of Siemens PLC systems. This enum defines the
+ * various Siemens PLC series that are supported by the driver, including S7-200, S7-300,
+ * S7-400, S7-1200, and S7-1500 series. Each series may have different communication
+ * characteristics and memory layouts.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public enum SiemensPLCS {
-    S_200,
-    S_200_SMART,
-    /**
-     * Non-200 series (S7-300/400/1200/1500).
-     */
-    S_NON_200,
-    S_300,
-    S_400,
-    S_1200,
-    S_1500,
+
+	S_200, S_200_SMART,
+	/**
+	 * Non-200 series (S7-300/400/1200/1500).
+	 */
+	S_NON_200, S_300, S_400, S_1200, S_1500,
+
 }

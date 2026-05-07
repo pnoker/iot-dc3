@@ -26,24 +26,25 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.grpc.client.GrpcChannelFactory;
 
 /**
- * Spring configuration that creates the blocking gRPC stubs used by the driver SDK to talk to the
- * manager center.
+ * Spring configuration that creates the blocking gRPC stubs used by the driver SDK to
+ * talk to the manager center.
  */
 @Configuration
 public class GrpcStubConfig {
 
-    @Bean
-    public DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub(GrpcChannelFactory channels) {
-        return DriverApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
-    }
+	@Bean
+	public DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub(GrpcChannelFactory channels) {
+		return DriverApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+	}
 
-    @Bean
-    public DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub(GrpcChannelFactory channels) {
-        return DeviceApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
-    }
+	@Bean
+	public DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub(GrpcChannelFactory channels) {
+		return DeviceApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+	}
 
-    @Bean
-    public PointApiGrpc.PointApiBlockingStub pointApiBlockingStub(GrpcChannelFactory channels) {
-        return PointApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
-    }
+	@Bean
+	public PointApiGrpc.PointApiBlockingStub pointApiBlockingStub(GrpcChannelFactory channels) {
+		return PointApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+	}
+
 }

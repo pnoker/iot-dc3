@@ -35,12 +35,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeviceDataVolumeRunBO {
-    /**
-     * Name
-     */
-    private String pointName;
-    /**
-     * 7 days
-     */
-    private List<Long> total;
+
+	/**
+	 * Name
+	 */
+	private String pointName;
+
+	/**
+	 * 7 days
+	 */
+	private List<Long> total;
+
 }

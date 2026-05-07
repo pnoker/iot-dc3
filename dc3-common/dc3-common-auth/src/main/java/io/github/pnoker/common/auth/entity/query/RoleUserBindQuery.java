@@ -36,20 +36,21 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RoleUserBindQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    //
+	//
 
-    /**
-     * ID
-     */
-    private Long roleId;
+	/**
+	 * ID
+	 */
+	private Long roleId;
 
-    /**
-     * ID
-     */
-    private Long userId;
+	/**
+	 * ID
+	 */
+	private Long userId;
+
 }

@@ -25,8 +25,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * A single bucket in a dashboard time-series response (e.g. point-value count
- * at a given hour).
+ * A single bucket in a dashboard time-series response (e.g. point-value count at a given
+ * hour).
  *
  * @author pnoker
  * @since 2026.5.2
@@ -38,11 +38,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TimeseriesPointVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime bucket;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime bucket;
 
-    private long count;
+	private long count;
+
 }

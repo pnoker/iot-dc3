@@ -37,8 +37,8 @@ import java.util.Objects;
 /**
  * In-process implementation: routes each call straight into {@link DeviceService}.
  * <p>
- * Selected when {@code dc3.facade.mode=local}. Carries zero serialization cost
- * — the same JVM handles both caller and service.
+ * Selected when {@code dc3.facade.mode=local}. Carries zero serialization cost — the same
+ * JVM handles both caller and service.
  *
  * @author pnoker
  * @since 2026.5.5
@@ -47,47 +47,46 @@ import java.util.Objects;
 @Component
 public class DeviceLocalFacade implements DeviceFacade {
 
-    @Resource
-    private DeviceService deviceService;
+	@Resource
+	private DeviceService deviceService;
 
-    @Resource
-    private FacadeDeviceBuilder facadeDeviceBuilder;
+	@Resource
+	private FacadeDeviceBuilder facadeDeviceBuilder;
 
-    @Override
-    public FacadeDeviceBO selectById(Long id) {
-        DeviceBO managerBO = deviceService.selectById(id);
-        return Objects.isNull(managerBO) ? null : facadeDeviceBuilder.toFacadeBO(managerBO);
-    }
+	@Override
+	public FacadeDeviceBO selectById(Long id) {
+		DeviceBO managerBO = deviceService.selectById(id);
+		return Objects.isNull(managerBO) ? null : facadeDeviceBuilder.toFacadeBO(managerBO);
+	}
 
-    @Override
-    public FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query) {
-        DeviceQuery managerQuery = facadeDeviceBuilder.toManagerQuery(query);
-        Page<DeviceBO> page = deviceService.selectByPage(managerQuery);
-        if (Objects.isNull(page)) {
-            return FacadePage.empty();
-        }
+	@Override
+	public FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query) {
+		DeviceQuery managerQuery = facadeDeviceBuilder.toManagerQuery(query);
+		Page<DeviceBO> page = deviceService.selectByPage(managerQuery);
+		if (Objects.isNull(page)) {
+			return FacadePage.empty();
+		}
 
-        List<FacadeDeviceBO> records = page.getRecords().stream()
-                .map(facadeDeviceBuilder::toFacadeBO)
-                .toList();
-        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
-    }
+		List<FacadeDeviceBO> records = page.getRecords().stream().map(facadeDeviceBuilder::toFacadeBO).toList();
+		return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+	}
 
-    @Override
-    public List<FacadeDeviceBO> selectByProfileId(Long profileId) {
-        List<DeviceBO> list = deviceService.selectByProfileId(profileId);
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
-    }
+	@Override
+	public List<FacadeDeviceBO> selectByProfileId(Long profileId) {
+		List<DeviceBO> list = deviceService.selectByProfileId(profileId);
+		if (Objects.isNull(list) || list.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
+	}
 
-    @Override
-    public List<FacadeDeviceBO> selectByDriverId(Long driverId) {
-        List<DeviceBO> list = deviceService.selectByDriverId(driverId);
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
-    }
+	@Override
+	public List<FacadeDeviceBO> selectByDriverId(Long driverId) {
+		List<DeviceBO> list = deviceService.selectByDriverId(driverId);
+		if (Objects.isNull(list) || list.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
+	}
+
 }

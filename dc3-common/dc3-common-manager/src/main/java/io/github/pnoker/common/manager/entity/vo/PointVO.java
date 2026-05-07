@@ -47,75 +47,73 @@ import java.math.BigDecimal;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PointVO extends BaseVO {
 
-    /**
-     * Name
-     */
-    @NotBlank(message = "位号名称不能为空",
-            groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "位号名称格式无效",
-            groups = {Add.class, Update.class})
-    private String pointName;
+	/**
+	 * Name
+	 */
+	@NotBlank(message = "位号名称不能为空", groups = { Add.class })
+	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "位号名称格式无效",
+			groups = { Add.class, Update.class })
+	private String pointName;
 
-    /**
-     * Code
-     */
-    private String pointCode;
+	/**
+	 * Code
+	 */
+	private String pointCode;
 
-    /**
-     * Type
-     */
-    private PointTypeFlagEnum pointTypeFlag;
+	/**
+	 * Type
+	 */
+	private PointTypeFlagEnum pointTypeFlag;
 
-    /**
-     *
-     */
-    private RwFlagEnum rwFlag;
+	/**
+	 *
+	 */
+	private RwFlagEnum rwFlag;
 
-    /**
-     *
-     */
-    private BigDecimal baseValue;
+	/**
+	 *
+	 */
+	private BigDecimal baseValue;
 
-    /**
-     *
-     */
-    private BigDecimal multiple;
+	/**
+	 *
+	 */
+	private BigDecimal multiple;
 
-    /**
-     *
-     */
-    private Byte valueDecimal;
+	/**
+	 *
+	 */
+	private Byte valueDecimal;
 
-    /**
-     *
-     */
-    private String unit;
+	/**
+	 *
+	 */
+	private String unit;
 
-    /**
-     * ID
-     */
-    @NotNull(message = "模版ID不能为空",
-            groups = {Add.class, Update.class})
-    private Long profileId;
+	/**
+	 * ID
+	 */
+	@NotNull(message = "模版ID不能为空", groups = { Add.class, Update.class })
+	private Long profileId;
 
-    /**
-     *
-     */
-    private PointExt pointExt;
+	/**
+	 *
+	 */
+	private PointExt pointExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     *
-     */
-    private String signature;
+	/**
+	 *
+	 */
+	private String signature;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
+
 }

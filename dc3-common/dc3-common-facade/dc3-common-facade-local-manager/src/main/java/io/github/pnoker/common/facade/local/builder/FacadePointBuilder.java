@@ -30,10 +30,11 @@ import org.mapstruct.Mapper;
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface FacadePointBuilder {
 
-    PointQuery toManagerQuery(FacadePointQuery facadeQuery);
+	PointQuery toManagerQuery(FacadePointQuery facadeQuery);
 
-    FacadePointBO toFacadeBO(PointBO managerBO);
+	FacadePointBO toFacadeBO(PointBO managerBO);
+
 }

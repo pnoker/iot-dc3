@@ -18,83 +18,85 @@
 package org.openscada.opc.dcom.da;
 
 public class OPCGroupState {
-    private int _updateRate = 1000;
 
-    private boolean _active = true;
+	private int _updateRate = 1000;
 
-    private String _name = "";
+	private boolean _active = true;
 
-    private int _timeBias = 0;
+	private String _name = "";
 
-    private float _percentDeadband = 0.0f;
+	private int _timeBias = 0;
 
-    private int _localeID = 0;
+	private float _percentDeadband = 0.0f;
 
-    private int _clientHandle = 0;
+	private int _localeID = 0;
 
-    private int _serverHandle = 0;
+	private int _clientHandle = 0;
 
-    public boolean isActive() {
-        return this._active;
-    }
+	private int _serverHandle = 0;
 
-    public void setActive(final boolean active) {
-        this._active = active;
-    }
+	public boolean isActive() {
+		return this._active;
+	}
 
-    public int getClientHandle() {
-        return this._clientHandle;
-    }
+	public void setActive(final boolean active) {
+		this._active = active;
+	}
 
-    public void setClientHandle(final int clientHandle) {
-        this._clientHandle = clientHandle;
-    }
+	public int getClientHandle() {
+		return this._clientHandle;
+	}
 
-    public int getLocaleID() {
-        return this._localeID;
-    }
+	public void setClientHandle(final int clientHandle) {
+		this._clientHandle = clientHandle;
+	}
 
-    public void setLocaleID(final int localeID) {
-        this._localeID = localeID;
-    }
+	public int getLocaleID() {
+		return this._localeID;
+	}
 
-    public String getName() {
-        return this._name;
-    }
+	public void setLocaleID(final int localeID) {
+		this._localeID = localeID;
+	}
 
-    public void setName(final String name) {
-        this._name = name;
-    }
+	public String getName() {
+		return this._name;
+	}
 
-    public float getPercentDeadband() {
-        return this._percentDeadband;
-    }
+	public void setName(final String name) {
+		this._name = name;
+	}
 
-    public void setPercentDeadband(final float percentDeadband) {
-        this._percentDeadband = percentDeadband;
-    }
+	public float getPercentDeadband() {
+		return this._percentDeadband;
+	}
 
-    public int getServerHandle() {
-        return this._serverHandle;
-    }
+	public void setPercentDeadband(final float percentDeadband) {
+		this._percentDeadband = percentDeadband;
+	}
 
-    public void setServerHandle(final int serverHandle) {
-        this._serverHandle = serverHandle;
-    }
+	public int getServerHandle() {
+		return this._serverHandle;
+	}
 
-    public int getTimeBias() {
-        return this._timeBias;
-    }
+	public void setServerHandle(final int serverHandle) {
+		this._serverHandle = serverHandle;
+	}
 
-    public void setTimeBias(final int timeBias) {
-        this._timeBias = timeBias;
-    }
+	public int getTimeBias() {
+		return this._timeBias;
+	}
 
-    public int getUpdateRate() {
-        return this._updateRate;
-    }
+	public void setTimeBias(final int timeBias) {
+		this._timeBias = timeBias;
+	}
 
-    public void setUpdateRate(final int updateRate) {
-        this._updateRate = updateRate;
-    }
+	public int getUpdateRate() {
+		return this._updateRate;
+	}
+
+	public void setUpdateRate(final int updateRate) {
+		this._updateRate = updateRate;
+	}
+
 }

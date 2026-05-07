@@ -26,138 +26,150 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <p>Abstract SerialMaster class.</p>
+ * <p>
+ * Abstract SerialMaster class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 abstract /**
- * Serial Master
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
- */
+			 * Serial Master
+			 *
+			 * @author pnoker
+			 * @version 2025.9.0
+			 * @since 2022.1.0
+			 */
 public class SerialMaster extends ModbusMaster {
 
-    private static final int RETRY_PAUSE_START = 50;
-    private static final int RETRY_PAUSE_MAX = 1000;
+	private static final int RETRY_PAUSE_START = 50;
 
-    private final Log LOG = LogFactory.getLog(SerialMaster.class);
+	private static final int RETRY_PAUSE_MAX = 1000;
 
-    // Runtime fields.
-    protected boolean serialPortOpen;
-    protected SerialPortWrapper wrapper;
-    protected Transport transport;
+	private final Log LOG = LogFactory.getLog(SerialMaster.class);
 
+	// Runtime fields.
+	protected boolean serialPortOpen;
 
-    /**
-     * <p>Constructor for SerialMaster.</p>
-     * <p>
-     * Default to validating the slave id in responses
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
-     */
-    public SerialMaster(SerialPortWrapper wrapper) {
-        this(wrapper, true);
-    }
+	protected SerialPortWrapper wrapper;
 
-    /**
-     * <p>Constructor for SerialMaster.</p>
-     *
-     * @param wrapper          a {@link SerialPortWrapper} object.
-     * @param validateResponse - confirm that requested slave id is the same in the response
-     */
-    public SerialMaster(SerialPortWrapper wrapper, boolean validateResponse) {
-        this.wrapper = wrapper;
-        this.validateResponse = validateResponse;
-    }
+	protected Transport transport;
 
-    @Override
-    public void init() throws ModbusInitException {
-        try {
-            this.openConnection(null);
-        } catch (Exception e) {
-            throw new ModbusInitException(e);
-        }
-    }
+	/**
+	 * <p>
+	 * Constructor for SerialMaster.
+	 * </p>
+	 * <p>
+	 * Default to validating the slave id in responses
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 */
+	public SerialMaster(SerialPortWrapper wrapper) {
+		this(wrapper, true);
+	}
 
-    /**
-     * Open the serial port and initialize the transport, ensure
-     * connection is closed first
-     *
-     * @param conn
-     * @throws Exception
-     */
-    protected void openConnection(MessageControl toClose) throws Exception {
-        // Make sure any existing connection is closed.
-        closeConnection(toClose);
+	/**
+	 * <p>
+	 * Constructor for SerialMaster.
+	 * </p>
+	 * @param wrapper a {@link SerialPortWrapper} object.
+	 * @param validateResponse - confirm that requested slave id is the same in the
+	 * response
+	 */
+	public SerialMaster(SerialPortWrapper wrapper, boolean validateResponse) {
+		this.wrapper = wrapper;
+		this.validateResponse = validateResponse;
+	}
 
-        // Try 'retries' times to get the socket open.
-        int retries = getRetries();
-        int retryPause = RETRY_PAUSE_START;
-        while (true) {
-            try {
-                this.wrapper.open();
-                this.serialPortOpen = true;
-                if (getePoll() != null) {
-                    transport = new EpollStreamTransport(wrapper.getInputStream(),
-                            wrapper.getOutputStream(),
-                            getePoll());
-                } else {
-                    transport = new StreamTransport(wrapper.getInputStream(),
-                            wrapper.getOutputStream());
-                }
-                break;
-            } catch (Exception e) {
-                //Ensure port is closed before we try to reopen or bail out
-                close();
+	@Override
+	public void init() throws ModbusInitException {
+		try {
+			this.openConnection(null);
+		}
+		catch (Exception e) {
+			throw new ModbusInitException(e);
+		}
+	}
 
-                if (retries <= 0)
-                    throw e;
+	/**
+	 * Open the serial port and initialize the transport, ensure connection is closed
+	 * first
+	 * @param conn
+	 * @throws Exception
+	 */
+	protected void openConnection(MessageControl toClose) throws Exception {
+		// Make sure any existing connection is closed.
+		closeConnection(toClose);
 
-                retries--;
+		// Try 'retries' times to get the socket open.
+		int retries = getRetries();
+		int retryPause = RETRY_PAUSE_START;
+		while (true) {
+			try {
+				this.wrapper.open();
+				this.serialPortOpen = true;
+				if (getePoll() != null) {
+					transport = new EpollStreamTransport(wrapper.getInputStream(), wrapper.getOutputStream(),
+							getePoll());
+				}
+				else {
+					transport = new StreamTransport(wrapper.getInputStream(), wrapper.getOutputStream());
+				}
+				break;
+			}
+			catch (Exception e) {
+				// Ensure port is closed before we try to reopen or bail out
+				close();
 
-                // Pause for a bit.
-                try {
-                    Thread.sleep(retryPause);
-                } catch (InterruptedException e1) {
-                    // ignore
-                }
-                retryPause *= 2;
-                if (retryPause > RETRY_PAUSE_MAX)
-                    retryPause = RETRY_PAUSE_MAX;
-            }
-        }
-    }
+				if (retries <= 0)
+					throw e;
 
-    /**
-     * Close serial port
-     *
-     * @param conn
-     */
-    protected void closeConnection(MessageControl conn) {
-        closeMessageControl(conn);
-        try {
-            if (serialPortOpen) {
-                wrapper.close();
-                serialPortOpen = false;
-            }
-        } catch (Exception e) {
-            getExceptionHandler().receivedException(e);
-        }
+				retries--;
 
-        transport = null;
-    }
+				// Pause for a bit.
+				try {
+					Thread.sleep(retryPause);
+				}
+				catch (InterruptedException e1) {
+					// ignore
+				}
+				retryPause *= 2;
+				if (retryPause > RETRY_PAUSE_MAX)
+					retryPause = RETRY_PAUSE_MAX;
+			}
+		}
+	}
 
-    /**
-     * <p>close.</p>
-     */
-    public void close() {
-        try {
-            wrapper.close();
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
-    }
+	/**
+	 * Close serial port
+	 * @param conn
+	 */
+	protected void closeConnection(MessageControl conn) {
+		closeMessageControl(conn);
+		try {
+			if (serialPortOpen) {
+				wrapper.close();
+				serialPortOpen = false;
+			}
+		}
+		catch (Exception e) {
+			getExceptionHandler().receivedException(e);
+		}
+
+		transport = null;
+	}
+
+	/**
+	 * <p>
+	 * close.
+	 * </p>
+	 */
+	public void close() {
+		try {
+			wrapper.close();
+		}
+		catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+	}
+
 }

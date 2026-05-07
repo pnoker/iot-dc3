@@ -25,8 +25,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -39,21 +37,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DriverCommandDTO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Type
-     */
-    private DriverCommandTypeEnum type;
+	/**
+	 * Type
+	 */
+	private DriverCommandTypeEnum type;
 
-    /**
-     *
-     */
-    private String content;
+	/**
+	 *
+	 */
+	private String content;
 
-    /**
-     * Create Time
-     */
-    private LocalDateTime createTime;
+	/**
+	 * Create Time
+	 */
+	private LocalDateTime createTime;
+
 }

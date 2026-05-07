@@ -22,8 +22,8 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.*;
 
 /**
- * Facade-level user-login BO. Field set matches
- * {@code api.center.auth.UserLoginApi} wire shape.
+ * Facade-level user-login BO. Field set matches {@code api.center.auth.UserLoginApi} wire
+ * shape.
  *
  * @author pnoker
  * @since 2026.5.5
@@ -35,11 +35,12 @@ import lombok.*;
 @ToString(callSuper = true)
 public class FacadeUserLoginBO extends BaseBO {
 
-    private String loginName;
+	private String loginName;
 
-    private Long userId;
+	private Long userId;
 
-    private Long userPasswordId;
+	private Long userPasswordId;
 
-    private EnableFlagEnum enableFlag;
+	private EnableFlagEnum enableFlag;
+
 }

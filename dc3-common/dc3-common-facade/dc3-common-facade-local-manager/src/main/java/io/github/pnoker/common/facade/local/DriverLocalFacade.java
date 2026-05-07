@@ -43,35 +43,34 @@ import java.util.Objects;
 @Component
 public class DriverLocalFacade implements DriverFacade {
 
-    @Resource
-    private DriverService driverService;
+	@Resource
+	private DriverService driverService;
 
-    @Resource
-    private FacadeDriverBuilder facadeDriverBuilder;
+	@Resource
+	private FacadeDriverBuilder facadeDriverBuilder;
 
-    @Override
-    public FacadeDriverBO selectById(Long id) {
-        DriverBO managerBO = driverService.selectById(id);
-        return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
-    }
+	@Override
+	public FacadeDriverBO selectById(Long id) {
+		DriverBO managerBO = driverService.selectById(id);
+		return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
+	}
 
-    @Override
-    public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
-        DriverQuery managerQuery = facadeDriverBuilder.toManagerQuery(query);
-        Page<DriverBO> page = driverService.selectByPage(managerQuery);
-        if (Objects.isNull(page)) {
-            return FacadePage.empty();
-        }
+	@Override
+	public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
+		DriverQuery managerQuery = facadeDriverBuilder.toManagerQuery(query);
+		Page<DriverBO> page = driverService.selectByPage(managerQuery);
+		if (Objects.isNull(page)) {
+			return FacadePage.empty();
+		}
 
-        List<FacadeDriverBO> records = page.getRecords().stream()
-                .map(facadeDriverBuilder::toFacadeBO)
-                .toList();
-        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
-    }
+		List<FacadeDriverBO> records = page.getRecords().stream().map(facadeDriverBuilder::toFacadeBO).toList();
+		return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+	}
 
-    @Override
-    public FacadeDriverBO selectByDeviceId(Long deviceId) {
-        DriverBO managerBO = driverService.selectByDeviceId(deviceId);
-        return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
-    }
+	@Override
+	public FacadeDriverBO selectByDeviceId(Long deviceId) {
+		DriverBO managerBO = driverService.selectByDeviceId(deviceId);
+		return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
+	}
+
 }

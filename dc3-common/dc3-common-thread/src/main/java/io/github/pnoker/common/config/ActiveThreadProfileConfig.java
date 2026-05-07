@@ -28,9 +28,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 /**
  * Active Thread Profile Configuration
  * <p>
- * Environment post processor that automatically activates the "thread" profile.
- * This configuration runs with highest precedence to ensure the thread profile
- * is available during application startup for thread-related configurations.
+ * Environment post processor that automatically activates the "thread" profile. This
+ * configuration runs with highest precedence to ensure the thread profile is available
+ * during application startup for thread-related configurations.
  * </p>
  *
  * @author pnoker
@@ -42,14 +42,14 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveThreadProfileConfig implements EnvironmentPostProcessor {
 
-    /**
-     * Post-process environment to add the "thread" active profile
-     *
-     * @param environment ConfigurableEnvironment to modify
-     * @param application SpringApplication instance
-     */
-    @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("thread");
-    }
+	/**
+	 * Post-process environment to add the "thread" active profile
+	 * @param environment ConfigurableEnvironment to modify
+	 * @param application SpringApplication instance
+	 */
+	@Override
+	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+		environment.addActiveProfile("thread");
+	}
+
 }

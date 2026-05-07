@@ -43,103 +43,104 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_api", autoResultMap = true)
 public class ApiDO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Primary key ID
-     */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private Long id;
+	/**
+	 * Primary key ID
+	 */
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
+	private Long id;
 
-    /**
-     * Owning service name, populated by resource registrar
-     */
-    @TableField("service_name")
-    private String serviceName;
+	/**
+	 * Owning service name, populated by resource registrar
+	 */
+	@TableField("service_name")
+	private String serviceName;
 
-    /**
-     * Type
-     */
-    @TableField("api_type_flag")
-    private Byte apiTypeFlag;
+	/**
+	 * Type
+	 */
+	@TableField("api_type_flag")
+	private Byte apiTypeFlag;
 
-    /**
-     * Name
-     */
-    @TableField("api_name")
-    private String apiName;
+	/**
+	 * Name
+	 */
+	@TableField("api_name")
+	private String apiName;
 
-    /**
-     * Code
-     */
-    @TableField("api_code")
-    private String apiCode;
+	/**
+	 * Code
+	 */
+	@TableField("api_code")
+	private String apiCode;
 
-    /**
-     * API grouping, usually the owning controller simple class name
-     */
-    @TableField("api_group")
-    private String apiGroup;
+	/**
+	 * API grouping, usually the owning controller simple class name
+	 */
+	@TableField("api_group")
+	private String apiGroup;
 
-    /**
-     *
-     */
-    @TableField(value = "api_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt apiExt;
+	/**
+	 *
+	 */
+	@TableField(value = "api_ext", typeHandler = JacksonTypeHandler.class)
+	private JsonExt apiExt;
 
-    /**
-     * Enable flag, 0:, 1:Disable
-     */
-    @TableField("enable_flag")
-    private Byte enableFlag;
+	/**
+	 * Enable flag, 0:, 1:Disable
+	 */
+	@TableField("enable_flag")
+	private Byte enableFlag;
 
-    /**
-     * Description
-     */
-    @TableField("remark")
-    private String remark;
+	/**
+	 * Description
+	 */
+	@TableField("remark")
+	private String remark;
 
-    /**
-     * Creator ID
-     */
-    @TableField("creator_id")
-    private Long creatorId;
+	/**
+	 * Creator ID
+	 */
+	@TableField("creator_id")
+	private Long creatorId;
 
-    /**
-     * Creator Name
-     */
-    @TableField("creator_name")
-    private String creatorName;
+	/**
+	 * Creator Name
+	 */
+	@TableField("creator_name")
+	private String creatorName;
 
-    /**
-     * Create Time
-     */
-    @TableField("create_time")
-    private LocalDateTime createTime;
+	/**
+	 * Create Time
+	 */
+	@TableField("create_time")
+	private LocalDateTime createTime;
 
-    /**
-     * Operator ID
-     */
-    @TableField("operator_id")
-    private Long operatorId;
+	/**
+	 * Operator ID
+	 */
+	@TableField("operator_id")
+	private Long operatorId;
 
-    /**
-     * Operator Name
-     */
-    @TableField("operator_name")
-    private String operatorName;
+	/**
+	 * Operator Name
+	 */
+	@TableField("operator_name")
+	private String operatorName;
 
-    /**
-     * Operate Time
-     */
-    @TableField("operate_time")
-    private LocalDateTime operateTime;
+	/**
+	 * Operate Time
+	 */
+	@TableField("operate_time")
+	private LocalDateTime operateTime;
 
-    /**
-     * Logical delete flag, 0:not deleted, 1:deleted
-     */
-    @TableLogic
-    @TableField("deleted")
-    private Byte deleted;
+	/**
+	 * Logical delete flag, 0:not deleted, 1:deleted
+	 */
+	@TableLogic
+	@TableField("deleted")
+	private Byte deleted;
+
 }

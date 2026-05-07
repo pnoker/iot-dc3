@@ -52,131 +52,134 @@ import java.util.Objects;
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeController implements BaseController {
 
-    private final PointAttributeBuilder pointAttributeBuilder;
-    private final PointAttributeService pointAttributeService;
+	private final PointAttributeBuilder pointAttributeBuilder;
 
-    public PointAttributeController(PointAttributeBuilder pointAttributeBuilder, PointAttributeService pointAttributeService) {
-        this.pointAttributeBuilder = pointAttributeBuilder;
-        this.pointAttributeService = pointAttributeService;
-    }
+	private final PointAttributeService pointAttributeService;
 
-    /**
-     * PointAttribute
-     *
-     * @param entityVO {@link PointAttributeVO}
-     * @return R of String
-     */
-    @PostMapping("/add")
-    public Mono<R<PointAttributeBO>> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                pointAttributeService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	public PointAttributeController(PointAttributeBuilder pointAttributeBuilder,
+			PointAttributeService pointAttributeService) {
+		this.pointAttributeBuilder = pointAttributeBuilder;
+		this.pointAttributeService = pointAttributeService;
+	}
 
-    /**
-     * ID PointAttribute
-     *
-     * @param id ID
-     * @return R of String
-     */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            pointAttributeService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	/**
+	 * PointAttribute
+	 * @param entityVO {@link PointAttributeVO}
+	 * @return R of String
+	 */
+	@PostMapping("/add")
+	public Mono<R<PointAttributeBO>> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
+				entityBO.setTenantId(tenantId);
+				pointAttributeService.save(entityBO);
+				return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    /**
-     * PointAttribute
-     *
-     * @param entityVO {@link PointAttributeVO}
-     * @return R of String
-     */
-    @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                pointAttributeService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	/**
+	 * ID PointAttribute
+	 * @param id ID
+	 * @return R of String
+	 */
+	@PostMapping("/delete/{id}")
+	public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			pointAttributeService.remove(id);
+			return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    /**
-     * ID PointAttribute
-     *
-     * @param id ID
-     * @return PointAttributeVO {@link PointAttributeVO}
-     */
-    @GetMapping("/id/{id}")
-    public Mono<R<PointAttributeVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            PointAttributeBO entityBO = pointAttributeService.selectById(id);
-            PointAttributeVO entityVO = pointAttributeBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	/**
+	 * PointAttribute
+	 * @param entityVO {@link PointAttributeVO}
+	 * @return R of String
+	 */
+	@PostMapping("/update")
+	public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
+				entityBO.setTenantId(tenantId);
+				pointAttributeService.update(entityBO);
+				return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    /**
-     * Driver ID PointAttribute
-     *
-     * @param id ID
-     * @return Array
-     */
-    @GetMapping("/driver_id/{id}")
-    public Mono<R<List<PointAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            List<PointAttributeBO> entityBOList = pointAttributeService.selectByDriverId(id);
-            List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVO));
-        } catch (NotFoundException ne) {
-            return Mono.just(R.ok(Collections.emptyList()));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	/**
+	 * ID PointAttribute
+	 * @param id ID
+	 * @return PointAttributeVO {@link PointAttributeVO}
+	 */
+	@GetMapping("/id/{id}")
+	public Mono<R<PointAttributeVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			PointAttributeBO entityBO = pointAttributeService.selectById(id);
+			PointAttributeVO entityVO = pointAttributeBuilder.buildVOByBO(entityBO);
+			return Mono.just(R.ok(entityVO));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    /**
-     * PointAttribute
-     *
-     * @param entityQuery
-     * @return Page Of PointAttribute
-     */
-    @PostMapping("/list")
-    public Mono<R<Page<PointAttributeVO>>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                PointAttributeQuery query = Objects.isNull(entityQuery) ? new PointAttributeQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<PointAttributeBO> entityPageBO = pointAttributeService.selectByPage(query);
-                Page<PointAttributeVO> entityPageVO = pointAttributeBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	/**
+	 * Driver ID PointAttribute
+	 * @param id ID
+	 * @return Array
+	 */
+	@GetMapping("/driver_id/{id}")
+	public Mono<R<List<PointAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			List<PointAttributeBO> entityBOList = pointAttributeService.selectByDriverId(id);
+			List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
+			return Mono.just(R.ok(entityVO));
+		}
+		catch (NotFoundException ne) {
+			return Mono.just(R.ok(Collections.emptyList()));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
+
+	/**
+	 * PointAttribute
+	 * @param entityQuery
+	 * @return Page Of PointAttribute
+	 */
+	@PostMapping("/list")
+	public Mono<R<Page<PointAttributeVO>>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				PointAttributeQuery query = Objects.isNull(entityQuery) ? new PointAttributeQuery() : entityQuery;
+				query.setTenantId(tenantId);
+				Page<PointAttributeBO> entityPageBO = pointAttributeService.selectByPage(query);
+				Page<PointAttributeVO> entityPageVO = pointAttributeBuilder.buildVOPageByBOPage(entityPageBO);
+				return Mono.just(R.ok(entityPageVO));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
 }

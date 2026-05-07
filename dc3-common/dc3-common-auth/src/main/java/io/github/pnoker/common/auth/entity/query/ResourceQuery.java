@@ -40,57 +40,59 @@ import java.util.List;
 @AllArgsConstructor
 public class ResourceQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    //
+	//
 
-    /**
-     * Name
-     */
-    private String resourceName;
+	/**
+	 * Name
+	 */
+	private String resourceName;
 
-    /**
-     * Code
-     */
-    private String resourceCode;
+	/**
+	 * Code
+	 */
+	private String resourceCode;
 
-    /**
-     * Type
-     */
-    private ResourceTypeFlagEnum resourceTypeFlag;
+	/**
+	 * Type
+	 */
+	private ResourceTypeFlagEnum resourceTypeFlag;
 
-    /**
-     * Type multi-select — takes precedence over {@link #resourceTypeFlag} when non-empty.
-     */
-    private List<ResourceTypeFlagEnum> resourceTypeFlags;
+	/**
+	 * Type multi-select — takes precedence over {@link #resourceTypeFlag} when non-empty.
+	 */
+	private List<ResourceTypeFlagEnum> resourceTypeFlags;
 
-    /**
-     * , : ResourceScopeFlagEnum
-     * <ul>
-     *   <li>0x01: </li>
-     *   <li>0x02: </li>
-     *   <li>0x04: </li>
-     *   <li>0x08: </li>
-     * </ul>
-     *
-     */
-    private Byte resourceScopeFlag;
+	/**
+	 * , : ResourceScopeFlagEnum
+	 * <ul>
+	 * <li>0x01:</li>
+	 * <li>0x02:</li>
+	 * <li>0x04:</li>
+	 * <li>0x08:</li>
+	 * </ul>
+	 *
+	 */
+	private Byte resourceScopeFlag;
 
-    /**
-     * Scope multi-select — takes precedence over {@link #resourceScopeFlag} when non-empty.
-     */
-    private List<ResourceScopeFlagEnum> resourceScopeFlags;
+	/**
+	 * Scope multi-select — takes precedence over {@link #resourceScopeFlag} when
+	 * non-empty.
+	 */
+	private List<ResourceScopeFlagEnum> resourceScopeFlags;
 
-    /**
-     * Parent resource id filter (optional).
-     */
-    private Long parentResourceId;
+	/**
+	 * Parent resource id filter (optional).
+	 */
+	private Long parentResourceId;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

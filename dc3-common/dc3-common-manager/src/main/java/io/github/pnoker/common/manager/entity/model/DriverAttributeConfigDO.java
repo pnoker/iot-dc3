@@ -43,109 +43,110 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_driver_attribute_config", autoResultMap = true)
 public class DriverAttributeConfigDO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Primary key ID
-     */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private Long id;
+	/**
+	 * Primary key ID
+	 */
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
+	private Long id;
 
-    /**
-     * ID
-     */
-    @TableField("attribute_id")
-    private Long attributeId;
+	/**
+	 * ID
+	 */
+	@TableField("attribute_id")
+	private Long attributeId;
 
-    /**
-     *
-     */
-    @TableField("config_value")
-    private String configValue;
+	/**
+	 *
+	 */
+	@TableField("config_value")
+	private String configValue;
 
-    /**
-     * Device ID
-     */
-    @TableField("device_id")
-    private Long deviceId;
+	/**
+	 * Device ID
+	 */
+	@TableField("device_id")
+	private Long deviceId;
 
-    /**
-     *
-     */
-    @TableField(value = "config_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt configExt;
+	/**
+	 *
+	 */
+	@TableField(value = "config_ext", typeHandler = JacksonTypeHandler.class)
+	private JsonExt configExt;
 
-    /**
-     * Enable flag, 0:, 1:Disable
-     */
-    @TableField("enable_flag")
-    private Byte enableFlag;
+	/**
+	 * Enable flag, 0:, 1:Disable
+	 */
+	@TableField("enable_flag")
+	private Byte enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    @TableField("tenant_id")
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	@TableField("tenant_id")
+	private Long tenantId;
 
-    /**
-     * Description
-     */
-    @TableField("remark")
-    private String remark;
+	/**
+	 * Description
+	 */
+	@TableField("remark")
+	private String remark;
 
-    /**
-     *
-     */
-    @TableField("signature")
-    private String signature;
+	/**
+	 *
+	 */
+	@TableField("signature")
+	private String signature;
 
-    /**
-     *
-     */
-    @TableField("version")
-    private Integer version;
+	/**
+	 *
+	 */
+	@TableField("version")
+	private Integer version;
 
-    /**
-     * Creator ID
-     */
-    @TableField("creator_id")
-    private Long creatorId;
+	/**
+	 * Creator ID
+	 */
+	@TableField("creator_id")
+	private Long creatorId;
 
-    /**
-     * Creator Name
-     */
-    @TableField("creator_name")
-    private String creatorName;
+	/**
+	 * Creator Name
+	 */
+	@TableField("creator_name")
+	private String creatorName;
 
-    /**
-     * Create Time
-     */
-    @TableField("create_time")
-    private LocalDateTime createTime;
+	/**
+	 * Create Time
+	 */
+	@TableField("create_time")
+	private LocalDateTime createTime;
 
-    /**
-     * Operator ID
-     */
-    @TableField("operator_id")
-    private Long operatorId;
+	/**
+	 * Operator ID
+	 */
+	@TableField("operator_id")
+	private Long operatorId;
 
-    /**
-     * Operator Name
-     */
-    @TableField("operator_name")
-    private String operatorName;
+	/**
+	 * Operator Name
+	 */
+	@TableField("operator_name")
+	private String operatorName;
 
-    /**
-     * Operate Time
-     */
-    @TableField("operate_time")
-    private LocalDateTime operateTime;
+	/**
+	 * Operate Time
+	 */
+	@TableField("operate_time")
+	private LocalDateTime operateTime;
 
-    /**
-     * Logical delete flag, 0:not deleted, 1:deleted
-     */
-    @TableLogic
-    @TableField("deleted")
-    private Byte deleted;
+	/**
+	 * Logical delete flag, 0:not deleted, 1:deleted
+	 */
+	@TableLogic
+	@TableField("deleted")
+	private Byte deleted;
+
 }

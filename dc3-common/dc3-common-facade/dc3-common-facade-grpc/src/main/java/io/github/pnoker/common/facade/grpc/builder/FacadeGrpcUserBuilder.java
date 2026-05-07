@@ -26,8 +26,8 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * {@code GrpcUserDTO} → {@link FacadeUserBO}. {@code socialExt}/{@code identityExt}
- * stay as opaque JSON strings — keeping the wire representation untouched.
+ * {@code GrpcUserDTO} → {@link FacadeUserBO}. {@code socialExt}/{@code identityExt} stay
+ * as opaque JSON strings — keeping the wire representation untouched.
  *
  * @author pnoker
  * @since 2026.5.5
@@ -35,21 +35,22 @@ import java.util.Objects;
 @Component
 public class FacadeGrpcUserBuilder {
 
-    public FacadeUserBO toFacadeBO(GrpcUserDTO dto) {
-        if (Objects.isNull(dto)) {
-            return null;
-        }
+	public FacadeUserBO toFacadeBO(GrpcUserDTO dto) {
+		if (Objects.isNull(dto)) {
+			return null;
+		}
 
-        FacadeUserBO bo = new FacadeUserBO();
-        GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
+		FacadeUserBO bo = new FacadeUserBO();
+		GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
 
-        StringOptional.ofNullable(dto.getNickName()).ifPresent(bo::setNickName);
-        StringOptional.ofNullable(dto.getUserName()).ifPresent(bo::setUserName);
-        StringOptional.ofNullable(dto.getPhone()).ifPresent(bo::setPhone);
-        StringOptional.ofNullable(dto.getEmail()).ifPresent(bo::setEmail);
-        StringOptional.ofNullable(dto.getSocialExt()).ifPresent(bo::setSocialExt);
-        StringOptional.ofNullable(dto.getIdentityExt()).ifPresent(bo::setIdentityExt);
+		StringOptional.ofNullable(dto.getNickName()).ifPresent(bo::setNickName);
+		StringOptional.ofNullable(dto.getUserName()).ifPresent(bo::setUserName);
+		StringOptional.ofNullable(dto.getPhone()).ifPresent(bo::setPhone);
+		StringOptional.ofNullable(dto.getEmail()).ifPresent(bo::setEmail);
+		StringOptional.ofNullable(dto.getSocialExt()).ifPresent(bo::setSocialExt);
+		StringOptional.ofNullable(dto.getIdentityExt()).ifPresent(bo::setIdentityExt);
 
-        return bo;
-    }
+		return bo;
+	}
+
 }

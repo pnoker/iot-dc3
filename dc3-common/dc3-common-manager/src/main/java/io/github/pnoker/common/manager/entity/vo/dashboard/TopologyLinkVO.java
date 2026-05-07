@@ -25,11 +25,11 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * One edge in the Sankey. In cardinality mode {@code value} is the number
- * of relationships this edge represents (1 per device for Driver→Device,
- * 1 per profile_bind row for Device→Profile, 1 per point for Profile→Point;
- * aggregated into N for {@code *→others} edges). In volume mode (Phase 2)
- * it carries the point_value sample count rolled up along the edge.
+ * One edge in the Sankey. In cardinality mode {@code value} is the number of
+ * relationships this edge represents (1 per device for Driver→Device, 1 per profile_bind
+ * row for Device→Profile, 1 per point for Profile→Point; aggregated into N for
+ * {@code *→others} edges). In volume mode (Phase 2) it carries the point_value sample
+ * count rolled up along the edge.
  *
  * @author pnoker
  * @since 2026.5.4
@@ -39,10 +39,13 @@ import java.io.Serializable;
 @ToString
 public class TopologyLinkVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String source;
-    private String target;
-    private long value;
+	private String source;
+
+	private String target;
+
+	private long value;
+
 }

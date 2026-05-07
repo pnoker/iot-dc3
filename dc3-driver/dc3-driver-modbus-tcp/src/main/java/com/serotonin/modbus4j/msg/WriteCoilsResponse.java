@@ -22,57 +22,64 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>WriteCoilsResponse class.</p>
+ * <p>
+ * WriteCoilsResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class WriteCoilsResponse extends ModbusResponse {
-    private int startOffset;
-    private int numberOfBits;
 
-    WriteCoilsResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	private int startOffset;
 
-    WriteCoilsResponse(int slaveId, int startOffset, int numberOfBits) throws ModbusTransportException {
-        super(slaveId);
-        this.startOffset = startOffset;
-        this.numberOfBits = numberOfBits;
-    }
+	private int numberOfBits;
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_COILS;
-    }
+	WriteCoilsResponse(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    protected void writeResponse(ByteQueue queue) {
-        ModbusUtils.pushShort(queue, startOffset);
-        ModbusUtils.pushShort(queue, numberOfBits);
-    }
+	WriteCoilsResponse(int slaveId, int startOffset, int numberOfBits) throws ModbusTransportException {
+		super(slaveId);
+		this.startOffset = startOffset;
+		this.numberOfBits = numberOfBits;
+	}
 
-    @Override
-    protected void readResponse(ByteQueue queue) {
-        startOffset = ModbusUtils.popUnsignedShort(queue);
-        numberOfBits = ModbusUtils.popUnsignedShort(queue);
-    }
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.WRITE_COILS;
+	}
 
-    /**
-     * <p>Getter for the field <code>startOffset</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getStartOffset() {
-        return startOffset;
-    }
+	@Override
+	protected void writeResponse(ByteQueue queue) {
+		ModbusUtils.pushShort(queue, startOffset);
+		ModbusUtils.pushShort(queue, numberOfBits);
+	}
 
-    /**
-     * <p>Getter for the field <code>numberOfBits</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getNumberOfBits() {
-        return numberOfBits;
-    }
+	@Override
+	protected void readResponse(ByteQueue queue) {
+		startOffset = ModbusUtils.popUnsignedShort(queue);
+		numberOfBits = ModbusUtils.popUnsignedShort(queue);
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>startOffset</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getStartOffset() {
+		return startOffset;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>numberOfBits</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getNumberOfBits() {
+		return numberOfBits;
+	}
+
 }

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.controller;
 
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -42,26 +41,27 @@ import java.util.List;
  * @since 2022.1.0
  */
 
-
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.TOPIC_URL_PREFIX)
 public class TopicController implements BaseController {
 
-    private final TopicService topicService;
+	private final TopicService topicService;
 
-    public TopicController(TopicService topicService) {
-        this.topicService = topicService;
-    }
+	public TopicController(TopicService topicService) {
+		this.topicService = topicService;
+	}
 
-    @PostMapping("/list")
-    public Mono<R<Page<List<TopicVO>>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
-        try {
-            Page<List<TopicVO>> topicVOList = topicService.query(topicQuery);
-            return Mono.just(R.ok(topicVOList));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	@PostMapping("/list")
+	public Mono<R<Page<List<TopicVO>>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
+		try {
+			Page<List<TopicVO>> topicVOList = topicService.query(topicQuery);
+			return Mono.just(R.ok(topicVOList));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
+
 }

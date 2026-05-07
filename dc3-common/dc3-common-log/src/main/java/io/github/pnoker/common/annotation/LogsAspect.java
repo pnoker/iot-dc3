@@ -27,9 +27,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.UUID;
 
 /**
- * Aspect for logging method execution details using the @Logs annotation.
- * This aspect provides automatic logging of method entry and exit points,
- * including execution time tracking and unique request identification.
+ * Aspect for logging method execution details using the @Logs annotation. This aspect
+ * provides automatic logging of method entry and exit points, including execution time
+ * tracking and unique request identification.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -40,39 +40,42 @@ import java.util.UUID;
 @Configuration
 public class LogsAspect {
 
-    /**
-     * Pointcut definition targeting methods annotated with @Logs annotation.
-     * This pointcut will be used to intercept and log method executions.
-     */
-    @Pointcut("@annotation(io.github.pnoker.common.annotation.Logs)")
-    public void logsCut() {
-        // nothing to do
-    }
+	/**
+	 * Pointcut definition targeting methods annotated with @Logs annotation. This
+	 * pointcut will be used to intercept and log method executions.
+	 */
+	@Pointcut("@annotation(io.github.pnoker.common.annotation.Logs)")
+	public void logsCut() {
+		// nothing to do
+	}
 
-    /**
-     * Around advice that handles the logging of method execution.
-     * Generates a unique UUID for each execution, logs the start and end of method calls,
-     * tracks execution time, and handles any exceptions that occur during execution.
-     *
-     * @param proceedingJoinPoint The joinpoint representing the intercepted method
-     * @param logs                The Logs annotation instance containing the log message
-     * @return The result of the method execution
-     * @throws Throwable If any error occurs during method execution
-     */
-    @Around("logsCut() && @annotation(logs)")
-    public Object doAround(ProceedingJoinPoint proceedingJoinPoint, Logs logs) throws Throwable {
-        String uuid = UUID.randomUUID().toString();
-        String className = proceedingJoinPoint.getSignature().getDeclaringType().getSimpleName();
-        String methodName = proceedingJoinPoint.getSignature().getName();
-        long startTime = System.currentTimeMillis();
-        log.info("Start => [{}].[{}.{}]: {}", uuid, className, methodName, logs.value());
-        try {
-            Object proceed = proceedingJoinPoint.proceed();
-            log.info("End   <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName, System.currentTimeMillis() - startTime, logs.value());
-            return proceed;
-        } catch (Throwable throwable) {
-            log.info("End   <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName, System.currentTimeMillis() - startTime, logs.value());
-            throw throwable;
-        }
-    }
+	/**
+	 * Around advice that handles the logging of method execution. Generates a unique UUID
+	 * for each execution, logs the start and end of method calls, tracks execution time,
+	 * and handles any exceptions that occur during execution.
+	 * @param proceedingJoinPoint The joinpoint representing the intercepted method
+	 * @param logs The Logs annotation instance containing the log message
+	 * @return The result of the method execution
+	 * @throws Throwable If any error occurs during method execution
+	 */
+	@Around("logsCut() && @annotation(logs)")
+	public Object doAround(ProceedingJoinPoint proceedingJoinPoint, Logs logs) throws Throwable {
+		String uuid = UUID.randomUUID().toString();
+		String className = proceedingJoinPoint.getSignature().getDeclaringType().getSimpleName();
+		String methodName = proceedingJoinPoint.getSignature().getName();
+		long startTime = System.currentTimeMillis();
+		log.info("Start => [{}].[{}.{}]: {}", uuid, className, methodName, logs.value());
+		try {
+			Object proceed = proceedingJoinPoint.proceed();
+			log.info("End   <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName,
+					System.currentTimeMillis() - startTime, logs.value());
+			return proceed;
+		}
+		catch (Throwable throwable) {
+			log.info("End   <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName,
+					System.currentTimeMillis() - startTime, logs.value());
+			throw throwable;
+		}
+	}
+
 }

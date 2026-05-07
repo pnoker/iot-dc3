@@ -22,7 +22,6 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.stereotype.Component;
 
-
 /**
  * Request Header
  *
@@ -34,15 +33,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
-    private final AuthenticGatewayFilter authenticGatewayFilter;
+	private final AuthenticGatewayFilter authenticGatewayFilter;
 
-    public AuthenticGatewayFilterFactory(AuthenticGatewayFilter authenticGatewayFilter) {
-        this.authenticGatewayFilter = authenticGatewayFilter;
-    }
+	public AuthenticGatewayFilterFactory(AuthenticGatewayFilter authenticGatewayFilter) {
+		this.authenticGatewayFilter = authenticGatewayFilter;
+	}
 
-    @Override
-    public GatewayFilter apply(Object config) {
-        return authenticGatewayFilter;
-    }
+	@Override
+	public GatewayFilter apply(Object config) {
+		return authenticGatewayFilter;
+	}
 
 }

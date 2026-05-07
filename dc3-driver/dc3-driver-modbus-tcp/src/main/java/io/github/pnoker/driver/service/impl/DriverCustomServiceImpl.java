@@ -54,12 +54,11 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * Custom driver service implementation for the Modbus TCP driver.
  * <p>
- * Manages Modbus TCP connections, reads point values from Modbus devices
- * via function codes 1-4, and writes values to coils and holding registers.
+ * Manages Modbus TCP connections, reads point values from Modbus devices via function
+ * codes 1-4, and writes values to coils and holding registers.
  * </p>
  *
  * @author pnoker
@@ -70,228 +69,235 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DriverCustomServiceImpl implements DriverCustomService {
 
-    /**
-     * Modbus factory for creating ModbusMaster instances.
-     */
-    static ModbusFactory modbusFactory;
+	/**
+	 * Modbus factory for creating ModbusMaster instances.
+	 */
+	static ModbusFactory modbusFactory;
 
-    static {
-        modbusFactory = new ModbusFactory();
-    }
+	static {
+		modbusFactory = new ModbusFactory();
+	}
 
-    @Resource
-    DriverMetadata driverMetadata;
+	@Resource
+	DriverMetadata driverMetadata;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+	@Resource
+	private DriverSenderService driverSenderService;
 
-    /**
-     * Cache of device ID to ModbusMaster connections.
-     */
-    private Map<Long, ModbusMaster> connectMap;
+	/**
+	 * Cache of device ID to ModbusMaster connections.
+	 */
+	private Map<Long, ModbusMaster> connectMap;
 
-    @Override
-    public void initial() {
-        connectMap = new ConcurrentHashMap<>(16);
-    }
+	@Override
+	public void initial() {
+		connectMap = new ConcurrentHashMap<>(16);
+	}
 
-    @Override
-    public void schedule() {
-        driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
-    }
+	@Override
+	public void schedule() {
+		driverMetadata.getDeviceIds()
+			.forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+	}
 
-    @Override
-    public void event(MetadataEventDTO metadataEvent) {
-        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-        MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
-        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
+	@Override
+	public void event(MetadataEventDTO metadataEvent) {
+		MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+		MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
+		if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+			log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
 
-            // Remove stale connection when device is updated or deleted
-            if (MetadataOperateTypeEnum.DELETE.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                connectMap.remove(metadataEvent.getId());
-            }
-        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
-        }
-    }
+			// Remove stale connection when device is updated or deleted
+			if (MetadataOperateTypeEnum.DELETE.equals(operateType)
+					|| MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
+				connectMap.remove(metadataEvent.getId());
+			}
+		}
+		else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+			log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
+		}
+	}
 
-    @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
-        return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig, point.getPointTypeFlag().getCode()));
-    }
+	@Override
+	public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+			PointBO point) {
+		return new RValue(device, point,
+				readValue(getConnector(device.getId(), driverConfig), pointConfig, point.getPointTypeFlag().getCode()));
+	}
 
-    @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
-        ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
-        return writeValue(modbusMaster, pointConfig, wValue);
-    }
+	@Override
+	public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+			PointBO point, WValue wValue) {
+		ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
+		return writeValue(modbusMaster, pointConfig, wValue);
+	}
 
-    /**
-     * Get or create a Modbus TCP connection for the given device.
-     *
-     * @param deviceId     unique device identifier
-     * @param driverConfig driver configuration containing host and port
-     * @return cached or newly created ModbusMaster
-     * @throws ConnectorException if connection initialization fails
-     */
-    private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverConfig));
-        ModbusMaster modbusMaster = connectMap.get(deviceId);
-        if (Objects.isNull(modbusMaster)) {
-            IpParameters params = new IpParameters();
-            params.setHost(driverConfig.get("host").getValue(String.class));
-            params.setPort(driverConfig.get("port").getValue(Integer.class));
-            modbusMaster = modbusFactory.createTcpMaster(params, true);
-            try {
-                modbusMaster.init();
-                connectMap.put(deviceId, modbusMaster);
-            } catch (ModbusInitException e) {
-                connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
-                log.error("Connect modbus master error: {}", e.getMessage(), e);
-                throw new ConnectorException(e.getMessage());
-            }
-        }
-        return modbusMaster;
-    }
+	/**
+	 * Get or create a Modbus TCP connection for the given device.
+	 * @param deviceId unique device identifier
+	 * @param driverConfig driver configuration containing host and port
+	 * @return cached or newly created ModbusMaster
+	 * @throws ConnectorException if connection initialization fails
+	 */
+	private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
+		log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverConfig));
+		ModbusMaster modbusMaster = connectMap.get(deviceId);
+		if (Objects.isNull(modbusMaster)) {
+			IpParameters params = new IpParameters();
+			params.setHost(driverConfig.get("host").getValue(String.class));
+			params.setPort(driverConfig.get("port").getValue(Integer.class));
+			modbusMaster = modbusFactory.createTcpMaster(params, true);
+			try {
+				modbusMaster.init();
+				connectMap.put(deviceId, modbusMaster);
+			}
+			catch (ModbusInitException e) {
+				connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
+				log.error("Connect modbus master error: {}", e.getMessage(), e);
+				throw new ConnectorException(e.getMessage());
+			}
+		}
+		return modbusMaster;
+	}
 
-    /**
-     * Read a point value from the Modbus device by function code.
-     * <p>Function codes: 1=coil, 2=input status, 3=holding register, 4=input register.
-     *
-     * @param modbusMaster active Modbus connection
-     * @param pointConfig  point configuration (slaveId, functionCode, offset)
-     * @param type         point value type for register data interpretation
-     * @return read value as string, or "0" for unsupported function codes
-     */
-    private String readValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, String type) {
-        int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
-        int functionCode = pointConfig.get("functionCode").getValue(Integer.class);
-        int offset = pointConfig.get("offset").getValue(Integer.class);
-        switch (functionCode) {
-            case 1:
-                BaseLocator<Boolean> coilLocator = BaseLocator.coilStatus(slaveId, offset);
-                Boolean coilValue = getMasterValue(modbusMaster, coilLocator);
-                return String.valueOf(coilValue);
-            case 2:
-                BaseLocator<Boolean> inputLocator = BaseLocator.inputStatus(slaveId, offset);
-                Boolean inputStatusValue = getMasterValue(modbusMaster, inputLocator);
-                return String.valueOf(inputStatusValue);
-            case 3:
-                BaseLocator<Number> holdingLocator = BaseLocator.holdingRegister(slaveId, offset, getValueType(type));
-                Number holdingValue = getMasterValue(modbusMaster, holdingLocator);
-                return String.valueOf(holdingValue);
-            case 4:
-                BaseLocator<Number> inputRegister = BaseLocator.inputRegister(slaveId, offset, getValueType(type));
-                Number inputRegisterValue = getMasterValue(modbusMaster, inputRegister);
-                return String.valueOf(inputRegisterValue);
-            default:
-                return "0";
-        }
-    }
+	/**
+	 * Read a point value from the Modbus device by function code.
+	 * <p>
+	 * Function codes: 1=coil, 2=input status, 3=holding register, 4=input register.
+	 * @param modbusMaster active Modbus connection
+	 * @param pointConfig point configuration (slaveId, functionCode, offset)
+	 * @param type point value type for register data interpretation
+	 * @return read value as string, or "0" for unsupported function codes
+	 */
+	private String readValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, String type) {
+		int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
+		int functionCode = pointConfig.get("functionCode").getValue(Integer.class);
+		int offset = pointConfig.get("offset").getValue(Integer.class);
+		switch (functionCode) {
+			case 1:
+				BaseLocator<Boolean> coilLocator = BaseLocator.coilStatus(slaveId, offset);
+				Boolean coilValue = getMasterValue(modbusMaster, coilLocator);
+				return String.valueOf(coilValue);
+			case 2:
+				BaseLocator<Boolean> inputLocator = BaseLocator.inputStatus(slaveId, offset);
+				Boolean inputStatusValue = getMasterValue(modbusMaster, inputLocator);
+				return String.valueOf(inputStatusValue);
+			case 3:
+				BaseLocator<Number> holdingLocator = BaseLocator.holdingRegister(slaveId, offset, getValueType(type));
+				Number holdingValue = getMasterValue(modbusMaster, holdingLocator);
+				return String.valueOf(holdingValue);
+			case 4:
+				BaseLocator<Number> inputRegister = BaseLocator.inputRegister(slaveId, offset, getValueType(type));
+				Number inputRegisterValue = getMasterValue(modbusMaster, inputRegister);
+				return String.valueOf(inputRegisterValue);
+			default:
+				return "0";
+		}
+	}
 
-    /**
-     * Read a value from the Modbus device using the given locator.
-     *
-     * @param modbusMaster active Modbus connection
-     * @param locator      identifies the target point (slave, function, offset)
-     * @param <T>          value type determined by the locator
-     * @return the read value
-     * @throws ReadPointException if a transport or error response occurs
-     */
-    private <T> T getMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator) {
-        try {
-            return modbusMaster.getValue(locator);
-        } catch (ModbusTransportException | ErrorResponseException e) {
-            log.error("Read modbus master value error: {}", e.getMessage(), e);
-            throw new ReadPointException(e.getMessage());
-        }
-    }
+	/**
+	 * Read a value from the Modbus device using the given locator.
+	 * @param modbusMaster active Modbus connection
+	 * @param locator identifies the target point (slave, function, offset)
+	 * @param <T> value type determined by the locator
+	 * @return the read value
+	 * @throws ReadPointException if a transport or error response occurs
+	 */
+	private <T> T getMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator) {
+		try {
+			return modbusMaster.getValue(locator);
+		}
+		catch (ModbusTransportException | ErrorResponseException e) {
+			log.error("Read modbus master value error: {}", e.getMessage(), e);
+			throw new ReadPointException(e.getMessage());
+		}
+	}
 
-    /**
-     * Write a point value to the Modbus device by function code.
-     * <p>Function codes: 1=write coil, 3=write holding register. Others return false.
-     *
-     * @param modbusMaster active Modbus connection
-     * @param pointConfig  point configuration (slaveId, functionCode, offset)
-     * @param wValue       value to write
-     * @return true if write succeeded, false if failed or unsupported function code
-     */
-    private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WValue wValue) {
-        int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
-        int functionCode = pointConfig.get("functionCode").getValue(Integer.class);
-        int offset = pointConfig.get("offset").getValue(Integer.class);
-        switch (functionCode) {
-            case 1:
-                WriteCoilResponse coilResponse = setMasterValue(modbusMaster, slaveId, offset, wValue);
-                return !coilResponse.isException();
-            case 3:
-                BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset, getValueType(wValue.getType().getCode()));
-                setMasterValue(modbusMaster, locator, wValue);
-                return true;
-            default:
-                return false;
-        }
-    }
+	/**
+	 * Write a point value to the Modbus device by function code.
+	 * <p>
+	 * Function codes: 1=write coil, 3=write holding register. Others return false.
+	 * @param modbusMaster active Modbus connection
+	 * @param pointConfig point configuration (slaveId, functionCode, offset)
+	 * @param wValue value to write
+	 * @return true if write succeeded, false if failed or unsupported function code
+	 */
+	private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WValue wValue) {
+		int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
+		int functionCode = pointConfig.get("functionCode").getValue(Integer.class);
+		int offset = pointConfig.get("offset").getValue(Integer.class);
+		switch (functionCode) {
+			case 1:
+				WriteCoilResponse coilResponse = setMasterValue(modbusMaster, slaveId, offset, wValue);
+				return !coilResponse.isException();
+			case 3:
+				BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset,
+						getValueType(wValue.getType().getCode()));
+				setMasterValue(modbusMaster, locator, wValue);
+				return true;
+			default:
+				return false;
+		}
+	}
 
-    /**
-     * Map a point type flag to a Modbus DataType constant.
-     * <p>LONG->4-byte int, FLOAT->4-byte float, DOUBLE->8-byte float, else 2-byte int.
-     *
-     * @param type point type code
-     * @return Modbus DataType constant
-     * @throws UnSupportException if the type is unknown
-     */
-    private int getValueType(String type) {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(type);
-        if (Objects.isNull(valueType)) {
-            throw new UnSupportException("Unsupported type of " + type);
-        }
+	/**
+	 * Map a point type flag to a Modbus DataType constant.
+	 * <p>
+	 * LONG->4-byte int, FLOAT->4-byte float, DOUBLE->8-byte float, else 2-byte int.
+	 * @param type point type code
+	 * @return Modbus DataType constant
+	 * @throws UnSupportException if the type is unknown
+	 */
+	private int getValueType(String type) {
+		PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(type);
+		if (Objects.isNull(valueType)) {
+			throw new UnSupportException("Unsupported type of " + type);
+		}
 
-        return switch (valueType) {
-            case LONG -> DataType.FOUR_BYTE_INT_SIGNED;
-            case FLOAT -> DataType.FOUR_BYTE_FLOAT;
-            case DOUBLE -> DataType.EIGHT_BYTE_FLOAT;
-            default -> DataType.TWO_BYTE_INT_SIGNED;
-        };
-    }
+		return switch (valueType) {
+			case LONG -> DataType.FOUR_BYTE_INT_SIGNED;
+			case FLOAT -> DataType.FOUR_BYTE_FLOAT;
+			case DOUBLE -> DataType.EIGHT_BYTE_FLOAT;
+			default -> DataType.TWO_BYTE_INT_SIGNED;
+		};
+	}
 
-    /**
-     * Write a boolean value to a Modbus coil.
-     *
-     * @param modbusMaster active Modbus connection
-     * @param slaveId      target slave address
-     * @param offset       coil offset
-     * @param wValue       value containing the boolean to write
-     * @return the coil write response
-     * @throws WritePointException if a transport error occurs
-     */
-    private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, WValue wValue) {
-        try {
-            WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, wValue.getValue(Boolean.class));
-            return (WriteCoilResponse) modbusMaster.send(coilRequest);
-        } catch (ModbusTransportException e) {
-            log.error("Write modbus master value error: {}", e.getMessage(), e);
-            throw new WritePointException(e.getMessage());
-        }
-    }
+	/**
+	 * Write a boolean value to a Modbus coil.
+	 * @param modbusMaster active Modbus connection
+	 * @param slaveId target slave address
+	 * @param offset coil offset
+	 * @param wValue value containing the boolean to write
+	 * @return the coil write response
+	 * @throws WritePointException if a transport error occurs
+	 */
+	private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, WValue wValue) {
+		try {
+			WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, wValue.getValue(Boolean.class));
+			return (WriteCoilResponse) modbusMaster.send(coilRequest);
+		}
+		catch (ModbusTransportException e) {
+			log.error("Write modbus master value error: {}", e.getMessage(), e);
+			throw new WritePointException(e.getMessage());
+		}
+	}
 
-    /**
-     * Write a numeric value to a Modbus holding register via the given locator.
-     *
-     * @param modbusMaster active Modbus connection
-     * @param locator      identifies the target register
-     * @param wValue       value to write (read as Float)
-     * @param <T>          value type determined by the locator
-     * @throws WritePointException if a transport or error response occurs
-     */
-    private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WValue wValue) {
-        try {
-            modbusMaster.setValue(locator, wValue.getValue(Float.class));
-        } catch (ModbusTransportException | ErrorResponseException e) {
-            log.error("Write modbus master value error: {}", e.getMessage(), e);
-            throw new WritePointException(e.getMessage());
-        }
-    }
+	/**
+	 * Write a numeric value to a Modbus holding register via the given locator.
+	 * @param modbusMaster active Modbus connection
+	 * @param locator identifies the target register
+	 * @param wValue value to write (read as Float)
+	 * @param <T> value type determined by the locator
+	 * @throws WritePointException if a transport or error response occurs
+	 */
+	private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WValue wValue) {
+		try {
+			modbusMaster.setValue(locator, wValue.getValue(Float.class));
+		}
+		catch (ModbusTransportException | ErrorResponseException e) {
+			log.error("Write modbus master value error: {}", e.getMessage(), e);
+			throw new WritePointException(e.getMessage());
+		}
+	}
 
 }

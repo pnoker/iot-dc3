@@ -22,91 +22,104 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * First, instatiate with the streams. Then add a data consumer, or create a message control and pass this as the
- * transport (which will make the message control the data consumer). Change the read delay if desired. This class
- * supports running in its own thread (start) or an external one (run), say from a thread pool. Both approaches are
- * delegated to the stream listener. In either case, stop the transport with the stop method (or just stop the message
- * control).
+ * First, instatiate with the streams. Then add a data consumer, or create a message
+ * control and pass this as the transport (which will make the message control the data
+ * consumer). Change the read delay if desired. This class supports running in its own
+ * thread (start) or an external one (run), say from a thread pool. Both approaches are
+ * delegated to the stream listener. In either case, stop the transport with the stop
+ * method (or just stop the message control).
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class StreamTransport implements Transport, Runnable {
-    protected OutputStream out;
-    protected InputStream in;
-    private InputStreamListener listener;
 
-    /**
-     * <p>Constructor for StreamTransport.</p>
-     *
-     * @param in  a {@link InputStream} object.
-     * @param out a {@link OutputStream} object.
-     */
-    public StreamTransport(InputStream in, OutputStream out) {
-        this.out = out;
-        this.in = in;
-    }
+	protected OutputStream out;
 
-    /**
-     * <p>setReadDelay.</p>
-     *
-     * @param readDelay a int.
-     */
-    public void setReadDelay(int readDelay) {
-        if (listener != null)
-            listener.setReadDelay(readDelay);
-    }
+	protected InputStream in;
 
-    /**
-     * <p>start.</p>
-     *
-     * @param threadName a {@link String} object.
-     */
-    public void start(String threadName) {
-        listener.start(threadName);
-    }
+	private InputStreamListener listener;
 
-    /**
-     * <p>stop.</p>
-     */
-    public void stop() {
-        listener.stop();
-    }
+	/**
+	 * <p>
+	 * Constructor for StreamTransport.
+	 * </p>
+	 * @param in a {@link InputStream} object.
+	 * @param out a {@link OutputStream} object.
+	 */
+	public StreamTransport(InputStream in, OutputStream out) {
+		this.out = out;
+		this.in = in;
+	}
 
-    /**
-     * <p>run.</p>
-     */
-    public void run() {
-        listener.run();
-    }
+	/**
+	 * <p>
+	 * setReadDelay.
+	 * </p>
+	 * @param readDelay a int.
+	 */
+	public void setReadDelay(int readDelay) {
+		if (listener != null)
+			listener.setReadDelay(readDelay);
+	}
 
+	/**
+	 * <p>
+	 * start.
+	 * </p>
+	 * @param threadName a {@link String} object.
+	 */
+	public void start(String threadName) {
+		listener.start(threadName);
+	}
 
-    public void setConsumer(DataConsumer consumer) {
-        listener = new InputStreamListener(in, consumer);
-    }
+	/**
+	 * <p>
+	 * stop.
+	 * </p>
+	 */
+	public void stop() {
+		listener.stop();
+	}
 
-    /**
-     * <p>removeConsumer.</p>
-     */
-    public void removeConsumer() {
-        listener.stop();
-        listener = null;
-    }
+	/**
+	 * <p>
+	 * run.
+	 * </p>
+	 */
+	public void run() {
+		listener.run();
+	}
 
-    /**
-     * <p>write.</p>
-     *
-     * @param data an array of {@link byte} objects.
-     * @throws IOException if any.
-     */
-    public void write(byte[] data) throws IOException {
-        out.write(data);
-        out.flush();
-    }
+	public void setConsumer(DataConsumer consumer) {
+		listener = new InputStreamListener(in, consumer);
+	}
 
+	/**
+	 * <p>
+	 * removeConsumer.
+	 * </p>
+	 */
+	public void removeConsumer() {
+		listener.stop();
+		listener = null;
+	}
 
-    public void write(byte[] data, int len) throws IOException {
-        out.write(data, 0, len);
-        out.flush();
-    }
+	/**
+	 * <p>
+	 * write.
+	 * </p>
+	 * @param data an array of {@link byte} objects.
+	 * @throws IOException if any.
+	 */
+	public void write(byte[] data) throws IOException {
+		out.write(data);
+		out.flush();
+	}
+
+	public void write(byte[] data, int len) throws IOException {
+		out.write(data, 0, len);
+		out.flush();
+	}
+
 }

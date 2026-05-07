@@ -44,35 +44,33 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class RoleVO extends BaseVO {
 
-    /**
-     * ID
-     */
-    @NotNull(message = "Role parent id can't be empty",
-            groups = {Add.class, Update.class})
-    private Long parentRoleId;
+	/**
+	 * ID
+	 */
+	@NotNull(message = "Role parent id can't be empty", groups = { Add.class, Update.class })
+	private Long parentRoleId;
 
-    /**
-     * Name
-     */
-    @NotBlank(message = "Role name can't be empty",
-            groups = {Add.class, Auth.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "Invalid role name",
-            groups = {Add.class, Update.class})
-    private String roleName;
+	/**
+	 * Name
+	 */
+	@NotBlank(message = "Role name can't be empty", groups = { Add.class, Auth.class })
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
+			groups = { Add.class, Update.class })
+	private String roleName;
 
-    /**
-     * Code
-     */
-    private String roleCode;
+	/**
+	 * Code
+	 */
+	private String roleCode;
 
-    /**
-     *
-     */
-    private RoleExt roleExt;
+	/**
+	 *
+	 */
+	private RoleExt roleExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

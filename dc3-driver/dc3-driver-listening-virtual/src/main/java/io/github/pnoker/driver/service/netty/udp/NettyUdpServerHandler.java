@@ -31,8 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * UDP server handler for processing incoming datagram packets.
  * <p>
- * This handler processes UDP messages according to a specific format:
- * <pre>
+ * This handler processes UDP messages according to a specific format: <pre>
  * - Device name: 22 bytes
  * - Keyword: 1 byte
  * - Altitude: 4 bytes (float)
@@ -43,10 +42,9 @@ import org.springframework.stereotype.Component;
  * - Latitude/longitude: 21 bytes (string)
  * </pre>
  * <p>
- * Example test message (hex):
- * 4C 69 73 74 65 6E 69 6E 67 56 69 72 74 75 61 6C 44 65 76 69 63 65
- * 62 44 C3 E7 5C 40 46 D5 C2 8F 5C 28 F6 00 00 00 00 00 00 00 0C
- * 00 00 00 2D 01 31 33 31 2E 32 33 31 34 35 36 2C 30 32 31 2E 35 36 38 32 31 31
+ * Example test message (hex): 4C 69 73 74 65 6E 69 6E 67 56 69 72 74 75 61 6C 44 65 76 69
+ * 63 65 62 44 C3 E7 5C 40 46 D5 C2 8F 5C 28 F6 00 00 00 00 00 00 00 0C 00 00 00 2D 01 31
+ * 33 31 2E 32 33 31 34 35 36 2C 30 32 31 2E 35 36 38 32 31 31
  * </p>
  *
  * @author pnoker
@@ -57,44 +55,44 @@ import org.springframework.stereotype.Component;
 @Component
 @ChannelHandler.Sharable
 public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
-    /**
-     * Static self-reference for accessing Spring-injected beans from static context.
-     */
-    private static NettyUdpServerHandler nettyUdpServerHandler;
-    @Resource
-    private NettyServerHandler nettyServerHandler;
 
-    /**
-     * Initializes the handler instance after Spring dependency injection.
-     */
-    @PostConstruct
-    public void init() {
-        nettyUdpServerHandler = this;
-    }
+	/**
+	 * Static self-reference for accessing Spring-injected beans from static context.
+	 */
+	private static NettyUdpServerHandler nettyUdpServerHandler;
 
-    /**
-     * Handles incoming UDP datagram packets.
-     *
-     * @param context The channel handler context
-     * @param msg     The received datagram packet
-     */
-    @Override
-    @SneakyThrows
-    public void channelRead0(ChannelHandlerContext context, DatagramPacket msg) {
-        nettyUdpServerHandler.nettyServerHandler.read(context, msg.content());
-    }
+	@Resource
+	private NettyServerHandler nettyServerHandler;
 
-    /**
-     * Handles exceptions during UDP packet processing.
-     *
-     * @param context   The channel handler context
-     * @param throwable The exception that occurred
-     */
-    @Override
-    @SneakyThrows
-    public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.debug(throwable.getMessage());
-        context.disconnect();
-    }
+	/**
+	 * Initializes the handler instance after Spring dependency injection.
+	 */
+	@PostConstruct
+	public void init() {
+		nettyUdpServerHandler = this;
+	}
+
+	/**
+	 * Handles incoming UDP datagram packets.
+	 * @param context The channel handler context
+	 * @param msg The received datagram packet
+	 */
+	@Override
+	@SneakyThrows
+	public void channelRead0(ChannelHandlerContext context, DatagramPacket msg) {
+		nettyUdpServerHandler.nettyServerHandler.read(context, msg.content());
+	}
+
+	/**
+	 * Handles exceptions during UDP packet processing.
+	 * @param context The channel handler context
+	 * @param throwable The exception that occurred
+	 */
+	@Override
+	@SneakyThrows
+	public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
+		log.debug(throwable.getMessage());
+		context.disconnect();
+	}
 
 }

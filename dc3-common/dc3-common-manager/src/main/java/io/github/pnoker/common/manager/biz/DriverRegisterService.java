@@ -33,27 +33,24 @@ import java.util.List;
  */
 public interface DriverRegisterService {
 
-    /**
-     * Register driver
-     *
-     * @param entityGrpc GrpcDriverRegisterDTO
-     */
-    DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc);
+	/**
+	 * Register driver
+	 * @param entityGrpc GrpcDriverRegisterDTO
+	 */
+	DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc);
 
-    /**
-     * Register driver attributes
-     *
-     * @param entityGrpc GrpcDriverRegisterDTO
-     * @param entityBO   DriverBO
-     */
-    List<DriverAttributeBO> registerDriverAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
+	/**
+	 * Register driver attributes
+	 * @param entityGrpc GrpcDriverRegisterDTO
+	 * @param entityBO DriverBO
+	 */
+	List<DriverAttributeBO> registerDriverAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
 
-    /**
-     * Register point attributes
-     *
-     * @param entityGrpc GrpcDriverRegisterDTO
-     * @param entityBO   DriverBO
-     */
-    List<PointAttributeBO> registerPointAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
+	/**
+	 * Register point attributes
+	 * @param entityGrpc GrpcDriverRegisterDTO
+	 * @param entityBO DriverBO
+	 */
+	List<PointAttributeBO> registerPointAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
 
 }

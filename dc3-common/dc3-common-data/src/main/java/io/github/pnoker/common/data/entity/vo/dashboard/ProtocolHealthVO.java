@@ -26,23 +26,29 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Rollup for one driver service_name — how many driver rows are enabled,
- * how many devices they serve, how much sample volume they carried in
- * the window. Phase-1 health signal is just enable% + device count +
- * sample volume; true heartbeat/latency signals get layered in later.
+ * Rollup for one driver service_name — how many driver rows are enabled, how many devices
+ * they serve, how much sample volume they carried in the window. Phase-1 health signal is
+ * just enable% + device count + sample volume; true heartbeat/latency signals get layered
+ * in later.
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class ProtocolHealthVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    /**
-     * e.g. {@code dc3-driver-modbus-tcp}; frontend strips the prefix.
-     */
-    private String serviceName;
-    private long driverCount;
-    private long enabledCount;
-    private long deviceCount;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * e.g. {@code dc3-driver-modbus-tcp}; frontend strips the prefix.
+	 */
+	private String serviceName;
+
+	private long driverCount;
+
+	private long enabledCount;
+
+	private long deviceCount;
+
 }

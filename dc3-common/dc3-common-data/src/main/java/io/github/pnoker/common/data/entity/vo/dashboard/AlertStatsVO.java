@@ -38,48 +38,50 @@ import java.util.List;
 @NoArgsConstructor
 public class AlertStatsVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private long total;
+	private long total;
 
-    private long unconfirmed;
+	private long unconfirmed;
 
-    private long deviceAlerts;
+	private long deviceAlerts;
 
-    private long driverAlerts;
+	private long driverAlerts;
 
-    private long deviceUnconfirmed;
+	private long deviceUnconfirmed;
 
-    private long driverUnconfirmed;
+	private long driverUnconfirmed;
 
-    private long todayDeviceAlarms;
+	private long todayDeviceAlarms;
 
-    private long todayDriverAlarms;
+	private long todayDriverAlarms;
 
-    private long todayDeviceUnconfirmed;
+	private long todayDeviceUnconfirmed;
 
-    private long todayDriverUnconfirmed;
+	private long todayDriverUnconfirmed;
 
-    private List<BucketVO> byType;
+	private List<BucketVO> byType;
 
-    /**
-     * 24-element hourly count series for the alert indicator card sparkline,
-     * oldest first. Always length 24 — service zero-pads missing hours.
-     */
-    private List<Long> sparkline24h;
+	/**
+	 * 24-element hourly count series for the alert indicator card sparkline, oldest
+	 * first. Always length 24 — service zero-pads missing hours.
+	 */
+	private List<Long> sparkline24h;
 
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    public static class BucketVO implements Serializable {
+	@Getter
+	@Setter
+	@ToString
+	@NoArgsConstructor
+	public static class BucketVO implements Serializable {
 
-        @Serial
-        private static final long serialVersionUID = 1L;
+		@Serial
+		private static final long serialVersionUID = 1L;
 
-        private String key;
+		private String key;
 
-        private long count;
-    }
+		private long count;
+
+	}
+
 }

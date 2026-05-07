@@ -32,4 +32,3 @@ import io.github.pnoker.common.dal.entity.model.GroupBindDO;
 public interface GroupBindMapper extends BaseMapper<GroupBindDO> {
 
 }
-

@@ -32,8 +32,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Represents a raw point value read from a device together with the device and point metadata
- * required to calculate its final value.
+ * Represents a raw point value read from a device together with the device and point
+ * metadata required to calculate its final value.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,182 +47,186 @@ import java.util.Optional;
 @AllArgsConstructor
 public class RValue implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private static final BigDecimal defaultBase = new BigDecimal(0);
-    private static final BigDecimal defaultMultiple = new BigDecimal(1);
+	private static final BigDecimal defaultBase = new BigDecimal(0);
 
-    /**
-     * Source device that produced the value.
-     */
-    private DeviceBO device;
+	private static final BigDecimal defaultMultiple = new BigDecimal(1);
 
-    /**
-     * Point definition associated with the value.
-     */
-    private PointBO point;
+	/**
+	 * Source device that produced the value.
+	 */
+	private DeviceBO device;
 
-    /**
-     * Raw point value represented as a string.
-     */
-    private String value;
+	/**
+	 * Point definition associated with the value.
+	 */
+	private PointBO point;
 
-    /**
-     * Returns the final point value after applying scaling and type conversion rules defined by
-     * the point metadata.
-     *
-     * @return final point value as a string
-     */
-    public String getFinalValue() {
-        if (Objects.isNull(point)) {
-            throw new EmptyException("Point is empty");
-        }
+	/**
+	 * Raw point value represented as a string.
+	 */
+	private String value;
 
-        PointTypeFlagEnum valueType = Optional.ofNullable(point.getPointTypeFlag()).orElse(PointTypeFlagEnum.STRING);
-        BigDecimal base = Optional.ofNullable(point.getBaseValue()).orElse(defaultBase);
-        BigDecimal multiple = Optional.ofNullable(point.getMultiple()).orElse(defaultMultiple);
-        byte decimal = Optional.ofNullable(point.getValueDecimal()).orElse((byte) 6);
+	/**
+	 * Returns the final point value after applying scaling and type conversion rules
+	 * defined by the point metadata.
+	 * @return final point value as a string
+	 */
+	public String getFinalValue() {
+		if (Objects.isNull(point)) {
+			throw new EmptyException("Point is empty");
+		}
 
-        return switch (valueType) {
-            case STRING -> value;
-            case BYTE -> String.valueOf(getByteValue(value, base, multiple));
-            case SHORT -> String.valueOf(getShortValue(value, base, multiple));
-            case INT -> String.valueOf(getIntegerValue(value, base, multiple));
-            case LONG -> String.valueOf(getLongValue(value, base, multiple));
-            case FLOAT -> String.valueOf(getFloatValue(value, base, multiple, decimal));
-            case DOUBLE -> String.valueOf(getDoubleValue(value, base, multiple, decimal));
-            case BOOLEAN -> String.valueOf(getBooleanValue(value));
-        };
-    }
+		PointTypeFlagEnum valueType = Optional.ofNullable(point.getPointTypeFlag()).orElse(PointTypeFlagEnum.STRING);
+		BigDecimal base = Optional.ofNullable(point.getBaseValue()).orElse(defaultBase);
+		BigDecimal multiple = Optional.ofNullable(point.getMultiple()).orElse(defaultMultiple);
+		byte decimal = Optional.ofNullable(point.getValueDecimal()).orElse((byte) 6);
 
-    /**
-     * Applies a linear transformation using the formula {@code y = ax + b}.
-     *
-     * @param a multiplier
-     * @param x raw value
-     * @param b offset
-     * @return transformed decimal value
-     */
-    private BigDecimal getLinearValue(BigDecimal a, String x, BigDecimal b) {
-        BigDecimal bigDecimal = new BigDecimal(x);
-        if (defaultMultiple.compareTo(a) == 0 && defaultBase.compareTo(b) == 0) {
-            return bigDecimal;
-        }
-        if (defaultMultiple.compareTo(a) != 0 && defaultBase.compareTo(b) == 0) {
-            return bigDecimal.multiply(a);
-        }
-        if (defaultMultiple.compareTo(a) == 0 && defaultBase.compareTo(b) != 0) {
-            return bigDecimal.add(b);
-        }
-        BigDecimal multiply = a.multiply(bigDecimal);
-        return multiply.add(b);
-    }
+		return switch (valueType) {
+			case STRING -> value;
+			case BYTE -> String.valueOf(getByteValue(value, base, multiple));
+			case SHORT -> String.valueOf(getShortValue(value, base, multiple));
+			case INT -> String.valueOf(getIntegerValue(value, base, multiple));
+			case LONG -> String.valueOf(getLongValue(value, base, multiple));
+			case FLOAT -> String.valueOf(getFloatValue(value, base, multiple, decimal));
+			case DOUBLE -> String.valueOf(getDoubleValue(value, base, multiple, decimal));
+			case BOOLEAN -> String.valueOf(getBooleanValue(value));
+		};
+	}
 
-    /**
-     * Converts the raw value to a byte after linear scaling.
-     *
-     * @param rawValue raw value
-     * @return converted byte value
-     */
-    private byte getByteValue(String rawValue, BigDecimal base, BigDecimal multiple) {
-        try {
-            BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            return multiply.byteValue();
-        } catch (Exception e) {
-            throw new OutRangeException("Out of byte range: {} ~ {}, current: {}", Byte.MIN_VALUE, Byte.MAX_VALUE, rawValue);
-        }
-    }
+	/**
+	 * Applies a linear transformation using the formula {@code y = ax + b}.
+	 * @param a multiplier
+	 * @param x raw value
+	 * @param b offset
+	 * @return transformed decimal value
+	 */
+	private BigDecimal getLinearValue(BigDecimal a, String x, BigDecimal b) {
+		BigDecimal bigDecimal = new BigDecimal(x);
+		if (defaultMultiple.compareTo(a) == 0 && defaultBase.compareTo(b) == 0) {
+			return bigDecimal;
+		}
+		if (defaultMultiple.compareTo(a) != 0 && defaultBase.compareTo(b) == 0) {
+			return bigDecimal.multiply(a);
+		}
+		if (defaultMultiple.compareTo(a) == 0 && defaultBase.compareTo(b) != 0) {
+			return bigDecimal.add(b);
+		}
+		BigDecimal multiply = a.multiply(bigDecimal);
+		return multiply.add(b);
+	}
 
-    /**
-     * Converts the raw value to a short after linear scaling.
-     *
-     * @param rawValue raw value
-     * @return converted short value
-     */
-    private short getShortValue(String rawValue, BigDecimal base, BigDecimal multiple) {
-        try {
-            BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            return multiply.shortValue();
-        } catch (Exception e) {
-            throw new OutRangeException("Out of short range: {} ~ {}, current: {}", Short.MIN_VALUE, Short.MAX_VALUE, rawValue);
-        }
-    }
+	/**
+	 * Converts the raw value to a byte after linear scaling.
+	 * @param rawValue raw value
+	 * @return converted byte value
+	 */
+	private byte getByteValue(String rawValue, BigDecimal base, BigDecimal multiple) {
+		try {
+			BigDecimal multiply = getLinearValue(multiple, rawValue, base);
+			return multiply.byteValue();
+		}
+		catch (Exception e) {
+			throw new OutRangeException("Out of byte range: {} ~ {}, current: {}", Byte.MIN_VALUE, Byte.MAX_VALUE,
+					rawValue);
+		}
+	}
 
-    /**
-     * Converts the raw value to an integer after linear scaling.
-     *
-     * @param rawValue raw value
-     * @return converted integer value
-     */
-    private int getIntegerValue(String rawValue, BigDecimal base, BigDecimal multiple) {
-        try {
-            BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            return multiply.intValue();
-        } catch (Exception e) {
-            throw new OutRangeException("Out of int range: {} ~ {}, current: {}", Integer.MIN_VALUE, Integer.MAX_VALUE, rawValue);
-        }
-    }
+	/**
+	 * Converts the raw value to a short after linear scaling.
+	 * @param rawValue raw value
+	 * @return converted short value
+	 */
+	private short getShortValue(String rawValue, BigDecimal base, BigDecimal multiple) {
+		try {
+			BigDecimal multiply = getLinearValue(multiple, rawValue, base);
+			return multiply.shortValue();
+		}
+		catch (Exception e) {
+			throw new OutRangeException("Out of short range: {} ~ {}, current: {}", Short.MIN_VALUE, Short.MAX_VALUE,
+					rawValue);
+		}
+	}
 
-    /**
-     * Converts the raw value to a long after linear scaling.
-     *
-     * @param rawValue raw value
-     * @return converted long value
-     */
-    private long getLongValue(String rawValue, BigDecimal base, BigDecimal multiple) {
-        try {
-            BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            return multiply.longValue();
-        } catch (Exception e) {
-            throw new OutRangeException("Out of long range: {} ~ {}, current: {}", Long.MIN_VALUE, Long.MAX_VALUE, rawValue);
-        }
-    }
+	/**
+	 * Converts the raw value to an integer after linear scaling.
+	 * @param rawValue raw value
+	 * @return converted integer value
+	 */
+	private int getIntegerValue(String rawValue, BigDecimal base, BigDecimal multiple) {
+		try {
+			BigDecimal multiply = getLinearValue(multiple, rawValue, base);
+			return multiply.intValue();
+		}
+		catch (Exception e) {
+			throw new OutRangeException("Out of int range: {} ~ {}, current: {}", Integer.MIN_VALUE, Integer.MAX_VALUE,
+					rawValue);
+		}
+	}
 
-    /**
-     * Converts the raw value to a rounded float after linear scaling.
-     *
-     * @param rawValue raw value
-     * @return converted float value
-     */
-    private float getFloatValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
-        try {
-            BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            if (Float.isInfinite(multiply.floatValue())) {
-                throw new OutRangeException();
-            }
-            return ArithmeticUtil.round(multiply.floatValue(), decimal);
-        } catch (Exception e) {
-            throw new OutRangeException("Out of float range: |{} ~ {}|, current: {}", Float.MIN_VALUE, Float.MAX_VALUE, rawValue);
-        }
-    }
+	/**
+	 * Converts the raw value to a long after linear scaling.
+	 * @param rawValue raw value
+	 * @return converted long value
+	 */
+	private long getLongValue(String rawValue, BigDecimal base, BigDecimal multiple) {
+		try {
+			BigDecimal multiply = getLinearValue(multiple, rawValue, base);
+			return multiply.longValue();
+		}
+		catch (Exception e) {
+			throw new OutRangeException("Out of long range: {} ~ {}, current: {}", Long.MIN_VALUE, Long.MAX_VALUE,
+					rawValue);
+		}
+	}
 
-    /**
-     * Converts the raw value to a rounded double after linear scaling.
-     *
-     * @param rawValue raw value
-     * @return converted double value
-     */
-    private double getDoubleValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
-        try {
-            BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            if (Double.isInfinite(multiply.doubleValue())) {
-                throw new OutRangeException();
-            }
-            return ArithmeticUtil.round(multiply.doubleValue(), decimal);
-        } catch (Exception e) {
-            throw new OutRangeException("Out of double range: |{} ~ {}|, current: {}", Double.MIN_VALUE, Double.MAX_VALUE, rawValue);
-        }
-    }
+	/**
+	 * Converts the raw value to a rounded float after linear scaling.
+	 * @param rawValue raw value
+	 * @return converted float value
+	 */
+	private float getFloatValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
+		try {
+			BigDecimal multiply = getLinearValue(multiple, rawValue, base);
+			if (Float.isInfinite(multiply.floatValue())) {
+				throw new OutRangeException();
+			}
+			return ArithmeticUtil.round(multiply.floatValue(), decimal);
+		}
+		catch (Exception e) {
+			throw new OutRangeException("Out of float range: |{} ~ {}|, current: {}", Float.MIN_VALUE, Float.MAX_VALUE,
+					rawValue);
+		}
+	}
 
-    /**
-     * Converts the raw value to a boolean.
-     *
-     * @param rawValue raw value
-     * @return converted boolean value
-     */
-    private boolean getBooleanValue(String rawValue) {
-        return Boolean.parseBoolean(rawValue);
-    }
+	/**
+	 * Converts the raw value to a rounded double after linear scaling.
+	 * @param rawValue raw value
+	 * @return converted double value
+	 */
+	private double getDoubleValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
+		try {
+			BigDecimal multiply = getLinearValue(multiple, rawValue, base);
+			if (Double.isInfinite(multiply.doubleValue())) {
+				throw new OutRangeException();
+			}
+			return ArithmeticUtil.round(multiply.doubleValue(), decimal);
+		}
+		catch (Exception e) {
+			throw new OutRangeException("Out of double range: |{} ~ {}|, current: {}", Double.MIN_VALUE,
+					Double.MAX_VALUE, rawValue);
+		}
+	}
+
+	/**
+	 * Converts the raw value to a boolean.
+	 * @param rawValue raw value
+	 * @return converted boolean value
+	 */
+	private boolean getBooleanValue(String rawValue) {
+		return Boolean.parseBoolean(rawValue);
+	}
 
 }

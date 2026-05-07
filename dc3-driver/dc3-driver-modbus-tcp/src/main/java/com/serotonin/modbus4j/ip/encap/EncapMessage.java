@@ -22,36 +22,42 @@ import com.serotonin.modbus4j.msg.ModbusMessage;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>EncapMessage class.</p>
+ * <p>
+ * EncapMessage class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class EncapMessage extends IpMessage {
-    /**
-     * <p>Constructor for EncapMessage.</p>
-     *
-     * @param modbusMessage a {@link ModbusMessage} object.
-     */
-    public EncapMessage(ModbusMessage modbusMessage) {
-        super(modbusMessage);
-    }
 
-    /**
-     * <p>getMessageData.</p>
-     *
-     * @return an array of {@link byte} objects.
-     */
-    public byte[] getMessageData() {
-        ByteQueue msgQueue = new ByteQueue();
+	/**
+	 * <p>
+	 * Constructor for EncapMessage.
+	 * </p>
+	 * @param modbusMessage a {@link ModbusMessage} object.
+	 */
+	public EncapMessage(ModbusMessage modbusMessage) {
+		super(modbusMessage);
+	}
 
-        // Write the particular message.
-        modbusMessage.write(msgQueue);
+	/**
+	 * <p>
+	 * getMessageData.
+	 * </p>
+	 * @return an array of {@link byte} objects.
+	 */
+	public byte[] getMessageData() {
+		ByteQueue msgQueue = new ByteQueue();
 
-        // Write the CRC
-        ModbusUtils.pushShort(msgQueue, ModbusUtils.calculateCRC(modbusMessage));
+		// Write the particular message.
+		modbusMessage.write(msgQueue);
 
-        // Return the data.
-        return msgQueue.popAll();
-    }
+		// Write the CRC
+		ModbusUtils.pushShort(msgQueue, ModbusUtils.calculateCRC(modbusMessage));
+
+		// Return the data.
+		return msgQueue.popAll();
+	}
+
 }

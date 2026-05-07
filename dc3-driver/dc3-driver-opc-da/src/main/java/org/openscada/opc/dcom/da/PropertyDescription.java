@@ -18,33 +18,35 @@
 package org.openscada.opc.dcom.da;
 
 public class PropertyDescription {
-    private int _id = -1;
 
-    private String _description = "";
+	private int _id = -1;
 
-    private short _varType = 0;
+	private String _description = "";
 
-    public String getDescription() {
-        return this._description;
-    }
+	private short _varType = 0;
 
-    public void setDescription(final String description) {
-        this._description = description;
-    }
+	public String getDescription() {
+		return this._description;
+	}
 
-    public int getId() {
-        return this._id;
-    }
+	public void setDescription(final String description) {
+		this._description = description;
+	}
 
-    public void setId(final int id) {
-        this._id = id;
-    }
+	public int getId() {
+		return this._id;
+	}
 
-    public short getVarType() {
-        return this._varType;
-    }
+	public void setId(final int id) {
+		this._id = id;
+	}
 
-    public void setVarType(final short varType) {
-        this._varType = varType;
-    }
+	public short getVarType() {
+		return this._varType;
+	}
+
+	public void setVarType(final short varType) {
+		this._varType = varType;
+	}
+
 }

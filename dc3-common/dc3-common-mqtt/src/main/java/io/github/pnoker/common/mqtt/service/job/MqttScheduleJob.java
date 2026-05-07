@@ -36,9 +36,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * MQTT Schedule Job
  * <p>
- * Quartz job for processing MQTT messages in batch mode.
- * Manages message counting, speed calculation, and batch processing
- * of MQTT messages with thread-safe operations.
+ * Quartz job for processing MQTT messages in batch mode. Manages message counting, speed
+ * calculation, and batch processing of MQTT messages with thread-safe operations.
  * </p>
  *
  * @author pnoker
@@ -49,70 +48,74 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class MqttScheduleJob extends QuartzJobBean {
 
-    public static final ReentrantReadWriteLock messageLock = new ReentrantReadWriteLock();
-    public static final AtomicLong messageCount = new AtomicLong(0);
-    public static final AtomicLong messageSpeed = new AtomicLong(0);
-    private static final List<MqttMessage> mqttMessages = new ArrayList<>();
+	public static final ReentrantReadWriteLock messageLock = new ReentrantReadWriteLock();
 
-    @Value("${driver.mqtt.batch.speed}")
-    private Integer batchSpeed;
-    @Value("${driver.mqtt.batch.interval}")
-    private Integer interval;
+	public static final AtomicLong messageCount = new AtomicLong(0);
 
-    @Resource
-    private MqttReceiveService mqttReceiveService;
-    @Resource
-    private ExecutorService virtualThreadExecutor;
+	public static final AtomicLong messageSpeed = new AtomicLong(0);
 
-    /**
-     * Get MqttMessage list size
-     *
-     * @return message size
-     */
-    public static int getMqttMessagesSize() {
-        return mqttMessages.size();
-    }
+	private static final List<MqttMessage> mqttMessages = new ArrayList<>();
 
-    /**
-     * Clear MqttMessage list
-     */
-    public static void clearMqttMessages() {
-        mqttMessages.clear();
-    }
+	@Value("${driver.mqtt.batch.speed}")
+	private Integer batchSpeed;
 
-    /**
-     * Add MqttMessage to list
-     *
-     * @param mqttMessage MqttMessage
-     */
-    public static void addMqttMessages(MqttMessage mqttMessage) {
-        mqttMessages.add(mqttMessage);
-    }
+	@Value("${driver.mqtt.batch.interval}")
+	private Integer interval;
 
-    @Override
-    /**
-     * Execute scheduled job for batch MQTT message processing
-     *
-     * @param context Job execution context
-     * @throws JobExecutionException if job execution fails
-     */
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // Calculate MQTT message receive rate
-        long speed = messageCount.getAndSet(0);
-        messageSpeed.set(speed);
-        speed /= interval;
-        if (speed >= batchSpeed) {
-            log.debug("Mqtt message receiver speed: {} /s, value size: {}, interval: {}", speed, getMqttMessagesSize(), interval);
-        }
+	@Resource
+	private MqttReceiveService mqttReceiveService;
 
-        // Process batch MQTT messages
-        virtualThreadExecutor.execute(() -> {
-            messageLock.writeLock().lock();
-            if (!mqttMessages.isEmpty()) {
-                mqttReceiveService.receiveValues(mqttMessages);
-                clearMqttMessages();
-            }
-            messageLock.writeLock().unlock();
-        });
-    }
+	@Resource
+	private ExecutorService virtualThreadExecutor;
+
+	/**
+	 * Get MqttMessage list size
+	 * @return message size
+	 */
+	public static int getMqttMessagesSize() {
+		return mqttMessages.size();
+	}
+
+	/**
+	 * Clear MqttMessage list
+	 */
+	public static void clearMqttMessages() {
+		mqttMessages.clear();
+	}
+
+	/**
+	 * Add MqttMessage to list
+	 * @param mqttMessage MqttMessage
+	 */
+	public static void addMqttMessages(MqttMessage mqttMessage) {
+		mqttMessages.add(mqttMessage);
+	}
+
+	@Override
+	/**
+	 * Execute scheduled job for batch MQTT message processing
+	 * @param context Job execution context
+	 * @throws JobExecutionException if job execution fails
+	 */
+	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+		// Calculate MQTT message receive rate
+		long speed = messageCount.getAndSet(0);
+		messageSpeed.set(speed);
+		speed /= interval;
+		if (speed >= batchSpeed) {
+			log.debug("Mqtt message receiver speed: {} /s, value size: {}, interval: {}", speed, getMqttMessagesSize(),
+					interval);
+		}
+
+		// Process batch MQTT messages
+		virtualThreadExecutor.execute(() -> {
+			messageLock.writeLock().lock();
+			if (!mqttMessages.isEmpty()) {
+				mqttReceiveService.receiveValues(mqttMessages);
+				clearMqttMessages();
+			}
+			messageLock.writeLock().unlock();
+		});
+	}
+
 }

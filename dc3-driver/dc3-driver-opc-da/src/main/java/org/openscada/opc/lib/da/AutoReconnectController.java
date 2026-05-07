@@ -25,159 +25,167 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 public class AutoReconnectController implements ServerConnectionStateListener {
 
-    private static final int DEFAULT_DELAY = 5 * 1000;
-    private final Server _server;
-    private final Set<AutoReconnectListener> _listeners = new CopyOnWriteArraySet<AutoReconnectListener>();
-    private int _delay;
-    private AutoReconnectState _state = AutoReconnectState.DISABLED;
+	private static final int DEFAULT_DELAY = 5 * 1000;
 
-    private Thread _connectTask = null;
+	private final Server _server;
 
-    public AutoReconnectController(final Server server) {
-        this(server, DEFAULT_DELAY);
-    }
+	private final Set<AutoReconnectListener> _listeners = new CopyOnWriteArraySet<AutoReconnectListener>();
 
-    public AutoReconnectController(final Server server, final int delay) {
-        super();
-        setDelay(delay);
+	private int _delay;
 
-        this._server = server;
-        this._server.addStateListener(this);
-    }
+	private AutoReconnectState _state = AutoReconnectState.DISABLED;
 
-    public void addListener(final AutoReconnectListener listener) {
-        if (listener != null) {
-            this._listeners.add(listener);
-            listener.stateChanged(this._state);
-        }
-    }
+	private Thread _connectTask = null;
 
-    public void removeListener(final AutoReconnectListener listener) {
-        this._listeners.remove(listener);
-    }
+	public AutoReconnectController(final Server server) {
+		this(server, DEFAULT_DELAY);
+	}
 
-    protected void notifyStateChange(final AutoReconnectState state) {
-        this._state = state;
-        for (AutoReconnectListener listener : this._listeners) {
-            listener.stateChanged(state);
-        }
-    }
+	public AutoReconnectController(final Server server, final int delay) {
+		super();
+		setDelay(delay);
 
-    public int getDelay() {
-        return this._delay;
-    }
+		this._server = server;
+		this._server.addStateListener(this);
+	}
 
-    /**
-     * Set the reconnect delay. If the delay less than or equal to zero it will be
-     * the default delay time.
-     *
-     * @param delay The delay to use
-     */
-    public void setDelay(int delay) {
-        if (delay <= 0) {
-            delay = DEFAULT_DELAY;
-        }
-        this._delay = delay;
-    }
+	public void addListener(final AutoReconnectListener listener) {
+		if (listener != null) {
+			this._listeners.add(listener);
+			listener.stateChanged(this._state);
+		}
+	}
 
-    public synchronized void connect() {
-        if (isRequested()) {
-            return;
-        }
+	public void removeListener(final AutoReconnectListener listener) {
+		this._listeners.remove(listener);
+	}
 
-        log.debug("Requesting connection");
-        notifyStateChange(AutoReconnectState.DISCONNECTED);
+	protected void notifyStateChange(final AutoReconnectState state) {
+		this._state = state;
+		for (AutoReconnectListener listener : this._listeners) {
+			listener.stateChanged(state);
+		}
+	}
 
-        triggerReconnect(false);
-    }
+	public int getDelay() {
+		return this._delay;
+	}
 
-    public synchronized void disconnect() {
-        if (!isRequested()) {
-            return;
-        }
+	/**
+	 * Set the reconnect delay. If the delay less than or equal to zero it will be the
+	 * default delay time.
+	 * @param delay The delay to use
+	 */
+	public void setDelay(int delay) {
+		if (delay <= 0) {
+			delay = DEFAULT_DELAY;
+		}
+		this._delay = delay;
+	}
 
-        log.debug("Un-Requesting connection");
+	public synchronized void connect() {
+		if (isRequested()) {
+			return;
+		}
 
-        notifyStateChange(AutoReconnectState.DISABLED);
-        this._server.disconnect();
-    }
+		log.debug("Requesting connection");
+		notifyStateChange(AutoReconnectState.DISCONNECTED);
 
-    public boolean isRequested() {
-        return this._state != AutoReconnectState.DISABLED;
-    }
+		triggerReconnect(false);
+	}
 
-    public synchronized void connectionStateChanged(final boolean connected) {
-        log.debug("Connection state changed: " + connected);
+	public synchronized void disconnect() {
+		if (!isRequested()) {
+			return;
+		}
 
-        if (!connected) {
-            if (isRequested()) {
-                notifyStateChange(AutoReconnectState.DISCONNECTED);
-                triggerReconnect(true);
-            }
-        } else {
-            if (!isRequested()) {
-                this._server.disconnect();
-            } else {
-                notifyStateChange(AutoReconnectState.CONNECTED);
-            }
-        }
-    }
+		log.debug("Un-Requesting connection");
 
-    private synchronized void triggerReconnect(final boolean wait) {
-        if (this._connectTask != null) {
-            log.info("Connect thread already running");
-            return;
-        }
+		notifyStateChange(AutoReconnectState.DISABLED);
+		this._server.disconnect();
+	}
 
-        log.debug("Trigger reconnect");
+	public boolean isRequested() {
+		return this._state != AutoReconnectState.DISABLED;
+	}
 
-        this._connectTask = new Thread(new Runnable() {
+	public synchronized void connectionStateChanged(final boolean connected) {
+		log.debug("Connection state changed: " + connected);
 
-            public void run() {
-                boolean result = false;
-                try {
-                    result = performReconnect(wait);
-                } finally {
-                    AutoReconnectController.this._connectTask = null;
-                    log.debug(String.format("performReconnect completed : %s", result));
-                    if (!result) {
-                        triggerReconnect(true);
-                    }
-                }
-            }
-        }, "OPCReconnectThread");
-        this._connectTask.setDaemon(true);
-        this._connectTask.start();
-    }
+		if (!connected) {
+			if (isRequested()) {
+				notifyStateChange(AutoReconnectState.DISCONNECTED);
+				triggerReconnect(true);
+			}
+		}
+		else {
+			if (!isRequested()) {
+				this._server.disconnect();
+			}
+			else {
+				notifyStateChange(AutoReconnectState.CONNECTED);
+			}
+		}
+	}
 
-    private boolean performReconnect(final boolean wait) {
-        try {
-            if (wait) {
-                notifyStateChange(AutoReconnectState.WAITING);
-                log.debug(String.format("Delaying (%s)...", this._delay));
-                Thread.sleep(this._delay);
-            }
-        } catch (InterruptedException e) {
-        }
+	private synchronized void triggerReconnect(final boolean wait) {
+		if (this._connectTask != null) {
+			log.info("Connect thread already running");
+			return;
+		}
 
-        if (!isRequested()) {
-            log.debug("Request canceled during delay");
-            return true;
-        }
+		log.debug("Trigger reconnect");
 
-        try {
-            log.debug("Connecting to server");
-            notifyStateChange(AutoReconnectState.CONNECTING);
-            synchronized (this) {
-                this._server.connect();
-                return true;
-            }
-            // CONNECTED state will be set by server callback
-        } catch (Throwable e) {
-            log.info("Re-connect failed", e);
-            notifyStateChange(AutoReconnectState.DISCONNECTED);
-            return false;
-        }
-    }
+		this._connectTask = new Thread(new Runnable() {
+
+			public void run() {
+				boolean result = false;
+				try {
+					result = performReconnect(wait);
+				}
+				finally {
+					AutoReconnectController.this._connectTask = null;
+					log.debug(String.format("performReconnect completed : %s", result));
+					if (!result) {
+						triggerReconnect(true);
+					}
+				}
+			}
+		}, "OPCReconnectThread");
+		this._connectTask.setDaemon(true);
+		this._connectTask.start();
+	}
+
+	private boolean performReconnect(final boolean wait) {
+		try {
+			if (wait) {
+				notifyStateChange(AutoReconnectState.WAITING);
+				log.debug(String.format("Delaying (%s)...", this._delay));
+				Thread.sleep(this._delay);
+			}
+		}
+		catch (InterruptedException e) {
+		}
+
+		if (!isRequested()) {
+			log.debug("Request canceled during delay");
+			return true;
+		}
+
+		try {
+			log.debug("Connecting to server");
+			notifyStateChange(AutoReconnectState.CONNECTING);
+			synchronized (this) {
+				this._server.connect();
+				return true;
+			}
+			// CONNECTED state will be set by server callback
+		}
+		catch (Throwable e) {
+			log.info("Re-connect failed", e);
+			notifyStateChange(AutoReconnectState.DISCONNECTED);
+			return false;
+		}
+	}
 
 }

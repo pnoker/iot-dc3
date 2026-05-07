@@ -24,9 +24,8 @@ import java.util.function.Consumer;
 /**
  * Custom String Optional Class
  * <p>
- * Optional wrapper class for string operations.
- * Provides utility methods for null safety and empty checks
- * with consumer-based conditional operations.
+ * Optional wrapper class for string operations. Provides utility methods for null safety
+ * and empty checks with consumer-based conditional operations.
  * </p>
  *
  * @author pnoker
@@ -35,27 +34,29 @@ import java.util.function.Consumer;
  */
 public final class StringOptional {
 
-    private final String value;
+	private final String value;
 
-    private StringOptional(String value) {
-        this.value = value;
-    }
+	private StringOptional(String value) {
+		this.value = value;
+	}
 
-    public static StringOptional ofNullable(String value) {
-        return new StringOptional(value);
-    }
+	public static StringOptional ofNullable(String value) {
+		return new StringOptional(value);
+	}
 
-    public void ifPresent(Consumer<String> action) {
-        if (StringUtils.isNotEmpty(value)) {
-            action.accept(value);
-        }
-    }
+	public void ifPresent(Consumer<String> action) {
+		if (StringUtils.isNotEmpty(value)) {
+			action.accept(value);
+		}
+	}
 
-    public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
-        if (StringUtils.isNotEmpty(value)) {
-            action.accept(value);
-        } else {
-            emptyAction.run();
-        }
-    }
+	public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
+		if (StringUtils.isNotEmpty(value)) {
+			action.accept(value);
+		}
+		else {
+			emptyAction.run();
+		}
+	}
+
 }

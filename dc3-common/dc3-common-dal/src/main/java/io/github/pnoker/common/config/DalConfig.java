@@ -25,8 +25,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Data access layer (DAL) auto-configuration.
  * <p>
- * Responsible for scanning DAL components (services, managers, builders, etc.)
- * and MyBatis mapper interfaces under the {@code io.github.pnoker.common.dal} package.
+ * Responsible for scanning DAL components (services, managers, builders, etc.) and
+ * MyBatis mapper interfaces under the {@code io.github.pnoker.common.dal} package.
  * </p>
  *
  * @author pnoker
@@ -35,11 +35,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.dal"
-})
-@MapperScan(basePackages = {
-        "io.github.pnoker.common.dal.mapper"
-})
+@ComponentScan(basePackages = { "io.github.pnoker.common.dal" })
+@MapperScan(basePackages = { "io.github.pnoker.common.dal.mapper" })
 public class DalConfig {
+
 }

@@ -34,71 +34,74 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum MetadataOperateTypeEnum {
-    /**
-     * Add
-     */
-    ADD((byte) 0, "add", "Add"),
 
-    /**
-     * Delete
-     */
-    DELETE((byte) 1, "delete", "Delete"),
+	/**
+	 * Add
+	 */
+	ADD((byte) 0, "add", "Add"),
 
-    /**
-     * Update
-     */
-    UPDATE((byte) 2, "update", "Update"),
-    ;
+	/**
+	 * Delete
+	 */
+	DELETE((byte) 1, "delete", "Delete"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Update
+	 */
+	UPDATE((byte) 2, "update", "Update"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link MetadataOperateTypeEnum}
-     */
-    public static MetadataOperateTypeEnum ofIndex(Byte index) {
-        Optional<MetadataOperateTypeEnum> any = Arrays.stream(MetadataOperateTypeEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link MetadataOperateTypeEnum}
-     */
-    public static MetadataOperateTypeEnum ofCode(String code) {
-        Optional<MetadataOperateTypeEnum> any = Arrays.stream(MetadataOperateTypeEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link MetadataOperateTypeEnum}
+	 */
+	public static MetadataOperateTypeEnum ofIndex(Byte index) {
+		Optional<MetadataOperateTypeEnum> any = Arrays.stream(MetadataOperateTypeEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link MetadataOperateTypeEnum}
-     */
-    public static MetadataOperateTypeEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link MetadataOperateTypeEnum}
+	 */
+	public static MetadataOperateTypeEnum ofCode(String code) {
+		Optional<MetadataOperateTypeEnum> any = Arrays.stream(MetadataOperateTypeEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link MetadataOperateTypeEnum}
+	 */
+	public static MetadataOperateTypeEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

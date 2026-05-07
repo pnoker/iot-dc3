@@ -30,50 +30,52 @@ import io.github.pnoker.driver.api.S7Type;
 
 public final class StringConverter implements S7Serializable {
 
-    private static final int OFFSET_CURRENT_LENGTH = 1;
-    private static final int OFFSET_OVERALL_LENGTH = 0;
-    private static final int OFFSET_START = 2;
+	private static final int OFFSET_CURRENT_LENGTH = 1;
 
-    @Override
-    public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
-        final int len = buffer[byteOffset + OFFSET_CURRENT_LENGTH] & 0xFF;
+	private static final int OFFSET_OVERALL_LENGTH = 0;
 
-        return targetClass.cast(new String(buffer, byteOffset + OFFSET_START, len));
-    }
+	private static final int OFFSET_START = 2;
 
-    @Override
-    public S7Type getS7Type() {
-        return S7Type.STRING;
-    }
+	@Override
+	public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
+		final int len = buffer[byteOffset + OFFSET_CURRENT_LENGTH] & 0xFF;
 
-    @Override
-    public int getSizeInBits() {
-        // Not static
-        return 0;
-    }
+		return targetClass.cast(new String(buffer, byteOffset + OFFSET_START, len));
+	}
 
-    @Override
-    public int getSizeInBytes() {
-        // Not static
-        return 2; // 2 bytes overhead
-    }
+	@Override
+	public S7Type getS7Type() {
+		return S7Type.STRING;
+	}
 
-    @Override
-    public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
-                       final int size) {
-        final String value = (String) javaType;
+	@Override
+	public int getSizeInBits() {
+		// Not static
+		return 0;
+	}
 
-        final int len = value.length();
+	@Override
+	public int getSizeInBytes() {
+		// Not static
+		return 2; // 2 bytes overhead
+	}
 
-        if (len > size) {
-            throw new IllegalArgumentException("String to big: " + len);
-        }
+	@Override
+	public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
+			final int size) {
+		final String value = (String) javaType;
 
-        buffer[byteOffset + OFFSET_OVERALL_LENGTH] = (byte) size;
-        buffer[byteOffset + OFFSET_CURRENT_LENGTH] = (byte) len;
+		final int len = value.length();
 
-        final byte[] strBytes = DecodeUtil.stringToByte(value);
-        System.arraycopy(strBytes, 0, buffer, byteOffset + OFFSET_START, len);
-    }
+		if (len > size) {
+			throw new IllegalArgumentException("String to big: " + len);
+		}
+
+		buffer[byteOffset + OFFSET_OVERALL_LENGTH] = (byte) size;
+		buffer[byteOffset + OFFSET_CURRENT_LENGTH] = (byte) len;
+
+		final byte[] strBytes = DecodeUtil.stringToByte(value);
+		System.arraycopy(strBytes, 0, buffer, byteOffset + OFFSET_START, len);
+	}
 
 }

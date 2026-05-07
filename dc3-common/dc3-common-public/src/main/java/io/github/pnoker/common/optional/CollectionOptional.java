@@ -25,9 +25,8 @@ import java.util.function.Consumer;
 /**
  * Custom Collection Optional Class
  * <p>
- * Optional wrapper class for collection operations.
- * Provides utility methods for conditional operations
- * on collections with null safety and empty checks.
+ * Optional wrapper class for collection operations. Provides utility methods for
+ * conditional operations on collections with null safety and empty checks.
  * </p>
  *
  * @author pnoker
@@ -36,27 +35,29 @@ import java.util.function.Consumer;
  */
 public final class CollectionOptional<T> {
 
-    private final Collection<T> value;
+	private final Collection<T> value;
 
-    private CollectionOptional(Collection<T> value) {
-        this.value = value;
-    }
+	private CollectionOptional(Collection<T> value) {
+		this.value = value;
+	}
 
-    public static <T> CollectionOptional<T> ofNullable(Collection<T> value) {
-        return new CollectionOptional<>(value);
-    }
+	public static <T> CollectionOptional<T> ofNullable(Collection<T> value) {
+		return new CollectionOptional<>(value);
+	}
 
-    public void ifPresent(Consumer<Collection<T>> action) {
-        if (CollectionUtils.isNotEmpty(value)) {
-            action.accept(value);
-        }
-    }
+	public void ifPresent(Consumer<Collection<T>> action) {
+		if (CollectionUtils.isNotEmpty(value)) {
+			action.accept(value);
+		}
+	}
 
-    public void ifPresentOrElse(Consumer<Collection<?>> action, Runnable emptyAction) {
-        if (CollectionUtils.isNotEmpty(value)) {
-            action.accept(value);
-        } else {
-            emptyAction.run();
-        }
-    }
+	public void ifPresentOrElse(Consumer<Collection<?>> action, Runnable emptyAction) {
+		if (CollectionUtils.isNotEmpty(value)) {
+			action.accept(value);
+		}
+		else {
+			emptyAction.run();
+		}
+	}
+
 }

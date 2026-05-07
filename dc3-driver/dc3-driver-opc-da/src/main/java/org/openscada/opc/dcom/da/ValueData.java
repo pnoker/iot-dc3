@@ -22,33 +22,35 @@ import org.jinterop.dcom.core.JIVariant;
 import java.util.Calendar;
 
 public class ValueData {
-    private JIVariant value;
 
-    private short quality;
+	private JIVariant value;
 
-    private Calendar timestamp;
+	private short quality;
 
-    public short getQuality() {
-        return this.quality;
-    }
+	private Calendar timestamp;
 
-    public void setQuality(final short quality) {
-        this.quality = quality;
-    }
+	public short getQuality() {
+		return this.quality;
+	}
 
-    public Calendar getTimestamp() {
-        return this.timestamp;
-    }
+	public void setQuality(final short quality) {
+		this.quality = quality;
+	}
 
-    public void setTimestamp(final Calendar timestamp) {
-        this.timestamp = timestamp;
-    }
+	public Calendar getTimestamp() {
+		return this.timestamp;
+	}
 
-    public JIVariant getValue() {
-        return this.value;
-    }
+	public void setTimestamp(final Calendar timestamp) {
+		this.timestamp = timestamp;
+	}
 
-    public void setValue(final JIVariant value) {
-        this.value = value;
-    }
+	public JIVariant getValue() {
+		return this.value;
+	}
+
+	public void setValue(final JIVariant value) {
+		this.value = value;
+	}
+
 }

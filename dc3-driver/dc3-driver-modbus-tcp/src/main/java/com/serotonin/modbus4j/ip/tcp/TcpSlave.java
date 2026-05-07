@@ -38,150 +38,173 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * <p>TcpSlave class.</p>
+ * <p>
+ * TcpSlave class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class TcpSlave extends ModbusSlaveSet {
-    final boolean encapsulated;
-    final ExecutorService executorService;
-    final List<TcpConnectionHandler> listConnections = new ArrayList<>();
-    // Configuration fields
-    private final int port;
-    // Runtime fields.
-    private ServerSocket serverSocket;
 
-    /**
-     * <p>Constructor for TcpSlave.</p>
-     *
-     * @param encapsulated a boolean.
-     */
-    public TcpSlave(boolean encapsulated) {
-        this(ModbusUtils.TCP_PORT, encapsulated);
-    }
+	final boolean encapsulated;
 
-    /**
-     * <p>Constructor for TcpSlave.</p>
-     *
-     * @param port         a int.
-     * @param encapsulated a boolean.
-     */
-    public TcpSlave(int port, boolean encapsulated) {
-        this.port = port;
-        this.encapsulated = encapsulated;
-        executorService = Executors.newCachedThreadPool();
-    }
+	final ExecutorService executorService;
 
-    @Override
-    public void start() throws ModbusInitException {
-        try {
-            serverSocket = new ServerSocket(port);
+	final List<TcpConnectionHandler> listConnections = new ArrayList<>();
 
-            Socket socket;
-            while (true) {
-                socket = serverSocket.accept();
-                TcpConnectionHandler handler = new TcpConnectionHandler(socket);
-                executorService.execute(handler);
-                synchronized (listConnections) {
-                    listConnections.add(handler);
-                }
-            }
-        } catch (IOException e) {
-            throw new ModbusInitException(e);
-        }
-    }
+	// Configuration fields
+	private final int port;
 
-    @Override
-    public void stop() {
-        // Close the socket first to prevent new messages.
-        try {
-            serverSocket.close();
-        } catch (IOException e) {
-            getExceptionHandler().receivedException(e);
-        }
+	// Runtime fields.
+	private ServerSocket serverSocket;
 
-        // Close all open connections.
-        synchronized (listConnections) {
-            for (TcpConnectionHandler tch : listConnections)
-                tch.kill();
-            listConnections.clear();
-        }
+	/**
+	 * <p>
+	 * Constructor for TcpSlave.
+	 * </p>
+	 * @param encapsulated a boolean.
+	 */
+	public TcpSlave(boolean encapsulated) {
+		this(ModbusUtils.TCP_PORT, encapsulated);
+	}
 
-        // Now close the executor service.
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(3, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            getExceptionHandler().receivedException(e);
-        }
-    }
+	/**
+	 * <p>
+	 * Constructor for TcpSlave.
+	 * </p>
+	 * @param port a int.
+	 * @param encapsulated a boolean.
+	 */
+	public TcpSlave(int port, boolean encapsulated) {
+		this.port = port;
+		this.encapsulated = encapsulated;
+		executorService = Executors.newCachedThreadPool();
+	}
 
-    class TcpConnectionHandler implements Runnable {
-        private final Socket socket;
-        private TestableTransport transport;
-        private MessageControl conn;
+	@Override
+	public void start() throws ModbusInitException {
+		try {
+			serverSocket = new ServerSocket(port);
 
-        TcpConnectionHandler(Socket socket) throws ModbusInitException {
-            this.socket = socket;
-            try {
-                transport = new TestableTransport(socket.getInputStream(), socket.getOutputStream());
-            } catch (IOException e) {
-                throw new ModbusInitException(e);
-            }
-        }
+			Socket socket;
+			while (true) {
+				socket = serverSocket.accept();
+				TcpConnectionHandler handler = new TcpConnectionHandler(socket);
+				executorService.execute(handler);
+				synchronized (listConnections) {
+					listConnections.add(handler);
+				}
+			}
+		}
+		catch (IOException e) {
+			throw new ModbusInitException(e);
+		}
+	}
 
-        @Override
-        public void run() {
-            BaseMessageParser messageParser;
-            BaseRequestHandler requestHandler;
+	@Override
+	public void stop() {
+		// Close the socket first to prevent new messages.
+		try {
+			serverSocket.close();
+		}
+		catch (IOException e) {
+			getExceptionHandler().receivedException(e);
+		}
 
-            if (encapsulated) {
-                messageParser = new EncapMessageParser(false);
-                requestHandler = new EncapRequestHandler(TcpSlave.this);
-            } else {
-                messageParser = new XaMessageParser(false);
-                requestHandler = new XaRequestHandler(TcpSlave.this);
-            }
+		// Close all open connections.
+		synchronized (listConnections) {
+			for (TcpConnectionHandler tch : listConnections)
+				tch.kill();
+			listConnections.clear();
+		}
 
-            conn = new MessageControl();
-            conn.setExceptionHandler(getExceptionHandler());
+		// Now close the executor service.
+		executorService.shutdown();
+		try {
+			executorService.awaitTermination(3, TimeUnit.SECONDS);
+		}
+		catch (InterruptedException e) {
+			getExceptionHandler().receivedException(e);
+		}
+	}
 
-            try {
-                conn.start(transport, messageParser, requestHandler, null);
-                executorService.execute(transport);
-            } catch (IOException e) {
-                getExceptionHandler().receivedException(new ModbusInitException(e));
-            }
+	class TcpConnectionHandler implements Runnable {
 
-            // Monitor the socket to detect when it gets closed.
-            while (true) {
-                try {
-                    transport.testInputStream();
-                } catch (IOException e) {
-                    break;
-                }
+		private final Socket socket;
 
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    // no op
-                }
-            }
+		private TestableTransport transport;
 
-            conn.close();
-            kill();
-            synchronized (listConnections) {
-                listConnections.remove(this);
-            }
-        }
+		private MessageControl conn;
 
-        void kill() {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                getExceptionHandler().receivedException(new ModbusInitException(e));
-            }
-        }
-    }
+		TcpConnectionHandler(Socket socket) throws ModbusInitException {
+			this.socket = socket;
+			try {
+				transport = new TestableTransport(socket.getInputStream(), socket.getOutputStream());
+			}
+			catch (IOException e) {
+				throw new ModbusInitException(e);
+			}
+		}
+
+		@Override
+		public void run() {
+			BaseMessageParser messageParser;
+			BaseRequestHandler requestHandler;
+
+			if (encapsulated) {
+				messageParser = new EncapMessageParser(false);
+				requestHandler = new EncapRequestHandler(TcpSlave.this);
+			}
+			else {
+				messageParser = new XaMessageParser(false);
+				requestHandler = new XaRequestHandler(TcpSlave.this);
+			}
+
+			conn = new MessageControl();
+			conn.setExceptionHandler(getExceptionHandler());
+
+			try {
+				conn.start(transport, messageParser, requestHandler, null);
+				executorService.execute(transport);
+			}
+			catch (IOException e) {
+				getExceptionHandler().receivedException(new ModbusInitException(e));
+			}
+
+			// Monitor the socket to detect when it gets closed.
+			while (true) {
+				try {
+					transport.testInputStream();
+				}
+				catch (IOException e) {
+					break;
+				}
+
+				try {
+					Thread.sleep(500);
+				}
+				catch (InterruptedException e) {
+					// no op
+				}
+			}
+
+			conn.close();
+			kill();
+			synchronized (listConnections) {
+				listConnections.remove(this);
+			}
+		}
+
+		void kill() {
+			try {
+				socket.close();
+			}
+			catch (IOException e) {
+				getExceptionHandler().receivedException(new ModbusInitException(e));
+			}
+		}
+
+	}
+
 }

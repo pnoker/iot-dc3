@@ -41,30 +41,33 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface PointBuilder {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "remark", ignore = true)
-    @Mapping(target = "creatorId", ignore = true)
-    @Mapping(target = "creatorName", ignore = true)
-    @Mapping(target = "createTime", ignore = true)
-    @Mapping(target = "operatorId", ignore = true)
-    @Mapping(target = "operatorName", ignore = true)
-    @Mapping(target = "operateTime", ignore = true)
-    @Mapping(target = "pointExt", ignore = true)
-    @Mapping(target = "rwFlag", ignore = true)
-    @Mapping(target = "pointTypeFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    PointBO buildDTOByGrpcDTO(GrpcPointDTO entityGrpc);
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "remark", ignore = true)
+	@Mapping(target = "creatorId", ignore = true)
+	@Mapping(target = "creatorName", ignore = true)
+	@Mapping(target = "createTime", ignore = true)
+	@Mapping(target = "operatorId", ignore = true)
+	@Mapping(target = "operatorName", ignore = true)
+	@Mapping(target = "operateTime", ignore = true)
+	@Mapping(target = "pointExt", ignore = true)
+	@Mapping(target = "rwFlag", ignore = true)
+	@Mapping(target = "pointTypeFlag", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	PointBO buildDTOByGrpcDTO(GrpcPointDTO entityGrpc);
 
-    @AfterMapping
-    default void afterProcess(GrpcPointDTO entityGrpc, @MappingTarget PointBO entityBO) {
-        GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
+	@AfterMapping
+	default void afterProcess(GrpcPointDTO entityGrpc, @MappingTarget PointBO entityBO) {
+		GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
 
-        JsonOptional.ofNullable(entityGrpc.getPointExt()).ifPresent(value -> entityBO.setPointExt(JsonUtil.parseObject(value, PointExt.class)));
-        Optional.ofNullable(RwFlagEnum.ofIndex((byte) entityGrpc.getRwFlag())).ifPresent(entityBO::setRwFlag);
-        Optional.ofNullable(PointTypeFlagEnum.ofIndex((byte) entityGrpc.getPointTypeFlag())).ifPresent(entityBO::setPointTypeFlag);
-        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
-    }
+		JsonOptional.ofNullable(entityGrpc.getPointExt())
+			.ifPresent(value -> entityBO.setPointExt(JsonUtil.parseObject(value, PointExt.class)));
+		Optional.ofNullable(RwFlagEnum.ofIndex((byte) entityGrpc.getRwFlag())).ifPresent(entityBO::setRwFlag);
+		Optional.ofNullable(PointTypeFlagEnum.ofIndex((byte) entityGrpc.getPointTypeFlag()))
+			.ifPresent(entityBO::setPointTypeFlag);
+		EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
+	}
+
 }

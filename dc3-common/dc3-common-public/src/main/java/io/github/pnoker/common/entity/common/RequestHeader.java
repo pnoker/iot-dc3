@@ -26,9 +26,9 @@ import lombok.Setter;
 /**
  * Request Header Configuration Class
  * <p>
- * Configuration class for HTTP request headers in IoT DC3 platform.
- * Contains static inner classes for token and user headers
- * with authentication and user identification information.
+ * Configuration class for HTTP request headers in IoT DC3 platform. Contains static inner
+ * classes for token and user headers with authentication and user identification
+ * information.
  * </p>
  *
  * @author pnoker
@@ -39,51 +39,54 @@ import lombok.Setter;
 @Setter
 public class RequestHeader {
 
-    private RequestHeader() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private RequestHeader() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class TokenHeader {
-        /**
-         * Salt value for token encryption
-         */
-        private String salt;
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class TokenHeader {
 
-        /**
-         * JWT token string
-         */
-        private String token;
-    }
+		/**
+		 * Salt value for token encryption
+		 */
+		private String salt;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserHeader {
+		/**
+		 * JWT token string
+		 */
+		private String token;
 
-        /**
-         * User ID for identification
-         */
-        private Long userId;
+	}
 
-        /**
-         * User nickname or alias
-         */
-        private String nickName;
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class UserHeader {
 
-        /**
-         * User account name
-         */
-        private String userName;
+		/**
+		 * User ID for identification
+		 */
+		private Long userId;
 
-        /**
-         * Tenant ID for multi-tenant isolation
-         */
-        private Long tenantId;
-    }
+		/**
+		 * User nickname or alias
+		 */
+		private String nickName;
+
+		/**
+		 * User account name
+		 */
+		private String userName;
+
+		/**
+		 * Tenant ID for multi-tenant isolation
+		 */
+		private Long tenantId;
+
+	}
 
 }

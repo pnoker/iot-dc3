@@ -25,11 +25,11 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * Converts between {@code dc3-common-facade-api} shapes and the protobuf types
- * generated from {@code api/center/data/point_value.proto}.
+ * Converts between {@code dc3-common-facade-api} shapes and the protobuf types generated
+ * from {@code api/center/data/point_value.proto}.
  * <p>
- * Hand-rolled rather than MapStruct because protobuf builders expose dozens of
- * generated accessors that would each need an explicit ignore mapping.
+ * Hand-rolled rather than MapStruct because protobuf builders expose dozens of generated
+ * accessors that would each need an explicit ignore mapping.
  *
  * @author pnoker
  * @since 2026.5.5
@@ -37,30 +37,28 @@ import java.util.Objects;
 @Component
 public class FacadeGrpcPointValueBuilder {
 
-    /**
-     * Convert a gRPC {@link GrpcPointValueDTO} to a facade-level BO.
-     *
-     * @param dto the gRPC DTO (may be {@code null})
-     * @return the facade BO, or {@code null} when the input is {@code null}
-     */
-    public FacadePointValueBO toFacadeBO(GrpcPointValueDTO dto) {
-        if (Objects.isNull(dto)) {
-            return null;
-        }
+	/**
+	 * Convert a gRPC {@link GrpcPointValueDTO} to a facade-level BO.
+	 * @param dto the gRPC DTO (may be {@code null})
+	 * @return the facade BO, or {@code null} when the input is {@code null}
+	 */
+	public FacadePointValueBO toFacadeBO(GrpcPointValueDTO dto) {
+		if (Objects.isNull(dto)) {
+			return null;
+		}
 
-        FacadePointValueBO bo = FacadePointValueBO.builder()
-                .createTime(dto.getCreateTime())
-                .build();
+		FacadePointValueBO bo = FacadePointValueBO.builder().createTime(dto.getCreateTime()).build();
 
-        if (dto.getDeviceId() > 0) {
-            bo.setDeviceId(dto.getDeviceId());
-        }
-        if (dto.getPointId() > 0) {
-            bo.setPointId(dto.getPointId());
-        }
-        StringOptional.ofNullable(dto.getValue()).ifPresent(bo::setValue);
-        StringOptional.ofNullable(dto.getRawValue()).ifPresent(bo::setRawValue);
+		if (dto.getDeviceId() > 0) {
+			bo.setDeviceId(dto.getDeviceId());
+		}
+		if (dto.getPointId() > 0) {
+			bo.setPointId(dto.getPointId());
+		}
+		StringOptional.ofNullable(dto.getValue()).ifPresent(bo::setValue);
+		StringOptional.ofNullable(dto.getRawValue()).ifPresent(bo::setRawValue);
 
-        return bo;
-    }
+		return bo;
+	}
+
 }

@@ -23,8 +23,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Manager Center Service Application
  * <p>
- * Main entry point for Manager Center Service.
- * This service handles device management, driver management, and system configuration.
+ * Main entry point for Manager Center Service. This service handles device management,
+ * driver management, and system configuration.
  * </p>
  *
  * @author pnoker
@@ -34,12 +34,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ManagerApplication {
 
-    /**
-     * Main entry point for the Manager Center Service.
-     *
-     * @param args command line arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(ManagerApplication.class, args);
-    }
+	/**
+	 * Main entry point for the Manager Center Service.
+	 * @param args command line arguments
+	 */
+	public static void main(String[] args) {
+		SpringApplication.run(ManagerApplication.class, args);
+	}
+
 }

@@ -20,22 +20,22 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class RepositoryException extends RuntimeException {
-    public RepositoryException() {
-        this(null);
-    }
 
-    public RepositoryException(Throwable cause) {
-        super(cause);
-    }
+	public RepositoryException() {
+		this(null);
+	}
 
-    public RepositoryException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public RepositoryException(Throwable cause) {
+		super(cause);
+	}
+
+	public RepositoryException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

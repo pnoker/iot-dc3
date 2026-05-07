@@ -31,27 +31,29 @@ import java.util.function.LongConsumer;
  */
 public final class LongOptional {
 
-    private final Long value;
+	private final Long value;
 
-    private LongOptional(Long value) {
-        this.value = value;
-    }
+	private LongOptional(Long value) {
+		this.value = value;
+	}
 
-    public static LongOptional ofNullable(Long value) {
-        return new LongOptional(value);
-    }
+	public static LongOptional ofNullable(Long value) {
+		return new LongOptional(value);
+	}
 
-    public void ifPresent(LongConsumer action) {
-        if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
-            action.accept(value);
-        }
-    }
+	public void ifPresent(LongConsumer action) {
+		if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
+			action.accept(value);
+		}
+	}
 
-    public void ifPresentOrElse(LongConsumer action, Runnable emptyAction) {
-        if (value > DefaultConstant.ZERO) {
-            action.accept(value);
-        } else {
-            emptyAction.run();
-        }
-    }
+	public void ifPresentOrElse(LongConsumer action, Runnable emptyAction) {
+		if (value > DefaultConstant.ZERO) {
+			action.accept(value);
+		}
+		else {
+			emptyAction.run();
+		}
+	}
+
 }

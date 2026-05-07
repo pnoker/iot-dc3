@@ -21,22 +21,26 @@ import java.io.IOException;
 import java.io.Serial;
 
 /**
- * <p>TimeoutException class.</p>
+ * <p>
+ * TimeoutException class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class TimeoutException extends IOException {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * <p>Constructor for TimeoutException.</p>
-     *
-     * @param message a {@link String} object.
-     */
-    public TimeoutException(String message) {
-        super(message);
-    }
+	/**
+	 * <p>
+	 * Constructor for TimeoutException.
+	 * </p>
+	 * @param message a {@link String} object.
+	 */
+	public TimeoutException(String message) {
+		super(message);
+	}
+
 }

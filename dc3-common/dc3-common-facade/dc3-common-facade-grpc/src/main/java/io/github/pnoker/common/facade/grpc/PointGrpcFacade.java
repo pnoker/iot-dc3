@@ -43,51 +43,46 @@ import java.util.List;
 @Component
 public class PointGrpcFacade implements PointFacade {
 
-    @Resource
-    private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
+	@Resource
+	private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcPointBuilder facadeGrpcPointBuilder;
+	@Resource
+	private FacadeGrpcPointBuilder facadeGrpcPointBuilder;
 
-    @Override
-    public FacadePointBO selectById(Long id) {
-        GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).build();
-        GrpcRPointDTO response = pointApiBlockingStub.selectById(request);
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectById");
-            return null;
-        }
-        return facadeGrpcPointBuilder.toFacadeBO(response.getData());
-    }
+	@Override
+	public FacadePointBO selectById(Long id) {
+		GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).build();
+		GrpcRPointDTO response = pointApiBlockingStub.selectById(request);
+		if (!response.getResult().getOk()) {
+			guardOrThrow(response.getResult(), "selectById");
+			return null;
+		}
+		return facadeGrpcPointBuilder.toFacadeBO(response.getData());
+	}
 
-    @Override
-    public FacadePage<FacadePointBO> selectByPage(FacadePointQuery query) {
-        GrpcPagePointQuery request = facadeGrpcPointBuilder.toGrpcPageQuery(query);
-        GrpcRPagePointDTO response = pointApiBlockingStub.selectByPage(request);
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByPage");
-            return FacadePage.empty();
-        }
+	@Override
+	public FacadePage<FacadePointBO> selectByPage(FacadePointQuery query) {
+		GrpcPagePointQuery request = facadeGrpcPointBuilder.toGrpcPageQuery(query);
+		GrpcRPagePointDTO response = pointApiBlockingStub.selectByPage(request);
+		if (!response.getResult().getOk()) {
+			guardOrThrow(response.getResult(), "selectByPage");
+			return FacadePage.empty();
+		}
 
-        GrpcPagePointDTO pageDTO = response.getData();
-        List<FacadePointBO> records = pageDTO.getDataList().stream()
-                .map(facadeGrpcPointBuilder::toFacadeBO)
-                .toList();
+		GrpcPagePointDTO pageDTO = response.getData();
+		List<FacadePointBO> records = pageDTO.getDataList().stream().map(facadeGrpcPointBuilder::toFacadeBO).toList();
 
-        return new FacadePage<>(
-                pageDTO.getPage().getCurrent(),
-                pageDTO.getPage().getSize(),
-                pageDTO.getPage().getTotal(),
-                pageDTO.getPage().getPages(),
-                records);
-    }
+		return new FacadePage<>(pageDTO.getPage().getCurrent(), pageDTO.getPage().getSize(),
+				pageDTO.getPage().getTotal(), pageDTO.getPage().getPages(), records);
+	}
 
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
-            log.debug("PointGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("PointFacade." + op + " failed: [" + code + "] " + result.getMessage());
-    }
+	private void guardOrThrow(GrpcR result, String op) {
+		String code = result.getCode();
+		if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+			log.debug("PointGrpcFacade.{} => no resource", op);
+			return;
+		}
+		throw new ServiceException("PointFacade." + op + " failed: [" + code + "] " + result.getMessage());
+	}
+
 }

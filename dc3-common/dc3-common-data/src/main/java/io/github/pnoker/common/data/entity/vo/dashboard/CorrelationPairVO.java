@@ -26,22 +26,31 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Two events that fired within a small time window of each other, enough
- * times to suggest a cascading-failure relationship. Frontend renders
- * these as a network graph (A—B edge weighted by coCount).
+ * Two events that fired within a small time window of each other, enough times to suggest
+ * a cascading-failure relationship. Frontend renders these as a network graph (A—B edge
+ * weighted by coCount).
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class CorrelationPairVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private String aSource;
-    private long aSourceId;
-    private int aEventType;
-    private String bSource;
-    private long bSourceId;
-    private int bEventType;
-    private long coCount;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private String aSource;
+
+	private long aSourceId;
+
+	private int aEventType;
+
+	private String bSource;
+
+	private long bSourceId;
+
+	private int bEventType;
+
+	private long coCount;
+
 }

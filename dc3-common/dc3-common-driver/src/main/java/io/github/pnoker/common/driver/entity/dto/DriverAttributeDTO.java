@@ -39,53 +39,54 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DriverAttributeDTO extends BaseDTO {
 
-    /**
-     * Attribute display name.
-     */
-    private String attributeName;
+	/**
+	 * Attribute display name.
+	 */
+	private String attributeName;
 
-    /**
-     * Attribute code used in configuration maps.
-     */
-    private String attributeCode;
+	/**
+	 * Attribute code used in configuration maps.
+	 */
+	private String attributeCode;
 
-    /**
-     * Attribute value type.
-     */
-    private AttributeTypeFlagEnum attributeTypeFlag;
+	/**
+	 * Attribute value type.
+	 */
+	private AttributeTypeFlagEnum attributeTypeFlag;
 
-    /**
-     * Default value used when no explicit configuration is provided.
-     */
-    private String defaultValue;
+	/**
+	 * Default value used when no explicit configuration is provided.
+	 */
+	private String defaultValue;
 
-    /**
-     * Driver ID
-     */
-    private Long driverId;
+	/**
+	 * Driver ID
+	 */
+	private Long driverId;
 
-    /**
-     * Extended attribute metadata.
-     */
-    private DriverAttributeExt attributeExt;
+	/**
+	 * Extended attribute metadata.
+	 */
+	private DriverAttributeExt attributeExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant identifier.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant identifier.
+	 */
+	private Long tenantId;
 
-    /**
-     * Data signature used for optimistic checks or synchronization.
-     */
-    private String signature;
+	/**
+	 * Data signature used for optimistic checks or synchronization.
+	 */
+	private String signature;
 
-    /**
-     * Data version.
-     */
-    private Integer version;
+	/**
+	 * Data version.
+	 */
+	private Integer version;
+
 }

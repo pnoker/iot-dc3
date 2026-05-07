@@ -21,114 +21,130 @@ import com.serotonin.modbus4j.code.ExceptionCode;
 import com.serotonin.modbus4j.locator.BaseLocator;
 
 /**
- * <p>KeyedModbusLocator class.</p>
+ * <p>
+ * KeyedModbusLocator class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class KeyedModbusLocator<K> {
-    private final K key;
-    private final BaseLocator<?> locator;
 
-    /**
-     * <p>Constructor for KeyedModbusLocator.</p>
-     *
-     * @param key     a K object.
-     * @param locator a {@link BaseLocator} object.
-     */
-    public KeyedModbusLocator(K key, BaseLocator<?> locator) {
-        this.key = key;
-        this.locator = locator;
-    }
+	private final K key;
 
-    /**
-     * <p>Getter for the field <code>key</code>.</p>
-     *
-     * @return a K object.
-     */
-    public K getKey() {
-        return key;
-    }
+	private final BaseLocator<?> locator;
 
-    /**
-     * <p>Getter for the field <code>locator</code>.</p>
-     *
-     * @return a {@link BaseLocator} object.
-     */
-    public BaseLocator<?> getLocator() {
-        return locator;
-    }
+	/**
+	 * <p>
+	 * Constructor for KeyedModbusLocator.
+	 * </p>
+	 * @param key a K object.
+	 * @param locator a {@link BaseLocator} object.
+	 */
+	public KeyedModbusLocator(K key, BaseLocator<?> locator) {
+		this.key = key;
+		this.locator = locator;
+	}
 
-    @Override
-    public String toString() {
-        return "KeyedModbusLocator(key=" + key + ", locator=" + locator + ")";
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>key</code>.
+	 * </p>
+	 * @return a K object.
+	 */
+	public K getKey() {
+		return key;
+	}
 
-    //
-    ///
-    /// Delegation.
-    ///
-    //
+	/**
+	 * <p>
+	 * Getter for the field <code>locator</code>.
+	 * </p>
+	 * @return a {@link BaseLocator} object.
+	 */
+	public BaseLocator<?> getLocator() {
+		return locator;
+	}
 
-    /**
-     * <p>getDataType.</p>
-     *
-     * @return a int.
-     */
-    public int getDataType() {
-        return locator.getDataType();
-    }
+	@Override
+	public String toString() {
+		return "KeyedModbusLocator(key=" + key + ", locator=" + locator + ")";
+	}
 
-    /**
-     * <p>getOffset.</p>
-     *
-     * @return a int.
-     */
-    public int getOffset() {
-        return locator.getOffset();
-    }
+	//
+	///
+	/// Delegation.
+	///
+	//
 
-    /**
-     * <p>getSlaveAndRange.</p>
-     *
-     * @return a {@link SlaveAndRange} object.
-     */
-    public SlaveAndRange getSlaveAndRange() {
-        return new SlaveAndRange(locator.getSlaveId(), locator.getRange());
-    }
+	/**
+	 * <p>
+	 * getDataType.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getDataType() {
+		return locator.getDataType();
+	}
 
-    /**
-     * <p>getEndOffset.</p>
-     *
-     * @return a int.
-     */
-    public int getEndOffset() {
-        return locator.getEndOffset();
-    }
+	/**
+	 * <p>
+	 * getOffset.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getOffset() {
+		return locator.getOffset();
+	}
 
-    /**
-     * <p>getRegisterCount.</p>
-     *
-     * @return a int.
-     */
-    public int getRegisterCount() {
-        return locator.getRegisterCount();
-    }
+	/**
+	 * <p>
+	 * getSlaveAndRange.
+	 * </p>
+	 * @return a {@link SlaveAndRange} object.
+	 */
+	public SlaveAndRange getSlaveAndRange() {
+		return new SlaveAndRange(locator.getSlaveId(), locator.getRange());
+	}
 
-    /**
-     * <p>bytesToValue.</p>
-     *
-     * @param data          an array of {@link byte} objects.
-     * @param requestOffset a int.
-     * @return a {@link Object} object.
-     */
-    public Object bytesToValue(byte[] data, int requestOffset) {
-        try {
-            return locator.bytesToValue(data, requestOffset);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // Some equipment will not return data lengths that we expect, which causes AIOOBEs. Catch them and convert
-            // them into illegal data address exceptions.
-            return new ExceptionResult(ExceptionCode.ILLEGAL_DATA_ADDRESS);
-        }
-    }
+	/**
+	 * <p>
+	 * getEndOffset.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getEndOffset() {
+		return locator.getEndOffset();
+	}
+
+	/**
+	 * <p>
+	 * getRegisterCount.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getRegisterCount() {
+		return locator.getRegisterCount();
+	}
+
+	/**
+	 * <p>
+	 * bytesToValue.
+	 * </p>
+	 * @param data an array of {@link byte} objects.
+	 * @param requestOffset a int.
+	 * @return a {@link Object} object.
+	 */
+	public Object bytesToValue(byte[] data, int requestOffset) {
+		try {
+			return locator.bytesToValue(data, requestOffset);
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			// Some equipment will not return data lengths that we expect, which causes
+			// AIOOBEs. Catch them and convert
+			// them into illegal data address exceptions.
+			return new ExceptionResult(ExceptionCode.ILLEGAL_DATA_ADDRESS);
+		}
+	}
+
 }

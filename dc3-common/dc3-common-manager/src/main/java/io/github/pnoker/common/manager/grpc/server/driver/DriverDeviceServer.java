@@ -55,104 +55,113 @@ import java.util.Objects;
 @Service
 public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
-    @Resource
-    private GrpcDeviceBuilder grpcDeviceBuilder;
-    @Resource
-    private GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
-    @Resource
-    private GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
+	@Resource
+	private GrpcDeviceBuilder grpcDeviceBuilder;
 
-    @Resource
-    private DeviceService deviceService;
-    @Resource
-    private PointService pointService;
-    @Resource
-    private DriverAttributeConfigService driverAttributeConfigService;
-    @Resource
-    private PointAttributeConfigService pointAttributeConfigService;
+	@Resource
+	private GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
 
-    @Override
-    public void selectByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
-        GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+	@Resource
+	private GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
 
-        DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
+	@Resource
+	private DeviceService deviceService;
 
-        Page<DeviceBO> entityPage = deviceService.selectByPage(query);
-        if (Objects.isNull(entityPage)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+	@Resource
+	private PointService pointService;
 
-            GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
-            GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(entityPage.getCurrent());
-            page.setSize(entityPage.getSize());
-            page.setPages(entityPage.getPages());
-            page.setTotal(entityPage.getTotal());
-            pageBuilder.setPage(page);
+	@Resource
+	private DriverAttributeConfigService driverAttributeConfigService;
 
-            List<GrpcRDeviceAttachDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(entityBO -> getDeviceAttachDTO(entityBO).build()).toList();
-            pageBuilder.addAllData(entityGrpcDTOList);
+	@Resource
+	private PointAttributeConfigService pointAttributeConfigService;
 
-            builder.setData(pageBuilder);
-        }
+	@Override
+	public void selectByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
+		GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
+		GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        builder.setResult(rBuilder);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
-    }
+		DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
-    @Override
-    public void selectById(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
-        GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+		Page<DeviceBO> entityPage = deviceService.selectByPage(query);
+		if (Objects.isNull(entityPage)) {
+			rBuilder.setOk(false);
+			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+		}
+		else {
+			rBuilder.setOk(true);
+			rBuilder.setCode(ResponseEnum.OK.getCode());
+			rBuilder.setMessage(ResponseEnum.OK.getText());
 
-        DeviceBO entityBO = deviceService.selectById(request.getDeviceId());
-        if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+			GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
+			GrpcPage.Builder page = GrpcPage.newBuilder();
+			page.setCurrent(entityPage.getCurrent());
+			page.setSize(entityPage.getSize());
+			page.setPages(entityPage.getPages());
+			page.setTotal(entityPage.getTotal());
+			pageBuilder.setPage(page);
 
-            builder.setData(getDeviceAttachDTO(entityBO));
-        }
+			List<GrpcRDeviceAttachDTO> entityGrpcDTOList = entityPage.getRecords()
+				.stream()
+				.map(entityBO -> getDeviceAttachDTO(entityBO).build())
+				.toList();
+			pageBuilder.addAllData(entityGrpcDTOList);
 
-        builder.setResult(rBuilder);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
-    }
+			builder.setData(pageBuilder);
+		}
 
-    private GrpcRDeviceAttachDTO.Builder getDeviceAttachDTO(DeviceBO entityBO) {
-        GrpcRDeviceAttachDTO.Builder builder = GrpcRDeviceAttachDTO.newBuilder();
-        GrpcDeviceDTO entityGrpcDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);
-        builder.setDevice(entityGrpcDTO);
+		builder.setResult(rBuilder);
+		responseObserver.onNext(builder.build());
+		responseObserver.onCompleted();
+	}
 
-        // 
-        List<PointBO> pointBOList = pointService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(pointBOList)
-                .ifPresent(value -> builder.addAllPointIds(value.stream().map(PointBO::getId).toList()));
+	@Override
+	public void selectById(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
+		GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
+		GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DriverAttributeConfigBO> driverAttributeConfigBOList = driverAttributeConfigService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(driverAttributeConfigBOList)
-                .ifPresent(value -> builder.addAllDriverConfigs(value.stream()
-                        .map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO)
-                        .toList())
-                );
+		DeviceBO entityBO = deviceService.selectById(request.getDeviceId());
+		if (Objects.isNull(entityBO)) {
+			rBuilder.setOk(false);
+			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+		}
+		else {
+			rBuilder.setOk(true);
+			rBuilder.setCode(ResponseEnum.OK.getCode());
+			rBuilder.setMessage(ResponseEnum.OK.getText());
 
-        List<PointAttributeConfigBO> pointAttributeConfigBOList = pointAttributeConfigService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(pointAttributeConfigBOList)
-                .ifPresent(value -> builder.addAllPointConfigs(value.stream()
-                        .map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO)
-                        .toList())
-                );
-        return builder;
-    }
+			builder.setData(getDeviceAttachDTO(entityBO));
+		}
+
+		builder.setResult(rBuilder);
+		responseObserver.onNext(builder.build());
+		responseObserver.onCompleted();
+	}
+
+	private GrpcRDeviceAttachDTO.Builder getDeviceAttachDTO(DeviceBO entityBO) {
+		GrpcRDeviceAttachDTO.Builder builder = GrpcRDeviceAttachDTO.newBuilder();
+		GrpcDeviceDTO entityGrpcDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);
+		builder.setDevice(entityGrpcDTO);
+
+		//
+		List<PointBO> pointBOList = pointService.selectByDeviceId(entityBO.getId());
+		CollectionOptional.ofNullable(pointBOList)
+			.ifPresent(value -> builder.addAllPointIds(value.stream().map(PointBO::getId).toList()));
+
+		List<DriverAttributeConfigBO> driverAttributeConfigBOList = driverAttributeConfigService
+			.selectByDeviceId(entityBO.getId());
+		CollectionOptional.ofNullable(driverAttributeConfigBOList)
+			.ifPresent(value -> builder
+				.addAllDriverConfigs(value.stream().map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
+
+		List<PointAttributeConfigBO> pointAttributeConfigBOList = pointAttributeConfigService
+			.selectByDeviceId(entityBO.getId());
+		CollectionOptional.ofNullable(pointAttributeConfigBOList)
+			.ifPresent(value -> builder
+				.addAllPointConfigs(value.stream().map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
+		return builder;
+	}
+
 }

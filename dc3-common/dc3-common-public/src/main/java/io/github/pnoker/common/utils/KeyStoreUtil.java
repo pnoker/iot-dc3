@@ -37,9 +37,8 @@ import java.security.cert.CertificateFactory;
 /**
  * KeyStore Certificate Import Utility Class
  * <p>
- * Utility class for importing certificates into KeyStore.
- * Provides methods to load certificates from resources
- * and manage SSL/TLS certificate stores.
+ * Utility class for importing certificates into KeyStore. Provides methods to load
+ * certificates from resources and manage SSL/TLS certificate stores.
  * </p>
  *
  * @author pnoker
@@ -49,56 +48,59 @@ import java.security.cert.CertificateFactory;
 @Slf4j
 public class KeyStoreUtil {
 
-    private KeyStoreUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+	private KeyStoreUtil() {
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+	}
 
-    public static void importKeystore(String crtFileName, String crtNameAlias) {
-        DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
-        String[] resourcePaths = new String[]{"classpath:/ssl/", "file:./ssl/"};
-        String passphrase = "changeit";
-        try (InputStream inputStream = getResource(resourceLoader, resourcePaths, crtFileName).getInputStream()) {
-            KeyStoreUtil.importKeystore(inputStream, crtNameAlias, passphrase);
-        } catch (Exception e) {
-            throw new SecurityException(e);
-        }
-    }
+	public static void importKeystore(String crtFileName, String crtNameAlias) {
+		DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+		String[] resourcePaths = new String[] { "classpath:/ssl/", "file:./ssl/" };
+		String passphrase = "changeit";
+		try (InputStream inputStream = getResource(resourceLoader, resourcePaths, crtFileName).getInputStream()) {
+			KeyStoreUtil.importKeystore(inputStream, crtNameAlias, passphrase);
+		}
+		catch (Exception e) {
+			throw new SecurityException(e);
+		}
+	}
 
-    private static Resource getResource(ResourceLoader resourceLoader, String[] resourcePaths, String fileName) {
-        for (String path : resourcePaths) {
-            Resource resource = resourceLoader.getResource(path + fileName);
-            if (resource.exists()) {
-                return resource;
-            }
-        }
-        throw new NotFoundException("Certificate file '{}' doesn't exist", fileName);
-    }
+	private static Resource getResource(ResourceLoader resourceLoader, String[] resourcePaths, String fileName) {
+		for (String path : resourcePaths) {
+			Resource resource = resourceLoader.getResource(path + fileName);
+			if (resource.exists()) {
+				return resource;
+			}
+		}
+		throw new NotFoundException("Certificate file '{}' doesn't exist", fileName);
+	}
 
-    private static void importKeystore(InputStream crtInputStream, String crtAliasName, String passphrase) throws Exception {
-        log.info("Importing certificate '{}'", crtAliasName);
-        final char separator = File.separatorChar;
-        final char[] passphraseArray = passphrase.toCharArray();
-        File securityFile = new File(System.getProperty("java.home") + separator + "lib" + separator + "security");
-        File keyStoreFile = new File(securityFile, "cacerts");
-        Path path = keyStoreFile.toPath();
-        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        try (InputStream inputStream = Files.newInputStream(path)) {
-            keystore.load(inputStream, passphraseArray);
-            if (keystore.containsAlias(crtAliasName)) {
-                log.info("Skip import, certificate '{}' already exists", crtAliasName);
-                return;
-            }
-        }
+	private static void importKeystore(InputStream crtInputStream, String crtAliasName, String passphrase)
+			throws Exception {
+		log.info("Importing certificate '{}'", crtAliasName);
+		final char separator = File.separatorChar;
+		final char[] passphraseArray = passphrase.toCharArray();
+		File securityFile = new File(System.getProperty("java.home") + separator + "lib" + separator + "security");
+		File keyStoreFile = new File(securityFile, "cacerts");
+		Path path = keyStoreFile.toPath();
+		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+		try (InputStream inputStream = Files.newInputStream(path)) {
+			keystore.load(inputStream, passphraseArray);
+			if (keystore.containsAlias(crtAliasName)) {
+				log.info("Skip import, certificate '{}' already exists", crtAliasName);
+				return;
+			}
+		}
 
-        try (OutputStream outputStream = Files.newOutputStream(path)) {
-            BufferedInputStream bis = new BufferedInputStream(crtInputStream);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            while (bis.available() > 0) {
-                Certificate cert = cf.generateCertificate(bis);
-                keystore.setCertificateEntry(crtAliasName, cert);
-            }
-            keystore.store(outputStream, passphraseArray);
-        }
-        log.info("Certificate '{}' imported successfully", crtAliasName);
-    }
+		try (OutputStream outputStream = Files.newOutputStream(path)) {
+			BufferedInputStream bis = new BufferedInputStream(crtInputStream);
+			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			while (bis.available() > 0) {
+				Certificate cert = cf.generateCertificate(bis);
+				keystore.setCertificateEntry(crtAliasName, cert);
+			}
+			keystore.store(outputStream, passphraseArray);
+		}
+		log.info("Certificate '{}' imported successfully", crtAliasName);
+	}
+
 }

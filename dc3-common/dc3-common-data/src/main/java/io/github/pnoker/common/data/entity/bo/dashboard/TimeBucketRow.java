@@ -24,14 +24,17 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * One time-bucketed count row. Bucket comes from Postgres {@code time_bucket()}
- * which returns TIMESTAMPTZ; JDBC maps it to LocalDateTime directly so no
- * service-side parsing is needed.
+ * One time-bucketed count row. Bucket comes from Postgres {@code time_bucket()} which
+ * returns TIMESTAMPTZ; JDBC maps it to LocalDateTime directly so no service-side parsing
+ * is needed.
  */
 @Getter
 @Setter
 @ToString
 public class TimeBucketRow {
-    private LocalDateTime bucket;
-    private long count;
+
+	private LocalDateTime bucket;
+
+	private long count;
+
 }

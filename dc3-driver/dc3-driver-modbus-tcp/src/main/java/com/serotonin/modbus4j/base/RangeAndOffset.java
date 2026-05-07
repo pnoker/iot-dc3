@@ -19,63 +19,73 @@ package com.serotonin.modbus4j.base;
 import com.serotonin.modbus4j.code.RegisterRange;
 
 /**
- * <p>RangeAndOffset class.</p>
+ * <p>
+ * RangeAndOffset class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class RangeAndOffset {
-    private int range;
-    private int offset;
 
-    /**
-     * <p>Constructor for RangeAndOffset.</p>
-     *
-     * @param range  a int.
-     * @param offset a int.
-     */
-    public RangeAndOffset(int range, int offset) {
-        this.range = range;
-        this.offset = offset;
-    }
+	private int range;
 
-    /**
-     * This constructor provides a best guess at the function and offset the user wants, with the assumption that the
-     * offset will never go over 9999.
-     *
-     * @param registerId a int.
-     */
-    public RangeAndOffset(int registerId) {
-        if (registerId < 10000) {
-            this.range = RegisterRange.COIL_STATUS;
-            this.offset = registerId - 1;
-        } else if (registerId < 20000) {
-            this.range = RegisterRange.INPUT_STATUS;
-            this.offset = registerId - 10001;
-        } else if (registerId < 40000) {
-            this.range = RegisterRange.INPUT_REGISTER;
-            this.offset = registerId - 30001;
-        } else {
-            this.range = RegisterRange.HOLDING_REGISTER;
-            this.offset = registerId - 40001;
-        }
-    }
+	private int offset;
 
-    /**
-     * <p>Getter for the field <code>range</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getRange() {
-        return range;
-    }
+	/**
+	 * <p>
+	 * Constructor for RangeAndOffset.
+	 * </p>
+	 * @param range a int.
+	 * @param offset a int.
+	 */
+	public RangeAndOffset(int range, int offset) {
+		this.range = range;
+		this.offset = offset;
+	}
 
-    /**
-     * <p>Getter for the field <code>offset</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getOffset() {
-        return offset;
-    }
+	/**
+	 * This constructor provides a best guess at the function and offset the user wants,
+	 * with the assumption that the offset will never go over 9999.
+	 * @param registerId a int.
+	 */
+	public RangeAndOffset(int registerId) {
+		if (registerId < 10000) {
+			this.range = RegisterRange.COIL_STATUS;
+			this.offset = registerId - 1;
+		}
+		else if (registerId < 20000) {
+			this.range = RegisterRange.INPUT_STATUS;
+			this.offset = registerId - 10001;
+		}
+		else if (registerId < 40000) {
+			this.range = RegisterRange.INPUT_REGISTER;
+			this.offset = registerId - 30001;
+		}
+		else {
+			this.range = RegisterRange.HOLDING_REGISTER;
+			this.offset = registerId - 40001;
+		}
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>range</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getRange() {
+		return range;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>offset</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getOffset() {
+		return offset;
+	}
+
 }

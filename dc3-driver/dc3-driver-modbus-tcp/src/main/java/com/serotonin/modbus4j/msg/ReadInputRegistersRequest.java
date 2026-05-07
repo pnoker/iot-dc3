@@ -21,52 +21,57 @@ import com.serotonin.modbus4j.code.FunctionCode;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 
 /**
- * <p>ReadInputRegistersRequest class.</p>
+ * <p>
+ * ReadInputRegistersRequest class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ReadInputRegistersRequest extends ReadNumericRequest {
-    /**
-     * <p>Constructor for ReadInputRegistersRequest.</p>
-     *
-     * @param slaveId           a int.
-     * @param startOffset       a int.
-     * @param numberOfRegisters a int.
-     * @throws ModbusTransportException if any.
-     */
-    public ReadInputRegistersRequest(int slaveId, int startOffset, int numberOfRegisters)
-            throws ModbusTransportException {
-        super(slaveId, startOffset, numberOfRegisters);
-    }
 
-    ReadInputRegistersRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	/**
+	 * <p>
+	 * Constructor for ReadInputRegistersRequest.
+	 * </p>
+	 * @param slaveId a int.
+	 * @param startOffset a int.
+	 * @param numberOfRegisters a int.
+	 * @throws ModbusTransportException if any.
+	 */
+	public ReadInputRegistersRequest(int slaveId, int startOffset, int numberOfRegisters)
+			throws ModbusTransportException {
+		super(slaveId, startOffset, numberOfRegisters);
+	}
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.READ_INPUT_REGISTERS;
-    }
+	ReadInputRegistersRequest(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
-        return new ReadInputRegistersResponse(slaveId, getData(processImage));
-    }
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.READ_INPUT_REGISTERS;
+	}
 
-    @Override
-    protected short getNumeric(ProcessImage processImage, int index) throws ModbusTransportException {
-        return processImage.getInputRegister(index);
-    }
+	@Override
+	ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
+		return new ReadInputRegistersResponse(slaveId, getData(processImage));
+	}
 
-    @Override
-    ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
-        return new ReadInputRegistersResponse(slaveId);
-    }
+	@Override
+	protected short getNumeric(ProcessImage processImage, int index) throws ModbusTransportException {
+		return processImage.getInputRegister(index);
+	}
 
-    @Override
-    public String toString() {
-        return "ReadInputRegistersRequest [slaveId=" + slaveId + ", getFunctionCode()=" + getFunctionCode()
-                + ", toString()=" + super.toString() + "]";
-    }
+	@Override
+	ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
+		return new ReadInputRegistersResponse(slaveId);
+	}
+
+	@Override
+	public String toString() {
+		return "ReadInputRegistersRequest [slaveId=" + slaveId + ", getFunctionCode()=" + getFunctionCode()
+				+ ", toString()=" + super.toString() + "]";
+	}
+
 }

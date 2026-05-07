@@ -39,30 +39,31 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class UserLoginQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    // 
+	//
 
-    /**
-     * Name
-     */
-    private String loginName;
+	/**
+	 * Name
+	 */
+	private String loginName;
 
-    /**
-     * ID
-     */
-    private Long userId;
+	/**
+	 * ID
+	 */
+	private Long userId;
 
-    /**
-     * ID
-     */
-    private Long userPasswordId;
+	/**
+	 * ID
+	 */
+	private Long userPasswordId;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

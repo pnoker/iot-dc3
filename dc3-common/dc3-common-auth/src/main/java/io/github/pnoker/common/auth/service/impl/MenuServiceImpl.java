@@ -55,176 +55,173 @@ import java.util.*;
 @Service
 public class MenuServiceImpl implements MenuService {
 
-    @Resource
-    private MenuBuilder menuBuilder;
+	@Resource
+	private MenuBuilder menuBuilder;
 
-    @Resource
-    private MenuManager menuManager;
+	@Resource
+	private MenuManager menuManager;
 
-    @Resource
-    private ResourceRegistrySyncService resourceRegistrySyncService;
+	@Resource
+	private ResourceRegistrySyncService resourceRegistrySyncService;
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void save(MenuBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void save(MenuBO entityBO) {
+		checkDuplicate(entityBO, false, true);
 
-        MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
-        if (!menuManager.save(entityDO)) {
-            throw new AddException("Failed to create menu");
-        }
-        resourceRegistrySyncService.syncMenuResource(entityDO);
-    }
+		MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
+		if (!menuManager.save(entityDO)) {
+			throw new AddException("Failed to create menu");
+		}
+		resourceRegistrySyncService.syncMenuResource(entityDO);
+	}
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void remove(Long id) {
-        getDOById(id, true);
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void remove(Long id) {
+		getDOById(id, true);
 
-        //
-        LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
-        long count = wrapper.count();
-        if (count > 0) {
-            throw new AssociatedException("Failed to remove menu: some sub menus exists in the menu");
-        }
+		//
+		LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
+		long count = wrapper.count();
+		if (count > 0) {
+			throw new AssociatedException("Failed to remove menu: some sub menus exists in the menu");
+		}
 
-        if (!menuManager.removeById(id)) {
-            throw new DeleteException("Failed to remove menu");
-        }
-        resourceRegistrySyncService.removeMenuResource(id);
-    }
+		if (!menuManager.removeById(id)) {
+			throw new DeleteException("Failed to remove menu");
+		}
+		resourceRegistrySyncService.removeMenuResource(id);
+	}
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void update(MenuBO entityBO) {
-        getDOById(entityBO.getId(), true);
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void update(MenuBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+		checkDuplicate(entityBO, true, true);
 
-        MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!menuManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update menu");
-        }
-        // Re-read to pick up any DB-side mutations (trigger-updated operate_time, etc).
-        MenuDO latest = menuManager.getById(entityBO.getId());
-        resourceRegistrySyncService.syncMenuResource(latest != null ? latest : entityDO);
-    }
+		MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!menuManager.updateById(entityDO)) {
+			throw new UpdateException("Failed to update menu");
+		}
+		// Re-read to pick up any DB-side mutations (trigger-updated operate_time, etc).
+		MenuDO latest = menuManager.getById(entityBO.getId());
+		resourceRegistrySyncService.syncMenuResource(latest != null ? latest : entityDO);
+	}
 
-    @Override
-    public MenuBO selectById(Long id) {
-        MenuDO entityDO = getDOById(id, true);
-        return menuBuilder.buildBOByDO(entityDO);
-    }
+	@Override
+	public MenuBO selectById(Long id) {
+		MenuDO entityDO = getDOById(id, true);
+		return menuBuilder.buildBOByDO(entityDO);
+	}
 
-    @Override
-    public Page<MenuBO> selectByPage(MenuQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<MenuDO> entityPageDO = menuManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return menuBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	@Override
+	public Page<MenuBO> selectByPage(MenuQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<MenuDO> entityPageDO = menuManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+		return menuBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link MenuQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<MenuDO> fuzzyQuery(MenuQuery entityQuery) {
-        LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getMenuName()), MenuDO::getMenuName, entityQuery.getMenuName());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getMenuCode()), MenuDO::getMenuCode, entityQuery.getMenuCode());
-        wrapper.eq(Objects.nonNull(entityQuery.getMenuTypeFlag()), MenuDO::getMenuTypeFlag,
-                entityQuery.getMenuTypeFlag() == null ? null : entityQuery.getMenuTypeFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getParentMenuId()), MenuDO::getParentMenuId, entityQuery.getParentMenuId());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), MenuDO::getEnableFlag,
-                entityQuery.getEnableFlag() == null ? null : entityQuery.getEnableFlag().getIndex());
-        return wrapper;
-    }
+	/**
+	 * @param entityQuery {@link MenuQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<MenuDO> fuzzyQuery(MenuQuery entityQuery) {
+		LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getMenuName()), MenuDO::getMenuName, entityQuery.getMenuName());
+		wrapper.eq(StringUtils.isNotEmpty(entityQuery.getMenuCode()), MenuDO::getMenuCode, entityQuery.getMenuCode());
+		wrapper.eq(Objects.nonNull(entityQuery.getMenuTypeFlag()), MenuDO::getMenuTypeFlag,
+				entityQuery.getMenuTypeFlag() == null ? null : entityQuery.getMenuTypeFlag().getIndex());
+		wrapper.eq(Objects.nonNull(entityQuery.getParentMenuId()), MenuDO::getParentMenuId,
+				entityQuery.getParentMenuId());
+		wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), MenuDO::getEnableFlag,
+				entityQuery.getEnableFlag() == null ? null : entityQuery.getEnableFlag().getIndex());
+		return wrapper;
+	}
 
-    @Override
-    public List<MenuTreeBO> selectTree(MenuQuery entityQuery) {
-        MenuQuery effective = Objects.requireNonNullElseGet(entityQuery, MenuQuery::new);
-        List<MenuDO> rows = menuManager.list(fuzzyQuery(effective));
-        return assembleTree(rows);
-    }
+	@Override
+	public List<MenuTreeBO> selectTree(MenuQuery entityQuery) {
+		MenuQuery effective = Objects.requireNonNullElseGet(entityQuery, MenuQuery::new);
+		List<MenuDO> rows = menuManager.list(fuzzyQuery(effective));
+		return assembleTree(rows);
+	}
 
-    private List<MenuTreeBO> assembleTree(List<MenuDO> rows) {
-        if (CollectionUtils.isEmpty(rows)) {
-            return List.of();
-        }
-        Map<Long, MenuTreeBO> byId = new HashMap<>(rows.size());
-        for (MenuDO row : rows) {
-            byId.put(row.getId(), MenuTreeBO.fromBO(menuBuilder.buildBOByDO(row)));
-        }
-        List<MenuTreeBO> roots = new ArrayList<>();
-        for (MenuTreeBO node : byId.values()) {
-            Long parentId = node.getParentMenuId();
-            MenuTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
-            if (parent == null) {
-                roots.add(node);
-            } else {
-                parent.addChild(node);
-            }
-        }
-        Comparator<MenuTreeBO> order = Comparator
-                .comparing(MenuTreeBO::getMenuIndex, Comparator.nullsLast(Comparator.naturalOrder()))
-                .thenComparing(MenuTreeBO::getMenuName, Comparator.nullsLast(Comparator.naturalOrder()));
-        sortRecursive(roots, order);
-        return roots;
-    }
+	private List<MenuTreeBO> assembleTree(List<MenuDO> rows) {
+		if (CollectionUtils.isEmpty(rows)) {
+			return List.of();
+		}
+		Map<Long, MenuTreeBO> byId = new HashMap<>(rows.size());
+		for (MenuDO row : rows) {
+			byId.put(row.getId(), MenuTreeBO.fromBO(menuBuilder.buildBOByDO(row)));
+		}
+		List<MenuTreeBO> roots = new ArrayList<>();
+		for (MenuTreeBO node : byId.values()) {
+			Long parentId = node.getParentMenuId();
+			MenuTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
+			if (parent == null) {
+				roots.add(node);
+			}
+			else {
+				parent.addChild(node);
+			}
+		}
+		Comparator<MenuTreeBO> order = Comparator
+			.comparing(MenuTreeBO::getMenuIndex, Comparator.nullsLast(Comparator.naturalOrder()))
+			.thenComparing(MenuTreeBO::getMenuName, Comparator.nullsLast(Comparator.naturalOrder()));
+		sortRecursive(roots, order);
+		return roots;
+	}
 
-    private void sortRecursive(List<MenuTreeBO> nodes, Comparator<MenuTreeBO> order) {
-        if (CollectionUtils.isEmpty(nodes)) {
-            return;
-        }
-        nodes.sort(order);
-        for (MenuTreeBO node : nodes) {
-            sortRecursive(node.getChildren(), order);
-        }
-    }
+	private void sortRecursive(List<MenuTreeBO> nodes, Comparator<MenuTreeBO> order) {
+		if (CollectionUtils.isEmpty(nodes)) {
+			return;
+		}
+		nodes.sort(order);
+		for (MenuTreeBO node : nodes) {
+			sortRecursive(node.getChildren(), order);
+		}
+	}
 
-    /**
-     *
-     *
-     * @param entityBO       {@link MenuBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
-     */
-    private boolean checkDuplicate(MenuBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
-        wrapper.eq(MenuDO::getParentMenuId, entityBO.getParentMenuId());
-        wrapper.eq(MenuDO::getMenuTypeFlag, entityBO.getMenuTypeFlag());
-        wrapper.eq(MenuDO::getMenuName, entityBO.getMenuName());
-        wrapper.eq(MenuDO::getMenuCode, entityBO.getMenuCode());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        MenuDO one = menuManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Menu has been duplicated");
-        }
-        return duplicate;
-    }
+	/**
+	 * @param entityBO {@link MenuBO}
+	 * @param isUpdate
+	 * @param throwException
+	 * @return
+	 */
+	private boolean checkDuplicate(MenuBO entityBO, boolean isUpdate, boolean throwException) {
+		LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
+		wrapper.eq(MenuDO::getParentMenuId, entityBO.getParentMenuId());
+		wrapper.eq(MenuDO::getMenuTypeFlag, entityBO.getMenuTypeFlag());
+		wrapper.eq(MenuDO::getMenuName, entityBO.getMenuName());
+		wrapper.eq(MenuDO::getMenuCode, entityBO.getMenuCode());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		MenuDO one = menuManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+		if (throwException && duplicate) {
+			throw new DuplicateException("Menu has been duplicated");
+		}
+		return duplicate;
+	}
 
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link MenuDO}
-     */
-    private MenuDO getDOById(Long id, boolean throwException) {
-        MenuDO entityDO = menuManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Menu does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link MenuDO}
+	 */
+	private MenuDO getDOById(Long id, boolean throwException) {
+		MenuDO entityDO = menuManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Menu does not exist");
+		}
+		return entityDO;
+	}
 
 }

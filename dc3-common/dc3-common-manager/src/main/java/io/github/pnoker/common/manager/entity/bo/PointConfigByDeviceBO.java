@@ -36,17 +36,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PointConfigByDeviceBO {
-    /**
-     *
-     */
-    private Long configCount;
 
-    /**
-     *
-     */
-    private Long unConfigCount;
-    /**
-     *
-     */
-    private List<PointDO> points;
+	/**
+	 *
+	 */
+	private Long configCount;
+
+	/**
+	 *
+	 */
+	private Long unConfigCount;
+
+	/**
+	 *
+	 */
+	private List<PointDO> points;
+
 }

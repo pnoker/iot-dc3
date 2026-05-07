@@ -53,148 +53,151 @@ import java.util.stream.Collectors;
 @RequestMapping(ManagerConstant.DRIVER_URL_PREFIX)
 public class DriverController implements BaseController {
 
-    private final DriverBuilder driverBuilder;
-    private final DriverService driverService;
+	private final DriverBuilder driverBuilder;
 
-    public DriverController(DriverBuilder driverBuilder, DriverService driverService) {
-        this.driverBuilder = driverBuilder;
-        this.driverService = driverService;
-    }
+	private final DriverService driverService;
 
-    /**
-     * Driver
-     *
-     * @param entityVO {@link DriverVO}
-     * @return R of String
-     */
-    @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                driverService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	public DriverController(DriverBuilder driverBuilder, DriverService driverService) {
+		this.driverBuilder = driverBuilder;
+		this.driverService = driverService;
+	}
 
-    /**
-     * ID Driver
-     *
-     * @param id ID
-     * @return R of String
-     */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            driverService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	/**
+	 * Driver
+	 * @param entityVO {@link DriverVO}
+	 * @return R of String
+	 */
+	@PostMapping("/add")
+	public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
+				entityBO.setTenantId(tenantId);
+				driverService.save(entityBO);
+				return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    /**
-     * Driver
-     *
-     * @param entityVO {@link DriverVO}
-     * @return R of String
-     */
-    @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                driverService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	/**
+	 * ID Driver
+	 * @param id ID
+	 * @return R of String
+	 */
+	@PostMapping("/delete/{id}")
+	public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			driverService.remove(id);
+			return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    /**
-     * ID Driver
-     *
-     * @param id ID
-     * @return DriverVO {@link DriverVO}
-     */
-    @GetMapping("/id/{id}")
-    public Mono<R<DriverVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            DriverBO entityBO = driverService.selectById(id);
-            DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	/**
+	 * Driver
+	 * @param entityVO {@link DriverVO}
+	 * @return R of String
+	 */
+	@PostMapping("/update")
+	public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
+				entityBO.setTenantId(tenantId);
+				driverService.update(entityBO);
+				return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    /**
-     * ID Driver
-     *
-     * @param driverIds Driver ID
-     * @return Map(ID, DriverVO)
-     */
-    @PostMapping("/ids")
-    public Mono<R<Map<Long, DriverVO>>> selectByIds(@RequestBody Set<Long> driverIds) {
-        try {
-            List<DriverBO> entityBOList = driverService.selectByIds(driverIds);
-            Map<Long, DriverVO> driverMap = entityBOList.stream().collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
-            return Mono.just(R.ok(driverMap));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	/**
+	 * ID Driver
+	 * @param id ID
+	 * @return DriverVO {@link DriverVO}
+	 */
+	@GetMapping("/id/{id}")
+	public Mono<R<DriverVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			DriverBO entityBO = driverService.selectById(id);
+			DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
+			return Mono.just(R.ok(entityVO));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    /**
-     * SERVICENAME Driver
-     *
-     * @param serviceName Driver service name
-     * @return Driver
-     */
-    @GetMapping("/service/{serviceName}")
-    public Mono<R<DriverVO>> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DriverBO entityBO = driverService.selectByServiceName(serviceName, tenantId);
-                DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
-                return Mono.just(R.ok(entityVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	/**
+	 * ID Driver
+	 * @param driverIds Driver ID
+	 * @return Map(ID, DriverVO)
+	 */
+	@PostMapping("/ids")
+	public Mono<R<Map<Long, DriverVO>>> selectByIds(@RequestBody Set<Long> driverIds) {
+		try {
+			List<DriverBO> entityBOList = driverService.selectByIds(driverIds);
+			Map<Long, DriverVO> driverMap = entityBOList.stream()
+				.collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
+			return Mono.just(R.ok(driverMap));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    /**
-     * Driver
-     *
-     * @param entityQuery Driver Dto
-     * @return Page Of Driver
-     */
-    @PostMapping("/list")
-    public Mono<R<Page<DriverVO>>> list(@RequestBody(required = false) DriverQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<DriverBO> entityPageBO = driverService.selectByPage(query);
-                Page<DriverVO> entityPageVO = driverBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	/**
+	 * SERVICENAME Driver
+	 * @param serviceName Driver service name
+	 * @return Driver
+	 */
+	@GetMapping("/service/{serviceName}")
+	public Mono<R<DriverVO>> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				DriverBO entityBO = driverService.selectByServiceName(serviceName, tenantId);
+				DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
+				return Mono.just(R.ok(entityVO));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
+
+	/**
+	 * Driver
+	 * @param entityQuery Driver Dto
+	 * @return Page Of Driver
+	 */
+	@PostMapping("/list")
+	public Mono<R<Page<DriverVO>>> list(@RequestBody(required = false) DriverQuery entityQuery) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
+				query.setTenantId(tenantId);
+				Page<DriverBO> entityPageBO = driverService.selectByPage(query);
+				Page<DriverVO> entityPageVO = driverBuilder.buildVOPageByBOPage(entityPageBO);
+				return Mono.just(R.ok(entityPageVO));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
+
 }

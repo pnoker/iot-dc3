@@ -38,15 +38,16 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class UserPasswordQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    // 
+	//
 
-    /**
-     *
-     */
-    private String loginPassword;
+	/**
+	 *
+	 */
+	private String loginPassword;
+
 }

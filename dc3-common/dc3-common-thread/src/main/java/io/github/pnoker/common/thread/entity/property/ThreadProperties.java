@@ -25,10 +25,9 @@ import org.springframework.validation.annotation.Validated;
 /**
  * Thread Pool Configuration Properties
  * <p>
- * Configuration properties for thread pools in Spring Boot applications.
- * Supports configuration through application.yml with prefix "server.thread".
- * Includes settings for core pool size, maximum pool size, keep alive time,
- * and thread name prefix.
+ * Configuration properties for thread pools in Spring Boot applications. Supports
+ * configuration through application.yml with prefix "server.thread". Includes settings
+ * for core pool size, maximum pool size, keep alive time, and thread name prefix.
  * </p>
  *
  * @author pnoker
@@ -41,23 +40,24 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "server.thread")
 public class ThreadProperties {
 
-    /**
-     * Thread name prefix
-     */
-    private String prefix;
+	/**
+	 * Thread name prefix
+	 */
+	private String prefix;
 
-    /**
-     * Number of thread pool core threads
-     */
-    private int corePoolSize;
+	/**
+	 * Number of thread pool core threads
+	 */
+	private int corePoolSize;
 
-    /**
-     * Maximum number of thread pool threads
-     */
-    private int maximumPoolSize;
+	/**
+	 * Maximum number of thread pool threads
+	 */
+	private int maximumPoolSize;
 
-    /**
-     * Idle thread waiting time, unit: seconds
-     */
-    private int keepAliveTime;
+	/**
+	 * Idle thread waiting time, unit: seconds
+	 */
+	private int keepAliveTime;
+
 }

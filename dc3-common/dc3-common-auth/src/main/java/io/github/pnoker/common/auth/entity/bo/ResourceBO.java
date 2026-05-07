@@ -38,51 +38,51 @@ import lombok.*;
 @ToString(callSuper = true)
 public class ResourceBO extends BaseBO {
 
-    /**
-     * ID
-     */
-    private Long parentResourceId;
+	/**
+	 * ID
+	 */
+	private Long parentResourceId;
 
-    /**
-     * Name
-     */
-    private String resourceName;
+	/**
+	 * Name
+	 */
+	private String resourceName;
 
-    /**
-     * Code
-     */
-    private String resourceCode;
+	/**
+	 * Code
+	 */
+	private String resourceCode;
 
-    /**
-     * Type
-     */
-    private ResourceTypeFlagEnum resourceTypeFlag;
+	/**
+	 * Type
+	 */
+	private ResourceTypeFlagEnum resourceTypeFlag;
 
-    /**
-     * , : ResourceScopeFlagEnum
-     * <ul>
-     *   <li>0x01: </li>
-     *   <li>0x02: </li>
-     *   <li>0x04: </li>
-     *   <li>0x08: </li>
-     * </ul>
-     *
-     */
-    private ResourceScopeFlagEnum resourceScopeFlag;
+	/**
+	 * , : ResourceScopeFlagEnum
+	 * <ul>
+	 * <li>0x01:</li>
+	 * <li>0x02:</li>
+	 * <li>0x04:</li>
+	 * <li>0x08:</li>
+	 * </ul>
+	 *
+	 */
+	private ResourceScopeFlagEnum resourceScopeFlag;
 
-    /**
-     * Entity ID
-     */
-    private Long entityId;
+	/**
+	 * Entity ID
+	 */
+	private Long entityId;
 
-    /**
-     *
-     */
-    private ResourceExt resourceExt;
+	/**
+	 *
+	 */
+	private ResourceExt resourceExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
 }

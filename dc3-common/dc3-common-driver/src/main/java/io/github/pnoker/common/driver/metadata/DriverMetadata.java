@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.metadata;
 
-
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
@@ -31,7 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * In-memory holder for driver registration state and shared metadata used across the driver runtime.
+ * In-memory holder for driver registration state and shared metadata used across the
+ * driver runtime.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -43,38 +43,39 @@ import java.util.Set;
 @Component
 public final class DriverMetadata {
 
-    /**
-     * Current driver status.
-     */
-    private DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
+	/**
+	 * Current driver status.
+	 */
+	private DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
 
-    /**
-     * Registered driver definition.
-     */
-    private DriverBO driver;
+	/**
+	 * Registered driver definition.
+	 */
+	private DriverBO driver;
 
-    /**
-     * Identifiers of devices owned by the driver.
-     */
-    private Set<Long> deviceIds;
+	/**
+	 * Identifiers of devices owned by the driver.
+	 */
+	private Set<Long> deviceIds;
 
-    /**
-     * Driver attributes keyed by attribute identifier.
-     */
-    private Map<Long, DriverAttributeDTO> driverAttributeIdMap;
+	/**
+	 * Driver attributes keyed by attribute identifier.
+	 */
+	private Map<Long, DriverAttributeDTO> driverAttributeIdMap;
 
-    /**
-     * Driver attributes keyed by attribute code.
-     */
-    private Map<String, DriverAttributeDTO> driverAttributeNameMap;
+	/**
+	 * Driver attributes keyed by attribute code.
+	 */
+	private Map<String, DriverAttributeDTO> driverAttributeNameMap;
 
-    /**
-     * Point attributes keyed by attribute identifier.
-     */
-    private Map<Long, PointAttributeDTO> pointAttributeIdMap;
+	/**
+	 * Point attributes keyed by attribute identifier.
+	 */
+	private Map<Long, PointAttributeDTO> pointAttributeIdMap;
 
-    /**
-     * Point attributes keyed by attribute code.
-     */
-    private Map<String, PointAttributeDTO> pointAttributeNameMap;
+	/**
+	 * Point attributes keyed by attribute code.
+	 */
+	private Map<String, PointAttributeDTO> pointAttributeNameMap;
+
 }

@@ -26,9 +26,9 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Generic count bucket used by the manager dashboard breakdown endpoints:
- * a string key (status name, type name, or stringified id) paired with a
- * row count. The frontend resolves ids → names via existing batch APIs.
+ * Generic count bucket used by the manager dashboard breakdown endpoints: a string key
+ * (status name, type name, or stringified id) paired with a row count. The frontend
+ * resolves ids → names via existing batch APIs.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -39,14 +39,15 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class BucketVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Human-readable bucket key (e.g. "ENABLE", "DISABLE", "GATEWAY",
-     * or an entity id rendered as string).
-     */
-    private String key;
+	/**
+	 * Human-readable bucket key (e.g. "ENABLE", "DISABLE", "GATEWAY", or an entity id
+	 * rendered as string).
+	 */
+	private String key;
 
-    private long count;
+	private long count;
+
 }

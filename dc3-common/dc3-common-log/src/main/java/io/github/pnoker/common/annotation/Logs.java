@@ -17,12 +17,17 @@
 
 package io.github.pnoker.common.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Custom annotation for logging method execution in DC3 IoT Platform.
- * This annotation can be used to automatically generate logs for method calls,
- * with configurable log type, message, tags and persistence options.
+ * Custom annotation for logging method execution in DC3 IoT Platform. This annotation can
+ * be used to automatically generate logs for method calls, with configurable log type,
+ * message, tags and persistence options.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,31 +38,29 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Logs {
-    /**
-     * The log message to be recorded
-     *
-     * @return The log message string
-     */
-    String value() default "";
 
-    /**
-     * The type/level of the log entry
-     *
-     * @return The LogsType enum value
-     */
-    LogsType type() default LogsType.INFO;
+	/**
+	 * The log message to be recorded
+	 * @return The log message string
+	 */
+	String value() default "";
 
-    /**
-     * Custom tag for categorizing or filtering logs
-     *
-     * @return The tag string
-     */
-    String tag() default "";
+	/**
+	 * The type/level of the log entry
+	 * @return The LogsType enum value
+	 */
+	LogsType type() default LogsType.INFO;
 
-    /**
-     * Whether to persist the log entry to storage
-     *
-     * @return True if the log should be saved, false otherwise
-     */
-    boolean save() default false;
+	/**
+	 * Custom tag for categorizing or filtering logs
+	 * @return The tag string
+	 */
+	String tag() default "";
+
+	/**
+	 * Whether to persist the log entry to storage
+	 * @return True if the log should be saved, false otherwise
+	 */
+	boolean save() default false;
+
 }

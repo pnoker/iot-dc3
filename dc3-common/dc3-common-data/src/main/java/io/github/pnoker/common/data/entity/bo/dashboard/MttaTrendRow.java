@@ -28,8 +28,13 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MttaTrendRow {
-    private String date;
-    private long p50Ms;
-    private long p95Ms;
-    private long confirmedCount;
+
+	private String date;
+
+	private long p50Ms;
+
+	private long p95Ms;
+
+	private long confirmedCount;
+
 }

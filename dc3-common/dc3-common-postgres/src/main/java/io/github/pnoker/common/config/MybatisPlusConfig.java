@@ -27,9 +27,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * MyBatis-Plus Configuration Class
  * <p>
- * Configuration class for MyBatis-Plus framework integration.
- * Configures pagination interceptors and enables transaction management
- * for PostgreSQL database operations in IoT DC3 platform.
+ * Configuration class for MyBatis-Plus framework integration. Configures pagination
+ * interceptors and enables transaction management for PostgreSQL database operations in
+ * IoT DC3 platform.
  * </p>
  *
  * @author pnoker
@@ -40,16 +40,15 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class MybatisPlusConfig {
 
-    /**
-     * Pagination interceptor bean configuration
-     *
-     * @return Configured MybatisPlusInterceptor with PostgreSQL pagination support
-     */
-    @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor() {
-        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
-        return interceptor;
-    }
+	/**
+	 * Pagination interceptor bean configuration
+	 * @return Configured MybatisPlusInterceptor with PostgreSQL pagination support
+	 */
+	@Bean
+	public MybatisPlusInterceptor mybatisPlusInterceptor() {
+		MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+		interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
+		return interceptor;
+	}
 
 }

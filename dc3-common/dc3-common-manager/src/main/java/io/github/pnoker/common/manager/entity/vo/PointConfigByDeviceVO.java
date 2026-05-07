@@ -39,17 +39,19 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PointConfigByDeviceVO {
 
-    /**
-     *
-     */
-    private Long unConfigCount;
-    /**
-     *
-     */
-    private Long configCount;
+	/**
+	 *
+	 */
+	private Long unConfigCount;
 
-    /**
-     *
-     */
-    private List<PointDO> points;
+	/**
+	 *
+	 */
+	private Long configCount;
+
+	/**
+	 *
+	 */
+	private List<PointDO> points;
+
 }

@@ -34,13 +34,14 @@ import lombok.*;
 @ToString(callSuper = true)
 public class RoleUserBindBO extends BaseBO {
 
-    /**
-     * ID
-     */
-    private Long roleId;
+	/**
+	 * ID
+	 */
+	private Long roleId;
 
-    /**
-     * ID
-     */
-    private Long userId;
+	/**
+	 * ID
+	 */
+	private Long userId;
+
 }

@@ -43,18 +43,17 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
 @ConditionalOnProperty(prefix = "dc3.resource-registrar", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class ResourceRegistrarAutoConfiguration {
 
-    @Bean
-    public ApiEndpointScanner apiEndpointScanner(RequestMappingHandlerMapping requestMappingHandlerMapping,
-                                                 ResourceRegistrarProperties properties) {
-        return new ApiEndpointScanner(requestMappingHandlerMapping, properties);
-    }
+	@Bean
+	public ApiEndpointScanner apiEndpointScanner(RequestMappingHandlerMapping requestMappingHandlerMapping,
+			ResourceRegistrarProperties properties) {
+		return new ApiEndpointScanner(requestMappingHandlerMapping, properties);
+	}
 
-    @Bean
-    @ConditionalOnBean(ResourceRegistryFacade.class)
-    public ResourceRegistrar resourceRegistrar(ApiEndpointScanner scanner,
-                                               ResourceRegistryFacade facade,
-                                               ResourceRegistrarProperties properties,
-                                               @Value("${spring.application.name:}") String applicationName) {
-        return new ResourceRegistrar(scanner, facade, properties, applicationName);
-    }
+	@Bean
+	@ConditionalOnBean(ResourceRegistryFacade.class)
+	public ResourceRegistrar resourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
+			ResourceRegistrarProperties properties, @Value("${spring.application.name:}") String applicationName) {
+		return new ResourceRegistrar(scanner, facade, properties, applicationName);
+	}
+
 }

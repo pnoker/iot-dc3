@@ -28,30 +28,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Config-vs-reality coverage report — points declared in dc3_point that
- * never produced any point_value row. {@code missingPoints / totalPoints}
- * is the gap ratio; {@code items} is the (capped) list of offending ids
- * so the UI can drill in.
+ * Config-vs-reality coverage report — points declared in dc3_point that never produced
+ * any point_value row. {@code missingPoints / totalPoints} is the gap ratio;
+ * {@code items} is the (capped) list of offending ids so the UI can drill in.
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class CoverageGapVO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private long totalPoints;
-    private long missingPoints;
-    private List<Item> items = new ArrayList<>();
 
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    public static class Item implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
-        private long pointId;
-        private long profileId;
-    }
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private long totalPoints;
+
+	private long missingPoints;
+
+	private List<Item> items = new ArrayList<>();
+
+	@Getter
+	@Setter
+	@ToString
+	@NoArgsConstructor
+	public static class Item implements Serializable {
+
+		@Serial
+		private static final long serialVersionUID = 1L;
+
+		private long pointId;
+
+		private long profileId;
+
+	}
+
 }

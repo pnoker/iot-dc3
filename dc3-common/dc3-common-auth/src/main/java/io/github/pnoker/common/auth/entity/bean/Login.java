@@ -40,27 +40,22 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class Login implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "租户不能为空",
-            groups = {Auth.class})
-    private String tenant;
+	@NotBlank(message = "租户不能为空", groups = { Auth.class })
+	private String tenant;
 
-    @NotBlank(message = "名称不能为空",
-            groups = {Check.class, Auth.class, Update.class})
-    private String name;
+	@NotBlank(message = "名称不能为空", groups = { Check.class, Auth.class, Update.class })
+	private String name;
 
-    @NotBlank(message = "盐值不能为空",
-            groups = {Check.class, Auth.class})
-    private String salt;
+	@NotBlank(message = "盐值不能为空", groups = { Check.class, Auth.class })
+	private String salt;
 
-    @NotBlank(message = "密码不能为空",
-            groups = {Auth.class})
-    private String password;
+	@NotBlank(message = "密码不能为空", groups = { Auth.class })
+	private String password;
 
-    @NotBlank(message = "令牌不能为空",
-            groups = {Check.class})
-    private String token;
+	@NotBlank(message = "令牌不能为空", groups = { Check.class })
+	private String token;
 
 }

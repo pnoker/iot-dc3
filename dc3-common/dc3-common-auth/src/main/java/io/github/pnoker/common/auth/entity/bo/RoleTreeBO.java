@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tree-shaped variant of {@link RoleBO} — adds a nested children collection so
- * the role hierarchy can be serialized into a single payload for the frontend's
- * tree widgets (el-tree-select in RoleEditForm).
+ * Tree-shaped variant of {@link RoleBO} — adds a nested children collection so the role
+ * hierarchy can be serialized into a single payload for the frontend's tree widgets
+ * (el-tree-select in RoleEditForm).
  *
  * @author pnoker
  * @version 2026.5.5
@@ -38,34 +38,35 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class RoleTreeBO extends RoleBO {
 
-    private List<RoleTreeBO> children = new ArrayList<>();
+	private List<RoleTreeBO> children = new ArrayList<>();
 
-    /**
-     * Copy shared fields from a flat {@link RoleBO} into a new tree node.
-     */
-    public static RoleTreeBO fromBO(RoleBO source) {
-        RoleTreeBO node = new RoleTreeBO();
-        node.setId(source.getId());
-        node.setParentRoleId(source.getParentRoleId());
-        node.setRoleName(source.getRoleName());
-        node.setRoleCode(source.getRoleCode());
-        node.setRoleExt(source.getRoleExt());
-        node.setEnableFlag(source.getEnableFlag());
-        node.setTenantId(source.getTenantId());
-        node.setRemark(source.getRemark());
-        node.setCreatorId(source.getCreatorId());
-        node.setCreatorName(source.getCreatorName());
-        node.setCreateTime(source.getCreateTime());
-        node.setOperatorId(source.getOperatorId());
-        node.setOperatorName(source.getOperatorName());
-        node.setOperateTime(source.getOperateTime());
-        return node;
-    }
+	/**
+	 * Copy shared fields from a flat {@link RoleBO} into a new tree node.
+	 */
+	public static RoleTreeBO fromBO(RoleBO source) {
+		RoleTreeBO node = new RoleTreeBO();
+		node.setId(source.getId());
+		node.setParentRoleId(source.getParentRoleId());
+		node.setRoleName(source.getRoleName());
+		node.setRoleCode(source.getRoleCode());
+		node.setRoleExt(source.getRoleExt());
+		node.setEnableFlag(source.getEnableFlag());
+		node.setTenantId(source.getTenantId());
+		node.setRemark(source.getRemark());
+		node.setCreatorId(source.getCreatorId());
+		node.setCreatorName(source.getCreatorName());
+		node.setCreateTime(source.getCreateTime());
+		node.setOperatorId(source.getOperatorId());
+		node.setOperatorName(source.getOperatorName());
+		node.setOperateTime(source.getOperateTime());
+		return node;
+	}
 
-    public void addChild(RoleTreeBO child) {
-        if (children == null) {
-            children = new ArrayList<>();
-        }
-        children.add(child);
-    }
+	public void addChild(RoleTreeBO child) {
+		if (children == null) {
+			children = new ArrayList<>();
+		}
+		children.add(child);
+	}
+
 }

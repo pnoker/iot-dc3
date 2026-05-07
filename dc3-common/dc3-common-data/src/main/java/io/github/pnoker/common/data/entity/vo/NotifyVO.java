@@ -41,33 +41,34 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class NotifyVO extends BaseVO {
 
-    /**
-     * Alarm notification template name
-     */
-    private String notifyName;
+	/**
+	 * Alarm notification template name
+	 */
+	private String notifyName;
 
-    /**
-     * Alarm notification template code
-     */
-    private String notifyCode;
+	/**
+	 * Alarm notification template code
+	 */
+	private String notifyCode;
 
-    /**
-     * Auto confirm flag
-     */
-    private AutoConfirmFlagEnum autoConfirmFlag;
+	/**
+	 * Auto confirm flag
+	 */
+	private AutoConfirmFlagEnum autoConfirmFlag;
 
-    /**
-     * Alarm notification interval, milliseconds
-     */
-    private Long notifyInterval;
+	/**
+	 * Alarm notification interval, milliseconds
+	 */
+	private Long notifyInterval;
 
-    /**
-     * Alarm notification template configuration
-     */
-    private NotifyExt notifyExt;
+	/**
+	 * Alarm notification template configuration
+	 */
+	private NotifyExt notifyExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

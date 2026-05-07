@@ -17,13 +17,16 @@
 
 package com.serotonin.modbus4j.sero.messaging;
 
-
 /**
- * <p>OutgoingResponseMessage interface.</p>
+ * <p>
+ * OutgoingResponseMessage interface.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public interface OutgoingResponseMessage extends OutgoingMessage {
-    // A marker interface.
+
+	// A marker interface.
+
 }

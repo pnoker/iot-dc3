@@ -26,9 +26,8 @@ import java.util.Map;
 /**
  * MyBatis Plus code generation utility.
  * <p>
- * Note:
- * This configuration is only for the {@code dc3-common-dal} service module.
- * If you need to use it for other modules, please reconfigure the {@code path} parameter.
+ * Note: This configuration is only for the {@code dc3-common-dal} service module. If you
+ * need to use it for other modules, please reconfigure the {@code path} parameter.
  * </p>
  *
  * @author pnoker
@@ -36,35 +35,28 @@ import java.util.Map;
  * @since 2022.1.0
  */
 public class MybatisGenerator {
-    public static void main(String[] args) {
-        generator();
-    }
 
-    public static void generator() {
-        String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-dal/src/main";
-        MybatisUtil.defaultGenerator("dc3-postgres", "35432", "dc3", "dc3_auth", "dc3", "dc3dc3dc3")
-                .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
-                .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
-                .packageConfig(builder -> builder
-                        .parent("io.github.pnoker.common.dal")
-                        .entity("entity.model")
-                        .service("dal")
-                        .serviceImpl("dal.impl")
-                        .mapper("mapper")
-                        .pathInfo(Map.of(
-                                OutputFile.service, path + "/java/io/github/pnoker/common/dal/dal",
-                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/dal/dal/impl",
-                                OutputFile.xml, path + "/resources/mapping"))
-                )
-                .templateEngine(new FreemarkerTemplateEngine())
-                .strategyConfig(MybatisUtil::defaultStrategyConfig)
-                .strategyConfig(builder -> builder
-                        .addInclude(
-                                "dc3_group",
-                                "dc3_group_bind",
-                                "dc3_label",
-                                "dc3_label_bind"
-                        )
-                ).execute();
-    }
+	public static void main(String[] args) {
+		generator();
+	}
+
+	public static void generator() {
+		String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-dal/src/main";
+		MybatisUtil.defaultGenerator("dc3-postgres", "35432", "dc3", "dc3_auth", "dc3", "dc3dc3dc3")
+			.globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
+			.dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
+			.packageConfig(builder -> builder.parent("io.github.pnoker.common.dal")
+				.entity("entity.model")
+				.service("dal")
+				.serviceImpl("dal.impl")
+				.mapper("mapper")
+				.pathInfo(Map.of(OutputFile.service, path + "/java/io/github/pnoker/common/dal/dal",
+						OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/dal/dal/impl", OutputFile.xml,
+						path + "/resources/mapping")))
+			.templateEngine(new FreemarkerTemplateEngine())
+			.strategyConfig(MybatisUtil::defaultStrategyConfig)
+			.strategyConfig(builder -> builder.addInclude("dc3_group", "dc3_group_bind", "dc3_label", "dc3_label_bind"))
+			.execute();
+	}
+
 }

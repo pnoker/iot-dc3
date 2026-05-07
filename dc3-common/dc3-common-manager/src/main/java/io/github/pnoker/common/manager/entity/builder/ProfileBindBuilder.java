@@ -34,100 +34,91 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface ProfileBindBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    @Mapping(target = "tenantId", ignore = true)
-    ProfileBindBO buildBOByVO(ProfileBindVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "tenantId", ignore = true)
+	ProfileBindBO buildBOByVO(ProfileBindVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<ProfileBindBO> buildBOListByVOList(List<ProfileBindVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<ProfileBindBO> buildBOListByVOList(List<ProfileBindVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "deleted", ignore = true)
-    ProfileBindDO buildDOByBO(ProfileBindBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "deleted", ignore = true)
+	ProfileBindDO buildDOByBO(ProfileBindBO entityBO);
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<ProfileBindDO> buildDOListByBOList(List<ProfileBindBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<ProfileBindDO> buildDOListByBOList(List<ProfileBindBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    ProfileBindBO buildBOByDO(ProfileBindDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	ProfileBindBO buildBOByDO(ProfileBindDO entityDO);
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<ProfileBindBO> buildBOListByDOList(List<ProfileBindDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<ProfileBindBO> buildBOListByDOList(List<ProfileBindDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    ProfileBindVO buildVOByBO(ProfileBindBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	ProfileBindVO buildVOByBO(ProfileBindBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<ProfileBindVO> buildVOListByBOList(List<ProfileBindBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<ProfileBindVO> buildVOListByBOList(List<ProfileBindBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ProfileBindBO> buildBOPageByDOPage(Page<ProfileBindDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<ProfileBindBO> buildBOPageByDOPage(Page<ProfileBindDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ProfileBindVO> buildVOPageByBOPage(Page<ProfileBindBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<ProfileBindVO> buildVOPageByBOPage(Page<ProfileBindBO> entityPageBO);
+
 }

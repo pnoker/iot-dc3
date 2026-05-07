@@ -28,9 +28,9 @@ import java.util.List;
 /**
  * Tree Node Data Structure
  * <p>
- * Generic tree node implementation for hierarchical data structures.
- * Supports parent-child relationships with ID-based navigation.
- * Commonly used for organization, category, or menu structures.
+ * Generic tree node implementation for hierarchical data structures. Supports
+ * parent-child relationships with ID-based navigation. Commonly used for organization,
+ * category, or menu structures.
  * </p>
  *
  * @author pnoker
@@ -42,19 +42,21 @@ import java.util.List;
 @Setter
 public class TreeNode implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private int id;
-    private int parentId;
-    private List<TreeNode> children = new ArrayList<>(16);
+	private int id;
 
-    /**
-     * Add child node to current node
-     *
-     * @param node Tree node to add as child
-     */
-    public void add(TreeNode node) {
-        children.add(node);
-    }
+	private int parentId;
+
+	private List<TreeNode> children = new ArrayList<>(16);
+
+	/**
+	 * Add child node to current node
+	 * @param node Tree node to add as child
+	 */
+	public void add(TreeNode node) {
+		children.add(node);
+	}
+
 }

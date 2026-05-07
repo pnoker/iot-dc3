@@ -20,22 +20,22 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class ReadPointException extends RuntimeException {
-    public ReadPointException() {
-        this(null);
-    }
 
-    public ReadPointException(Throwable cause) {
-        super(cause);
-    }
+	public ReadPointException() {
+		this(null);
+	}
 
-    public ReadPointException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public ReadPointException(Throwable cause) {
+		super(cause);
+	}
+
+	public ReadPointException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

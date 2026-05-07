@@ -26,16 +26,17 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Spring environment post-processor that ensures the {@code driver} profile is always active
- * before driver beans are initialized.
+ * Spring environment post-processor that ensures the {@code driver} profile is always
+ * active before driver beans are initialized.
  */
 @Slf4j
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveDriverProfileConfig implements EnvironmentPostProcessor {
 
-    @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("driver");
-    }
+	@Override
+	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+		environment.addActiveProfile("driver");
+	}
+
 }

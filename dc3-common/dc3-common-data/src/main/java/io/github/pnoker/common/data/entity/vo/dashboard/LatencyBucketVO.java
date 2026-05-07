@@ -26,9 +26,9 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * One bin of the acquisition-to-storage latency histogram. The {@code bin}
- * index is mapped to a human-readable label by the frontend:
- * 0=&lt;100ms, 1=100-500ms, 2=500ms-1s, 3=1-5s, 4=5-30s, 5=&gt;=30s.
+ * One bin of the acquisition-to-storage latency histogram. The {@code bin} index is
+ * mapped to a human-readable label by the frontend: 0=&lt;100ms, 1=100-500ms, 2=500ms-1s,
+ * 3=1-5s, 4=5-30s, 5=&gt;=30s.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -39,10 +39,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class LatencyBucketVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private int bin;
+	private int bin;
 
-    private long count;
+	private long count;
+
 }

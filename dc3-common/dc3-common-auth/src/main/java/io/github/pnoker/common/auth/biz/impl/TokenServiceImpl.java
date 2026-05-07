@@ -41,8 +41,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -51,72 +49,77 @@ import java.util.UUID;
 @Service
 public class TokenServiceImpl implements TokenService {
 
-    @Resource
-    private TenantService tenantService;
-    @Resource
-    private UserLoginService userLoginService;
-    @Resource
-    private UserPasswordService userPasswordService;
-    @Resource
-    private TenantBindService tenantBindService;
+	@Resource
+	private TenantService tenantService;
 
-    @Override
-    public String generateSalt(String loginName, String tenantCode) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
-        if (Objects.isNull(tenantBO)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        return UUID.randomUUID().toString();
-    }
+	@Resource
+	private UserLoginService userLoginService;
 
-    @Override
-    public String generateToken(String loginName, String salt, String password, String tenantCode) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
-        if (Objects.isNull(tenantBO)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
-        if (Objects.isNull(userLogin)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
-        if (Objects.isNull(tenantBindBO)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
-        if (Objects.isNull(userPasswordBO)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        if (StringUtils.isEmpty(salt)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        String md5Password = DecodeUtil.md5(userPasswordBO.getLoginPassword(), salt);
-        if (!md5Password.equals(password)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        return KeyUtil.generateToken(loginName, salt, tenantBO.getId());
-    }
+	@Resource
+	private UserPasswordService userPasswordService;
 
-    @Override
-    public TokenValid checkValid(String loginName, String salt, String token, String tenantCode) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
-        if (Objects.isNull(tenantBO)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
+	@Resource
+	private TenantBindService tenantBindService;
 
-        TokenValid tokenValid = new TokenValid(false, null);
-        if (StringUtils.isBlank(token)) {
-            return tokenValid;
-        }
+	@Override
+	public String generateSalt(String loginName, String tenantCode) {
+		TenantBO tenantBO = tenantService.selectByCode(tenantCode);
+		if (Objects.isNull(tenantBO)) {
+			throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+		}
+		return UUID.randomUUID().toString();
+	}
 
-        try {
-            Claims claims = KeyUtil.parserToken(loginName, salt, token, tenantBO.getId());
-            tokenValid.setValid(true);
-            tokenValid.setExpireTime(claims.getExpiration());
-            return tokenValid;
-        } catch (Exception e) {
-            return tokenValid;
-        }
-    }
+	@Override
+	public String generateToken(String loginName, String salt, String password, String tenantCode) {
+		TenantBO tenantBO = tenantService.selectByCode(tenantCode);
+		if (Objects.isNull(tenantBO)) {
+			throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+		}
+		UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
+		if (Objects.isNull(userLogin)) {
+			throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+		}
+		TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(),
+				userLogin.getUserId());
+		if (Objects.isNull(tenantBindBO)) {
+			throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+		}
+		UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
+		if (Objects.isNull(userPasswordBO)) {
+			throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+		}
+		if (StringUtils.isEmpty(salt)) {
+			throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+		}
+		String md5Password = DecodeUtil.md5(userPasswordBO.getLoginPassword(), salt);
+		if (!md5Password.equals(password)) {
+			throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+		}
+		return KeyUtil.generateToken(loginName, salt, tenantBO.getId());
+	}
+
+	@Override
+	public TokenValid checkValid(String loginName, String salt, String token, String tenantCode) {
+		TenantBO tenantBO = tenantService.selectByCode(tenantCode);
+		if (Objects.isNull(tenantBO)) {
+			throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+		}
+
+		TokenValid tokenValid = new TokenValid(false, null);
+		if (StringUtils.isBlank(token)) {
+			return tokenValid;
+		}
+
+		try {
+			Claims claims = KeyUtil.parserToken(loginName, salt, token, tenantBO.getId());
+			tokenValid.setValid(true);
+			tokenValid.setExpireTime(claims.getExpiration());
+			return tokenValid;
+		}
+		catch (Exception e) {
+			return tokenValid;
+		}
+	}
 
 }

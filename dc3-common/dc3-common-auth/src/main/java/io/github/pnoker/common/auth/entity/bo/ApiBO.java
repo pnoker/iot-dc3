@@ -37,39 +37,39 @@ import lombok.*;
 @ToString(callSuper = true)
 public class ApiBO extends BaseBO {
 
-    /**
-     * Owning service name, populated by resource registrar
-     */
-    private String serviceName;
+	/**
+	 * Owning service name, populated by resource registrar
+	 */
+	private String serviceName;
 
-    /**
-     * ApiType
-     */
-    private ApiTypeFlagEnum apiTypeFlag;
+	/**
+	 * ApiType
+	 */
+	private ApiTypeFlagEnum apiTypeFlag;
 
-    /**
-     * ApiName
-     */
-    private String apiName;
+	/**
+	 * ApiName
+	 */
+	private String apiName;
 
-    /**
-     * ApiCode, URLMD5
-     */
-    private String apiCode;
+	/**
+	 * ApiCode, URLMD5
+	 */
+	private String apiCode;
 
-    /**
-     * API grouping, usually the owning controller simple class name
-     */
-    private String apiGroup;
+	/**
+	 * API grouping, usually the owning controller simple class name
+	 */
+	private String apiGroup;
 
-    /**
-     * Api
-     */
-    private ApiExt apiExt;
+	/**
+	 * Api
+	 */
+	private ApiExt apiExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
 }

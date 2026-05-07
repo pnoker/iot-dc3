@@ -34,18 +34,19 @@ import lombok.*;
 @ToString(callSuper = true)
 public class ProfileBindBO extends BaseBO {
 
-    /**
-     * ID
-     */
-    private Long profileId;
+	/**
+	 * ID
+	 */
+	private Long profileId;
 
-    /**
-     * Device ID
-     */
-    private Long deviceId;
+	/**
+	 * Device ID
+	 */
+	private Long deviceId;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
+
 }

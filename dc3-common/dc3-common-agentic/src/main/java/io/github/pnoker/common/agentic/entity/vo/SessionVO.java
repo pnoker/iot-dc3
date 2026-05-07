@@ -30,19 +30,20 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class SessionVO extends BaseVO {
 
-    private String conversationId;
+	private String conversationId;
 
-    private String title;
+	private String title;
 
-    private String skill;
+	private String skill;
 
-    private Byte status;
+	private Byte status;
 
-    private LocalDateTime expireTime;
+	private LocalDateTime expireTime;
 
-    private Long tenantId;
+	private Long tenantId;
 
-    private Long userId;
+	private Long userId;
 
-    private Byte enableFlag;
+	private Byte enableFlag;
+
 }

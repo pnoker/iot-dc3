@@ -39,38 +39,39 @@ import lombok.*;
 @ToString(callSuper = true)
 public class NotifyBO extends BaseBO {
 
-    /**
-     * Alarm notification template name
-     */
-    private String notifyName;
+	/**
+	 * Alarm notification template name
+	 */
+	private String notifyName;
 
-    /**
-     * Alarm notification template code
-     */
-    private String notifyCode;
+	/**
+	 * Alarm notification template code
+	 */
+	private String notifyCode;
 
-    /**
-     * Auto confirm flag
-     */
-    private AutoConfirmFlagEnum autoConfirmFlag;
+	/**
+	 * Auto confirm flag
+	 */
+	private AutoConfirmFlagEnum autoConfirmFlag;
 
-    /**
-     * Alarm notification interval, milliseconds
-     */
-    private Long notifyInterval;
+	/**
+	 * Alarm notification interval, milliseconds
+	 */
+	private Long notifyInterval;
 
-    /**
-     * Alarm notification template configuration
-     */
-    private NotifyExt notifyExt;
+	/**
+	 * Alarm notification template configuration
+	 */
+	private NotifyExt notifyExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
+
 }

@@ -18,16 +18,17 @@
 package org.openscada.opc.lib.da.browser;
 
 public enum Access {
-    READ(1),
-    WRITE(2);
 
-    private int _code = 0;
+	READ(1), WRITE(2);
 
-    private Access(final int code) {
-        this._code = code;
-    }
+	private int _code = 0;
 
-    public int getCode() {
-        return this._code;
-    }
+	private Access(final int code) {
+		this._code = code;
+	}
+
+	public int getCode() {
+		return this._code;
+	}
+
 }

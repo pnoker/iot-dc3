@@ -44,144 +44,135 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface TenantBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    TenantBO buildBOByVO(TenantVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	TenantBO buildBOByVO(TenantVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<TenantBO> buildBOListByVOList(List<TenantVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO Array
+	 * @return EntityBO Array
+	 */
+	List<TenantBO> buildBOListByVOList(List<TenantVO> entityVOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "tenantExt", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    TenantDO buildDOByBO(TenantBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "tenantExt", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	@Mapping(target = "deleted", ignore = true)
+	TenantDO buildDOByBO(TenantBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(TenantBO entityBO, @MappingTarget TenantDO entityDO) {
-        // Code
-        if (StringUtils.isEmpty(entityBO.getTenantCode())) {
-            entityDO.setTenantCode(CodeUtil.getCode());
-        }
+	@AfterMapping
+	default void afterProcess(TenantBO entityBO, @MappingTarget TenantDO entityDO) {
+		// Code
+		if (StringUtils.isEmpty(entityBO.getTenantCode())) {
+			entityDO.setTenantCode(CodeUtil.getCode());
+		}
 
-        // Json Ext
-        TenantExt entityExt = entityBO.getTenantExt();
-        JsonExt ext = new JsonExt();
-        if (Objects.nonNull(entityExt)) {
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-        }
-        entityDO.setTenantExt(ext);
+		// Json Ext
+		TenantExt entityExt = entityBO.getTenantExt();
+		JsonExt ext = new JsonExt();
+		if (Objects.nonNull(entityExt)) {
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+		}
+		entityDO.setTenantExt(ext);
 
-        // Enable Flag
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
+		// Enable Flag
+		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+	}
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<TenantDO> buildDOListByBOList(List<TenantBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<TenantDO> buildDOListByBOList(List<TenantBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "tenantExt", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    TenantBO buildBOByDO(TenantDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "tenantExt", ignore = true)
+	@Mapping(target = "enableFlag", ignore = true)
+	TenantBO buildBOByDO(TenantDO entityDO);
 
-    @AfterMapping
-    default void afterProcess(TenantDO entityDO, @MappingTarget TenantBO entityBO) {
-        // Json Ext
-        JsonExt entityExt = entityDO.getTenantExt();
-        if (Objects.nonNull(entityExt)) {
-            TenantExt ext = new TenantExt();
-            ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
-            ext.setRemark(entityExt.getRemark());
-            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), TenantExt.Content.class));
-            entityBO.setTenantExt(ext);
-        }
+	@AfterMapping
+	default void afterProcess(TenantDO entityDO, @MappingTarget TenantBO entityBO) {
+		// Json Ext
+		JsonExt entityExt = entityDO.getTenantExt();
+		if (Objects.nonNull(entityExt)) {
+			TenantExt ext = new TenantExt();
+			ext.setType(entityExt.getType());
+			ext.setVersion(entityExt.getVersion());
+			ext.setRemark(entityExt.getRemark());
+			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), TenantExt.Content.class));
+			entityBO.setTenantExt(ext);
+		}
 
-        // Enable Flag
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
+		// Enable Flag
+		Byte enableFlag = entityDO.getEnableFlag();
+		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+	}
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<TenantBO> buildBOListByDOList(List<TenantDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<TenantBO> buildBOListByDOList(List<TenantDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    TenantVO buildVOByBO(TenantBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	TenantVO buildVOByBO(TenantBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<TenantVO> buildVOListByBOList(List<TenantBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityVO Array
+	 */
+	List<TenantVO> buildVOListByBOList(List<TenantBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<TenantBO> buildBOPageByDOPage(Page<TenantDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<TenantBO> buildBOPageByDOPage(Page<TenantDO> entityPageDO);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<TenantVO> buildVOPageByBOPage(Page<TenantBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<TenantVO> buildVOPageByBOPage(Page<TenantBO> entityPageBO);
+
 }

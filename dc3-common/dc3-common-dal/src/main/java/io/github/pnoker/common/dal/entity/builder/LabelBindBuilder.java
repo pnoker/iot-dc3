@@ -38,116 +38,107 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface LabelBindBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    @Mapping(target = "tenantId", ignore = true)
-    LabelBindBO buildBOByVO(LabelBindVO entityVO);
+	/**
+	 * VO to BO
+	 * @param entityVO EntityVO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "tenantId", ignore = true)
+	LabelBindBO buildBOByVO(LabelBindVO entityVO);
 
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO collection
-     * @return EntityBO collection
-     */
-    List<LabelBindBO> buildBOListByVOList(List<LabelBindVO> entityVOList);
+	/**
+	 * VOList to BOList
+	 * @param entityVOList EntityVO collection
+	 * @return EntityBO collection
+	 */
+	List<LabelBindBO> buildBOListByVOList(List<LabelBindVO> entityVOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    LabelBindVO buildVOByBO(LabelBindBO entityBO);
+	/**
+	 * BO to VO
+	 * @param entityBO EntityBO
+	 * @return EntityVO
+	 */
+	LabelBindVO buildVOByBO(LabelBindBO entityBO);
 
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO collection
-     * @return EntityVO collection
-     */
-    List<LabelBindVO> buildVOListByBOList(List<LabelBindBO> entityBOList);
+	/**
+	 * BOList to VOList
+	 * @param entityBOList EntityBO collection
+	 * @return EntityVO collection
+	 */
+	List<LabelBindVO> buildVOListByBOList(List<LabelBindBO> entityBOList);
 
-    /**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "entityTypeFlag", ignore = true)
-    LabelBindBO buildBOByDO(LabelBindDO entityDO);
+	/**
+	 * DO to BO
+	 * @param entityDO EntityDO
+	 * @return EntityBO
+	 */
+	@Mapping(target = "entityTypeFlag", ignore = true)
+	LabelBindBO buildBOByDO(LabelBindDO entityDO);
 
-    @AfterMapping
-    default void afterProcess(LabelBindDO entityDO, @MappingTarget LabelBindBO entityBO) {
-        // EntityType Flag
-        Byte groupTypeFlag = entityDO.getEntityTypeFlag();
-        entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(groupTypeFlag));
-    }
+	@AfterMapping
+	default void afterProcess(LabelBindDO entityDO, @MappingTarget LabelBindBO entityBO) {
+		// EntityType Flag
+		Byte groupTypeFlag = entityDO.getEntityTypeFlag();
+		entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(groupTypeFlag));
+	}
 
-    /**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     */
-    List<LabelBindBO> buildBOListByDOList(List<LabelBindDO> entityDOList);
+	/**
+	 * DOList to BOList
+	 * @param entityDOList EntityDO Array
+	 * @return EntityBO Array
+	 */
+	List<LabelBindBO> buildBOListByDOList(List<LabelBindDO> entityDOList);
 
-    /**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    @Mapping(target = "entityTypeFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    LabelBindDO buildDOByBO(LabelBindBO entityBO);
+	/**
+	 * BO to DO
+	 * @param entityBO EntityBO
+	 * @return EntityDO
+	 */
+	@Mapping(target = "entityTypeFlag", ignore = true)
+	@Mapping(target = "deleted", ignore = true)
+	LabelBindDO buildDOByBO(LabelBindBO entityBO);
 
-    @AfterMapping
-    default void afterProcess(LabelBindBO entityBO, @MappingTarget LabelBindDO entityDO) {
-        // EntityType Flag
-        EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
-        Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
-    }
+	@AfterMapping
+	default void afterProcess(LabelBindBO entityBO, @MappingTarget LabelBindDO entityDO) {
+		// EntityType Flag
+		EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
+		Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
+	}
 
-    /**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     */
-    List<LabelBindDO> buildDOListByBOList(List<LabelBindBO> entityBOList);
+	/**
+	 * BOList to DOList
+	 * @param entityBOList EntityBO Array
+	 * @return EntityDO Array
+	 */
+	List<LabelBindDO> buildDOListByBOList(List<LabelBindBO> entityBOList);
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelBindVO> buildVOPageByBOPage(Page<LabelBindBO> entityPageBO);
+	/**
+	 * BOPage to VOPage
+	 * @param entityPageBO EntityBO Page
+	 * @return EntityVO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<LabelBindVO> buildVOPageByBOPage(Page<LabelBindBO> entityPageBO);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelBindBO> buildBOPageByDOPage(Page<LabelBindDO> entityPageDO);
+	/**
+	 * DOPage to BOPage
+	 * @param entityPageDO EntityDO Page
+	 * @return EntityBO Page
+	 */
+	@Mapping(target = "orders", ignore = true)
+	@Mapping(target = "countId", ignore = true)
+	@Mapping(target = "maxLimit", ignore = true)
+	@Mapping(target = "searchCount", ignore = true)
+	@Mapping(target = "optimizeCountSql", ignore = true)
+	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+	Page<LabelBindBO> buildBOPageByDOPage(Page<LabelBindDO> entityPageDO);
+
 }

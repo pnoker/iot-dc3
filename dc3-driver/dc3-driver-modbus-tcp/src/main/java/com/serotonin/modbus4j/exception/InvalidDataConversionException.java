@@ -17,20 +17,25 @@
 package com.serotonin.modbus4j.exception;
 
 /**
- * <p>InvalidDataConversionException class.</p>
+ * <p>
+ * InvalidDataConversionException class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class InvalidDataConversionException extends RuntimeException {
-    private static final long serialVersionUID = -1;
 
-    /**
-     * <p>Constructor for InvalidDataConversionException.</p>
-     *
-     * @param message a {@link String} object.
-     */
-    public InvalidDataConversionException(String message) {
-        super(message);
-    }
+	private static final long serialVersionUID = -1;
+
+	/**
+	 * <p>
+	 * Constructor for InvalidDataConversionException.
+	 * </p>
+	 * @param message a {@link String} object.
+	 */
+	public InvalidDataConversionException(String message) {
+		super(message);
+	}
+
 }

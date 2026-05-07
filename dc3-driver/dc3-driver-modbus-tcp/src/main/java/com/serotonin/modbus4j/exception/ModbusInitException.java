@@ -17,46 +17,55 @@
 package com.serotonin.modbus4j.exception;
 
 /**
- * <p>ModbusInitException class.</p>
+ * <p>
+ * ModbusInitException class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ModbusInitException extends Exception {
-    private static final long serialVersionUID = -1;
 
-    /**
-     * <p>Constructor for ModbusInitException.</p>
-     */
-    public ModbusInitException() {
-        super();
-    }
+	private static final long serialVersionUID = -1;
 
-    /**
-     * <p>Constructor for ModbusInitException.</p>
-     *
-     * @param message a {@link String} object.
-     * @param cause   a {@link Throwable} object.
-     */
-    public ModbusInitException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	/**
+	 * <p>
+	 * Constructor for ModbusInitException.
+	 * </p>
+	 */
+	public ModbusInitException() {
+		super();
+	}
 
-    /**
-     * <p>Constructor for ModbusInitException.</p>
-     *
-     * @param message a {@link String} object.
-     */
-    public ModbusInitException(String message) {
-        super(message);
-    }
+	/**
+	 * <p>
+	 * Constructor for ModbusInitException.
+	 * </p>
+	 * @param message a {@link String} object.
+	 * @param cause a {@link Throwable} object.
+	 */
+	public ModbusInitException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    /**
-     * <p>Constructor for ModbusInitException.</p>
-     *
-     * @param cause a {@link Throwable} object.
-     */
-    public ModbusInitException(Throwable cause) {
-        super(cause);
-    }
+	/**
+	 * <p>
+	 * Constructor for ModbusInitException.
+	 * </p>
+	 * @param message a {@link String} object.
+	 */
+	public ModbusInitException(String message) {
+		super(message);
+	}
+
+	/**
+	 * <p>
+	 * Constructor for ModbusInitException.
+	 * </p>
+	 * @param cause a {@link Throwable} object.
+	 */
+	public ModbusInitException(Throwable cause) {
+		super(cause);
+	}
+
 }

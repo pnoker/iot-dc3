@@ -25,7 +25,8 @@ import java.util.List;
 /**
  * A single SSE chunk in the OpenAI streaming chat completion response.
  *
- * @see <a href="https://platform.openai.com/docs/api-reference/chat/streaming">OpenAI Streaming</a>
+ * @see <a href="https://platform.openai.com/docs/api-reference/chat/streaming">OpenAI
+ * Streaming</a>
  */
 @Getter
 @Setter
@@ -35,31 +36,43 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatCompletionChunkResponse {
 
-    private String id;
-    private String object;
-    private long created;
-    private String model;
-    private List<ChunkChoice> choices;
+	private String id;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class ChunkChoice {
-        private int index;
-        private Delta delta;
-        @JsonProperty("finish_reason")
-        private String finishReason;
-    }
+	private String object;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class Delta {
-        private String role;
-        private String content;
-    }
+	private long created;
+
+	private String model;
+
+	private List<ChunkChoice> choices;
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class ChunkChoice {
+
+		private int index;
+
+		private Delta delta;
+
+		@JsonProperty("finish_reason")
+		private String finishReason;
+
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	public static class Delta {
+
+		private String role;
+
+		private String content;
+
+	}
+
 }

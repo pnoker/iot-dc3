@@ -24,12 +24,13 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  * Auto-configuration for the agentic module.
  * <p>
- * Activated when {@code dc3.agentic.enabled=true} (default).
- * Scans all components under {@code io.github.pnoker.common.agentic}.
+ * Activated when {@code dc3.agentic.enabled=true} (default). Scans all components under
+ * {@code io.github.pnoker.common.agentic}.
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.agentic.enabled", havingValue = "true", matchIfMissing = true)
 @ComponentScan("io.github.pnoker.common.agentic")
 @MapperScan("io.github.pnoker.common.agentic.mapper")
 public class AgenticAutoConfiguration {
+
 }

@@ -34,81 +34,84 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum MenuLevelFlagEnum {
-    /**
-     * Root menu
-     */
-    ROOT((byte) 0, "root", "Root menu"),
 
-    /**
-     * First-level submenu
-     */
-    C1((byte) 1, "c1", "First-level submenu"),
+	/**
+	 * Root menu
+	 */
+	ROOT((byte) 0, "root", "Root menu"),
 
-    /**
-     * Second-level submenu
-     */
-    C2((byte) 2, "c2", "Second-level submenu"),
+	/**
+	 * First-level submenu
+	 */
+	C1((byte) 1, "c1", "First-level submenu"),
 
-    /**
-     * Third-level submenu
-     */
-    C3((byte) 3, "c3", "Third-level submenu"),
+	/**
+	 * Second-level submenu
+	 */
+	C2((byte) 2, "c2", "Second-level submenu"),
 
-    /**
-     * Fourth-level submenu
-     */
-    C4((byte) 4, "c4", "Fourth-level submenu"),
-    ;
+	/**
+	 * Third-level submenu
+	 */
+	C3((byte) 3, "c3", "Third-level submenu"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Fourth-level submenu
+	 */
+	C4((byte) 4, "c4", "Fourth-level submenu"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Remark
-     */
-    private final String remark;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link MenuLevelFlagEnum}
-     */
-    public static MenuLevelFlagEnum ofIndex(Byte index) {
-        Optional<MenuLevelFlagEnum> any = Arrays.stream(MenuLevelFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Remark
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link MenuLevelFlagEnum}
-     */
-    public static MenuLevelFlagEnum ofCode(String code) {
-        Optional<MenuLevelFlagEnum> any = Arrays.stream(MenuLevelFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link MenuLevelFlagEnum}
+	 */
+	public static MenuLevelFlagEnum ofIndex(Byte index) {
+		Optional<MenuLevelFlagEnum> any = Arrays.stream(MenuLevelFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Enum name
-     * @return {@link MenuLevelFlagEnum}
-     */
-    public static MenuLevelFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link MenuLevelFlagEnum}
+	 */
+	public static MenuLevelFlagEnum ofCode(String code) {
+		Optional<MenuLevelFlagEnum> any = Arrays.stream(MenuLevelFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Enum name
+	 * @return {@link MenuLevelFlagEnum}
+	 */
+	public static MenuLevelFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

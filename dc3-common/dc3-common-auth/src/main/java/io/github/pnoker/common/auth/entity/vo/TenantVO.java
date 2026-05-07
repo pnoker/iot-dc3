@@ -43,33 +43,30 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class TenantVO extends BaseVO {
 
-    /**
-     * TenantName
-     */
-    @NotBlank(message = "Tenant name can't be empty",
-            groups = {Add.class, Auth.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "Invalid tenant name",
-            groups = {Add.class, Update.class})
-    private String tenantName;
+	/**
+	 * TenantName
+	 */
+	@NotBlank(message = "Tenant name can't be empty", groups = { Add.class, Auth.class })
+	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+			message = "Invalid tenant name", groups = { Add.class, Update.class })
+	private String tenantName;
 
-    /**
-     * TenantCode
-     */
-    @NotBlank(message = "Tenant code can't be empty",
-            groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "Invalid tenant code",
-            groups = {Add.class, Update.class})
-    private String tenantCode;
+	/**
+	 * TenantCode
+	 */
+	@NotBlank(message = "Tenant code can't be empty", groups = { Add.class })
+	@Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid tenant code",
+			groups = { Add.class, Update.class })
+	private String tenantCode;
 
-    /**
-     * Tenant
-     */
-    private TenantExt tenantExt;
+	/**
+	 * Tenant
+	 */
+	private TenantExt tenantExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

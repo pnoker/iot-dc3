@@ -52,13 +52,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.*;
 
-
 /**
  * Custom driver service implementation for the OPC UA driver.
  * <p>
  * This service provides OPC UA-specific device communication capabilities using the
- * Eclipse Milo OPC UA stack. It manages client connections to OPC UA servers and
- * handles read/write operations to OPC UA nodes.
+ * Eclipse Milo OPC UA stack. It manages client connections to OPC UA servers and handles
+ * read/write operations to OPC UA nodes.
  * </p>
  *
  * @author pnoker
@@ -69,196 +68,203 @@ import java.util.concurrent.*;
 @Service
 public class DriverCustomServiceImpl implements DriverCustomService {
 
-    @Resource
-    DriverMetadata driverMetadata;
-    @Resource
-    private DriverSenderService driverSenderService;
+	@Resource
+	DriverMetadata driverMetadata;
 
-    /**
-     * Cache of device ID to OPC UA client connections.
-     */
-    private Map<Long, OpcUaClient> connectMap;
+	@Resource
+	private DriverSenderService driverSenderService;
 
-    @Override
-    public void initial() {
-        connectMap = new ConcurrentHashMap<>(16);
-    }
+	/**
+	 * Cache of device ID to OPC UA client connections.
+	 */
+	private Map<Long, OpcUaClient> connectMap;
 
-    @Override
-    public void schedule() {
-        driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
-    }
+	@Override
+	public void initial() {
+		connectMap = new ConcurrentHashMap<>(16);
+	}
 
-    @Override
-    public void event(MetadataEventDTO metadataEvent) {
-        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-        MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
-        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
+	@Override
+	public void schedule() {
+		driverMetadata.getDeviceIds()
+			.forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+	}
 
-            // Remove stale connection when device is updated or deleted
-            if (MetadataOperateTypeEnum.DELETE.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                connectMap.remove(metadataEvent.getId());
-            }
-        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
-        }
-    }
+	@Override
+	public void event(MetadataEventDTO metadataEvent) {
+		MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+		MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
+		if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+			log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
 
-    @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
-        return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
-    }
+			// Remove stale connection when device is updated or deleted
+			if (MetadataOperateTypeEnum.DELETE.equals(operateType)
+					|| MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
+				connectMap.remove(metadataEvent.getId());
+			}
+		}
+		else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+			log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
+		}
+	}
 
-    @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
-        OpcUaClient client = getConnector(device.getId(), driverConfig);
-        return writeValue(client, pointConfig, wValue);
-    }
+	@Override
+	public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+			PointBO point) {
+		return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
+	}
 
-    /**
-     * Get or create an OPC UA client for the given device.
-     *
-     * @param deviceId     unique device identifier
-     * @param driverConfig driver configuration (host, port, path)
-     * @return cached or newly created OpcUaClient
-     * @throws ConnectorException if client creation fails
-     */
-    private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        log.debug("OPC UA server connection info: {}", JsonUtil.toJsonString(driverConfig));
-        OpcUaClient opcUaClient = connectMap.get(deviceId);
-        if (Objects.isNull(opcUaClient)) {
-            String host = driverConfig.get("host").getValue(String.class);
-            int port = driverConfig.get("port").getValue(Integer.class);
-            String path = driverConfig.get("path").getValue(String.class);
-            String url = String.format("opc.tcp://%s:%s%s", host, port, path);
-            try {
-                opcUaClient = OpcUaClient.create(
-                        url,
-                        endpoints -> endpoints.stream().findFirst(),
-                        configBuilder -> configBuilder
-                                // Use anonymous authentication
-                                .setIdentityProvider(new AnonymousProvider())
-                                // Set request timeout to 5000 ms
-                                .setRequestTimeout(Unsigned.uint(5000))
-                                .build()
-                );
-                connectMap.put(deviceId, opcUaClient);
-            } catch (UaException e) {
-                connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
-                log.error("Failed to connect OPC UA client: {}", e.getMessage(), e);
-                throw new ConnectorException(e.getMessage());
-            }
-        }
-        return opcUaClient;
-    }
+	@Override
+	public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+			PointBO point, WValue wValue) {
+		OpcUaClient client = getConnector(device.getId(), driverConfig);
+		return writeValue(client, pointConfig, wValue);
+	}
 
-    /**
-     * Build a NodeId from point configuration (namespace + tag).
-     */
-    private NodeId getNode(Map<String, AttributeBO> pointConfig) {
-        int namespace = pointConfig.get("namespace").getValue(Integer.class);
-        String tag = pointConfig.get("tag").getValue(String.class);
-        return new NodeId(namespace, tag);
-    }
+	/**
+	 * Get or create an OPC UA client for the given device.
+	 * @param deviceId unique device identifier
+	 * @param driverConfig driver configuration (host, port, path)
+	 * @return cached or newly created OpcUaClient
+	 * @throws ConnectorException if client creation fails
+	 */
+	private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
+		log.debug("OPC UA server connection info: {}", JsonUtil.toJsonString(driverConfig));
+		OpcUaClient opcUaClient = connectMap.get(deviceId);
+		if (Objects.isNull(opcUaClient)) {
+			String host = driverConfig.get("host").getValue(String.class);
+			int port = driverConfig.get("port").getValue(Integer.class);
+			String path = driverConfig.get("path").getValue(String.class);
+			String url = String.format("opc.tcp://%s:%s%s", host, port, path);
+			try {
+				opcUaClient = OpcUaClient.create(url, endpoints -> endpoints.stream().findFirst(),
+						configBuilder -> configBuilder
+							// Use anonymous authentication
+							.setIdentityProvider(new AnonymousProvider())
+							// Set request timeout to 5000 ms
+							.setRequestTimeout(Unsigned.uint(5000))
+							.build());
+				connectMap.put(deviceId, opcUaClient);
+			}
+			catch (UaException e) {
+				connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
+				log.error("Failed to connect OPC UA client: {}", e.getMessage(), e);
+				throw new ConnectorException(e.getMessage());
+			}
+		}
+		return opcUaClient;
+	}
 
-    /**
-     * Read a node value from the OPC UA server with a 1-second timeout.
-     *
-     * @param client      connected OPC UA client
-     * @param pointConfig point configuration (namespace, tag)
-     * @return the node value as a string
-     * @throws ReadPointException if reading fails or times out
-     */
-    private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
-        try {
-            NodeId nodeId = getNode(pointConfig);
-            client.connect().get();
-            CompletableFuture<String> value = new CompletableFuture<>();
-            client.readValue(0.0, TimestampsToReturn.Both, nodeId).thenAccept(dataValue -> value.complete(dataValue.getValue().getValue().toString()));
-            return value.get(1, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            log.error("Read opc ua value error: {}", e.getMessage(), e);
-            Thread.currentThread().interrupt();
-            throw new ReadPointException(e.getMessage());
-        } catch (ExecutionException | TimeoutException e) {
-            log.error("Read opc ua value error: {}", e.getMessage(), e);
-            throw new ReadPointException(e.getMessage());
-        }
-    }
+	/**
+	 * Build a NodeId from point configuration (namespace + tag).
+	 */
+	private NodeId getNode(Map<String, AttributeBO> pointConfig) {
+		int namespace = pointConfig.get("namespace").getValue(Integer.class);
+		String tag = pointConfig.get("tag").getValue(String.class);
+		return new NodeId(namespace, tag);
+	}
 
-    /**
-     * Write a value to an OPC UA node.
-     *
-     * @param client      connected OPC UA client
-     * @param pointConfig point configuration (namespace, tag)
-     * @param wValue      value to write
-     * @return true if the write succeeded
-     * @throws WritePointException if writing fails
-     */
-    private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WValue wValue) {
-        try {
-            NodeId nodeId = getNode(pointConfig);
-            client.connect().get();
-            return writeNode(client, nodeId, wValue);
-        } catch (InterruptedException e) {
-            log.error("Write opc ua value error: {}", e.getMessage(), e);
-            Thread.currentThread().interrupt();
-            throw new WritePointException(e.getMessage());
-        } catch (ExecutionException e) {
-            log.error("Write opc ua value error: {}", e.getMessage(), e);
-            throw new WritePointException(e.getMessage());
-        }
-    }
+	/**
+	 * Read a node value from the OPC UA server with a 1-second timeout.
+	 * @param client connected OPC UA client
+	 * @param pointConfig point configuration (namespace, tag)
+	 * @return the node value as a string
+	 * @throws ReadPointException if reading fails or times out
+	 */
+	private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
+		try {
+			NodeId nodeId = getNode(pointConfig);
+			client.connect().get();
+			CompletableFuture<String> value = new CompletableFuture<>();
+			client.readValue(0.0, TimestampsToReturn.Both, nodeId)
+				.thenAccept(dataValue -> value.complete(dataValue.getValue().getValue().toString()));
+			return value.get(1, TimeUnit.SECONDS);
+		}
+		catch (InterruptedException e) {
+			log.error("Read opc ua value error: {}", e.getMessage(), e);
+			Thread.currentThread().interrupt();
+			throw new ReadPointException(e.getMessage());
+		}
+		catch (ExecutionException | TimeoutException e) {
+			log.error("Read opc ua value error: {}", e.getMessage(), e);
+			throw new ReadPointException(e.getMessage());
+		}
+	}
 
-    /**
-     * Write a typed value to an OPC UA node via DataValue/Variant.
-     * <p>Supports INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
-     *
-     * @param client connected OPC UA client
-     * @param nodeId target node identifier
-     * @param wValue value and type to write
-     * @return true if the server reported a good status
-     */
-    private boolean writeNode(OpcUaClient client, NodeId nodeId, WValue wValue) throws ExecutionException, InterruptedException {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());
-        if (Objects.isNull(valueType)) {
-            throw new UnSupportException("Unsupported type of " + wValue.getType());
-        }
+	/**
+	 * Write a value to an OPC UA node.
+	 * @param client connected OPC UA client
+	 * @param pointConfig point configuration (namespace, tag)
+	 * @param wValue value to write
+	 * @return true if the write succeeded
+	 * @throws WritePointException if writing fails
+	 */
+	private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WValue wValue) {
+		try {
+			NodeId nodeId = getNode(pointConfig);
+			client.connect().get();
+			return writeNode(client, nodeId, wValue);
+		}
+		catch (InterruptedException e) {
+			log.error("Write opc ua value error: {}", e.getMessage(), e);
+			Thread.currentThread().interrupt();
+			throw new WritePointException(e.getMessage());
+		}
+		catch (ExecutionException e) {
+			log.error("Write opc ua value error: {}", e.getMessage(), e);
+			throw new WritePointException(e.getMessage());
+		}
+	}
 
-        CompletableFuture<StatusCode> status = new CompletableFuture<>();
-        switch (valueType) {
-            case INT:
-                int intValue = wValue.getValue(Integer.class);
-                status = client.writeValue(nodeId, new DataValue(new Variant(intValue)));
-                break;
-            case LONG:
-                long longValue = wValue.getValue(Long.class);
-                status = client.writeValue(nodeId, new DataValue(new Variant(longValue)));
-                break;
-            case FLOAT:
-                float floatValue = wValue.getValue(Float.class);
-                status = client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
-                break;
-            case DOUBLE:
-                double doubleValue = wValue.getValue(Double.class);
-                status = client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
-                break;
-            case BOOLEAN:
-                boolean booleanValue = wValue.getValue(Boolean.class);
-                status = client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
-                break;
-            case STRING:
-                status = client.writeValue(nodeId, new DataValue(new Variant(wValue.getValue())));
-                break;
-            default:
-                break;
-        }
+	/**
+	 * Write a typed value to an OPC UA node via DataValue/Variant.
+	 * <p>
+	 * Supports INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
+	 * @param client connected OPC UA client
+	 * @param nodeId target node identifier
+	 * @param wValue value and type to write
+	 * @return true if the server reported a good status
+	 */
+	private boolean writeNode(OpcUaClient client, NodeId nodeId, WValue wValue)
+			throws ExecutionException, InterruptedException {
+		PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());
+		if (Objects.isNull(valueType)) {
+			throw new UnSupportException("Unsupported type of " + wValue.getType());
+		}
 
-        if (Objects.nonNull(status) && Objects.nonNull(status.get())) {
-            return status.get().getValue() > 0;
-        }
-        return false;
-    }
+		CompletableFuture<StatusCode> status = new CompletableFuture<>();
+		switch (valueType) {
+			case INT:
+				int intValue = wValue.getValue(Integer.class);
+				status = client.writeValue(nodeId, new DataValue(new Variant(intValue)));
+				break;
+			case LONG:
+				long longValue = wValue.getValue(Long.class);
+				status = client.writeValue(nodeId, new DataValue(new Variant(longValue)));
+				break;
+			case FLOAT:
+				float floatValue = wValue.getValue(Float.class);
+				status = client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
+				break;
+			case DOUBLE:
+				double doubleValue = wValue.getValue(Double.class);
+				status = client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
+				break;
+			case BOOLEAN:
+				boolean booleanValue = wValue.getValue(Boolean.class);
+				status = client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
+				break;
+			case STRING:
+				status = client.writeValue(nodeId, new DataValue(new Variant(wValue.getValue())));
+				break;
+			default:
+				break;
+		}
+
+		if (Objects.nonNull(status) && Objects.nonNull(status.get())) {
+			return status.get().getValue() > 0;
+		}
+		return false;
+	}
 
 }

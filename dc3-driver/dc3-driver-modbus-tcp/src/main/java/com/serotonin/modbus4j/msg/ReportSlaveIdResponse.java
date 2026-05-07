@@ -22,50 +22,55 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>ReportSlaveIdResponse class.</p>
+ * <p>
+ * ReportSlaveIdResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ReportSlaveIdResponse extends ModbusResponse {
-    private byte[] data;
 
-    ReportSlaveIdResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	private byte[] data;
 
-    ReportSlaveIdResponse(int slaveId, byte[] data) throws ModbusTransportException {
-        super(slaveId);
-        this.data = data;
-    }
+	ReportSlaveIdResponse(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.REPORT_SLAVE_ID;
-    }
+	ReportSlaveIdResponse(int slaveId, byte[] data) throws ModbusTransportException {
+		super(slaveId);
+		this.data = data;
+	}
 
-    @Override
-    protected void readResponse(ByteQueue queue) {
-        int numberOfBytes = ModbusUtils.popUnsignedByte(queue);
-        if (queue.size() < numberOfBytes)
-            throw new ArrayIndexOutOfBoundsException();
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.REPORT_SLAVE_ID;
+	}
 
-        data = new byte[numberOfBytes];
-        queue.pop(data);
-    }
+	@Override
+	protected void readResponse(ByteQueue queue) {
+		int numberOfBytes = ModbusUtils.popUnsignedByte(queue);
+		if (queue.size() < numberOfBytes)
+			throw new ArrayIndexOutOfBoundsException();
 
-    @Override
-    protected void writeResponse(ByteQueue queue) {
-        ModbusUtils.pushByte(queue, data.length);
-        queue.push(data);
-    }
+		data = new byte[numberOfBytes];
+		queue.pop(data);
+	}
 
-    /**
-     * <p>Getter for the field <code>data</code>.</p>
-     *
-     * @return an array of {@link byte} objects.
-     */
-    public byte[] getData() {
-        return data;
-    }
+	@Override
+	protected void writeResponse(ByteQueue queue) {
+		ModbusUtils.pushByte(queue, data.length);
+		queue.push(data);
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>data</code>.
+	 * </p>
+	 * @return an array of {@link byte} objects.
+	 */
+	public byte[] getData() {
+		return data;
+	}
+
 }

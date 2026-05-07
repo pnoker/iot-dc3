@@ -27,35 +27,30 @@ import io.github.pnoker.common.auth.entity.bean.TokenValid;
  * @since 2022.1.0
  */
 public interface TokenService {
-    /**
-     *
-     *
-     * @param loginName  Name
-     * @param tenantCode TenantCode
-     * @return R of String
-     */
-    String generateSalt(String loginName, String tenantCode);
 
-    /**
-     *
-     *
-     * @param loginName  Name
-     * @param salt       User Salt
-     * @param password   User Password
-     * @param tenantCode TenantCode
-     * @return R of String
-     */
-    String generateToken(String loginName, String salt, String password, String tenantCode);
+	/**
+	 * @param loginName Name
+	 * @param tenantCode TenantCode
+	 * @return R of String
+	 */
+	String generateSalt(String loginName, String tenantCode);
 
-    /**
-     *
-     *
-     * @param loginName  Name
-     * @param salt
-     * @param token      Token
-     * @param tenantCode TenantCode
-     * @return TokenValid
-     */
-    TokenValid checkValid(String loginName, String salt, String token, String tenantCode);
+	/**
+	 * @param loginName Name
+	 * @param salt User Salt
+	 * @param password User Password
+	 * @param tenantCode TenantCode
+	 * @return R of String
+	 */
+	String generateToken(String loginName, String salt, String password, String tenantCode);
+
+	/**
+	 * @param loginName Name
+	 * @param salt
+	 * @param token Token
+	 * @param tenantCode TenantCode
+	 * @return TokenValid
+	 */
+	TokenValid checkValid(String loginName, String salt, String token, String tenantCode);
 
 }

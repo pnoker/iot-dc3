@@ -38,21 +38,21 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class TenantBindQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    // 
+	//
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
 
-    /**
-     * ID
-     */
-    private Long userId;
+	/**
+	 * ID
+	 */
+	private Long userId;
 
 }

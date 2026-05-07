@@ -36,9 +36,9 @@ import java.util.Map;
 /**
  * MQTT Environment Configuration
  * <p>
- * Environment post processor for MQTT configuration in IoT DC3 platform.
- * Sets up MQTT environment variables and property sources
- * based on node configuration and service tags.
+ * Environment post processor for MQTT configuration in IoT DC3 platform. Sets up MQTT
+ * environment variables and property sources based on node configuration and service
+ * tags.
  * </p>
  *
  * @author pnoker
@@ -50,28 +50,28 @@ import java.util.Map;
 @Configuration
 public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
 
-    @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
-        if (StringUtils.isEmpty(node)) {
-            node = EnvironmentUtil.getNodeId();
-        }
+	@Override
+	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+		String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
+		if (StringUtils.isEmpty(node)) {
+			node = EnvironmentUtil.getNodeId();
+		}
 
-        String tenant = environment.getProperty(EnvironmentConstant.DRIVER_TENANT, String.class);
-        String name = environment.getProperty(EnvironmentConstant.SPRING_APPLICATION_NAME, String.class);
-        String client = MessageFormat.format("{0}/{1}/{2}", tenant, name, node);
+		String tenant = environment.getProperty(EnvironmentConstant.DRIVER_TENANT, String.class);
+		String name = environment.getProperty(EnvironmentConstant.SPRING_APPLICATION_NAME, String.class);
+		String client = MessageFormat.format("{0}/{1}/{2}", tenant, name, node);
 
-        String prefix = environment.getProperty(EnvironmentConstant.MQTT_PREFIX, String.class);
-        if (StringUtils.isEmpty(node)) {
-            prefix = MessageFormat.format("dc3/{0}/{1}/", tenant, name);
-        }
+		String prefix = environment.getProperty(EnvironmentConstant.MQTT_PREFIX, String.class);
+		if (StringUtils.isEmpty(node)) {
+			prefix = MessageFormat.format("dc3/{0}/{1}/", tenant, name);
+		}
 
-        Map<String, Object> source = new HashMap<>(2);
-        source.put(EnvironmentConstant.DRIVER_NODE, node);
-        source.put(EnvironmentConstant.MQTT_CLIENT, client);
-        source.put(EnvironmentConstant.MQTT_PREFIX, prefix);
-        MutablePropertySources propertySources = environment.getPropertySources();
-        propertySources.addFirst(new MapPropertySource("mqtt", source));
-    }
+		Map<String, Object> source = new HashMap<>(2);
+		source.put(EnvironmentConstant.DRIVER_NODE, node);
+		source.put(EnvironmentConstant.MQTT_CLIENT, client);
+		source.put(EnvironmentConstant.MQTT_PREFIX, prefix);
+		MutablePropertySources propertySources = environment.getPropertySources();
+		propertySources.addFirst(new MapPropertySource("mqtt", source));
+	}
 
 }

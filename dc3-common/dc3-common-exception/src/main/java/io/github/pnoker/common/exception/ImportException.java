@@ -20,22 +20,22 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class ImportException extends RuntimeException {
-    public ImportException() {
-        this(null);
-    }
 
-    public ImportException(Throwable cause) {
-        super(cause);
-    }
+	public ImportException() {
+		this(null);
+	}
 
-    public ImportException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public ImportException(Throwable cause) {
+		super(cause);
+	}
+
+	public ImportException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

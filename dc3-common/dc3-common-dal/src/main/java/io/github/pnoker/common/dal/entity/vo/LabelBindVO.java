@@ -26,7 +26,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 /**
- * Label binding view object (VO) representing the association between labels and entities.
+ * Label binding view object (VO) representing the association between labels and
+ * entities.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -40,24 +41,22 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class LabelBindVO extends BaseVO {
 
-    /**
-     * Entity type flag.
-     */
-    @NotNull(message = "实体类型标识不能为空",
-            groups = {Add.class, Update.class})
-    private EntityTypeFlagEnum entityTypeFlag;
+	/**
+	 * Entity type flag.
+	 */
+	@NotNull(message = "实体类型标识不能为空", groups = { Add.class, Update.class })
+	private EntityTypeFlagEnum entityTypeFlag;
 
-    /**
-     * Label ID.
-     */
-    @NotNull(message = "标签ID不能为空",
-            groups = {Add.class, Update.class})
-    private Long labelId;
+	/**
+	 * Label ID.
+	 */
+	@NotNull(message = "标签ID不能为空", groups = { Add.class, Update.class })
+	private Long labelId;
 
-    /**
-     * Entity ID.
-     */
-    @NotNull(message = "实体ID不能为空",
-            groups = {Add.class, Update.class})
-    private Long entityId;
+	/**
+	 * Entity ID.
+	 */
+	@NotNull(message = "实体ID不能为空", groups = { Add.class, Update.class })
+	private Long entityId;
+
 }

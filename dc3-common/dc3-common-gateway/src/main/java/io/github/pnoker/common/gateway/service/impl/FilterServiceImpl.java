@@ -48,79 +48,82 @@ import java.util.Objects;
 @Service
 public class FilterServiceImpl implements FilterService {
 
-    @Resource
-    private TenantFacade tenantFacade;
+	@Resource
+	private TenantFacade tenantFacade;
 
-    @Resource
-    private UserLoginFacade userLoginFacade;
+	@Resource
+	private UserLoginFacade userLoginFacade;
 
-    @Resource
-    private UserFacade userFacade;
+	@Resource
+	private UserFacade userFacade;
 
-    @Resource
-    private TokenFacade tokenFacade;
+	@Resource
+	private TokenFacade tokenFacade;
 
-    @Override
-    public FacadeTenantBO getTenant(ServerHttpRequest request) {
-        String code = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
-        if (StringUtils.isEmpty(code)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
+	@Override
+	public FacadeTenantBO getTenant(ServerHttpRequest request) {
+		String code = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
+		if (StringUtils.isEmpty(code)) {
+			throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+		}
 
-        FacadeTenantBO tenant = tenantFacade.selectByCode(code);
-        if (Objects.isNull(tenant) || tenant.getEnableFlag() != EnableFlagEnum.ENABLE) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-        return tenant;
-    }
+		FacadeTenantBO tenant = tenantFacade.selectByCode(code);
+		if (Objects.isNull(tenant) || tenant.getEnableFlag() != EnableFlagEnum.ENABLE) {
+			throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+		}
+		return tenant;
+	}
 
-    @Override
-    public FacadeUserLoginBO getUserLogin(ServerHttpRequest request) {
-        String name = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
-        if (StringUtils.isEmpty(name)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
+	@Override
+	public FacadeUserLoginBO getUserLogin(ServerHttpRequest request) {
+		String name = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
+		if (StringUtils.isEmpty(name)) {
+			throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+		}
 
-        FacadeUserLoginBO userLogin = userLoginFacade.selectByName(name);
-        if (Objects.isNull(userLogin) || userLogin.getEnableFlag() != EnableFlagEnum.ENABLE) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-        return userLogin;
-    }
+		FacadeUserLoginBO userLogin = userLoginFacade.selectByName(name);
+		if (Objects.isNull(userLogin) || userLogin.getEnableFlag() != EnableFlagEnum.ENABLE) {
+			throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+		}
+		return userLogin;
+	}
 
-    @Override
-    public RequestHeader.UserHeader getUser(FacadeUserLoginBO userLogin, FacadeTenantBO tenant) {
-        // Preserves the existing (surprising) behavior: lookup UserApi by UserLogin.id,
-        // not UserLogin.userId. Changing that belongs in a separate bug-fix PR.
-        FacadeUserBO user = userFacade.selectById(userLogin.getId());
-        if (Objects.isNull(user)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
+	@Override
+	public RequestHeader.UserHeader getUser(FacadeUserLoginBO userLogin, FacadeTenantBO tenant) {
+		// Preserves the existing (surprising) behavior: lookup UserApi by UserLogin.id,
+		// not UserLogin.userId. Changing that belongs in a separate bug-fix PR.
+		FacadeUserBO user = userFacade.selectById(userLogin.getId());
+		if (Objects.isNull(user)) {
+			throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+		}
 
-        RequestHeader.UserHeader header = new RequestHeader.UserHeader();
-        header.setUserId(user.getId());
-        header.setNickName(user.getNickName());
-        header.setUserName(user.getUserName());
-        header.setTenantId(tenant.getId());
-        return header;
-    }
+		RequestHeader.UserHeader header = new RequestHeader.UserHeader();
+		header.setUserId(user.getId());
+		header.setNickName(user.getNickName());
+		header.setUserName(user.getUserName());
+		header.setTenantId(tenant.getId());
+		return header;
+	}
 
-    @Override
-    public void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeUserLoginBO userLogin) {
-        String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-        RequestHeader.TokenHeader header;
-        try {
-            header = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
-        } catch (Exception e) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-        if (Objects.isNull(header) || StringUtils.isAnyEmpty(header.getSalt(), header.getToken())) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
+	@Override
+	public void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeUserLoginBO userLogin) {
+		String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
+		RequestHeader.TokenHeader header;
+		try {
+			header = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
+		}
+		catch (Exception e) {
+			throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+		}
+		if (Objects.isNull(header) || StringUtils.isAnyEmpty(header.getSalt(), header.getToken())) {
+			throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+		}
 
-        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), userLogin.getLoginName(), header.getSalt(), header.getToken());
-        if (!valid) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-    }
+		boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), userLogin.getLoginName(), header.getSalt(),
+				header.getToken());
+		if (!valid) {
+			throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+		}
+	}
+
 }

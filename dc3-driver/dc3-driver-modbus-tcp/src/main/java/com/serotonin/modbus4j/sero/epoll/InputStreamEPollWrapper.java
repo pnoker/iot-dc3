@@ -19,26 +19,30 @@ package com.serotonin.modbus4j.sero.epoll;
 import java.io.InputStream;
 
 /**
- * <p>InputStreamEPollWrapper interface.</p>
+ * <p>
+ * InputStreamEPollWrapper interface.
+ * </p>
  *
  * @author Terry Packer
  * @version 2025.9.0
  */
 public interface InputStreamEPollWrapper {
 
-    /**
-     * <p>add.</p>
-     *
-     * @param in                  a {@link InputStream} object.
-     * @param inputStreamCallback a {@link Modbus4JInputStreamCallback} object.
-     */
-    void add(InputStream in, Modbus4JInputStreamCallback inputStreamCallback);
+	/**
+	 * <p>
+	 * add.
+	 * </p>
+	 * @param in a {@link InputStream} object.
+	 * @param inputStreamCallback a {@link Modbus4JInputStreamCallback} object.
+	 */
+	void add(InputStream in, Modbus4JInputStreamCallback inputStreamCallback);
 
-    /**
-     * <p>remove.</p>
-     *
-     * @param in a {@link InputStream} object.
-     */
-    void remove(InputStream in);
+	/**
+	 * <p>
+	 * remove.
+	 * </p>
+	 * @param in a {@link InputStream} object.
+	 */
+	void remove(InputStream in);
 
 }

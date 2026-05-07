@@ -34,61 +34,62 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum DeviceStatusEnum {
-    ONLINE((byte) 0, "ONLINE", "online"),
-    OFFLINE((byte) 1, "OFFLINE", "offline"),
-    MAINTAIN((byte) 2, "MAINTAIN", "maintenance"),
-    FAULT((byte) 3, "FAULT", "fault"),
-    ;
 
-    /**
-     * Index value stored in database.
-     */
-    @EnumValue
-    private final Byte index;
+	ONLINE((byte) 0, "ONLINE", "online"), OFFLINE((byte) 1, "OFFLINE", "offline"),
+	MAINTAIN((byte) 2, "MAINTAIN", "maintenance"), FAULT((byte) 3, "FAULT", "fault"),;
 
-    /**
-     * Status code string.
-     */
-    private final String code;
+	/**
+	 * Index value stored in database.
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Human-readable description.
-     */
-    private final String remark;
+	/**
+	 * Status code string.
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index value.
-     *
-     * @param index index value
-     * @return {@link DeviceStatusEnum} or {@code null} if not found
-     */
-    public static DeviceStatusEnum ofIndex(Byte index) {
-        Optional<DeviceStatusEnum> any = Arrays.stream(DeviceStatusEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Human-readable description.
+	 */
+	private final String remark;
 
-    /**
-     * Get enum by code string.
-     *
-     * @param code code string
-     * @return {@link DeviceStatusEnum} or {@code null} if not found
-     */
-    public static DeviceStatusEnum ofCode(String code) {
-        Optional<DeviceStatusEnum> any = Arrays.stream(DeviceStatusEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index value.
+	 * @param index index value
+	 * @return {@link DeviceStatusEnum} or {@code null} if not found
+	 */
+	public static DeviceStatusEnum ofIndex(Byte index) {
+		Optional<DeviceStatusEnum> any = Arrays.stream(DeviceStatusEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by enum name.
-     *
-     * @param name enum name
-     * @return {@link DeviceStatusEnum} or {@code null} if parsing fails
-     */
-    public static DeviceStatusEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code string.
+	 * @param code code string
+	 * @return {@link DeviceStatusEnum} or {@code null} if not found
+	 */
+	public static DeviceStatusEnum ofCode(String code) {
+		Optional<DeviceStatusEnum> any = Arrays.stream(DeviceStatusEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by enum name.
+	 * @param name enum name
+	 * @return {@link DeviceStatusEnum} or {@code null} if parsing fails
+	 */
+	public static DeviceStatusEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

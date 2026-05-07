@@ -28,6 +28,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class EntityCountRow {
-    private long entityId;
-    private long count;
+
+	private long entityId;
+
+	private long count;
+
 }

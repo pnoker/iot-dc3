@@ -25,29 +25,27 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Thread Initialization Runner for DC3 IoT Platform.
- * This component handles thread initialization tasks during application startup.
- * It scans and initializes thread-related components in the specified package.
+ * Thread Initialization Runner for DC3 IoT Platform. This component handles thread
+ * initialization tasks during application startup. It scans and initializes
+ * thread-related components in the specified package.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.thread"
-})
-@EnableConfigurationProperties({ThreadProperties.class})
+@ComponentScan(basePackages = { "io.github.pnoker.common.thread" })
+@EnableConfigurationProperties({ ThreadProperties.class })
 public class ThreadInitRunner implements ApplicationRunner {
 
-    /**
-     * Initialize thread components during application startup
-     *
-     * @param args Application arguments passed to the application
-     * @throws Exception if initialization fails
-     */
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // nothing to do
-    }
+	/**
+	 * Initialize thread components during application startup
+	 * @param args Application arguments passed to the application
+	 * @throws Exception if initialization fails
+	 */
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		// nothing to do
+	}
+
 }

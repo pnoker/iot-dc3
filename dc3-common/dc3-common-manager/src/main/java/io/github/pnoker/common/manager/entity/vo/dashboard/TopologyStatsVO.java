@@ -25,10 +25,9 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Total counts across the tenant (not just the Top-N rendered in the
- * Sankey). Frontend uses this for the footer summary bar — "X Driver ·
- * Y Device · Z Profile · W Point" — so the user can see how much the
- * diagram has been cropped.
+ * Total counts across the tenant (not just the Top-N rendered in the Sankey). Frontend
+ * uses this for the footer summary bar — "X Driver · Y Device · Z Profile · W Point" — so
+ * the user can see how much the diagram has been cropped.
  *
  * @author pnoker
  * @since 2026.5.4
@@ -38,17 +37,22 @@ import java.io.Serializable;
 @ToString
 public class TopologyStatsVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private long driverCount;
-    private long deviceCount;
-    private long profileCount;
-    private long pointCount;
-    /**
-     * Short human-readable range label ("24h" / "7d" / ...) — present only
-     * when the server computed volumes over a time window (volume mode).
-     * null for cardinality mode so the frontend footer can skip it.
-     */
-    private String rangeLabel;
+	private long driverCount;
+
+	private long deviceCount;
+
+	private long profileCount;
+
+	private long pointCount;
+
+	/**
+	 * Short human-readable range label ("24h" / "7d" / ...) — present only when the
+	 * server computed volumes over a time window (volume mode). null for cardinality mode
+	 * so the frontend footer can skip it.
+	 */
+	private String rangeLabel;
+
 }

@@ -18,16 +18,19 @@
 package com.serotonin.modbus4j.sero.messaging;
 
 /**
- * <p>OutgoingMessage interface.</p>
+ * <p>
+ * OutgoingMessage interface.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public interface OutgoingMessage {
-    /**
-     * Return the byte array representing the serialization of the request.
-     *
-     * @return byte array representing the serialization of the request
-     */
-    byte[] getMessageData();
+
+	/**
+	 * Return the byte array representing the serialization of the request.
+	 * @return byte array representing the serialization of the request
+	 */
+	byte[] getMessageData();
+
 }

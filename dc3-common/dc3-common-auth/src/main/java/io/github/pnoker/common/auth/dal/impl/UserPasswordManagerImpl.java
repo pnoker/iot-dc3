@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @since 2022.1.0
  */
 @Service
-public class UserPasswordManagerImpl extends ServiceImpl<UserPasswordMapper, UserPasswordDO> implements UserPasswordManager {
+public class UserPasswordManagerImpl extends ServiceImpl<UserPasswordMapper, UserPasswordDO>
+		implements UserPasswordManager {
 
 }

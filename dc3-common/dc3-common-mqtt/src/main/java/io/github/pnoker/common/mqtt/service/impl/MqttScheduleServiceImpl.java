@@ -30,9 +30,8 @@ import org.springframework.stereotype.Service;
 /**
  * MQTT Schedule Service Implementation
  * <p>
- * Implementation of MQTT schedule service for IoT DC3 platform.
- * Manages scheduling of MQTT message processing tasks
- * using Quartz framework with configurable intervals.
+ * Implementation of MQTT schedule service for IoT DC3 platform. Manages scheduling of
+ * MQTT message processing tasks using Quartz framework with configurable intervals.
  * </p>
  *
  * @author pnoker
@@ -43,20 +42,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class MqttScheduleServiceImpl implements MqttScheduleService {
 
-    @Value("${driver.mqtt.batch.interval}")
-    private Integer interval;
+	@Value("${driver.mqtt.batch.interval}")
+	private Integer interval;
 
-    @Resource
-    private QuartzService quartzService;
+	@Resource
+	private QuartzService quartzService;
 
-    @Override
-    public void initial() {
-        try {
-            quartzService.createJobWithInterval("ScheduleGroup", "MqttScheduleJob", interval, DateBuilder.IntervalUnit.SECOND, MqttScheduleJob.class);
+	@Override
+	public void initial() {
+		try {
+			quartzService.createJobWithInterval("ScheduleGroup", "MqttScheduleJob", interval,
+					DateBuilder.IntervalUnit.SECOND, MqttScheduleJob.class);
 
-            quartzService.startScheduler();
-        } catch (SchedulerException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
+			quartzService.startScheduler();
+		}
+		catch (SchedulerException e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
 }

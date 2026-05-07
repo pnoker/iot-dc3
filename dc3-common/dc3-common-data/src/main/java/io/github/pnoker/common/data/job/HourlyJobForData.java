@@ -35,16 +35,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class HourlyJobForData extends QuartzJobBean {
 
-    /**
-     *
-     * * <p>
-     * * biz service
-     *
-     * @param context JobExecutionContext
-     * @throws JobExecutionException JobExecutionException
-     */
-    @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        log.info("hourlyJobHandler: {}", LocalDateTimeUtil.now());
-    }
+	/**
+	 *
+	 * *
+	 * <p>
+	 * * biz service
+	 * @param context JobExecutionContext
+	 * @throws JobExecutionException JobExecutionException
+	 */
+	@Override
+	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+		log.info("hourlyJobHandler: {}", LocalDateTimeUtil.now());
+	}
+
 }

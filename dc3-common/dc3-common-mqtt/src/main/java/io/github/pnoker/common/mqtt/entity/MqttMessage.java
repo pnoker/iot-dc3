@@ -24,9 +24,8 @@ import java.io.Serializable;
 /**
  * MQTT Message Entity Class
  * <p>
- * Represents an MQTT message in IoT DC3 platform.
- * Contains message header and payload data for
- * MQTT communication and processing.
+ * Represents an MQTT message in IoT DC3 platform. Contains message header and payload
+ * data for MQTT communication and processing.
  * </p>
  *
  * @author pnoker
@@ -40,6 +39,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MqttMessage implements Serializable {
-    private MessageHeader header;
-    private String payload;
+
+	private MessageHeader header;
+
+	private String payload;
+
 }

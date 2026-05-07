@@ -20,22 +20,22 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class UpdateException extends RuntimeException {
-    public UpdateException() {
-        this(null);
-    }
 
-    public UpdateException(Throwable cause) {
-        super(cause);
-    }
+	public UpdateException() {
+		this(null);
+	}
 
-    public UpdateException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public UpdateException(Throwable cause) {
+		super(cause);
+	}
+
+	public UpdateException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

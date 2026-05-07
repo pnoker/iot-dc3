@@ -28,7 +28,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class PeerAlarmRow {
-    private long profileId;
-    private long deviceId;
-    private long alarmCount;
+
+	private long profileId;
+
+	private long deviceId;
+
+	private long alarmCount;
+
 }

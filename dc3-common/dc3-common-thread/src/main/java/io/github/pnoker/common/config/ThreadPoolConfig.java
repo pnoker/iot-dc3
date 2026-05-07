@@ -22,7 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -41,89 +48,83 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Configuration
 public class ThreadPoolConfig {
 
-    private final AtomicInteger threadPoolAtomic = new AtomicInteger(1);
-    private final AtomicInteger scheduledThreadPoolAtomic = new AtomicInteger(1);
+	private final AtomicInteger threadPoolAtomic = new AtomicInteger(1);
 
-    private final ThreadProperties thread;
+	private final AtomicInteger scheduledThreadPoolAtomic = new AtomicInteger(1);
 
-    public ThreadPoolConfig(ThreadProperties thread) {
-        this.thread = thread;
-    }
+	private final ThreadProperties thread;
 
-    /**
-     * Create ThreadPoolExecutor with LinkedBlockingQueue
-     *
-     * @return Configured ThreadPoolExecutor bean
-     */
-    @Bean(destroyMethod = "shutdown")
-    public ThreadPoolExecutor threadPoolExecutor() {
-        return new ThreadPoolExecutor(
-                thread.getCorePoolSize(),
-                thread.getMaximumPoolSize(),
-                thread.getKeepAliveTime(),
-                TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(thread.getMaximumPoolSize() * 2),
-                r -> new Thread(r, "[T]" + thread.getPrefix() + threadPoolAtomic.getAndIncrement()),
-                (r, e) -> new BlockingRejectedExecutionHandler());
-    }
+	public ThreadPoolConfig(ThreadProperties thread) {
+		this.thread = thread;
+	}
 
-    /**
-     * Create virtual thread executor service
-     * Creates one virtual thread per task for improved resource utilization
-     *
-     * @return Virtual thread ExecutorService bean
-     */
-    @Bean(destroyMethod = "shutdown")
-    public ExecutorService virtualThreadExecutor() {
-        ThreadFactory factory = Thread.ofVirtual()
-                .name("[VT]" + thread.getPrefix(), 0)
-                .factory();
+	/**
+	 * Create ThreadPoolExecutor with LinkedBlockingQueue
+	 * @return Configured ThreadPoolExecutor bean
+	 */
+	@Bean(destroyMethod = "shutdown")
+	public ThreadPoolExecutor threadPoolExecutor() {
+		return new ThreadPoolExecutor(thread.getCorePoolSize(), thread.getMaximumPoolSize(), thread.getKeepAliveTime(),
+				TimeUnit.SECONDS, new LinkedBlockingQueue<>(thread.getMaximumPoolSize() * 2),
+				r -> new Thread(r, "[T]" + thread.getPrefix() + threadPoolAtomic.getAndIncrement()),
+				(r, e) -> new BlockingRejectedExecutionHandler());
+	}
 
-        return Executors.newThreadPerTaskExecutor(factory);
-    }
+	/**
+	 * Create virtual thread executor service Creates one virtual thread per task for
+	 * improved resource utilization
+	 * @return Virtual thread ExecutorService bean
+	 */
+	@Bean(destroyMethod = "shutdown")
+	public ExecutorService virtualThreadExecutor() {
+		ThreadFactory factory = Thread.ofVirtual().name("[VT]" + thread.getPrefix(), 0).factory();
 
-    /**
-     * Create ScheduledThreadPoolExecutor for scheduled tasks
-     *
-     * @return Configured ScheduledThreadPoolExecutor bean
-     */
-    @Bean(destroyMethod = "shutdown")
-    public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
-        return new ScheduledThreadPoolExecutor(
-                thread.getCorePoolSize(),
-                r -> new Thread(r, "[ST]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
-                (r, e) -> new BlockingRejectedExecutionHandler());
-    }
+		return Executors.newThreadPerTaskExecutor(factory);
+	}
 
-    /**
-     * Custom RejectedExecutionHandler for blocking rejected tasks
-     * <p>
-     * Instead of rejecting tasks when the thread pool is full,
-     * this handler attempts to execute them in the calling thread.
-     * </p>
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2022.1.0
-     */
-    private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
-        /**
-         * Handle rejected execution by attempting to run task in calling thread
-         *
-         * @param runnable The runnable task requested to be executed
-         * @param executor The executor attempting to execute this task
-         */
-        @Override
-        public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
-            try {
-                log.info("BlockingRejectedExecutionHandler: {}", executor.toString());
+	/**
+	 * Create ScheduledThreadPoolExecutor for scheduled tasks
+	 * @return Configured ScheduledThreadPoolExecutor bean
+	 */
+	@Bean(destroyMethod = "shutdown")
+	public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
+		return new ScheduledThreadPoolExecutor(thread.getCorePoolSize(),
+				r -> new Thread(r, "[ST]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
+				(r, e) -> new BlockingRejectedExecutionHandler());
+	}
 
-                if (!executor.isShutdown()) {
-                    runnable.run();
-                }
-            } catch (Exception e) {
-                log.error("BlockingRejectedExecutionHandler: {}", e.getMessage(), e);
-            }
-        }
-    }
+	/**
+	 * Custom RejectedExecutionHandler for blocking rejected tasks
+	 * <p>
+	 * Instead of rejecting tasks when the thread pool is full, this handler attempts to
+	 * execute them in the calling thread.
+	 * </p>
+	 *
+	 * @author pnoker
+	 * @version 2025.9.0
+	 * @since 2022.1.0
+	 */
+	private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
+
+		/**
+		 * Handle rejected execution by attempting to run task in calling thread
+		 * @param runnable The runnable task requested to be executed
+		 * @param executor The executor attempting to execute this task
+		 */
+		@Override
+		public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
+			try {
+				log.info("BlockingRejectedExecutionHandler: {}", executor.toString());
+
+				if (!executor.isShutdown()) {
+					runnable.run();
+				}
+			}
+			catch (Exception e) {
+				log.error("BlockingRejectedExecutionHandler: {}", e.getMessage(), e);
+			}
+		}
+
+	}
+
 }

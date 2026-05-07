@@ -39,31 +39,32 @@ import java.math.BigDecimal;
 @ToString(callSuper = true)
 public class FacadePointBO extends BaseBO {
 
-    private String pointName;
+	private String pointName;
 
-    private String pointCode;
+	private String pointCode;
 
-    private PointTypeFlagEnum pointTypeFlag;
+	private PointTypeFlagEnum pointTypeFlag;
 
-    private RwFlagEnum rwFlag;
+	private RwFlagEnum rwFlag;
 
-    private BigDecimal baseValue;
+	private BigDecimal baseValue;
 
-    private BigDecimal multiple;
+	private BigDecimal multiple;
 
-    private Byte valueDecimal;
+	private Byte valueDecimal;
 
-    private String unit;
+	private String unit;
 
-    private Long profileId;
+	private Long profileId;
 
-    private PointExt pointExt;
+	private PointExt pointExt;
 
-    private EnableFlagEnum enableFlag;
+	private EnableFlagEnum enableFlag;
 
-    private Long tenantId;
+	private Long tenantId;
 
-    private String signature;
+	private String signature;
 
-    private Integer version;
+	private Integer version;
+
 }

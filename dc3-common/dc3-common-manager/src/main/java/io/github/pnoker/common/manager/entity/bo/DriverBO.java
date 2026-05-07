@@ -37,53 +37,54 @@ import lombok.*;
 @ToString(callSuper = true)
 public class DriverBO extends BaseBO {
 
-    /**
-     * Name
-     */
-    private String driverName;
+	/**
+	 * Name
+	 */
+	private String driverName;
 
-    /**
-     * Driver ID
-     */
-    private String driverCode;
+	/**
+	 * Driver ID
+	 */
+	private String driverCode;
 
-    /**
-     * Driver service name
-     */
-    private String serviceName;
+	/**
+	 * Driver service name
+	 */
+	private String serviceName;
 
-    /**
-     *
-     */
-    private String serviceHost;
+	/**
+	 *
+	 */
+	private String serviceHost;
 
-    /**
-     * Type
-     */
-    private DriverTypeFlagEnum driverTypeFlag;
+	/**
+	 * Type
+	 */
+	private DriverTypeFlagEnum driverTypeFlag;
 
-    /**
-     *
-     */
-    private DriverExt driverExt;
+	/**
+	 *
+	 */
+	private DriverExt driverExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID
+	 */
+	private Long tenantId;
 
-    /**
-     *
-     */
-    private String signature;
+	/**
+	 *
+	 */
+	private String signature;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
+
 }

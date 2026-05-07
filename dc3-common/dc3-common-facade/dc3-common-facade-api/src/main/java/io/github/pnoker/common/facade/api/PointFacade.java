@@ -30,13 +30,14 @@ import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
  */
 public interface PointFacade {
 
-    /**
-     * @return the point, or {@code null} when it does not exist.
-     */
-    FacadePointBO selectById(Long id);
+	/**
+	 * @return the point, or {@code null} when it does not exist.
+	 */
+	FacadePointBO selectById(Long id);
 
-    /**
-     * @return a page of points (never {@code null}; empty page when nothing matches).
-     */
-    FacadePage<FacadePointBO> selectByPage(FacadePointQuery query);
+	/**
+	 * @return a page of points (never {@code null}; empty page when nothing matches).
+	 */
+	FacadePage<FacadePointBO> selectByPage(FacadePointQuery query);
+
 }

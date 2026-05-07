@@ -20,23 +20,23 @@ package io.github.pnoker.common.facade.api;
 /**
  * Protocol-neutral token facade. Mirrors {@code api.center.auth.TokenApi}.
  * <p>
- * Returns a plain boolean rather than a {@code TokenBO} because callers only
- * care whether the token is valid — the existing RPC only returns an expiry
- * string that nobody reads from the gateway.
+ * Returns a plain boolean rather than a {@code TokenBO} because callers only care whether
+ * the token is valid — the existing RPC only returns an expiry string that nobody reads
+ * from the gateway.
  *
  * @author pnoker
  * @since 2026.5.5
  */
 public interface TokenFacade {
 
-    /**
-     * Validate a token triple against the backing auth service.
-     *
-     * @param tenant tenant code
-     * @param name   login name
-     * @param salt   salt the client holds
-     * @param token  token the client holds
-     * @return {@code true} when the triple is valid and unexpired
-     */
-    boolean checkValid(String tenant, String name, String salt, String token);
+	/**
+	 * Validate a token triple against the backing auth service.
+	 * @param tenant tenant code
+	 * @param name login name
+	 * @param salt salt the client holds
+	 * @param token token the client holds
+	 * @return {@code true} when the triple is valid and unexpired
+	 */
+	boolean checkValid(String tenant, String name, String salt, String token);
+
 }

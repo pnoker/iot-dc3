@@ -41,43 +41,42 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DriverAttributeConfigVO extends BaseVO {
 
-    /**
-     * ID
-     */
-    @NotNull(message = "驱动属性ID不能为空",
-            groups = {Add.class, Update.class})
-    private Long attributeId;
+	/**
+	 * ID
+	 */
+	@NotNull(message = "驱动属性ID不能为空", groups = { Add.class, Update.class })
+	private Long attributeId;
 
-    /**
-     *
-     */
-    @NotNull(message = "驱动属性配置值不能为空")
-    private String configValue;
+	/**
+	 *
+	 */
+	@NotNull(message = "驱动属性配置值不能为空")
+	private String configValue;
 
-    /**
-     * Device ID
-     */
-    @NotNull(message = "设备ID不能为空",
-            groups = {Add.class, Update.class})
-    private Long deviceId;
+	/**
+	 * Device ID
+	 */
+	@NotNull(message = "设备ID不能为空", groups = { Add.class, Update.class })
+	private Long deviceId;
 
-    /**
-     *
-     */
-    private JsonExt configExt;
+	/**
+	 *
+	 */
+	private JsonExt configExt;
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable flag
+	 */
+	private EnableFlagEnum enableFlag;
 
-    /**
-     *
-     */
-    private String signature;
+	/**
+	 *
+	 */
+	private String signature;
 
-    /**
-     *
-     */
-    private Integer version;
+	/**
+	 *
+	 */
+	private Integer version;
+
 }

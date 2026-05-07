@@ -43,65 +43,65 @@ import java.util.List;
 @Component
 public class PointClient {
 
-    @Resource
-    private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
+	@Resource
+	private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
-    @Resource
-    private DriverMetadata driverMetadata;
+	@Resource
+	private DriverMetadata driverMetadata;
 
-    @Resource
-    private PointBuilder pointBuilder;
+	@Resource
+	private PointBuilder pointBuilder;
 
-    public List<PointBO> list() {
-        long current = 1;
-        GrpcRPagePointDTO rPagePointDTO = getGrpcRPagePointDTO(current);
-        GrpcPagePointDTO pageDTO = rPagePointDTO.getData();
-        List<GrpcPointDTO> dataList = pageDTO.getDataList();
-        List<PointBO> pointBOList = dataList.stream().map(pointBuilder::buildDTOByGrpcDTO).toList();
-        ArrayList<PointBO> allPointBOList = new ArrayList<>(pointBOList);
+	public List<PointBO> list() {
+		long current = 1;
+		GrpcRPagePointDTO rPagePointDTO = getGrpcRPagePointDTO(current);
+		GrpcPagePointDTO pageDTO = rPagePointDTO.getData();
+		List<GrpcPointDTO> dataList = pageDTO.getDataList();
+		List<PointBO> pointBOList = dataList.stream().map(pointBuilder::buildDTOByGrpcDTO).toList();
+		ArrayList<PointBO> allPointBOList = new ArrayList<>(pointBOList);
 
-        long pages = pageDTO.getPage().getPages();
-        while (current < pages) {
-            current++;
-            GrpcRPagePointDTO tPagePointDTO = getGrpcRPagePointDTO(current);
-            GrpcPagePointDTO tPageDTO = tPagePointDTO.getData();
-            List<GrpcPointDTO> tDataList = tPageDTO.getDataList();
-            List<PointBO> tPointBOList = tDataList.stream().map(pointBuilder::buildDTOByGrpcDTO).toList();
-            allPointBOList.addAll(tPointBOList);
-            pages = tPageDTO.getPage().getPages();
-        }
-        return allPointBOList;
-    }
+		long pages = pageDTO.getPage().getPages();
+		while (current < pages) {
+			current++;
+			GrpcRPagePointDTO tPagePointDTO = getGrpcRPagePointDTO(current);
+			GrpcPagePointDTO tPageDTO = tPagePointDTO.getData();
+			List<GrpcPointDTO> tDataList = tPageDTO.getDataList();
+			List<PointBO> tPointBOList = tDataList.stream().map(pointBuilder::buildDTOByGrpcDTO).toList();
+			allPointBOList.addAll(tPointBOList);
+			pages = tPageDTO.getPage().getPages();
+		}
+		return allPointBOList;
+	}
 
-    /**
-     * Point ID
-     *
-     * @param id Point ID
-     * @return PointDTO
-     */
-    public PointBO selectById(Long id) {
-        GrpcPointQuery.Builder query = GrpcPointQuery.newBuilder();
-        query.setPointId(id);
-        GrpcRPointDTO rPointDTO = pointApiBlockingStub.selectById(query.build());
-        if (!rPointDTO.getResult().getOk()) {
-            log.error("Point doesn't exist: {}", id);
-            return null;
-        }
+	/**
+	 * Point ID
+	 * @param id Point ID
+	 * @return PointDTO
+	 */
+	public PointBO selectById(Long id) {
+		GrpcPointQuery.Builder query = GrpcPointQuery.newBuilder();
+		query.setPointId(id);
+		GrpcRPointDTO rPointDTO = pointApiBlockingStub.selectById(query.build());
+		if (!rPointDTO.getResult().getOk()) {
+			log.error("Point doesn't exist: {}", id);
+			return null;
+		}
 
-        return pointBuilder.buildDTOByGrpcDTO(rPointDTO.getData());
-    }
+		return pointBuilder.buildDTOByGrpcDTO(rPointDTO.getData());
+	}
 
-    private GrpcRPagePointDTO getGrpcRPagePointDTO(long current) {
-        GrpcPagePointQuery.Builder query = GrpcPagePointQuery.newBuilder();
-        GrpcPage.Builder page = GrpcPage.newBuilder();
-        page.setCurrent(current);
-        query.setTenantId(driverMetadata.getDriver().getTenantId())
-                .setDriverId(driverMetadata.getDriver().getId())
-                .setPage(page);
-        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.selectByPage(query.build());
-        if (!rPagePointDTO.getResult().getOk()) {
-            throw new ServiceException("获取设备列表失败");
-        }
-        return rPagePointDTO;
-    }
+	private GrpcRPagePointDTO getGrpcRPagePointDTO(long current) {
+		GrpcPagePointQuery.Builder query = GrpcPagePointQuery.newBuilder();
+		GrpcPage.Builder page = GrpcPage.newBuilder();
+		page.setCurrent(current);
+		query.setTenantId(driverMetadata.getDriver().getTenantId())
+			.setDriverId(driverMetadata.getDriver().getId())
+			.setPage(page);
+		GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.selectByPage(query.build());
+		if (!rPagePointDTO.getResult().getOk()) {
+			throw new ServiceException("获取设备列表失败");
+		}
+		return rPagePointDTO;
+	}
+
 }

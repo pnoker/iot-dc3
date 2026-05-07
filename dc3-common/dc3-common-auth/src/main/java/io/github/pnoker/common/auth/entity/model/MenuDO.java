@@ -43,109 +43,110 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_menu", autoResultMap = true)
 public class MenuDO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Primary key ID
-     */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private Long id;
+	/**
+	 * Primary key ID
+	 */
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
+	private Long id;
 
-    /**
-     * ID
-     */
-    @TableField("parent_menu_id")
-    private Long parentMenuId;
+	/**
+	 * ID
+	 */
+	@TableField("parent_menu_id")
+	private Long parentMenuId;
 
-    /**
-     * Type
-     */
-    @TableField("menu_type_flag")
-    private Byte menuTypeFlag;
+	/**
+	 * Type
+	 */
+	@TableField("menu_type_flag")
+	private Byte menuTypeFlag;
 
-    /**
-     * Name
-     */
-    @TableField("menu_name")
-    private String menuName;
+	/**
+	 * Name
+	 */
+	@TableField("menu_name")
+	private String menuName;
 
-    /**
-     * Code
-     */
-    @TableField("menu_code")
-    private String menuCode;
+	/**
+	 * Code
+	 */
+	@TableField("menu_code")
+	private String menuCode;
 
-    /**
-     *
-     */
-    @TableField("menu_level")
-    private Byte menuLevel;
+	/**
+	 *
+	 */
+	@TableField("menu_level")
+	private Byte menuLevel;
 
-    /**
-     *
-     */
-    @TableField("menu_index")
-    private Byte menuIndex;
+	/**
+	 *
+	 */
+	@TableField("menu_index")
+	private Byte menuIndex;
 
-    /**
-     *
-     */
-    @TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt menuExt;
+	/**
+	 *
+	 */
+	@TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
+	private JsonExt menuExt;
 
-    /**
-     * Enable flag, 0:, 1:Disable
-     */
-    @TableField("enable_flag")
-    private Byte enableFlag;
+	/**
+	 * Enable flag, 0:, 1:Disable
+	 */
+	@TableField("enable_flag")
+	private Byte enableFlag;
 
-    /**
-     * Description
-     */
-    @TableField("remark")
-    private String remark;
+	/**
+	 * Description
+	 */
+	@TableField("remark")
+	private String remark;
 
-    /**
-     * Creator ID
-     */
-    @TableField("creator_id")
-    private Long creatorId;
+	/**
+	 * Creator ID
+	 */
+	@TableField("creator_id")
+	private Long creatorId;
 
-    /**
-     * Creator Name
-     */
-    @TableField("creator_name")
-    private String creatorName;
+	/**
+	 * Creator Name
+	 */
+	@TableField("creator_name")
+	private String creatorName;
 
-    /**
-     * Create Time
-     */
-    @TableField("create_time")
-    private LocalDateTime createTime;
+	/**
+	 * Create Time
+	 */
+	@TableField("create_time")
+	private LocalDateTime createTime;
 
-    /**
-     * Operator ID
-     */
-    @TableField("operator_id")
-    private Long operatorId;
+	/**
+	 * Operator ID
+	 */
+	@TableField("operator_id")
+	private Long operatorId;
 
-    /**
-     * Operator Name
-     */
-    @TableField("operator_name")
-    private String operatorName;
+	/**
+	 * Operator Name
+	 */
+	@TableField("operator_name")
+	private String operatorName;
 
-    /**
-     * Operate Time
-     */
-    @TableField("operate_time")
-    private LocalDateTime operateTime;
+	/**
+	 * Operate Time
+	 */
+	@TableField("operate_time")
+	private LocalDateTime operateTime;
 
-    /**
-     * Logical delete flag, 0:not deleted, 1:deleted
-     */
-    @TableLogic
-    @TableField("deleted")
-    private Byte deleted;
+	/**
+	 * Logical delete flag, 0:not deleted, 1:deleted
+	 */
+	@TableLogic
+	@TableField("deleted")
+	private Byte deleted;
+
 }

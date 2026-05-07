@@ -23,8 +23,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * One entry in a dashboard top-N ranking (e.g. device with the most
- * point-value rows in the given time window).
+ * One entry in a dashboard top-N ranking (e.g. device with the most point-value rows in
+ * the given time window).
  *
  * @author pnoker
  * @since 2026.5.2
@@ -36,14 +36,15 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class TopEntityVO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Device / point / driver id — the service resolves the human-readable
-     * name asynchronously on the frontend via existing getXxxByIds APIs.
-     */
-    private Long entityId;
+	/**
+	 * Device / point / driver id — the service resolves the human-readable name
+	 * asynchronously on the frontend via existing getXxxByIds APIs.
+	 */
+	private Long entityId;
 
-    private long count;
+	private long count;
+
 }

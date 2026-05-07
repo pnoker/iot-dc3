@@ -49,110 +49,107 @@ import java.util.Objects;
 @RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
 public class LabelController implements BaseController {
 
-    private final LabelBuilder labelBuilder;
-    private final LabelService labelService;
+	private final LabelBuilder labelBuilder;
 
-    public LabelController(LabelBuilder labelBuilder, LabelService labelService) {
-        this.labelBuilder = labelBuilder;
-        this.labelService = labelService;
-    }
+	private final LabelService labelService;
 
-    /**
-     *
-     *
-     * @param entityVO {@link LabelVO}
-     * @return R of String
-     */
-    @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                labelService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	public LabelController(LabelBuilder labelBuilder, LabelService labelService) {
+		this.labelBuilder = labelBuilder;
+		this.labelService = labelService;
+	}
 
-    /**
-     *
-     *
-     * @param id ID
-     * @return R of String
-     */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            labelService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	/**
+	 * @param entityVO {@link LabelVO}
+	 * @return R of String
+	 */
+	@PostMapping("/add")
+	public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
+				entityBO.setTenantId(tenantId);
+				labelService.save(entityBO);
+				return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    /**
-     *
-     *
-     * @param entityVO {@link LabelVO}
-     * @return R of String
-     */
-    @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                labelService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	/**
+	 * @param id ID
+	 * @return R of String
+	 */
+	@PostMapping("/delete/{id}")
+	public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			labelService.remove(id);
+			return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
 
-    /**
-     *
-     *
-     * @param id ID
-     * @return LabelVO {@link LabelVO}
-     */
-    @GetMapping("/id/{id}")
-    public Mono<R<LabelVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
-            LabelBO entityBO = labelService.selectById(id);
-            LabelVO entityVO = labelBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
+	/**
+	 * @param entityVO {@link LabelVO}
+	 * @return R of String
+	 */
+	@PostMapping("/update")
+	public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
+				entityBO.setTenantId(tenantId);
+				labelService.update(entityBO);
+				return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
 
-    /**
-     *
-     *
-     * @param entityQuery {@link LabelQuery}
-     * @return R Of LabelVO Page
-     */
-    @PostMapping("/list")
-    public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                LabelQuery query = Objects.isNull(entityQuery) ? new LabelQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<LabelBO> entityPageBO = labelService.selectByPage(query);
-                Page<LabelVO> entityPageVO = labelBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
+	/**
+	 * @param id ID
+	 * @return LabelVO {@link LabelVO}
+	 */
+	@GetMapping("/id/{id}")
+	public Mono<R<LabelVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+		try {
+			LabelBO entityBO = labelService.selectById(id);
+			LabelVO entityVO = labelBuilder.buildVOByBO(entityBO);
+			return Mono.just(R.ok(entityVO));
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Mono.just(R.fail(e.getMessage()));
+		}
+	}
+
+	/**
+	 * @param entityQuery {@link LabelQuery}
+	 * @return R Of LabelVO Page
+	 */
+	@PostMapping("/list")
+	public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
+		return getTenantId().flatMap(tenantId -> {
+			try {
+				LabelQuery query = Objects.isNull(entityQuery) ? new LabelQuery() : entityQuery;
+				query.setTenantId(tenantId);
+				Page<LabelBO> entityPageBO = labelService.selectByPage(query);
+				Page<LabelVO> entityPageVO = labelBuilder.buildVOPageByBOPage(entityPageBO);
+				return Mono.just(R.ok(entityPageVO));
+			}
+			catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Mono.just(R.fail(e.getMessage()));
+			}
+		});
+	}
+
 }

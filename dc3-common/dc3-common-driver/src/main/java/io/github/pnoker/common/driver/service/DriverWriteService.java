@@ -28,20 +28,18 @@ import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
  */
 public interface DriverWriteService {
 
-    /**
-     * Writes a value to the specified point on the specified device.
-     *
-     * @param deviceId device identifier
-     * @param pointId  point identifier
-     * @param value    raw value to write
-     */
-    void write(Long deviceId, Long pointId, String value);
+	/**
+	 * Writes a value to the specified point on the specified device.
+	 * @param deviceId device identifier
+	 * @param pointId point identifier
+	 * @param value raw value to write
+	 */
+	void write(Long deviceId, Long pointId, String value);
 
-    /**
-     * Executes a write command received from the command queue.
-     *
-     * @param commandDTO device command payload
-     */
-    void write(DeviceCommandDTO commandDTO);
+	/**
+	 * Executes a write command received from the command queue.
+	 * @param commandDTO device command payload
+	 */
+	void write(DeviceCommandDTO commandDTO);
 
 }

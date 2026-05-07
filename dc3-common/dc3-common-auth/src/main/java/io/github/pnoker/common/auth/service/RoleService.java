@@ -33,12 +33,12 @@ import java.util.List;
  */
 public interface RoleService extends BaseService<RoleBO, RoleQuery> {
 
-    /**
-     * Assemble the tenant's role hierarchy as a single nested tree. Top-level
-     * roles (parent_role_id == 0 or null) land at the root.
-     *
-     * @param entityQuery optional filters (tenantId is populated by the controller)
-     * @return root nodes, each node carrying its children
-     */
-    List<RoleTreeBO> selectTree(RoleQuery entityQuery);
+	/**
+	 * Assemble the tenant's role hierarchy as a single nested tree. Top-level roles
+	 * (parent_role_id == 0 or null) land at the root.
+	 * @param entityQuery optional filters (tenantId is populated by the controller)
+	 * @return root nodes, each node carrying its children
+	 */
+	List<RoleTreeBO> selectTree(RoleQuery entityQuery);
+
 }

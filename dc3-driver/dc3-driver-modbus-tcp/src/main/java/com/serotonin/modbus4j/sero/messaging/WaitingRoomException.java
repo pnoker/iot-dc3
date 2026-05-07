@@ -21,22 +21,26 @@ import java.io.IOException;
 import java.io.Serial;
 
 /**
- * <p>WaitingRoomException class.</p>
+ * <p>
+ * WaitingRoomException class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class WaitingRoomException extends IOException {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * <p>Constructor for WaitingRoomException.</p>
-     *
-     * @param message a {@link String} object.
-     */
-    public WaitingRoomException(String message) {
-        super(message);
-    }
+	/**
+	 * <p>
+	 * Constructor for WaitingRoomException.
+	 * </p>
+	 * @param message a {@link String} object.
+	 */
+	public WaitingRoomException(String message) {
+		super(message);
+	}
+
 }

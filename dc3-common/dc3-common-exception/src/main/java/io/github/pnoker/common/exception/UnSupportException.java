@@ -20,22 +20,22 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- *
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class UnSupportException extends RuntimeException {
-    public UnSupportException() {
-        this(null);
-    }
 
-    public UnSupportException(Throwable cause) {
-        super(cause);
-    }
+	public UnSupportException() {
+		this(null);
+	}
 
-    public UnSupportException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
-    }
+	public UnSupportException(Throwable cause) {
+		super(cause);
+	}
+
+	public UnSupportException(String template, Object... params) {
+		super(MessageFormat.format(template, params));
+	}
+
 }

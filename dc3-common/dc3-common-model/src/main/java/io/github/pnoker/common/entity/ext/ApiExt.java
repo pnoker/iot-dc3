@@ -37,31 +37,34 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ApiExt extends BaseExt {
 
-    /**
-     * Extended content.
-     * <p>
-     * The content can be distinguished by Type and Version.
-     */
-    private Content content;
+	/**
+	 * Extended content.
+	 * <p>
+	 * The content can be distinguished by Type and Version.
+	 */
+	private Content content;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Content {
-        /**
-         * Title.
-         */
-        private String title;
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Content {
 
-        /**
-         * URL link.
-         */
-        private String url;
+		/**
+		 * Title.
+		 */
+		private String title;
 
-        /**
-         * Description.
-         */
-        private String remark;
-    }
+		/**
+		 * URL link.
+		 */
+		private String url;
+
+		/**
+		 * Description.
+		 */
+		private String remark;
+
+	}
+
 }

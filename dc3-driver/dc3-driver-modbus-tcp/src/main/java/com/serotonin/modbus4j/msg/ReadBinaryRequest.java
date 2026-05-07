@@ -23,89 +23,97 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>Abstract ReadBinaryRequest class.</p>
+ * <p>
+ * Abstract ReadBinaryRequest class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 abstract /**
- * Read Binary Request
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
- */
+			 * Read Binary Request
+			 *
+			 * @author pnoker
+			 * @version 2025.9.0
+			 * @since 2022.1.0
+			 */
 public class ReadBinaryRequest extends ModbusRequest {
-    private int startOffset;
-    private int numberOfBits;
 
-    /**
-     * <p>Constructor for ReadBinaryRequest.</p>
-     *
-     * @param slaveId      a int.
-     * @param startOffset  a int.
-     * @param numberOfBits a int.
-     * @throws ModbusTransportException if any.
-     */
-    public ReadBinaryRequest(int slaveId, int startOffset, int numberOfBits) throws ModbusTransportException {
-        super(slaveId);
-        this.startOffset = startOffset;
-        this.numberOfBits = numberOfBits;
-    }
+	private int startOffset;
 
-    ReadBinaryRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	private int numberOfBits;
 
-    @Override
-    public void validate(Modbus modbus) throws ModbusTransportException {
-        ModbusUtils.validateOffset(startOffset);
-        modbus.validateNumberOfBits(numberOfBits);
-        ModbusUtils.validateEndOffset(startOffset + numberOfBits - 1);
-    }
+	/**
+	 * <p>
+	 * Constructor for ReadBinaryRequest.
+	 * </p>
+	 * @param slaveId a int.
+	 * @param startOffset a int.
+	 * @param numberOfBits a int.
+	 * @throws ModbusTransportException if any.
+	 */
+	public ReadBinaryRequest(int slaveId, int startOffset, int numberOfBits) throws ModbusTransportException {
+		super(slaveId);
+		this.startOffset = startOffset;
+		this.numberOfBits = numberOfBits;
+	}
 
-    @Override
-    protected void writeRequest(ByteQueue queue) {
-        ModbusUtils.pushShort(queue, startOffset);
-        ModbusUtils.pushShort(queue, numberOfBits);
-    }
+	ReadBinaryRequest(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
-    @Override
-    protected void readRequest(ByteQueue queue) {
-        startOffset = ModbusUtils.popUnsignedShort(queue);
-        numberOfBits = ModbusUtils.popUnsignedShort(queue);
-    }
+	@Override
+	public void validate(Modbus modbus) throws ModbusTransportException {
+		ModbusUtils.validateOffset(startOffset);
+		modbus.validateNumberOfBits(numberOfBits);
+		ModbusUtils.validateEndOffset(startOffset + numberOfBits - 1);
+	}
 
-    /**
-     * <p>getData.</p>
-     *
-     * @param processImage a {@link ProcessImage} object.
-     * @return an array of {@link byte} objects.
-     * @throws ModbusTransportException if any.
-     */
-    protected byte[] getData(ProcessImage processImage) throws ModbusTransportException {
-        boolean[] data = new boolean[numberOfBits];
+	@Override
+	protected void writeRequest(ByteQueue queue) {
+		ModbusUtils.pushShort(queue, startOffset);
+		ModbusUtils.pushShort(queue, numberOfBits);
+	}
 
-        // Get the data from the process image.
-        for (int i = 0; i < numberOfBits; i++)
-            data[i] = getBinary(processImage, i + startOffset);
+	@Override
+	protected void readRequest(ByteQueue queue) {
+		startOffset = ModbusUtils.popUnsignedShort(queue);
+		numberOfBits = ModbusUtils.popUnsignedShort(queue);
+	}
 
-        // Convert the boolean array into an array of bytes.
-        return convertToBytes(data);
-    }
+	/**
+	 * <p>
+	 * getData.
+	 * </p>
+	 * @param processImage a {@link ProcessImage} object.
+	 * @return an array of {@link byte} objects.
+	 * @throws ModbusTransportException if any.
+	 */
+	protected byte[] getData(ProcessImage processImage) throws ModbusTransportException {
+		boolean[] data = new boolean[numberOfBits];
 
-    /**
-     * <p>getBinary.</p>
-     *
-     * @param processImage a {@link ProcessImage} object.
-     * @param index        a int.
-     * @return a boolean.
-     * @throws ModbusTransportException if any.
-     */
-    abstract protected boolean getBinary(ProcessImage processImage, int index) throws ModbusTransportException;
+		// Get the data from the process image.
+		for (int i = 0; i < numberOfBits; i++)
+			data[i] = getBinary(processImage, i + startOffset);
 
-    @Override
-    public String toString() {
-        return "ReadBinaryRequest [startOffset=" + startOffset + ", numberOfBits=" + numberOfBits + "]";
-    }
+		// Convert the boolean array into an array of bytes.
+		return convertToBytes(data);
+	}
+
+	/**
+	 * <p>
+	 * getBinary.
+	 * </p>
+	 * @param processImage a {@link ProcessImage} object.
+	 * @param index a int.
+	 * @return a boolean.
+	 * @throws ModbusTransportException if any.
+	 */
+	abstract protected boolean getBinary(ProcessImage processImage, int index) throws ModbusTransportException;
+
+	@Override
+	public String toString() {
+		return "ReadBinaryRequest [startOffset=" + startOffset + ", numberOfBits=" + numberOfBits + "]";
+	}
+
 }

@@ -34,16 +34,16 @@ import java.util.List;
  */
 public interface ImportDeviceService {
 
-    /**
-     * Import device
-     *
-     * @param deviceBO              Device
-     * @param pointBOList           Point list
-     * @param driverAttributeBOList Driver attribute config list
-     * @param pointAttributeBOList  Point attribute config list
-     * @param sheet                 Sheet
-     * @param row                   Row Index
-     */
-    DeviceBO importDevice(DeviceBO deviceBO, List<PointBO> pointBOList, List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet, int row);
+	/**
+	 * Import device
+	 * @param deviceBO Device
+	 * @param pointBOList Point list
+	 * @param driverAttributeBOList Driver attribute config list
+	 * @param pointAttributeBOList Point attribute config list
+	 * @param sheet Sheet
+	 * @param row Row Index
+	 */
+	DeviceBO importDevice(DeviceBO deviceBO, List<PointBO> pointBOList, List<DriverAttributeBO> driverAttributeBOList,
+			List<PointAttributeBO> pointAttributeBOList, Sheet sheet, int row);
 
 }

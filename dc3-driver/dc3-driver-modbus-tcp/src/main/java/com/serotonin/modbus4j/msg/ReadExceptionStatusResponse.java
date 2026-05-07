@@ -21,47 +21,49 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>ReadExceptionStatusResponse class.</p>
+ * <p>
+ * ReadExceptionStatusResponse class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ReadExceptionStatusResponse extends ModbusResponse {
-    private byte exceptionStatus;
 
-    ReadExceptionStatusResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
+	private byte exceptionStatus;
 
-    ReadExceptionStatusResponse(int slaveId, byte exceptionStatus) throws ModbusTransportException {
-        super(slaveId);
-        this.exceptionStatus = exceptionStatus;
-    }
+	ReadExceptionStatusResponse(int slaveId) throws ModbusTransportException {
+		super(slaveId);
+	}
 
+	ReadExceptionStatusResponse(int slaveId, byte exceptionStatus) throws ModbusTransportException {
+		super(slaveId);
+		this.exceptionStatus = exceptionStatus;
+	}
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.READ_EXCEPTION_STATUS;
-    }
+	@Override
+	public byte getFunctionCode() {
+		return FunctionCode.READ_EXCEPTION_STATUS;
+	}
 
+	@Override
+	protected void readResponse(ByteQueue queue) {
+		exceptionStatus = queue.pop();
+	}
 
-    @Override
-    protected void readResponse(ByteQueue queue) {
-        exceptionStatus = queue.pop();
-    }
+	@Override
+	protected void writeResponse(ByteQueue queue) {
+		queue.push(exceptionStatus);
+	}
 
+	/**
+	 * <p>
+	 * Getter for the field <code>exceptionStatus</code>.
+	 * </p>
+	 * @return a byte.
+	 */
+	public byte getExceptionStatus() {
+		return exceptionStatus;
+	}
 
-    @Override
-    protected void writeResponse(ByteQueue queue) {
-        queue.push(exceptionStatus);
-    }
-
-    /**
-     * <p>Getter for the field <code>exceptionStatus</code>.</p>
-     *
-     * @return a byte.
-     */
-    public byte getExceptionStatus() {
-        return exceptionStatus;
-    }
 }

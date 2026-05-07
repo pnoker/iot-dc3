@@ -36,19 +36,20 @@ import java.util.List;
 @AllArgsConstructor
 public class ResourceRegistrySyncCommand {
 
-    /**
-     * Owning service name, e.g. dc3-center-manager.
-     */
-    private String serviceName;
+	/**
+	 * Owning service name, e.g. dc3-center-manager.
+	 */
+	private String serviceName;
 
-    /**
-     * When true, endpoints that exist in the DB but are absent from the current scan
-     * are soft-deleted. When false, such endpoints are left untouched.
-     */
-    private boolean deleteMissing;
+	/**
+	 * When true, endpoints that exist in the DB but are absent from the current scan are
+	 * soft-deleted. When false, such endpoints are left untouched.
+	 */
+	private boolean deleteMissing;
 
-    /**
-     * Complete list of endpoints discovered by the registrar on the calling service.
-     */
-    private List<ResourceRegistryScannedApi> apis;
+	/**
+	 * Complete list of endpoints discovered by the registrar on the calling service.
+	 */
+	private List<ResourceRegistryScannedApi> apis;
+
 }

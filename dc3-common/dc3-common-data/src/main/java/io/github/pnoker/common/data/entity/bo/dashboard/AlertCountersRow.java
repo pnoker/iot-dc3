@@ -22,14 +22,16 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Tenant-wide (total, unconfirmed) counters — the service layer combines
- * this with separate per-source and today-only queries to populate the
- * full AlertStatsVO.
+ * Tenant-wide (total, unconfirmed) counters — the service layer combines this with
+ * separate per-source and today-only queries to populate the full AlertStatsVO.
  */
 @Getter
 @Setter
 @ToString
 public class AlertCountersRow {
-    private long total;
-    private long unconfirmed;
+
+	private long total;
+
+	private long unconfirmed;
+
 }

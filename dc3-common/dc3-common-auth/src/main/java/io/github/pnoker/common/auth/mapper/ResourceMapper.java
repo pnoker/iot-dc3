@@ -32,4 +32,3 @@ import io.github.pnoker.common.auth.entity.model.ResourceDO;
 public interface ResourceMapper extends BaseMapper<ResourceDO> {
 
 }
-

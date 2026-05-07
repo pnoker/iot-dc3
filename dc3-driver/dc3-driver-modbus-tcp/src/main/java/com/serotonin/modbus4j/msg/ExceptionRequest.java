@@ -23,65 +23,72 @@ import com.serotonin.modbus4j.sero.ShouldNeverHappenException;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
 
 /**
- * <p>ExceptionRequest class.</p>
+ * <p>
+ * ExceptionRequest class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ExceptionRequest extends ModbusRequest {
-    private final byte functionCode;
-    private final byte exceptionCode;
 
-    /**
-     * <p>Constructor for ExceptionRequest.</p>
-     *
-     * @param slaveId       a int.
-     * @param functionCode  a byte.
-     * @param exceptionCode a byte.
-     * @throws ModbusTransportException if any.
-     */
-    public ExceptionRequest(int slaveId, byte functionCode, byte exceptionCode) throws ModbusTransportException {
-        super(slaveId);
-        this.functionCode = functionCode;
-        this.exceptionCode = exceptionCode;
-    }
+	private final byte functionCode;
 
-    @Override
-    public void validate(Modbus modbus) {
-        // no op
-    }
+	private final byte exceptionCode;
 
-    @Override
-    protected void writeRequest(ByteQueue queue) {
-        throw new ShouldNeverHappenException("wha");
-    }
+	/**
+	 * <p>
+	 * Constructor for ExceptionRequest.
+	 * </p>
+	 * @param slaveId a int.
+	 * @param functionCode a byte.
+	 * @param exceptionCode a byte.
+	 * @throws ModbusTransportException if any.
+	 */
+	public ExceptionRequest(int slaveId, byte functionCode, byte exceptionCode) throws ModbusTransportException {
+		super(slaveId);
+		this.functionCode = functionCode;
+		this.exceptionCode = exceptionCode;
+	}
 
-    @Override
-    protected void readRequest(ByteQueue queue) {
-        queue.clear();
-    }
+	@Override
+	public void validate(Modbus modbus) {
+		// no op
+	}
 
-    @Override
-    ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
-        return new ExceptionResponse(slaveId, functionCode, exceptionCode);
-    }
+	@Override
+	protected void writeRequest(ByteQueue queue) {
+		throw new ShouldNeverHappenException("wha");
+	}
 
-    @Override
-    ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
-        return getResponseInstance(slaveId);
-    }
+	@Override
+	protected void readRequest(ByteQueue queue) {
+		queue.clear();
+	}
 
-    @Override
-    public byte getFunctionCode() {
-        return functionCode;
-    }
+	@Override
+	ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
+		return new ExceptionResponse(slaveId, functionCode, exceptionCode);
+	}
 
-    /**
-     * <p>Getter for the field <code>exceptionCode</code>.</p>
-     *
-     * @return a byte.
-     */
-    public byte getExceptionCode() {
-        return exceptionCode;
-    }
+	@Override
+	ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
+		return getResponseInstance(slaveId);
+	}
+
+	@Override
+	public byte getFunctionCode() {
+		return functionCode;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>exceptionCode</code>.
+	 * </p>
+	 * @return a byte.
+	 */
+	public byte getExceptionCode() {
+		return exceptionCode;
+	}
+
 }

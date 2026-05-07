@@ -34,91 +34,94 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum ResourceTypeFlagEnum {
-    /**
-     * Driver
-     */
-    DRIVER((byte) 0, "driver", "Driver"),
 
-    /**
-     * Profile
-     */
-    PROFILE((byte) 1, "profile", "Profile"),
+	/**
+	 * Driver
+	 */
+	DRIVER((byte) 0, "driver", "Driver"),
 
-    /**
-     * Point
-     */
-    POINT((byte) 2, "point", "Point"),
+	/**
+	 * Profile
+	 */
+	PROFILE((byte) 1, "profile", "Profile"),
 
-    /**
-     * Device
-     */
-    DEVICE((byte) 3, "device", "Device"),
+	/**
+	 * Point
+	 */
+	POINT((byte) 2, "point", "Point"),
 
-    /**
-     * Data
-     */
-    DATA((byte) 4, "data", "Data"),
+	/**
+	 * Device
+	 */
+	DEVICE((byte) 3, "device", "Device"),
 
-    /**
-     * Menu
-     */
-    MENU((byte) 5, "menu", "Menu"),
+	/**
+	 * Data
+	 */
+	DATA((byte) 4, "data", "Data"),
 
-    /**
-     * Api
-     */
-    API((byte) 6, "api", "Api"),
-    ;
+	/**
+	 * Menu
+	 */
+	MENU((byte) 5, "menu", "Menu"),
 
-    /**
-     * Index
-     */
-    @EnumValue
-    private final Byte index;
+	/**
+	 * Api
+	 */
+	API((byte) 6, "api", "Api"),;
 
-    /**
-     * Code
-     */
-    private final String code;
+	/**
+	 * Index
+	 */
+	@EnumValue
+	private final Byte index;
 
-    /**
-     * Text
-     */
-    private final String text;
+	/**
+	 * Code
+	 */
+	private final String code;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link ResourceTypeFlagEnum}
-     */
-    public static ResourceTypeFlagEnum ofIndex(Byte index) {
-        Optional<ResourceTypeFlagEnum> any = Arrays.stream(ResourceTypeFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Text
+	 */
+	private final String text;
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link ResourceTypeFlagEnum}
-     */
-    public static ResourceTypeFlagEnum ofCode(String code) {
-        Optional<ResourceTypeFlagEnum> any = Arrays.stream(ResourceTypeFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
-        return any.orElse(null);
-    }
+	/**
+	 * Get enum by index
+	 * @param index Index
+	 * @return {@link ResourceTypeFlagEnum}
+	 */
+	public static ResourceTypeFlagEnum ofIndex(Byte index) {
+		Optional<ResourceTypeFlagEnum> any = Arrays.stream(ResourceTypeFlagEnum.values())
+			.filter(type -> type.getIndex().equals(index))
+			.findFirst();
+		return any.orElse(null);
+	}
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link ResourceTypeFlagEnum}
-     */
-    public static ResourceTypeFlagEnum ofName(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	/**
+	 * Get enum by code
+	 * @param code Code
+	 * @return {@link ResourceTypeFlagEnum}
+	 */
+	public static ResourceTypeFlagEnum ofCode(String code) {
+		Optional<ResourceTypeFlagEnum> any = Arrays.stream(ResourceTypeFlagEnum.values())
+			.filter(type -> type.getCode().equals(code))
+			.findFirst();
+		return any.orElse(null);
+	}
+
+	/**
+	 * Get enum by name
+	 * @param name Name
+	 * @return {@link ResourceTypeFlagEnum}
+	 */
+	public static ResourceTypeFlagEnum ofName(String name) {
+		try {
+			return valueOf(name);
+		}
+		catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 }

@@ -24,14 +24,14 @@ import java.util.List;
 /**
  * Protocol-neutral point value facade.
  * <p>
- * Mirrors the value-query RPCs on {@code api.center.data.PointValueApi} but returns
- * plain BO types so callers never have to touch gRPC or protobuf classes.
- * Two implementations back this interface:
+ * Mirrors the value-query RPCs on {@code api.center.data.PointValueApi} but returns plain
+ * BO types so callers never have to touch gRPC or protobuf classes. Two implementations
+ * back this interface:
  * <ul>
- *   <li>{@code PointValueLocalFacade} — in-process call into {@code PointValueService},
- *       selected when {@code dc3.facade.mode=local} (single deployment).</li>
- *   <li>{@code PointValueGrpcFacade} — gRPC call against Data Center,
- *       selected when {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
+ * <li>{@code PointValueLocalFacade} — in-process call into {@code PointValueService},
+ * selected when {@code dc3.facade.mode=local} (single deployment).</li>
+ * <li>{@code PointValueGrpcFacade} — gRPC call against Data Center, selected when
+ * {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
  * </ul>
  *
  * @author pnoker
@@ -39,17 +39,17 @@ import java.util.List;
  */
 public interface PointValueFacade {
 
-    /**
-     * Query the latest collected value of a device point.
-     *
-     * @return the point value, or {@code null} when no value exists.
-     */
-    FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId);
+	/**
+	 * Query the latest collected value of a device point.
+	 * @return the point value, or {@code null} when no value exists.
+	 */
+	FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId);
 
-    /**
-     * Query historical values of a device point.
-     *
-     * @return an immutable list of value strings (never {@code null}; empty when nothing matches).
-     */
-    List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
+	/**
+	 * Query historical values of a device point.
+	 * @return an immutable list of value strings (never {@code null}; empty when nothing
+	 * matches).
+	 */
+	List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
+
 }

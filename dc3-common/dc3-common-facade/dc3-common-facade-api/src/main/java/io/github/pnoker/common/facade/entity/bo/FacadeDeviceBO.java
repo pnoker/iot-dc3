@@ -28,9 +28,8 @@ import java.util.List;
  * Facade-level device BO.
  * <p>
  * Field set matches {@code api.center.manager.DeviceApi} wire shape. Intentionally
- * excludes driver-side attachments (pointIds, attributeConfig maps) — those remain
- * in {@code dc3-common-driver}'s DeviceBO and are not part of the center-to-center
- * contract.
+ * excludes driver-side attachments (pointIds, attributeConfig maps) — those remain in
+ * {@code dc3-common-driver}'s DeviceBO and are not part of the center-to-center contract.
  *
  * @author pnoker
  * @since 2026.5.5
@@ -42,21 +41,22 @@ import java.util.List;
 @ToString(callSuper = true)
 public class FacadeDeviceBO extends BaseBO {
 
-    private String deviceName;
+	private String deviceName;
 
-    private String deviceCode;
+	private String deviceCode;
 
-    private Long driverId;
+	private Long driverId;
 
-    private DeviceExt deviceExt;
+	private DeviceExt deviceExt;
 
-    private EnableFlagEnum enableFlag;
+	private EnableFlagEnum enableFlag;
 
-    private Long tenantId;
+	private Long tenantId;
 
-    private String signature;
+	private String signature;
 
-    private Integer version;
+	private Integer version;
 
-    private List<Long> profileIds;
+	private List<Long> profileIds;
+
 }

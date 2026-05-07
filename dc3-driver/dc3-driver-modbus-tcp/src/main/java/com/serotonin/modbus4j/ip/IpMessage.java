@@ -19,36 +19,42 @@ package com.serotonin.modbus4j.ip;
 import com.serotonin.modbus4j.msg.ModbusMessage;
 
 /**
- * <p>Abstract IpMessage class.</p>
+ * <p>
+ * Abstract IpMessage class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 abstract /**
- * Ip Message
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
- */
+			 * Ip Message
+			 *
+			 * @author pnoker
+			 * @version 2025.9.0
+			 * @since 2022.1.0
+			 */
 public class IpMessage {
-    protected final ModbusMessage modbusMessage;
 
-    /**
-     * <p>Constructor for IpMessage.</p>
-     *
-     * @param modbusMessage a {@link ModbusMessage} object.
-     */
-    public IpMessage(ModbusMessage modbusMessage) {
-        this.modbusMessage = modbusMessage;
-    }
+	protected final ModbusMessage modbusMessage;
 
-    /**
-     * <p>Getter for the field <code>modbusMessage</code>.</p>
-     *
-     * @return a {@link ModbusMessage} object.
-     */
-    public ModbusMessage getModbusMessage() {
-        return modbusMessage;
-    }
+	/**
+	 * <p>
+	 * Constructor for IpMessage.
+	 * </p>
+	 * @param modbusMessage a {@link ModbusMessage} object.
+	 */
+	public IpMessage(ModbusMessage modbusMessage) {
+		this.modbusMessage = modbusMessage;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>modbusMessage</code>.
+	 * </p>
+	 * @return a {@link ModbusMessage} object.
+	 */
+	public ModbusMessage getModbusMessage() {
+		return modbusMessage;
+	}
+
 }

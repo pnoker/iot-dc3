@@ -47,85 +47,86 @@ import java.util.stream.Collectors;
 @Service
 public class DriverStatusServiceImpl implements DriverStatusService {
 
-    @Resource
-    private DriverFacade driverFacade;
+	@Resource
+	private DriverFacade driverFacade;
 
-    @Resource
-    private DeviceFacade deviceFacade;
+	@Resource
+	private DeviceFacade deviceFacade;
 
-    @Resource
-    private LocalCacheService localCacheService;
+	@Resource
+	private LocalCacheService localCacheService;
 
-    @Override
-    public Map<Long, String> selectByPage(DriverQuery pageQuery) {
-        FacadeDriverQuery facadeQuery = FacadeDriverQuery.builder()
-                .page(pageQuery.getPage())
-                .driverName(pageQuery.getDriverName())
-                .driverCode(pageQuery.getDriverCode())
-                .serviceName(pageQuery.getServiceName())
-                .serviceHost(pageQuery.getServiceHost())
-                .tenantId(pageQuery.getTenantId())
-                .driverTypeFlag(pageQuery.getDriverTypeFlag())
-                .enableFlag(pageQuery.getEnableFlag())
-                .build();
+	@Override
+	public Map<Long, String> selectByPage(DriverQuery pageQuery) {
+		FacadeDriverQuery facadeQuery = FacadeDriverQuery.builder()
+			.page(pageQuery.getPage())
+			.driverName(pageQuery.getDriverName())
+			.driverCode(pageQuery.getDriverCode())
+			.serviceName(pageQuery.getServiceName())
+			.serviceHost(pageQuery.getServiceHost())
+			.tenantId(pageQuery.getTenantId())
+			.driverTypeFlag(pageQuery.getDriverTypeFlag())
+			.enableFlag(pageQuery.getEnableFlag())
+			.build();
 
-        FacadePage<FacadeDriverBO> page = driverFacade.selectByPage(facadeQuery);
-        if (page.getRecords().isEmpty()) {
-            return Map.of();
-        }
-        return getStatusMap(page.getRecords());
-    }
+		FacadePage<FacadeDriverBO> page = driverFacade.selectByPage(facadeQuery);
+		if (page.getRecords().isEmpty()) {
+			return Map.of();
+		}
+		return getStatusMap(page.getRecords());
+	}
 
-    @Override
-    public String getDeviceOnlineByDriverId(Long driverId) {
-        List<String> list = getDeviceStatuses(driverId);
-        if (list == null) {
-            return String.valueOf(0L);
-        }
-        long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
-        return String.valueOf(count);
-    }
+	@Override
+	public String getDeviceOnlineByDriverId(Long driverId) {
+		List<String> list = getDeviceStatuses(driverId);
+		if (list == null) {
+			return String.valueOf(0L);
+		}
+		long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
+		return String.valueOf(count);
+	}
 
-    @Override
-    public String getDeviceOfflineByDriverId(Long driverId) {
-        List<String> list = getDeviceStatuses(driverId);
-        if (list == null) {
-            return String.valueOf(0L);
-        }
-        long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.OFFLINE.getCode())).count();
-        return String.valueOf(count);
-    }
+	@Override
+	public String getDeviceOfflineByDriverId(Long driverId) {
+		List<String> list = getDeviceStatuses(driverId);
+		if (list == null) {
+			return String.valueOf(0L);
+		}
+		long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.OFFLINE.getCode())).count();
+		return String.valueOf(count);
+	}
 
-    /**
-     * Load the status of every device attached to the given driver.
-     * Returns {@code null} when the driver has no devices (preserves legacy "0" signal).
-     */
-    private List<String> getDeviceStatuses(Long driverId) {
-        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(driverId);
-        if (devices.isEmpty()) {
-            return null;
-        }
+	/**
+	 * Load the status of every device attached to the given driver. Returns {@code null}
+	 * when the driver has no devices (preserves legacy "0" signal).
+	 */
+	private List<String> getDeviceStatuses(Long driverId) {
+		List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(driverId);
+		if (devices.isEmpty()) {
+			return null;
+		}
 
-        Set<Long> deviceIds = devices.stream().map(FacadeDeviceBO::getId).collect(Collectors.toSet());
-        List<String> list = new ArrayList<>(deviceIds.size());
-        deviceIds.forEach(id -> {
-            String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
-            String status = localCacheService.getKey(key);
-            status = Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
-            list.add(status);
-        });
-        return list;
-    }
+		Set<Long> deviceIds = devices.stream().map(FacadeDeviceBO::getId).collect(Collectors.toSet());
+		List<String> list = new ArrayList<>(deviceIds.size());
+		deviceIds.forEach(id -> {
+			String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
+			String status = localCacheService.getKey(key);
+			status = Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
+			list.add(status);
+		});
+		return list;
+	}
 
-    private Map<Long, String> getStatusMap(List<FacadeDriverBO> drivers) {
-        Map<Long, String> statusMap = new HashMap<>(16);
-        Set<Long> driverIds = drivers.stream().map(FacadeDriverBO::getId).collect(Collectors.toSet());
-        driverIds.forEach(id -> {
-            String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + id;
-            String status = localCacheService.getKey(key);
-            status = Objects.nonNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
-            statusMap.put(id, status);
-        });
-        return statusMap;
-    }
+	private Map<Long, String> getStatusMap(List<FacadeDriverBO> drivers) {
+		Map<Long, String> statusMap = new HashMap<>(16);
+		Set<Long> driverIds = drivers.stream().map(FacadeDriverBO::getId).collect(Collectors.toSet());
+		driverIds.forEach(id -> {
+			String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + id;
+			String status = localCacheService.getKey(key);
+			status = Objects.nonNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+			statusMap.put(id, status);
+		});
+		return statusMap;
+	}
+
 }

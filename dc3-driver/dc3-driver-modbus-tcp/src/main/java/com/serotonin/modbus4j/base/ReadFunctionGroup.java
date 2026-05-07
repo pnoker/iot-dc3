@@ -22,93 +22,109 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>ReadFunctionGroup class.</p>
+ * <p>
+ * ReadFunctionGroup class.
+ * </p>
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
 public class ReadFunctionGroup<K> {
-    private final SlaveAndRange slaveAndRange;
-    private final int functionCode;
-    private final List<KeyedModbusLocator<K>> locators = new ArrayList<>();
-    private int startOffset = 65536;
-    private int length = 0;
 
-    /**
-     * <p>Constructor for ReadFunctionGroup.</p>
-     *
-     * @param locator a {@link KeyedModbusLocator} object.
-     */
-    public ReadFunctionGroup(KeyedModbusLocator<K> locator) {
-        slaveAndRange = locator.getSlaveAndRange();
-        functionCode = RegisterRange.getReadFunctionCode(slaveAndRange.getRange());
-        add(locator);
-    }
+	private final SlaveAndRange slaveAndRange;
 
-    /**
-     * <p>add.</p>
-     *
-     * @param locator a {@link KeyedModbusLocator} object.
-     */
-    public void add(KeyedModbusLocator<K> locator) {
-        if (startOffset > locator.getOffset())
-            startOffset = locator.getOffset();
-        if (length < locator.getEndOffset() - startOffset + 1)
-            length = locator.getEndOffset() - startOffset + 1;
-        locators.add(locator);
-    }
+	private final int functionCode;
 
-    /**
-     * <p>Getter for the field <code>startOffset</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getStartOffset() {
-        return startOffset;
-    }
+	private final List<KeyedModbusLocator<K>> locators = new ArrayList<>();
 
-    /**
-     * <p>getEndOffset.</p>
-     *
-     * @return a int.
-     */
-    public int getEndOffset() {
-        return startOffset + length - 1;
-    }
+	private int startOffset = 65536;
 
-    /**
-     * <p>Getter for the field <code>slaveAndRange</code>.</p>
-     *
-     * @return a {@link SlaveAndRange} object.
-     */
-    public SlaveAndRange getSlaveAndRange() {
-        return slaveAndRange;
-    }
+	private int length = 0;
 
-    /**
-     * <p>Getter for the field <code>length</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getLength() {
-        return length;
-    }
+	/**
+	 * <p>
+	 * Constructor for ReadFunctionGroup.
+	 * </p>
+	 * @param locator a {@link KeyedModbusLocator} object.
+	 */
+	public ReadFunctionGroup(KeyedModbusLocator<K> locator) {
+		slaveAndRange = locator.getSlaveAndRange();
+		functionCode = RegisterRange.getReadFunctionCode(slaveAndRange.getRange());
+		add(locator);
+	}
 
-    /**
-     * <p>Getter for the field <code>functionCode</code>.</p>
-     *
-     * @return a int.
-     */
-    public int getFunctionCode() {
-        return functionCode;
-    }
+	/**
+	 * <p>
+	 * add.
+	 * </p>
+	 * @param locator a {@link KeyedModbusLocator} object.
+	 */
+	public void add(KeyedModbusLocator<K> locator) {
+		if (startOffset > locator.getOffset())
+			startOffset = locator.getOffset();
+		if (length < locator.getEndOffset() - startOffset + 1)
+			length = locator.getEndOffset() - startOffset + 1;
+		locators.add(locator);
+	}
 
-    /**
-     * <p>Getter for the field <code>locators</code>.</p>
-     *
-     * @return a {@link List} object.
-     */
-    public List<KeyedModbusLocator<K>> getLocators() {
-        return locators;
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>startOffset</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getStartOffset() {
+		return startOffset;
+	}
+
+	/**
+	 * <p>
+	 * getEndOffset.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getEndOffset() {
+		return startOffset + length - 1;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>slaveAndRange</code>.
+	 * </p>
+	 * @return a {@link SlaveAndRange} object.
+	 */
+	public SlaveAndRange getSlaveAndRange() {
+		return slaveAndRange;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>length</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getLength() {
+		return length;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>functionCode</code>.
+	 * </p>
+	 * @return a int.
+	 */
+	public int getFunctionCode() {
+		return functionCode;
+	}
+
+	/**
+	 * <p>
+	 * Getter for the field <code>locators</code>.
+	 * </p>
+	 * @return a {@link List} object.
+	 */
+	public List<KeyedModbusLocator<K>> getLocators() {
+		return locators;
+	}
+
 }

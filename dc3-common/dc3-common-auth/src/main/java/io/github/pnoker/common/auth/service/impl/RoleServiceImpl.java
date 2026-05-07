@@ -53,172 +53,164 @@ import java.util.*;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    @Resource
-    private RoleBuilder roleBuilder;
+	@Resource
+	private RoleBuilder roleBuilder;
 
-    @Resource
-    private RoleManager roleManager;
+	@Resource
+	private RoleManager roleManager;
 
-    @Override
-    public void save(RoleBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+	@Override
+	public void save(RoleBO entityBO) {
+		checkDuplicate(entityBO, false, true);
 
-        RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
-        if (!roleManager.save(entityDO)) {
-            throw new AddException("Failed to create role");
-        }
-    }
+		RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
+		if (!roleManager.save(entityDO)) {
+			throw new AddException("Failed to create role");
+		}
+	}
 
+	@Override
+	public void remove(Long id) {
+		getDOById(id, true);
 
-    @Override
-    public void remove(Long id) {
-        getDOById(id, true);
+		//
+		LambdaQueryChainWrapper<RoleDO> wrapper = roleManager.lambdaQuery().eq(RoleDO::getParentRoleId, id);
+		long count = wrapper.count();
+		if (count > 0) {
+			throw new AssociatedException("Failed to remove role: some sub roles exists in the role");
+		}
 
-        // 
-        LambdaQueryChainWrapper<RoleDO> wrapper = roleManager.lambdaQuery().eq(RoleDO::getParentRoleId, id);
-        long count = wrapper.count();
-        if (count > 0) {
-            throw new AssociatedException("Failed to remove role: some sub roles exists in the role");
-        }
+		if (!roleManager.removeById(id)) {
+			throw new DeleteException("Failed to remove role");
+		}
+	}
 
-        if (!roleManager.removeById(id)) {
-            throw new DeleteException("Failed to remove role");
-        }
-    }
+	@Override
+	public void update(RoleBO entityBO) {
+		getDOById(entityBO.getId(), true);
 
+		checkDuplicate(entityBO, true, true);
 
-    @Override
-    public void update(RoleBO entityBO) {
-        getDOById(entityBO.getId(), true);
+		RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
+		entityDO.setOperateTime(null);
+		if (!roleManager.updateById(entityDO)) {
+			throw new UpdateException("Failed to update role");
+		}
+	}
 
-        checkDuplicate(entityBO, true, true);
+	@Override
+	public RoleBO selectById(Long id) {
+		RoleDO entityDO = getDOById(id, true);
+		return roleBuilder.buildBOByDO(entityDO);
+	}
 
-        RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!roleManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update role");
-        }
-    }
+	@Override
+	public Page<RoleBO> selectByPage(RoleQuery entityQuery) {
+		if (Objects.isNull(entityQuery.getPage())) {
+			entityQuery.setPage(new Pages());
+		}
+		Page<RoleDO> entityPageDO = roleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+		return roleBuilder.buildBOPageByDOPage(entityPageDO);
+	}
 
+	@Override
+	public List<RoleTreeBO> selectTree(RoleQuery entityQuery) {
+		RoleQuery effective = Objects.requireNonNullElseGet(entityQuery, RoleQuery::new);
+		List<RoleDO> rows = roleManager.list(fuzzyQuery(effective));
+		return assembleTree(rows);
+	}
 
-    @Override
-    public RoleBO selectById(Long id) {
-        RoleDO entityDO = getDOById(id, true);
-        return roleBuilder.buildBOByDO(entityDO);
-    }
+	/**
+	 * Build the role hierarchy from a flat list of DOs. Roles with {@code parent_role_id}
+	 * null or 0 become roots; children are linked by their {@code parent_role_id}, and
+	 * each level is ordered by role name.
+	 */
+	private List<RoleTreeBO> assembleTree(List<RoleDO> rows) {
+		if (CollectionUtils.isEmpty(rows)) {
+			return new ArrayList<>();
+		}
+		Map<Long, RoleTreeBO> byId = new HashMap<>(rows.size());
+		Map<Long, Long> parentByChild = new HashMap<>(rows.size());
+		for (RoleDO row : rows) {
+			RoleTreeBO node = RoleTreeBO.fromBO(roleBuilder.buildBOByDO(row));
+			byId.put(row.getId(), node);
+			parentByChild.put(row.getId(), row.getParentRoleId());
+		}
+		List<RoleTreeBO> roots = new ArrayList<>();
+		for (Map.Entry<Long, RoleTreeBO> e : byId.entrySet()) {
+			Long parentId = parentByChild.get(e.getKey());
+			RoleTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
+			if (parent == null) {
+				roots.add(e.getValue());
+			}
+			else {
+				parent.addChild(e.getValue());
+			}
+		}
+		Comparator<RoleTreeBO> order = Comparator.comparing(RoleTreeBO::getRoleName,
+				Comparator.nullsLast(Comparator.naturalOrder()));
+		sortRecursive(roots, order);
+		return roots;
+	}
 
+	private void sortRecursive(List<RoleTreeBO> nodes, Comparator<RoleTreeBO> order) {
+		if (CollectionUtils.isEmpty(nodes)) {
+			return;
+		}
+		nodes.sort(order);
+		for (RoleTreeBO node : nodes) {
+			sortRecursive(node.getChildren(), order);
+		}
+	}
 
-    @Override
-    public Page<RoleBO> selectByPage(RoleQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<RoleDO> entityPageDO = roleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return roleBuilder.buildBOPageByDOPage(entityPageDO);
-    }
+	/**
+	 * @param entityQuery {@link RoleQuery}
+	 * @return {@link LambdaQueryWrapper}
+	 */
+	private LambdaQueryWrapper<RoleDO> fuzzyQuery(RoleQuery entityQuery) {
+		LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
+		wrapper.like(StringUtils.isNotEmpty(entityQuery.getRoleName()), RoleDO::getRoleName, entityQuery.getRoleName());
+		wrapper.eq(StringUtils.isNotEmpty(entityQuery.getRoleCode()), RoleDO::getRoleCode, entityQuery.getRoleCode());
+		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RoleDO::getTenantId, entityQuery.getTenantId());
+		return wrapper;
+	}
 
-    @Override
-    public List<RoleTreeBO> selectTree(RoleQuery entityQuery) {
-        RoleQuery effective = Objects.requireNonNullElseGet(entityQuery, RoleQuery::new);
-        List<RoleDO> rows = roleManager.list(fuzzyQuery(effective));
-        return assembleTree(rows);
-    }
+	/**
+	 * @param entityBO {@link RoleBO}
+	 * @param isUpdate
+	 * @param throwException
+	 * @return
+	 */
+	private boolean checkDuplicate(RoleBO entityBO, boolean isUpdate, boolean throwException) {
+		LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
+		wrapper.eq(RoleDO::getParentRoleId, entityBO.getParentRoleId());
+		wrapper.eq(RoleDO::getRoleName, entityBO.getRoleName());
+		wrapper.eq(RoleDO::getRoleCode, entityBO.getRoleCode());
+		wrapper.eq(RoleDO::getTenantId, entityBO.getTenantId());
+		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+		RoleDO one = roleManager.getOne(wrapper);
+		if (Objects.isNull(one)) {
+			return false;
+		}
+		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+		if (throwException && duplicate) {
+			throw new DuplicateException("Role has been duplicated");
+		}
+		return duplicate;
+	}
 
-    /**
-     * Build the role hierarchy from a flat list of DOs. Roles with
-     * {@code parent_role_id} null or 0 become roots; children are linked by
-     * their {@code parent_role_id}, and each level is ordered by role name.
-     */
-    private List<RoleTreeBO> assembleTree(List<RoleDO> rows) {
-        if (CollectionUtils.isEmpty(rows)) {
-            return new ArrayList<>();
-        }
-        Map<Long, RoleTreeBO> byId = new HashMap<>(rows.size());
-        Map<Long, Long> parentByChild = new HashMap<>(rows.size());
-        for (RoleDO row : rows) {
-            RoleTreeBO node = RoleTreeBO.fromBO(roleBuilder.buildBOByDO(row));
-            byId.put(row.getId(), node);
-            parentByChild.put(row.getId(), row.getParentRoleId());
-        }
-        List<RoleTreeBO> roots = new ArrayList<>();
-        for (Map.Entry<Long, RoleTreeBO> e : byId.entrySet()) {
-            Long parentId = parentByChild.get(e.getKey());
-            RoleTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
-            if (parent == null) {
-                roots.add(e.getValue());
-            } else {
-                parent.addChild(e.getValue());
-            }
-        }
-        Comparator<RoleTreeBO> order = Comparator.comparing(
-                RoleTreeBO::getRoleName, Comparator.nullsLast(Comparator.naturalOrder()));
-        sortRecursive(roots, order);
-        return roots;
-    }
-
-    private void sortRecursive(List<RoleTreeBO> nodes, Comparator<RoleTreeBO> order) {
-        if (CollectionUtils.isEmpty(nodes)) {
-            return;
-        }
-        nodes.sort(order);
-        for (RoleTreeBO node : nodes) {
-            sortRecursive(node.getChildren(), order);
-        }
-    }
-
-    /**
-     *
-     *
-     * @param entityQuery {@link RoleQuery}
-     * @return {@link LambdaQueryWrapper}
-     */
-    private LambdaQueryWrapper<RoleDO> fuzzyQuery(RoleQuery entityQuery) {
-        LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getRoleName()), RoleDO::getRoleName, entityQuery.getRoleName());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getRoleCode()), RoleDO::getRoleCode, entityQuery.getRoleCode());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RoleDO::getTenantId, entityQuery.getTenantId());
-        return wrapper;
-    }
-
-    /**
-     *
-     *
-     * @param entityBO       {@link RoleBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
-     */
-    private boolean checkDuplicate(RoleBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
-        wrapper.eq(RoleDO::getParentRoleId, entityBO.getParentRoleId());
-        wrapper.eq(RoleDO::getRoleName, entityBO.getRoleName());
-        wrapper.eq(RoleDO::getRoleCode, entityBO.getRoleCode());
-        wrapper.eq(RoleDO::getTenantId, entityBO.getTenantId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        RoleDO one = roleManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Role has been duplicated");
-        }
-        return duplicate;
-    }
-
-    /**
-     * Primary key ID
-     *
-     * @param id             ID
-     * @param throwException
-     * @return {@link RoleDO}
-     */
-    private RoleDO getDOById(Long id, boolean throwException) {
-        RoleDO entityDO = roleManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Role does not exist");
-        }
-        return entityDO;
-    }
+	/**
+	 * Primary key ID
+	 * @param id ID
+	 * @param throwException
+	 * @return {@link RoleDO}
+	 */
+	private RoleDO getDOById(Long id, boolean throwException) {
+		RoleDO entityDO = roleManager.getById(id);
+		if (throwException && Objects.isNull(entityDO)) {
+			throw new NotFoundException("Role does not exist");
+		}
+		return entityDO;
+	}
 
 }

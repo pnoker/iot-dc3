@@ -22,8 +22,8 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.*;
 
 /**
- * Facade-level tenant BO. Field set matches {@code api.center.auth.TenantApi}
- * wire shape (no tenantExt — that is not exposed through gRPC).
+ * Facade-level tenant BO. Field set matches {@code api.center.auth.TenantApi} wire shape
+ * (no tenantExt — that is not exposed through gRPC).
  *
  * @author pnoker
  * @since 2026.5.5
@@ -35,9 +35,10 @@ import lombok.*;
 @ToString(callSuper = true)
 public class FacadeTenantBO extends BaseBO {
 
-    private String tenantName;
+	private String tenantName;
 
-    private String tenantCode;
+	private String tenantCode;
 
-    private EnableFlagEnum enableFlag;
+	private EnableFlagEnum enableFlag;
+
 }

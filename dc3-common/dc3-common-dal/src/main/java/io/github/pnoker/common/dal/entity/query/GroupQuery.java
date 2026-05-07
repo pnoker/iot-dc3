@@ -40,40 +40,41 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class GroupQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Pages page;
+	private Pages page;
 
-    /**
-     * Tenant ID.
-     */
-    private Long tenantId;
+	/**
+	 * Tenant ID.
+	 */
+	private Long tenantId;
 
-    // Query fields
+	// Query fields
 
-    /**
-     * Group name.
-     */
-    private String groupName;
+	/**
+	 * Group name.
+	 */
+	private String groupName;
 
-    /**
-     * Parent group ID.
-     */
-    private String parentGroupId;
+	/**
+	 * Parent group ID.
+	 */
+	private String parentGroupId;
 
-    /**
-     * Group sort position.
-     */
-    private Integer position;
+	/**
+	 * Group sort position.
+	 */
+	private Integer position;
 
-    /**
-     * Group type flag.
-     */
-    private GroupTypeFlagEnum groupTypeFlag;
+	/**
+	 * Group type flag.
+	 */
+	private GroupTypeFlagEnum groupTypeFlag;
 
-    /**
-     * Enable status flag.
-     */
-    private EnableFlagEnum enableFlag;
+	/**
+	 * Enable status flag.
+	 */
+	private EnableFlagEnum enableFlag;
+
 }

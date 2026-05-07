@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.dal;
 
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.manager.entity.model.PointDataVolumeRunDO;
 

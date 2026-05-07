@@ -21,9 +21,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Modbus TCP Driver Application for DC3 IoT Platform.
- * This driver implements communication with Modbus TCP servers and devices,
- * providing data collection and device management capabilities.
+ * Modbus TCP Driver Application for DC3 IoT Platform. This driver implements
+ * communication with Modbus TCP servers and devices, providing data collection and device
+ * management capabilities.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -32,14 +32,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ModbusTcpDriverApplication {
 
-    /**
-     * Main method to start the Modbus TCP driver application
-     *
-     * @param args Command line arguments passed to the application
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(ModbusTcpDriverApplication.class, args);
-    }
+	/**
+	 * Main method to start the Modbus TCP driver application
+	 * @param args Command line arguments passed to the application
+	 */
+	public static void main(String[] args) {
+		SpringApplication.run(ModbusTcpDriverApplication.class, args);
+	}
 
 }
-

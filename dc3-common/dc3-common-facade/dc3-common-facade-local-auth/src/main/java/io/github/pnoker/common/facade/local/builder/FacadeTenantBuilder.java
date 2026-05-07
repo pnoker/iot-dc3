@@ -23,14 +23,15 @@ import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
 /**
- * FacadeTenant ↔ auth TenantBO mapper. {@code tenantExt} is absent from the
- * facade shape and therefore dropped by MapStruct.
+ * FacadeTenant ↔ auth TenantBO mapper. {@code tenantExt} is absent from the facade shape
+ * and therefore dropped by MapStruct.
  *
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
 public interface FacadeTenantBuilder {
 
-    FacadeTenantBO toFacadeBO(TenantBO authBO);
+	FacadeTenantBO toFacadeBO(TenantBO authBO);
+
 }

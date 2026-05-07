@@ -40,21 +40,22 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class MetadataEventDTO implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Type{@link MetadataTypeEnum}, ,
-     */
-    private Long id;
+	/**
+	 * Type{@link MetadataTypeEnum}, ,
+	 */
+	private Long id;
 
-    /**
-     * Type
-     */
-    private MetadataTypeEnum metadataType;
+	/**
+	 * Type
+	 */
+	private MetadataTypeEnum metadataType;
 
-    /**
-     * Type, , ,
-     */
-    private MetadataOperateTypeEnum operateType;
+	/**
+	 * Type, , ,
+	 */
+	private MetadataOperateTypeEnum operateType;
+
 }

@@ -33,251 +33,273 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public abstract class AccessBase implements ServerConnectionStateListener {
 
-    private final List<AccessStateListener> stateListeners = new CopyOnWriteArrayList<AccessStateListener>();
-    protected Server server = null;
-    protected Group group = null;
-    protected boolean active = false;
-    /**
-     * Holds the item to callback assignment
-     */
-    protected Map<Item, DataCallback> items = new HashMap<Item, DataCallback>();
-    protected Map<String, Item> itemMap = new HashMap<String, Item>();
-    protected Map<Item, ItemState> itemCache = new HashMap<Item, ItemState>();
-    protected Map<String, DataCallback> itemSet = new HashMap<String, DataCallback>();
-    protected String logTag = null;
-    protected Logger dataLogger = null;
-    private boolean bound = false;
-    private int period = 0;
+	private final List<AccessStateListener> stateListeners = new CopyOnWriteArrayList<AccessStateListener>();
 
-    public AccessBase(final Server server, final int period) throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException, DuplicateGroupException {
-        super();
-        this.server = server;
-        this.period = period;
-    }
+	protected Server server = null;
 
-    public AccessBase(final Server server, final int period, final String logTag) {
-        super();
-        this.server = server;
-        this.period = period;
-        this.logTag = logTag;
-        if (this.logTag != null) {
-            this.dataLogger = LoggerFactory.getLogger("opc.data." + logTag);
-        }
-    }
+	protected Group group = null;
 
-    public boolean isBound() {
-        return this.bound;
-    }
+	protected boolean active = false;
 
-    public synchronized void bind() {
-        if (isBound()) {
-            return;
-        }
+	/**
+	 * Holds the item to callback assignment
+	 */
+	protected Map<Item, DataCallback> items = new HashMap<Item, DataCallback>();
 
-        this.server.addStateListener(this);
-        this.bound = true;
-    }
+	protected Map<String, Item> itemMap = new HashMap<String, Item>();
 
-    public synchronized void unbind() throws JIException {
-        if (!isBound()) {
-            return;
-        }
+	protected Map<Item, ItemState> itemCache = new HashMap<Item, ItemState>();
 
-        this.server.removeStateListener(this);
-        this.bound = false;
+	protected Map<String, DataCallback> itemSet = new HashMap<String, DataCallback>();
 
-        stop();
-    }
+	protected String logTag = null;
 
-    public boolean isActive() {
-        return this.active;
-    }
+	protected Logger dataLogger = null;
 
-    public void addStateListener(final AccessStateListener listener) {
-        this.stateListeners.add(listener);
-        listener.stateChanged(isActive());
-    }
+	private boolean bound = false;
 
-    public void removeStateListener(final AccessStateListener listener) {
-        this.stateListeners.remove(listener);
-    }
+	private int period = 0;
 
-    protected void notifyStateListenersState(final boolean state) {
-        final List<AccessStateListener> list = new ArrayList<AccessStateListener>(this.stateListeners);
+	public AccessBase(final Server server, final int period) throws IllegalArgumentException, UnknownHostException,
+			NotConnectedException, JIException, DuplicateGroupException {
+		super();
+		this.server = server;
+		this.period = period;
+	}
 
-        for (final AccessStateListener listener : list) {
-            listener.stateChanged(state);
-        }
-    }
+	public AccessBase(final Server server, final int period, final String logTag) {
+		super();
+		this.server = server;
+		this.period = period;
+		this.logTag = logTag;
+		if (this.logTag != null) {
+			this.dataLogger = LoggerFactory.getLogger("opc.data." + logTag);
+		}
+	}
 
-    protected void notifyStateListenersError(final Throwable t) {
-        final List<AccessStateListener> list = new ArrayList<AccessStateListener>(this.stateListeners);
+	public boolean isBound() {
+		return this.bound;
+	}
 
-        for (final AccessStateListener listener : list) {
-            listener.errorOccured(t);
-        }
-    }
+	public synchronized void bind() {
+		if (isBound()) {
+			return;
+		}
 
-    public int getPeriod() {
-        return this.period;
-    }
+		this.server.addStateListener(this);
+		this.bound = true;
+	}
 
-    public synchronized void addItem(final String itemId, final DataCallback dataCallback) throws JIException, AddFailedException {
-        if (this.itemSet.containsKey(itemId)) {
-            return;
-        }
+	public synchronized void unbind() throws JIException {
+		if (!isBound()) {
+			return;
+		}
 
-        this.itemSet.put(itemId, dataCallback);
+		this.server.removeStateListener(this);
+		this.bound = false;
 
-        if (isActive()) {
-            realizeItem(itemId);
-        }
-    }
+		stop();
+	}
 
-    public synchronized void removeItem(final String itemId) {
-        if (!this.itemSet.containsKey(itemId)) {
-            return;
-        }
+	public boolean isActive() {
+		return this.active;
+	}
 
-        this.itemSet.remove(itemId);
+	public void addStateListener(final AccessStateListener listener) {
+		this.stateListeners.add(listener);
+		listener.stateChanged(isActive());
+	}
 
-        if (isActive()) {
-            unrealizeItem(itemId);
-        }
-    }
+	public void removeStateListener(final AccessStateListener listener) {
+		this.stateListeners.remove(listener);
+	}
 
-    public void connectionStateChanged(final boolean connected) {
-        try {
-            if (connected) {
-                start();
-            } else {
-                stop();
-            }
-        } catch (final Exception e) {
-            log.error(String.format("Failed to change state (%s)", connected), e);
-        }
-    }
+	protected void notifyStateListenersState(final boolean state) {
+		final List<AccessStateListener> list = new ArrayList<AccessStateListener>(this.stateListeners);
 
-    protected synchronized void start() throws JIException, IllegalArgumentException, UnknownHostException, NotConnectedException, DuplicateGroupException {
-        if (isActive()) {
-            return;
-        }
+		for (final AccessStateListener listener : list) {
+			listener.stateChanged(state);
+		}
+	}
 
-        log.debug("Create a new group");
-        this.group = this.server.addGroup();
-        this.group.setActive(true);
-        this.active = true;
+	protected void notifyStateListenersError(final Throwable t) {
+		final List<AccessStateListener> list = new ArrayList<AccessStateListener>(this.stateListeners);
 
-        notifyStateListenersState(true);
+		for (final AccessStateListener listener : list) {
+			listener.errorOccured(t);
+		}
+	}
 
-        realizeAll();
-    }
+	public int getPeriod() {
+		return this.period;
+	}
 
-    protected void realizeItem(final String itemId) throws JIException, AddFailedException {
-        log.debug("Realizing item: {}", itemId);
+	public synchronized void addItem(final String itemId, final DataCallback dataCallback)
+			throws JIException, AddFailedException {
+		if (this.itemSet.containsKey(itemId)) {
+			return;
+		}
 
-        final DataCallback dataCallback = this.itemSet.get(itemId);
-        if (dataCallback == null) {
-            return;
-        }
+		this.itemSet.put(itemId, dataCallback);
 
-        final Item item = this.group.addItem(itemId);
-        this.items.put(item, dataCallback);
-        this.itemMap.put(itemId, item);
-    }
+		if (isActive()) {
+			realizeItem(itemId);
+		}
+	}
 
-    protected void unrealizeItem(final String itemId) {
-        final Item item = this.itemMap.remove(itemId);
-        this.items.remove(item);
-        this.itemCache.remove(item);
+	public synchronized void removeItem(final String itemId) {
+		if (!this.itemSet.containsKey(itemId)) {
+			return;
+		}
 
-        try {
-            this.group.removeItem(itemId);
-        } catch (final Throwable e) {
-            log.error(String.format("Failed to unrealize item '%s'", itemId), e);
-        }
-    }
+		this.itemSet.remove(itemId);
 
-    /*
-     * FIXME: need some perfomance boost: subscribe all in one call
-     */
-    protected void realizeAll() {
-        for (final String itemId : this.itemSet.keySet()) {
-            try {
-                realizeItem(itemId);
-            } catch (final AddFailedException e) {
-                Integer rc = e.getErrors().get(itemId);
-                if (rc == null) {
-                    rc = -1;
-                }
-                log.warn(String.format("Failed to add item: %s (%08X)", itemId, rc));
+		if (isActive()) {
+			unrealizeItem(itemId);
+		}
+	}
 
-            } catch (final Exception e) {
-                log.warn("Failed to realize item: " + itemId, e);
-            }
-        }
-    }
+	public void connectionStateChanged(final boolean connected) {
+		try {
+			if (connected) {
+				start();
+			}
+			else {
+				stop();
+			}
+		}
+		catch (final Exception e) {
+			log.error(String.format("Failed to change state (%s)", connected), e);
+		}
+	}
 
-    protected void unrealizeAll() {
-        this.items.clear();
-        this.itemCache.clear();
-        try {
-            this.group.clear();
-        } catch (final JIException e) {
-            log.info("Failed to clear group. No problem if we already lost the connection", e);
-        }
-    }
+	protected synchronized void start() throws JIException, IllegalArgumentException, UnknownHostException,
+			NotConnectedException, DuplicateGroupException {
+		if (isActive()) {
+			return;
+		}
 
-    protected synchronized void stop() throws JIException {
-        if (!isActive()) {
-            return;
-        }
+		log.debug("Create a new group");
+		this.group = this.server.addGroup();
+		this.group.setActive(true);
+		this.active = true;
 
-        unrealizeAll();
+		notifyStateListenersState(true);
 
-        this.active = false;
-        notifyStateListenersState(false);
+		realizeAll();
+	}
 
-        try {
-            this.group.remove();
-        } catch (final Throwable t) {
-            log.warn("Failed to disable group. No problem if we already lost connection");
-        }
-        this.group = null;
-    }
+	protected void realizeItem(final String itemId) throws JIException, AddFailedException {
+		log.debug("Realizing item: {}", itemId);
 
-    public synchronized void clear() {
-        this.itemSet.clear();
-        this.items.clear();
-        this.itemMap.clear();
-        this.itemCache.clear();
-    }
+		final DataCallback dataCallback = this.itemSet.get(itemId);
+		if (dataCallback == null) {
+			return;
+		}
 
-    protected void updateItem(final Item item, final ItemState itemState) {
-        if (this.dataLogger != null) {
-            this.dataLogger.debug("Update item: {}, {}", item.getId(), itemState);
-        }
+		final Item item = this.group.addItem(itemId);
+		this.items.put(item, dataCallback);
+		this.itemMap.put(itemId, item);
+	}
 
-        final DataCallback dataCallback = this.items.get(item);
-        if (dataCallback == null) {
-            return;
-        }
+	protected void unrealizeItem(final String itemId) {
+		final Item item = this.itemMap.remove(itemId);
+		this.items.remove(item);
+		this.itemCache.remove(item);
 
-        final ItemState cachedState = this.itemCache.get(item);
-        if (cachedState == null) {
-            this.itemCache.put(item, itemState);
-            dataCallback.changed(item, itemState);
-        } else {
-            if (!cachedState.equals(itemState)) {
-                this.itemCache.put(item, itemState);
-                dataCallback.changed(item, itemState);
-            }
-        }
-    }
+		try {
+			this.group.removeItem(itemId);
+		}
+		catch (final Throwable e) {
+			log.error(String.format("Failed to unrealize item '%s'", itemId), e);
+		}
+	}
 
-    protected void handleError(final Throwable e) {
-        notifyStateListenersError(e);
-        this.server.dispose();
-    }
+	/*
+	 * FIXME: need some perfomance boost: subscribe all in one call
+	 */
+	protected void realizeAll() {
+		for (final String itemId : this.itemSet.keySet()) {
+			try {
+				realizeItem(itemId);
+			}
+			catch (final AddFailedException e) {
+				Integer rc = e.getErrors().get(itemId);
+				if (rc == null) {
+					rc = -1;
+				}
+				log.warn(String.format("Failed to add item: %s (%08X)", itemId, rc));
+
+			}
+			catch (final Exception e) {
+				log.warn("Failed to realize item: " + itemId, e);
+			}
+		}
+	}
+
+	protected void unrealizeAll() {
+		this.items.clear();
+		this.itemCache.clear();
+		try {
+			this.group.clear();
+		}
+		catch (final JIException e) {
+			log.info("Failed to clear group. No problem if we already lost the connection", e);
+		}
+	}
+
+	protected synchronized void stop() throws JIException {
+		if (!isActive()) {
+			return;
+		}
+
+		unrealizeAll();
+
+		this.active = false;
+		notifyStateListenersState(false);
+
+		try {
+			this.group.remove();
+		}
+		catch (final Throwable t) {
+			log.warn("Failed to disable group. No problem if we already lost connection");
+		}
+		this.group = null;
+	}
+
+	public synchronized void clear() {
+		this.itemSet.clear();
+		this.items.clear();
+		this.itemMap.clear();
+		this.itemCache.clear();
+	}
+
+	protected void updateItem(final Item item, final ItemState itemState) {
+		if (this.dataLogger != null) {
+			this.dataLogger.debug("Update item: {}, {}", item.getId(), itemState);
+		}
+
+		final DataCallback dataCallback = this.items.get(item);
+		if (dataCallback == null) {
+			return;
+		}
+
+		final ItemState cachedState = this.itemCache.get(item);
+		if (cachedState == null) {
+			this.itemCache.put(item, itemState);
+			dataCallback.changed(item, itemState);
+		}
+		else {
+			if (!cachedState.equals(itemState)) {
+				this.itemCache.put(item, itemState);
+				dataCallback.changed(item, itemState);
+			}
+		}
+	}
+
+	protected void handleError(final Throwable e) {
+		notifyStateListenersError(e);
+		this.server.dispose();
+	}
 
 }
