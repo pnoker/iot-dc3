@@ -36,24 +36,24 @@ import lombok.*;
 @ToString(callSuper = true)
 public class TenantBO extends BaseBO {
 
-	/**
-	 * TenantName
-	 */
-	private String tenantName;
+    /**
+     * TenantName
+     */
+    private String tenantName;
 
-	/**
-	 * TenantCode
-	 */
-	private String tenantCode;
+    /**
+     * TenantCode
+     */
+    private String tenantCode;
 
-	/**
-	 * Tenant
-	 */
-	private TenantExt tenantExt;
+    /**
+     * Tenant
+     */
+    private TenantExt tenantExt;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

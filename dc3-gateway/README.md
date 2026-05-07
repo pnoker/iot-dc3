@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-gateway` is the API Gateway of the IoT DC3 platform, built on Spring Cloud Gateway (WebFlux). It serves as the single ingress point for all external HTTP traffic, providing
+`dc3-gateway` is the API Gateway of the IoT DC3 platform, built on Spring Cloud Gateway (WebFlux). It serves as the
+single ingress point for all external HTTP traffic, providing
 rate limiting, authentication verification, service routing, and reverse proxying.
 
 ## Module Information
@@ -21,7 +22,8 @@ rate limiting, authentication verification, service routing, and reverse proxyin
 ## Key Responsibilities
 
 - **Request Routing**: Routes `/api/v3/{service}/**` requests to the corresponding center service via `StripPrefix=2`
-- **Authentication Filter**: `Authentic` filter validates Bearer tokens with the Auth Center before forwarding protected routes
+- **Authentication Filter**: `Authentic` filter validates Bearer tokens with the Auth Center before forwarding protected
+  routes
 - **Load Balancing**: Uses Nacos or static addresses (dev mode) for backend service discovery
 - **gRPC Client**: Connects to `dc3-center-auth` (port `9300`) for token validation
 

@@ -35,33 +35,33 @@ import java.util.List;
 @ConfigurationProperties(prefix = "dc3.resource-registrar")
 public class ResourceRegistrarProperties {
 
-	/**
-	 * Master switch. When false, the registrar is a no-op.
-	 */
-	private boolean enabled = true;
+    /**
+     * Master switch. When false, the registrar is a no-op.
+     */
+    private boolean enabled = true;
 
-	/**
-	 * Owning service name. Defaults to {@code spring.application.name} when blank.
-	 */
-	private String serviceName;
+    /**
+     * Owning service name. Defaults to {@code spring.application.name} when blank.
+     */
+    private String serviceName;
 
-	/**
-	 * When true, endpoints that exist in the DB but are absent from the current scan are
-	 * soft-deleted. Leave false in production to avoid accidental wipes during rolling
-	 * deploys of older binaries.
-	 */
-	private boolean deleteMissing = true;
+    /**
+     * When true, endpoints that exist in the DB but are absent from the current scan are
+     * soft-deleted. Leave false in production to avoid accidental wipes during rolling
+     * deploys of older binaries.
+     */
+    private boolean deleteMissing = true;
 
-	/**
-	 * Path patterns (Ant-style) to exclude from the scan, in addition to the built-in
-	 * actuator/error defaults.
-	 */
-	private List<String> excludePaths = new ArrayList<>();
+    /**
+     * Path patterns (Ant-style) to exclude from the scan, in addition to the built-in
+     * actuator/error defaults.
+     */
+    private List<String> excludePaths = new ArrayList<>();
 
-	/**
-	 * When true, a registration failure aborts startup. When false, it is logged and
-	 * startup continues.
-	 */
-	private boolean failFast = false;
+    /**
+     * When true, a registration failure aborts startup. When false, it is logged and
+     * startup continues.
+     */
+    private boolean failFast = false;
 
 }

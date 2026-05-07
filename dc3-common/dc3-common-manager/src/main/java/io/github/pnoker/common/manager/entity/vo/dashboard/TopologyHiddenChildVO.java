@@ -36,20 +36,20 @@ import java.io.Serializable;
 @ToString
 public class TopologyHiddenChildVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Prefixed id, same scheme as {@link TopologyNodeVO#getId()} — {@code driver:{n}} /
-	 * {@code device:{n}} / {@code point:{n}}.
-	 */
-	private String id;
+    /**
+     * Prefixed id, same scheme as {@link TopologyNodeVO#getId()} — {@code driver:{n}} /
+     * {@code device:{n}} / {@code point:{n}}.
+     */
+    private String id;
 
-	private String name;
+    private String name;
 
-	/**
-	 * {@code driver | device | point}. Profile layer does not get collapsed.
-	 */
-	private String type;
+    /**
+     * {@code driver | device | point}. Profile layer does not get collapsed.
+     */
+    private String type;
 
 }

@@ -43,110 +43,110 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_resource", autoResultMap = true)
 public class ResourceDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Primary key ID
-	 */
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    /**
+     * Primary key ID
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	/**
-	 * ID
-	 */
-	@TableField("parent_resource_id")
-	private Long parentResourceId;
+    /**
+     * ID
+     */
+    @TableField("parent_resource_id")
+    private Long parentResourceId;
 
-	/**
-	 * Name
-	 */
-	@TableField("resource_name")
-	private String resourceName;
+    /**
+     * Name
+     */
+    @TableField("resource_name")
+    private String resourceName;
 
-	/**
-	 * Code
-	 */
-	@TableField("resource_code")
-	private String resourceCode;
+    /**
+     * Code
+     */
+    @TableField("resource_code")
+    private String resourceCode;
 
-	/**
-	 * Type
-	 */
-	@TableField("resource_type_flag")
-	private Byte resourceTypeFlag;
+    /**
+     * Type
+     */
+    @TableField("resource_type_flag")
+    private Byte resourceTypeFlag;
 
-	/**
-	 *
-	 */
-	@TableField("resource_scope_flag")
-	private Byte resourceScopeFlag;
+    /**
+     *
+     */
+    @TableField("resource_scope_flag")
+    private Byte resourceScopeFlag;
 
-	/**
-	 * Entity ID
-	 */
-	@TableField("entity_id")
-	private Long entityId;
+    /**
+     * Entity ID
+     */
+    @TableField("entity_id")
+    private Long entityId;
 
-	/**
-	 *
-	 */
-	@TableField(value = "resource_ext", typeHandler = JacksonTypeHandler.class)
-	private JsonExt resourceExt;
+    /**
+     *
+     */
+    @TableField(value = "resource_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt resourceExt;
 
-	/**
-	 * Enable flag, 0:, 1:Disable
-	 */
-	@TableField("enable_flag")
-	private Byte enableFlag;
+    /**
+     * Enable flag, 0:, 1:Disable
+     */
+    @TableField("enable_flag")
+    private Byte enableFlag;
 
-	/**
-	 * Description
-	 */
-	@TableField("remark")
-	private String remark;
+    /**
+     * Description
+     */
+    @TableField("remark")
+    private String remark;
 
-	/**
-	 * Creator ID
-	 */
-	@TableField("creator_id")
-	private Long creatorId;
+    /**
+     * Creator ID
+     */
+    @TableField("creator_id")
+    private Long creatorId;
 
-	/**
-	 * Creator Name
-	 */
-	@TableField("creator_name")
-	private String creatorName;
+    /**
+     * Creator Name
+     */
+    @TableField("creator_name")
+    private String creatorName;
 
-	/**
-	 * Create Time
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operator ID
-	 */
-	@TableField("operator_id")
-	private Long operatorId;
+    /**
+     * Operator ID
+     */
+    @TableField("operator_id")
+    private Long operatorId;
 
-	/**
-	 * Operator Name
-	 */
-	@TableField("operator_name")
-	private String operatorName;
+    /**
+     * Operator Name
+     */
+    @TableField("operator_name")
+    private String operatorName;
 
-	/**
-	 * Operate Time
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operate Time
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
-	/**
-	 * Logical delete flag, 0:not deleted, 1:deleted
-	 */
-	@TableLogic
-	@TableField("deleted")
-	private Byte deleted;
+    /**
+     * Logical delete flag, 0:not deleted, 1:deleted
+     */
+    @TableLogic
+    @TableField("deleted")
+    private Byte deleted;
 
 }

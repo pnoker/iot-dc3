@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-public` is the foundational common utilities module of the IoT DC3 platform. It provides the universal response wrapper (`R<T>`), base entity classes, JWT key
+`dc3-common-public` is the foundational common utilities module of the IoT DC3 platform. It provides the universal
+response wrapper (`R<T>`), base entity classes, JWT key
 management, HTTP client configuration, and shared utility functions used across all platform modules.
 
 ## Module Information

@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PointValueBoolManagerImpl extends ServiceImpl<PointValueBoolMapper, PointValueBoolDO>
-		implements PointValueBoolManager {
+        implements PointValueBoolManager {
 
 }

@@ -44,88 +44,87 @@ import java.util.regex.Pattern;
 @Slf4j
 public class KeyLoader {
 
-	/**
-	 * IPv4 address regex pattern, used to validate if a string is a legal IPv4 address.
-	 */
-	private static final Pattern IP_ADDR_PATTERN = Pattern
-		.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    /**
+     * IPv4 address regex pattern, used to validate if a string is a legal IPv4 address.
+     */
+    private static final Pattern IP_ADDR_PATTERN = Pattern
+            .compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
-	/**
-	 * PKCS12 keystore password, used to load/generate client certificate keystore.
-	 */
-	private static final char[] PASSWORD = "password".toCharArray();
+    /**
+     * PKCS12 keystore password, used to load/generate client certificate keystore.
+     */
+    private static final char[] PASSWORD = "password".toCharArray();
 
-	/**
-	 * Client certificate alias, used to read client private key and certificate from
-	 * keystore.
-	 */
-	private static final String CLIENT_ALIAS = "client-ai";
+    /**
+     * Client certificate alias, used to read client private key and certificate from
+     * keystore.
+     */
+    private static final String CLIENT_ALIAS = "client-ai";
 
-	@Getter
-	private X509Certificate clientCertificate;
+    @Getter
+    private X509Certificate clientCertificate;
 
-	@Getter
-	private KeyPair clientKeyPair;
+    @Getter
+    private KeyPair clientKeyPair;
 
-	/**
-	 * Loads or creates the client certificate and key pair.
-	 * <p>
-	 * If the keystore doesn't exist, a new self-signed certificate is generated with the
-	 * configured subject alternative names (hostnames and IP addresses). The certificate
-	 * and private key are stored in a PKCS12 keystore.
-	 * </p>
-	 * @param baseDir the base directory where the keystore file is located
-	 * @return this KeyLoader instance with loaded certificate and key pair
-	 * @throws Exception if certificate generation or loading fails
-	 */
-	public KeyLoader load(Path baseDir) throws Exception {
-		KeyStore keyStore = KeyStore.getInstance("PKCS12");
-		Path serverKeyStore = baseDir.resolve("dc3-opc-ua-client.pfx");
+    /**
+     * Loads or creates the client certificate and key pair.
+     * <p>
+     * If the keystore doesn't exist, a new self-signed certificate is generated with the
+     * configured subject alternative names (hostnames and IP addresses). The certificate
+     * and private key are stored in a PKCS12 keystore.
+     * </p>
+     *
+     * @param baseDir the base directory where the keystore file is located
+     * @return this KeyLoader instance with loaded certificate and key pair
+     * @throws Exception if certificate generation or loading fails
+     */
+    public KeyLoader load(Path baseDir) throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        Path serverKeyStore = baseDir.resolve("dc3-opc-ua-client.pfx");
 
-		if (!Files.exists(serverKeyStore)) {
-			keyStore.load(null, PASSWORD);
-			KeyPair keyPair = SelfSignedCertificateGenerator.generateRsaKeyPair(2048);
-			SelfSignedCertificateBuilder builder = new SelfSignedCertificateBuilder(keyPair)
-				.setCommonName("DC3 Opc Ua Client")
-				.setOrganization("dc3")
-				.setOrganizationalUnit("iot")
-				.setLocalityName("BeiJing")
-				.setStateName("BJ")
-				.setCountryCode("ZN")
-				.setApplicationUri("urn:dc3:opc:ua:client")
-				.addDnsName("localhost")
-				.addIpAddress("127.0.0.1");
+        if (!Files.exists(serverKeyStore)) {
+            keyStore.load(null, PASSWORD);
+            KeyPair keyPair = SelfSignedCertificateGenerator.generateRsaKeyPair(2048);
+            SelfSignedCertificateBuilder builder = new SelfSignedCertificateBuilder(keyPair)
+                    .setCommonName("DC3 Opc Ua Client")
+                    .setOrganization("dc3")
+                    .setOrganizationalUnit("iot")
+                    .setLocalityName("BeiJing")
+                    .setStateName("BJ")
+                    .setCountryCode("ZN")
+                    .setApplicationUri("urn:dc3:opc:ua:client")
+                    .addDnsName("localhost")
+                    .addIpAddress("127.0.0.1");
 
-			// Get as many hostnames and IP addresses as we can listed in the certificate.
-			for (String hostname : HostUtil.getHostNames("0.0.0.0")) {
-				if (IP_ADDR_PATTERN.matcher(hostname).matches()) {
-					builder.addIpAddress(hostname);
-				}
-				else {
-					builder.addDnsName(hostname);
-				}
-			}
+            // Get as many hostnames and IP addresses as we can listed in the certificate.
+            for (String hostname : HostUtil.getHostNames("0.0.0.0")) {
+                if (IP_ADDR_PATTERN.matcher(hostname).matches()) {
+                    builder.addIpAddress(hostname);
+                } else {
+                    builder.addDnsName(hostname);
+                }
+            }
 
-			X509Certificate certificate = builder.build();
-			keyStore.setKeyEntry(CLIENT_ALIAS, keyPair.getPrivate(), PASSWORD, new X509Certificate[] { certificate });
-			try (OutputStream out = Files.newOutputStream(serverKeyStore)) {
-				keyStore.store(out, PASSWORD);
-			}
-		}
-		else {
-			try (InputStream in = Files.newInputStream(serverKeyStore)) {
-				keyStore.load(in, PASSWORD);
-			}
-		}
+            X509Certificate certificate = builder.build();
+            keyStore.setKeyEntry(CLIENT_ALIAS, keyPair.getPrivate(), PASSWORD, new X509Certificate[]{certificate});
+            try (OutputStream out = Files.newOutputStream(serverKeyStore)) {
+                keyStore.store(out, PASSWORD);
+            }
+        } else {
+            try (InputStream in = Files.newInputStream(serverKeyStore)) {
+                keyStore.load(in, PASSWORD);
+            }
+        }
 
-		Key serverPrivateKey = keyStore.getKey(CLIENT_ALIAS, PASSWORD);
-		if (serverPrivateKey instanceof PrivateKey) {
-			clientCertificate = (X509Certificate) keyStore.getCertificate(CLIENT_ALIAS);
-			PublicKey serverPublicKey = clientCertificate.getPublicKey();
-			clientKeyPair = new KeyPair(serverPublicKey, (PrivateKey) serverPrivateKey);
-		}
+        Key serverPrivateKey = keyStore.getKey(CLIENT_ALIAS, PASSWORD);
+        if (serverPrivateKey instanceof PrivateKey) {
+            clientCertificate = (X509Certificate) keyStore.getCertificate(CLIENT_ALIAS);
+            PublicKey serverPublicKey = clientCertificate.getPublicKey();
+            clientKeyPair = new KeyPair(serverPublicKey, (PrivateKey) serverPrivateKey);
+        }
 
-		return this;
-	}
+        return this;
+    }
 
 }

@@ -30,10 +30,11 @@ import java.util.List;
  */
 public interface DictionaryForAuthService {
 
-	/**
-	 * Tenant
-	 * @return Dictionary Array
-	 */
-	List<DictionaryBO> tenantDictionary();
+    /**
+     * Tenant
+     *
+     * @return Dictionary Array
+     */
+    List<DictionaryBO> tenantDictionary();
 
 }

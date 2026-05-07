@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-api-data` provides gRPC service definitions for device data collection and management in the IoT DC3 platform. It defines interfaces for querying real-time device point values
+`dc3-api-data` provides gRPC service definitions for device data collection and management in the IoT DC3 platform. It
+defines interfaces for querying real-time device point values
 and historical data retrieval.
 
 ## Module Information

@@ -33,12 +33,12 @@ import lombok.*;
 @AllArgsConstructor
 public class FacadeResourceRegistrySyncResultBO {
 
-	private int inserted;
+    private int inserted;
 
-	private int updated;
+    private int updated;
 
-	private int deleted;
+    private int deleted;
 
-	private int unchanged;
+    private int unchanged;
 
 }

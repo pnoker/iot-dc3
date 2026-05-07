@@ -33,32 +33,35 @@ import java.util.List;
  */
 public interface DriverAttributeConfigService extends BaseService<DriverAttributeConfigBO, DriverAttributeConfigQuery> {
 
-	/**
-	 * Device ID
-	 * @param deviceId Device ID
-	 * @return DriverConfig
-	 */
-	List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId);
+    /**
+     * Device ID
+     *
+     * @param deviceId Device ID
+     * @return DriverConfig
+     */
+    List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId);
 
-	/**
-	 * ID
-	 * @param attributeId ID
-	 * @return DriverConfig
-	 */
-	List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId);
+    /**
+     * ID
+     *
+     * @param attributeId ID
+     * @return DriverConfig
+     */
+    List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId);
 
-	/**
-	 * ID Device ID
-	 * @param deviceId Device ID
-	 * @param attributeId ID
-	 * @return DriverConfig
-	 */
-	DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId);
+    /**
+     * ID Device ID
+     *
+     * @param deviceId    Device ID
+     * @param attributeId ID
+     * @return DriverConfig
+     */
+    DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId);
 
-	/**
-	 * @param entityBO {@link DriverAttributeConfigBO}
-	 * @return {@link DeviceBO}
-	 */
-	DriverAttributeConfigBO innerSave(DriverAttributeConfigBO entityBO);
+    /**
+     * @param entityBO {@link DriverAttributeConfigBO}
+     * @return {@link DeviceBO}
+     */
+    DriverAttributeConfigBO innerSave(DriverAttributeConfigBO entityBO);
 
 }

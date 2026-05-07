@@ -35,12 +35,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class MqttDriverApplication {
 
-	/**
-	 * Main entry point for the MQTT driver application.
-	 * @param args command line arguments passed to the application
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(MqttDriverApplication.class, args);
-	}
+    /**
+     * Main entry point for the MQTT driver application.
+     *
+     * @param args command line arguments passed to the application
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(MqttDriverApplication.class, args);
+    }
 
 }

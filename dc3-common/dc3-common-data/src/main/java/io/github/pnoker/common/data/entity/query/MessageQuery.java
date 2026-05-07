@@ -44,36 +44,36 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MessageQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	/**
-	 * Alarm message template title
-	 */
-	private String alarmMessageTitle;
+    /**
+     * Alarm message template title
+     */
+    private String alarmMessageTitle;
 
-	/**
-	 * Alarm message template code
-	 */
-	private String alarmMessageCode;
+    /**
+     * Alarm message template code
+     */
+    private String alarmMessageCode;
 
-	/**
-	 * Alarm message template level
-	 */
-	private AlarmMessageLevelFlagEnum alarmMessageLevel;
+    /**
+     * Alarm message template level
+     */
+    private AlarmMessageLevelFlagEnum alarmMessageLevel;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

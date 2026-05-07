@@ -44,23 +44,25 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
 
-	/**
-	 * Configure static resource handlers
-	 * @param registry ResourceHandlerRegistry for configuring static resources
-	 */
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/");
-	}
+    /**
+     * Configure static resource handlers
+     *
+     * @param registry ResourceHandlerRegistry for configuring static resources
+     */
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/");
+    }
 
-	/**
-	 * Configure HTTP message codecs for JSON serialization/deserialization
-	 * @param configurer ServerCodecConfigurer for configuring message codecs
-	 */
-	@Override
-	public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-		configurer.customCodecs().registerWithDefaultConfig(new JacksonJsonEncoder(JsonUtil.getJsonMapper()));
-		configurer.customCodecs().registerWithDefaultConfig(new JacksonJsonDecoder(JsonUtil.getJsonMapper()));
-	}
+    /**
+     * Configure HTTP message codecs for JSON serialization/deserialization
+     *
+     * @param configurer ServerCodecConfigurer for configuring message codecs
+     */
+    @Override
+    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
+        configurer.customCodecs().registerWithDefaultConfig(new JacksonJsonEncoder(JsonUtil.getJsonMapper()));
+        configurer.customCodecs().registerWithDefaultConfig(new JacksonJsonDecoder(JsonUtil.getJsonMapper()));
+    }
 
 }

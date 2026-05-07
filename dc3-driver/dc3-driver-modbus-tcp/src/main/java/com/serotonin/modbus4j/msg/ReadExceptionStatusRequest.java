@@ -32,45 +32,46 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class ReadExceptionStatusRequest extends ModbusRequest {
 
-	/**
-	 * <p>
-	 * Constructor for ReadExceptionStatusRequest.
-	 * </p>
-	 * @param slaveId a int.
-	 * @throws ModbusTransportException if any.
-	 */
-	public ReadExceptionStatusRequest(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    /**
+     * <p>
+     * Constructor for ReadExceptionStatusRequest.
+     * </p>
+     *
+     * @param slaveId a int.
+     * @throws ModbusTransportException if any.
+     */
+    public ReadExceptionStatusRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	@Override
-	public void validate(Modbus modbus) {
-		// no op
-	}
+    @Override
+    public void validate(Modbus modbus) {
+        // no op
+    }
 
-	@Override
-	protected void writeRequest(ByteQueue queue) {
-		// no op
-	}
+    @Override
+    protected void writeRequest(ByteQueue queue) {
+        // no op
+    }
 
-	@Override
-	protected void readRequest(ByteQueue queue) {
-		// no op
-	}
+    @Override
+    protected void readRequest(ByteQueue queue) {
+        // no op
+    }
 
-	@Override
-	ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
-		return new ReadExceptionStatusResponse(slaveId);
-	}
+    @Override
+    ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
+        return new ReadExceptionStatusResponse(slaveId);
+    }
 
-	@Override
-	ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
-		return new ReadExceptionStatusResponse(slaveId, processImage.getExceptionStatus());
-	}
+    @Override
+    ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
+        return new ReadExceptionStatusResponse(slaveId, processImage.getExceptionStatus());
+    }
 
-	@Override
-	public byte getFunctionCode() {
-		return FunctionCode.READ_EXCEPTION_STATUS;
-	}
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.READ_EXCEPTION_STATUS;
+    }
 
 }

@@ -42,40 +42,40 @@ import java.util.Objects;
 @Service
 public class PointValueCommandServiceImpl implements PointValueCommandService {
 
-	@Resource
-	private DriverFacade driverFacade;
+    @Resource
+    private DriverFacade driverFacade;
 
-	@Resource
-	private RabbitTemplate rabbitTemplate;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
-	@Override
-	public void read(PointValueReadVO entityVO) {
-		FacadeDriverBO driver = driverFacade.selectByDeviceId(entityVO.getDeviceId());
-		if (Objects.isNull(driver)) {
-			return;
-		}
+    @Override
+    public void read(PointValueReadVO entityVO) {
+        FacadeDriverBO driver = driverFacade.selectByDeviceId(entityVO.getDeviceId());
+        if (Objects.isNull(driver)) {
+            return;
+        }
 
-		DeviceCommandDTO.DeviceRead deviceRead = new DeviceCommandDTO.DeviceRead(entityVO.getDeviceId(),
-				entityVO.getPointId());
-		DeviceCommandDTO deviceCommandDTO = new DeviceCommandDTO(DeviceCommandTypeEnum.READ,
-				JsonUtil.toJsonString(deviceRead));
-		rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-				RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + driver.getServiceName(), deviceCommandDTO);
-	}
+        DeviceCommandDTO.DeviceRead deviceRead = new DeviceCommandDTO.DeviceRead(entityVO.getDeviceId(),
+                entityVO.getPointId());
+        DeviceCommandDTO deviceCommandDTO = new DeviceCommandDTO(DeviceCommandTypeEnum.READ,
+                JsonUtil.toJsonString(deviceRead));
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
+                RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + driver.getServiceName(), deviceCommandDTO);
+    }
 
-	@Override
-	public void write(PointValueWriteVO entityVO) {
-		FacadeDriverBO driver = driverFacade.selectByDeviceId(entityVO.getDeviceId());
-		if (Objects.isNull(driver)) {
-			return;
-		}
+    @Override
+    public void write(PointValueWriteVO entityVO) {
+        FacadeDriverBO driver = driverFacade.selectByDeviceId(entityVO.getDeviceId());
+        if (Objects.isNull(driver)) {
+            return;
+        }
 
-		DeviceCommandDTO.DeviceWrite deviceWrite = new DeviceCommandDTO.DeviceWrite(entityVO.getDeviceId(),
-				entityVO.getPointId(), entityVO.getValue());
-		DeviceCommandDTO deviceCommandDTO = new DeviceCommandDTO(DeviceCommandTypeEnum.WRITE,
-				JsonUtil.toJsonString(deviceWrite));
-		rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-				RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + driver.getServiceName(), deviceCommandDTO);
-	}
+        DeviceCommandDTO.DeviceWrite deviceWrite = new DeviceCommandDTO.DeviceWrite(entityVO.getDeviceId(),
+                entityVO.getPointId(), entityVO.getValue());
+        DeviceCommandDTO deviceCommandDTO = new DeviceCommandDTO(DeviceCommandTypeEnum.WRITE,
+                JsonUtil.toJsonString(deviceWrite));
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
+                RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + driver.getServiceName(), deviceCommandDTO);
+    }
 
 }

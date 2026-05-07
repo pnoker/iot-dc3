@@ -28,23 +28,23 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
  */
 public class TimeoutConstant {
 
-	/**
-	 * salt cache timeout, minutes
-	 */
-	public static final int SALT_CACHE_TIMEOUT = 5;
+    /**
+     * salt cache timeout, minutes
+     */
+    public static final int SALT_CACHE_TIMEOUT = 5;
 
-	/**
-	 * user login limit timeout, minutes
-	 */
-	public static final int USER_LIMIT_TIMEOUT = 5;
+    /**
+     * user login limit timeout, minutes
+     */
+    public static final int USER_LIMIT_TIMEOUT = 5;
 
-	/**
-	 * token cache timeout, hours
-	 */
-	public static final int TOKEN_CACHE_TIMEOUT = 12;
+    /**
+     * token cache timeout, hours
+     */
+    public static final int TOKEN_CACHE_TIMEOUT = 12;
 
-	private TimeoutConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private TimeoutConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

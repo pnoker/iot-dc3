@@ -35,68 +35,71 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum MenuTypeFlagEnum {
 
-	/**
-	 * Title menu
-	 */
-	TITLE((byte) 0, "title", "Title menu"),
+    /**
+     * Title menu
+     */
+    TITLE((byte) 0, "title", "Title menu"),
 
-	/**
-	 * Common menu
-	 */
-	COMMON((byte) 1, "common", "Common menu"),;
+    /**
+     * Common menu
+     */
+    COMMON((byte) 1, "common", "Common menu"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Remark
-	 */
-	private final String remark;
+    /**
+     * Remark
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link MenuTypeFlagEnum}
-	 */
-	public static MenuTypeFlagEnum ofIndex(Byte index) {
-		Optional<MenuTypeFlagEnum> any = Arrays.stream(MenuTypeFlagEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link MenuTypeFlagEnum}
+     */
+    public static MenuTypeFlagEnum ofIndex(Byte index) {
+        Optional<MenuTypeFlagEnum> any = Arrays.stream(MenuTypeFlagEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link MenuTypeFlagEnum}
-	 */
-	public static MenuTypeFlagEnum ofCode(String code) {
-		Optional<MenuTypeFlagEnum> any = Arrays.stream(MenuTypeFlagEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link MenuTypeFlagEnum}
+     */
+    public static MenuTypeFlagEnum ofCode(String code) {
+        Optional<MenuTypeFlagEnum> any = Arrays.stream(MenuTypeFlagEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Name
-	 * @return {@link MenuTypeFlagEnum}
-	 */
-	public static MenuTypeFlagEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link MenuTypeFlagEnum}
+     */
+    public static MenuTypeFlagEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

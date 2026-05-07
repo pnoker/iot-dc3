@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class UnAuthorizedException extends RuntimeException {
 
-	public UnAuthorizedException() {
-		this(null);
-	}
+    public UnAuthorizedException() {
+        this(null);
+    }
 
-	public UnAuthorizedException(Throwable cause) {
-		super(cause);
-	}
+    public UnAuthorizedException(Throwable cause) {
+        super(cause);
+    }
 
-	public UnAuthorizedException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public UnAuthorizedException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

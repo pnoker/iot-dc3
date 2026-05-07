@@ -46,47 +46,47 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DeviceVO extends BaseVO {
 
-	/**
-	 * Device Name
-	 */
-	@NotBlank(message = "设备名称不能为空", groups = { Add.class })
-	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "设备名称格式无效",
-			groups = { Add.class, Update.class })
-	private String deviceName;
+    /**
+     * Device Name
+     */
+    @NotBlank(message = "设备名称不能为空", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "设备名称格式无效",
+            groups = {Add.class, Update.class})
+    private String deviceName;
 
-	/**
-	 * Device ID
-	 */
-	private String deviceCode;
+    /**
+     * Device ID
+     */
+    private String deviceCode;
 
-	/**
-	 * Driver ID
-	 */
-	@NotNull(message = "驱动ID不能为空", groups = { Add.class, Update.class, Upload.class })
-	private Long driverId;
+    /**
+     * Driver ID
+     */
+    @NotNull(message = "驱动ID不能为空", groups = {Add.class, Update.class, Upload.class})
+    private Long driverId;
 
-	/**
-	 *
-	 */
-	private DeviceExt deviceExt;
+    /**
+     *
+     */
+    private DeviceExt deviceExt;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 *
-	 */
-	private String signature;
+    /**
+     *
+     */
+    private String signature;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
-	//
-	@NotNull(message = "ID", groups = { Upload.class })
-	private Set<Long> profileIds;
+    //
+    @NotNull(message = "ID", groups = {Upload.class})
+    private Set<Long> profileIds;
 
 }

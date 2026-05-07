@@ -46,156 +46,166 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface ProfileBuilder {
 
-	/**
-	 * VO to BO
-	 * @param entityVO EntityVO
-	 * @return EntityBO
-	 */
-	@Mapping(target = "tenantId", ignore = true)
-	ProfileBO buildBOByVO(ProfileVO entityVO);
+    /**
+     * VO to BO
+     *
+     * @param entityVO EntityVO
+     * @return EntityBO
+     */
+    @Mapping(target = "tenantId", ignore = true)
+    ProfileBO buildBOByVO(ProfileVO entityVO);
 
-	/**
-	 * VOList to BOList
-	 * @param entityVOList EntityVO Array
-	 * @return EntityBO Array
-	 */
-	List<ProfileBO> buildBOListByVOList(List<ProfileVO> entityVOList);
+    /**
+     * VOList to BOList
+     *
+     * @param entityVOList EntityVO Array
+     * @return EntityBO Array
+     */
+    List<ProfileBO> buildBOListByVOList(List<ProfileVO> entityVOList);
 
-	/**
-	 * BO to DO
-	 * @param entityBO EntityBO
-	 * @return EntityDO
-	 */
-	@Mapping(target = "profileExt", ignore = true)
-	@Mapping(target = "profileShareFlag", ignore = true)
-	@Mapping(target = "profileTypeFlag", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	@Mapping(target = "deleted", ignore = true)
-	ProfileDO buildDOByBO(ProfileBO entityBO);
+    /**
+     * BO to DO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDO
+     */
+    @Mapping(target = "profileExt", ignore = true)
+    @Mapping(target = "profileShareFlag", ignore = true)
+    @Mapping(target = "profileTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    ProfileDO buildDOByBO(ProfileBO entityBO);
 
-	@AfterMapping
-	default void afterProcess(ProfileBO entityBO, @MappingTarget ProfileDO entityDO) {
-		// Code
-		if (StringUtils.isEmpty(entityBO.getProfileCode())) {
-			entityDO.setProfileCode(CodeUtil.getCode());
-		}
+    @AfterMapping
+    default void afterProcess(ProfileBO entityBO, @MappingTarget ProfileDO entityDO) {
+        // Code
+        if (StringUtils.isEmpty(entityBO.getProfileCode())) {
+            entityDO.setProfileCode(CodeUtil.getCode());
+        }
 
-		// Json Ext
-		ProfileExt entityExt = entityBO.getProfileExt();
-		JsonExt ext = new JsonExt();
-		if (Objects.nonNull(entityExt)) {
-			ext.setType(entityExt.getType());
-			ext.setVersion(entityExt.getVersion());
-			ext.setRemark(entityExt.getRemark());
-			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-		}
-		entityDO.setProfileExt(ext);
+        // Json Ext
+        ProfileExt entityExt = entityBO.getProfileExt();
+        JsonExt ext = new JsonExt();
+        if (Objects.nonNull(entityExt)) {
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+        }
+        entityDO.setProfileExt(ext);
 
-		// ProfileShare Flag
-		ProfileShareFlagEnum profileShareFlag = entityBO.getProfileShareFlag();
-		Optional.ofNullable(profileShareFlag).ifPresent(value -> entityDO.setProfileShareFlag(value.getIndex()));
+        // ProfileShare Flag
+        ProfileShareFlagEnum profileShareFlag = entityBO.getProfileShareFlag();
+        Optional.ofNullable(profileShareFlag).ifPresent(value -> entityDO.setProfileShareFlag(value.getIndex()));
 
-		// ProfileType Flag
-		ProfileTypeFlagEnum profileTypeFlag = entityBO.getProfileTypeFlag();
-		Optional.ofNullable(profileTypeFlag).ifPresent(value -> entityDO.setProfileTypeFlag(value.getIndex()));
+        // ProfileType Flag
+        ProfileTypeFlagEnum profileTypeFlag = entityBO.getProfileTypeFlag();
+        Optional.ofNullable(profileTypeFlag).ifPresent(value -> entityDO.setProfileTypeFlag(value.getIndex()));
 
-		// Enable Flag
-		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-	}
+        // Enable Flag
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+    }
 
-	/**
-	 * BOList to DOList
-	 * @param entityBOList EntityBO Array
-	 * @return EntityDO Array
-	 */
-	List<ProfileDO> buildDOListByBOList(List<ProfileBO> entityBOList);
+    /**
+     * BOList to DOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDO Array
+     */
+    List<ProfileDO> buildDOListByBOList(List<ProfileBO> entityBOList);
 
-	/**
-	 * DO to BO
-	 * @param entityDO EntityDO
-	 * @return EntityBO
-	 */
-	@Mapping(target = "profileExt", ignore = true)
-	@Mapping(target = "profileShareFlag", ignore = true)
-	@Mapping(target = "profileTypeFlag", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	ProfileBO buildBOByDO(ProfileDO entityDO);
+    /**
+     * DO to BO
+     *
+     * @param entityDO EntityDO
+     * @return EntityBO
+     */
+    @Mapping(target = "profileExt", ignore = true)
+    @Mapping(target = "profileShareFlag", ignore = true)
+    @Mapping(target = "profileTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    ProfileBO buildBOByDO(ProfileDO entityDO);
 
-	@AfterMapping
-	default void afterProcess(ProfileDO entityDO, @MappingTarget ProfileBO entityBO) {
-		// Json Ext
-		JsonExt entityExt = entityDO.getProfileExt();
-		if (Objects.nonNull(entityExt)) {
-			ProfileExt ext = new ProfileExt();
-			ext.setType(entityExt.getType());
-			ext.setVersion(entityExt.getVersion());
-			ext.setRemark(entityExt.getRemark());
-			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ProfileExt.Content.class));
-			entityBO.setProfileExt(ext);
-		}
+    @AfterMapping
+    default void afterProcess(ProfileDO entityDO, @MappingTarget ProfileBO entityBO) {
+        // Json Ext
+        JsonExt entityExt = entityDO.getProfileExt();
+        if (Objects.nonNull(entityExt)) {
+            ProfileExt ext = new ProfileExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ProfileExt.Content.class));
+            entityBO.setProfileExt(ext);
+        }
 
-		// ProfileShare Flag
-		Byte profileShareFlag = entityDO.getProfileShareFlag();
-		entityBO.setProfileShareFlag(ProfileShareFlagEnum.ofIndex(profileShareFlag));
+        // ProfileShare Flag
+        Byte profileShareFlag = entityDO.getProfileShareFlag();
+        entityBO.setProfileShareFlag(ProfileShareFlagEnum.ofIndex(profileShareFlag));
 
-		// ProfileType Flag
-		Byte profileTypeFlag = entityDO.getProfileTypeFlag();
-		entityBO.setProfileTypeFlag(ProfileTypeFlagEnum.ofIndex(profileTypeFlag));
+        // ProfileType Flag
+        Byte profileTypeFlag = entityDO.getProfileTypeFlag();
+        entityBO.setProfileTypeFlag(ProfileTypeFlagEnum.ofIndex(profileTypeFlag));
 
-		// Enable Flag
-		Byte enableFlag = entityDO.getEnableFlag();
-		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-	}
+        // Enable Flag
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
 
-	/**
-	 * DOList to BOList
-	 * @param entityDOList EntityDO Array
-	 * @return EntityBO Array
-	 */
-	List<ProfileBO> buildBOListByDOList(List<ProfileDO> entityDOList);
+    /**
+     * DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<ProfileBO> buildBOListByDOList(List<ProfileDO> entityDOList);
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	ProfileVO buildVOByBO(ProfileBO entityBO);
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    ProfileVO buildVOByBO(ProfileBO entityBO);
 
-	/**
-	 * BOList to VOList
-	 * @param entityBOList EntityBO Array
-	 * @return EntityVO Array
-	 */
-	List<ProfileVO> buildVOListByBOList(List<ProfileBO> entityBOList);
+    /**
+     * BOList to VOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityVO Array
+     */
+    List<ProfileVO> buildVOListByBOList(List<ProfileBO> entityBOList);
 
-	/**
-	 * DOPage to BOPage
-	 * @param entityPageDO EntityDO Page
-	 * @return EntityBO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<ProfileBO> buildBOPageByDOPage(Page<ProfileDO> entityPageDO);
+    /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<ProfileBO> buildBOPageByDOPage(Page<ProfileDO> entityPageDO);
 
-	/**
-	 * BOPage to VOPage
-	 * @param entityPageBO EntityBO Page
-	 * @return EntityVO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<ProfileVO> buildVOPageByBOPage(Page<ProfileBO> entityPageBO);
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<ProfileVO> buildVOPageByBOPage(Page<ProfileBO> entityPageBO);
 
 }

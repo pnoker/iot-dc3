@@ -30,8 +30,8 @@ import lombok.ToString;
 @ToString
 public class AlertCountersRow {
 
-	private long total;
+    private long total;
 
-	private long unconfirmed;
+    private long unconfirmed;
 
 }

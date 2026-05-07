@@ -31,70 +31,73 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class WriteMaskRegisterResponse extends ModbusResponse {
 
-	private int writeOffset;
+    private int writeOffset;
 
-	private int andMask;
+    private int andMask;
 
-	private int orMask;
+    private int orMask;
 
-	WriteMaskRegisterResponse(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    WriteMaskRegisterResponse(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	WriteMaskRegisterResponse(int slaveId, int writeOffset, int andMask, int orMask) throws ModbusTransportException {
-		super(slaveId);
-		this.writeOffset = writeOffset;
-		this.andMask = andMask;
-		this.orMask = orMask;
-	}
+    WriteMaskRegisterResponse(int slaveId, int writeOffset, int andMask, int orMask) throws ModbusTransportException {
+        super(slaveId);
+        this.writeOffset = writeOffset;
+        this.andMask = andMask;
+        this.orMask = orMask;
+    }
 
-	@Override
-	public byte getFunctionCode() {
-		return FunctionCode.WRITE_MASK_REGISTER;
-	}
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_MASK_REGISTER;
+    }
 
-	@Override
-	protected void writeResponse(ByteQueue queue) {
-		ModbusUtils.pushShort(queue, writeOffset);
-		ModbusUtils.pushShort(queue, andMask);
-		ModbusUtils.pushShort(queue, orMask);
-	}
+    @Override
+    protected void writeResponse(ByteQueue queue) {
+        ModbusUtils.pushShort(queue, writeOffset);
+        ModbusUtils.pushShort(queue, andMask);
+        ModbusUtils.pushShort(queue, orMask);
+    }
 
-	@Override
-	protected void readResponse(ByteQueue queue) {
-		writeOffset = ModbusUtils.popUnsignedShort(queue);
-		andMask = ModbusUtils.popUnsignedShort(queue);
-		orMask = ModbusUtils.popUnsignedShort(queue);
-	}
+    @Override
+    protected void readResponse(ByteQueue queue) {
+        writeOffset = ModbusUtils.popUnsignedShort(queue);
+        andMask = ModbusUtils.popUnsignedShort(queue);
+        orMask = ModbusUtils.popUnsignedShort(queue);
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>writeOffset</code>.
-	 * </p>
-	 * @return a int.
-	 */
-	public int getWriteOffset() {
-		return writeOffset;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>writeOffset</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getWriteOffset() {
+        return writeOffset;
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>andMask</code>.
-	 * </p>
-	 * @return a int.
-	 */
-	public int getAndMask() {
-		return andMask;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>andMask</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getAndMask() {
+        return andMask;
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>orMask</code>.
-	 * </p>
-	 * @return a int.
-	 */
-	public int getOrMask() {
-		return orMask;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>orMask</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getOrMask() {
+        return orMask;
+    }
 
 }

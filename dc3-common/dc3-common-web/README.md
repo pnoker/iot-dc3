@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-web` is the shared WebFlux configuration module of the IoT DC3 platform. It provides global exception handling, WebFlux request processing configuration, global web
+`dc3-common-web` is the shared WebFlux configuration module of the IoT DC3 platform. It provides global exception
+handling, WebFlux request processing configuration, global web
 filters, and reactive response utilities for all REST-based center services.
 
 ## Module Information

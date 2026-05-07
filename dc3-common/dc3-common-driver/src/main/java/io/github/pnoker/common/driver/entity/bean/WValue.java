@@ -43,85 +43,86 @@ import java.util.Objects;
 @AllArgsConstructor
 public class WValue implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Raw value content stored as a string before type conversion.
-	 */
-	private String value;
+    /**
+     * Raw value content stored as a string before type conversion.
+     */
+    private String value;
 
-	/**
-	 * Declared point type used to convert the raw string value.
-	 */
-	private PointTypeFlagEnum type;
+    /**
+     * Declared point type used to convert the raw string value.
+     */
+    private PointTypeFlagEnum type;
 
-	/**
-	 * Converts the stored string value to the requested boxed Java type.
-	 * @param clazz target boxed type
-	 * @param <T> target type parameter
-	 * @return converted value
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> T getValue(Class<T> clazz) {
-		if (Objects.isNull(type)) {
-			throw new UnSupportException("Unsupported point type of " + type);
-		}
-		if (StringUtils.isEmpty(value)) {
-			throw new EmptyException("Point value is empty");
-		}
+    /**
+     * Converts the stored string value to the requested boxed Java type.
+     *
+     * @param clazz target boxed type
+     * @param <T>   target type parameter
+     * @return converted value
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getValue(Class<T> clazz) {
+        if (Objects.isNull(type)) {
+            throw new UnSupportException("Unsupported point type of " + type);
+        }
+        if (StringUtils.isEmpty(value)) {
+            throw new EmptyException("Point value is empty");
+        }
 
-		final String message = "Point type is: {}, can't be cast to class: {}";
-		return switch (type) {
-			case STRING -> {
-				if (!clazz.equals(String.class)) {
-					throw new TypeException(message, type.getCode(), clazz.getName());
-				}
-				yield (T) value;
-			}
-			case BYTE -> {
-				if (!clazz.equals(Byte.class)) {
-					throw new TypeException(message, type.getCode(), clazz.getName());
-				}
-				yield (T) Byte.valueOf(value);
-			}
-			case SHORT -> {
-				if (!clazz.equals(Short.class)) {
-					throw new TypeException(message, type.getCode(), clazz.getName());
-				}
-				yield (T) Short.valueOf(value);
-			}
-			case INT -> {
-				if (!clazz.equals(Integer.class)) {
-					throw new TypeException(message, type.getCode(), clazz.getName());
-				}
-				yield (T) Integer.valueOf(value);
-			}
-			case LONG -> {
-				if (!clazz.equals(Long.class)) {
-					throw new TypeException(message, type.getCode(), clazz.getName());
-				}
-				yield (T) Long.valueOf(value);
-			}
-			case FLOAT -> {
-				if (!clazz.equals(Float.class)) {
-					throw new TypeException(message, type.getCode(), clazz.getName());
-				}
-				yield (T) Float.valueOf(value);
-			}
-			case DOUBLE -> {
-				if (!clazz.equals(Double.class)) {
-					throw new TypeException(message, type.getCode(), clazz.getName());
-				}
-				yield (T) Double.valueOf(value);
-			}
-			case BOOLEAN -> {
-				if (!clazz.equals(Boolean.class)) {
-					throw new TypeException(message, type.getCode(), clazz.getName());
-				}
-				yield (T) Boolean.valueOf(value);
-			}
-		};
-	}
+        final String message = "Point type is: {}, can't be cast to class: {}";
+        return switch (type) {
+            case STRING -> {
+                if (!clazz.equals(String.class)) {
+                    throw new TypeException(message, type.getCode(), clazz.getName());
+                }
+                yield (T) value;
+            }
+            case BYTE -> {
+                if (!clazz.equals(Byte.class)) {
+                    throw new TypeException(message, type.getCode(), clazz.getName());
+                }
+                yield (T) Byte.valueOf(value);
+            }
+            case SHORT -> {
+                if (!clazz.equals(Short.class)) {
+                    throw new TypeException(message, type.getCode(), clazz.getName());
+                }
+                yield (T) Short.valueOf(value);
+            }
+            case INT -> {
+                if (!clazz.equals(Integer.class)) {
+                    throw new TypeException(message, type.getCode(), clazz.getName());
+                }
+                yield (T) Integer.valueOf(value);
+            }
+            case LONG -> {
+                if (!clazz.equals(Long.class)) {
+                    throw new TypeException(message, type.getCode(), clazz.getName());
+                }
+                yield (T) Long.valueOf(value);
+            }
+            case FLOAT -> {
+                if (!clazz.equals(Float.class)) {
+                    throw new TypeException(message, type.getCode(), clazz.getName());
+                }
+                yield (T) Float.valueOf(value);
+            }
+            case DOUBLE -> {
+                if (!clazz.equals(Double.class)) {
+                    throw new TypeException(message, type.getCode(), clazz.getName());
+                }
+                yield (T) Double.valueOf(value);
+            }
+            case BOOLEAN -> {
+                if (!clazz.equals(Boolean.class)) {
+                    throw new TypeException(message, type.getCode(), clazz.getName());
+                }
+                yield (T) Boolean.valueOf(value);
+            }
+        };
+    }
 
 }

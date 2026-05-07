@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserPasswordManagerImpl extends ServiceImpl<UserPasswordMapper, UserPasswordDO>
-		implements UserPasswordManager {
+        implements UserPasswordManager {
 
 }

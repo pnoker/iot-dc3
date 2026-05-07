@@ -32,8 +32,8 @@ import java.time.LocalDateTime;
 @ToString
 public class HourCountRow {
 
-	private LocalDateTime bucket;
+    private LocalDateTime bucket;
 
-	private long count;
+    private long count;
 
 }

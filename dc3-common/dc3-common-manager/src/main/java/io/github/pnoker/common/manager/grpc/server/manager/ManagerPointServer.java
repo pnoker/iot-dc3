@@ -46,74 +46,72 @@ import java.util.Objects;
 @Service
 public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
-	@Resource
-	private GrpcPointBuilder grpcPointBuilder;
+    @Resource
+    private GrpcPointBuilder grpcPointBuilder;
 
-	@Resource
-	private PointService pointService;
+    @Resource
+    private PointService pointService;
 
-	@Override
-	public void selectByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
-		GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
-		GrpcR.Builder rBuilder = GrpcR.newBuilder();
+    @Override
+    public void selectByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
+        GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-		PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
+        PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
 
-		Page<PointBO> entityPage = pointService.selectByPage(query);
-		if (Objects.isNull(entityPage)) {
-			rBuilder.setOk(false);
-			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-		}
-		else {
-			rBuilder.setOk(true);
-			rBuilder.setCode(ResponseEnum.OK.getCode());
-			rBuilder.setMessage(ResponseEnum.OK.getText());
+        Page<PointBO> entityPage = pointService.selectByPage(query);
+        if (Objects.isNull(entityPage)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
-			GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
-			GrpcPage.Builder page = GrpcPage.newBuilder();
-			page.setCurrent(entityPage.getCurrent());
-			page.setSize(entityPage.getSize());
-			page.setPages(entityPage.getPages());
-			page.setTotal(entityPage.getTotal());
-			pagePointBuilder.setPage(page);
+            GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
+            GrpcPage.Builder page = GrpcPage.newBuilder();
+            page.setCurrent(entityPage.getCurrent());
+            page.setSize(entityPage.getSize());
+            page.setPages(entityPage.getPages());
+            page.setTotal(entityPage.getTotal());
+            pagePointBuilder.setPage(page);
 
-			List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords()
-				.stream()
-				.map(grpcPointBuilder::buildGrpcDTOByBO)
-				.toList();
-			pagePointBuilder.addAllData(entityGrpcDTOList);
+            List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords()
+                    .stream()
+                    .map(grpcPointBuilder::buildGrpcDTOByBO)
+                    .toList();
+            pagePointBuilder.addAllData(entityGrpcDTOList);
 
-			builder.setData(pagePointBuilder);
-		}
+            builder.setData(pagePointBuilder);
+        }
 
-		builder.setResult(rBuilder);
-		responseObserver.onNext(builder.build());
-		responseObserver.onCompleted();
-	}
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
 
-	@Override
-	public void selectById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
-		GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
-		GrpcR.Builder rBuilder = GrpcR.newBuilder();
+    @Override
+    public void selectById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
+        GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-		PointBO entityBO = pointService.selectById(request.getPointId());
-		if (Objects.isNull(entityBO)) {
-			rBuilder.setOk(false);
-			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-		}
-		else {
-			rBuilder.setOk(true);
-			rBuilder.setCode(ResponseEnum.OK.getCode());
-			rBuilder.setMessage(ResponseEnum.OK.getText());
+        PointBO entityBO = pointService.selectById(request.getPointId());
+        if (Objects.isNull(entityBO)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
-			builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
-		}
+            builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
+        }
 
-		builder.setResult(rBuilder);
-		responseObserver.onNext(builder.build());
-		responseObserver.onCompleted();
-	}
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
 
 }

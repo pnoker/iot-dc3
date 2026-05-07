@@ -34,90 +34,100 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface UserPasswordBuilder {
 
-	/**
-	 * VO to BO
-	 * @param entityVO EntityVO
-	 * @return EntityBO
-	 */
-	UserPasswordBO buildBOByVO(UserPasswordVO entityVO);
+    /**
+     * VO to BO
+     *
+     * @param entityVO EntityVO
+     * @return EntityBO
+     */
+    UserPasswordBO buildBOByVO(UserPasswordVO entityVO);
 
-	/**
-	 * VOList to BOList
-	 * @param entityVOList EntityVO Array
-	 * @return EntityBO Array
-	 */
-	List<UserPasswordBO> buildBOListByVOList(List<UserPasswordVO> entityVOList);
+    /**
+     * VOList to BOList
+     *
+     * @param entityVOList EntityVO Array
+     * @return EntityBO Array
+     */
+    List<UserPasswordBO> buildBOListByVOList(List<UserPasswordVO> entityVOList);
 
-	/**
-	 * BO to DO
-	 * @param entityBO EntityBO
-	 * @return EntityDO
-	 */
-	@Mapping(target = "deleted", ignore = true)
-	UserPasswordDO buildDOByBO(UserPasswordBO entityBO);
+    /**
+     * BO to DO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDO
+     */
+    @Mapping(target = "deleted", ignore = true)
+    UserPasswordDO buildDOByBO(UserPasswordBO entityBO);
 
-	/**
-	 * BOList to DOList
-	 * @param entityBOList EntityBO Array
-	 * @return EntityDO Array
-	 */
-	List<UserPasswordDO> buildDOListByBOList(List<UserPasswordBO> entityBOList);
+    /**
+     * BOList to DOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDO Array
+     */
+    List<UserPasswordDO> buildDOListByBOList(List<UserPasswordBO> entityBOList);
 
-	/**
-	 * DO to BO
-	 * @param entityDO EntityDO
-	 * @return EntityBO
-	 */
-	UserPasswordBO buildBOByDO(UserPasswordDO entityDO);
+    /**
+     * DO to BO
+     *
+     * @param entityDO EntityDO
+     * @return EntityBO
+     */
+    UserPasswordBO buildBOByDO(UserPasswordDO entityDO);
 
-	/**
-	 * DOList to BOList
-	 * @param entityDOList EntityDO Array
-	 * @return EntityBO Array
-	 */
-	List<UserPasswordBO> buildBOListByDOList(List<UserPasswordDO> entityDOList);
+    /**
+     * DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<UserPasswordBO> buildBOListByDOList(List<UserPasswordDO> entityDOList);
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	UserPasswordVO buildVOByBO(UserPasswordBO entityBO);
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    UserPasswordVO buildVOByBO(UserPasswordBO entityBO);
 
-	/**
-	 * BOList to VOList
-	 * @param entityBOList EntityBO Array
-	 * @return EntityVO Array
-	 */
-	List<UserPasswordVO> buildVOListByBOList(List<UserPasswordBO> entityBOList);
+    /**
+     * BOList to VOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityVO Array
+     */
+    List<UserPasswordVO> buildVOListByBOList(List<UserPasswordBO> entityBOList);
 
-	/**
-	 * DOPage to BOPage
-	 * @param entityPageDO EntityDO Page
-	 * @return EntityBO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<UserPasswordBO> buildBOPageByDOPage(Page<UserPasswordDO> entityPageDO);
+    /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<UserPasswordBO> buildBOPageByDOPage(Page<UserPasswordDO> entityPageDO);
 
-	/**
-	 * BOPage to VOPage
-	 * @param entityPageBO EntityBO Page
-	 * @return EntityVO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<UserPasswordVO> buildVOPageByBOPage(Page<UserPasswordBO> entityPageBO);
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<UserPasswordVO> buildVOPageByBOPage(Page<UserPasswordBO> entityPageBO);
 
 }

@@ -51,114 +51,115 @@ import java.util.Objects;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-	@Resource
-	private MessageBuilder messageBuilder;
+    @Resource
+    private MessageBuilder messageBuilder;
 
-	@Resource
-	private MessageManager messageManager;
+    @Resource
+    private MessageManager messageManager;
 
-	@Override
-	public void save(MessageBO entityBO) {
-		checkDuplicate(entityBO, false, true);
+    @Override
+    public void save(MessageBO entityBO) {
+        checkDuplicate(entityBO, false, true);
 
-		MessageDO entityDO = messageBuilder.buildDOByBO(entityBO);
-		if (!messageManager.save(entityDO)) {
-			throw new AddException("Failed to create group");
-		}
-	}
+        MessageDO entityDO = messageBuilder.buildDOByBO(entityBO);
+        if (!messageManager.save(entityDO)) {
+            throw new AddException("Failed to create group");
+        }
+    }
 
-	@Override
-	public void remove(Long id) {
-		getDOById(id, true);
+    @Override
+    public void remove(Long id) {
+        getDOById(id, true);
 
-		//
-		LambdaQueryChainWrapper<MessageDO> wrapper = messageManager.lambdaQuery().eq(MessageDO::getTenantId, id);
-		long count = wrapper.count();
-		if (count > 0) {
-			throw new AssociatedException("Failed to remove group: there are subgroups under the group");
-		}
+        //
+        LambdaQueryChainWrapper<MessageDO> wrapper = messageManager.lambdaQuery().eq(MessageDO::getTenantId, id);
+        long count = wrapper.count();
+        if (count > 0) {
+            throw new AssociatedException("Failed to remove group: there are subgroups under the group");
+        }
 
-		if (!messageManager.removeById(id)) {
-			throw new DeleteException("Failed to remove group");
-		}
-	}
+        if (!messageManager.removeById(id)) {
+            throw new DeleteException("Failed to remove group");
+        }
+    }
 
-	@Override
-	public void update(MessageBO entityBO) {
-		getDOById(entityBO.getId(), true);
+    @Override
+    public void update(MessageBO entityBO) {
+        getDOById(entityBO.getId(), true);
 
-		checkDuplicate(entityBO, true, true);
+        checkDuplicate(entityBO, true, true);
 
-		MessageDO entityDO = messageBuilder.buildDOByBO(entityBO);
-		entityDO.setOperateTime(null);
-		if (!messageManager.updateById(entityDO)) {
-			throw new UpdateException("Failed to update group");
-		}
-	}
+        MessageDO entityDO = messageBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!messageManager.updateById(entityDO)) {
+            throw new UpdateException("Failed to update group");
+        }
+    }
 
-	@Override
-	public MessageBO selectById(Long id) {
-		MessageDO entityDO = getDOById(id, true);
-		return messageBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public MessageBO selectById(Long id) {
+        MessageDO entityDO = getDOById(id, true);
+        return messageBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public Page<MessageBO> selectByPage(MessageQuery entityQuery) {
-		if (Objects.isNull(entityQuery.getPage())) {
-			entityQuery.setPage(new Pages());
-		}
-		Page<MessageDO> entityPageDO = messageManager.page(PageUtil.page(entityQuery.getPage()),
-				fuzzyQuery(entityQuery));
-		return messageBuilder.buildBOPageByDOPage(entityPageDO);
-	}
+    @Override
+    public Page<MessageBO> selectByPage(MessageQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<MessageDO> entityPageDO = messageManager.page(PageUtil.page(entityQuery.getPage()),
+                fuzzyQuery(entityQuery));
+        return messageBuilder.buildBOPageByDOPage(entityPageDO);
+    }
 
-	/**
-	 * @param entityQuery {@link MessageQuery}
-	 * @return {@link LambdaQueryWrapper}
-	 */
-	private LambdaQueryWrapper<MessageDO> fuzzyQuery(MessageQuery entityQuery) {
-		LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
-		wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmMessageTitle()), MessageDO::getMessageName,
-				entityQuery.getAlarmMessageTitle());
-		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), MessageDO::getTenantId, entityQuery.getTenantId());
-		return wrapper;
-	}
+    /**
+     * @param entityQuery {@link MessageQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<MessageDO> fuzzyQuery(MessageQuery entityQuery) {
+        LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmMessageTitle()), MessageDO::getMessageName,
+                entityQuery.getAlarmMessageTitle());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), MessageDO::getTenantId, entityQuery.getTenantId());
+        return wrapper;
+    }
 
-	/**
-	 * @param entityBO {@link MessageBO}
-	 * @param isUpdate
-	 * @param throwException
-	 * @return
-	 */
-	private boolean checkDuplicate(MessageBO entityBO, boolean isUpdate, boolean throwException) {
-		LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
-		wrapper.eq(MessageDO::getMessageName, entityBO.getMessageName());
-		wrapper.eq(MessageDO::getMessageCode, entityBO.getMessageCode());
-		wrapper.eq(MessageDO::getTenantId, entityBO.getTenantId());
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		MessageDO one = messageManager.getOne(wrapper);
-		if (Objects.isNull(one)) {
-			return false;
-		}
-		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-		if (throwException && duplicate) {
-			throw new DuplicateException("Alarm message profile has been duplicated");
-		}
-		return duplicate;
-	}
+    /**
+     * @param entityBO       {@link MessageBO}
+     * @param isUpdate
+     * @param throwException
+     * @return
+     */
+    private boolean checkDuplicate(MessageBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
+        wrapper.eq(MessageDO::getMessageName, entityBO.getMessageName());
+        wrapper.eq(MessageDO::getMessageCode, entityBO.getMessageCode());
+        wrapper.eq(MessageDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        MessageDO one = messageManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("Alarm message profile has been duplicated");
+        }
+        return duplicate;
+    }
 
-	/**
-	 * Primary key ID
-	 * @param id ID
-	 * @param throwException
-	 * @return {@link MessageDO}
-	 */
-	private MessageDO getDOById(Long id, boolean throwException) {
-		MessageDO entityDO = messageManager.getById(id);
-		if (throwException && Objects.isNull(entityDO)) {
-			throw new NotFoundException("Alarm message profile does not exist");
-		}
-		return entityDO;
-	}
+    /**
+     * Primary key ID
+     *
+     * @param id             ID
+     * @param throwException
+     * @return {@link MessageDO}
+     */
+    private MessageDO getDOById(Long id, boolean throwException) {
+        MessageDO entityDO = messageManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Alarm message profile does not exist");
+        }
+        return entityDO;
+    }
 
 }

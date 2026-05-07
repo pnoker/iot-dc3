@@ -36,29 +36,29 @@ import io.github.pnoker.common.utils.MybatisUtil;
  */
 public class MybatisGenerator {
 
-	public static void main(String[] args) {
-		generator();
-	}
+    public static void main(String[] args) {
+        generator();
+    }
 
-	public static void generator() {
-		String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-data/src/main";
-		MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3_history", "dc3", "dc3dc3dc3")
-			.globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
-			.dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
-			.packageConfig(builder -> builder.parent("io.github.pnoker.common.data")
-				.entity("entity.model")
-				.service("dal")
-				.serviceImpl("dal.impl")
-				.mapper("mapper")
-				.pathInfo(ImmutableMap.of(OutputFile.service, path + "/java/io/github/pnoker/common/data/dal",
-						OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/data/dal/impl", OutputFile.xml,
-						path + "/resources/mapping")))
-			.templateEngine(new FreemarkerTemplateEngine())
-			.strategyConfig(MybatisUtil::defaultStrategyConfig)
-			.strategyConfig(builder -> builder.addInclude("dc3_point_value_bool", "dc3_point_value_double",
-					"dc3_point_value_float", "dc3_point_value_int", "dc3_point_value_long", "dc3_point_value_json",
-					"dc3_point_value"))
-			.execute();
-	}
+    public static void generator() {
+        String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-data/src/main";
+        MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3_history", "dc3", "dc3dc3dc3")
+                .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
+                .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
+                .packageConfig(builder -> builder.parent("io.github.pnoker.common.data")
+                        .entity("entity.model")
+                        .service("dal")
+                        .serviceImpl("dal.impl")
+                        .mapper("mapper")
+                        .pathInfo(ImmutableMap.of(OutputFile.service, path + "/java/io/github/pnoker/common/data/dal",
+                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/data/dal/impl", OutputFile.xml,
+                                path + "/resources/mapping")))
+                .templateEngine(new FreemarkerTemplateEngine())
+                .strategyConfig(MybatisUtil::defaultStrategyConfig)
+                .strategyConfig(builder -> builder.addInclude("dc3_point_value_bool", "dc3_point_value_double",
+                        "dc3_point_value_float", "dc3_point_value_int", "dc3_point_value_long", "dc3_point_value_json",
+                        "dc3_point_value"))
+                .execute();
+    }
 
 }

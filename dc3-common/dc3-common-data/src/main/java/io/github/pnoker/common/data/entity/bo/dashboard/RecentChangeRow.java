@@ -31,10 +31,10 @@ import java.time.LocalDateTime;
 @ToString
 public class RecentChangeRow {
 
-	private String kind;
+    private String kind;
 
-	private long entityId;
+    private long entityId;
 
-	private LocalDateTime operateTime;
+    private LocalDateTime operateTime;
 
 }

@@ -27,62 +27,70 @@ import java.io.OutputStream;
  */
 public interface SerialPortWrapper {
 
-	/**
-	 * Close the Serial Port
-	 * @throws Exception if any.
-	 */
-	void close() throws Exception;
+    /**
+     * Close the Serial Port
+     *
+     * @throws Exception if any.
+     */
+    void close() throws Exception;
 
-	/**
-	 * <p>
-	 * open.
-	 * </p>
-	 * @throws Exception if any.
-	 */
-	void open() throws Exception;
+    /**
+     * <p>
+     * open.
+     * </p>
+     *
+     * @throws Exception if any.
+     */
+    void open() throws Exception;
 
-	/**
-	 * Return the input stream for an open port
-	 * @return a {@link InputStream} object.
-	 */
-	InputStream getInputStream();
+    /**
+     * Return the input stream for an open port
+     *
+     * @return a {@link InputStream} object.
+     */
+    InputStream getInputStream();
 
-	/**
-	 * Return the output stream for an open port
-	 * @return a {@link OutputStream} object.
-	 */
-	OutputStream getOutputStream();
+    /**
+     * Return the output stream for an open port
+     *
+     * @return a {@link OutputStream} object.
+     */
+    OutputStream getOutputStream();
 
-	/**
-	 * <p>
-	 * getBaudRate.
-	 * </p>
-	 * @return a int.
-	 */
-	int getBaudRate();
+    /**
+     * <p>
+     * getBaudRate.
+     * </p>
+     *
+     * @return a int.
+     */
+    int getBaudRate();
 
-	/**
-	 * <p>
-	 * getDataBits.
-	 * </p>
-	 * @return a int.
-	 */
-	int getDataBits();
+    /**
+     * <p>
+     * getDataBits.
+     * </p>
+     *
+     * @return a int.
+     */
+    int getDataBits();
 
-	/**
-	 * <p>
-	 * getStopBits.
-	 * </p>
-	 * @return a int.
-	 */
-	int getStopBits();
+    /**
+     * <p>
+     * getStopBits.
+     * </p>
+     *
+     * @return a int.
+     */
+    int getStopBits();
 
-	/**
-	 * <p>
-	 * getParity.
-	 * </p>
-	 * @return a int.
-	 */
-	int getParity();
+    /**
+     * <p>
+     * getParity.
+     * </p>
+     *
+     * @return a int.
+     */
+    int getParity();
 
 }

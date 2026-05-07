@@ -35,68 +35,71 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum AutoConfirmFlagEnum {
 
-	/**
-	 * Auto
-	 */
-	AUTO((byte) 0, "auto", "Auto"),
+    /**
+     * Auto
+     */
+    AUTO((byte) 0, "auto", "Auto"),
 
-	/**
-	 * Manual
-	 */
-	MANUAL((byte) 1, "manual", "Manual"),;
+    /**
+     * Manual
+     */
+    MANUAL((byte) 1, "manual", "Manual"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Remark
-	 */
-	private final String remark;
+    /**
+     * Remark
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link AutoConfirmFlagEnum}
-	 */
-	public static AutoConfirmFlagEnum ofIndex(Byte index) {
-		Optional<AutoConfirmFlagEnum> any = Arrays.stream(AutoConfirmFlagEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link AutoConfirmFlagEnum}
+     */
+    public static AutoConfirmFlagEnum ofIndex(Byte index) {
+        Optional<AutoConfirmFlagEnum> any = Arrays.stream(AutoConfirmFlagEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link AutoConfirmFlagEnum}
-	 */
-	public static AutoConfirmFlagEnum ofCode(String code) {
-		Optional<AutoConfirmFlagEnum> any = Arrays.stream(AutoConfirmFlagEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link AutoConfirmFlagEnum}
+     */
+    public static AutoConfirmFlagEnum ofCode(String code) {
+        Optional<AutoConfirmFlagEnum> any = Arrays.stream(AutoConfirmFlagEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Name
-	 * @return {@link AutoConfirmFlagEnum}
-	 */
-	public static AutoConfirmFlagEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link AutoConfirmFlagEnum}
+     */
+    public static AutoConfirmFlagEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

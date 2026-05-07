@@ -28,16 +28,16 @@ import java.text.MessageFormat;
  */
 public class JsonException extends RuntimeException {
 
-	public JsonException() {
-		this(null);
-	}
+    public JsonException() {
+        this(null);
+    }
 
-	public JsonException(Throwable cause) {
-		super(cause);
-	}
+    public JsonException(Throwable cause) {
+        super(cause);
+    }
 
-	public JsonException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public JsonException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

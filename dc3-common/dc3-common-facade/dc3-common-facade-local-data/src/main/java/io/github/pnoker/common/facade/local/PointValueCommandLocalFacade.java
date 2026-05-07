@@ -39,26 +39,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class PointValueCommandLocalFacade implements PointValueCommandFacade {
 
-	@Resource
-	private PointValueCommandService pointValueCommandService;
+    @Resource
+    private PointValueCommandService pointValueCommandService;
 
-	@Override
-	public boolean read(Long deviceId, Long pointId) {
-		PointValueReadVO readVO = new PointValueReadVO();
-		readVO.setDeviceId(deviceId);
-		readVO.setPointId(pointId);
-		pointValueCommandService.read(readVO);
-		return true;
-	}
+    @Override
+    public boolean read(Long deviceId, Long pointId) {
+        PointValueReadVO readVO = new PointValueReadVO();
+        readVO.setDeviceId(deviceId);
+        readVO.setPointId(pointId);
+        pointValueCommandService.read(readVO);
+        return true;
+    }
 
-	@Override
-	public boolean write(Long deviceId, Long pointId, String value) {
-		PointValueWriteVO writeVO = new PointValueWriteVO();
-		writeVO.setDeviceId(deviceId);
-		writeVO.setPointId(pointId);
-		writeVO.setValue(value);
-		pointValueCommandService.write(writeVO);
-		return true;
-	}
+    @Override
+    public boolean write(Long deviceId, Long pointId, String value) {
+        PointValueWriteVO writeVO = new PointValueWriteVO();
+        writeVO.setDeviceId(deviceId);
+        writeVO.setPointId(pointId);
+        writeVO.setValue(value);
+        pointValueCommandService.write(writeVO);
+        return true;
+    }
 
 }

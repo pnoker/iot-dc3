@@ -36,21 +36,21 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DriverExt extends BaseExt {
 
-	/**
-	 *
-	 * <p>
-	 * Type Version
-	 */
-	private Content content;
+    /**
+     *
+     * <p>
+     * Type Version
+     */
+    private Content content;
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Content {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Content {
 
-		private String keep;
+        private String keep;
 
-	}
+    }
 
 }

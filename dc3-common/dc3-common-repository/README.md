@@ -2,8 +2,10 @@
 
 ## Overview
 
-`dc3-common-repository` is the pluggable data storage interface module of the IoT DC3 platform. It abstracts point value persistence through a `RepositoryService` interface,
-allowing the Data Center to store telemetry data in different backends without coupling business logic to a specific storage implementation.
+`dc3-common-repository` is the pluggable data storage interface module of the IoT DC3 platform. It abstracts point value
+persistence through a `RepositoryService` interface,
+allowing the Data Center to store telemetry data in different backends without coupling business logic to a specific
+storage implementation.
 
 ## Module Information
 
@@ -21,7 +23,8 @@ allowing the Data Center to store telemetry data in different backends without c
 
 ## Usage Pattern
 
-The Data Center depends on `RepositoryService` via Spring injection. The active implementation is selected by the application profile. Add a concrete storage implementation (e.g.,
+The Data Center depends on `RepositoryService` via Spring injection. The active implementation is selected by the
+application profile. Add a concrete storage implementation (e.g.,
 TimescaleDB, InfluxDB, MongoDB) by implementing `RepositoryService` and registering it as a Spring bean.
 
 ```java

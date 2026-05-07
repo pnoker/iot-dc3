@@ -35,19 +35,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class MetadataEventPublisher {
 
-	private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
-	public MetadataEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-		this.applicationEventPublisher = applicationEventPublisher;
-	}
+    public MetadataEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
-	/**
-	 * Publishes the supplied metadata event to the Spring application context.
-	 * @param metadataEvent metadata event
-	 */
-	public void publishEvent(MetadataEvent metadataEvent) {
-		log.info("Metadata event publisher publishEvent: {}", JsonUtil.toJsonString(metadataEvent));
-		applicationEventPublisher.publishEvent(metadataEvent);
-	}
+    /**
+     * Publishes the supplied metadata event to the Spring application context.
+     *
+     * @param metadataEvent metadata event
+     */
+    public void publishEvent(MetadataEvent metadataEvent) {
+        log.info("Metadata event publisher publishEvent: {}", JsonUtil.toJsonString(metadataEvent));
+        applicationEventPublisher.publishEvent(metadataEvent);
+    }
 
 }

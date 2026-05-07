@@ -43,141 +43,151 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DriverAttributeBuilder {
 
-	/**
-	 * VO to BO
-	 * @param entityVO EntityVO
-	 * @return EntityBO
-	 */
-	@Mapping(target = "tenantId", ignore = true)
-	DriverAttributeBO buildBOByVO(DriverAttributeVO entityVO);
+    /**
+     * VO to BO
+     *
+     * @param entityVO EntityVO
+     * @return EntityBO
+     */
+    @Mapping(target = "tenantId", ignore = true)
+    DriverAttributeBO buildBOByVO(DriverAttributeVO entityVO);
 
-	/**
-	 * VOList to BOList
-	 * @param entityVOList EntityVO Array
-	 * @return EntityBO Array
-	 */
-	List<DriverAttributeBO> buildBOListByVOList(List<DriverAttributeVO> entityVOList);
+    /**
+     * VOList to BOList
+     *
+     * @param entityVOList EntityVO Array
+     * @return EntityBO Array
+     */
+    List<DriverAttributeBO> buildBOListByVOList(List<DriverAttributeVO> entityVOList);
 
-	/**
-	 * BO to DO
-	 * @param entityBO EntityBO
-	 * @return EntityDO
-	 */
-	@Mapping(target = "attributeExt", ignore = true)
-	@Mapping(target = "attributeTypeFlag", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	@Mapping(target = "deleted", ignore = true)
-	DriverAttributeDO buildDOByBO(DriverAttributeBO entityBO);
+    /**
+     * BO to DO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDO
+     */
+    @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "attributeTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    DriverAttributeDO buildDOByBO(DriverAttributeBO entityBO);
 
-	@AfterMapping
-	default void afterProcess(DriverAttributeBO entityBO, @MappingTarget DriverAttributeDO entityDO) {
-		// Json Ext
-		DriverAttributeExt entityExt = entityBO.getAttributeExt();
-		JsonExt ext = new JsonExt();
-		if (Objects.nonNull(entityExt)) {
-			ext.setType(entityExt.getType());
-			ext.setVersion(entityExt.getVersion());
-			ext.setRemark(entityExt.getRemark());
-			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-		}
-		entityDO.setAttributeExt(ext);
+    @AfterMapping
+    default void afterProcess(DriverAttributeBO entityBO, @MappingTarget DriverAttributeDO entityDO) {
+        // Json Ext
+        DriverAttributeExt entityExt = entityBO.getAttributeExt();
+        JsonExt ext = new JsonExt();
+        if (Objects.nonNull(entityExt)) {
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+        }
+        entityDO.setAttributeExt(ext);
 
-		// AttributeType Flag
-		AttributeTypeFlagEnum attributeTypeFlag = entityBO.getAttributeTypeFlag();
-		Optional.ofNullable(attributeTypeFlag).ifPresent(value -> entityDO.setAttributeTypeFlag(value.getIndex()));
+        // AttributeType Flag
+        AttributeTypeFlagEnum attributeTypeFlag = entityBO.getAttributeTypeFlag();
+        Optional.ofNullable(attributeTypeFlag).ifPresent(value -> entityDO.setAttributeTypeFlag(value.getIndex()));
 
-		// Enable Flag
-		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-	}
+        // Enable Flag
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+    }
 
-	/**
-	 * BOList to DOList
-	 * @param entityBOList EntityBO Array
-	 * @return EntityDO Array
-	 */
-	List<DriverAttributeDO> buildDOListByBOList(List<DriverAttributeBO> entityBOList);
+    /**
+     * BOList to DOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDO Array
+     */
+    List<DriverAttributeDO> buildDOListByBOList(List<DriverAttributeBO> entityBOList);
 
-	/**
-	 * DO to BO
-	 * @param entityDO EntityDO
-	 * @return EntityBO
-	 */
-	@Mapping(target = "attributeExt", ignore = true)
-	@Mapping(target = "attributeTypeFlag", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	DriverAttributeBO buildBOByDO(DriverAttributeDO entityDO);
+    /**
+     * DO to BO
+     *
+     * @param entityDO EntityDO
+     * @return EntityBO
+     */
+    @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "attributeTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    DriverAttributeBO buildBOByDO(DriverAttributeDO entityDO);
 
-	@AfterMapping
-	default void afterProcess(DriverAttributeDO entityDO, @MappingTarget DriverAttributeBO entityBO) {
-		// Json Ext
-		JsonExt entityExt = entityDO.getAttributeExt();
-		if (Objects.nonNull(entityExt)) {
-			DriverAttributeExt ext = new DriverAttributeExt();
-			ext.setType(entityExt.getType());
-			ext.setVersion(entityExt.getVersion());
-			ext.setRemark(entityExt.getRemark());
-			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DriverAttributeExt.Content.class));
-			entityBO.setAttributeExt(ext);
-		}
+    @AfterMapping
+    default void afterProcess(DriverAttributeDO entityDO, @MappingTarget DriverAttributeBO entityBO) {
+        // Json Ext
+        JsonExt entityExt = entityDO.getAttributeExt();
+        if (Objects.nonNull(entityExt)) {
+            DriverAttributeExt ext = new DriverAttributeExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DriverAttributeExt.Content.class));
+            entityBO.setAttributeExt(ext);
+        }
 
-		// AttributeType Flag
-		Byte attributeTypeFlag = entityDO.getAttributeTypeFlag();
-		entityBO.setAttributeTypeFlag(AttributeTypeFlagEnum.ofIndex(attributeTypeFlag));
+        // AttributeType Flag
+        Byte attributeTypeFlag = entityDO.getAttributeTypeFlag();
+        entityBO.setAttributeTypeFlag(AttributeTypeFlagEnum.ofIndex(attributeTypeFlag));
 
-		// Enable Flag
-		Byte enableFlag = entityDO.getEnableFlag();
-		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-	}
+        // Enable Flag
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
 
-	/**
-	 * DOList to BOList
-	 * @param entityDOList EntityDO Array
-	 * @return EntityBO Array
-	 */
-	List<DriverAttributeBO> buildBOListByDOList(List<DriverAttributeDO> entityDOList);
+    /**
+     * DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<DriverAttributeBO> buildBOListByDOList(List<DriverAttributeDO> entityDOList);
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	DriverAttributeVO buildVOByBO(DriverAttributeBO entityBO);
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    DriverAttributeVO buildVOByBO(DriverAttributeBO entityBO);
 
-	/**
-	 * BOList to VOList
-	 * @param entityBOList EntityBO Array
-	 * @return EntityVO Array
-	 */
-	List<DriverAttributeVO> buildVOListByBOList(List<DriverAttributeBO> entityBOList);
+    /**
+     * BOList to VOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityVO Array
+     */
+    List<DriverAttributeVO> buildVOListByBOList(List<DriverAttributeBO> entityBOList);
 
-	/**
-	 * DOPage to BOPage
-	 * @param entityPageDO EntityDO Page
-	 * @return EntityBO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<DriverAttributeBO> buildBOPageByDOPage(Page<DriverAttributeDO> entityPageDO);
+    /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<DriverAttributeBO> buildBOPageByDOPage(Page<DriverAttributeDO> entityPageDO);
 
-	/**
-	 * BOPage to VOPage
-	 * @param entityPageBO EntityBO Page
-	 * @return EntityVO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<DriverAttributeVO> buildVOPageByBOPage(Page<DriverAttributeBO> entityPageBO);
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<DriverAttributeVO> buildVOPageByBOPage(Page<DriverAttributeBO> entityPageBO);
 
 }

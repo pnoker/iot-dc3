@@ -37,22 +37,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DriverCommandDTO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Type
-	 */
-	private DriverCommandTypeEnum type;
+    /**
+     * Type
+     */
+    private DriverCommandTypeEnum type;
 
-	/**
-	 *
-	 */
-	private String content;
+    /**
+     *
+     */
+    private String content;
 
-	/**
-	 * Create Time
-	 */
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    private LocalDateTime createTime;
 
 }

@@ -36,15 +36,15 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class FlappingSourceVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String source;
+    private String source;
 
-	private long sourceId;
+    private long sourceId;
 
-	private int eventTypeFlag;
+    private int eventTypeFlag;
 
-	private long count;
+    private long count;
 
 }

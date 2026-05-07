@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class UnSupportException extends RuntimeException {
 
-	public UnSupportException() {
-		this(null);
-	}
+    public UnSupportException() {
+        this(null);
+    }
 
-	public UnSupportException(Throwable cause) {
-		super(cause);
-	}
+    public UnSupportException(Throwable cause) {
+        super(cause);
+    }
 
-	public UnSupportException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public UnSupportException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

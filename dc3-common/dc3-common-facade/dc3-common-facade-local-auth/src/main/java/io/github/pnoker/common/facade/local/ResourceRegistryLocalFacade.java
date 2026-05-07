@@ -44,41 +44,41 @@ import java.util.Objects;
 @Component
 public class ResourceRegistryLocalFacade implements ResourceRegistryFacade {
 
-	@Resource
-	private ResourceRegistrySyncService resourceRegistrySyncService;
+    @Resource
+    private ResourceRegistrySyncService resourceRegistrySyncService;
 
-	private static List<ResourceRegistryScannedApi> toScannedApis(List<FacadeScannedApiBO> apis) {
-		if (Objects.isNull(apis) || apis.isEmpty()) {
-			return List.of();
-		}
-		List<ResourceRegistryScannedApi> out = new ArrayList<>(apis.size());
-		for (FacadeScannedApiBO bo : apis) {
-			out.add(ResourceRegistryScannedApi.builder()
-				.method(bo.getMethod())
-				.path(bo.getPath())
-				.apiName(bo.getApiName())
-				.title(bo.getTitle())
-				.remark(bo.getRemark())
-				.apiGroup(bo.getApiGroup())
-				.build());
-		}
-		return out;
-	}
+    private static List<ResourceRegistryScannedApi> toScannedApis(List<FacadeScannedApiBO> apis) {
+        if (Objects.isNull(apis) || apis.isEmpty()) {
+            return List.of();
+        }
+        List<ResourceRegistryScannedApi> out = new ArrayList<>(apis.size());
+        for (FacadeScannedApiBO bo : apis) {
+            out.add(ResourceRegistryScannedApi.builder()
+                    .method(bo.getMethod())
+                    .path(bo.getPath())
+                    .apiName(bo.getApiName())
+                    .title(bo.getTitle())
+                    .remark(bo.getRemark())
+                    .apiGroup(bo.getApiGroup())
+                    .build());
+        }
+        return out;
+    }
 
-	@Override
-	public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
-		ResourceRegistrySyncCommand cmd = ResourceRegistrySyncCommand.builder()
-			.serviceName(command.getServiceName())
-			.deleteMissing(command.isDeleteMissing())
-			.apis(toScannedApis(command.getApis()))
-			.build();
-		ResourceRegistrySyncResult result = resourceRegistrySyncService.sync(cmd);
-		return FacadeResourceRegistrySyncResultBO.builder()
-			.inserted(result.getInserted())
-			.updated(result.getUpdated())
-			.deleted(result.getDeleted())
-			.unchanged(result.getUnchanged())
-			.build();
-	}
+    @Override
+    public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
+        ResourceRegistrySyncCommand cmd = ResourceRegistrySyncCommand.builder()
+                .serviceName(command.getServiceName())
+                .deleteMissing(command.isDeleteMissing())
+                .apis(toScannedApis(command.getApis()))
+                .build();
+        ResourceRegistrySyncResult result = resourceRegistrySyncService.sync(cmd);
+        return FacadeResourceRegistrySyncResultBO.builder()
+                .inserted(result.getInserted())
+                .updated(result.getUpdated())
+                .deleted(result.getDeleted())
+                .unchanged(result.getUnchanged())
+                .build();
+    }
 
 }

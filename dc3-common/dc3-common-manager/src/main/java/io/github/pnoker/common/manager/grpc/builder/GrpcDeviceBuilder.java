@@ -43,80 +43,83 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcDeviceBuilder {
 
-	/**
-	 * Grpc Query to Query
-	 * @param entityQuery GrpcPageDeviceQuery
-	 * @return DeviceQuery
-	 */
-	@Mapping(target = "page", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	DeviceQuery buildQueryByGrpcQuery(GrpcPageDeviceQuery entityQuery);
+    /**
+     * Grpc Query to Query
+     *
+     * @param entityQuery GrpcPageDeviceQuery
+     * @return DeviceQuery
+     */
+    @Mapping(target = "page", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    DeviceQuery buildQueryByGrpcQuery(GrpcPageDeviceQuery entityQuery);
 
-	@AfterMapping
-	default void afterProcess(GrpcPageDeviceQuery entityGrpc,
-			@MappingTarget DeviceQuery.DeviceQueryBuilder entityQuery) {
-		Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-		entityQuery.page(pages);
+    @AfterMapping
+    default void afterProcess(GrpcPageDeviceQuery entityGrpc,
+                              @MappingTarget DeviceQuery.DeviceQueryBuilder entityQuery) {
+        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
+        entityQuery.page(pages);
 
-		EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
-	}
+        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
+    }
 
-	/**
-	 * Grpc Query to Query
-	 * @param entityQuery GrpcPageDeviceQuery
-	 * @return DeviceQuery
-	 */
-	@Mapping(target = "page", ignore = true)
-	@Mapping(target = "deviceName", ignore = true)
-	@Mapping(target = "deviceCode", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	@Mapping(target = "version", ignore = true)
-	@Mapping(target = "profileId", ignore = true)
-	DeviceQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityQuery);
+    /**
+     * Grpc Query to Query
+     *
+     * @param entityQuery GrpcPageDeviceQuery
+     * @return DeviceQuery
+     */
+    @Mapping(target = "page", ignore = true)
+    @Mapping(target = "deviceName", ignore = true)
+    @Mapping(target = "deviceCode", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "profileId", ignore = true)
+    DeviceQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityQuery);
 
-	@AfterMapping
-	default void afterProcess(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityGrpc,
-			@MappingTarget DeviceQuery.DeviceQueryBuilder entityQuery) {
-		Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-		entityQuery.page(pages);
-	}
+    @AfterMapping
+    default void afterProcess(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityGrpc,
+                              @MappingTarget DeviceQuery.DeviceQueryBuilder entityQuery) {
+        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
+        entityQuery.page(pages);
+    }
 
-	/**
-	 * BO to Grpc DTO
-	 * @param entityBO DeviceBO
-	 * @return GrpcDeviceDTO
-	 */
-	@Mapping(target = "deviceExt", ignore = true)
-	@Mapping(target = "profileIdsList", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	@Mapping(target = "deviceNameBytes", ignore = true)
-	@Mapping(target = "deviceCodeBytes", ignore = true)
-	@Mapping(target = "deviceExtBytes", ignore = true)
-	@Mapping(target = "signatureBytes", ignore = true)
-	@Mapping(target = "mergeFrom", ignore = true)
-	@Mapping(target = "clearField", ignore = true)
-	@Mapping(target = "clearOneof", ignore = true)
-	@Mapping(target = "base", ignore = true)
-	@Mapping(target = "mergeBase", ignore = true)
-	@Mapping(target = "unknownFields", ignore = true)
-	@Mapping(target = "mergeUnknownFields", ignore = true)
-	@Mapping(target = "allFields", ignore = true)
-	GrpcDeviceDTO buildGrpcDTOByBO(DeviceBO entityBO);
+    /**
+     * BO to Grpc DTO
+     *
+     * @param entityBO DeviceBO
+     * @return GrpcDeviceDTO
+     */
+    @Mapping(target = "deviceExt", ignore = true)
+    @Mapping(target = "profileIdsList", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "deviceNameBytes", ignore = true)
+    @Mapping(target = "deviceCodeBytes", ignore = true)
+    @Mapping(target = "deviceExtBytes", ignore = true)
+    @Mapping(target = "signatureBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
+    GrpcDeviceDTO buildGrpcDTOByBO(DeviceBO entityBO);
 
-	@AfterMapping
-	default void afterProcess(DeviceBO entityBO, @MappingTarget GrpcDeviceDTO.Builder entityGrpc) {
-		GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
-		entityGrpc.setBase(grpcBase);
+    @AfterMapping
+    default void afterProcess(DeviceBO entityBO, @MappingTarget GrpcDeviceDTO.Builder entityGrpc) {
+        GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
+        entityGrpc.setBase(grpcBase);
 
-		CollectionOptional.ofNullable(entityBO.getProfileIds()).ifPresent(entityGrpc::addAllProfileIds);
-		Optional.ofNullable(entityBO.getDeviceExt())
-			.ifPresent(value -> entityGrpc.setDeviceExt(JsonUtil.toJsonString(value)));
-		Optional.ofNullable(entityBO.getEnableFlag())
-			.ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
-					() -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
-	}
+        CollectionOptional.ofNullable(entityBO.getProfileIds()).ifPresent(entityGrpc::addAllProfileIds);
+        Optional.ofNullable(entityBO.getDeviceExt())
+                .ifPresent(value -> entityGrpc.setDeviceExt(JsonUtil.toJsonString(value)));
+        Optional.ofNullable(entityBO.getEnableFlag())
+                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                        () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
+    }
 
 }

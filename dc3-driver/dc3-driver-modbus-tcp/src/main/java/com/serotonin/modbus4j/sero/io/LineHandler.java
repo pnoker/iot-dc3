@@ -26,19 +26,20 @@ package com.serotonin.modbus4j.sero.io;
  */
 public interface LineHandler {
 
-	/**
-	 * <p>
-	 * handleLine.
-	 * </p>
-	 * @param line a {@link String} object.
-	 */
-	public void handleLine(String line);
+    /**
+     * <p>
+     * handleLine.
+     * </p>
+     *
+     * @param line a {@link String} object.
+     */
+    public void handleLine(String line);
 
-	/**
-	 * <p>
-	 * done.
-	 * </p>
-	 */
-	public void done();
+    /**
+     * <p>
+     * done.
+     * </p>
+     */
+    public void done();
 
 }

@@ -36,21 +36,21 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class CorrelationPairVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String aSource;
+    private String aSource;
 
-	private long aSourceId;
+    private long aSourceId;
 
-	private int aEventType;
+    private int aEventType;
 
-	private String bSource;
+    private String bSource;
 
-	private long bSourceId;
+    private long bSourceId;
 
-	private int bEventType;
+    private int bEventType;
 
-	private long coCount;
+    private long coCount;
 
 }

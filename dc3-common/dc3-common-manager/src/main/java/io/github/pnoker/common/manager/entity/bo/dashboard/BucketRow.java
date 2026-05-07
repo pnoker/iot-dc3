@@ -39,13 +39,13 @@ import lombok.ToString;
 @ToString
 public class BucketRow {
 
-	/**
-	 * Group column value. Typed {@code Object} because different queries GROUP BY columns
-	 * of different JDBC types (SMALLINT enable_flag, VARCHAR service_name, BIGINT
-	 * driver_id). Service-side formatters narrow it per call-site.
-	 */
-	private Object key;
+    /**
+     * Group column value. Typed {@code Object} because different queries GROUP BY columns
+     * of different JDBC types (SMALLINT enable_flag, VARCHAR service_name, BIGINT
+     * driver_id). Service-side formatters narrow it per call-site.
+     */
+    private Object key;
 
-	private long count;
+    private long count;
 
 }

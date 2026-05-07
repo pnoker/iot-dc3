@@ -29,8 +29,8 @@ import lombok.ToString;
 @ToString
 public class TopologyProfileRow {
 
-	private long id;
+    private long id;
 
-	private String profileName;
+    private String profileName;
 
 }

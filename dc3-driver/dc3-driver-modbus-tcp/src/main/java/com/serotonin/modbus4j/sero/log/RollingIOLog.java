@@ -35,93 +35,93 @@ import java.nio.file.StandardCopyOption;
  */
 public class RollingIOLog extends BaseIOLog {
 
-	private static final Log LOG = LogFactory.getLog(RollingIOLog.class);
+    private static final Log LOG = LogFactory.getLog(RollingIOLog.class);
 
-	// New Members
-	protected int fileSize;
+    // New Members
+    protected int fileSize;
 
-	protected int maxFiles;
+    protected int maxFiles;
 
-	protected int currentFileNumber;
+    protected int currentFileNumber;
 
-	/**
-	 * <p>
-	 * Constructor for RollingIOLog.
-	 * </p>
-	 * @param baseFilename - The base filename for all logfiles ie. dataLog.log
-	 * @param logDirectory a {@link File} object.
-	 * @param fileSize - in bytes of file before rolling over
-	 * @param maxFiles - max number to keep in addition to the current log file
-	 */
-	public RollingIOLog(final String baseFilename, File logDirectory, int fileSize, int maxFiles) {
-		super(new File(logDirectory, baseFilename)); // Ignoring this
-		createOut();
+    /**
+     * <p>
+     * Constructor for RollingIOLog.
+     * </p>
+     *
+     * @param baseFilename - The base filename for all logfiles ie. dataLog.log
+     * @param logDirectory a {@link File} object.
+     * @param fileSize     - in bytes of file before rolling over
+     * @param maxFiles     - max number to keep in addition to the current log file
+     */
+    public RollingIOLog(final String baseFilename, File logDirectory, int fileSize, int maxFiles) {
+        super(new File(logDirectory, baseFilename)); // Ignoring this
+        createOut();
 
-		// Detect the current file number
-		File[] files = logDirectory.listFiles(new LogFilenameFilter(baseFilename));
+        // Detect the current file number
+        File[] files = logDirectory.listFiles(new LogFilenameFilter(baseFilename));
 
-		// files will contain baseFilename.log, baseFilename.log.1 ... baseFilename.log.n
-		// where n is our currentFileNumber
-		this.currentFileNumber = files.length - 1;
-		if (this.currentFileNumber > maxFiles)
-			this.currentFileNumber = maxFiles;
+        // files will contain baseFilename.log, baseFilename.log.1 ... baseFilename.log.n
+        // where n is our currentFileNumber
+        this.currentFileNumber = files.length - 1;
+        if (this.currentFileNumber > maxFiles)
+            this.currentFileNumber = maxFiles;
 
-		this.fileSize = fileSize;
-		this.maxFiles = maxFiles;
+        this.fileSize = fileSize;
+        this.maxFiles = maxFiles;
 
-	}
+    }
 
-	@Override
-	protected void sizeCheck() {
-		// Check if the file should be rolled.
-		if (file.length() > this.fileSize) {
-			out.close();
+    @Override
+    protected void sizeCheck() {
+        // Check if the file should be rolled.
+        if (file.length() > this.fileSize) {
+            out.close();
 
-			try {
-				// Do rollover
+            try {
+                // Do rollover
 
-				for (int i = this.currentFileNumber; i > 0; i--) {
-					Path source = Paths.get(this.file.getAbsolutePath() + "." + i);
-					Path target = Paths.get(this.file.getAbsolutePath() + "." + (i + 1));
-					Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
-				}
+                for (int i = this.currentFileNumber; i > 0; i--) {
+                    Path source = Paths.get(this.file.getAbsolutePath() + "." + i);
+                    Path target = Paths.get(this.file.getAbsolutePath() + "." + (i + 1));
+                    Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+                }
 
-				Path source = Paths.get(this.file.toURI());
-				Path target = Paths.get(this.file.getAbsolutePath() + "." + 1);
-				Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+                Path source = Paths.get(this.file.toURI());
+                Path target = Paths.get(this.file.getAbsolutePath() + "." + 1);
+                Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
 
-				if (this.currentFileNumber < this.maxFiles - 1) {
-					// Use file number
-					this.currentFileNumber++;
-				}
+                if (this.currentFileNumber < this.maxFiles - 1) {
+                    // Use file number
+                    this.currentFileNumber++;
+                }
 
-			}
-			catch (IOException e) {
-				LOG.error(e);
-			}
+            } catch (IOException e) {
+                LOG.error(e);
+            }
 
-			createOut();
-		}
-	}
+            createOut();
+        }
+    }
 
-	/**
-	 * Class to filter log filenames from a directory listing
-	 *
-	 * @author Terry Packer
-	 */
-	class LogFilenameFilter implements FilenameFilter {
+    /**
+     * Class to filter log filenames from a directory listing
+     *
+     * @author Terry Packer
+     */
+    class LogFilenameFilter implements FilenameFilter {
 
-		private String nameToMatch;
+        private String nameToMatch;
 
-		public LogFilenameFilter(String nameToMatch) {
-			this.nameToMatch = nameToMatch;
-		}
+        public LogFilenameFilter(String nameToMatch) {
+            this.nameToMatch = nameToMatch;
+        }
 
-		@Override
-		public boolean accept(File dir, String name) {
-			return name.contains(this.nameToMatch);
-		}
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.contains(this.nameToMatch);
+        }
 
-	}
+    }
 
 }

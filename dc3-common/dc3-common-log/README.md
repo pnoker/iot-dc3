@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-log` is the shared logging aspect module of the IoT DC3 platform. It provides a custom AOP-based `@Logs` annotation for declarative method-level logging across all
+`dc3-common-log` is the shared logging aspect module of the IoT DC3 platform. It provides a custom AOP-based `@Logs`
+annotation for declarative method-level logging across all
 services.
 
 ## Module Information

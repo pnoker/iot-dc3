@@ -33,40 +33,42 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class EncapMessageRequest extends EncapMessage implements OutgoingRequestMessage, IncomingRequestMessage {
 
-	/**
-	 * <p>
-	 * Constructor for EncapMessageRequest.
-	 * </p>
-	 * @param modbusRequest a {@link ModbusRequest} object.
-	 */
-	public EncapMessageRequest(ModbusRequest modbusRequest) {
-		super(modbusRequest);
-	}
+    /**
+     * <p>
+     * Constructor for EncapMessageRequest.
+     * </p>
+     *
+     * @param modbusRequest a {@link ModbusRequest} object.
+     */
+    public EncapMessageRequest(ModbusRequest modbusRequest) {
+        super(modbusRequest);
+    }
 
-	static EncapMessageRequest createEncapMessageRequest(ByteQueue queue) throws ModbusTransportException {
-		// Create the modbus response.
-		ModbusRequest request = ModbusRequest.createModbusRequest(queue);
-		EncapMessageRequest encapRequest = new EncapMessageRequest(request);
+    static EncapMessageRequest createEncapMessageRequest(ByteQueue queue) throws ModbusTransportException {
+        // Create the modbus response.
+        ModbusRequest request = ModbusRequest.createModbusRequest(queue);
+        EncapMessageRequest encapRequest = new EncapMessageRequest(request);
 
-		// Check the CRC
-		ModbusUtils.checkCRC(encapRequest.modbusMessage, queue);
+        // Check the CRC
+        ModbusUtils.checkCRC(encapRequest.modbusMessage, queue);
 
-		return encapRequest;
-	}
+        return encapRequest;
+    }
 
-	@Override
-	public boolean expectsResponse() {
-		return modbusMessage.getSlaveId() != 0;
-	}
+    @Override
+    public boolean expectsResponse() {
+        return modbusMessage.getSlaveId() != 0;
+    }
 
-	/**
-	 * <p>
-	 * getModbusRequest.
-	 * </p>
-	 * @return a {@link ModbusRequest} object.
-	 */
-	public ModbusRequest getModbusRequest() {
-		return (ModbusRequest) modbusMessage;
-	}
+    /**
+     * <p>
+     * getModbusRequest.
+     * </p>
+     *
+     * @return a {@link ModbusRequest} object.
+     */
+    public ModbusRequest getModbusRequest() {
+        return (ModbusRequest) modbusMessage;
+    }
 
 }

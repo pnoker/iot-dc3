@@ -41,98 +41,98 @@ import java.time.LocalDateTime;
 @TableName("dc3_point_data_volume_run")
 public class PointDataVolumeRunDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Primary key ID
-	 */
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    /**
+     * Primary key ID
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	/**
-	 * Driver ID
-	 */
-	@TableField("driver_id")
-	private Long driverId;
+    /**
+     * Driver ID
+     */
+    @TableField("driver_id")
+    private Long driverId;
 
-	/**
-	 * Device ID
-	 */
-	@TableField("device_id")
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    @TableField("device_id")
+    private Long deviceId;
 
-	/**
-	 * Code
-	 */
-	@TableField("point_id")
-	private Long pointId;
+    /**
+     * Code
+     */
+    @TableField("point_id")
+    private Long pointId;
 
-	/**
-	 * Name
-	 */
-	@TableField("point_name")
-	private String pointName;
+    /**
+     * Name
+     */
+    @TableField("point_name")
+    private String pointName;
 
-	/**
-	 *
-	 */
-	@TableField("total")
-	private Long total;
+    /**
+     *
+     */
+    @TableField("total")
+    private Long total;
 
-	/**
-	 * Tenant ID
-	 */
-	@TableField("tenant_id")
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
 
-	/**
-	 * Description
-	 */
-	@TableField("remark")
-	private String remark;
+    /**
+     * Description
+     */
+    @TableField("remark")
+    private String remark;
 
-	/**
-	 * Creator ID
-	 */
-	@TableField("creator_id")
-	private Long creatorId;
+    /**
+     * Creator ID
+     */
+    @TableField("creator_id")
+    private Long creatorId;
 
-	/**
-	 * Creator Name
-	 */
-	@TableField("creator_name")
-	private String creatorName;
+    /**
+     * Creator Name
+     */
+    @TableField("creator_name")
+    private String creatorName;
 
-	/**
-	 * Create Time
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operator ID
-	 */
-	@TableField("operator_id")
-	private Long operatorId;
+    /**
+     * Operator ID
+     */
+    @TableField("operator_id")
+    private Long operatorId;
 
-	/**
-	 * Operator Name
-	 */
-	@TableField("operator_name")
-	private String operatorName;
+    /**
+     * Operator Name
+     */
+    @TableField("operator_name")
+    private String operatorName;
 
-	/**
-	 * Operate Time
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operate Time
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
-	/**
-	 * Logical delete flag, 0:not deleted, 1:deleted
-	 */
-	@TableField("deleted")
-	@TableLogic
-	private Integer deleted;
+    /**
+     * Logical delete flag, 0:not deleted, 1:deleted
+     */
+    @TableField("deleted")
+    @TableLogic
+    private Integer deleted;
 
 }

@@ -50,127 +50,128 @@ import java.util.Objects;
 @Service
 public class TenantBindServiceImpl implements TenantBindService {
 
-	@Resource
-	private TenantBindBuilder tenantBindBuilder;
+    @Resource
+    private TenantBindBuilder tenantBindBuilder;
 
-	@Resource
-	private TenantBindManager tenantBindManager;
+    @Resource
+    private TenantBindManager tenantBindManager;
 
-	@Override
-	public void save(TenantBindBO entityBO) {
-		checkDuplicate(entityBO, false, true);
+    @Override
+    public void save(TenantBindBO entityBO) {
+        checkDuplicate(entityBO, false, true);
 
-		TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
-		if (!tenantBindManager.save(entityDO)) {
-			throw new AddException("Failed to create tenant bind");
-		}
-	}
+        TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
+        if (!tenantBindManager.save(entityDO)) {
+            throw new AddException("Failed to create tenant bind");
+        }
+    }
 
-	@Override
-	public void remove(Long id) {
-		getDOById(id, true);
+    @Override
+    public void remove(Long id) {
+        getDOById(id, true);
 
-		if (!tenantBindManager.removeById(id)) {
-			throw new DeleteException("Failed to remove tenant bind");
-		}
-	}
+        if (!tenantBindManager.removeById(id)) {
+            throw new DeleteException("Failed to remove tenant bind");
+        }
+    }
 
-	@Override
-	public void update(TenantBindBO entityBO) {
-		getDOById(entityBO.getId(), true);
+    @Override
+    public void update(TenantBindBO entityBO) {
+        getDOById(entityBO.getId(), true);
 
-		checkDuplicate(entityBO, true, true);
+        checkDuplicate(entityBO, true, true);
 
-		TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
-		entityDO.setOperateTime(null);
-		if (!tenantBindManager.updateById(entityDO)) {
-			throw new UpdateException("The tenant bind update failed");
-		}
-	}
+        TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!tenantBindManager.updateById(entityDO)) {
+            throw new UpdateException("The tenant bind update failed");
+        }
+    }
 
-	@Override
-	public TenantBindBO selectById(Long id) {
-		TenantBindDO entityDO = getDOById(id, true);
-		return tenantBindBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public TenantBindBO selectById(Long id) {
+        TenantBindDO entityDO = getDOById(id, true);
+        return tenantBindBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId) {
-		LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
-		wrapper.eq(TenantBindDO::getTenantId, tenantId);
-		wrapper.eq(TenantBindDO::getUserId, userId);
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		TenantBindDO entityDO = tenantBindManager.getOne(wrapper);
-		return tenantBindBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId) {
+        LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
+        wrapper.eq(TenantBindDO::getTenantId, tenantId);
+        wrapper.eq(TenantBindDO::getUserId, userId);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        TenantBindDO entityDO = tenantBindManager.getOne(wrapper);
+        return tenantBindBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public List<Long> listUserIdsByTenantId(Long tenantId) {
-		if (Objects.isNull(tenantId)) {
-			return Collections.emptyList();
-		}
-		LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
-		wrapper.eq(TenantBindDO::getTenantId, tenantId);
-		wrapper.select(TenantBindDO::getUserId);
-		return tenantBindManager.listObjs(wrapper, o -> (Long) o);
-	}
+    @Override
+    public List<Long> listUserIdsByTenantId(Long tenantId) {
+        if (Objects.isNull(tenantId)) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
+        wrapper.eq(TenantBindDO::getTenantId, tenantId);
+        wrapper.select(TenantBindDO::getUserId);
+        return tenantBindManager.listObjs(wrapper, o -> (Long) o);
+    }
 
-	@Override
-	public Page<TenantBindBO> selectByPage(TenantBindQuery entityQuery) {
-		if (Objects.isNull(entityQuery.getPage())) {
-			entityQuery.setPage(new Pages());
-		}
-		Page<TenantBindDO> entityPageDO = tenantBindManager.page(PageUtil.page(entityQuery.getPage()),
-				fuzzyQuery(entityQuery));
-		return tenantBindBuilder.buildBOPageByDOPage(entityPageDO);
-	}
+    @Override
+    public Page<TenantBindBO> selectByPage(TenantBindQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<TenantBindDO> entityPageDO = tenantBindManager.page(PageUtil.page(entityQuery.getPage()),
+                fuzzyQuery(entityQuery));
+        return tenantBindBuilder.buildBOPageByDOPage(entityPageDO);
+    }
 
-	/**
-	 * @param entityQuery {@link TenantBindQuery}
-	 * @return {@link LambdaQueryWrapper}
-	 */
-	private LambdaQueryWrapper<TenantBindDO> fuzzyQuery(TenantBindQuery entityQuery) {
-		LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
-		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getTenantId()), TenantBindDO::getTenantId,
-				entityQuery.getTenantId());
-		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), TenantBindDO::getUserId, entityQuery.getUserId());
-		return wrapper;
-	}
+    /**
+     * @param entityQuery {@link TenantBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<TenantBindDO> fuzzyQuery(TenantBindQuery entityQuery) {
+        LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getTenantId()), TenantBindDO::getTenantId,
+                entityQuery.getTenantId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), TenantBindDO::getUserId, entityQuery.getUserId());
+        return wrapper;
+    }
 
-	/**
-	 * @param entityBO {@link TenantBindBO}
-	 * @param isUpdate
-	 * @param throwException
-	 * @return
-	 */
-	private boolean checkDuplicate(TenantBindBO entityBO, boolean isUpdate, boolean throwException) {
-		LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
-		wrapper.eq(TenantBindDO::getTenantId, entityBO.getTenantId());
-		wrapper.eq(TenantBindDO::getUserId, entityBO.getUserId());
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		TenantBindDO one = tenantBindManager.getOne(wrapper);
-		if (Objects.isNull(one)) {
-			return false;
-		}
-		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-		if (throwException && duplicate) {
-			throw new DuplicateException("Tenant has been duplicated");
-		}
-		return duplicate;
-	}
+    /**
+     * @param entityBO       {@link TenantBindBO}
+     * @param isUpdate
+     * @param throwException
+     * @return
+     */
+    private boolean checkDuplicate(TenantBindBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
+        wrapper.eq(TenantBindDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(TenantBindDO::getUserId, entityBO.getUserId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        TenantBindDO one = tenantBindManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("Tenant has been duplicated");
+        }
+        return duplicate;
+    }
 
-	/**
-	 * Primary key ID
-	 * @param id ID
-	 * @param throwException
-	 * @return {@link TenantBindDO}
-	 */
-	private TenantBindDO getDOById(Long id, boolean throwException) {
-		TenantBindDO entityDO = tenantBindManager.getById(id);
-		if (throwException && Objects.isNull(entityDO)) {
-			throw new NotFoundException("Tenant bind does not exist");
-		}
-		return entityDO;
-	}
+    /**
+     * Primary key ID
+     *
+     * @param id             ID
+     * @param throwException
+     * @return {@link TenantBindDO}
+     */
+    private TenantBindDO getDOById(Long id, boolean throwException) {
+        TenantBindDO entityDO = tenantBindManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Tenant bind does not exist");
+        }
+        return entityDO;
+    }
 
 }

@@ -31,10 +31,10 @@ import java.time.LocalDateTime;
 @ToString
 public class SilentSourceRow {
 
-	private long deviceId;
+    private long deviceId;
 
-	private long pointId;
+    private long pointId;
 
-	private LocalDateTime lastSeen;
+    private LocalDateTime lastSeen;
 
 }

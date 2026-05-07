@@ -43,37 +43,35 @@ import java.util.Objects;
 @Service
 public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
 
-	@Resource
-	private TokenService tokenService;
+    @Resource
+    private TokenService tokenService;
 
-	@Override
-	public void checkValid(GrpcLoginQuery request, StreamObserver<GrpcRTokenDTO> responseObserver) {
-		GrpcRTokenDTO.Builder builder = GrpcRTokenDTO.newBuilder();
-		GrpcR.Builder rBuilder = GrpcR.newBuilder();
+    @Override
+    public void checkValid(GrpcLoginQuery request, StreamObserver<GrpcRTokenDTO> responseObserver) {
+        GrpcRTokenDTO.Builder builder = GrpcRTokenDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-		TokenValid entity = tokenService.checkValid(request.getName(), request.getSalt(), request.getToken(),
-				request.getTenant());
-		if (Objects.isNull(entity)) {
-			rBuilder.setOk(false);
-			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-		}
-		else if (!entity.isValid()) {
-			rBuilder.setOk(false);
-			rBuilder.setCode(ResponseEnum.TOKEN_INVALID.getCode());
-			rBuilder.setMessage(ResponseEnum.TOKEN_INVALID.getText());
-		}
-		else {
-			rBuilder.setOk(true);
-			rBuilder.setCode(ResponseEnum.OK.getCode());
-			rBuilder.setMessage(ResponseEnum.OK.getText());
+        TokenValid entity = tokenService.checkValid(request.getName(), request.getSalt(), request.getToken(),
+                request.getTenant());
+        if (Objects.isNull(entity)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else if (!entity.isValid()) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.TOKEN_INVALID.getCode());
+            rBuilder.setMessage(ResponseEnum.TOKEN_INVALID.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
-			builder.setData(TimeUtil.completeFormat(entity.getExpireTime()));
-		}
+            builder.setData(TimeUtil.completeFormat(entity.getExpireTime()));
+        }
 
-		builder.setResult(rBuilder);
-		responseObserver.onNext(builder.build());
-		responseObserver.onCompleted();
-	}
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
 
 }

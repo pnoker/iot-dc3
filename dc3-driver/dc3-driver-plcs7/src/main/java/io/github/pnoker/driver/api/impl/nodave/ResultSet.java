@@ -21,28 +21,28 @@ package io.github.pnoker.driver.api.impl.nodave;
  */
 public final class ResultSet {
 
-	public Result[] results;
+    public Result[] results;
 
-	private int errorState, numResults;
+    private int errorState, numResults;
 
-	public int getErrorState() {
-		return this.errorState;
-	}
+    public int getErrorState() {
+        return this.errorState;
+    }
 
-	public void setErrorState(final int error) {
-		this.errorState = error;
-	}
+    public void setErrorState(final int error) {
+        this.errorState = error;
+    }
 
-	;
+    ;
 
-	public int getNumResults() {
-		return this.numResults;
-	}
+    public int getNumResults() {
+        return this.numResults;
+    }
 
-	public void setNumResults(final int nr) {
-		this.numResults = nr;
-	}
+    public void setNumResults(final int nr) {
+        this.numResults = nr;
+    }
 
-	;
+    ;
 
 }

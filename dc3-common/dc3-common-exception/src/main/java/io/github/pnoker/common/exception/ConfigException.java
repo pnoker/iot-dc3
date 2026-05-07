@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class ConfigException extends RuntimeException {
 
-	public ConfigException() {
-		this(null);
-	}
+    public ConfigException() {
+        this(null);
+    }
 
-	public ConfigException(Throwable cause) {
-		super(cause);
-	}
+    public ConfigException(Throwable cause) {
+        super(cause);
+    }
 
-	public ConfigException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public ConfigException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

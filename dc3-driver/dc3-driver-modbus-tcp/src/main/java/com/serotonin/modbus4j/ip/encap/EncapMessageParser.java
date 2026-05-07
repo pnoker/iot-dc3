@@ -30,21 +30,22 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class EncapMessageParser extends BaseMessageParser {
 
-	/**
-	 * <p>
-	 * Constructor for EncapMessageParser.
-	 * </p>
-	 * @param master a boolean.
-	 */
-	public EncapMessageParser(boolean master) {
-		super(master);
-	}
+    /**
+     * <p>
+     * Constructor for EncapMessageParser.
+     * </p>
+     *
+     * @param master a boolean.
+     */
+    public EncapMessageParser(boolean master) {
+        super(master);
+    }
 
-	@Override
-	protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception {
-		if (master)
-			return EncapMessageResponse.createEncapMessageResponse(queue);
-		return EncapMessageRequest.createEncapMessageRequest(queue);
-	}
+    @Override
+    protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception {
+        if (master)
+            return EncapMessageResponse.createEncapMessageResponse(queue);
+        return EncapMessageRequest.createEncapMessageRequest(queue);
+    }
 
 }

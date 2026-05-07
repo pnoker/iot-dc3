@@ -37,9 +37,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveDataProfileConfig implements EnvironmentPostProcessor {
 
-	@Override
-	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		environment.addActiveProfile("data");
-	}
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        environment.addActiveProfile("data");
+    }
 
 }

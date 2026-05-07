@@ -54,167 +54,169 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DriverCustomServiceImpl implements DriverCustomService {
 
-	@Resource
-	DriverMetadata driverMetadata;
+    @Resource
+    DriverMetadata driverMetadata;
 
-	@Resource
-	private DriverSenderService driverSenderService;
+    @Resource
+    private DriverSenderService driverSenderService;
 
-	/**
-	 * Initializes the virtual driver.
-	 * <p>
-	 * This method is called when the driver starts. Override this method to implement
-	 * custom initialization logic specific to your virtual device simulation.
-	 * </p>
-	 */
-	@Override
-	public void initial() {
-		/*
-		 * Driver initialization logic
-		 *
-		 * Hint: The logic here is for reference only; please modify it according to the
-		 * actual application scenario. This method is automatically executed when the
-		 * driver starts, and you can perform specific initialization operations here.
-		 *
-		 */
-	}
+    /**
+     * Initializes the virtual driver.
+     * <p>
+     * This method is called when the driver starts. Override this method to implement
+     * custom initialization logic specific to your virtual device simulation.
+     * </p>
+     */
+    @Override
+    public void initial() {
+        /*
+         * Driver initialization logic
+         *
+         * Hint: The logic here is for reference only; please modify it according to the
+         * actual application scenario. This method is automatically executed when the
+         * driver starts, and you can perform specific initialization operations here.
+         *
+         */
+    }
 
-	/**
-	 * Scheduled task to report device status.
-	 * <p>
-	 * This method is called periodically to update device status. By default, all virtual
-	 * devices are reported as ONLINE with a 25-second validity period. Override this
-	 * method to implement custom status reporting logic.
-	 * </p>
-	 */
-	@Override
-	public void schedule() {
-		/*
-		 * Device status upload logic
-		 *
-		 * Hint: The logic here is for reference only; please modify it according to the
-		 * actual application scenario. Device status upload can be flexibly implemented
-		 * based on specific requirements. Here are some common approaches: - Determine
-		 * device status based on read data in the `read` method; - Periodically check
-		 * device status in a custom scheduled task; - Trigger device status judgment
-		 * based on specific business logic or events.
-		 *
-		 * Finally, submit the device status to the SDK management through the {@link
-		 * DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface. The
-		 * device status enumeration {@link DeviceStatusEnum} includes the following
-		 * states: - ONLINE: Device online - OFFLINE: Device offline - MAINTAIN: Device
-		 * under maintenance - FAULT: Device fault
-		 *
-		 * In the following example, all devices are set to {@link
-		 * DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link
-		 * TimeUnit#SECONDS}.
-		 */
-		driverMetadata.getDeviceIds()
-			.forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
-	}
+    /**
+     * Scheduled task to report device status.
+     * <p>
+     * This method is called periodically to update device status. By default, all virtual
+     * devices are reported as ONLINE with a 25-second validity period. Override this
+     * method to implement custom status reporting logic.
+     * </p>
+     */
+    @Override
+    public void schedule() {
+        /*
+         * Device status upload logic
+         *
+         * Hint: The logic here is for reference only; please modify it according to the
+         * actual application scenario. Device status upload can be flexibly implemented
+         * based on specific requirements. Here are some common approaches: - Determine
+         * device status based on read data in the `read` method; - Periodically check
+         * device status in a custom scheduled task; - Trigger device status judgment
+         * based on specific business logic or events.
+         *
+         * Finally, submit the device status to the SDK management through the {@link
+         * DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface. The
+         * device status enumeration {@link DeviceStatusEnum} includes the following
+         * states: - ONLINE: Device online - OFFLINE: Device offline - MAINTAIN: Device
+         * under maintenance - FAULT: Device fault
+         *
+         * In the following example, all devices are set to {@link
+         * DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link
+         * TimeUnit#SECONDS}.
+         */
+        driverMetadata.getDeviceIds()
+                .forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+    }
 
-	/**
-	 * Handles metadata change events for drivers, devices, and points.
-	 * <p>
-	 * This method is called when metadata is created, updated, or deleted. Override this
-	 * method to implement custom event handling logic.
-	 * </p>
-	 * @param metadataEvent the metadata event containing type, operation, and ID
-	 * information
-	 */
-	@Override
-	public void event(MetadataEventDTO metadataEvent) {
-		/*
-		 * Receive metadata events for driver, device, and point creation, update, and
-		 * deletion.
-		 *
-		 * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT) Metadata
-		 * operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
-		 *
-		 * Hint: The logic here is for reference only; please modify it according to the
-		 * actual application scenario.
-		 */
-		MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-		MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
-		if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-			// to do something for device event
-			log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
-		}
-		else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-			// to do something for point event
-			log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
-		}
-	}
+    /**
+     * Handles metadata change events for drivers, devices, and points.
+     * <p>
+     * This method is called when metadata is created, updated, or deleted. Override this
+     * method to implement custom event handling logic.
+     * </p>
+     *
+     * @param metadataEvent the metadata event containing type, operation, and ID
+     *                      information
+     */
+    @Override
+    public void event(MetadataEventDTO metadataEvent) {
+        /*
+         * Receive metadata events for driver, device, and point creation, update, and
+         * deletion.
+         *
+         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT) Metadata
+         * operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         *
+         * Hint: The logic here is for reference only; please modify it according to the
+         * actual application scenario.
+         */
+        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+        MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
+        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+            // to do something for device event
+            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
+        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+            // to do something for point event
+            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
+        }
+    }
 
-	/**
-	 * Reads data from a virtual device point.
-	 * <p>
-	 * This method generates simulated data based on the point type:
-	 * <ul>
-	 * <li>STRING type: returns "abcd1234"</li>
-	 * <li>BOOLEAN type: returns a random boolean value</li>
-	 * <li>Other types: returns a random float between 0 and 100</li>
-	 * </ul>
-	 * Override this method to implement custom data generation logic.
-	 * </p>
-	 * @param driverConfig driver configuration attributes
-	 * @param pointConfig point configuration attributes
-	 * @param device the device to read from
-	 * @param point the point to read
-	 * @return the read value wrapped in an RValue object
-	 */
-	@Override
-	public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-			PointBO point) {
-		/*
-		 * Read device point data logic
-		 *
-		 * Hint: The logic here is for reference only; please modify it according to the
-		 * actual application scenario. Generate random data based on point type: - If the
-		 * point type is STRING, generate a random string of length 8; - If the point type
-		 * is BOOLEAN, generate a random boolean value; - Otherwise, generate a random
-		 * float between 0 and 100.
-		 */
-		if (PointTypeFlagEnum.STRING.equals(point.getPointTypeFlag())) {
-			return new RValue(device, point, "abcd1234");
-		}
-		if (PointTypeFlagEnum.BOOLEAN.equals(point.getPointTypeFlag())) {
-			Random random = new Random();
-			boolean b = random.nextBoolean();
-			return new RValue(device, point, String.valueOf(b));
-		}
+    /**
+     * Reads data from a virtual device point.
+     * <p>
+     * This method generates simulated data based on the point type:
+     * <ul>
+     * <li>STRING type: returns "abcd1234"</li>
+     * <li>BOOLEAN type: returns a random boolean value</li>
+     * <li>Other types: returns a random float between 0 and 100</li>
+     * </ul>
+     * Override this method to implement custom data generation logic.
+     * </p>
+     *
+     * @param driverConfig driver configuration attributes
+     * @param pointConfig  point configuration attributes
+     * @param device       the device to read from
+     * @param point        the point to read
+     * @return the read value wrapped in an RValue object
+     */
+    @Override
+    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+                       PointBO point) {
+        /*
+         * Read device point data logic
+         *
+         * Hint: The logic here is for reference only; please modify it according to the
+         * actual application scenario. Generate random data based on point type: - If the
+         * point type is STRING, generate a random string of length 8; - If the point type
+         * is BOOLEAN, generate a random boolean value; - Otherwise, generate a random
+         * float between 0 and 100.
+         */
+        if (PointTypeFlagEnum.STRING.equals(point.getPointTypeFlag())) {
+            return new RValue(device, point, "abcd1234");
+        }
+        if (PointTypeFlagEnum.BOOLEAN.equals(point.getPointTypeFlag())) {
+            Random random = new Random();
+            boolean b = random.nextBoolean();
+            return new RValue(device, point, String.valueOf(b));
+        }
 
-		Random random = new Random();
-		double value = random.nextDouble() * 100;
-		return new RValue(device, point, String.valueOf(value));
-	}
+        Random random = new Random();
+        double value = random.nextDouble() * 100;
+        return new RValue(device, point, String.valueOf(value));
+    }
 
-	/**
-	 * Writes data to a virtual device point.
-	 * <p>
-	 * By default, this method returns false indicating the write operation is not
-	 * supported. Override this method to implement custom write logic for virtual
-	 * devices.
-	 * </p>
-	 * @param driverConfig driver configuration attributes
-	 * @param pointConfig point configuration attributes
-	 * @param device the device to write to
-	 * @param point the point to write
-	 * @param wValue the value to write
-	 * @return true if the write operation succeeded, false otherwise
-	 */
-	@Override
-	public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-			PointBO point, WValue wValue) {
-		/*
-		 * Write device point data logic
-		 *
-		 * Hint: The logic here is for reference only; please modify it according to the
-		 * actual application scenario. You can implement the point data write logic based
-		 * on specific business requirements. By default, this method returns false,
-		 * indicating that the write operation was not executed or failed.
-		 */
-		return false;
-	}
+    /**
+     * Writes data to a virtual device point.
+     * <p>
+     * By default, this method returns false indicating the write operation is not
+     * supported. Override this method to implement custom write logic for virtual
+     * devices.
+     * </p>
+     *
+     * @param driverConfig driver configuration attributes
+     * @param pointConfig  point configuration attributes
+     * @param device       the device to write to
+     * @param point        the point to write
+     * @param wValue       the value to write
+     * @return true if the write operation succeeded, false otherwise
+     */
+    @Override
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+                         PointBO point, WValue wValue) {
+        /*
+         * Write device point data logic
+         *
+         * Hint: The logic here is for reference only; please modify it according to the
+         * actual application scenario. You can implement the point data write logic based
+         * on specific business requirements. By default, this method returns false,
+         * indicating that the write operation was not executed or failed.
+         */
+        return false;
+    }
 
 }

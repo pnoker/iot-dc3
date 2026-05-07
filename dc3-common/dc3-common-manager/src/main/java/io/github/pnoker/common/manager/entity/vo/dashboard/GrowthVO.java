@@ -39,15 +39,15 @@ import java.util.List;
 @NoArgsConstructor
 public class GrowthVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private List<Long> driver;
+    private List<Long> driver;
 
-	private List<Long> device;
+    private List<Long> device;
 
-	private List<Long> point;
+    private List<Long> point;
 
-	private List<Long> profile;
+    private List<Long> profile;
 
 }

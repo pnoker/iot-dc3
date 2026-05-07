@@ -31,61 +31,64 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class XaMessage extends IpMessage {
 
-	protected final int transactionId;
+    protected final int transactionId;
 
-	/**
-	 * <p>
-	 * Constructor for XaMessage.
-	 * </p>
-	 * @param modbusMessage a {@link ModbusMessage} object.
-	 * @param transactionId a int.
-	 */
-	public XaMessage(ModbusMessage modbusMessage, int transactionId) {
-		super(modbusMessage);
-		this.transactionId = transactionId;
-	}
+    /**
+     * <p>
+     * Constructor for XaMessage.
+     * </p>
+     *
+     * @param modbusMessage a {@link ModbusMessage} object.
+     * @param transactionId a int.
+     */
+    public XaMessage(ModbusMessage modbusMessage, int transactionId) {
+        super(modbusMessage);
+        this.transactionId = transactionId;
+    }
 
-	/**
-	 * <p>
-	 * getMessageData.
-	 * </p>
-	 * @return an array of {@link byte} objects.
-	 */
-	public byte[] getMessageData() {
-		ByteQueue msgQueue = new ByteQueue();
+    /**
+     * <p>
+     * getMessageData.
+     * </p>
+     *
+     * @return an array of {@link byte} objects.
+     */
+    public byte[] getMessageData() {
+        ByteQueue msgQueue = new ByteQueue();
 
-		// Write the particular message.
-		modbusMessage.write(msgQueue);
+        // Write the particular message.
+        modbusMessage.write(msgQueue);
 
-		// Create the XA message
-		ByteQueue xaQueue = new ByteQueue();
-		ModbusUtils.pushShort(xaQueue, transactionId);
-		ModbusUtils.pushShort(xaQueue, ModbusUtils.IP_PROTOCOL_ID);
-		ModbusUtils.pushShort(xaQueue, msgQueue.size());
-		xaQueue.push(msgQueue);
+        // Create the XA message
+        ByteQueue xaQueue = new ByteQueue();
+        ModbusUtils.pushShort(xaQueue, transactionId);
+        ModbusUtils.pushShort(xaQueue, ModbusUtils.IP_PROTOCOL_ID);
+        ModbusUtils.pushShort(xaQueue, msgQueue.size());
+        xaQueue.push(msgQueue);
 
-		// Return the data.
-		return xaQueue.popAll();
-	}
+        // Return the data.
+        return xaQueue.popAll();
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>transactionId</code>.
-	 * </p>
-	 * @return a int.
-	 */
-	public int getTransactionId() {
-		return transactionId;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>transactionId</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getTransactionId() {
+        return transactionId;
+    }
 
-	@Override
-	public ModbusMessage getModbusMessage() {
-		return modbusMessage;
-	}
+    @Override
+    public ModbusMessage getModbusMessage() {
+        return modbusMessage;
+    }
 
-	@Override
-	public String toString() {
-		return "XaMessage [transactionId=" + transactionId + ", message=" + modbusMessage + "]";
-	}
+    @Override
+    public String toString() {
+        return "XaMessage [transactionId=" + transactionId + ", message=" + modbusMessage + "]";
+    }
 
 }

@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class WritePointException extends RuntimeException {
 
-	public WritePointException() {
-		this(null);
-	}
+    public WritePointException() {
+        this(null);
+    }
 
-	public WritePointException(Throwable cause) {
-		super(cause);
-	}
+    public WritePointException(Throwable cause) {
+        super(cause);
+    }
 
-	public WritePointException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public WritePointException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

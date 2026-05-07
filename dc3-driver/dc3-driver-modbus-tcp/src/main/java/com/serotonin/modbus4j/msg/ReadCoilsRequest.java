@@ -30,47 +30,48 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
  */
 public class ReadCoilsRequest extends ReadBinaryRequest {
 
-	/**
-	 * <p>
-	 * Constructor for ReadCoilsRequest.
-	 * </p>
-	 * @param slaveId a int.
-	 * @param startOffset a int.
-	 * @param numberOfBits a int.
-	 * @throws ModbusTransportException if any.
-	 */
-	public ReadCoilsRequest(int slaveId, int startOffset, int numberOfBits) throws ModbusTransportException {
-		super(slaveId, startOffset, numberOfBits);
-	}
+    /**
+     * <p>
+     * Constructor for ReadCoilsRequest.
+     * </p>
+     *
+     * @param slaveId      a int.
+     * @param startOffset  a int.
+     * @param numberOfBits a int.
+     * @throws ModbusTransportException if any.
+     */
+    public ReadCoilsRequest(int slaveId, int startOffset, int numberOfBits) throws ModbusTransportException {
+        super(slaveId, startOffset, numberOfBits);
+    }
 
-	ReadCoilsRequest(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    ReadCoilsRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	@Override
-	public byte getFunctionCode() {
-		return FunctionCode.READ_COILS;
-	}
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.READ_COILS;
+    }
 
-	@Override
-	ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
-		return new ReadCoilsResponse(slaveId, getData(processImage));
-	}
+    @Override
+    ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
+        return new ReadCoilsResponse(slaveId, getData(processImage));
+    }
 
-	@Override
-	protected boolean getBinary(ProcessImage processImage, int index) throws ModbusTransportException {
-		return processImage.getCoil(index);
-	}
+    @Override
+    protected boolean getBinary(ProcessImage processImage, int index) throws ModbusTransportException {
+        return processImage.getCoil(index);
+    }
 
-	@Override
-	ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
-		return new ReadCoilsResponse(slaveId);
-	}
+    @Override
+    ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
+        return new ReadCoilsResponse(slaveId);
+    }
 
-	@Override
-	public String toString() {
-		return "ReadCoilsRequest [slaveId=" + slaveId + ", getFunctionCode()=" + getFunctionCode() + ", toString()="
-				+ super.toString() + "]";
-	}
+    @Override
+    public String toString() {
+        return "ReadCoilsRequest [slaveId=" + slaveId + ", getFunctionCode()=" + getFunctionCode() + ", toString()="
+                + super.toString() + "]";
+    }
 
 }

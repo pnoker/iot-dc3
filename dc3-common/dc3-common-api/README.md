@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-api` provides shared gRPC utility classes used across all services in the IoT DC3 platform. It contains builder utilities for constructing gRPC request/response objects
+`dc3-common-api` provides shared gRPC utility classes used across all services in the IoT DC3 platform. It contains
+builder utilities for constructing gRPC request/response objects
 from domain model entities.
 
 ## Module Information
@@ -13,11 +14,13 @@ from domain model entities.
 
 ## Key Components
 
-- **`GrpcBuilderUtil`** — Utility class for building common gRPC DTOs from BO/DO entities (e.g., setting pagination, building result wrappers)
+- **`GrpcBuilderUtil`** — Utility class for building common gRPC DTOs from BO/DO entities (e.g., setting pagination,
+  building result wrappers)
 
 ## Dependencies
 
-This module is included in any service that imports a `dc3-api-*` module. It bridges domain model objects with generated protobuf classes.
+This module is included in any service that imports a `dc3-api-*` module. It bridges domain model objects with generated
+protobuf classes.
 
 ## Build Instructions
 

@@ -28,15 +28,15 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
  */
 public class DriverConstant {
 
-	/**
-	 * Service name
-	 */
-	public static final String SERVICE_NAME = "dc3-driver";
+    /**
+     * Service name
+     */
+    public static final String SERVICE_NAME = "dc3-driver";
 
-	public static final String COMMAND_URL_PREFIX = "/command";
+    public static final String COMMAND_URL_PREFIX = "/command";
 
-	private DriverConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private DriverConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

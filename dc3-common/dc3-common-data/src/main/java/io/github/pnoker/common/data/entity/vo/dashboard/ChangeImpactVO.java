@@ -37,16 +37,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChangeImpactVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * {@code driver} | {@code device} | {@code profile}.
-	 */
-	private String kind;
+    /**
+     * {@code driver} | {@code device} | {@code profile}.
+     */
+    private String kind;
 
-	private long entityId;
+    private long entityId;
 
-	private LocalDateTime operateTime;
+    private LocalDateTime operateTime;
 
 }

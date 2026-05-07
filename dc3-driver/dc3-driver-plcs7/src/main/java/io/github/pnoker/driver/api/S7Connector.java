@@ -28,23 +28,25 @@ import java.io.Closeable;
  */
 public interface S7Connector extends Closeable {
 
-	/**
-	 * Read bytes from a PLC memory area.
-	 * @param area the memory area type
-	 * @param areaNumber area number (e.g. DB number)
-	 * @param bytes number of bytes to read
-	 * @param offset byte offset within the area
-	 * @return the bytes read from the PLC
-	 */
-	byte[] read(DaveArea area, int areaNumber, int bytes, int offset);
+    /**
+     * Read bytes from a PLC memory area.
+     *
+     * @param area       the memory area type
+     * @param areaNumber area number (e.g. DB number)
+     * @param bytes      number of bytes to read
+     * @param offset     byte offset within the area
+     * @return the bytes read from the PLC
+     */
+    byte[] read(DaveArea area, int areaNumber, int bytes, int offset);
 
-	/**
-	 * Write bytes to a PLC memory area.
-	 * @param area the memory area type
-	 * @param areaNumber area number (e.g. DB number)
-	 * @param offset byte offset within the area
-	 * @param buffer the byte array to write
-	 */
-	void write(DaveArea area, int areaNumber, int offset, byte[] buffer);
+    /**
+     * Write bytes to a PLC memory area.
+     *
+     * @param area       the memory area type
+     * @param areaNumber area number (e.g. DB number)
+     * @param offset     byte offset within the area
+     * @param buffer     the byte array to write
+     */
+    void write(DaveArea area, int areaNumber, int offset, byte[] buffer);
 
 }

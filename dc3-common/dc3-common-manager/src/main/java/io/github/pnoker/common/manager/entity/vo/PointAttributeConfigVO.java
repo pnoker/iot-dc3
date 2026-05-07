@@ -41,48 +41,48 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PointAttributeConfigVO extends BaseVO {
 
-	/**
-	 * ID
-	 */
-	@NotNull(message = "位号属性ID不能为空", groups = { Add.class, Update.class })
-	private Long attributeId;
+    /**
+     * ID
+     */
+    @NotNull(message = "位号属性ID不能为空", groups = {Add.class, Update.class})
+    private Long attributeId;
 
-	/**
-	 *
-	 */
-	@NotNull(message = "位号属性配置值不能为空")
-	private String configValue;
+    /**
+     *
+     */
+    @NotNull(message = "位号属性配置值不能为空")
+    private String configValue;
 
-	/**
-	 * Device ID
-	 */
-	@NotNull(message = "设备ID不能为空", groups = { Add.class, Update.class })
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    @NotNull(message = "设备ID不能为空", groups = {Add.class, Update.class})
+    private Long deviceId;
 
-	/**
-	 *
-	 */
-	private JsonExt configExt;
+    /**
+     *
+     */
+    private JsonExt configExt;
 
-	/**
-	 * Point ID
-	 */
-	@NotNull(message = "位号ID不能为空", groups = { Add.class, Update.class })
-	private Long pointId;
+    /**
+     * Point ID
+     */
+    @NotNull(message = "位号ID不能为空", groups = {Add.class, Update.class})
+    private Long pointId;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 *
-	 */
-	private String signature;
+    /**
+     *
+     */
+    private String signature;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
 }

@@ -37,36 +37,36 @@ import java.io.Serializable;
 @ToString
 public class AlertPageQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * {@code "device"} / {@code "driver"} / {@code null} (both).
-	 */
-	private String source;
+    /**
+     * {@code "device"} / {@code "driver"} / {@code null} (both).
+     */
+    private String source;
 
-	private Integer eventTypeFlag;
+    private Integer eventTypeFlag;
 
-	/**
-	 * 0 = unconfirmed, 1 = confirmed, null = both.
-	 */
-	private Integer confirmFlag;
+    /**
+     * 0 = unconfirmed, 1 = confirmed, null = both.
+     */
+    private Integer confirmFlag;
 
-	/**
-	 * Legacy integer window; {@code rangeKey} wins when both set.
-	 */
-	private Integer rangeHours;
+    /**
+     * Legacy integer window; {@code rangeKey} wins when both set.
+     */
+    private Integer rangeHours;
 
-	/**
-	 * Preset time-range key — resolved server-side via TimeRangeUtil.
-	 */
-	private String rangeKey;
+    /**
+     * Preset time-range key — resolved server-side via TimeRangeUtil.
+     */
+    private String rangeKey;
 
-	/**
-	 * 1-based page index. Defaults to 1 if null or less.
-	 */
-	private Long current;
+    /**
+     * 1-based page index. Defaults to 1 if null or less.
+     */
+    private Long current;
 
-	private Long size;
+    private Long size;
 
 }

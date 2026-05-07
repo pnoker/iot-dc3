@@ -35,98 +35,101 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ExpireFlagEnum {
 
-	/**
-	 * Permanent
-	 */
-	PERMANENT((byte) 0, "permanent", "Permanent"),
+    /**
+     * Permanent
+     */
+    PERMANENT((byte) 0, "permanent", "Permanent"),
 
-	/**
-	 * One day
-	 */
-	ONE_DAY((byte) 1, "one_day", "One day"),
+    /**
+     * One day
+     */
+    ONE_DAY((byte) 1, "one_day", "One day"),
 
-	/**
-	 * One week
-	 */
-	ONE_WEEK((byte) 2, "one_week", "One week"),
+    /**
+     * One week
+     */
+    ONE_WEEK((byte) 2, "one_week", "One week"),
 
-	/**
-	 * One month
-	 */
-	ONE_MONTH((byte) 3, "one_month", "One month"),
+    /**
+     * One month
+     */
+    ONE_MONTH((byte) 3, "one_month", "One month"),
 
-	/**
-	 * Three months
-	 */
-	THREE_MONTHS((byte) 4, "three_months", "Three months"),
+    /**
+     * Three months
+     */
+    THREE_MONTHS((byte) 4, "three_months", "Three months"),
 
-	/**
-	 * Half year
-	 */
-	HALF_YEAR((byte) 5, "half_year", "Half year"),
+    /**
+     * Half year
+     */
+    HALF_YEAR((byte) 5, "half_year", "Half year"),
 
-	/**
-	 * One year
-	 */
-	ONE_YEAR((byte) 6, "one_year", "One year"),
+    /**
+     * One year
+     */
+    ONE_YEAR((byte) 6, "one_year", "One year"),
 
-	/**
-	 * Custom
-	 */
-	CUSTOM((byte) 7, "custom", "Custom"),;
+    /**
+     * Custom
+     */
+    CUSTOM((byte) 7, "custom", "Custom"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Remark
-	 */
-	private final String remark;
+    /**
+     * Remark
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link ExpireFlagEnum}
-	 */
-	public static ExpireFlagEnum ofIndex(Byte index) {
-		Optional<ExpireFlagEnum> any = Arrays.stream(ExpireFlagEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link ExpireFlagEnum}
+     */
+    public static ExpireFlagEnum ofIndex(Byte index) {
+        Optional<ExpireFlagEnum> any = Arrays.stream(ExpireFlagEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link ExpireFlagEnum}
-	 */
-	public static ExpireFlagEnum ofCode(String code) {
-		Optional<ExpireFlagEnum> any = Arrays.stream(ExpireFlagEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link ExpireFlagEnum}
+     */
+    public static ExpireFlagEnum ofCode(String code) {
+        Optional<ExpireFlagEnum> any = Arrays.stream(ExpireFlagEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Enum name
-	 * @return {@link ExpireFlagEnum}
-	 */
-	public static ExpireFlagEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Enum name
+     * @return {@link ExpireFlagEnum}
+     */
+    public static ExpireFlagEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

@@ -44,31 +44,31 @@ import java.util.List;
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
 public class DictionaryForAuthController implements BaseController {
 
-	private final DictionaryForAuthBuilder dictionaryForAuthBuilder;
+    private final DictionaryForAuthBuilder dictionaryForAuthBuilder;
 
-	private final DictionaryForAuthService dictionaryForAuthService;
+    private final DictionaryForAuthService dictionaryForAuthService;
 
-	public DictionaryForAuthController(DictionaryForAuthBuilder dictionaryForAuthBuilder,
-			DictionaryForAuthService dictionaryForAuthService) {
-		this.dictionaryForAuthBuilder = dictionaryForAuthBuilder;
-		this.dictionaryForAuthService = dictionaryForAuthService;
-	}
+    public DictionaryForAuthController(DictionaryForAuthBuilder dictionaryForAuthBuilder,
+                                       DictionaryForAuthService dictionaryForAuthService) {
+        this.dictionaryForAuthBuilder = dictionaryForAuthBuilder;
+        this.dictionaryForAuthService = dictionaryForAuthService;
+    }
 
-	/**
-	 * Tenant
-	 * @return
-	 */
-	@GetMapping("/tenant")
-	public Mono<R<List<DictionaryVO>>> tenantDictionary() {
-		try {
-			List<DictionaryBO> entityBOList = dictionaryForAuthService.tenantDictionary();
-			List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
-			return Mono.just(R.ok(entityVOList));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * Tenant
+     *
+     * @return
+     */
+    @GetMapping("/tenant")
+    public Mono<R<List<DictionaryVO>>> tenantDictionary() {
+        try {
+            List<DictionaryBO> entityBOList = dictionaryForAuthService.tenantDictionary();
+            List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
 }

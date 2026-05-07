@@ -28,39 +28,42 @@ import com.serotonin.modbus4j.code.ExceptionCode;
  */
 public class ExceptionResult {
 
-	private final byte exceptionCode;
+    private final byte exceptionCode;
 
-	private final String exceptionMessage;
+    private final String exceptionMessage;
 
-	/**
-	 * <p>
-	 * Constructor for ExceptionResult.
-	 * </p>
-	 * @param exceptionCode a byte.
-	 */
-	public ExceptionResult(byte exceptionCode) {
-		this.exceptionCode = exceptionCode;
-		exceptionMessage = ExceptionCode.getExceptionMessage(exceptionCode);
-	}
+    /**
+     * <p>
+     * Constructor for ExceptionResult.
+     * </p>
+     *
+     * @param exceptionCode a byte.
+     */
+    public ExceptionResult(byte exceptionCode) {
+        this.exceptionCode = exceptionCode;
+        exceptionMessage = ExceptionCode.getExceptionMessage(exceptionCode);
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>exceptionCode</code>.
-	 * </p>
-	 * @return a byte.
-	 */
-	public byte getExceptionCode() {
-		return exceptionCode;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>exceptionCode</code>.
+     * </p>
+     *
+     * @return a byte.
+     */
+    public byte getExceptionCode() {
+        return exceptionCode;
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>exceptionMessage</code>.
-	 * </p>
-	 * @return a {@link String} object.
-	 */
-	public String getExceptionMessage() {
-		return exceptionMessage;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>exceptionMessage</code>.
+     * </p>
+     *
+     * @return a {@link String} object.
+     */
+    public String getExceptionMessage() {
+        return exceptionMessage;
+    }
 
 }

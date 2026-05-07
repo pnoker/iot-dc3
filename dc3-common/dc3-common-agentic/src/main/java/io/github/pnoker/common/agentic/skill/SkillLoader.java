@@ -39,59 +39,57 @@ import java.util.Map;
 @Component
 public class SkillLoader implements ApplicationRunner {
 
-	private final SkillRegistry registry;
+    private final SkillRegistry registry;
 
-	public SkillLoader(SkillRegistry registry) {
-		this.registry = registry;
-	}
+    public SkillLoader(SkillRegistry registry) {
+        this.registry = registry;
+    }
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource[] resources = resolver.getResources("classpath*:skills/*.yml");
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        Resource[] resources = resolver.getResources("classpath*:skills/*.yml");
 
-		List<String> loaded = new ArrayList<>();
+        List<String> loaded = new ArrayList<>();
 
-		Yaml yaml = new Yaml();
-		for (Resource resource : resources) {
-			try (InputStreamReader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
-				Map<String, Object> map = yaml.load(reader);
-				SkillDefinition skill = mapToSkill(map);
-				if (skill.isEnabled()) {
-					registry.register(skill);
-					loaded.add(skill.getName());
-				}
-				else {
-					log.debug("Skipping disabled skill: {}", skill.getName());
-				}
-			}
-			catch (Exception e) {
-				log.error("Failed to load skill from {}: {}", resource.getDescription(), e.getMessage(), e);
-			}
-		}
+        Yaml yaml = new Yaml();
+        for (Resource resource : resources) {
+            try (InputStreamReader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
+                Map<String, Object> map = yaml.load(reader);
+                SkillDefinition skill = mapToSkill(map);
+                if (skill.isEnabled()) {
+                    registry.register(skill);
+                    loaded.add(skill.getName());
+                } else {
+                    log.debug("Skipping disabled skill: {}", skill.getName());
+                }
+            } catch (Exception e) {
+                log.error("Failed to load skill from {}: {}", resource.getDescription(), e.getMessage(), e);
+            }
+        }
 
-		log.info("Loaded {} skills: {}", loaded.size(), loaded);
-	}
+        log.info("Loaded {} skills: {}", loaded.size(), loaded);
+    }
 
-	@SuppressWarnings("unchecked")
-	private SkillDefinition mapToSkill(Map<String, Object> map) {
-		SkillDefinition skill = new SkillDefinition();
-		skill.setName((String) map.get("name"));
-		skill.setDescription((String) map.get("description"));
-		skill.setEnabled(Boolean.TRUE.equals(map.get("enabled")));
-		skill.setSystemPromptAddition((String) map.get("system-prompt-addition"));
-		skill.setTools((List<String>) map.get("tools"));
+    @SuppressWarnings("unchecked")
+    private SkillDefinition mapToSkill(Map<String, Object> map) {
+        SkillDefinition skill = new SkillDefinition();
+        skill.setName((String) map.get("name"));
+        skill.setDescription((String) map.get("description"));
+        skill.setEnabled(Boolean.TRUE.equals(map.get("enabled")));
+        skill.setSystemPromptAddition((String) map.get("system-prompt-addition"));
+        skill.setTools((List<String>) map.get("tools"));
 
-		List<Map<String, String>> exampleMaps = (List<Map<String, String>>) map.get("examples");
-		if (exampleMaps != null) {
-			List<SkillDefinition.SkillExample> examples = new ArrayList<>();
-			for (Map<String, String> ex : exampleMaps) {
-				examples.add(new SkillDefinition.SkillExample(ex.get("user"), ex.get("assistant")));
-			}
-			skill.setExamples(examples);
-		}
+        List<Map<String, String>> exampleMaps = (List<Map<String, String>>) map.get("examples");
+        if (exampleMaps != null) {
+            List<SkillDefinition.SkillExample> examples = new ArrayList<>();
+            for (Map<String, String> ex : exampleMaps) {
+                examples.add(new SkillDefinition.SkillExample(ex.get("user"), ex.get("assistant")));
+            }
+            skill.setExamples(examples);
+        }
 
-		return skill;
-	}
+        return skill;
+    }
 
 }

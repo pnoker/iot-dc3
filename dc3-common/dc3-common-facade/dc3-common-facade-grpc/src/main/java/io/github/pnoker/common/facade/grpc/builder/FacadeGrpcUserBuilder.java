@@ -35,22 +35,22 @@ import java.util.Objects;
 @Component
 public class FacadeGrpcUserBuilder {
 
-	public FacadeUserBO toFacadeBO(GrpcUserDTO dto) {
-		if (Objects.isNull(dto)) {
-			return null;
-		}
+    public FacadeUserBO toFacadeBO(GrpcUserDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
 
-		FacadeUserBO bo = new FacadeUserBO();
-		GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
+        FacadeUserBO bo = new FacadeUserBO();
+        GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
 
-		StringOptional.ofNullable(dto.getNickName()).ifPresent(bo::setNickName);
-		StringOptional.ofNullable(dto.getUserName()).ifPresent(bo::setUserName);
-		StringOptional.ofNullable(dto.getPhone()).ifPresent(bo::setPhone);
-		StringOptional.ofNullable(dto.getEmail()).ifPresent(bo::setEmail);
-		StringOptional.ofNullable(dto.getSocialExt()).ifPresent(bo::setSocialExt);
-		StringOptional.ofNullable(dto.getIdentityExt()).ifPresent(bo::setIdentityExt);
+        StringOptional.ofNullable(dto.getNickName()).ifPresent(bo::setNickName);
+        StringOptional.ofNullable(dto.getUserName()).ifPresent(bo::setUserName);
+        StringOptional.ofNullable(dto.getPhone()).ifPresent(bo::setPhone);
+        StringOptional.ofNullable(dto.getEmail()).ifPresent(bo::setEmail);
+        StringOptional.ofNullable(dto.getSocialExt()).ifPresent(bo::setSocialExt);
+        StringOptional.ofNullable(dto.getIdentityExt()).ifPresent(bo::setIdentityExt);
 
-		return bo;
-	}
+        return bo;
+    }
 
 }

@@ -37,16 +37,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Configures MyBatis mapper scanning for multiple packages. Enables automatic discovery
  * of mapper interfaces for database access.
  */
-@MapperScan(basePackages = { "io.github.pnoker.common.dal.mapper", "io.github.pnoker.common.auth.mapper",
-		"io.github.pnoker.common.data.mapper", "io.github.pnoker.common.manager.mapper" })
+@MapperScan(basePackages = {"io.github.pnoker.common.dal.mapper", "io.github.pnoker.common.auth.mapper",
+        "io.github.pnoker.common.data.mapper", "io.github.pnoker.common.manager.mapper"})
 public class SingleApplication {
 
-	/**
-	 * Main entry point for the Single Center Service.
-	 * @param args command line arguments
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(SingleApplication.class, args);
-	}
+    /**
+     * Main entry point for the Single Center Service.
+     *
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(SingleApplication.class, args);
+    }
 
 }

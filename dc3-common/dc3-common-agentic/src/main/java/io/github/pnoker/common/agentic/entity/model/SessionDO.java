@@ -31,59 +31,59 @@ import java.time.LocalDateTime;
 @TableName("dc3_session")
 public class SessionDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	@TableField("conversation_id")
-	private String conversationId;
+    @TableField("conversation_id")
+    private String conversationId;
 
-	@TableField("title")
-	private String title;
+    @TableField("title")
+    private String title;
 
-	@TableField("skill")
-	private String skill;
+    @TableField("skill")
+    private String skill;
 
-	@TableField("status")
-	private Byte status;
+    @TableField("status")
+    private Byte status;
 
-	@TableField("expire_time")
-	private LocalDateTime expireTime;
+    @TableField("expire_time")
+    private LocalDateTime expireTime;
 
-	@TableField("tenant_id")
-	private Long tenantId;
+    @TableField("tenant_id")
+    private Long tenantId;
 
-	@TableField("user_id")
-	private Long userId;
+    @TableField("user_id")
+    private Long userId;
 
-	@TableField("enable_flag")
-	private Byte enableFlag;
+    @TableField("enable_flag")
+    private Byte enableFlag;
 
-	@TableField("remark")
-	private String remark;
+    @TableField("remark")
+    private String remark;
 
-	@TableField("creator_id")
-	private Long creatorId;
+    @TableField("creator_id")
+    private Long creatorId;
 
-	@TableField("creator_name")
-	private String creatorName;
+    @TableField("creator_name")
+    private String creatorName;
 
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	@TableField("operator_id")
-	private Long operatorId;
+    @TableField("operator_id")
+    private Long operatorId;
 
-	@TableField("operator_name")
-	private String operatorName;
+    @TableField("operator_name")
+    private String operatorName;
 
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
-	@TableLogic
-	@TableField("deleted")
-	private Byte deleted;
+    @TableLogic
+    @TableField("deleted")
+    private Byte deleted;
 
 }

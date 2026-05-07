@@ -36,34 +36,34 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class MenuTreeBO extends MenuBO {
 
-	private List<MenuTreeBO> children = new ArrayList<>();
+    private List<MenuTreeBO> children = new ArrayList<>();
 
-	public static MenuTreeBO fromBO(MenuBO source) {
-		MenuTreeBO node = new MenuTreeBO();
-		node.setId(source.getId());
-		node.setParentMenuId(source.getParentMenuId());
-		node.setMenuTypeFlag(source.getMenuTypeFlag());
-		node.setMenuName(source.getMenuName());
-		node.setMenuCode(source.getMenuCode());
-		node.setMenuLevel(source.getMenuLevel());
-		node.setMenuIndex(source.getMenuIndex());
-		node.setMenuExt(source.getMenuExt());
-		node.setEnableFlag(source.getEnableFlag());
-		node.setRemark(source.getRemark());
-		node.setCreatorId(source.getCreatorId());
-		node.setCreatorName(source.getCreatorName());
-		node.setCreateTime(source.getCreateTime());
-		node.setOperatorId(source.getOperatorId());
-		node.setOperatorName(source.getOperatorName());
-		node.setOperateTime(source.getOperateTime());
-		return node;
-	}
+    public static MenuTreeBO fromBO(MenuBO source) {
+        MenuTreeBO node = new MenuTreeBO();
+        node.setId(source.getId());
+        node.setParentMenuId(source.getParentMenuId());
+        node.setMenuTypeFlag(source.getMenuTypeFlag());
+        node.setMenuName(source.getMenuName());
+        node.setMenuCode(source.getMenuCode());
+        node.setMenuLevel(source.getMenuLevel());
+        node.setMenuIndex(source.getMenuIndex());
+        node.setMenuExt(source.getMenuExt());
+        node.setEnableFlag(source.getEnableFlag());
+        node.setRemark(source.getRemark());
+        node.setCreatorId(source.getCreatorId());
+        node.setCreatorName(source.getCreatorName());
+        node.setCreateTime(source.getCreateTime());
+        node.setOperatorId(source.getOperatorId());
+        node.setOperatorName(source.getOperatorName());
+        node.setOperateTime(source.getOperateTime());
+        return node;
+    }
 
-	public void addChild(MenuTreeBO child) {
-		if (children == null) {
-			children = new ArrayList<>();
-		}
-		children.add(child);
-	}
+    public void addChild(MenuTreeBO child) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        children.add(child);
+    }
 
 }

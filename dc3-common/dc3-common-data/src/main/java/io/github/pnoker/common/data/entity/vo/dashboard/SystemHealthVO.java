@@ -44,54 +44,54 @@ import java.util.Map;
 @NoArgsConstructor
 public class SystemHealthVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Center service reachability (auth, data, manager).
-	 */
-	private Map<String, String> center;
+    /**
+     * Center service reachability (auth, data, manager).
+     */
+    private Map<String, String> center;
 
-	/**
-	 * Infrastructure reachability (database, mq, gateway).
-	 */
-	private Map<String, String> infra;
+    /**
+     * Infrastructure reachability (database, mq, gateway).
+     */
+    private Map<String, String> infra;
 
-	/**
-	 * Driver population summary.
-	 */
-	private FleetSummary drivers;
+    /**
+     * Driver population summary.
+     */
+    private FleetSummary drivers;
 
-	/**
-	 * Device population summary.
-	 */
-	private FleetSummary devices;
+    /**
+     * Device population summary.
+     */
+    private FleetSummary devices;
 
-	/**
-	 * Population summary shared by drivers and devices: count of records in the DB, how
-	 * many of them reported ONLINE to the status cache, and how many rows resolved to a
-	 * cache miss (never heartbeated since startup).
-	 */
-	@Getter
-	@Setter
-	@ToString
-	@NoArgsConstructor
-	public static class FleetSummary implements Serializable {
+    /**
+     * Population summary shared by drivers and devices: count of records in the DB, how
+     * many of them reported ONLINE to the status cache, and how many rows resolved to a
+     * cache miss (never heartbeated since startup).
+     */
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class FleetSummary implements Serializable {
 
-		@Serial
-		private static final long serialVersionUID = 1L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
-		private int total;
+        private int total;
 
-		private int online;
+        private int online;
 
-	}
+    }
 
-	/**
-	 * Backwards-compat alias — drivers used to be typed as DriverSummary.
-	 */
-	public static class DriverSummary extends FleetSummary {
+    /**
+     * Backwards-compat alias — drivers used to be typed as DriverSummary.
+     */
+    public static class DriverSummary extends FleetSummary {
 
-	}
+    }
 
 }

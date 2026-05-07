@@ -34,18 +34,19 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = { "io.github.pnoker.common.thread" })
-@EnableConfigurationProperties({ ThreadProperties.class })
+@ComponentScan(basePackages = {"io.github.pnoker.common.thread"})
+@EnableConfigurationProperties({ThreadProperties.class})
 public class ThreadInitRunner implements ApplicationRunner {
 
-	/**
-	 * Initialize thread components during application startup
-	 * @param args Application arguments passed to the application
-	 * @throws Exception if initialization fails
-	 */
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		// nothing to do
-	}
+    /**
+     * Initialize thread components during application startup
+     *
+     * @param args Application arguments passed to the application
+     * @throws Exception if initialization fails
+     */
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // nothing to do
+    }
 
 }

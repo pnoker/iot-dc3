@@ -101,12 +101,12 @@ make compose-restart STACK=dev
 
 ## 8. Service default endpoints
 
-| Service | HTTP | gRPC |
-|---------|------|------|
-| Gateway | 8000 | - |
-| Auth Center | 8300 | 9300 |
+| Service        | HTTP | gRPC |
+|----------------|------|------|
+| Gateway        | 8000 | -    |
+| Auth Center    | 8300 | 9300 |
 | Manager Center | 8400 | 9400 |
-| Data Center | 8500 | 9500 |
+| Data Center    | 8500 | 9500 |
 
 ## 9. Recommended local workflow
 

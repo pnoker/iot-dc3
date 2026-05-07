@@ -40,98 +40,104 @@ import java.util.Map;
 @ConditionalOnClass(ExchangeConfig.class)
 public class DriverTopicConfig {
 
-	private final DriverProperties driverProperties;
+    private final DriverProperties driverProperties;
 
-	private final TopicExchange metadataExchange;
+    private final TopicExchange metadataExchange;
 
-	private final TopicExchange commandExchange;
+    private final TopicExchange commandExchange;
 
-	public DriverTopicConfig(DriverProperties driverProperties, TopicExchange metadataExchange,
-			TopicExchange commandExchange) {
-		this.driverProperties = driverProperties;
-		this.metadataExchange = metadataExchange;
-		this.commandExchange = commandExchange;
-	}
+    public DriverTopicConfig(DriverProperties driverProperties, TopicExchange metadataExchange,
+                             TopicExchange commandExchange) {
+        this.driverProperties = driverProperties;
+        this.metadataExchange = metadataExchange;
+        this.commandExchange = commandExchange;
+    }
 
-	/**
-	 * Creates the metadata queue used to receive driver metadata synchronization events.
-	 * @return metadata queue
-	 */
-	@Bean
-	Queue metadataQueue() {
-		Map<String, Object> arguments = new HashMap<>();
-		// 30 seconds: 30 * 1000 = 30000L
-		arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-		return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient(), true, false, true,
-				arguments);
-	}
+    /**
+     * Creates the metadata queue used to receive driver metadata synchronization events.
+     *
+     * @return metadata queue
+     */
+    @Bean
+    Queue metadataQueue() {
+        Map<String, Object> arguments = new HashMap<>();
+        // 30 seconds: 30 * 1000 = 30000L
+        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
+        return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient(), true, false, true,
+                arguments);
+    }
 
-	/**
-	 * Binds the metadata queue to the metadata exchange.
-	 * @param metadataQueue metadata queue
-	 * @return queue binding
-	 */
-	@Bean
-	Binding metadataBinding(Queue metadataQueue) {
-		Binding binding = BindingBuilder.bind(metadataQueue)
-			.to(metadataExchange)
-			.with(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverProperties.getService());
-		binding.addArgument(RabbitConstant.AUTO_DELETE, false);
-		return binding;
-	}
+    /**
+     * Binds the metadata queue to the metadata exchange.
+     *
+     * @param metadataQueue metadata queue
+     * @return queue binding
+     */
+    @Bean
+    Binding metadataBinding(Queue metadataQueue) {
+        Binding binding = BindingBuilder.bind(metadataQueue)
+                .to(metadataExchange)
+                .with(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverProperties.getService());
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+        return binding;
+    }
 
-	/**
-	 * Creates the driver command queue used to receive driver-level commands.
-	 * @return driver command queue
-	 */
-	@Bean
-	Queue driverCommandQueue() {
-		Map<String, Object> arguments = new HashMap<>();
-		// 30 seconds: 30 * 1000 = 30000L
-		arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-		return new Queue(RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX + driverProperties.getService(), true, false, false,
-				arguments);
-	}
+    /**
+     * Creates the driver command queue used to receive driver-level commands.
+     *
+     * @return driver command queue
+     */
+    @Bean
+    Queue driverCommandQueue() {
+        Map<String, Object> arguments = new HashMap<>();
+        // 30 seconds: 30 * 1000 = 30000L
+        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
+        return new Queue(RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX + driverProperties.getService(), true, false, false,
+                arguments);
+    }
 
-	/**
-	 * Binds the driver command queue to the command exchange.
-	 * @param driverCommandQueue driver command queue
-	 * @return queue binding
-	 */
-	@Bean
-	Binding driverCommandBinding(Queue driverCommandQueue) {
-		Binding binding = BindingBuilder.bind(driverCommandQueue)
-			.to(commandExchange)
-			.with(RabbitConstant.ROUTING_DRIVER_COMMAND_PREFIX + driverProperties.getService());
-		binding.addArgument(RabbitConstant.AUTO_DELETE, false);
-		return binding;
-	}
+    /**
+     * Binds the driver command queue to the command exchange.
+     *
+     * @param driverCommandQueue driver command queue
+     * @return queue binding
+     */
+    @Bean
+    Binding driverCommandBinding(Queue driverCommandQueue) {
+        Binding binding = BindingBuilder.bind(driverCommandQueue)
+                .to(commandExchange)
+                .with(RabbitConstant.ROUTING_DRIVER_COMMAND_PREFIX + driverProperties.getService());
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+        return binding;
+    }
 
-	/**
-	 * Creates the device command queue used to receive device read and write commands.
-	 * @return device command queue
-	 */
-	@Bean
-	Queue deviceCommandQueue() {
-		Map<String, Object> arguments = new HashMap<>();
-		// 30 seconds: 30 * 1000 = 30000L
-		arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-		return new Queue(RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX + driverProperties.getService(), true, false, false,
-				arguments);
-	}
+    /**
+     * Creates the device command queue used to receive device read and write commands.
+     *
+     * @return device command queue
+     */
+    @Bean
+    Queue deviceCommandQueue() {
+        Map<String, Object> arguments = new HashMap<>();
+        // 30 seconds: 30 * 1000 = 30000L
+        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
+        return new Queue(RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX + driverProperties.getService(), true, false, false,
+                arguments);
+    }
 
-	/**
-	 * Binds the device command queue to the command exchange.
-	 * @param deviceCommandQueue device command queue
-	 * @return queue binding
-	 */
-	@Bean
-	Binding deviceCommandBinding(Queue deviceCommandQueue) {
-		Binding binding = BindingBuilder.bind(deviceCommandQueue)
-			.to(commandExchange)
-			.with(RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + driverProperties.getService());
-		binding.addArgument(RabbitConstant.AUTO_DELETE, false);
-		return binding;
-	}
+    /**
+     * Binds the device command queue to the command exchange.
+     *
+     * @param deviceCommandQueue device command queue
+     * @return queue binding
+     */
+    @Bean
+    Binding deviceCommandBinding(Queue deviceCommandQueue) {
+        Binding binding = BindingBuilder.bind(deviceCommandQueue)
+                .to(commandExchange)
+                .with(RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + driverProperties.getService());
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+        return binding;
+    }
 
 }

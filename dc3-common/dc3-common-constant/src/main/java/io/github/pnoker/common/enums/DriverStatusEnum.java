@@ -35,61 +35,64 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum DriverStatusEnum {
 
-	ONLINE((byte) 0, "ONLINE", "Online"), OFFLINE((byte) 1, "OFFLINE", "Offline"),
-	MAINTAIN((byte) 2, "MAINTAIN", "Maintain"), FAULT((byte) 3, "FAULT", "Fault"),;
+    ONLINE((byte) 0, "ONLINE", "Online"), OFFLINE((byte) 1, "OFFLINE", "Offline"),
+    MAINTAIN((byte) 2, "MAINTAIN", "Maintain"), FAULT((byte) 3, "FAULT", "Fault"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Remark
-	 */
-	private final String remark;
+    /**
+     * Remark
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link DriverStatusEnum}
-	 */
-	public static DriverStatusEnum ofIndex(Byte index) {
-		Optional<DriverStatusEnum> any = Arrays.stream(DriverStatusEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link DriverStatusEnum}
+     */
+    public static DriverStatusEnum ofIndex(Byte index) {
+        Optional<DriverStatusEnum> any = Arrays.stream(DriverStatusEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link DriverStatusEnum}
-	 */
-	public static DriverStatusEnum ofCode(String code) {
-		Optional<DriverStatusEnum> any = Arrays.stream(DriverStatusEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link DriverStatusEnum}
+     */
+    public static DriverStatusEnum ofCode(String code) {
+        Optional<DriverStatusEnum> any = Arrays.stream(DriverStatusEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Name
-	 * @return {@link DriverStatusEnum}
-	 */
-	public static DriverStatusEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link DriverStatusEnum}
+     */
+    public static DriverStatusEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

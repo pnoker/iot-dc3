@@ -27,79 +27,77 @@ import java.util.Map;
 @Slf4j
 public class SyncAccess extends AccessBase implements Runnable {
 
-	private Thread runner = null;
+    private Thread runner = null;
 
-	private Throwable lastError = null;
+    private Throwable lastError = null;
 
-	public SyncAccess(final Server server, final int period) throws IllegalArgumentException, UnknownHostException,
-			NotConnectedException, JIException, DuplicateGroupException {
-		super(server, period);
-	}
+    public SyncAccess(final Server server, final int period) throws IllegalArgumentException, UnknownHostException,
+            NotConnectedException, JIException, DuplicateGroupException {
+        super(server, period);
+    }
 
-	public SyncAccess(final Server server, final int period, final String logTag) throws IllegalArgumentException,
-			UnknownHostException, NotConnectedException, JIException, DuplicateGroupException {
-		super(server, period, logTag);
-	}
+    public SyncAccess(final Server server, final int period, final String logTag) throws IllegalArgumentException,
+            UnknownHostException, NotConnectedException, JIException, DuplicateGroupException {
+        super(server, period, logTag);
+    }
 
-	public void run() {
-		while (this.active) {
-			try {
-				runOnce();
-				if (this.lastError != null) {
-					this.lastError = null;
-					handleError(null);
-				}
-			}
-			catch (Throwable e) {
-				log.error("Sync read failed", e);
-				handleError(e);
-				this.server.disconnect();
-			}
+    public void run() {
+        while (this.active) {
+            try {
+                runOnce();
+                if (this.lastError != null) {
+                    this.lastError = null;
+                    handleError(null);
+                }
+            } catch (Throwable e) {
+                log.error("Sync read failed", e);
+                handleError(e);
+                this.server.disconnect();
+            }
 
-			try {
-				Thread.sleep(getPeriod());
-			}
-			catch (InterruptedException e) {
-			}
-		}
-	}
+            try {
+                Thread.sleep(getPeriod());
+            } catch (InterruptedException e) {
+            }
+        }
+    }
 
-	protected void runOnce() throws JIException {
-		if (!this.active || this.group == null) {
-			return;
-		}
+    protected void runOnce() throws JIException {
+        if (!this.active || this.group == null) {
+            return;
+        }
 
-		Map<Item, ItemState> result;
+        Map<Item, ItemState> result;
 
-		// lock only this section since we could get into a deadlock otherwise
-		// calling updateItem
-		synchronized (this) {
-			Item[] items = this.items.keySet().toArray(new Item[this.items.size()]);
-			result = this.group.read(false, items);
-		}
+        // lock only this section since we could get into a deadlock otherwise
+        // calling updateItem
+        synchronized (this) {
+            Item[] items = this.items.keySet().toArray(new Item[this.items.size()]);
+            result = this.group.read(false, items);
+        }
 
-		for (Map.Entry<Item, ItemState> entry : result.entrySet()) {
-			updateItem(entry.getKey(), entry.getValue());
-		}
+        for (Map.Entry<Item, ItemState> entry : result.entrySet()) {
+            updateItem(entry.getKey(), entry.getValue());
+        }
 
-	}
+    }
 
-	@Override
-	protected synchronized void start() throws JIException, IllegalArgumentException, UnknownHostException,
-			NotConnectedException, DuplicateGroupException {
-		super.start();
+    @Override
+    protected synchronized void start() throws JIException, IllegalArgumentException, UnknownHostException,
+            NotConnectedException, DuplicateGroupException {
+        super.start();
 
-		this.runner = new Thread(this, "UtgardSyncReader");
-		this.runner.setDaemon(true);
-		this.runner.start();
-	}
+        this.runner = new Thread(this, "UtgardSyncReader");
+        this.runner.setDaemon(true);
+        this.runner.start();
+    }
 
-	@Override
-	protected synchronized void stop() throws JIException {
-		super.stop();
+    @Override
+    protected synchronized void stop() throws JIException {
+        super.stop();
 
-		this.runner = null;
-		this.items.clear();
-	}
+        this.runner = null;
+        this.items.clear();
+    }
 
 }

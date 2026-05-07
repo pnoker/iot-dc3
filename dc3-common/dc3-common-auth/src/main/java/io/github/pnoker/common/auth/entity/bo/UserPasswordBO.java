@@ -34,9 +34,9 @@ import lombok.*;
 @ToString(callSuper = true)
 public class UserPasswordBO extends BaseBO {
 
-	/**
-	 *
-	 */
-	private String loginPassword;
+    /**
+     *
+     */
+    private String loginPassword;
 
 }

@@ -31,52 +31,51 @@ import org.apache.commons.logging.LogFactory;
  * @version 2025.9.0
  */
 abstract /**
-			 * Serial Slave
-			 *
-			 * @author pnoker
-			 * @version 2025.9.0
-			 * @since 2022.1.0
-			 */
+ * Serial Slave
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class SerialSlave extends ModbusSlaveSet {
 
-	private final Log LOG = LogFactory.getLog(SerialSlave.class);
+    private final Log LOG = LogFactory.getLog(SerialSlave.class);
 
-	protected StreamTransport transport;
+    protected StreamTransport transport;
 
-	// Runtime fields
-	private SerialPortWrapper wrapper;
+    // Runtime fields
+    private SerialPortWrapper wrapper;
 
-	/**
-	 * <p>
-	 * Constructor for SerialSlave.
-	 * </p>
-	 * @param wrapper a {@link SerialPortWrapper} object.
-	 */
-	public SerialSlave(SerialPortWrapper wrapper) {
-		this.wrapper = wrapper;
-	}
+    /**
+     * <p>
+     * Constructor for SerialSlave.
+     * </p>
+     *
+     * @param wrapper a {@link SerialPortWrapper} object.
+     */
+    public SerialSlave(SerialPortWrapper wrapper) {
+        this.wrapper = wrapper;
+    }
 
-	@Override
-	public void start() throws ModbusInitException {
-		try {
+    @Override
+    public void start() throws ModbusInitException {
+        try {
 
-			wrapper.open();
+            wrapper.open();
 
-			transport = new StreamTransport(wrapper.getInputStream(), wrapper.getOutputStream());
-		}
-		catch (Exception e) {
-			throw new ModbusInitException(e);
-		}
-	}
+            transport = new StreamTransport(wrapper.getInputStream(), wrapper.getOutputStream());
+        } catch (Exception e) {
+            throw new ModbusInitException(e);
+        }
+    }
 
-	@Override
-	public void stop() {
-		try {
-			wrapper.close();
-		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-	}
+    @Override
+    public void stop() {
+        try {
+            wrapper.close();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
+    }
 
 }

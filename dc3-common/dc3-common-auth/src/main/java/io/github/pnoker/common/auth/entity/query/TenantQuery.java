@@ -39,26 +39,26 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class TenantQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	//
+    //
 
-	/**
-	 * TenantName
-	 */
-	private String tenantName;
+    /**
+     * TenantName
+     */
+    private String tenantName;
 
-	/**
-	 * TenantCode
-	 */
-	private String tenantCode;
+    /**
+     * TenantCode
+     */
+    private String tenantCode;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

@@ -29,10 +29,10 @@ import lombok.ToString;
 @ToString
 public class SourceCountRow {
 
-	private String source;
+    private String source;
 
-	private long sourceId;
+    private long sourceId;
 
-	private long count;
+    private long count;
 
 }

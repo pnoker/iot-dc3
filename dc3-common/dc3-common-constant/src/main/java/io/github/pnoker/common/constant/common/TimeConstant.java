@@ -28,29 +28,29 @@ import java.time.ZoneId;
  */
 public class TimeConstant {
 
-	/**
-	 * Default time zone ID, default is {@code Asia/Shanghai}.
-	 */
-	public static final String DEFAULT_TIMEZONE = "Asia/Shanghai";
+    /**
+     * Default time zone ID, default is {@code Asia/Shanghai}.
+     */
+    public static final String DEFAULT_TIMEZONE = "Asia/Shanghai";
 
-	/**
-	 * Default {@link ZoneId}, default is {@code Asia/Shanghai}.
-	 */
-	public static final ZoneId DEFAULT_ZONEID = ZoneId.of(DEFAULT_TIMEZONE);
+    /**
+     * Default {@link ZoneId}, default is {@code Asia/Shanghai}.
+     */
+    public static final ZoneId DEFAULT_ZONEID = ZoneId.of(DEFAULT_TIMEZONE);
 
-	/**
-	 * Date and time format patterns.
-	 */
-	public static final String DAY_DATE_FORMAT1 = "yyyy.MM.dd";
+    /**
+     * Date and time format patterns.
+     */
+    public static final String DAY_DATE_FORMAT1 = "yyyy.MM.dd";
 
-	public static final String DAY_DATE_FORMAT2 = "yyyy-MM-dd";
+    public static final String DAY_DATE_FORMAT2 = "yyyy-MM-dd";
 
-	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-	public static final String COMPLETE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String COMPLETE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
-	private TimeConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private TimeConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

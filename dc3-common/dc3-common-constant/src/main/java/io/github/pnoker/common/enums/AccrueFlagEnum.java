@@ -35,73 +35,76 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum AccrueFlagEnum {
 
-	/**
-	 * None
-	 */
-	NONE((byte) 0, "none", "None"),
+    /**
+     * None
+     */
+    NONE((byte) 0, "none", "None"),
 
-	/**
-	 * Increment
-	 */
-	INCREMENT((byte) 1, "increment", "Increment"),
+    /**
+     * Increment
+     */
+    INCREMENT((byte) 1, "increment", "Increment"),
 
-	/**
-	 * Decrement
-	 */
-	DECREMENT((byte) 2, "decrement", "Decrement"),;
+    /**
+     * Decrement
+     */
+    DECREMENT((byte) 2, "decrement", "Decrement"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Remark
-	 */
-	private final String remark;
+    /**
+     * Remark
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link AccrueFlagEnum}
-	 */
-	public static AccrueFlagEnum ofIndex(Byte index) {
-		Optional<AccrueFlagEnum> any = Arrays.stream(AccrueFlagEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link AccrueFlagEnum}
+     */
+    public static AccrueFlagEnum ofIndex(Byte index) {
+        Optional<AccrueFlagEnum> any = Arrays.stream(AccrueFlagEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link AccrueFlagEnum}
-	 */
-	public static AccrueFlagEnum ofCode(String code) {
-		Optional<AccrueFlagEnum> any = Arrays.stream(AccrueFlagEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link AccrueFlagEnum}
+     */
+    public static AccrueFlagEnum ofCode(String code) {
+        Optional<AccrueFlagEnum> any = Arrays.stream(AccrueFlagEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Name
-	 * @return {@link AccrueFlagEnum}
-	 */
-	public static AccrueFlagEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link AccrueFlagEnum}
+     */
+    public static AccrueFlagEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

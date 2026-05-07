@@ -35,103 +35,111 @@ import org.mapstruct.Mapping;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DictionaryForManagerBuilder extends DictionaryBuilder {
 
-	//
+    //
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	default DictionaryBO buildVOByDriverBO(DriverBO entityBO) {
-		return DictionaryBO.builder().label(entityBO.getDriverName()).value(entityBO.getId().toString()).build();
-	}
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    default DictionaryBO buildVOByDriverBO(DriverBO entityBO) {
+        return DictionaryBO.builder().label(entityBO.getDriverName()).value(entityBO.getId().toString()).build();
+    }
 
-	/**
-	 * BOPage to VOPage
-	 * @param entityPageBO EntityBO Page
-	 * @return EntityVO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<DictionaryBO> buildVOPageByDriverBOPage(Page<DriverBO> entityPageBO);
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<DictionaryBO> buildVOPageByDriverBOPage(Page<DriverBO> entityPageBO);
 
-	//
+    //
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	default DictionaryBO buildVOByProfileBO(ProfileBO entityBO) {
-		return DictionaryBO.builder().label(entityBO.getProfileName()).value(entityBO.getId().toString()).build();
-	}
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    default DictionaryBO buildVOByProfileBO(ProfileBO entityBO) {
+        return DictionaryBO.builder().label(entityBO.getProfileName()).value(entityBO.getId().toString()).build();
+    }
 
-	/**
-	 * BOPage to VOPage
-	 * @param entityPageBO EntityBO Page
-	 * @return EntityVO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<DictionaryBO> buildVOPageByProfileBOPage(Page<ProfileBO> entityPageBO);
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<DictionaryBO> buildVOPageByProfileBOPage(Page<ProfileBO> entityPageBO);
 
-	//
+    //
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	default DictionaryBO buildVOByPointBO(PointBO entityBO) {
-		return DictionaryBO.builder().label(entityBO.getPointName()).value(entityBO.getId().toString()).build();
-	}
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    default DictionaryBO buildVOByPointBO(PointBO entityBO) {
+        return DictionaryBO.builder().label(entityBO.getPointName()).value(entityBO.getId().toString()).build();
+    }
 
-	/**
-	 * BOPage to VOPage
-	 * @param entityPageBO EntityBO Page
-	 * @return EntityVO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<DictionaryBO> buildVOPageByPointBOPage(Page<PointBO> entityPageBO);
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<DictionaryBO> buildVOPageByPointBOPage(Page<PointBO> entityPageBO);
 
-	//
+    //
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	default DictionaryBO buildVOByDeviceBO(DeviceBO entityBO) {
-		return DictionaryBO.builder().label(entityBO.getDeviceName()).value(entityBO.getId().toString()).build();
-	}
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    default DictionaryBO buildVOByDeviceBO(DeviceBO entityBO) {
+        return DictionaryBO.builder().label(entityBO.getDeviceName()).value(entityBO.getId().toString()).build();
+    }
 
-	/**
-	 * BOPage to VOPage
-	 * @param entityPageBO EntityBO Page
-	 * @return EntityVO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<DictionaryBO> buildVOPageByDeviceBOPage(Page<DeviceBO> entityPageBO);
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<DictionaryBO> buildVOPageByDeviceBOPage(Page<DeviceBO> entityPageBO);
 
 }

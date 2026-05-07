@@ -41,110 +41,110 @@ import java.time.LocalDateTime;
 @TableName("dc3_group")
 public class GroupDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Primary key ID.
-	 */
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    /**
+     * Primary key ID.
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	/**
-	 * Parent group ID.
-	 */
-	@TableField("parent_group_id")
-	private Long parentGroupId;
+    /**
+     * Parent group ID.
+     */
+    @TableField("parent_group_id")
+    private Long parentGroupId;
 
-	/**
-	 * Group type flag.
-	 */
-	@TableField("group_type_flag")
-	private Byte groupTypeFlag;
+    /**
+     * Group type flag.
+     */
+    @TableField("group_type_flag")
+    private Byte groupTypeFlag;
 
-	/**
-	 * Group name.
-	 */
-	@TableField("group_name")
-	private String groupName;
+    /**
+     * Group name.
+     */
+    @TableField("group_name")
+    private String groupName;
 
-	/**
-	 * Group code.
-	 */
-	@TableField("group_code")
-	private String groupCode;
+    /**
+     * Group code.
+     */
+    @TableField("group_code")
+    private String groupCode;
 
-	/**
-	 * Group level.
-	 */
-	@TableField("group_level")
-	private Byte groupLevel;
+    /**
+     * Group level.
+     */
+    @TableField("group_level")
+    private Byte groupLevel;
 
-	/**
-	 * Group index/order.
-	 */
-	@TableField("group_index")
-	private Byte groupIndex;
+    /**
+     * Group index/order.
+     */
+    @TableField("group_index")
+    private Byte groupIndex;
 
-	/**
-	 * Enable flag, {@code 0} for enabled, {@code 1} for disabled.
-	 */
-	@TableField("enable_flag")
-	private Byte enableFlag;
+    /**
+     * Enable flag, {@code 0} for enabled, {@code 1} for disabled.
+     */
+    @TableField("enable_flag")
+    private Byte enableFlag;
 
-	/**
-	 * Tenant ID.
-	 */
-	@TableField("tenant_id")
-	private Long tenantId;
+    /**
+     * Tenant ID.
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
 
-	/**
-	 * Remark or description.
-	 */
-	@TableField("remark")
-	private String remark;
+    /**
+     * Remark or description.
+     */
+    @TableField("remark")
+    private String remark;
 
-	/**
-	 * Creator ID.
-	 */
-	@TableField("creator_id")
-	private Long creatorId;
+    /**
+     * Creator ID.
+     */
+    @TableField("creator_id")
+    private Long creatorId;
 
-	/**
-	 * Creator name.
-	 */
-	@TableField("creator_name")
-	private String creatorName;
+    /**
+     * Creator name.
+     */
+    @TableField("creator_name")
+    private String creatorName;
 
-	/**
-	 * Creation time.
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Creation time.
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operator ID.
-	 */
-	@TableField("operator_id")
-	private Long operatorId;
+    /**
+     * Operator ID.
+     */
+    @TableField("operator_id")
+    private Long operatorId;
 
-	/**
-	 * Operator name.
-	 */
-	@TableField("operator_name")
-	private String operatorName;
+    /**
+     * Operator name.
+     */
+    @TableField("operator_name")
+    private String operatorName;
 
-	/**
-	 * Operation time.
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operation time.
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
-	/**
-	 * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
-	 */
-	@TableLogic
-	@TableField("deleted")
-	private Byte deleted;
+    /**
+     * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
+     */
+    @TableLogic
+    @TableField("deleted")
+    private Byte deleted;
 
 }

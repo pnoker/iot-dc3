@@ -37,18 +37,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ProtocolHealthVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * e.g. {@code dc3-driver-modbus-tcp}; frontend strips the prefix.
-	 */
-	private String serviceName;
+    /**
+     * e.g. {@code dc3-driver-modbus-tcp}; frontend strips the prefix.
+     */
+    private String serviceName;
 
-	private long driverCount;
+    private long driverCount;
 
-	private long enabledCount;
+    private long enabledCount;
 
-	private long deviceCount;
+    private long deviceCount;
 
 }

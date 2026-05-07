@@ -44,54 +44,54 @@ import java.util.stream.Collectors;
 @Service
 public class DeviceStatusServiceImpl implements DeviceStatusService {
 
-	@Resource
-	private DeviceFacade deviceFacade;
+    @Resource
+    private DeviceFacade deviceFacade;
 
-	@Resource
-	private LocalCacheService localCacheService;
+    @Resource
+    private LocalCacheService localCacheService;
 
-	@Override
-	public Map<Long, String> selectByPage(DeviceQuery pageQuery) {
-		FacadeDeviceQuery facadeQuery = FacadeDeviceQuery.builder()
-			.page(pageQuery.getPage())
-			.deviceName(pageQuery.getDeviceName())
-			.deviceCode(pageQuery.getDeviceCode())
-			.driverId(pageQuery.getDriverId())
-			.profileId(pageQuery.getProfileId())
-			.tenantId(pageQuery.getTenantId())
-			.enableFlag(pageQuery.getEnableFlag())
-			.build();
+    @Override
+    public Map<Long, String> selectByPage(DeviceQuery pageQuery) {
+        FacadeDeviceQuery facadeQuery = FacadeDeviceQuery.builder()
+                .page(pageQuery.getPage())
+                .deviceName(pageQuery.getDeviceName())
+                .deviceCode(pageQuery.getDeviceCode())
+                .driverId(pageQuery.getDriverId())
+                .profileId(pageQuery.getProfileId())
+                .tenantId(pageQuery.getTenantId())
+                .enableFlag(pageQuery.getEnableFlag())
+                .build();
 
-		FacadePage<FacadeDeviceBO> page = deviceFacade.selectByPage(facadeQuery);
-		if (page.getRecords().isEmpty()) {
-			return Map.of();
-		}
+        FacadePage<FacadeDeviceBO> page = deviceFacade.selectByPage(facadeQuery);
+        if (page.getRecords().isEmpty()) {
+            return Map.of();
+        }
 
-		return getStatusMap(page.getRecords());
-	}
+        return getStatusMap(page.getRecords());
+    }
 
-	@Override
-	public Map<Long, String> selectByProfileId(Long profileId) {
-		List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(profileId);
-		if (devices.isEmpty()) {
-			return Map.of();
-		}
-		return getStatusMap(devices);
-	}
+    @Override
+    public Map<Long, String> selectByProfileId(Long profileId) {
+        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(profileId);
+        if (devices.isEmpty()) {
+            return Map.of();
+        }
+        return getStatusMap(devices);
+    }
 
-	/**
-	 * Get a map of device statuses keyed by device id.
-	 */
-	private Map<Long, String> getStatusMap(List<FacadeDeviceBO> devices) {
-		Map<Long, String> statusMap = new HashMap<>(16);
-		Set<Long> deviceIds = devices.stream().map(FacadeDeviceBO::getId).collect(Collectors.toSet());
-		deviceIds.forEach(id -> {
-			String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
-			String status = localCacheService.getKey(key);
-			status = Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
-			statusMap.put(id, status);
-		});
-		return statusMap;
-	}
+    /**
+     * Get a map of device statuses keyed by device id.
+     */
+    private Map<Long, String> getStatusMap(List<FacadeDeviceBO> devices) {
+        Map<Long, String> statusMap = new HashMap<>(16);
+        Set<Long> deviceIds = devices.stream().map(FacadeDeviceBO::getId).collect(Collectors.toSet());
+        deviceIds.forEach(id -> {
+            String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
+            String status = localCacheService.getKey(key);
+            status = Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
+            statusMap.put(id, status);
+        });
+        return statusMap;
+    }
 
 }

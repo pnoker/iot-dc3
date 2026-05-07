@@ -26,48 +26,48 @@ package io.github.pnoker.common.constant.common;
  */
 public class DefaultConstant {
 
-	/**
-	 * Default {@link Integer} null value: {@code -1}.
-	 */
-	public static final Integer NULL_INT = -1;
+    /**
+     * Default {@link Integer} null value: {@code -1}.
+     */
+    public static final Integer NULL_INT = -1;
 
-	/**
-	 * Default {@link Integer} zero value: {@code 0}.
-	 */
-	public static final Integer DEFAULT_INT = 0;
+    /**
+     * Default {@link Integer} zero value: {@code 0}.
+     */
+    public static final Integer DEFAULT_INT = 0;
 
-	/**
-	 * Zero constant: {@code 0}.
-	 */
-	public static final Integer ZERO = 0;
+    /**
+     * Zero constant: {@code 0}.
+     */
+    public static final Integer ZERO = 0;
 
-	/**
-	 * One constant: {@code 1}.
-	 */
-	public static final Integer ONE = 1;
+    /**
+     * One constant: {@code 1}.
+     */
+    public static final Integer ONE = 1;
 
-	/**
-	 * Default username.
-	 */
-	public static final String USER_NAME = "pnoker";
+    /**
+     * Default username.
+     */
+    public static final String USER_NAME = "pnoker";
 
-	/**
-	 * Default {@link String} null value: {@code "nil"}.
-	 */
-	public static final String NULL_STRING = "nil";
+    /**
+     * Default {@link String} null value: {@code "nil"}.
+     */
+    public static final String NULL_STRING = "nil";
 
-	/**
-	 * Default page size.
-	 */
-	public static final Integer PAGE_SIZE = 20;
+    /**
+     * Default page size.
+     */
+    public static final Integer PAGE_SIZE = 20;
 
-	/**
-	 * Default maximum page size.
-	 */
-	public static final Integer MAX_PAGE_SIZE = 100;
+    /**
+     * Default maximum page size.
+     */
+    public static final Integer MAX_PAGE_SIZE = 100;
 
-	private DefaultConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private DefaultConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

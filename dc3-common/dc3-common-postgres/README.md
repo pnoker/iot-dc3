@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-postgres` is the shared PostgreSQL and MyBatis-Plus configuration module of the IoT DC3 platform. It auto-configures datasource, paging plugin, and common MyBatis
+`dc3-common-postgres` is the shared PostgreSQL and MyBatis-Plus configuration module of the IoT DC3 platform. It
+auto-configures datasource, paging plugin, and common MyBatis
 utility support for all services that use PostgreSQL as their primary storage.
 
 ## Module Information

@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class RepositoryException extends RuntimeException {
 
-	public RepositoryException() {
-		this(null);
-	}
+    public RepositoryException() {
+        this(null);
+    }
 
-	public RepositoryException(Throwable cause) {
-		super(cause);
-	}
+    public RepositoryException(Throwable cause) {
+        super(cause);
+    }
 
-	public RepositoryException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public RepositoryException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

@@ -23,87 +23,91 @@ import java.util.LinkedList;
 
 public class Branch {
 
-	private Branch _parent = null;
+    private Branch _parent = null;
 
-	private String _name = null;
+    private String _name = null;
 
-	private Collection<Branch> _branches = new LinkedList<Branch>();
+    private Collection<Branch> _branches = new LinkedList<Branch>();
 
-	private Collection<Leaf> _leaves = new LinkedList<Leaf>();
+    private Collection<Leaf> _leaves = new LinkedList<Leaf>();
 
-	/**
-	 * Create a branch to the virtual root folder
-	 */
-	public Branch() {
-		super();
-	}
+    /**
+     * Create a branch to the virtual root folder
+     */
+    public Branch() {
+        super();
+    }
 
-	/**
-	 * Create a branch with a parent branch and a name of this branch.
-	 * @param parent The parent of this branch
-	 * @param name The name of this branch
-	 */
-	public Branch(final Branch parent, final String name) {
-		super();
-		this._name = name;
-		this._parent = parent;
-	}
+    /**
+     * Create a branch with a parent branch and a name of this branch.
+     *
+     * @param parent The parent of this branch
+     * @param name   The name of this branch
+     */
+    public Branch(final Branch parent, final String name) {
+        super();
+        this._name = name;
+        this._parent = parent;
+    }
 
-	/**
-	 * Get all branches.
-	 * <p>
-	 * They must be filled first with a fill method from the {@link TreeBrowser}
-	 * @return The list of branches
-	 */
-	public Collection<Branch> getBranches() {
-		return this._branches;
-	}
+    /**
+     * Get all branches.
+     * <p>
+     * They must be filled first with a fill method from the {@link TreeBrowser}
+     *
+     * @return The list of branches
+     */
+    public Collection<Branch> getBranches() {
+        return this._branches;
+    }
 
-	public void setBranches(final Collection<Branch> branches) {
-		this._branches = branches;
-	}
+    public void setBranches(final Collection<Branch> branches) {
+        this._branches = branches;
+    }
 
-	/**
-	 * Get all leaves.
-	 * <p>
-	 * They must be filled first with a fill method from the {@link TreeBrowser}
-	 * @return The list of leaves
-	 */
-	public Collection<Leaf> getLeaves() {
-		return this._leaves;
-	}
+    /**
+     * Get all leaves.
+     * <p>
+     * They must be filled first with a fill method from the {@link TreeBrowser}
+     *
+     * @return The list of leaves
+     */
+    public Collection<Leaf> getLeaves() {
+        return this._leaves;
+    }
 
-	public void setLeaves(final Collection<Leaf> leaves) {
-		this._leaves = leaves;
-	}
+    public void setLeaves(final Collection<Leaf> leaves) {
+        this._leaves = leaves;
+    }
 
-	public String getName() {
-		return this._name;
-	}
+    public String getName() {
+        return this._name;
+    }
 
-	public void setName(final String name) {
-		this._name = name;
-	}
+    public void setName(final String name) {
+        this._name = name;
+    }
 
-	public Branch getParent() {
-		return this._parent;
-	}
+    public Branch getParent() {
+        return this._parent;
+    }
 
-	/**
-	 * Get the list of names from the parent up to this branch
-	 * @return The stack of branch names from the parent up this one
-	 */
-	public Collection<String> getBranchStack() {
-		LinkedList<String> branches = new LinkedList<String>();
+    /**
+     * Get the list of names from the parent up to this branch
+     *
+     * @return The stack of branch names from the parent up this one
+     */
+    public Collection<String> getBranchStack() {
+        LinkedList<String> branches = new LinkedList<String>();
 
-		Branch currentBranch = this;
-		while (currentBranch.getParent() != null) {
-			branches.add(currentBranch.getName());
-			currentBranch = currentBranch.getParent();
-		}
+        Branch currentBranch = this;
+        while (currentBranch.getParent() != null) {
+            branches.add(currentBranch.getName());
+            currentBranch = currentBranch.getParent();
+        }
 
-		Collections.reverse(branches);
-		return branches;
-	}
+        Collections.reverse(branches);
+        return branches;
+    }
 
 }

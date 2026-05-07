@@ -27,12 +27,13 @@ package com.serotonin.modbus4j.sero.messaging;
  */
 public interface MessagingExceptionHandler {
 
-	/**
-	 * <p>
-	 * receivedException.
-	 * </p>
-	 * @param e a {@link Exception} object.
-	 */
-	public void receivedException(Exception e);
+    /**
+     * <p>
+     * receivedException.
+     * </p>
+     *
+     * @param e a {@link Exception} object.
+     */
+    public void receivedException(Exception e);
 
 }

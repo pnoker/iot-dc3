@@ -39,16 +39,16 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ProfileBindVO extends BaseVO {
 
-	/**
-	 * ID
-	 */
-	@NotNull(message = "模版ID不能为空", groups = { Add.class, Update.class })
-	private Long profileId;
+    /**
+     * ID
+     */
+    @NotNull(message = "模版ID不能为空", groups = {Add.class, Update.class})
+    private Long profileId;
 
-	/**
-	 * Device ID
-	 */
-	@NotNull(message = "设备ID不能为空", groups = { Add.class, Update.class })
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    @NotNull(message = "设备ID不能为空", groups = {Add.class, Update.class})
+    private Long deviceId;
 
 }

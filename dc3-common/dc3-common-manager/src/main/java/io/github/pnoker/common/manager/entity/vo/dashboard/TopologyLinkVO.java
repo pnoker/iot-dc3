@@ -39,13 +39,13 @@ import java.io.Serializable;
 @ToString
 public class TopologyLinkVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String source;
+    private String source;
 
-	private String target;
+    private String target;
 
-	private long value;
+    private long value;
 
 }

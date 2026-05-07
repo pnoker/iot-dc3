@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-thread` is the shared thread pool configuration module of the IoT DC3 platform. It configures the platform-wide async task executor used for `@Async` annotated methods
+`dc3-common-thread` is the shared thread pool configuration module of the IoT DC3 platform. It configures the
+platform-wide async task executor used for `@Async` annotated methods
 across all services.
 
 ## Module Information
@@ -33,7 +34,8 @@ thread:
 
 ## Usage
 
-Any `@Async` annotated method (e.g., `MetadataEventListener.onApplicationEvent`) executes on this thread pool automatically when `dc3-common-thread` is on the classpath.
+Any `@Async` annotated method (e.g., `MetadataEventListener.onApplicationEvent`) executes on this thread pool
+automatically when `dc3-common-thread` is on the classpath.
 
 ## Build Instructions
 

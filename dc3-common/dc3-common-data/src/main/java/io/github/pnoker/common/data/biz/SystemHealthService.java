@@ -29,15 +29,15 @@ import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
  */
 public interface SystemHealthService {
 
-	/**
-	 * Probe everything once and collect a snapshot. Probes must be short-circuited /
-	 * bounded in time so a slow dependency doesn't stall the dashboard.
-	 *
-	 * <p>
-	 * Takes tenantId because the driver / device fleet summaries query tenant-scoped
-	 * facades; infra / center probes ignore it.
-	 * </p>
-	 */
-	SystemHealthVO snapshot(Long tenantId);
+    /**
+     * Probe everything once and collect a snapshot. Probes must be short-circuited /
+     * bounded in time so a slow dependency doesn't stall the dashboard.
+     *
+     * <p>
+     * Takes tenantId because the driver / device fleet summaries query tenant-scoped
+     * facades; infra / center probes ignore it.
+     * </p>
+     */
+    SystemHealthVO snapshot(Long tenantId);
 
 }

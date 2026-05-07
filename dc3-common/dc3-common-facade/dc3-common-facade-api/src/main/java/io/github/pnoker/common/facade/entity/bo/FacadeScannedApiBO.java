@@ -33,19 +33,19 @@ import lombok.*;
 @AllArgsConstructor
 public class FacadeScannedApiBO {
 
-	private String method;
+    private String method;
 
-	private String path;
+    private String path;
 
-	private String apiName;
+    private String apiName;
 
-	private String title;
+    private String title;
 
-	private String remark;
+    private String remark;
 
-	/**
-	 * API grouping label — usually the owning controller's simple class name.
-	 */
-	private String apiGroup;
+    /**
+     * API grouping label — usually the owning controller's simple class name.
+     */
+    private String apiGroup;
 
 }

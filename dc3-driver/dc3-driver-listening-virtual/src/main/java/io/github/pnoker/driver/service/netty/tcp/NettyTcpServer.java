@@ -46,42 +46,42 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class NettyTcpServer {
 
-	/**
-	 * Mapping of device IDs to Netty channels.
-	 * <p>
-	 * Used to store and retrieve the communication channel for each device. This enables
-	 * sending data back to specific devices when needed.
-	 * </p>
-	 */
-	public static final Map<Long, Channel> deviceChannelMap = new ConcurrentHashMap<>(16);
+    /**
+     * Mapping of device IDs to Netty channels.
+     * <p>
+     * Used to store and retrieve the communication channel for each device. This enables
+     * sending data back to specific devices when needed.
+     * </p>
+     */
+    public static final Map<Long, Channel> deviceChannelMap = new ConcurrentHashMap<>(16);
 
-	/**
-	 * Starts the TCP server on the specified port.
-	 * @param port The port number to listen on
-	 */
-	@SneakyThrows
-	public void start(int port) {
-		EventLoopGroup group = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
-		try {
-			ServerBootstrap bootstrap = new ServerBootstrap();
-			bootstrap.group(group)
-				.channel(NioServerSocketChannel.class)
-				.localAddress(new InetSocketAddress(port))
-				.childHandler(new ChannelInitializer<SocketChannel>() {
-					@Override
-					protected void initChannel(SocketChannel socketChannel) {
-						socketChannel.pipeline()
-							.addLast(new StringEncoder())
-							.addLast(new ByteArrayEncoder())
-							.addLast(new WriteTimeoutHandler(30), new NettyTcpServerHandler());
-					}
-				});
-			ChannelFuture future = bootstrap.bind().sync();
-			future.channel().closeFuture().sync();
-		}
-		finally {
-			group.shutdownGracefully().sync();
-		}
-	}
+    /**
+     * Starts the TCP server on the specified port.
+     *
+     * @param port The port number to listen on
+     */
+    @SneakyThrows
+    public void start(int port) {
+        EventLoopGroup group = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+        try {
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(group)
+                    .channel(NioServerSocketChannel.class)
+                    .localAddress(new InetSocketAddress(port))
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) {
+                            socketChannel.pipeline()
+                                    .addLast(new StringEncoder())
+                                    .addLast(new ByteArrayEncoder())
+                                    .addLast(new WriteTimeoutHandler(30), new NettyTcpServerHandler());
+                        }
+                    });
+            ChannelFuture future = bootstrap.bind().sync();
+            future.channel().closeFuture().sync();
+        } finally {
+            group.shutdownGracefully().sync();
+        }
+    }
 
 }

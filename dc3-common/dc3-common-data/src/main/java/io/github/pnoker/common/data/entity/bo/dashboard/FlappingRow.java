@@ -29,12 +29,12 @@ import lombok.ToString;
 @ToString
 public class FlappingRow {
 
-	private String source;
+    private String source;
 
-	private long sourceId;
+    private long sourceId;
 
-	private int eventTypeFlag;
+    private int eventTypeFlag;
 
-	private long count;
+    private long count;
 
 }

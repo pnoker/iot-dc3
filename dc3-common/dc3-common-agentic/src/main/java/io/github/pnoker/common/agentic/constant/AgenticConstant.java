@@ -21,20 +21,20 @@ package io.github.pnoker.common.agentic.constant;
  */
 public class AgenticConstant {
 
-	public static final String SERVICE_NAME = "dc3-center-agentic";
+    public static final String SERVICE_NAME = "dc3-center-agentic";
 
-	/**
-	 * URL prefix for the chat REST API. Gateway: /api/v3/agentic/chat/** →
-	 * agentic:8600/agentic/chat/**
-	 */
-	public static final String CHAT_URL_PREFIX = "/chat";
+    /**
+     * URL prefix for the chat REST API. Gateway: /api/v3/agentic/chat/** →
+     * agentic:8600/agentic/chat/**
+     */
+    public static final String CHAT_URL_PREFIX = "/chat";
 
-	/**
-	 * URL prefix for the session REST API.
-	 */
-	public static final String SESSION_URL_PREFIX = "/session";
+    /**
+     * URL prefix for the session REST API.
+     */
+    public static final String SESSION_URL_PREFIX = "/session";
 
-	private AgenticConstant() {
-	}
+    private AgenticConstant() {
+    }
 
 }

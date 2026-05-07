@@ -35,38 +35,42 @@ import java.util.List;
  */
 public interface RoleResourceBindService extends BaseService<RoleResourceBindBO, RoleResourceBindQuery> {
 
-	/**
-	 * Paginated query filtered by tenant: only bindings whose role belongs to the given
-	 * tenant.
-	 * @param entityQuery Query conditions
-	 * @param tenantId Tenant ID, null means no tenant filtering
-	 * @return Paginated bindings
-	 */
-	Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery, Long tenantId);
+    /**
+     * Paginated query filtered by tenant: only bindings whose role belongs to the given
+     * tenant.
+     *
+     * @param entityQuery Query conditions
+     * @param tenantId    Tenant ID, null means no tenant filtering
+     * @return Paginated bindings
+     */
+    Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery, Long tenantId);
 
-	/**
-	 * TenantIdUserId
-	 * @param roleId id
-	 * @return
-	 */
-	List<ResourceBO> listResourceByRoleId(Long roleId);
+    /**
+     * TenantIdUserId
+     *
+     * @param roleId id
+     * @return
+     */
+    List<ResourceBO> listResourceByRoleId(Long roleId);
 
-	/**
-	 * List resources reachable by the given user, via dc3_role_user_bind joined onto
-	 * dc3_role_resource_bind. Disabled resources are filtered out.
-	 * @param userId target user
-	 * @param tenantId tenant scope (constrains the user's roles)
-	 * @return distinct enabled resources, empty list if the user has no roles
-	 */
-	List<ResourceBO> listResourceByUserId(Long userId, Long tenantId);
+    /**
+     * List resources reachable by the given user, via dc3_role_user_bind joined onto
+     * dc3_role_resource_bind. Disabled resources are filtered out.
+     *
+     * @param userId   target user
+     * @param tenantId tenant scope (constrains the user's roles)
+     * @return distinct enabled resources, empty list if the user has no roles
+     */
+    List<ResourceBO> listResourceByUserId(Long userId, Long tenantId);
 
-	/**
-	 * Reverse of {@link #listResourceByRoleId} — given a resource, list the enabled roles
-	 * that currently grant it. Used by the resource detail page's "Assigned Roles" tab.
-	 * @param resourceId target resource
-	 * @param tenantId tenant scope (constrains which roles are returned)
-	 * @return enabled roles within the tenant; empty list if none
-	 */
-	List<RoleBO> listRoleByResourceId(Long resourceId, Long tenantId);
+    /**
+     * Reverse of {@link #listResourceByRoleId} — given a resource, list the enabled roles
+     * that currently grant it. Used by the resource detail page's "Assigned Roles" tab.
+     *
+     * @param resourceId target resource
+     * @param tenantId   tenant scope (constrains which roles are returned)
+     * @return enabled roles within the tenant; empty list if none
+     */
+    List<RoleBO> listRoleByResourceId(Long resourceId, Long tenantId);
 
 }

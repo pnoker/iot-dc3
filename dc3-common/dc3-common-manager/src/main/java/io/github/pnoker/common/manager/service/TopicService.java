@@ -35,6 +35,6 @@ import java.util.List;
 
 public interface TopicService extends IService<DeviceDO> {
 
-	Page<List<TopicVO>> query(TopicQuery topicQuery);
+    Page<List<TopicVO>> query(TopicQuery topicQuery);
 
 }

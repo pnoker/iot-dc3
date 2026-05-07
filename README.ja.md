@@ -70,7 +70,8 @@ make dev
 make dev-all
 ```
 
-中国本土向けのイメージレジストリを使う場合は `REGISTRY=domestic` を指定してください。互換エイリアスの `REGISTRY=aliyun` と `REGISTRY=cn` も利用できます:
+中国本土向けのイメージレジストリを使う場合は `REGISTRY=domestic` を指定してください。互換エイリアスの `REGISTRY=aliyun` と
+`REGISTRY=cn` も利用できます:
 
 ```bash
 make dev-db REGISTRY=domestic
@@ -88,7 +89,8 @@ make compose-logs STACK=dev REGISTRY=global
 cp .env.example .env
 ```
 
-リポジトリ直下の `.env` は `dc3/` 配下の Compose ファイル用の変数展開に使用されます。アプリケーション実行時の環境変数は引き続き `dc3/env/dev.env` または `dc3/env/dev.env.sh`
+リポジトリ直下の `.env` は `dc3/` 配下の Compose ファイル用の変数展開に使用されます。アプリケーション実行時の環境変数は引き続き
+`dc3/env/dev.env` または `dc3/env/dev.env.sh`
 で管理されます。
 
 ## 3.2 準備
@@ -102,7 +104,8 @@ mvn -s .mvn/settings.xml clean package
 
 > **ローカル開発ガイド**: ワンストップのローカルセットアップ手順は [`docs/QUICKSTART.md`](docs/QUICKSTART.md) を参照してください。
 
-> **トラブルシューティング**: よくあるビルド/ランタイムの問題と解決策は [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) を参照してください。
+> **トラブルシューティング**: よくあるビルド/ランタイムの問題と解決策は [
+`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) を参照してください。
 
 ## 3.3 サービスの起動
 

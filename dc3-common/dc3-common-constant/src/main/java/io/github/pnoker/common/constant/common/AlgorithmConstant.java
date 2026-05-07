@@ -30,48 +30,48 @@ package io.github.pnoker.common.constant.common;
  */
 public class AlgorithmConstant {
 
-	/**
-	 * Default encryption key
-	 */
-	public static final String DEFAULT_KEY = "io.github.pnoker.dc3";
+    /**
+     * Default encryption key
+     */
+    public static final String DEFAULT_KEY = "io.github.pnoker.dc3";
 
-	/**
-	 * Default password
-	 */
-	public static final String DEFAULT_PASSWORD = "dc3dc3dc3";
+    /**
+     * Default password
+     */
+    public static final String DEFAULT_PASSWORD = "dc3dc3dc3";
 
-	/**
-	 * Symmetric encryption algorithm: AES
-	 */
-	public static final String ALGORITHM_AES = "AES";
+    /**
+     * Symmetric encryption algorithm: AES
+     */
+    public static final String ALGORITHM_AES = "AES";
 
-	/**
-	 * Asymmetric encryption algorithm: RSA
-	 */
-	public static final String ALGORITHM_RSA = "RSA";
+    /**
+     * Asymmetric encryption algorithm: RSA
+     */
+    public static final String ALGORITHM_RSA = "RSA";
 
-	/**
-	 * Encryption algorithm: SHA256withRSA
-	 */
-	public static final String ALGORITHM_SHA256_RSA = "SHA256withRSA";
+    /**
+     * Encryption algorithm: SHA256withRSA
+     */
+    public static final String ALGORITHM_SHA256_RSA = "SHA256withRSA";
 
-	/**
-	 * Certificate type: X.509
-	 */
-	public static final String CERTIFICATE_X509 = "X.509";
+    /**
+     * Certificate type: X.509
+     */
+    public static final String CERTIFICATE_X509 = "X.509";
 
-	/**
-	 * Certificate type: PKCS12
-	 */
-	public static final String CERTIFICATE_PKCS12 = "PKCS12";
+    /**
+     * Certificate type: PKCS12
+     */
+    public static final String CERTIFICATE_PKCS12 = "PKCS12";
 
-	/**
-	 * Certificate type: JKS (Java KeyStore)
-	 */
-	public static final String CERTIFICATE_JKS = "jks";
+    /**
+     * Certificate type: JKS (Java KeyStore)
+     */
+    public static final String CERTIFICATE_JKS = "jks";
 
-	private AlgorithmConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private AlgorithmConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

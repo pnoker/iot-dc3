@@ -41,32 +41,32 @@ import java.util.List;
 @AllArgsConstructor
 public class RegisterBO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Tenant name of the driver instance.
-	 */
-	private String tenant;
+    /**
+     * Tenant name of the driver instance.
+     */
+    private String tenant;
 
-	/**
-	 * Driver client identifier.
-	 */
-	private String client;
+    /**
+     * Driver client identifier.
+     */
+    private String client;
 
-	/**
-	 * Driver definition to register.
-	 */
-	private DriverBO driver;
+    /**
+     * Driver definition to register.
+     */
+    private DriverBO driver;
 
-	/**
-	 * Driver-level attribute definitions.
-	 */
-	private List<DriverAttributeDTO> driverAttributes;
+    /**
+     * Driver-level attribute definitions.
+     */
+    private List<DriverAttributeDTO> driverAttributes;
 
-	/**
-	 * Point-level attribute definitions.
-	 */
-	private List<PointAttributeDTO> pointAttributes;
+    /**
+     * Point-level attribute definitions.
+     */
+    private List<PointAttributeDTO> pointAttributes;
 
 }

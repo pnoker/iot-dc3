@@ -45,13 +45,13 @@ import java.util.List;
 @ToString
 public class TopologyVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private List<TopologyNodeVO> nodes = new ArrayList<>();
+    private List<TopologyNodeVO> nodes = new ArrayList<>();
 
-	private List<TopologyLinkVO> links = new ArrayList<>();
+    private List<TopologyLinkVO> links = new ArrayList<>();
 
-	private TopologyStatsVO stats = new TopologyStatsVO();
+    private TopologyStatsVO stats = new TopologyStatsVO();
 
 }

@@ -35,12 +35,12 @@ import lombok.*;
 @ToString(callSuper = true)
 public class FacadeUserLoginBO extends BaseBO {
 
-	private String loginName;
+    private String loginName;
 
-	private Long userId;
+    private Long userId;
 
-	private Long userPasswordId;
+    private Long userPasswordId;
 
-	private EnableFlagEnum enableFlag;
+    private EnableFlagEnum enableFlag;
 
 }

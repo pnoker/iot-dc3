@@ -88,7 +88,8 @@ make compose-logs STACK=dev REGISTRY=global
 cp .env.example .env
 ```
 
-根目录 `.env` 用于 `dc3/` 下 Compose 文件的变量插值；应用运行时环境变量仍然位于 `dc3/env/dev.env` 或 `dc3/env/dev.env.sh`。
+根目录 `.env` 用于 `dc3/` 下 Compose 文件的变量插值；应用运行时环境变量仍然位于 `dc3/env/dev.env` 或
+`dc3/env/dev.env.sh`。
 
 ## 3.2 准备工作
 

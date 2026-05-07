@@ -32,38 +32,40 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class XaMessageResponse extends XaMessage implements IpMessageResponse {
 
-	/**
-	 * <p>
-	 * Constructor for XaMessageResponse.
-	 * </p>
-	 * @param modbusResponse a {@link ModbusResponse} object.
-	 * @param transactionId a int.
-	 */
-	public XaMessageResponse(ModbusResponse modbusResponse, int transactionId) {
-		super(modbusResponse, transactionId);
-	}
+    /**
+     * <p>
+     * Constructor for XaMessageResponse.
+     * </p>
+     *
+     * @param modbusResponse a {@link ModbusResponse} object.
+     * @param transactionId  a int.
+     */
+    public XaMessageResponse(ModbusResponse modbusResponse, int transactionId) {
+        super(modbusResponse, transactionId);
+    }
 
-	static XaMessageResponse createXaMessageResponse(ByteQueue queue) throws ModbusTransportException {
-		// Remove the XA header
-		int transactionId = ModbusUtils.popShort(queue);
-		int protocolId = ModbusUtils.popShort(queue);
-		if (protocolId != ModbusUtils.IP_PROTOCOL_ID)
-			throw new ModbusTransportException("Unsupported IP protocol id: " + protocolId);
-		ModbusUtils.popShort(queue); // Length, which we don't care about.
+    static XaMessageResponse createXaMessageResponse(ByteQueue queue) throws ModbusTransportException {
+        // Remove the XA header
+        int transactionId = ModbusUtils.popShort(queue);
+        int protocolId = ModbusUtils.popShort(queue);
+        if (protocolId != ModbusUtils.IP_PROTOCOL_ID)
+            throw new ModbusTransportException("Unsupported IP protocol id: " + protocolId);
+        ModbusUtils.popShort(queue); // Length, which we don't care about.
 
-		// Create the modbus response.
-		ModbusResponse response = ModbusResponse.createModbusResponse(queue);
-		return new XaMessageResponse(response, transactionId);
-	}
+        // Create the modbus response.
+        ModbusResponse response = ModbusResponse.createModbusResponse(queue);
+        return new XaMessageResponse(response, transactionId);
+    }
 
-	/**
-	 * <p>
-	 * getModbusResponse.
-	 * </p>
-	 * @return a {@link ModbusResponse} object.
-	 */
-	public ModbusResponse getModbusResponse() {
-		return (ModbusResponse) modbusMessage;
-	}
+    /**
+     * <p>
+     * getModbusResponse.
+     * </p>
+     *
+     * @return a {@link ModbusResponse} object.
+     */
+    public ModbusResponse getModbusResponse() {
+        return (ModbusResponse) modbusMessage;
+    }
 
 }

@@ -33,23 +33,24 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
  */
 public class AsciiRequestHandler extends BaseRequestHandler {
 
-	/**
-	 * <p>
-	 * Constructor for AsciiRequestHandler.
-	 * </p>
-	 * @param slave a {@link ModbusSlaveSet} object.
-	 */
-	public AsciiRequestHandler(ModbusSlaveSet slave) {
-		super(slave);
-	}
+    /**
+     * <p>
+     * Constructor for AsciiRequestHandler.
+     * </p>
+     *
+     * @param slave a {@link ModbusSlaveSet} object.
+     */
+    public AsciiRequestHandler(ModbusSlaveSet slave) {
+        super(slave);
+    }
 
-	public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
-		AsciiMessageRequest asciiRequest = (AsciiMessageRequest) req;
-		ModbusRequest request = asciiRequest.getModbusRequest();
-		ModbusResponse response = handleRequestImpl(request);
-		if (response == null)
-			return null;
-		return new AsciiMessageResponse(response);
-	}
+    public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
+        AsciiMessageRequest asciiRequest = (AsciiMessageRequest) req;
+        ModbusRequest request = asciiRequest.getModbusRequest();
+        ModbusResponse response = handleRequestImpl(request);
+        if (response == null)
+            return null;
+        return new AsciiMessageResponse(response);
+    }
 
 }

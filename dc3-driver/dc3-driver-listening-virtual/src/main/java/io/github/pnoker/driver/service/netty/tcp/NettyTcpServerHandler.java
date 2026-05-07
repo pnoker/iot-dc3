@@ -56,43 +56,45 @@ import org.springframework.stereotype.Component;
 @ChannelHandler.Sharable
 public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
 
-	/**
-	 * Static self-reference for accessing Spring-injected beans from static context.
-	 */
-	private static NettyTcpServerHandler nettyTcpServerHandler;
+    /**
+     * Static self-reference for accessing Spring-injected beans from static context.
+     */
+    private static NettyTcpServerHandler nettyTcpServerHandler;
 
-	@Resource
-	private NettyServerHandler nettyServerHandler;
+    @Resource
+    private NettyServerHandler nettyServerHandler;
 
-	/**
-	 * Initializes the handler instance after Spring dependency injection.
-	 */
-	@PostConstruct
-	public void init() {
-		nettyTcpServerHandler = this;
-	}
+    /**
+     * Initializes the handler instance after Spring dependency injection.
+     */
+    @PostConstruct
+    public void init() {
+        nettyTcpServerHandler = this;
+    }
 
-	/**
-	 * Handles incoming TCP messages.
-	 * @param context The channel handler context
-	 * @param msg The received message object
-	 */
-	@Override
-	@SneakyThrows
-	public void channelRead(ChannelHandlerContext context, Object msg) {
-		nettyTcpServerHandler.nettyServerHandler.read(context, (ByteBuf) msg);
-	}
+    /**
+     * Handles incoming TCP messages.
+     *
+     * @param context The channel handler context
+     * @param msg     The received message object
+     */
+    @Override
+    @SneakyThrows
+    public void channelRead(ChannelHandlerContext context, Object msg) {
+        nettyTcpServerHandler.nettyServerHandler.read(context, (ByteBuf) msg);
+    }
 
-	/**
-	 * Handles exceptions during TCP message processing.
-	 * @param context The channel handler context
-	 * @param throwable The exception that occurred
-	 */
-	@Override
-	@SneakyThrows
-	public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-		log.debug(throwable.getMessage());
-		context.disconnect();
-	}
+    /**
+     * Handles exceptions during TCP message processing.
+     *
+     * @param context   The channel handler context
+     * @param throwable The exception that occurred
+     */
+    @Override
+    @SneakyThrows
+    public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
+        log.debug(throwable.getMessage());
+        context.disconnect();
+    }
 
 }

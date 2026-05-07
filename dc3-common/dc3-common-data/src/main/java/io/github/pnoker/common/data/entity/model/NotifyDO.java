@@ -43,104 +43,104 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_notify", autoResultMap = true)
 public class NotifyDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Primary key ID
-	 */
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    /**
+     * Primary key ID
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	/**
-	 * Name
-	 */
-	@TableField("notify_name")
-	private String notifyName;
+    /**
+     * Name
+     */
+    @TableField("notify_name")
+    private String notifyName;
 
-	/**
-	 * Code
-	 */
-	@TableField("notify_code")
-	private String notifyCode;
+    /**
+     * Code
+     */
+    @TableField("notify_code")
+    private String notifyCode;
 
-	/**
-	 * Auto confirm flag
-	 */
-	@TableField("auto_confirm_flag")
-	private Byte autoConfirmFlag;
+    /**
+     * Auto confirm flag
+     */
+    @TableField("auto_confirm_flag")
+    private Byte autoConfirmFlag;
 
-	/**
-	 * ,
-	 */
-	@TableField("notify_interval")
-	private Long notifyInterval;
+    /**
+     * ,
+     */
+    @TableField("notify_interval")
+    private Long notifyInterval;
 
-	/**
-	 *
-	 */
-	@TableField(value = "notify_ext", typeHandler = JacksonTypeHandler.class)
-	private JsonExt notifyExt;
+    /**
+     *
+     */
+    @TableField(value = "notify_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt notifyExt;
 
-	/**
-	 * Enable flag, 0:, 1:Disable
-	 */
-	@TableField("enable_flag")
-	private Byte enableFlag;
+    /**
+     * Enable flag, 0:, 1:Disable
+     */
+    @TableField("enable_flag")
+    private Byte enableFlag;
 
-	/**
-	 * Tenant ID
-	 */
-	@TableField("tenant_id")
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
 
-	/**
-	 * Description
-	 */
-	@TableField("remark")
-	private String remark;
+    /**
+     * Description
+     */
+    @TableField("remark")
+    private String remark;
 
-	/**
-	 * Creator ID
-	 */
-	@TableField("creator_id")
-	private Long creatorId;
+    /**
+     * Creator ID
+     */
+    @TableField("creator_id")
+    private Long creatorId;
 
-	/**
-	 * Creator Name
-	 */
-	@TableField("creator_name")
-	private String creatorName;
+    /**
+     * Creator Name
+     */
+    @TableField("creator_name")
+    private String creatorName;
 
-	/**
-	 * Create Time
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operator ID
-	 */
-	@TableField("operator_id")
-	private Long operatorId;
+    /**
+     * Operator ID
+     */
+    @TableField("operator_id")
+    private Long operatorId;
 
-	/**
-	 * Operator Name
-	 */
-	@TableField("operator_name")
-	private String operatorName;
+    /**
+     * Operator Name
+     */
+    @TableField("operator_name")
+    private String operatorName;
 
-	/**
-	 * Operate Time
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operate Time
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
-	/**
-	 * Logical delete flag, 0:not deleted, 1:deleted
-	 */
-	@TableLogic
-	@TableField("deleted")
-	private Byte deleted;
+    /**
+     * Logical delete flag, 0:not deleted, 1:deleted
+     */
+    @TableLogic
+    @TableField("deleted")
+    private Byte deleted;
 
 }

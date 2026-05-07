@@ -24,39 +24,38 @@ import io.github.pnoker.driver.api.S7Type;
  */
 public final class BitConverter implements S7Serializable {
 
-	@Override
-	public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
-		final byte bufValue = buffer[byteOffset];
-		return targetClass.cast(bufValue == (bufValue | (0x01 << bitOffset)));
-	}
+    @Override
+    public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
+        final byte bufValue = buffer[byteOffset];
+        return targetClass.cast(bufValue == (bufValue | (0x01 << bitOffset)));
+    }
 
-	@Override
-	public S7Type getS7Type() {
-		return S7Type.BOOL;
-	}
+    @Override
+    public S7Type getS7Type() {
+        return S7Type.BOOL;
+    }
 
-	@Override
-	public int getSizeInBits() {
-		return 1;
-	}
+    @Override
+    public int getSizeInBits() {
+        return 1;
+    }
 
-	@Override
-	public int getSizeInBytes() {
-		return 0;
-	}
+    @Override
+    public int getSizeInBytes() {
+        return 0;
+    }
 
-	@Override
-	public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
-			final int size) {
-		final Boolean value = (Boolean) javaType;
+    @Override
+    public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
+                       final int size) {
+        final Boolean value = (Boolean) javaType;
 
-		// thx to @mfriedemann (https://github.com/mfriedemann)
-		if (value) {
-			buffer[byteOffset] |= (0x01 << bitOffset);
-		}
-		else {
-			buffer[byteOffset] &= ~(0x01 << bitOffset);
-		}
-	}
+        // thx to @mfriedemann (https://github.com/mfriedemann)
+        if (value) {
+            buffer[byteOffset] |= (0x01 << bitOffset);
+        } else {
+            buffer[byteOffset] &= ~(0x01 << bitOffset);
+        }
+    }
 
 }

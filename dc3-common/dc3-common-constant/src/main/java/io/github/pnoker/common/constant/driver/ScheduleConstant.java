@@ -28,43 +28,43 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
  */
 public class ScheduleConstant {
 
-	/**
-	 * Driver schedule group
-	 */
-	public static final String DRIVER_SCHEDULE_GROUP = "driver-schedule-group";
+    /**
+     * Driver schedule group
+     */
+    public static final String DRIVER_SCHEDULE_GROUP = "driver-schedule-group";
 
-	/**
-	 * Driver read schedule job
-	 */
-	public static final String DRIVER_READ_SCHEDULE_JOB = "read-schedule-job";
+    /**
+     * Driver read schedule job
+     */
+    public static final String DRIVER_READ_SCHEDULE_JOB = "read-schedule-job";
 
-	/**
-	 * Driver custom schedule job
-	 */
-	public static final String DRIVER_CUSTOM_SCHEDULE_JOB = "customs-chedule-job";
+    /**
+     * Driver custom schedule job
+     */
+    public static final String DRIVER_CUSTOM_SCHEDULE_JOB = "customs-chedule-job";
 
-	/**
-	 * Driver status schedule job
-	 */
-	public static final String DRIVER_STATUS_SCHEDULE_JOB = "status-schedule-job";
+    /**
+     * Driver status schedule job
+     */
+    public static final String DRIVER_STATUS_SCHEDULE_JOB = "status-schedule-job";
 
-	/**
-	 * Driver status schedule cron
-	 */
-	public static final String DRIVER_STATUS_SCHEDULE_CRON = "0/15 * * * * ?";
+    /**
+     * Driver status schedule cron
+     */
+    public static final String DRIVER_STATUS_SCHEDULE_CRON = "0/15 * * * * ?";
 
-	/**
-	 * Data schedule group
-	 */
-	public static final String DATA_SCHEDULE_GROUP = "data-schedule-group";
+    /**
+     * Data schedule group
+     */
+    public static final String DATA_SCHEDULE_GROUP = "data-schedule-group";
 
-	/**
-	 * Manager schedule group
-	 */
-	public static final String MANAGER_SCHEDULE_GROUP = "manager-schedule-group";
+    /**
+     * Manager schedule group
+     */
+    public static final String MANAGER_SCHEDULE_GROUP = "manager-schedule-group";
 
-	private ScheduleConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private ScheduleConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

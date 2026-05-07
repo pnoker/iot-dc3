@@ -35,21 +35,21 @@ import java.time.ZoneOffset;
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadePointValueBuilder {
 
-	@Mapping(source = "calValue", target = "value")
-	@Mapping(source = "createTime", target = "createTime")
-	FacadePointValueBO toFacadeBO(PointValueBO bo);
+    @Mapping(source = "calValue", target = "value")
+    @Mapping(source = "createTime", target = "createTime")
+    FacadePointValueBO toFacadeBO(PointValueBO bo);
 
-	/**
-	 * Convert LocalDateTime to epoch seconds.
-	 */
-	default long map(LocalDateTime value) {
-		if (value == null) {
-			return 0L;
-		}
-		return value.toEpochSecond(ZoneOffset.UTC);
-	}
+    /**
+     * Convert LocalDateTime to epoch seconds.
+     */
+    default long map(LocalDateTime value) {
+        if (value == null) {
+            return 0L;
+        }
+        return value.toEpochSecond(ZoneOffset.UTC);
+    }
 
 }

@@ -48,74 +48,76 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class MqttScheduleJob extends QuartzJobBean {
 
-	public static final ReentrantReadWriteLock messageLock = new ReentrantReadWriteLock();
+    public static final ReentrantReadWriteLock messageLock = new ReentrantReadWriteLock();
 
-	public static final AtomicLong messageCount = new AtomicLong(0);
+    public static final AtomicLong messageCount = new AtomicLong(0);
 
-	public static final AtomicLong messageSpeed = new AtomicLong(0);
+    public static final AtomicLong messageSpeed = new AtomicLong(0);
 
-	private static final List<MqttMessage> mqttMessages = new ArrayList<>();
+    private static final List<MqttMessage> mqttMessages = new ArrayList<>();
 
-	@Value("${driver.mqtt.batch.speed}")
-	private Integer batchSpeed;
+    @Value("${driver.mqtt.batch.speed}")
+    private Integer batchSpeed;
 
-	@Value("${driver.mqtt.batch.interval}")
-	private Integer interval;
+    @Value("${driver.mqtt.batch.interval}")
+    private Integer interval;
 
-	@Resource
-	private MqttReceiveService mqttReceiveService;
+    @Resource
+    private MqttReceiveService mqttReceiveService;
 
-	@Resource
-	private ExecutorService virtualThreadExecutor;
+    @Resource
+    private ExecutorService virtualThreadExecutor;
 
-	/**
-	 * Get MqttMessage list size
-	 * @return message size
-	 */
-	public static int getMqttMessagesSize() {
-		return mqttMessages.size();
-	}
+    /**
+     * Get MqttMessage list size
+     *
+     * @return message size
+     */
+    public static int getMqttMessagesSize() {
+        return mqttMessages.size();
+    }
 
-	/**
-	 * Clear MqttMessage list
-	 */
-	public static void clearMqttMessages() {
-		mqttMessages.clear();
-	}
+    /**
+     * Clear MqttMessage list
+     */
+    public static void clearMqttMessages() {
+        mqttMessages.clear();
+    }
 
-	/**
-	 * Add MqttMessage to list
-	 * @param mqttMessage MqttMessage
-	 */
-	public static void addMqttMessages(MqttMessage mqttMessage) {
-		mqttMessages.add(mqttMessage);
-	}
+    /**
+     * Add MqttMessage to list
+     *
+     * @param mqttMessage MqttMessage
+     */
+    public static void addMqttMessages(MqttMessage mqttMessage) {
+        mqttMessages.add(mqttMessage);
+    }
 
-	@Override
-	/**
-	 * Execute scheduled job for batch MQTT message processing
-	 * @param context Job execution context
-	 * @throws JobExecutionException if job execution fails
-	 */
-	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-		// Calculate MQTT message receive rate
-		long speed = messageCount.getAndSet(0);
-		messageSpeed.set(speed);
-		speed /= interval;
-		if (speed >= batchSpeed) {
-			log.debug("Mqtt message receiver speed: {} /s, value size: {}, interval: {}", speed, getMqttMessagesSize(),
-					interval);
-		}
+    @Override
+    /**
+     * Execute scheduled job for batch MQTT message processing
+     * @param context Job execution context
+     * @throws JobExecutionException if job execution fails
+     */
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        // Calculate MQTT message receive rate
+        long speed = messageCount.getAndSet(0);
+        messageSpeed.set(speed);
+        speed /= interval;
+        if (speed >= batchSpeed) {
+            log.debug("Mqtt message receiver speed: {} /s, value size: {}, interval: {}", speed, getMqttMessagesSize(),
+                    interval);
+        }
 
-		// Process batch MQTT messages
-		virtualThreadExecutor.execute(() -> {
-			messageLock.writeLock().lock();
-			if (!mqttMessages.isEmpty()) {
-				mqttReceiveService.receiveValues(mqttMessages);
-				clearMqttMessages();
-			}
-			messageLock.writeLock().unlock();
-		});
-	}
+        // Process batch MQTT messages
+        virtualThreadExecutor.execute(() -> {
+            messageLock.writeLock().lock();
+            if (!mqttMessages.isEmpty()) {
+                mqttReceiveService.receiveValues(mqttMessages);
+                clearMqttMessages();
+            }
+            messageLock.writeLock().unlock();
+        });
+    }
 
 }

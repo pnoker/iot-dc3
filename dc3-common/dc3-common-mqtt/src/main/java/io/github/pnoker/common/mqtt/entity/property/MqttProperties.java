@@ -45,65 +45,65 @@ import java.util.List;
 @ConfigurationProperties(prefix = "driver.mqtt")
 public class MqttProperties {
 
-	@NotBlank(message = "Url can't be empty, ssl://host:port")
-	private String url;
+    @NotBlank(message = "Url can't be empty, ssl://host:port")
+    private String url;
 
-	@NotNull(message = "Auth type can't be empty")
-	private AuthTypeEnum authType = AuthTypeEnum.NONE;
+    @NotNull(message = "Auth type can't be empty")
+    private AuthTypeEnum authType = AuthTypeEnum.NONE;
 
-	private String username;
+    private String username;
 
-	private String password;
+    private String password;
 
-	private String caCrt = "classpath:/certs/ca.crt";
+    private String caCrt = "classpath:/certs/ca.crt";
 
-	private String clientKeyPass = "dc3-client";
+    private String clientKeyPass = "dc3-client";
 
-	private String clientKey = "classpath:/certs/client.key";
+    private String clientKey = "classpath:/certs/client.key";
 
-	private String clientCrt = "classpath:/certs/client.crt";
+    private String clientCrt = "classpath:/certs/client.crt";
 
-	@NotBlank(message = "Client name can't be empty")
-	private String client;
+    @NotBlank(message = "Client name can't be empty")
+    private String client;
 
-	@NotBlank(message = "Topic prefix name can't be empty")
-	private String topicPrefix;
+    @NotBlank(message = "Topic prefix name can't be empty")
+    private String topicPrefix;
 
-	@NotNull(message = "Default topic can't be empty")
-	private Topic defaultSendTopic = new Topic("dc3/d/v/dc3-driver-mqtt_default", 2);
+    @NotNull(message = "Default topic can't be empty")
+    private Topic defaultSendTopic = new Topic("dc3/d/v/dc3-driver-mqtt_default", 2);
 
-	@Size(min = 1, message = "Receive topic at least one topic")
-	private List<Topic> receiveTopics;
+    @Size(min = 1, message = "Receive topic at least one topic")
+    private List<Topic> receiveTopics;
 
-	@NotNull(message = "Keep alive interval can't be empty")
-	private Integer keepAlive = 15;
+    @NotNull(message = "Keep alive interval can't be empty")
+    private Integer keepAlive = 15;
 
-	@NotNull(message = "Completion timeout can't be empty")
-	private Integer completionTimeout = 3000;
+    @NotNull(message = "Completion timeout can't be empty")
+    private Integer completionTimeout = 3000;
 
-	/**
-	 * MQTT authentication type enum
-	 */
-	@NoArgsConstructor
-	public enum AuthTypeEnum {
+    /**
+     * MQTT authentication type enum
+     */
+    @NoArgsConstructor
+    public enum AuthTypeEnum {
 
-		NONE, CLIENT_ID, USERNAME, X509,
+        NONE, CLIENT_ID, USERNAME, X509,
 
-	}
+    }
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Topic {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Topic {
 
-		@NotBlank(message = "Topic name can't be empty")
-		private String name;
+        @NotBlank(message = "Topic name can't be empty")
+        private String name;
 
-		@Min(0)
-		@Max(2)
-		private Integer qos;
+        @Min(0)
+        @Max(2)
+        private Integer qos;
 
-	}
+    }
 
 }

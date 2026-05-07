@@ -45,162 +45,167 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DriverSenderServiceImpl implements DriverSenderService {
 
-	private final DriverProperties driverProperties;
+    private final DriverProperties driverProperties;
 
-	private final DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-	private final RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-	public DriverSenderServiceImpl(DriverProperties driverProperties, DriverMetadata driverMetadata,
-			RabbitTemplate rabbitTemplate) {
-		this.driverProperties = driverProperties;
-		this.driverMetadata = driverMetadata;
-		this.rabbitTemplate = rabbitTemplate;
-	}
+    public DriverSenderServiceImpl(DriverProperties driverProperties, DriverMetadata driverMetadata,
+                                   RabbitTemplate rabbitTemplate) {
+        this.driverProperties = driverProperties;
+        this.driverMetadata = driverMetadata;
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
-	/**
-	 * Send driver event to message queue
-	 * @param entityDTO Driver event data transfer object
-	 */
-	@Override
-	public void driverEventSender(DriverEventDTO entityDTO) {
-		if (Objects.isNull(entityDTO)) {
-			return;
-		}
+    /**
+     * Send driver event to message queue
+     *
+     * @param entityDTO Driver event data transfer object
+     */
+    @Override
+    public void driverEventSender(DriverEventDTO entityDTO) {
+        if (Objects.isNull(entityDTO)) {
+            return;
+        }
 
-		rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-				RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + driverProperties.getService(), entityDTO);
-	}
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_EVENT,
+                RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + driverProperties.getService(), entityDTO);
+    }
 
-	/**
-	 * Send device event to message queue
-	 * @param entityDTO Device event data transfer object
-	 */
-	@Override
-	public void deviceEventSender(DeviceEventDTO entityDTO) {
-		if (!Objects.nonNull(entityDTO)) {
-			return;
-		}
+    /**
+     * Send device event to message queue
+     *
+     * @param entityDTO Device event data transfer object
+     */
+    @Override
+    public void deviceEventSender(DeviceEventDTO entityDTO) {
+        if (!Objects.nonNull(entityDTO)) {
+            return;
+        }
 
-		rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-				RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + driverProperties.getService(), entityDTO);
-	}
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_EVENT,
+                RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + driverProperties.getService(), entityDTO);
+    }
 
-	/**
-	 * Send device status with default timeout (15 minutes)
-	 * @param deviceId Device ID
-	 * @param status Device status enum
-	 */
-	@Override
-	public void deviceStatusSender(Long deviceId, DeviceStatusEnum status) {
-		sendDeviceStatus(deviceId, status, 15, TimeUnit.MINUTES);
-	}
+    /**
+     * Send device status with default timeout (15 minutes)
+     *
+     * @param deviceId Device ID
+     * @param status   Device status enum
+     */
+    @Override
+    public void deviceStatusSender(Long deviceId, DeviceStatusEnum status) {
+        sendDeviceStatus(deviceId, status, 15, TimeUnit.MINUTES);
+    }
 
-	/**
-	 * Send device status with custom timeout
-	 * @param deviceId Device ID
-	 * @param status Device status enum
-	 * @param timeOut Timeout value
-	 * @param timeUnit Time unit for timeout
-	 */
-	@Override
-	public void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
-		sendDeviceStatus(deviceId, status, timeOut, timeUnit);
-	}
+    /**
+     * Send device status with custom timeout
+     *
+     * @param deviceId Device ID
+     * @param status   Device status enum
+     * @param timeOut  Timeout value
+     * @param timeUnit Time unit for timeout
+     */
+    @Override
+    public void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
+        sendDeviceStatus(deviceId, status, timeOut, timeUnit);
+    }
 
-	@Override
-	public void driverAlarmSender(String message) {
-		DriverBO driver = driverMetadata.getDriver();
-		if (Objects.isNull(driver)) {
-			log.warn("Driver not registered yet; drop alarm: {}", message);
-			return;
-		}
-		DriverEventDTO.DriverStatus payload = new DriverEventDTO.DriverStatus(driver.getId(),
-				driverMetadata.getDriverStatus());
-		payload.setTenantId(driver.getTenantId());
-		payload.setMessage(message);
-		DriverEventDTO event = new DriverEventDTO(DriverEventTypeEnum.ALARM, JsonUtil.toJsonString(payload));
-		log.info("Report driver alarm: {}", message);
-		driverEventSender(event);
-	}
+    @Override
+    public void driverAlarmSender(String message) {
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.isNull(driver)) {
+            log.warn("Driver not registered yet; drop alarm: {}", message);
+            return;
+        }
+        DriverEventDTO.DriverStatus payload = new DriverEventDTO.DriverStatus(driver.getId(),
+                driverMetadata.getDriverStatus());
+        payload.setTenantId(driver.getTenantId());
+        payload.setMessage(message);
+        DriverEventDTO event = new DriverEventDTO(DriverEventTypeEnum.ALARM, JsonUtil.toJsonString(payload));
+        log.info("Report driver alarm: {}", message);
+        driverEventSender(event);
+    }
 
-	@Override
-	public void deviceAlarmSender(Long deviceId, String message) {
-		if (Objects.isNull(deviceId)) {
-			return;
-		}
-		DeviceEventDTO.DeviceStatus payload = new DeviceEventDTO.DeviceStatus(deviceId, null);
-		DriverBO driver = driverMetadata.getDriver();
-		if (Objects.nonNull(driver)) {
-			payload.setDriverId(driver.getId());
-			payload.setTenantId(driver.getTenantId());
-		}
-		payload.setMessage(message);
-		DeviceEventDTO event = new DeviceEventDTO(DeviceEventTypeEnum.ALARM, JsonUtil.toJsonString(payload));
-		log.info("Report device alarm: deviceId={}, message={}", deviceId, message);
-		deviceEventSender(event);
-	}
+    @Override
+    public void deviceAlarmSender(Long deviceId, String message) {
+        if (Objects.isNull(deviceId)) {
+            return;
+        }
+        DeviceEventDTO.DeviceStatus payload = new DeviceEventDTO.DeviceStatus(deviceId, null);
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.nonNull(driver)) {
+            payload.setDriverId(driver.getId());
+            payload.setTenantId(driver.getTenantId());
+        }
+        payload.setMessage(message);
+        DeviceEventDTO event = new DeviceEventDTO(DeviceEventTypeEnum.ALARM, JsonUtil.toJsonString(payload));
+        log.info("Report device alarm: deviceId={}, message={}", deviceId, message);
+        deviceEventSender(event);
+    }
 
-	/**
-	 * Send single point value to message queue
-	 * @param entityDTO Point value data transfer object
-	 */
-	@Override
-	public void pointValueSender(PointValue entityDTO) {
-		if (Objects.nonNull(entityDTO)) {
-			DriverBO driver = driverMetadata.getDriver();
-			if (Objects.nonNull(driver)) {
-				if (Objects.isNull(entityDTO.getDriverId())) {
-					entityDTO.setDriverId(driver.getId());
-				}
-				if (Objects.isNull(entityDTO.getTenantId())) {
-					entityDTO.setTenantId(driver.getTenantId());
-				}
-			}
-			else {
-				log.warn(
-						"DriverMetadata has no registered driver yet; point value will be published without driverId/tenantId");
-			}
-			log.info("Send point value: {}", JsonUtil.toJsonString(entityDTO));
-			rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE,
-					RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService(), entityDTO);
-		}
-	}
+    /**
+     * Send single point value to message queue
+     *
+     * @param entityDTO Point value data transfer object
+     */
+    @Override
+    public void pointValueSender(PointValue entityDTO) {
+        if (Objects.nonNull(entityDTO)) {
+            DriverBO driver = driverMetadata.getDriver();
+            if (Objects.nonNull(driver)) {
+                if (Objects.isNull(entityDTO.getDriverId())) {
+                    entityDTO.setDriverId(driver.getId());
+                }
+                if (Objects.isNull(entityDTO.getTenantId())) {
+                    entityDTO.setTenantId(driver.getTenantId());
+                }
+            } else {
+                log.warn(
+                        "DriverMetadata has no registered driver yet; point value will be published without driverId/tenantId");
+            }
+            log.info("Send point value: {}", JsonUtil.toJsonString(entityDTO));
+            rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE,
+                    RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService(), entityDTO);
+        }
+    }
 
-	/**
-	 * Send multiple point values to message queue
-	 * @param entityDTOList List of point value data transfer objects
-	 */
-	@Override
-	public void pointValueSender(List<PointValue> entityDTOList) {
-		if (Objects.nonNull(entityDTOList)) {
-			entityDTOList.forEach(this::pointValueSender);
-		}
-	}
+    /**
+     * Send multiple point values to message queue
+     *
+     * @param entityDTOList List of point value data transfer objects
+     */
+    @Override
+    public void pointValueSender(List<PointValue> entityDTOList) {
+        if (Objects.nonNull(entityDTOList)) {
+            entityDTOList.forEach(this::pointValueSender);
+        }
+    }
 
-	/**
-	 * Helper method to send device status event
-	 * @param deviceId Device ID
-	 * @param status Device status enum
-	 * @param timeOut Timeout value
-	 * @param timeUnit Time unit for timeout
-	 */
-	private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
-		DeviceEventDTO.DeviceStatus deviceStatus = new DeviceEventDTO.DeviceStatus(deviceId, status, timeOut, timeUnit);
-		DriverBO driver = driverMetadata.getDriver();
-		if (Objects.nonNull(driver)) {
-			deviceStatus.setDriverId(driver.getId());
-			deviceStatus.setTenantId(driver.getTenantId());
-		}
-		else {
-			log.warn(
-					"DriverMetadata has no registered driver yet; device status will be published without driverId/tenantId");
-		}
-		DeviceEventDTO deviceEventDTO = new DeviceEventDTO(DeviceEventTypeEnum.HEARTBEAT,
-				JsonUtil.toJsonString(deviceStatus));
-		log.info("Report device event: {}, event content: {}", deviceEventDTO.getType().getCode(),
-				JsonUtil.toJsonString(deviceEventDTO));
-		deviceEventSender(deviceEventDTO);
-	}
+    /**
+     * Helper method to send device status event
+     *
+     * @param deviceId Device ID
+     * @param status   Device status enum
+     * @param timeOut  Timeout value
+     * @param timeUnit Time unit for timeout
+     */
+    private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
+        DeviceEventDTO.DeviceStatus deviceStatus = new DeviceEventDTO.DeviceStatus(deviceId, status, timeOut, timeUnit);
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.nonNull(driver)) {
+            deviceStatus.setDriverId(driver.getId());
+            deviceStatus.setTenantId(driver.getTenantId());
+        } else {
+            log.warn(
+                    "DriverMetadata has no registered driver yet; device status will be published without driverId/tenantId");
+        }
+        DeviceEventDTO deviceEventDTO = new DeviceEventDTO(DeviceEventTypeEnum.HEARTBEAT,
+                JsonUtil.toJsonString(deviceStatus));
+        log.info("Report device event: {}, event content: {}", deviceEventDTO.getType().getCode(),
+                JsonUtil.toJsonString(deviceEventDTO));
+        deviceEventSender(deviceEventDTO);
+    }
 
 }

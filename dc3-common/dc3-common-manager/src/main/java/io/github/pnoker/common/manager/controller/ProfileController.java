@@ -53,148 +53,148 @@ import java.util.stream.Collectors;
 @RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
 public class ProfileController implements BaseController {
 
-	private final ProfileBuilder profileBuilder;
+    private final ProfileBuilder profileBuilder;
 
-	private final ProfileService profileService;
+    private final ProfileService profileService;
 
-	public ProfileController(ProfileBuilder profileBuilder, ProfileService profileService) {
-		this.profileBuilder = profileBuilder;
-		this.profileService = profileService;
-	}
+    public ProfileController(ProfileBuilder profileBuilder, ProfileService profileService) {
+        this.profileBuilder = profileBuilder;
+        this.profileService = profileService;
+    }
 
-	/**
-	 * Profile
-	 * @param entityVO {@link ProfileVO}
-	 * @return R of String
-	 */
-	@PostMapping("/add")
-	public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
-				entityBO.setTenantId(tenantId);
-				profileService.save(entityBO);
-				return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Profile
+     *
+     * @param entityVO {@link ProfileVO}
+     * @return R of String
+     */
+    @PostMapping("/add")
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                profileService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * ID Profile
-	 * @param id ID
-	 * @return R of String
-	 */
-	@PostMapping("/delete/{id}")
-	public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-		try {
-			profileService.remove(id);
-			return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * ID Profile
+     *
+     * @param id ID
+     * @return R of String
+     */
+    @PostMapping("/delete/{id}")
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+        try {
+            profileService.remove(id);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * Profile
-	 * @param entityVO {@link ProfileVO}
-	 * @return R of String
-	 */
-	@PostMapping("/update")
-	public Mono<R<String>> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
-				entityBO.setTenantId(tenantId);
-				profileService.update(entityBO);
-				return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Profile
+     *
+     * @param entityVO {@link ProfileVO}
+     * @return R of String
+     */
+    @PostMapping("/update")
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                profileService.update(entityBO);
+                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * ID Profile
-	 * @param id ID
-	 * @return ProfileVO {@link ProfileVO}
-	 */
-	@GetMapping("/id/{id}")
-	public Mono<R<ProfileVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-		try {
-			ProfileBO entityBO = profileService.selectById(id);
-			ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
-			return Mono.just(R.ok(entityVO));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * ID Profile
+     *
+     * @param id ID
+     * @return ProfileVO {@link ProfileVO}
+     */
+    @GetMapping("/id/{id}")
+    public Mono<R<ProfileVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+        try {
+            ProfileBO entityBO = profileService.selectById(id);
+            ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * ID Profile
-	 * @param profileIds ID
-	 * @return Map(ID, ProfileVO)
-	 */
-	@PostMapping("/ids")
-	public Mono<R<Map<Long, ProfileVO>>> selectByIds(@RequestBody Set<Long> profileIds) {
-		try {
-			List<ProfileBO> entityBOList = profileService.selectByIds(profileIds);
-			Map<Long, ProfileVO> deviceMap = entityBOList.stream()
-				.collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
-			return Mono.just(R.ok(deviceMap));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * ID Profile
+     *
+     * @param profileIds ID
+     * @return Map(ID, ProfileVO)
+     */
+    @PostMapping("/ids")
+    public Mono<R<Map<Long, ProfileVO>>> selectByIds(@RequestBody Set<Long> profileIds) {
+        try {
+            List<ProfileBO> entityBOList = profileService.selectByIds(profileIds);
+            Map<Long, ProfileVO> deviceMap = entityBOList.stream()
+                    .collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
+            return Mono.just(R.ok(deviceMap));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * Device ID Profile
-	 * @param deviceId Device ID
-	 * @return Profile
-	 */
-	@GetMapping("/device_id/{deviceId}")
-	public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
-		try {
-			List<ProfileBO> entityBOList = profileService.selectByDeviceId(deviceId);
-			List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
-			return Mono.just(R.ok(entityVOList));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * Device ID Profile
+     *
+     * @param deviceId Device ID
+     * @return Profile
+     */
+    @GetMapping("/device_id/{deviceId}")
+    public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+        try {
+            List<ProfileBO> entityBOList = profileService.selectByDeviceId(deviceId);
+            List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * Profile
-	 * @param entityQuery Profile Dto
-	 * @return Page Of Profile
-	 */
-	@PostMapping("/list")
-	public Mono<R<Page<ProfileVO>>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				ProfileQuery query = Objects.isNull(entityQuery) ? new ProfileQuery() : entityQuery;
-				query.setTenantId(tenantId);
-				Page<ProfileBO> entityPageBO = profileService.selectByPage(query);
-				Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
-				return Mono.just(R.ok(entityPageVO));
-			}
-			catch (Exception e) {
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Profile
+     *
+     * @param entityQuery Profile Dto
+     * @return Page Of Profile
+     */
+    @PostMapping("/list")
+    public Mono<R<Page<ProfileVO>>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                ProfileQuery query = Objects.isNull(entityQuery) ? new ProfileQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<ProfileBO> entityPageBO = profileService.selectByPage(query);
+                Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
 }

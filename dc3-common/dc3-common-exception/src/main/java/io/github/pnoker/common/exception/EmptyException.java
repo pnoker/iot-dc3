@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class EmptyException extends RuntimeException {
 
-	public EmptyException() {
-		this(null);
-	}
+    public EmptyException() {
+        this(null);
+    }
 
-	public EmptyException(Throwable cause) {
-		super(cause);
-	}
+    public EmptyException(Throwable cause) {
+        super(cause);
+    }
 
-	public EmptyException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public EmptyException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

@@ -38,13 +38,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ActivityCellVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private int dow;
+    private int dow;
 
-	private int hour;
+    private int hour;
 
-	private long count;
+    private long count;
 
 }

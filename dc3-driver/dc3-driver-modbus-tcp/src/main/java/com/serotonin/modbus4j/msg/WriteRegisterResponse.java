@@ -31,55 +31,57 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class WriteRegisterResponse extends ModbusResponse {
 
-	private int writeOffset;
+    private int writeOffset;
 
-	private int writeValue;
+    private int writeValue;
 
-	WriteRegisterResponse(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    WriteRegisterResponse(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	WriteRegisterResponse(int slaveId, int writeOffset, int writeValue) throws ModbusTransportException {
-		super(slaveId);
-		this.writeOffset = writeOffset;
-		this.writeValue = writeValue;
-	}
+    WriteRegisterResponse(int slaveId, int writeOffset, int writeValue) throws ModbusTransportException {
+        super(slaveId);
+        this.writeOffset = writeOffset;
+        this.writeValue = writeValue;
+    }
 
-	@Override
-	public byte getFunctionCode() {
-		return FunctionCode.WRITE_REGISTER;
-	}
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_REGISTER;
+    }
 
-	@Override
-	protected void writeResponse(ByteQueue queue) {
-		ModbusUtils.pushShort(queue, writeOffset);
-		ModbusUtils.pushShort(queue, writeValue);
-	}
+    @Override
+    protected void writeResponse(ByteQueue queue) {
+        ModbusUtils.pushShort(queue, writeOffset);
+        ModbusUtils.pushShort(queue, writeValue);
+    }
 
-	@Override
-	protected void readResponse(ByteQueue queue) {
-		writeOffset = ModbusUtils.popUnsignedShort(queue);
-		writeValue = ModbusUtils.popUnsignedShort(queue);
-	}
+    @Override
+    protected void readResponse(ByteQueue queue) {
+        writeOffset = ModbusUtils.popUnsignedShort(queue);
+        writeValue = ModbusUtils.popUnsignedShort(queue);
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>writeOffset</code>.
-	 * </p>
-	 * @return a int.
-	 */
-	public int getWriteOffset() {
-		return writeOffset;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>writeOffset</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getWriteOffset() {
+        return writeOffset;
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>writeValue</code>.
-	 * </p>
-	 * @return a int.
-	 */
-	public int getWriteValue() {
-		return writeValue;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>writeValue</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getWriteValue() {
+        return writeValue;
+    }
 
 }

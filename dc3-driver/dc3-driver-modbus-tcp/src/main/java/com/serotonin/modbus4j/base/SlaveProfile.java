@@ -26,26 +26,28 @@ package com.serotonin.modbus4j.base;
  */
 public class SlaveProfile {
 
-	private boolean writeMaskRegister = true;
+    private boolean writeMaskRegister = true;
 
-	/**
-	 * <p>
-	 * Getter for the field <code>writeMaskRegister</code>.
-	 * </p>
-	 * @return a boolean.
-	 */
-	public boolean getWriteMaskRegister() {
-		return writeMaskRegister;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>writeMaskRegister</code>.
+     * </p>
+     *
+     * @return a boolean.
+     */
+    public boolean getWriteMaskRegister() {
+        return writeMaskRegister;
+    }
 
-	/**
-	 * <p>
-	 * Setter for the field <code>writeMaskRegister</code>.
-	 * </p>
-	 * @param writeMaskRegister a boolean.
-	 */
-	public void setWriteMaskRegister(boolean writeMaskRegister) {
-		this.writeMaskRegister = writeMaskRegister;
-	}
+    /**
+     * <p>
+     * Setter for the field <code>writeMaskRegister</code>.
+     * </p>
+     *
+     * @param writeMaskRegister a boolean.
+     */
+    public void setWriteMaskRegister(boolean writeMaskRegister) {
+        this.writeMaskRegister = writeMaskRegister;
+    }
 
 }

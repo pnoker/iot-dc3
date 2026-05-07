@@ -30,83 +30,87 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 2025.9.0
  */
 abstract /**
-			 * Read Response
-			 *
-			 * @author pnoker
-			 * @version 2025.9.0
-			 * @since 2022.1.0
-			 */
+ * Read Response
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class ReadResponse extends ModbusResponse {
 
-	private byte[] data;
+    private byte[] data;
 
-	ReadResponse(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    ReadResponse(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	ReadResponse(int slaveId, byte[] data) throws ModbusTransportException {
-		super(slaveId);
-		this.data = data;
-	}
+    ReadResponse(int slaveId, byte[] data) throws ModbusTransportException {
+        super(slaveId);
+        this.data = data;
+    }
 
-	@Override
-	protected void readResponse(ByteQueue queue) {
-		int numberOfBytes = ModbusUtils.popUnsignedByte(queue);
-		if (queue.size() < numberOfBytes)
-			throw new ArrayIndexOutOfBoundsException();
+    @Override
+    protected void readResponse(ByteQueue queue) {
+        int numberOfBytes = ModbusUtils.popUnsignedByte(queue);
+        if (queue.size() < numberOfBytes)
+            throw new ArrayIndexOutOfBoundsException();
 
-		data = new byte[numberOfBytes];
-		queue.pop(data);
-	}
+        data = new byte[numberOfBytes];
+        queue.pop(data);
+    }
 
-	@Override
-	protected void writeResponse(ByteQueue queue) {
-		ModbusUtils.pushByte(queue, data.length);
-		queue.push(data);
-	}
+    @Override
+    protected void writeResponse(ByteQueue queue) {
+        ModbusUtils.pushByte(queue, data.length);
+        queue.push(data);
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>data</code>.
-	 * </p>
-	 * @return an array of {@link byte} objects.
-	 */
-	public byte[] getData() {
-		return data;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>data</code>.
+     * </p>
+     *
+     * @return an array of {@link byte} objects.
+     */
+    public byte[] getData() {
+        return data;
+    }
 
-	/**
-	 * <p>
-	 * getShortData.
-	 * </p>
-	 * @return an array of {@link short} objects.
-	 */
-	public short[] getShortData() {
-		return convertToShorts(data);
-	}
+    /**
+     * <p>
+     * getShortData.
+     * </p>
+     *
+     * @return an array of {@link short} objects.
+     */
+    public short[] getShortData() {
+        return convertToShorts(data);
+    }
 
-	/**
-	 * <p>
-	 * getBooleanData.
-	 * </p>
-	 * @return an array of {@link boolean} objects.
-	 */
-	public boolean[] getBooleanData() {
-		return convertToBooleans(data);
-	}
+    /**
+     * <p>
+     * getBooleanData.
+     * </p>
+     *
+     * @return an array of {@link boolean} objects.
+     */
+    public boolean[] getBooleanData() {
+        return convertToBooleans(data);
+    }
 
-	/**
-	 * <p>
-	 * toString.
-	 * </p>
-	 * @param numeric a boolean.
-	 * @return a {@link String} object.
-	 */
-	public String toString(boolean numeric) {
-		if (data == null)
-			return "ReadResponse [null]";
-		return "ReadResponse [len=" + (numeric ? data.length / 2 : data.length * 8) + ", " + StreamUtils.dumpHex(data)
-				+ "]";
-	}
+    /**
+     * <p>
+     * toString.
+     * </p>
+     *
+     * @param numeric a boolean.
+     * @return a {@link String} object.
+     */
+    public String toString(boolean numeric) {
+        if (data == null)
+            return "ReadResponse [null]";
+        return "ReadResponse [len=" + (numeric ? data.length / 2 : data.length * 8) + ", " + StreamUtils.dumpHex(data)
+                + "]";
+    }
 
 }

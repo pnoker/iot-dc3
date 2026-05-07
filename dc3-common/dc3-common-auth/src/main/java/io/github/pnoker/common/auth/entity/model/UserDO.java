@@ -43,104 +43,104 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_user", autoResultMap = true)
 public class UserDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Primary key ID.
-	 */
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    /**
+     * Primary key ID.
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	/**
-	 * Username.
-	 */
-	@TableField("user_name")
-	private String userName;
+    /**
+     * Username.
+     */
+    @TableField("user_name")
+    private String userName;
 
-	/**
-	 * User nickname.
-	 */
-	@TableField("nick_name")
-	private String nickName;
+    /**
+     * User nickname.
+     */
+    @TableField("nick_name")
+    private String nickName;
 
-	/**
-	 * Phone number.
-	 */
-	@TableField("phone")
-	private String phone;
+    /**
+     * Phone number.
+     */
+    @TableField("phone")
+    private String phone;
 
-	/**
-	 * Email address.
-	 */
-	@TableField("email")
-	private String email;
+    /**
+     * Email address.
+     */
+    @TableField("email")
+    private String email;
 
-	/**
-	 * Social-related extension information.
-	 */
-	@TableField(value = "social_ext", typeHandler = JacksonTypeHandler.class)
-	private JsonExt socialExt;
+    /**
+     * Social-related extension information.
+     */
+    @TableField(value = "social_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt socialExt;
 
-	/**
-	 * Identity-related extension information.
-	 */
-	@TableField(value = "identity_ext", typeHandler = JacksonTypeHandler.class)
-	private JsonExt identityExt;
+    /**
+     * Identity-related extension information.
+     */
+    @TableField(value = "identity_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt identityExt;
 
-	/**
-	 * Enable flag, {@code 0} for enabled, {@code 1} for disabled.
-	 */
-	@TableField("enable_flag")
-	private Byte enableFlag;
+    /**
+     * Enable flag, {@code 0} for enabled, {@code 1} for disabled.
+     */
+    @TableField("enable_flag")
+    private Byte enableFlag;
 
-	/**
-	 * Remark or description.
-	 */
-	@TableField("remark")
-	private String remark;
+    /**
+     * Remark or description.
+     */
+    @TableField("remark")
+    private String remark;
 
-	/**
-	 * Creator ID.
-	 */
-	@TableField("creator_id")
-	private Long creatorId;
+    /**
+     * Creator ID.
+     */
+    @TableField("creator_id")
+    private Long creatorId;
 
-	/**
-	 * Creator name.
-	 */
-	@TableField("creator_name")
-	private String creatorName;
+    /**
+     * Creator name.
+     */
+    @TableField("creator_name")
+    private String creatorName;
 
-	/**
-	 * Creation time.
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Creation time.
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operator ID.
-	 */
-	@TableField("operator_id")
-	private Long operatorId;
+    /**
+     * Operator ID.
+     */
+    @TableField("operator_id")
+    private Long operatorId;
 
-	/**
-	 * Operator name.
-	 */
-	@TableField("operator_name")
-	private String operatorName;
+    /**
+     * Operator name.
+     */
+    @TableField("operator_name")
+    private String operatorName;
 
-	/**
-	 * Operation time.
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operation time.
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
-	/**
-	 * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
-	 */
-	@TableLogic
-	@TableField("deleted")
-	private Byte deleted;
+    /**
+     * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
+     */
+    @TableLogic
+    @TableField("deleted")
+    private Byte deleted;
 
 }

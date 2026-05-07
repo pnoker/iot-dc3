@@ -46,102 +46,106 @@ import java.sql.Types;
 @Slf4j
 public class MybatisUtil {
 
-	private MybatisUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private MybatisUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Default code generator for MyBatis-Plus
-	 * <p>
-	 * Database connection parameters can be overridden by environment variables
-	 * @param defaultHost Default database host
-	 * @param defaultPort Default database port
-	 * @param defaultDb Default database name
-	 * @param defaultSchema Default database schema
-	 * @param defaultUsername Default database username
-	 * @param defaultPassword Default database password
-	 * @return Configured FastAutoGenerator instance
-	 */
-	public static FastAutoGenerator defaultGenerator(String defaultHost, String defaultPort, String defaultDb,
-			String defaultSchema, String defaultUsername, String defaultPassword) {
-		String host = System.getenv("POSTGRES_HOST");
-		if (StringUtils.isEmpty(host)) {
-			host = defaultHost;
-		}
-		String port = System.getenv("POSTGRES_PORT");
-		if (StringUtils.isEmpty(port)) {
-			port = defaultPort;
-		}
-		String db = System.getenv("POSTGRES_DB");
-		if (StringUtils.isEmpty(db)) {
-			db = defaultDb;
-		}
-		String schema = System.getenv("POSTGRES_SCHEMA");
-		if (StringUtils.isEmpty(schema)) {
-			schema = defaultSchema;
-		}
-		String username = System.getenv("POSTGRES_USERNAME");
-		if (StringUtils.isEmpty(username)) {
-			username = defaultUsername;
-		}
-		String password = System.getenv("POSTGRES_PASSWORD");
-		if (StringUtils.isEmpty(password)) {
-			password = defaultPassword;
-		}
+    /**
+     * Default code generator for MyBatis-Plus
+     * <p>
+     * Database connection parameters can be overridden by environment variables
+     *
+     * @param defaultHost     Default database host
+     * @param defaultPort     Default database port
+     * @param defaultDb       Default database name
+     * @param defaultSchema   Default database schema
+     * @param defaultUsername Default database username
+     * @param defaultPassword Default database password
+     * @return Configured FastAutoGenerator instance
+     */
+    public static FastAutoGenerator defaultGenerator(String defaultHost, String defaultPort, String defaultDb,
+                                                     String defaultSchema, String defaultUsername, String defaultPassword) {
+        String host = System.getenv("POSTGRES_HOST");
+        if (StringUtils.isEmpty(host)) {
+            host = defaultHost;
+        }
+        String port = System.getenv("POSTGRES_PORT");
+        if (StringUtils.isEmpty(port)) {
+            port = defaultPort;
+        }
+        String db = System.getenv("POSTGRES_DB");
+        if (StringUtils.isEmpty(db)) {
+            db = defaultDb;
+        }
+        String schema = System.getenv("POSTGRES_SCHEMA");
+        if (StringUtils.isEmpty(schema)) {
+            schema = defaultSchema;
+        }
+        String username = System.getenv("POSTGRES_USERNAME");
+        if (StringUtils.isEmpty(username)) {
+            username = defaultUsername;
+        }
+        String password = System.getenv("POSTGRES_PASSWORD");
+        if (StringUtils.isEmpty(password)) {
+            password = defaultPassword;
+        }
 
-		return FastAutoGenerator.create(
-				String.format("jdbc:postgresql://%s:%s/%s?currentSchema=%s&useSSL=false", host, port, db, schema),
-				username, password);
-	}
+        return FastAutoGenerator.create(
+                String.format("jdbc:postgresql://%s:%s/%s?currentSchema=%s&useSSL=false", host, port, db, schema),
+                username, password);
+    }
 
-	/**
-	 * Default global configuration for code generation
-	 * @param builder GlobalConfig.Builder instance
-	 * @param path Root directory for generated files
-	 */
-	public static void defaultGlobalConfig(GlobalConfig.Builder builder, String path) {
-		builder.outputDir(path + "/java")
-			.author(DefaultConstant.USER_NAME)
-			.commentDate(TimeConstant.DAY_DATE_FORMAT1)
-			.disableOpenDir();
-	}
+    /**
+     * Default global configuration for code generation
+     *
+     * @param builder GlobalConfig.Builder instance
+     * @param path    Root directory for generated files
+     */
+    public static void defaultGlobalConfig(GlobalConfig.Builder builder, String path) {
+        builder.outputDir(path + "/java")
+                .author(DefaultConstant.USER_NAME)
+                .commentDate(TimeConstant.DAY_DATE_FORMAT1)
+                .disableOpenDir();
+    }
 
-	/**
-	 * Default data source configuration for code generation
-	 * @param builder DataSourceConfig.Builder instance
-	 */
-	public static void defaultDataSourceConfig(DataSourceConfig.Builder builder) {
-		builder.typeConvertHandler((globalConfig, typeRegistry, metaInfo) -> {
-			int typeCode = metaInfo.getJdbcType().TYPE_CODE;
-			if (typeCode == Types.SMALLINT) {
-				return DbColumnType.BYTE;
-			}
-			return typeRegistry.getColumnType(metaInfo);
-		});
-	}
+    /**
+     * Default data source configuration for code generation
+     *
+     * @param builder DataSourceConfig.Builder instance
+     */
+    public static void defaultDataSourceConfig(DataSourceConfig.Builder builder) {
+        builder.typeConvertHandler((globalConfig, typeRegistry, metaInfo) -> {
+            int typeCode = metaInfo.getJdbcType().TYPE_CODE;
+            if (typeCode == Types.SMALLINT) {
+                return DbColumnType.BYTE;
+            }
+            return typeRegistry.getColumnType(metaInfo);
+        });
+    }
 
-	/**
-	 * Default strategy configuration for code generation
-	 * @param builder StrategyConfig.Builder instance
-	 */
-	public static void defaultStrategyConfig(StrategyConfig.Builder builder) {
-		builder.addTablePrefix("dc3_")
-			.entityBuilder()
-			.idType(IdType.ASSIGN_ID)
-			.enableLombok()
-			.formatFileName("%sDO")
-			.enableTableFieldAnnotation()
-			.enableRemoveIsPrefix()
-			.enableFileOverride()
-			.logicDeleteColumnName("deleted")
-			.controllerBuilder()
-			.disable()
-			.serviceBuilder()
-			.formatServiceFileName("%sManager")
-			.formatServiceImplFileName("%sManagerImpl")
-			.enableFileOverride()
-			.mapperBuilder()
-			.enableFileOverride();
-	}
+    /**
+     * Default strategy configuration for code generation
+     *
+     * @param builder StrategyConfig.Builder instance
+     */
+    public static void defaultStrategyConfig(StrategyConfig.Builder builder) {
+        builder.addTablePrefix("dc3_")
+                .entityBuilder()
+                .idType(IdType.ASSIGN_ID)
+                .enableLombok()
+                .formatFileName("%sDO")
+                .enableTableFieldAnnotation()
+                .enableRemoveIsPrefix()
+                .enableFileOverride()
+                .logicDeleteColumnName("deleted")
+                .controllerBuilder()
+                .disable()
+                .serviceBuilder()
+                .formatServiceFileName("%sManager")
+                .formatServiceImplFileName("%sManagerImpl")
+                .enableFileOverride()
+                .mapperBuilder()
+                .enableFileOverride();
+    }
 
 }

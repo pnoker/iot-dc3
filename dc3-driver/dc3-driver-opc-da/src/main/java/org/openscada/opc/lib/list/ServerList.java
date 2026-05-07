@@ -40,132 +40,139 @@ import java.util.List;
  */
 public class ServerList {
 
-	private final JISession _session;
+    private final JISession _session;
 
-	private final OPCServerList _serverList;
+    private final OPCServerList _serverList;
 
-	/**
-	 * Create a new instance with an already existing session
-	 * @param session the DCOM session
-	 * @param host the host to query
-	 * @throws IllegalArgumentException IllegalArgumentException
-	 * @throws UnknownHostException UnknownHostException
-	 * @throws JIException JIException
-	 */
-	public ServerList(final JISession session, final String host)
-			throws IllegalArgumentException, UnknownHostException, JIException {
-		this._session = session;
-		JIComServer comServer = new JIComServer(JIClsid.valueOf(Constants.OPCServerList_CLSID), host, this._session);
-		this._serverList = new OPCServerList(comServer.createInstance());
-	}
+    /**
+     * Create a new instance with an already existing session
+     *
+     * @param session the DCOM session
+     * @param host    the host to query
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
+     */
+    public ServerList(final JISession session, final String host)
+            throws IllegalArgumentException, UnknownHostException, JIException {
+        this._session = session;
+        JIComServer comServer = new JIComServer(JIClsid.valueOf(Constants.OPCServerList_CLSID), host, this._session);
+        this._serverList = new OPCServerList(comServer.createInstance());
+    }
 
-	/**
-	 * Create a new instance and a new DCOM session
-	 * @param host the host to contact
-	 * @param user the user to use for authentication
-	 * @param password the password to use for authentication
-	 * @throws IllegalArgumentException IllegalArgumentException
-	 * @throws UnknownHostException UnknownHostException
-	 * @throws JIException JIException
-	 */
-	public ServerList(final String host, final String user, final String password)
-			throws IllegalArgumentException, UnknownHostException, JIException {
-		this(host, user, password, null);
-	}
+    /**
+     * Create a new instance and a new DCOM session
+     *
+     * @param host     the host to contact
+     * @param user     the user to use for authentication
+     * @param password the password to use for authentication
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
+     */
+    public ServerList(final String host, final String user, final String password)
+            throws IllegalArgumentException, UnknownHostException, JIException {
+        this(host, user, password, null);
+    }
 
-	/**
-	 * Create a new instance and a new DCOM session
-	 * @param host the host to contact
-	 * @param user the user to use for authentication
-	 * @param password the password to use for authentication
-	 * @param domain The domain to use for authentication
-	 * @throws IllegalArgumentException IllegalArgumentException
-	 * @throws UnknownHostException UnknownHostException
-	 * @throws JIException JIException
-	 */
-	public ServerList(final String host, final String user, final String password, final String domain)
-			throws IllegalArgumentException, UnknownHostException, JIException {
-		this(JISession.createSession(domain, user, password), host);
-	}
+    /**
+     * Create a new instance and a new DCOM session
+     *
+     * @param host     the host to contact
+     * @param user     the user to use for authentication
+     * @param password the password to use for authentication
+     * @param domain   The domain to use for authentication
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
+     */
+    public ServerList(final String host, final String user, final String password, final String domain)
+            throws IllegalArgumentException, UnknownHostException, JIException {
+        this(JISession.createSession(domain, user, password), host);
+    }
 
-	/**
-	 * Get the details of a opc class
-	 * @param clsId the class to request details for
-	 * @return The class details
-	 * @throws JIException JIException
-	 */
-	public ClassDetails getDetails(final String clsId) throws JIException {
-		return this._serverList.getClassDetails(JIClsid.valueOf(clsId));
-	}
+    /**
+     * Get the details of a opc class
+     *
+     * @param clsId the class to request details for
+     * @return The class details
+     * @throws JIException JIException
+     */
+    public ClassDetails getDetails(final String clsId) throws JIException {
+        return this._serverList.getClassDetails(JIClsid.valueOf(clsId));
+    }
 
-	/**
-	 * Fetch the class id of a prog id
-	 * @param progId The prog id to look up
-	 * @return the class id or <code>null</code> if none could be found.
-	 * @throws JIException JIException
-	 */
-	public String getClsIdFromProgId(final String progId) throws JIException {
-		JIClsid cls = this._serverList.getCLSIDFromProgID(progId);
-		if (cls == null) {
-			return null;
-		}
-		return cls.getCLSID();
-	}
+    /**
+     * Fetch the class id of a prog id
+     *
+     * @param progId The prog id to look up
+     * @return the class id or <code>null</code> if none could be found.
+     * @throws JIException JIException
+     */
+    public String getClsIdFromProgId(final String progId) throws JIException {
+        JIClsid cls = this._serverList.getCLSIDFromProgID(progId);
+        if (cls == null) {
+            return null;
+        }
+        return cls.getCLSID();
+    }
 
-	/**
-	 * List all servers that match the requirements
-	 * @param implemented All implemented categories
-	 * @param required All required categories
-	 * @return A collection of class ids
-	 * @throws IllegalArgumentException IllegalArgumentException
-	 * @throws UnknownHostException UnknownHostException
-	 * @throws JIException JIException
-	 */
-	public Collection<String> listServers(final Category[] implemented, final Category[] required)
-			throws IllegalArgumentException, UnknownHostException, JIException {
-		// convert the type safe categories to plain UUIDs
-		UUID[] u1 = new UUID[implemented.length];
-		UUID[] u2 = new UUID[required.length];
+    /**
+     * List all servers that match the requirements
+     *
+     * @param implemented All implemented categories
+     * @param required    All required categories
+     * @return A collection of class ids
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
+     */
+    public Collection<String> listServers(final Category[] implemented, final Category[] required)
+            throws IllegalArgumentException, UnknownHostException, JIException {
+        // convert the type safe categories to plain UUIDs
+        UUID[] u1 = new UUID[implemented.length];
+        UUID[] u2 = new UUID[required.length];
 
-		for (int i = 0; i < implemented.length; i++) {
-			u1[i] = new UUID(implemented[i].toString());
-		}
+        for (int i = 0; i < implemented.length; i++) {
+            u1[i] = new UUID(implemented[i].toString());
+        }
 
-		for (int i = 0; i < required.length; i++) {
-			u2[i] = new UUID(required[i].toString());
-		}
+        for (int i = 0; i < required.length; i++) {
+            u2[i] = new UUID(required[i].toString());
+        }
 
-		// get them as UUIDs
-		Collection<UUID> resultU = this._serverList.enumClassesOfCategories(u1, u2).asCollection();
+        // get them as UUIDs
+        Collection<UUID> resultU = this._serverList.enumClassesOfCategories(u1, u2).asCollection();
 
-		// and convert to easier usable strings
-		Collection<String> result = new ArrayList<String>(resultU.size());
-		for (UUID uuid : resultU) {
-			result.add(uuid.toString());
-		}
-		return result;
-	}
+        // and convert to easier usable strings
+        Collection<String> result = new ArrayList<String>(resultU.size());
+        for (UUID uuid : resultU) {
+            result.add(uuid.toString());
+        }
+        return result;
+    }
 
-	/**
-	 * List all servers that match the requirements and return the class details
-	 * @param implemented All implemented categories
-	 * @param required All required categories
-	 * @return a collection of matching server and their class information
-	 * @throws IllegalArgumentException IllegalArgumentException
-	 * @throws UnknownHostException UnknownHostException
-	 * @throws JIException JIException
-	 */
-	public Collection<ClassDetails> listServersWithDetails(final Category[] implemented, final Category[] required)
-			throws IllegalArgumentException, UnknownHostException, JIException {
-		Collection<String> resultString = listServers(implemented, required);
+    /**
+     * List all servers that match the requirements and return the class details
+     *
+     * @param implemented All implemented categories
+     * @param required    All required categories
+     * @return a collection of matching server and their class information
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
+     */
+    public Collection<ClassDetails> listServersWithDetails(final Category[] implemented, final Category[] required)
+            throws IllegalArgumentException, UnknownHostException, JIException {
+        Collection<String> resultString = listServers(implemented, required);
 
-		List<ClassDetails> result = new ArrayList<ClassDetails>(resultString.size());
+        List<ClassDetails> result = new ArrayList<ClassDetails>(resultString.size());
 
-		for (String clsId : resultString) {
-			result.add(getDetails(clsId));
-		}
+        for (String clsId : resultString) {
+            result.add(getDetails(clsId));
+        }
 
-		return result;
-	}
+        return result;
+    }
 
 }

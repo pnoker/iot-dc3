@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class AddException extends RuntimeException {
 
-	public AddException() {
-		this(null);
-	}
+    public AddException() {
+        this(null);
+    }
 
-	public AddException(Throwable cause) {
-		super(cause);
-	}
+    public AddException(Throwable cause) {
+        super(cause);
+    }
 
-	public AddException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public AddException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

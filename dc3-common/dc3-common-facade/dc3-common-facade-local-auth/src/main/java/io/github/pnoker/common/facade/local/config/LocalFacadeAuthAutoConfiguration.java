@@ -40,20 +40,20 @@ import org.springframework.context.annotation.FilterType;
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
 @ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
-		includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-				classes = { io.github.pnoker.common.facade.local.TenantLocalFacade.class,
-						io.github.pnoker.common.facade.local.TokenLocalFacade.class,
-						io.github.pnoker.common.facade.local.UserLocalFacade.class,
-						io.github.pnoker.common.facade.local.UserLoginLocalFacade.class,
-						io.github.pnoker.common.facade.local.ResourceRegistryLocalFacade.class,
-						FacadeTenantBuilder.class, FacadeUserBuilder.class, FacadeUserLoginBuilder.class, }))
+        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+                classes = {io.github.pnoker.common.facade.local.TenantLocalFacade.class,
+                        io.github.pnoker.common.facade.local.TokenLocalFacade.class,
+                        io.github.pnoker.common.facade.local.UserLocalFacade.class,
+                        io.github.pnoker.common.facade.local.UserLoginLocalFacade.class,
+                        io.github.pnoker.common.facade.local.ResourceRegistryLocalFacade.class,
+                        FacadeTenantBuilder.class, FacadeUserBuilder.class, FacadeUserLoginBuilder.class,}))
 public class LocalFacadeAuthAutoConfiguration {
 
-	/**
-	 * Referenced only to ensure the {@link TenantLocalFacade} symbol is linked against
-	 * this module's compiled classes at AutoConfiguration load time.
-	 */
-	@SuppressWarnings("unused")
-	private static final Class<?> CANARY = TenantLocalFacade.class;
+    /**
+     * Referenced only to ensure the {@link TenantLocalFacade} symbol is linked against
+     * this module's compiled classes at AutoConfiguration load time.
+     */
+    @SuppressWarnings("unused")
+    private static final Class<?> CANARY = TenantLocalFacade.class;
 
 }

@@ -36,21 +36,21 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class MttaTrendVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * ISO date.
-	 */
-	private String date;
+    /**
+     * ISO date.
+     */
+    private String date;
 
-	private long p50Ms;
+    private long p50Ms;
 
-	private long p95Ms;
+    private long p95Ms;
 
-	/**
-	 * Count of confirmed events used in the percentile calc for this day.
-	 */
-	private long confirmedCount;
+    /**
+     * Count of confirmed events used in the percentile calc for this day.
+     */
+    private long confirmedCount;
 
 }

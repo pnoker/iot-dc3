@@ -55,99 +55,95 @@ import java.util.Objects;
 @Slf4j
 public class X509Util {
 
-	private X509Util() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private X509Util() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	// TODO: 2023.10.16 There are issues here, currently in an unavailable state
+    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
 
-	/**
-	 * Create SSL socket factory with custom certificates
-	 * @param caCrtFile CA certificate file path
-	 * @param crtFile Client certificate file path
-	 * @param keyFile Client private key file path
-	 * @param password Private key password
-	 * @return Configured SSL socket factory
-	 */
-	public static SSLSocketFactory getSSLSocketFactory(final String caCrtFile, final String crtFile,
-			final String keyFile, final String password) {
-		try {
-			Security.addProvider(new BouncyCastleProvider());
+    /**
+     * Create SSL socket factory with custom certificates
+     *
+     * @param caCrtFile CA certificate file path
+     * @param crtFile   Client certificate file path
+     * @param keyFile   Client private key file path
+     * @param password  Private key password
+     * @return Configured SSL socket factory
+     */
+    public static SSLSocketFactory getSSLSocketFactory(final String caCrtFile, final String crtFile,
+                                                       final String keyFile, final String password) {
+        try {
+            Security.addProvider(new BouncyCastleProvider());
 
-			// load CA certificate
-			X509Certificate caCert = loadCertificate(caCrtFile);
-			// CA certificate is used to authenticate server
-			KeyStore caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-			caKeyStore.load(null, null);
-			caKeyStore.setCertificateEntry("cacertfile", caCert);
-			TrustManagerFactory trustManagerFactory = TrustManagerFactory
-				.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-			trustManagerFactory.init(caKeyStore);
+            // load CA certificate
+            X509Certificate caCert = loadCertificate(caCrtFile);
+            // CA certificate is used to authenticate server
+            KeyStore caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            caKeyStore.load(null, null);
+            caKeyStore.setCertificateEntry("cacertfile", caCert);
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory
+                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(caKeyStore);
 
-			// load client certificate
-			X509Certificate cert = loadCertificate(crtFile);
-			// load client private key
-			KeyPair key = loadCertificateWithPassword(keyFile, password);
-			// client key and certificates are sent to server, so it can authenticate us
-			KeyStore certKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-			certKeyStore.load(null, null);
-			certKeyStore.setCertificateEntry("certfile", cert);
-			certKeyStore.setKeyEntry("keyfile", key.getPrivate(), password.toCharArray(),
-					new java.security.cert.Certificate[] { cert });
-			KeyManagerFactory keyManagerFactory = KeyManagerFactory
-				.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-			keyManagerFactory.init(certKeyStore, password.toCharArray());
+            // load client certificate
+            X509Certificate cert = loadCertificate(crtFile);
+            // load client private key
+            KeyPair key = loadCertificateWithPassword(keyFile, password);
+            // client key and certificates are sent to server, so it can authenticate us
+            KeyStore certKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            certKeyStore.load(null, null);
+            certKeyStore.setCertificateEntry("certfile", cert);
+            certKeyStore.setKeyEntry("keyfile", key.getPrivate(), password.toCharArray(),
+                    new java.security.cert.Certificate[]{cert});
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory
+                    .getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            keyManagerFactory.init(certKeyStore, password.toCharArray());
 
-			// finally, create SSL socket factory
-			SSLContext context = SSLContext.getInstance("TLSv1.2");
-			context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+            // finally, create SSL socket factory
+            SSLContext context = SSLContext.getInstance("TLSv1.2");
+            context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
 
-			return context.getSocketFactory();
-		}
-		catch (Exception e) {
-			throw new ConnectorException(e.getMessage());
-		}
-	}
+            return context.getSocketFactory();
+        } catch (Exception e) {
+            throw new ConnectorException(e.getMessage());
+        }
+    }
 
-	// TODO: 2023.10.16 There are issues here, currently in an unavailable state
-	private static <T> T loadCertificate(String caCrtFile) throws IOException {
-		return loadCertificateWithPassword(caCrtFile, null);
-	}
+    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
+    private static <T> T loadCertificate(String caCrtFile) throws IOException {
+        return loadCertificateWithPassword(caCrtFile, null);
+    }
 
-	// TODO: 2023.10.16 There are issues here, currently in an unavailable state
-	@SuppressWarnings("unchecked")
-	private static <T> T loadCertificateWithPassword(String caCrtFile, String password) throws IOException {
-		PemReader reader = null;
-		try {
-			String classPath = "classpath:";
-			if (caCrtFile.startsWith(classPath)) {
-				InputStream inputStream = X509Util.class.getResourceAsStream(caCrtFile.replace(classPath, ""));
-				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-				if (Objects.nonNull(password)) {
-					reader = new PemReader(inputStreamReader);
-				}
-				else {
-					reader = new PemReader(inputStreamReader);
-				}
-			}
-			else {
-				Path path = Paths.get(caCrtFile);
-				ByteArrayInputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(path));
-				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-				if (Objects.nonNull(password)) {
-					reader = new PemReader(inputStreamReader);
-				}
-				else {
-					reader = new PemReader(inputStreamReader);
-				}
-			}
-			return (T) reader.readPemObject();
-		}
-		finally {
-			if (Objects.nonNull(reader)) {
-				reader.close();
-			}
-		}
-	}
+    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
+    @SuppressWarnings("unchecked")
+    private static <T> T loadCertificateWithPassword(String caCrtFile, String password) throws IOException {
+        PemReader reader = null;
+        try {
+            String classPath = "classpath:";
+            if (caCrtFile.startsWith(classPath)) {
+                InputStream inputStream = X509Util.class.getResourceAsStream(caCrtFile.replace(classPath, ""));
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                if (Objects.nonNull(password)) {
+                    reader = new PemReader(inputStreamReader);
+                } else {
+                    reader = new PemReader(inputStreamReader);
+                }
+            } else {
+                Path path = Paths.get(caCrtFile);
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(path));
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                if (Objects.nonNull(password)) {
+                    reader = new PemReader(inputStreamReader);
+                } else {
+                    reader = new PemReader(inputStreamReader);
+                }
+            }
+            return (T) reader.readPemObject();
+        } finally {
+            if (Objects.nonNull(reader)) {
+                reader.close();
+            }
+        }
+    }
 
 }

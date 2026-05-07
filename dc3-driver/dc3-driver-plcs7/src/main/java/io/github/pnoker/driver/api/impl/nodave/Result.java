@@ -24,10 +24,10 @@ package io.github.pnoker.driver.api.impl.nodave;
  */
 public final class Result {
 
-	public int bufferStart;
+    public int bufferStart;
 
-	public int error;
+    public int error;
 
-	public int length;
+    public int length;
 
 }

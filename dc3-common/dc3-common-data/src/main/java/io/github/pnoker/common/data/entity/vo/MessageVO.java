@@ -41,29 +41,29 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MessageVO extends BaseVO {
 
-	/**
-	 * Alarm message template title
-	 */
-	private String messageName;
+    /**
+     * Alarm message template title
+     */
+    private String messageName;
 
-	/**
-	 * Alarm message template code
-	 */
-	private String messageCode;
+    /**
+     * Alarm message template code
+     */
+    private String messageCode;
 
-	/**
-	 * Alarm message template level
-	 */
-	private AlarmMessageLevelFlagEnum messageLevel;
+    /**
+     * Alarm message template level
+     */
+    private AlarmMessageLevelFlagEnum messageLevel;
 
-	/**
-	 * Alarm message template content
-	 */
-	private MessageExt messageExt;
+    /**
+     * Alarm message template content
+     */
+    private MessageExt messageExt;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

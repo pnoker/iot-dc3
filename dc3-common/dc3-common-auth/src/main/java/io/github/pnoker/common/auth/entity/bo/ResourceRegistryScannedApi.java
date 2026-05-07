@@ -34,36 +34,36 @@ import lombok.*;
 @AllArgsConstructor
 public class ResourceRegistryScannedApi {
 
-	/**
-	 * HTTP method: GET / POST / PUT / DELETE.
-	 */
-	private String method;
+    /**
+     * HTTP method: GET / POST / PUT / DELETE.
+     */
+    private String method;
 
-	/**
-	 * Full path (post gateway strip), e.g. /device/add.
-	 */
-	private String path;
+    /**
+     * Full path (post gateway strip), e.g. /device/add.
+     */
+    private String path;
 
-	/**
-	 * Human-readable name, typically ClassSimpleName.methodName.
-	 */
-	private String apiName;
+    /**
+     * Human-readable name, typically ClassSimpleName.methodName.
+     */
+    private String apiName;
 
-	/**
-	 * Short title, usually the controller method name.
-	 */
-	private String title;
+    /**
+     * Short title, usually the controller method name.
+     */
+    private String title;
 
-	/**
-	 * Optional description.
-	 */
-	private String remark;
+    /**
+     * Optional description.
+     */
+    private String remark;
 
-	/**
-	 * API grouping label — usually the owning controller's simple class name, e.g.
-	 * "ApiController". Endpoints sharing the same apiGroup become siblings under the same
-	 * resource-tree node.
-	 */
-	private String apiGroup;
+    /**
+     * API grouping label — usually the owning controller's simple class name, e.g.
+     * "ApiController". Endpoints sharing the same apiGroup become siblings under the same
+     * resource-tree node.
+     */
+    private String apiGroup;
 
 }

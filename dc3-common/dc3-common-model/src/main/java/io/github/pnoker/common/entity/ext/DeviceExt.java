@@ -39,24 +39,24 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DeviceExt extends BaseExt {
 
-	/**
-	 *
-	 * <p>
-	 * Type Version
-	 */
-	private Content content;
+    /**
+     *
+     * <p>
+     * Type Version
+     */
+    private Content content;
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Content implements Serializable {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Content implements Serializable {
 
-		@Serial
-		private static final long serialVersionUID = 1L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
-		private String keep;
+        private String keep;
 
-	}
+    }
 
 }
