@@ -291,9 +291,30 @@
                                         Current JDK: ${java.version}
                                     </message>
                                 </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>3.9.0</version>
+                                </requireMavenVersion>
+                                <requireEncoding>
+                                    <encoding>UTF-8</encoding>
+                                </requireEncoding>
                             </rules>
                             <fail>true</fail>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Spring Java Format -->
+            <plugin>
+                <groupId>io.spring.javaformat</groupId>
+                <artifactId>spring-javaformat-maven-plugin</artifactId>
+                <version>0.0.43</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
