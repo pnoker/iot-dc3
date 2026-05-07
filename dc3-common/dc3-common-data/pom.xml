@@ -38,7 +38,7 @@
 
     <dependencies>
 
-        <!-- Caffeine Cache -->
+        <!-- Utility Libraries -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>

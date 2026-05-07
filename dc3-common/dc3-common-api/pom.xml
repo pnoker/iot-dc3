@@ -61,7 +61,7 @@
 
     <dependencies>
 
-        <!-- gRpc Related -->
+        <!-- gRPC Related -->
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>
