@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
  * point_id) or {@code driver}.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter

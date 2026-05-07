@@ -28,6 +28,10 @@ import java.io.Serializable;
 /**
  * A device whose alarm rate deviates sharply from its profile peers. The ratio field is
  * alarmCount / peerMedian; service filters to ratio &gt;= 3.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

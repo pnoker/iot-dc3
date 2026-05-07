@@ -17,6 +17,12 @@
 
 package org.openscada.opc.lib.da.browser;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public enum Access {
 
     READ(1), WRITE(2);

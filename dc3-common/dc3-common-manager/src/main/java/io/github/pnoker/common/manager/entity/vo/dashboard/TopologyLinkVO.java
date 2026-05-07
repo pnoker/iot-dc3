@@ -32,6 +32,7 @@ import java.io.Serializable;
  * count rolled up along the edge.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.4
  */
 @Getter

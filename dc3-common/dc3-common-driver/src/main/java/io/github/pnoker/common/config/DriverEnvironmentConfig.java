@@ -38,6 +38,10 @@ import java.util.Map;
 /**
  * Spring environment post-processor that derives and injects runtime driver properties
  * such as node, service, host, and client identifiers.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Configuration

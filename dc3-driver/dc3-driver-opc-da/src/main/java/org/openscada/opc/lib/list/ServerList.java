@@ -36,6 +36,7 @@ import java.util.List;
  * easier.
  *
  * @author Jens Reimann &lt;jens.reimann@th4-systems.com&gt;
+ * @version 2025.9.0
  * @since 0.1.8
  */
 public class ServerList {

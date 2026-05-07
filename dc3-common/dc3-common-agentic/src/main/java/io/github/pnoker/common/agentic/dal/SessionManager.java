@@ -19,6 +19,12 @@ package io.github.pnoker.common.agentic.dal;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public interface SessionManager extends IService<SessionDO> {
 
 }

@@ -23,6 +23,10 @@ import java.util.*;
 /**
  * Central registry that holds all {@link SkillDefinition} instances loaded at startup.
  * Supports lookup by name and enumeration of all registered skills.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Component
 public class SkillRegistry {

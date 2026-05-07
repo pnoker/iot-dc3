@@ -23,6 +23,7 @@ import lombok.*;
  * Facade-level representation of a single scanned HTTP endpoint.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Getter

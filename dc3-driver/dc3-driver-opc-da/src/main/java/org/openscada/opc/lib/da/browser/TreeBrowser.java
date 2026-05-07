@@ -36,6 +36,8 @@ import java.util.LinkedList;
  * instance and the server address space browser.
  *
  * @author Jens Reimann jens.reimann@th4-systems.com
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public class TreeBrowser extends BaseBrowser {
 

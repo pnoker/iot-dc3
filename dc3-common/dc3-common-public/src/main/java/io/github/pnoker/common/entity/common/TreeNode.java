@@ -26,12 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tree Node Data Structure
- * <p>
- * Generic tree node implementation for hierarchical data structures. Supports
- * parent-child relationships with ID-based navigation. Commonly used for organization,
- * category, or menu structures.
- * </p>
+ * Generic tree node with parent-child relationships.
  *
  * @author pnoker
  * @version 2025.9.0

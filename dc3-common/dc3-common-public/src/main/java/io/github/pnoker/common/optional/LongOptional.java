@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.function.LongConsumer;
 
 /**
- * Custom Long Optional.
+ * Optional wrapper for {@link Long} with positive-value checks.
  *
  * @author pnoker
  * @version 2025.9.0

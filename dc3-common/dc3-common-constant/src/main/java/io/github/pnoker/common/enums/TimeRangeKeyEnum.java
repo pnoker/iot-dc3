@@ -31,6 +31,7 @@ import java.util.Optional;
  * falls back to the legacy {@code rangeHours} integer.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.3
  */
 @Getter

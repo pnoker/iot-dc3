@@ -37,6 +37,7 @@ import java.util.Objects;
  * In-process PointFacade implementation.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Slf4j

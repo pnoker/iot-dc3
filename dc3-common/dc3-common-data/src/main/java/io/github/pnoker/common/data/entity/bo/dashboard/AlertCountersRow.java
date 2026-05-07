@@ -24,6 +24,10 @@ import lombok.ToString;
 /**
  * Tenant-wide (total, unconfirmed) counters — the service layer combines this with
  * separate per-source and today-only queries to populate the full AlertStatsVO.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

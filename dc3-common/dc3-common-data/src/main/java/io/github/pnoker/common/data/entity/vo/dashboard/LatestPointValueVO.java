@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
  * every typed hypertable.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter

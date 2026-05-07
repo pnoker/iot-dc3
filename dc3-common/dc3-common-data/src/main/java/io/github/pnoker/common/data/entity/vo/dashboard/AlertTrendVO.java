@@ -29,6 +29,7 @@ import java.io.Serializable;
  * Daily event count for a single day, split by device and driver source.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.3
  */
 @Getter

@@ -29,6 +29,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.grpc.client.GrpcChannelFactory;
 
+/**
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 @Configuration
 public class GrpcStubConfig {
 

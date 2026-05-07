@@ -42,6 +42,11 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 
+/**
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 @Slf4j
 public class Server {
 

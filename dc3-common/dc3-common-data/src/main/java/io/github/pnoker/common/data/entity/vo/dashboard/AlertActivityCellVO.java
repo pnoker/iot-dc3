@@ -30,6 +30,7 @@ import java.io.Serializable;
  * a fully-padded 7 × 24 grid.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.3
  */
 @Getter

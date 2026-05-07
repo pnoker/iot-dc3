@@ -41,12 +41,7 @@ import java.security.cert.X509Certificate;
 import java.util.Objects;
 
 /**
- * X509 Certificate Utility Class
- * <p>
- * Utility class for X509 certificate and SSL/TLS operations. Provides methods for loading
- * certificates, creating SSL socket factories, and managing keystore/truststore
- * configurations.
- * </p>
+ * X.509 certificate loading and SSL socket factory creation.
  *
  * @author pnoker
  * @version 2025.9.0

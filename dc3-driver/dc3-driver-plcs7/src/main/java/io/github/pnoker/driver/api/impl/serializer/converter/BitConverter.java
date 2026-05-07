@@ -21,6 +21,10 @@ import io.github.pnoker.driver.api.S7Type;
 
 /**
  * The Class BitConverter is responsible for converting bit values
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public final class BitConverter implements S7Serializable {
 

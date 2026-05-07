@@ -29,11 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Pagination Utility Class
- * <p>
- * Utility class for pagination operations in IoT DC3 platform. Provides methods for
- * converting between MyBatis-Plus Page and custom Pages objects.
- * </p>
+ * Converts {@code Pages} DTO to MyBatis-Plus {@code Page}.
  *
  * @author pnoker
  * @version 2025.9.0

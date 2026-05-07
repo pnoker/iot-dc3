@@ -20,6 +20,12 @@ package org.openscada.opc.dcom.da;
 import org.openscada.opc.dcom.common.KeyedResultSet;
 import org.openscada.opc.dcom.common.ResultSet;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public interface IOPCDataCallback {
 
     public void dataChange(int transactionId, int serverGroupHandle, int masterQuality, int masterErrorCode,

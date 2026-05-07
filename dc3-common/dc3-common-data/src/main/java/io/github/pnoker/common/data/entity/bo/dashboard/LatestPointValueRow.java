@@ -26,6 +26,10 @@ import java.time.LocalDateTime;
 /**
  * Live-feed pv row — all values coerced to text so the union over 7 typed hypertables
  * stays compatible.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

@@ -27,6 +27,8 @@ import io.github.pnoker.driver.api.impl.nodave.S7Connection;
  * For more information, visit: http://libnodave.sourceforge.net/
  *
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public abstract class S7BaseConnection implements S7Connector {
 

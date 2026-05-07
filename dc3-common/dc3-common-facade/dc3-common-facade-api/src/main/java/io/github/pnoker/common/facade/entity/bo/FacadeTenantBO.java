@@ -26,6 +26,7 @@ import lombok.*;
  * (no tenantExt — that is not exposed through gRPC).
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Getter

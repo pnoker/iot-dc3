@@ -24,11 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Encryption Keys Configuration Class
- * <p>
- * Configuration class for AES/RSA encryption key management in IoT DC3 platform. Contains
- * static inner classes for different encryption algorithm key pairs.
- * </p>
+ * AES/RSA encryption key containers.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -41,6 +41,10 @@ import java.util.concurrent.TimeUnit;
  * because its TTL elapsed — e.g. the driver / device status keys use this to synthesise
  * OFFLINE alarm rows without a scanning thread.
  * </p>
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Component

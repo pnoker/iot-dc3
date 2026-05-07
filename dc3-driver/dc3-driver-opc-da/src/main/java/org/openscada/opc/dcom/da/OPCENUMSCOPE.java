@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.da;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public enum OPCENUMSCOPE {
 
     OPC_ENUM_PRIVATE_CONNECTIONS(1), OPC_ENUM_PUBLIC_CONNECTIONS(2), OPC_ENUM_ALL_CONNECTIONS(3), OPC_ENUM_PRIVATE(4),

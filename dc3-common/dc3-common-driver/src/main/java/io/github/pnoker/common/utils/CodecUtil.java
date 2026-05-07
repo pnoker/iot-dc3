@@ -26,6 +26,10 @@ import java.util.Base64;
 /**
  * Utility class providing various utility methods for encoding, decoding, and byte
  * manipulation operations including Base64, BCD, Hex, and ASCII conversions.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 public class CodecUtil {

@@ -28,6 +28,7 @@ import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
  * selection follows the same {@code dc3.facade.mode} switch used by {@link DeviceFacade}.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 public interface DriverFacade {

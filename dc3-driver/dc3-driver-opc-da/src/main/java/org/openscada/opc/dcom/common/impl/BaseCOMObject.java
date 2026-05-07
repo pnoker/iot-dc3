@@ -19,6 +19,12 @@ package org.openscada.opc.dcom.common.impl;
 
 import org.jinterop.dcom.core.IJIComObject;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class BaseCOMObject {
 
     private IJIComObject comObject = null;

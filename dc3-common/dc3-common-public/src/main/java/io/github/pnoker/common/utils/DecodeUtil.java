@@ -26,12 +26,7 @@ import java.util.Base64;
 import java.util.HexFormat;
 
 /**
- * Encoding and Decoding Utility Class
- * <p>
- * Utility class for various encoding and decoding operations. Provides methods for
- * string/bytes conversion, MD5 hashing, Base64 encoding/decoding, and hexadecimal
- * conversion.
- * </p>
+ * Encoding/decoding utility for Base64, hex, MD5, and UTF-8.
  *
  * @author pnoker
  * @version 2025.9.0

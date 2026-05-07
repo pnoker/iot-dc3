@@ -20,6 +20,12 @@ package org.openscada.opc.dcom.da;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.*;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCITEMDEF {
 
     private String accessPath = "";

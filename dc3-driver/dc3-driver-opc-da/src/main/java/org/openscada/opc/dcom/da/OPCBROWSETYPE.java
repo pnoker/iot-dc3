@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.da;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public enum OPCBROWSETYPE {
 
     OPC_BRANCH(1), OPC_LEAF(2), OPC_FLAT(3), OPC_UNKNOWN(0);

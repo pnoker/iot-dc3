@@ -42,6 +42,7 @@ import java.util.*;
  * @param <K> - Type of read
  * @author mlohbihler
  * @version 2025.9.0
+ * @since 2022.1.0
  */
 public class BatchRead<K> {
 

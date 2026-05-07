@@ -25,12 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 
 /**
- * Environment Utility Class
- * <p>
- * Utility class for environment-related operations in IoT DC3 platform. Provides methods
- * for UUID generation and environment tag creation based on environment and group
- * identifiers.
- * </p>
+ * Node ID generation and environment tag builder.
  *
  * @author pnoker
  * @version 2025.9.0

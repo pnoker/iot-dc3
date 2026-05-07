@@ -28,12 +28,7 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
 import java.util.Objects;
 
 /**
- * Field Name Utility Class
- * <p>
- * Utility class for field name operations and lambda expressions. Provides methods to
- * extract field names from lambda functions and convert property names for database
- * operations.
- * </p>
+ * Lambda-to-field-name extraction and ID/enum validation.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.common;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class KeyedResult<K, V> extends Result<V> {
 
     private K key;

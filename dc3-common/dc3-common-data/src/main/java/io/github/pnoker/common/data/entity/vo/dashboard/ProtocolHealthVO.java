@@ -30,6 +30,10 @@ import java.io.Serializable;
  * they serve, how much sample volume they carried in the window. Phase-1 health signal is
  * just enable% + device count + sample volume; true heartbeat/latency signals get layered
  * in later.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

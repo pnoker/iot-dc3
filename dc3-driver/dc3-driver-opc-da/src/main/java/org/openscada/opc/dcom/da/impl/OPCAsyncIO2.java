@@ -27,6 +27,12 @@ import org.openscada.opc.dcom.da.OPCDATASOURCE;
 
 import java.net.UnknownHostException;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCAsyncIO2 extends BaseCOMObject {
 
     public OPCAsyncIO2(final IJIComObject opcAsyncIO2)

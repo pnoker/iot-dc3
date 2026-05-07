@@ -24,6 +24,8 @@ package org.openscada.opc.lib.common;
  * <p>
  * If both <code>clsId</code> and <code>progId</code> are set then <code>clsId</code> has
  * priority!
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public class ConnectionInformation {
 

@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.da;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public enum OPCDATASOURCE {
 
     OPC_DS_CACHE(1), OPC_DS_DEVICE(2), OPC_DS_UNKNOWN(0);

@@ -45,6 +45,10 @@ import java.util.UUID;
  * <p>
  * Exposes {@code POST /v1/chat/completions} with both streaming (SSE) and non-streaming
  * (JSON) response modes, following the OpenAI API format.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @RestController

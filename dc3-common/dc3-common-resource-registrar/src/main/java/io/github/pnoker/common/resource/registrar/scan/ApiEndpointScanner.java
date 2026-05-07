@@ -34,6 +34,7 @@ import java.util.*;
  * patterns is fanned out to multiple entries.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 public class ApiEndpointScanner {

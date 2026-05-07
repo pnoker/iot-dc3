@@ -27,6 +27,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 @Slf4j
 public class ServerStateReader {
 

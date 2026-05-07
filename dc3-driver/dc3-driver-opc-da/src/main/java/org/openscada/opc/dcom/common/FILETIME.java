@@ -23,6 +23,12 @@ import org.jinterop.dcom.core.JIStruct;
 import java.math.BigDecimal;
 import java.util.Calendar;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class FILETIME {
 
     private int high = 0;

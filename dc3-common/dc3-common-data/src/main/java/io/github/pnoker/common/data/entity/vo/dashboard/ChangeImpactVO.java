@@ -30,6 +30,10 @@ import java.time.LocalDateTime;
  * One config-change event — a driver/device/profile row whose operate_time differs from
  * create_time (i.e. someone edited it). Overlaid on the alarm trend chart so spikes can
  * be attributed to recent changes.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

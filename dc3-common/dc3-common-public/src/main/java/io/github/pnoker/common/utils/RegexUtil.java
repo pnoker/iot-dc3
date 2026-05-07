@@ -23,11 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.math.BigDecimal;
 
 /**
- * Regular Expression Utility Class
- * <p>
- * Utility class for common regular expression operations. Provides methods for number
- * validation, email validation, and various string format checks using regex patterns.
- * </p>
+ * Common regex-based string validation.
  *
  * @author pnoker
  * @version 2025.9.0
