@@ -39,13 +39,13 @@
 
     <dependencies>
 
-        <!-- Spring gRPC Starter (client + server) -->
+        <!-- gRPC Related -->
         <dependency>
             <groupId>org.springframework.grpc</groupId>
             <artifactId>spring-grpc-spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- DC3 Api Related -->
+        <!-- DC3 API Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-auth</artifactId>

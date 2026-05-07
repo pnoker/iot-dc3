@@ -68,7 +68,7 @@
 
     <dependencies>
 
-        <!-- Gateway -->
+        <!-- Spring Cloud Related -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-gateway-server-webflux</artifactId>
