@@ -43,4 +43,7 @@
 
     </mirrors>
 
+    <pluginGroups>
+        <pluginGroup>io.spring.javaformat</pluginGroup>
+    </pluginGroups>
 </settings>

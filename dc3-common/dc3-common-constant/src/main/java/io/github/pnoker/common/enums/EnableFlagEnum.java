@@ -35,68 +35,71 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum EnableFlagEnum {
 
-	/**
-	 * Enabled.
-	 */
-	ENABLE((byte) 0, "enable", "enable"),
+    /**
+     * Enabled.
+     */
+    ENABLE((byte) 0, "enable", "enable"),
 
-	/**
-	 * Disabled.
-	 */
-	DISABLE((byte) 1, "disable", "disable"),;
+    /**
+     * Disabled.
+     */
+    DISABLE((byte) 1, "disable", "disable"),
+    ;
 
-	/**
-	 * Index value stored in database.
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index value stored in database.
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code string.
-	 */
-	private final String code;
+    /**
+     * Code string.
+     */
+    private final String code;
 
-	/**
-	 * Human-readable description.
-	 */
-	private final String remark;
+    /**
+     * Human-readable description.
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index value.
-	 * @param index index value
-	 * @return {@link EnableFlagEnum} or {@code null} if not found
-	 */
-	public static EnableFlagEnum ofIndex(Byte index) {
-		Optional<EnableFlagEnum> any = Arrays.stream(EnableFlagEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index value.
+     *
+     * @param index index value
+     * @return {@link EnableFlagEnum} or {@code null} if not found
+     */
+    public static EnableFlagEnum ofIndex(Byte index) {
+        Optional<EnableFlagEnum> any = Arrays.stream(EnableFlagEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code string.
-	 * @param code code string
-	 * @return {@link EnableFlagEnum} or {@code null} if not found
-	 */
-	public static EnableFlagEnum ofCode(String code) {
-		Optional<EnableFlagEnum> any = Arrays.stream(EnableFlagEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code string.
+     *
+     * @param code code string
+     * @return {@link EnableFlagEnum} or {@code null} if not found
+     */
+    public static EnableFlagEnum ofCode(String code) {
+        Optional<EnableFlagEnum> any = Arrays.stream(EnableFlagEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by enum name.
-	 * @param name enum name
-	 * @return {@link EnableFlagEnum} or {@code null} if parsing fails
-	 */
-	public static EnableFlagEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by enum name.
+     *
+     * @param name enum name
+     * @return {@link EnableFlagEnum} or {@code null} if parsing fails
+     */
+    public static EnableFlagEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

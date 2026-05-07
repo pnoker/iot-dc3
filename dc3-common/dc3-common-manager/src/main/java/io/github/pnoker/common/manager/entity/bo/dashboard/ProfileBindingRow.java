@@ -29,8 +29,8 @@ import lombok.ToString;
 @ToString
 public class ProfileBindingRow {
 
-	private long profileId;
+    private long profileId;
 
-	private long deviceId;
+    private long deviceId;
 
 }

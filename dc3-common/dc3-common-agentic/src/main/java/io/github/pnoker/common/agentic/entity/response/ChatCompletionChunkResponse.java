@@ -36,43 +36,43 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatCompletionChunkResponse {
 
-	private String id;
+    private String id;
 
-	private String object;
+    private String object;
 
-	private long created;
+    private long created;
 
-	private String model;
+    private String model;
 
-	private List<ChunkChoice> choices;
+    private List<ChunkChoice> choices;
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@Builder
-	public static class ChunkChoice {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ChunkChoice {
 
-		private int index;
+        private int index;
 
-		private Delta delta;
+        private Delta delta;
 
-		@JsonProperty("finish_reason")
-		private String finishReason;
+        @JsonProperty("finish_reason")
+        private String finishReason;
 
-	}
+    }
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	public static class Delta {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Delta {
 
-		private String role;
+        private String role;
 
-		private String content;
+        private String content;
 
-	}
+    }
 
 }

@@ -34,12 +34,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class DataApplication {
 
-	/**
-	 * Main entry point for the Data Center Service.
-	 * @param args command line arguments
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(DataApplication.class, args);
-	}
+    /**
+     * Main entry point for the Data Center Service.
+     *
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(DataApplication.class, args);
+    }
 
 }

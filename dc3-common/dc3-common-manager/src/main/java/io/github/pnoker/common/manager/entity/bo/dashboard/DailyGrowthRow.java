@@ -31,8 +31,8 @@ import java.time.LocalDate;
 @ToString
 public class DailyGrowthRow {
 
-	private LocalDate day;
+    private LocalDate day;
 
-	private long count;
+    private long count;
 
 }

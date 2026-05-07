@@ -36,44 +36,44 @@ import lombok.*;
 @ToString(callSuper = true)
 public class DriverAttributeConfigBO extends BaseBO {
 
-	/**
-	 * ID
-	 */
-	private Long attributeId;
+    /**
+     * ID
+     */
+    private Long attributeId;
 
-	/**
-	 *
-	 */
-	private String configValue;
+    /**
+     *
+     */
+    private String configValue;
 
-	/**
-	 * Device ID
-	 */
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    private Long deviceId;
 
-	/**
-	 *
-	 */
-	private JsonExt configExt;
+    /**
+     *
+     */
+    private JsonExt configExt;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	/**
-	 *
-	 */
-	private String signature;
+    /**
+     *
+     */
+    private String signature;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
 }

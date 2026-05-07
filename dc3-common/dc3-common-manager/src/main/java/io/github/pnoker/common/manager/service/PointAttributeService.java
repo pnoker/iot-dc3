@@ -32,19 +32,21 @@ import java.util.List;
  */
 public interface PointAttributeService extends BaseService<PointAttributeBO, PointAttributeQuery> {
 
-	/**
-	 * Code Driver ID
-	 * @param name Code
-	 * @param driverId Driver ID
-	 * @return PointAttribute
-	 */
-	PointAttributeBO selectByNameAndDriverId(String name, Long driverId);
+    /**
+     * Code Driver ID
+     *
+     * @param name     Code
+     * @param driverId Driver ID
+     * @return PointAttribute
+     */
+    PointAttributeBO selectByNameAndDriverId(String name, Long driverId);
 
-	/**
-	 * Driver ID
-	 * @param driverId Driver ID
-	 * @return Array
-	 */
-	List<PointAttributeBO> selectByDriverId(Long driverId);
+    /**
+     * Driver ID
+     *
+     * @param driverId Driver ID
+     * @return Array
+     */
+    List<PointAttributeBO> selectByDriverId(Long driverId);
 
 }

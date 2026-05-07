@@ -50,54 +50,54 @@ import java.util.Optional;
 @Component
 public class FacadeGrpcDeviceBuilder {
 
-	public GrpcPageDeviceQuery toGrpcPageQuery(FacadeDeviceQuery query) {
-		GrpcPageDeviceQuery.Builder builder = GrpcPageDeviceQuery.newBuilder();
+    public GrpcPageDeviceQuery toGrpcPageQuery(FacadeDeviceQuery query) {
+        GrpcPageDeviceQuery.Builder builder = GrpcPageDeviceQuery.newBuilder();
 
-		Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
-		GrpcPage.Builder page = GrpcPage.newBuilder().setCurrent(pages.getCurrent()).setSize(pages.getSize());
-		builder.setPage(page);
+        Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
+        GrpcPage.Builder page = GrpcPage.newBuilder().setCurrent(pages.getCurrent()).setSize(pages.getSize());
+        builder.setPage(page);
 
-		LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
-		StringOptional.ofNullable(query.getDeviceName()).ifPresent(builder::setDeviceName);
-		StringOptional.ofNullable(query.getDeviceCode()).ifPresent(builder::setDeviceCode);
-		LongOptional.ofNullable(query.getDriverId()).ifPresent(builder::setDriverId);
-		LongOptional.ofNullable(query.getProfileId()).ifPresent(builder::setProfileId);
-		Optional.ofNullable(query.getEnableFlag())
-			.ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
-					() -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT));
+        LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
+        StringOptional.ofNullable(query.getDeviceName()).ifPresent(builder::setDeviceName);
+        StringOptional.ofNullable(query.getDeviceCode()).ifPresent(builder::setDeviceCode);
+        LongOptional.ofNullable(query.getDriverId()).ifPresent(builder::setDriverId);
+        LongOptional.ofNullable(query.getProfileId()).ifPresent(builder::setProfileId);
+        Optional.ofNullable(query.getEnableFlag())
+                .ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
+                        () -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT));
 
-		return builder.build();
-	}
+        return builder.build();
+    }
 
-	public FacadeDeviceBO toFacadeBO(GrpcDeviceDTO dto) {
-		if (Objects.isNull(dto)) {
-			return null;
-		}
+    public FacadeDeviceBO toFacadeBO(GrpcDeviceDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
 
-		FacadeDeviceBO bo = new FacadeDeviceBO();
-		GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
+        FacadeDeviceBO bo = new FacadeDeviceBO();
+        GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
 
-		StringOptional.ofNullable(dto.getDeviceName()).ifPresent(bo::setDeviceName);
-		StringOptional.ofNullable(dto.getDeviceCode()).ifPresent(bo::setDeviceCode);
-		LongOptional.ofNullable(dto.getDriverId()).ifPresent(bo::setDriverId);
-		StringOptional.ofNullable(dto.getSignature()).ifPresent(bo::setSignature);
-		LongOptional.ofNullable(dto.getTenantId()).ifPresent(bo::setTenantId);
+        StringOptional.ofNullable(dto.getDeviceName()).ifPresent(bo::setDeviceName);
+        StringOptional.ofNullable(dto.getDeviceCode()).ifPresent(bo::setDeviceCode);
+        LongOptional.ofNullable(dto.getDriverId()).ifPresent(bo::setDriverId);
+        StringOptional.ofNullable(dto.getSignature()).ifPresent(bo::setSignature);
+        LongOptional.ofNullable(dto.getTenantId()).ifPresent(bo::setTenantId);
 
-		if (dto.getVersion() != DefaultConstant.DEFAULT_INT) {
-			bo.setVersion(dto.getVersion());
-		}
+        if (dto.getVersion() != DefaultConstant.DEFAULT_INT) {
+            bo.setVersion(dto.getVersion());
+        }
 
-		byte enableIndex = (byte) dto.getEnableFlag();
-		Optional.ofNullable(EnableFlagEnum.ofIndex(enableIndex)).ifPresent(bo::setEnableFlag);
+        byte enableIndex = (byte) dto.getEnableFlag();
+        Optional.ofNullable(EnableFlagEnum.ofIndex(enableIndex)).ifPresent(bo::setEnableFlag);
 
-		StringOptional.ofNullable(dto.getDeviceExt())
-			.ifPresent(value -> bo.setDeviceExt(JsonUtil.parseObject(value, DeviceExt.class)));
+        StringOptional.ofNullable(dto.getDeviceExt())
+                .ifPresent(value -> bo.setDeviceExt(JsonUtil.parseObject(value, DeviceExt.class)));
 
-		if (dto.getProfileIdsCount() > 0) {
-			bo.setProfileIds(new ArrayList<>(dto.getProfileIdsList()));
-		}
+        if (dto.getProfileIdsCount() > 0) {
+            bo.setProfileIds(new ArrayList<>(dto.getProfileIdsList()));
+        }
 
-		return bo;
-	}
+        return bo;
+    }
 
 }

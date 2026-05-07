@@ -33,8 +33,8 @@ import java.time.LocalDateTime;
 @ToString
 public class TimeBucketRow {
 
-	private LocalDateTime bucket;
+    private LocalDateTime bucket;
 
-	private long count;
+    private long count;
 
 }

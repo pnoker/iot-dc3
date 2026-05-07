@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-driver-plcs7` is the Siemens S7 PLC driver of the IoT DC3 platform. It communicates with Siemens S7 series PLCs (S7-200/300/400/1200/1500) using the S7 TCP protocol to read
+`dc3-driver-plcs7` is the Siemens S7 PLC driver of the IoT DC3 platform. It communicates with Siemens S7 series PLCs (
+S7-200/300/400/1200/1500) using the S7 TCP protocol to read
 and write data block registers.
 
 ## Module Information

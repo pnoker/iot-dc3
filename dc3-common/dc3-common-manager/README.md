@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-manager` is the shared Device Management business module of the IoT DC3 platform. It contains all controllers, service implementations, gRPC servers, DAL managers,
+`dc3-common-manager` is the shared Device Management business module of the IoT DC3 platform. It contains all
+controllers, service implementations, gRPC servers, DAL managers,
 mappers, and event handling logic for the Manager Center. It is wired into `dc3-center-manager`.
 
 ## Module Information

@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class RegisterException extends RuntimeException {
 
-	public RegisterException() {
-		this(null);
-	}
+    public RegisterException() {
+        this(null);
+    }
 
-	public RegisterException(Throwable cause) {
-		super(cause);
-	}
+    public RegisterException(Throwable cause) {
+        super(cause);
+    }
 
-	public RegisterException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public RegisterException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

@@ -45,376 +45,371 @@ import java.util.concurrent.ScheduledExecutorService;
 @Slf4j
 public class Server {
 
-	private final ConnectionInformation connectionInformation;
+    private final ConnectionInformation connectionInformation;
 
-	private final Map<Integer, Group> groups = new HashMap<>(16);
+    private final Map<Integer, Group> groups = new HashMap<>(16);
 
-	private final List<ServerConnectionStateListener> stateListeners = new CopyOnWriteArrayList<>();
+    private final List<ServerConnectionStateListener> stateListeners = new CopyOnWriteArrayList<>();
 
-	private final ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService scheduler;
 
-	private JISession session;
+    private JISession session;
 
-	private JIComServer comServer;
+    private JIComServer comServer;
 
-	private OPCServer server;
+    private OPCServer server;
 
-	private boolean defaultActive = true;
+    private boolean defaultActive = true;
 
-	private int defaultUpdateRate = 1000;
+    private int defaultUpdateRate = 1000;
 
-	private Integer defaultTimeBias;
+    private Integer defaultTimeBias;
 
-	private Float defaultPercentDeadband;
+    private Float defaultPercentDeadband;
 
-	private int defaultLocaleID = 0;
+    private int defaultLocaleID = 0;
 
-	private ErrorMessageResolver errorMessageResolver;
+    private ErrorMessageResolver errorMessageResolver;
 
-	public Server(final ConnectionInformation connectionInformation, final ScheduledExecutorService scheduler) {
-		super();
-		this.connectionInformation = connectionInformation;
-		this.scheduler = scheduler;
-	}
+    public Server(final ConnectionInformation connectionInformation, final ScheduledExecutorService scheduler) {
+        super();
+        this.connectionInformation = connectionInformation;
+        this.scheduler = scheduler;
+    }
 
-	/**
-	 * Gets the scheduler for the server. Note that this scheduler might get blocked for a
-	 * short time if the connection breaks. It should not be used for time critical
-	 * operations.
-	 * @return the scheduler for the server
-	 */
-	public ScheduledExecutorService getScheduler() {
-		return this.scheduler;
-	}
+    /**
+     * Gets the scheduler for the server. Note that this scheduler might get blocked for a
+     * short time if the connection breaks. It should not be used for time critical
+     * operations.
+     *
+     * @return the scheduler for the server
+     */
+    public ScheduledExecutorService getScheduler() {
+        return this.scheduler;
+    }
 
-	protected synchronized boolean isConnected() {
-		return this.session != null;
-	}
+    protected synchronized boolean isConnected() {
+        return this.session != null;
+    }
 
-	public synchronized void connect()
-			throws IllegalArgumentException, UnknownHostException, JIException, AlreadyConnectedException {
-		if (isConnected()) {
-			throw new AlreadyConnectedException();
-		}
+    public synchronized void connect()
+            throws IllegalArgumentException, UnknownHostException, JIException, AlreadyConnectedException {
+        if (isConnected()) {
+            throw new AlreadyConnectedException();
+        }
 
-		final int socketTimeout = Integer.getInteger("rpc.socketTimeout", 0);
-		log.debug(String.format("Socket timeout: %s ", socketTimeout));
+        final int socketTimeout = Integer.getInteger("rpc.socketTimeout", 0);
+        log.debug(String.format("Socket timeout: %s ", socketTimeout));
 
-		try {
-			if (this.connectionInformation.getClsid() != null) {
-				this.session = JISession.createSession(this.connectionInformation.getDomain(),
-						this.connectionInformation.getUser(), this.connectionInformation.getPassword());
-				this.session.setGlobalSocketTimeout(socketTimeout);
-				this.session.useSessionSecurity(true);
-				this.comServer = new JIComServer(JIClsid.valueOf(this.connectionInformation.getClsid()),
-						this.connectionInformation.getHost(), this.session);
-			}
-			else if (this.connectionInformation.getProgId() != null) {
-				this.session = JISession.createSession(this.connectionInformation.getDomain(),
-						this.connectionInformation.getUser(), this.connectionInformation.getPassword());
-				this.session.setGlobalSocketTimeout(socketTimeout);
-				this.comServer = new JIComServer(JIProgId.valueOf(this.connectionInformation.getProgId()),
-						this.connectionInformation.getHost(), this.session);
-			}
-			else {
-				throw new IllegalArgumentException("Neither clsid nor progid is valid!");
-			}
+        try {
+            if (this.connectionInformation.getClsid() != null) {
+                this.session = JISession.createSession(this.connectionInformation.getDomain(),
+                        this.connectionInformation.getUser(), this.connectionInformation.getPassword());
+                this.session.setGlobalSocketTimeout(socketTimeout);
+                this.session.useSessionSecurity(true);
+                this.comServer = new JIComServer(JIClsid.valueOf(this.connectionInformation.getClsid()),
+                        this.connectionInformation.getHost(), this.session);
+            } else if (this.connectionInformation.getProgId() != null) {
+                this.session = JISession.createSession(this.connectionInformation.getDomain(),
+                        this.connectionInformation.getUser(), this.connectionInformation.getPassword());
+                this.session.setGlobalSocketTimeout(socketTimeout);
+                this.comServer = new JIComServer(JIProgId.valueOf(this.connectionInformation.getProgId()),
+                        this.connectionInformation.getHost(), this.session);
+            } else {
+                throw new IllegalArgumentException("Neither clsid nor progid is valid!");
+            }
 
-			this.server = new OPCServer(this.comServer.createInstance());
-			this.errorMessageResolver = new ErrorMessageResolver(this.server.getCommon(), this.defaultLocaleID);
-		}
-		catch (final UnknownHostException e) {
-			log.error("Unknown host when connecting to server", e);
-			cleanup();
-			throw e;
-		}
-		catch (final JIException e) {
-			log.error("Failed to connect to server", e);
-			cleanup();
-			throw e;
-		}
-		catch (final Throwable e) {
-			log.error("Unknown error", e);
-			cleanup();
-			throw new RuntimeException(e);
-		}
+            this.server = new OPCServer(this.comServer.createInstance());
+            this.errorMessageResolver = new ErrorMessageResolver(this.server.getCommon(), this.defaultLocaleID);
+        } catch (final UnknownHostException e) {
+            log.error("Unknown host when connecting to server", e);
+            cleanup();
+            throw e;
+        } catch (final JIException e) {
+            log.error("Failed to connect to server", e);
+            cleanup();
+            throw e;
+        } catch (final Throwable e) {
+            log.error("Unknown error", e);
+            cleanup();
+            throw new RuntimeException(e);
+        }
 
-		notifyConnectionStateChange(true);
-	}
+        notifyConnectionStateChange(true);
+    }
 
-	/**
-	 * cleanup after the connection is closed
-	 */
-	protected void cleanup() {
-		log.debug("Destroying DCOM session...");
-		final JISession destructSession = this.session;
-		final Thread destructor = new Thread(new Runnable() {
+    /**
+     * cleanup after the connection is closed
+     */
+    protected void cleanup() {
+        log.debug("Destroying DCOM session...");
+        final JISession destructSession = this.session;
+        final Thread destructor = new Thread(new Runnable() {
 
-			public void run() {
-				final long ts = System.currentTimeMillis();
-				try {
-					log.debug("Starting destruction of DCOM session");
-					JISession.destroySession(destructSession);
-					log.debug("Destructed DCOM session");
-				}
-				catch (final Throwable e) {
-					log.error("Failed to destruct DCOM session", e);
-				}
-			}
-		}, "UtgardSessionDestructor");
-		destructor.setName("OPCSessionDestructor");
-		destructor.setDaemon(true);
-		destructor.start();
-		log.debug("Destroying DCOM session... forked");
+            public void run() {
+                final long ts = System.currentTimeMillis();
+                try {
+                    log.debug("Starting destruction of DCOM session");
+                    JISession.destroySession(destructSession);
+                    log.debug("Destructed DCOM session");
+                } catch (final Throwable e) {
+                    log.error("Failed to destruct DCOM session", e);
+                }
+            }
+        }, "UtgardSessionDestructor");
+        destructor.setName("OPCSessionDestructor");
+        destructor.setDaemon(true);
+        destructor.start();
+        log.debug("Destroying DCOM session... forked");
 
-		this.errorMessageResolver = null;
-		this.session = null;
-		this.comServer = null;
-		this.server = null;
+        this.errorMessageResolver = null;
+        this.session = null;
+        this.comServer = null;
+        this.server = null;
 
-		this.groups.clear();
-	}
+        this.groups.clear();
+    }
 
-	/**
-	 * Disconnect the connection if it is connected
-	 */
-	public synchronized void disconnect() {
-		if (!isConnected()) {
-			return;
-		}
+    /**
+     * Disconnect the connection if it is connected
+     */
+    public synchronized void disconnect() {
+        if (!isConnected()) {
+            return;
+        }
 
-		try {
-			notifyConnectionStateChange(false);
-		}
-		catch (final Throwable t) {
-		}
+        try {
+            notifyConnectionStateChange(false);
+        } catch (final Throwable t) {
+        }
 
-		cleanup();
-	}
+        cleanup();
+    }
 
-	/**
-	 * Dispose the connection in the case of an error
-	 */
-	public void dispose() {
-		disconnect();
-	}
+    /**
+     * Dispose the connection in the case of an error
+     */
+    public void dispose() {
+        disconnect();
+    }
 
-	protected synchronized Group getGroup(final OPCGroupStateMgt groupMgt)
-			throws JIException, IllegalArgumentException, UnknownHostException {
-		final Integer serverHandle = groupMgt.getState().getServerHandle();
-		if (this.groups.containsKey(serverHandle)) {
-			return this.groups.get(serverHandle);
-		}
-		else {
-			final Group group = new Group(this, serverHandle, groupMgt);
-			this.groups.put(serverHandle, group);
-			return group;
-		}
-	}
+    protected synchronized Group getGroup(final OPCGroupStateMgt groupMgt)
+            throws JIException, IllegalArgumentException, UnknownHostException {
+        final Integer serverHandle = groupMgt.getState().getServerHandle();
+        if (this.groups.containsKey(serverHandle)) {
+            return this.groups.get(serverHandle);
+        } else {
+            final Group group = new Group(this, serverHandle, groupMgt);
+            this.groups.put(serverHandle, group);
+            return group;
+        }
+    }
 
-	/**
-	 * Add a new named group to the server
-	 * @param name The name of the group to use. Must be unique or <code>null</code> so
-	 * that the server creates a unique name.
-	 * @return The new group
-	 * @throws NotConnectedException If the server is not connected using
-	 * {@link Server#connect()}
-	 * @throws IllegalArgumentException IllegalArgumentException
-	 * @throws UnknownHostException UnknownHostException
-	 * @throws JIException JIException
-	 * @throws DuplicateGroupException If a group with this name already exists
-	 */
-	public synchronized Group addGroup(final String name) throws NotConnectedException, IllegalArgumentException,
-			UnknownHostException, JIException, DuplicateGroupException {
-		if (!isConnected()) {
-			throw new NotConnectedException();
-		}
+    /**
+     * Add a new named group to the server
+     *
+     * @param name The name of the group to use. Must be unique or <code>null</code> so
+     *             that the server creates a unique name.
+     * @return The new group
+     * @throws NotConnectedException    If the server is not connected using
+     *                                  {@link Server#connect()}
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
+     * @throws DuplicateGroupException  If a group with this name already exists
+     */
+    public synchronized Group addGroup(final String name) throws NotConnectedException, IllegalArgumentException,
+            UnknownHostException, JIException, DuplicateGroupException {
+        if (!isConnected()) {
+            throw new NotConnectedException();
+        }
 
-		try {
-			final OPCGroupStateMgt groupMgt = this.server.addGroup(name, this.defaultActive, this.defaultUpdateRate, 0,
-					this.defaultTimeBias, this.defaultPercentDeadband, this.defaultLocaleID);
-			return getGroup(groupMgt);
-		}
-		catch (final JIException e) {
-			if (e.getErrorCode() == 0xC004000C) {
-				throw new DuplicateGroupException();
-			}
-			throw e;
-		}
-	}
+        try {
+            final OPCGroupStateMgt groupMgt = this.server.addGroup(name, this.defaultActive, this.defaultUpdateRate, 0,
+                    this.defaultTimeBias, this.defaultPercentDeadband, this.defaultLocaleID);
+            return getGroup(groupMgt);
+        } catch (final JIException e) {
+            if (e.getErrorCode() == 0xC004000C) {
+                throw new DuplicateGroupException();
+            }
+            throw e;
+        }
+    }
 
-	/**
-	 * Add a new group and let the server generate a group name
-	 * <p>
-	 * Actually this method only calls {@link Server#addGroup(String)} with
-	 * <code>null</code> as parameter.
-	 * @return the new group
-	 * @throws IllegalArgumentException IllegalArgumentException
-	 * @throws UnknownHostException UnknownHostException
-	 * @throws NotConnectedException NotConnectedException
-	 * @throws JIException JIException
-	 * @throws DuplicateGroupException DuplicateGroupException
-	 */
-	public Group addGroup() throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
-			DuplicateGroupException {
-		return addGroup(null);
-	}
+    /**
+     * Add a new group and let the server generate a group name
+     * <p>
+     * Actually this method only calls {@link Server#addGroup(String)} with
+     * <code>null</code> as parameter.
+     *
+     * @return the new group
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws NotConnectedException    NotConnectedException
+     * @throws JIException              JIException
+     * @throws DuplicateGroupException  DuplicateGroupException
+     */
+    public Group addGroup() throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
+            DuplicateGroupException {
+        return addGroup(null);
+    }
 
-	/**
-	 * Find a group by its name
-	 * @param name The name to look for
-	 * @return The group
-	 * @throws IllegalArgumentException IllegalArgumentException
-	 * @throws UnknownHostException UnknownHostException
-	 * @throws JIException JIException
-	 * @throws UnknownGroupException If the group was not found
-	 * @throws NotConnectedException If the server is not connected
-	 */
-	public Group findGroup(final String name) throws IllegalArgumentException, UnknownHostException, JIException,
-			UnknownGroupException, NotConnectedException {
-		if (!isConnected()) {
-			throw new NotConnectedException();
-		}
+    /**
+     * Find a group by its name
+     *
+     * @param name The name to look for
+     * @return The group
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
+     * @throws UnknownGroupException    If the group was not found
+     * @throws NotConnectedException    If the server is not connected
+     */
+    public Group findGroup(final String name) throws IllegalArgumentException, UnknownHostException, JIException,
+            UnknownGroupException, NotConnectedException {
+        if (!isConnected()) {
+            throw new NotConnectedException();
+        }
 
-		try {
-			final OPCGroupStateMgt groupMgt = this.server.getGroupByName(name);
-			return getGroup(groupMgt);
-		}
-		catch (final JIException e) {
-			switch (e.getErrorCode()) {
-				case 0x80070057:
-					throw new UnknownGroupException(name);
-				default:
-					throw e;
-			}
-		}
-	}
+        try {
+            final OPCGroupStateMgt groupMgt = this.server.getGroupByName(name);
+            return getGroup(groupMgt);
+        } catch (final JIException e) {
+            switch (e.getErrorCode()) {
+                case 0x80070057:
+                    throw new UnknownGroupException(name);
+                default:
+                    throw e;
+            }
+        }
+    }
 
-	public int getDefaultLocaleID() {
-		return this.defaultLocaleID;
-	}
+    public int getDefaultLocaleID() {
+        return this.defaultLocaleID;
+    }
 
-	public void setDefaultLocaleID(final int defaultLocaleID) {
-		this.defaultLocaleID = defaultLocaleID;
-	}
+    public void setDefaultLocaleID(final int defaultLocaleID) {
+        this.defaultLocaleID = defaultLocaleID;
+    }
 
-	public Float getDefaultPercentDeadband() {
-		return this.defaultPercentDeadband;
-	}
+    public Float getDefaultPercentDeadband() {
+        return this.defaultPercentDeadband;
+    }
 
-	public void setDefaultPercentDeadband(final Float defaultPercentDeadband) {
-		this.defaultPercentDeadband = defaultPercentDeadband;
-	}
+    public void setDefaultPercentDeadband(final Float defaultPercentDeadband) {
+        this.defaultPercentDeadband = defaultPercentDeadband;
+    }
 
-	public Integer getDefaultTimeBias() {
-		return this.defaultTimeBias;
-	}
+    public Integer getDefaultTimeBias() {
+        return this.defaultTimeBias;
+    }
 
-	public void setDefaultTimeBias(final Integer defaultTimeBias) {
-		this.defaultTimeBias = defaultTimeBias;
-	}
+    public void setDefaultTimeBias(final Integer defaultTimeBias) {
+        this.defaultTimeBias = defaultTimeBias;
+    }
 
-	public int getDefaultUpdateRate() {
-		return this.defaultUpdateRate;
-	}
+    public int getDefaultUpdateRate() {
+        return this.defaultUpdateRate;
+    }
 
-	public void setDefaultUpdateRate(final int defaultUpdateRate) {
-		this.defaultUpdateRate = defaultUpdateRate;
-	}
+    public void setDefaultUpdateRate(final int defaultUpdateRate) {
+        this.defaultUpdateRate = defaultUpdateRate;
+    }
 
-	public boolean isDefaultActive() {
-		return this.defaultActive;
-	}
+    public boolean isDefaultActive() {
+        return this.defaultActive;
+    }
 
-	public void setDefaultActive(final boolean defaultActive) {
-		this.defaultActive = defaultActive;
-	}
+    public void setDefaultActive(final boolean defaultActive) {
+        this.defaultActive = defaultActive;
+    }
 
-	/**
-	 * Get the flat browser
-	 * @return The flat browser or <code>null</code> if the functionality is not supported
-	 */
-	public FlatBrowser getFlatBrowser() {
-		final OPCBrowseServerAddressSpace browser = this.server.getBrowser();
-		if (browser == null) {
-			return null;
-		}
+    /**
+     * Get the flat browser
+     *
+     * @return The flat browser or <code>null</code> if the functionality is not supported
+     */
+    public FlatBrowser getFlatBrowser() {
+        final OPCBrowseServerAddressSpace browser = this.server.getBrowser();
+        if (browser == null) {
+            return null;
+        }
 
-		return new FlatBrowser(browser);
-	}
+        return new FlatBrowser(browser);
+    }
 
-	/**
-	 * Get the tree browser
-	 * @return The tree browser or <code>null</code> if the functionality is not supported
-	 * @throws JIException JIException
-	 */
-	public TreeBrowser getTreeBrowser() throws JIException {
-		final OPCBrowseServerAddressSpace browser = this.server.getBrowser();
-		if (browser == null) {
-			return null;
-		}
+    /**
+     * Get the tree browser
+     *
+     * @return The tree browser or <code>null</code> if the functionality is not supported
+     * @throws JIException JIException
+     */
+    public TreeBrowser getTreeBrowser() throws JIException {
+        final OPCBrowseServerAddressSpace browser = this.server.getBrowser();
+        if (browser == null) {
+            return null;
+        }
 
-		if (browser.queryOrganization() != OPCNAMESPACETYPE.OPC_NS_HIERARCHIAL) {
-			return null;
-		}
+        if (browser.queryOrganization() != OPCNAMESPACETYPE.OPC_NS_HIERARCHIAL) {
+            return null;
+        }
 
-		return new TreeBrowser(browser);
-	}
+        return new TreeBrowser(browser);
+    }
 
-	public synchronized String getErrorMessage(final int errorCode) {
-		if (this.errorMessageResolver == null) {
-			return String.format("Unknown error (%08X)", errorCode);
-		}
+    public synchronized String getErrorMessage(final int errorCode) {
+        if (this.errorMessageResolver == null) {
+            return String.format("Unknown error (%08X)", errorCode);
+        }
 
-		// resolve message
-		final String message = this.errorMessageResolver.getMessage(errorCode);
+        // resolve message
+        final String message = this.errorMessageResolver.getMessage(errorCode);
 
-		// and return if successfull
-		if (message != null) {
-			return message;
-		}
+        // and return if successfull
+        if (message != null) {
+            return message;
+        }
 
-		// return default message
-		return String.format("Unknown error (%08X)", errorCode);
-	}
+        // return default message
+        return String.format("Unknown error (%08X)", errorCode);
+    }
 
-	public synchronized void addStateListener(final ServerConnectionStateListener listener) {
-		this.stateListeners.add(listener);
-		listener.connectionStateChanged(isConnected());
-	}
+    public synchronized void addStateListener(final ServerConnectionStateListener listener) {
+        this.stateListeners.add(listener);
+        listener.connectionStateChanged(isConnected());
+    }
 
-	public synchronized void removeStateListener(final ServerConnectionStateListener listener) {
-		this.stateListeners.remove(listener);
-	}
+    public synchronized void removeStateListener(final ServerConnectionStateListener listener) {
+        this.stateListeners.remove(listener);
+    }
 
-	protected void notifyConnectionStateChange(final boolean connected) {
-		final List<ServerConnectionStateListener> list = new ArrayList<ServerConnectionStateListener>(
-				this.stateListeners);
-		for (final ServerConnectionStateListener listener : list) {
-			listener.connectionStateChanged(connected);
-		}
-	}
+    protected void notifyConnectionStateChange(final boolean connected) {
+        final List<ServerConnectionStateListener> list = new ArrayList<ServerConnectionStateListener>(
+                this.stateListeners);
+        for (final ServerConnectionStateListener listener : list) {
+            listener.connectionStateChanged(connected);
+        }
+    }
 
-	public OPCSERVERSTATUS getServerState(final int timeout) throws Throwable {
-		return new ServerStateOperation(this.server).getServerState(timeout);
-	}
+    public OPCSERVERSTATUS getServerState(final int timeout) throws Throwable {
+        return new ServerStateOperation(this.server).getServerState(timeout);
+    }
 
-	public OPCSERVERSTATUS getServerState() {
-		try {
-			return getServerState(2500);
-		}
-		catch (final Throwable e) {
-			log.error("Server connection failed", e);
-			dispose();
-			return null;
-		}
-	}
+    public OPCSERVERSTATUS getServerState() {
+        try {
+            return getServerState(2500);
+        } catch (final Throwable e) {
+            log.error("Server connection failed", e);
+            dispose();
+            return null;
+        }
+    }
 
-	public void removeGroup(final Group group, final boolean force) throws JIException {
-		if (this.groups.containsKey(group.getServerHandle())) {
-			this.server.removeGroup(group.getServerHandle(), force);
-			this.groups.remove(group.getServerHandle());
-		}
-	}
+    public void removeGroup(final Group group, final boolean force) throws JIException {
+        if (this.groups.containsKey(group.getServerHandle())) {
+            this.server.removeGroup(group.getServerHandle(), force);
+            this.groups.remove(group.getServerHandle());
+        }
+    }
 
 }

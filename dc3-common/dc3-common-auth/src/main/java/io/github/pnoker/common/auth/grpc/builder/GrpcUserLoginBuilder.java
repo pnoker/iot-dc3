@@ -37,34 +37,35 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcUserLoginBuilder {
 
-	/**
-	 * BO to Grpc DTO
-	 * @param entityBO UserLoginBO
-	 * @return GrpcUserLoginDTO
-	 */
-	@Mapping(target = "enableFlag", ignore = true)
-	@Mapping(target = "loginNameBytes", ignore = true)
-	@Mapping(target = "mergeFrom", ignore = true)
-	@Mapping(target = "clearField", ignore = true)
-	@Mapping(target = "clearOneof", ignore = true)
-	@Mapping(target = "base", ignore = true)
-	@Mapping(target = "mergeBase", ignore = true)
-	@Mapping(target = "unknownFields", ignore = true)
-	@Mapping(target = "mergeUnknownFields", ignore = true)
-	@Mapping(target = "allFields", ignore = true)
-	GrpcUserLoginDTO buildGrpcDTOByBO(UserLoginBO entityBO);
+    /**
+     * BO to Grpc DTO
+     *
+     * @param entityBO UserLoginBO
+     * @return GrpcUserLoginDTO
+     */
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "loginNameBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
+    GrpcUserLoginDTO buildGrpcDTOByBO(UserLoginBO entityBO);
 
-	@AfterMapping
-	default void afterProcess(UserLoginBO entityBO, @MappingTarget GrpcUserLoginDTO.Builder entityGrpc) {
-		GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
-		entityGrpc.setBase(grpcBase);
+    @AfterMapping
+    default void afterProcess(UserLoginBO entityBO, @MappingTarget GrpcUserLoginDTO.Builder entityGrpc) {
+        GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
+        entityGrpc.setBase(grpcBase);
 
-		Optional.ofNullable(entityBO.getEnableFlag())
-			.ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
-					() -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
-	}
+        Optional.ofNullable(entityBO.getEnableFlag())
+                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                        () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
+    }
 
 }

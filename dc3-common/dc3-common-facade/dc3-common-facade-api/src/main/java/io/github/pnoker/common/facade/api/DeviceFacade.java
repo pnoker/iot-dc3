@@ -41,28 +41,32 @@ import java.util.List;
  */
 public interface DeviceFacade {
 
-	/**
-	 * Query a single device by id.
-	 * @return the device, or {@code null} when the device does not exist.
-	 */
-	FacadeDeviceBO selectById(Long id);
+    /**
+     * Query a single device by id.
+     *
+     * @return the device, or {@code null} when the device does not exist.
+     */
+    FacadeDeviceBO selectById(Long id);
 
-	/**
-	 * Paginated query.
-	 * @return a page of devices (never {@code null}; empty page when nothing matches).
-	 */
-	FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query);
+    /**
+     * Paginated query.
+     *
+     * @return a page of devices (never {@code null}; empty page when nothing matches).
+     */
+    FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query);
 
-	/**
-	 * List devices attached to a given profile.
-	 * @return an immutable list (never {@code null}; empty when nothing matches).
-	 */
-	List<FacadeDeviceBO> selectByProfileId(Long profileId);
+    /**
+     * List devices attached to a given profile.
+     *
+     * @return an immutable list (never {@code null}; empty when nothing matches).
+     */
+    List<FacadeDeviceBO> selectByProfileId(Long profileId);
 
-	/**
-	 * List devices attached to a given driver.
-	 * @return an immutable list (never {@code null}; empty when nothing matches).
-	 */
-	List<FacadeDeviceBO> selectByDriverId(Long driverId);
+    /**
+     * List devices attached to a given driver.
+     *
+     * @return an immutable list (never {@code null}; empty when nothing matches).
+     */
+    List<FacadeDeviceBO> selectByDriverId(Long driverId);
 
 }

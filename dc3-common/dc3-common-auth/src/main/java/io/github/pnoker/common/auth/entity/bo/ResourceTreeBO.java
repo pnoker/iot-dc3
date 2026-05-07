@@ -37,37 +37,37 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class ResourceTreeBO extends ResourceBO {
 
-	private List<ResourceTreeBO> children = new ArrayList<>();
+    private List<ResourceTreeBO> children = new ArrayList<>();
 
-	/**
-	 * Copy shared fields from a flat {@link ResourceBO} into a new tree node.
-	 */
-	public static ResourceTreeBO fromBO(ResourceBO source) {
-		ResourceTreeBO node = new ResourceTreeBO();
-		node.setId(source.getId());
-		node.setParentResourceId(source.getParentResourceId());
-		node.setResourceName(source.getResourceName());
-		node.setResourceCode(source.getResourceCode());
-		node.setResourceTypeFlag(source.getResourceTypeFlag());
-		node.setResourceScopeFlag(source.getResourceScopeFlag());
-		node.setEntityId(source.getEntityId());
-		node.setResourceExt(source.getResourceExt());
-		node.setEnableFlag(source.getEnableFlag());
-		node.setRemark(source.getRemark());
-		node.setCreatorId(source.getCreatorId());
-		node.setCreatorName(source.getCreatorName());
-		node.setCreateTime(source.getCreateTime());
-		node.setOperatorId(source.getOperatorId());
-		node.setOperatorName(source.getOperatorName());
-		node.setOperateTime(source.getOperateTime());
-		return node;
-	}
+    /**
+     * Copy shared fields from a flat {@link ResourceBO} into a new tree node.
+     */
+    public static ResourceTreeBO fromBO(ResourceBO source) {
+        ResourceTreeBO node = new ResourceTreeBO();
+        node.setId(source.getId());
+        node.setParentResourceId(source.getParentResourceId());
+        node.setResourceName(source.getResourceName());
+        node.setResourceCode(source.getResourceCode());
+        node.setResourceTypeFlag(source.getResourceTypeFlag());
+        node.setResourceScopeFlag(source.getResourceScopeFlag());
+        node.setEntityId(source.getEntityId());
+        node.setResourceExt(source.getResourceExt());
+        node.setEnableFlag(source.getEnableFlag());
+        node.setRemark(source.getRemark());
+        node.setCreatorId(source.getCreatorId());
+        node.setCreatorName(source.getCreatorName());
+        node.setCreateTime(source.getCreateTime());
+        node.setOperatorId(source.getOperatorId());
+        node.setOperatorName(source.getOperatorName());
+        node.setOperateTime(source.getOperateTime());
+        return node;
+    }
 
-	public void addChild(ResourceTreeBO child) {
-		if (children == null) {
-			children = new ArrayList<>();
-		}
-		children.add(child);
-	}
+    public void addChild(ResourceTreeBO child) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        children.add(child);
+    }
 
 }

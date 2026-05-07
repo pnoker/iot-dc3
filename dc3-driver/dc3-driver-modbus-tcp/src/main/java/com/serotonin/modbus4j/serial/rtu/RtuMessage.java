@@ -29,33 +29,35 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class RtuMessage extends SerialMessage {
 
-	/**
-	 * <p>
-	 * Constructor for RtuMessage.
-	 * </p>
-	 * @param modbusMessage a {@link ModbusMessage} object.
-	 */
-	public RtuMessage(ModbusMessage modbusMessage) {
-		super(modbusMessage);
-	}
+    /**
+     * <p>
+     * Constructor for RtuMessage.
+     * </p>
+     *
+     * @param modbusMessage a {@link ModbusMessage} object.
+     */
+    public RtuMessage(ModbusMessage modbusMessage) {
+        super(modbusMessage);
+    }
 
-	/**
-	 * <p>
-	 * getMessageData.
-	 * </p>
-	 * @return an array of {@link byte} objects.
-	 */
-	public byte[] getMessageData() {
-		ByteQueue queue = new ByteQueue();
+    /**
+     * <p>
+     * getMessageData.
+     * </p>
+     *
+     * @return an array of {@link byte} objects.
+     */
+    public byte[] getMessageData() {
+        ByteQueue queue = new ByteQueue();
 
-		// Write the particular message.
-		modbusMessage.write(queue);
+        // Write the particular message.
+        modbusMessage.write(queue);
 
-		// Write the CRC
-		ModbusUtils.pushShort(queue, ModbusUtils.calculateCRC(modbusMessage));
+        // Write the CRC
+        ModbusUtils.pushShort(queue, ModbusUtils.calculateCRC(modbusMessage));
 
-		// Return the data.
-		return queue.popAll();
-	}
+        // Return the data.
+        return queue.popAll();
+    }
 
 }

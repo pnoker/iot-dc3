@@ -29,18 +29,18 @@ package io.github.pnoker.common.constant.common;
  */
 public class FolderConstant {
 
-	/**
-	 * User home directory path: "{user.home}/.dc3/"
-	 */
-	public static final String USER_HOME_PATH = System.getProperty("user.home") + "/.dc3/";
+    /**
+     * User home directory path: "{user.home}/.dc3/"
+     */
+    public static final String USER_HOME_PATH = System.getProperty("user.home") + "/.dc3/";
 
-	/**
-	 * Default temporary file upload cache location: "{java.io.tmpdir}/dc3/upload/"
-	 */
-	public static final String TEMP_FILE_PATH = System.getProperty("java.io.tmpdir") + "/dc3/upload/";
+    /**
+     * Default temporary file upload cache location: "{java.io.tmpdir}/dc3/upload/"
+     */
+    public static final String TEMP_FILE_PATH = System.getProperty("java.io.tmpdir") + "/dc3/upload/";
 
-	private FolderConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private FolderConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class UpdateException extends RuntimeException {
 
-	public UpdateException() {
-		this(null);
-	}
+    public UpdateException() {
+        this(null);
+    }
 
-	public UpdateException(Throwable cause) {
-		super(cause);
-	}
+    public UpdateException(Throwable cause) {
+        super(cause);
+    }
 
-	public UpdateException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public UpdateException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

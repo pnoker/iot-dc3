@@ -39,27 +39,27 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AlertItemVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Long id;
+    private Long id;
 
-	private String source;
+    private String source;
 
-	private Long sourceId;
+    private Long sourceId;
 
-	private Long pointId;
+    private Long pointId;
 
-	private Integer eventTypeFlag;
+    private Integer eventTypeFlag;
 
-	private Integer confirmFlag;
+    private Integer confirmFlag;
 
-	private LocalDateTime createTime;
+    private LocalDateTime createTime;
 
-	/**
-	 * Human-readable message extracted from event_ext->>'content'. Populated by the
-	 * paging / list endpoints; latest(size=N) leaves it null.
-	 */
-	private String message;
+    /**
+     * Human-readable message extracted from event_ext->>'content'. Populated by the
+     * paging / list endpoints; latest(size=N) leaves it null.
+     */
+    private String message;
 
 }

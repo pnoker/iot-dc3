@@ -39,11 +39,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class LatencyBucketVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private int bin;
+    private int bin;
 
-	private long count;
+    private long count;
 
 }

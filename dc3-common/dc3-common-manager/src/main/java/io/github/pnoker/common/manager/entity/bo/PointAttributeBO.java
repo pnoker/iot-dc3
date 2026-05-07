@@ -37,54 +37,54 @@ import lombok.*;
 @ToString(callSuper = true)
 public class PointAttributeBO extends BaseBO {
 
-	/**
-	 * Name
-	 */
-	private String attributeName;
+    /**
+     * Name
+     */
+    private String attributeName;
 
-	/**
-	 * Code
-	 */
-	private String attributeCode;
+    /**
+     * Code
+     */
+    private String attributeCode;
 
-	/**
-	 * Type
-	 */
-	private AttributeTypeFlagEnum attributeTypeFlag;
+    /**
+     * Type
+     */
+    private AttributeTypeFlagEnum attributeTypeFlag;
 
-	/**
-	 *
-	 */
-	private String defaultValue;
+    /**
+     *
+     */
+    private String defaultValue;
 
-	/**
-	 * Driver ID
-	 */
-	private Long driverId;
+    /**
+     * Driver ID
+     */
+    private Long driverId;
 
-	/**
-	 *
-	 */
-	private PointAttributeExt attributeExt;
+    /**
+     *
+     */
+    private PointAttributeExt attributeExt;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	/**
-	 *
-	 */
-	private String signature;
+    /**
+     *
+     */
+    private String signature;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
 }

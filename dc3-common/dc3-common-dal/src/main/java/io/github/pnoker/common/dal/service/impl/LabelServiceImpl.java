@@ -50,123 +50,126 @@ import java.util.Objects;
 @Service
 public class LabelServiceImpl implements LabelService {
 
-	@Resource
-	private LabelBuilder labelBuilder;
+    @Resource
+    private LabelBuilder labelBuilder;
 
-	@Resource
-	private LabelManager labelManager;
+    @Resource
+    private LabelManager labelManager;
 
-	@Resource
-	private LabelBindManager labelBindManager;
+    @Resource
+    private LabelBindManager labelBindManager;
 
-	@Override
-	public void save(LabelBO entityBO) {
-		checkDuplicate(entityBO, false, true);
+    @Override
+    public void save(LabelBO entityBO) {
+        checkDuplicate(entityBO, false, true);
 
-		LabelDO entityDO = labelBuilder.buildDOByBO(entityBO);
-		if (!labelManager.save(entityDO)) {
-			throw new AddException("Failed to create label");
-		}
-	}
+        LabelDO entityDO = labelBuilder.buildDOByBO(entityBO);
+        if (!labelManager.save(entityDO)) {
+            throw new AddException("Failed to create label");
+        }
+    }
 
-	@Override
-	public void remove(Long id) {
-		getDOById(id, true);
+    @Override
+    public void remove(Long id) {
+        getDOById(id, true);
 
-		// Before deleting a label, check whether it is already bound to any entity.
-		LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
-		wrapper.eq(LabelBindDO::getLabelId, id);
-		long count = labelBindManager.count(wrapper);
-		if (count > 0) {
-			throw new AssociatedException("The label has been bound by another entity");
-		}
+        // Before deleting a label, check whether it is already bound to any entity.
+        LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(LabelBindDO::getLabelId, id);
+        long count = labelBindManager.count(wrapper);
+        if (count > 0) {
+            throw new AssociatedException("The label has been bound by another entity");
+        }
 
-		if (!labelManager.removeById(id)) {
-			throw new DeleteException("Failed to remove label");
-		}
-	}
+        if (!labelManager.removeById(id)) {
+            throw new DeleteException("Failed to remove label");
+        }
+    }
 
-	@Override
-	public void update(LabelBO entityBO) {
-		getDOById(entityBO.getId(), true);
+    @Override
+    public void update(LabelBO entityBO) {
+        getDOById(entityBO.getId(), true);
 
-		checkDuplicate(entityBO, true, true);
+        checkDuplicate(entityBO, true, true);
 
-		LabelDO entityDO = labelBuilder.buildDOByBO(entityBO);
-		entityDO.setOperateTime(null);
-		if (!labelManager.updateById(entityDO)) {
-			throw new UpdateException("The label update failed");
-		}
-	}
+        LabelDO entityDO = labelBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!labelManager.updateById(entityDO)) {
+            throw new UpdateException("The label update failed");
+        }
+    }
 
-	@Override
-	public LabelBO selectById(Long id) {
-		LabelDO entityDO = getDOById(id, false);
-		return labelBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public LabelBO selectById(Long id) {
+        LabelDO entityDO = getDOById(id, false);
+        return labelBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public Page<LabelBO> selectByPage(LabelQuery entityQuery) {
-		if (Objects.isNull(entityQuery.getPage())) {
-			entityQuery.setPage(new Pages());
-		}
-		Page<LabelDO> entityPageDO = labelManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-		return labelBuilder.buildBOPageByDOPage(entityPageDO);
-	}
+    @Override
+    public Page<LabelBO> selectByPage(LabelQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<LabelDO> entityPageDO = labelManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return labelBuilder.buildBOPageByDOPage(entityPageDO);
+    }
 
-	/**
-	 * Build fuzzy query wrapper for label search.
-	 * @param entityQuery {@link LabelQuery} query parameters
-	 * @return {@link LambdaQueryWrapper} for {@link LabelDO}
-	 */
-	private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery entityQuery) {
-		LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
-		wrapper.like(StringUtils.isNotEmpty(entityQuery.getLabelName()), LabelDO::getLabelName,
-				entityQuery.getLabelName());
-		wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag,
-				entityQuery.getEntityTypeFlag());
-		wrapper.eq(StringUtils.isNotEmpty(entityQuery.getColor()), LabelDO::getLabelColor, entityQuery.getColor());
-		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), LabelDO::getTenantId, entityQuery.getTenantId());
-		return wrapper;
-	}
+    /**
+     * Build fuzzy query wrapper for label search.
+     *
+     * @param entityQuery {@link LabelQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link LabelDO}
+     */
+    private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery entityQuery) {
+        LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getLabelName()), LabelDO::getLabelName,
+                entityQuery.getLabelName());
+        wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag,
+                entityQuery.getEntityTypeFlag());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getColor()), LabelDO::getLabelColor, entityQuery.getColor());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), LabelDO::getTenantId, entityQuery.getTenantId());
+        return wrapper;
+    }
 
-	/**
-	 * Check whether a label is duplicated under the same tenant and entity type.
-	 * @param entityBO {@link LabelBO} to be validated
-	 * @param isUpdate whether the operation is an update (true) or create (false)
-	 * @param throwException whether to throw {@link DuplicateException} when duplicated
-	 * @return {@code true} if duplicated, otherwise {@code false}
-	 */
-	private boolean checkDuplicate(LabelBO entityBO, boolean isUpdate, boolean throwException) {
-		LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
-		wrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
-		wrapper.eq(LabelDO::getEntityTypeFlag, entityBO.getEntityTypeFlag());
-		wrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		LabelDO one = labelManager.getOne(wrapper);
-		if (Objects.isNull(one)) {
-			return false;
-		}
-		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-		if (throwException && duplicate) {
-			throw new DuplicateException("Label has been duplicated");
-		}
-		return duplicate;
-	}
+    /**
+     * Check whether a label is duplicated under the same tenant and entity type.
+     *
+     * @param entityBO       {@link LabelBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
+    private boolean checkDuplicate(LabelBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
+        wrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
+        wrapper.eq(LabelDO::getEntityTypeFlag, entityBO.getEntityTypeFlag());
+        wrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        LabelDO one = labelManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("Label has been duplicated");
+        }
+        return duplicate;
+    }
 
-	/**
-	 * Get label data object by primary key ID.
-	 * @param id primary key ID
-	 * @param throwException whether to throw {@link NotFoundException} when not found
-	 * @return {@link LabelDO} if found, otherwise {@code null} when
-	 * {@code throwException} is false
-	 */
-	private LabelDO getDOById(Long id, boolean throwException) {
-		LabelDO entityDO = labelManager.getById(id);
-		if (throwException && Objects.isNull(entityDO)) {
-			throw new NotFoundException("Label does not exist");
-		}
-		return entityDO;
-	}
+    /**
+     * Get label data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link LabelDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
+    private LabelDO getDOById(Long id, boolean throwException) {
+        LabelDO entityDO = labelManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Label does not exist");
+        }
+        return entityDO;
+    }
 
 }

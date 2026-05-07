@@ -42,103 +42,103 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 public class DeviceEventDTO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Type
-	 */
-	private DeviceEventTypeEnum type;
+    /**
+     * Type
+     */
+    private DeviceEventTypeEnum type;
 
-	/**
-	 *
-	 */
-	private String content;
+    /**
+     *
+     */
+    private String content;
 
-	/**
-	 * Create Time
-	 */
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    private LocalDateTime createTime;
 
-	public DeviceEventDTO(DeviceEventTypeEnum type, String content) {
-		this.type = type;
-		this.content = content;
-		this.createTime = LocalDateTimeUtil.now();
-	}
+    public DeviceEventDTO(DeviceEventTypeEnum type, String content) {
+        this.type = type;
+        this.content = content;
+        this.createTime = LocalDateTimeUtil.now();
+    }
 
-	/**
-	 * Device status
-	 *
-	 * @author pnoker
-	 * @version 2025.9.0
-	 * @since 2022.1.0
-	 */
-	@Getter
-	@Setter
-	@Builder
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class DeviceStatus implements Serializable {
+    /**
+     * Device status
+     *
+     * @author pnoker
+     * @version 2025.9.0
+     * @since 2022.1.0
+     */
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeviceStatus implements Serializable {
 
-		@Serial
-		private static final long serialVersionUID = 1L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
-		/**
-		 * Driver ID that reports this status. Populated by the sender.
-		 */
-		private Long driverId;
+        /**
+         * Driver ID that reports this status. Populated by the sender.
+         */
+        private Long driverId;
 
-		/**
-		 * Tenant ID the device belongs to. Populated by the sender.
-		 */
-		private Long tenantId;
+        /**
+         * Tenant ID the device belongs to. Populated by the sender.
+         */
+        private Long tenantId;
 
-		/**
-		 * Device ID
-		 */
-		private Long deviceId;
+        /**
+         * Device ID
+         */
+        private Long deviceId;
 
-		/**
-		 * Device status
-		 */
-		private DeviceStatusEnum status;
+        /**
+         * Device status
+         */
+        private DeviceStatusEnum status;
 
-		/**
-		 * Device status
-		 */
-		@Builder.Default
-		private int timeOut = 15;
+        /**
+         * Device status
+         */
+        @Builder.Default
+        private int timeOut = 15;
 
-		/**
-		 * Device status
-		 */
-		@Builder.Default
-		private TimeUnit timeUnit = TimeUnit.MINUTES;
+        /**
+         * Device status
+         */
+        @Builder.Default
+        private TimeUnit timeUnit = TimeUnit.MINUTES;
 
-		/**
-		 * Human-readable message. Populated for ALARM events; null for HEARTBEAT.
-		 */
-		private String message;
+        /**
+         * Human-readable message. Populated for ALARM events; null for HEARTBEAT.
+         */
+        private String message;
 
-		/**
-		 * Create Time
-		 */
-		private LocalDateTime createTime;
+        /**
+         * Create Time
+         */
+        private LocalDateTime createTime;
 
-		public DeviceStatus(Long deviceId, DeviceStatusEnum status) {
-			this.deviceId = deviceId;
-			this.status = status;
-			this.createTime = LocalDateTimeUtil.now();
-		}
+        public DeviceStatus(Long deviceId, DeviceStatusEnum status) {
+            this.deviceId = deviceId;
+            this.status = status;
+            this.createTime = LocalDateTimeUtil.now();
+        }
 
-		public DeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
-			this.deviceId = deviceId;
-			this.status = status;
-			this.timeOut = timeOut;
-			this.timeUnit = timeUnit;
-			this.createTime = LocalDateTimeUtil.now();
-		}
+        public DeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
+            this.deviceId = deviceId;
+            this.status = status;
+            this.timeOut = timeOut;
+            this.timeUnit = timeUnit;
+            this.createTime = LocalDateTimeUtil.now();
+        }
 
-	}
+    }
 
 }

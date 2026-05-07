@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class ImportException extends RuntimeException {
 
-	public ImportException() {
-		this(null);
-	}
+    public ImportException() {
+        this(null);
+    }
 
-	public ImportException(Throwable cause) {
-		super(cause);
-	}
+    public ImportException(Throwable cause) {
+        super(cause);
+    }
 
-	public ImportException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public ImportException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

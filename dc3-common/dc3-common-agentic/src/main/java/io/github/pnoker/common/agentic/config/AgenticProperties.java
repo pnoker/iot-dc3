@@ -31,19 +31,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "dc3.agentic")
 public class AgenticProperties {
 
-	/**
-	 * Whether to enable the agentic module.
-	 */
-	private boolean enabled = true;
+    /**
+     * Whether to enable the agentic module.
+     */
+    private boolean enabled = true;
 
-	/**
-	 * Maximum number of messages retained per conversation for chat memory.
-	 */
-	private int memoryMaxMessages = 50;
+    /**
+     * Maximum number of messages retained per conversation for chat memory.
+     */
+    private int memoryMaxMessages = 50;
 
-	/**
-	 * Session time-to-live in hours. Sessions older than this are marked expired.
-	 */
-	private int sessionTtlHours = 72;
+    /**
+     * Session time-to-live in hours. Sessions older than this are marked expired.
+     */
+    private int sessionTtlHours = 72;
 
 }

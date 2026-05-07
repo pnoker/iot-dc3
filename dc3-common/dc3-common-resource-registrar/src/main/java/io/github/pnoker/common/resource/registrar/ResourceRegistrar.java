@@ -41,62 +41,61 @@ import java.util.List;
 @Slf4j
 public class ResourceRegistrar {
 
-	private final ApiEndpointScanner scanner;
+    private final ApiEndpointScanner scanner;
 
-	private final ResourceRegistryFacade facade;
+    private final ResourceRegistryFacade facade;
 
-	private final ResourceRegistrarProperties properties;
+    private final ResourceRegistrarProperties properties;
 
-	private final String fallbackServiceName;
+    private final String fallbackServiceName;
 
-	public ResourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
-			ResourceRegistrarProperties properties, @Value("${spring.application.name:}") String fallbackServiceName) {
-		this.scanner = scanner;
-		this.facade = facade;
-		this.properties = properties;
-		this.fallbackServiceName = fallbackServiceName;
-	}
+    public ResourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
+                             ResourceRegistrarProperties properties, @Value("${spring.application.name:}") String fallbackServiceName) {
+        this.scanner = scanner;
+        this.facade = facade;
+        this.properties = properties;
+        this.fallbackServiceName = fallbackServiceName;
+    }
 
-	@EventListener(ApplicationReadyEvent.class)
-	public void register() {
-		if (!properties.isEnabled()) {
-			log.info("Resource registrar disabled; skipping endpoint registration");
-			return;
-		}
-		String serviceName = resolveServiceName();
-		if (StringUtils.isBlank(serviceName)) {
-			String msg = "Resource registrar cannot resolve a service name "
-					+ "(set dc3.resource-registrar.service-name or spring.application.name)";
-			if (properties.isFailFast()) {
-				throw new IllegalStateException(msg);
-			}
-			log.warn(msg);
-			return;
-		}
-		try {
-			List<FacadeScannedApiBO> apis = scanner.scan();
-			FacadeResourceRegistrySyncCommandBO command = FacadeResourceRegistrySyncCommandBO.builder()
-				.serviceName(serviceName)
-				.deleteMissing(properties.isDeleteMissing())
-				.apis(apis)
-				.build();
-			FacadeResourceRegistrySyncResultBO result = facade.sync(command);
-			log.info(
-					"Resource registrar synced {} endpoints for [{}]: inserted={}, updated={}, deleted={}, unchanged={}",
-					apis.size(), serviceName, result.getInserted(), result.getUpdated(), result.getDeleted(),
-					result.getUnchanged());
-		}
-		catch (RuntimeException e) {
-			if (properties.isFailFast()) {
-				throw e;
-			}
-			log.error("Resource registrar failed to sync endpoints for [{}]", serviceName, e);
-		}
-	}
+    @EventListener(ApplicationReadyEvent.class)
+    public void register() {
+        if (!properties.isEnabled()) {
+            log.info("Resource registrar disabled; skipping endpoint registration");
+            return;
+        }
+        String serviceName = resolveServiceName();
+        if (StringUtils.isBlank(serviceName)) {
+            String msg = "Resource registrar cannot resolve a service name "
+                    + "(set dc3.resource-registrar.service-name or spring.application.name)";
+            if (properties.isFailFast()) {
+                throw new IllegalStateException(msg);
+            }
+            log.warn(msg);
+            return;
+        }
+        try {
+            List<FacadeScannedApiBO> apis = scanner.scan();
+            FacadeResourceRegistrySyncCommandBO command = FacadeResourceRegistrySyncCommandBO.builder()
+                    .serviceName(serviceName)
+                    .deleteMissing(properties.isDeleteMissing())
+                    .apis(apis)
+                    .build();
+            FacadeResourceRegistrySyncResultBO result = facade.sync(command);
+            log.info(
+                    "Resource registrar synced {} endpoints for [{}]: inserted={}, updated={}, deleted={}, unchanged={}",
+                    apis.size(), serviceName, result.getInserted(), result.getUpdated(), result.getDeleted(),
+                    result.getUnchanged());
+        } catch (RuntimeException e) {
+            if (properties.isFailFast()) {
+                throw e;
+            }
+            log.error("Resource registrar failed to sync endpoints for [{}]", serviceName, e);
+        }
+    }
 
-	private String resolveServiceName() {
-		String name = properties.getServiceName();
-		return StringUtils.isBlank(name) ? fallbackServiceName : name;
-	}
+    private String resolveServiceName() {
+        String name = properties.getServiceName();
+        return StringUtils.isBlank(name) ? fallbackServiceName : name;
+    }
 
 }

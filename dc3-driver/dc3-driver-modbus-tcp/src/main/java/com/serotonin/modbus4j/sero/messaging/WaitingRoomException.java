@@ -30,17 +30,18 @@ import java.io.Serial;
  */
 public class WaitingRoomException extends IOException {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * <p>
-	 * Constructor for WaitingRoomException.
-	 * </p>
-	 * @param message a {@link String} object.
-	 */
-	public WaitingRoomException(String message) {
-		super(message);
-	}
+    /**
+     * <p>
+     * Constructor for WaitingRoomException.
+     * </p>
+     *
+     * @param message a {@link String} object.
+     */
+    public WaitingRoomException(String message) {
+        super(message);
+    }
 
 }

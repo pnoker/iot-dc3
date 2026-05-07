@@ -25,69 +25,69 @@ import org.jinterop.dcom.core.JIVariant;
 
 public class OPCITEMRESULT {
 
-	private int _serverHandle = 0;
+    private int _serverHandle = 0;
 
-	private short _canonicalDataType = JIVariant.VT_EMPTY;
+    private short _canonicalDataType = JIVariant.VT_EMPTY;
 
-	private short _reserved = 0;
+    private short _reserved = 0;
 
-	private int _accessRights = 0;
+    private int _accessRights = 0;
 
-	public static JIStruct getStruct() throws JIException {
-		JIStruct struct = new JIStruct();
+    public static JIStruct getStruct() throws JIException {
+        JIStruct struct = new JIStruct();
 
-		struct.addMember(Integer.class); // Server handle
-		struct.addMember(Short.class); // data type
-		struct.addMember(Short.class); // reserved
-		struct.addMember(Integer.class); // access rights
-		struct.addMember(Integer.class); // blob size
-		// grab the normally unused byte array
-		struct.addMember(new JIPointer(new JIArray(Byte.class, null, 1, true, false)));
+        struct.addMember(Integer.class); // Server handle
+        struct.addMember(Short.class); // data type
+        struct.addMember(Short.class); // reserved
+        struct.addMember(Integer.class); // access rights
+        struct.addMember(Integer.class); // blob size
+        // grab the normally unused byte array
+        struct.addMember(new JIPointer(new JIArray(Byte.class, null, 1, true, false)));
 
-		return struct;
-	}
+        return struct;
+    }
 
-	public static OPCITEMRESULT fromStruct(final JIStruct struct) {
-		OPCITEMRESULT result = new OPCITEMRESULT();
+    public static OPCITEMRESULT fromStruct(final JIStruct struct) {
+        OPCITEMRESULT result = new OPCITEMRESULT();
 
-		result.setServerHandle((Integer) struct.getMember(0));
-		result.setCanonicalDataType((Short) struct.getMember(1));
-		result.setReserved((Short) struct.getMember(2));
-		result.setAccessRights((Integer) struct.getMember(3));
+        result.setServerHandle((Integer) struct.getMember(0));
+        result.setCanonicalDataType((Short) struct.getMember(1));
+        result.setReserved((Short) struct.getMember(2));
+        result.setAccessRights((Integer) struct.getMember(3));
 
-		return result;
-	}
+        return result;
+    }
 
-	public int getAccessRights() {
-		return this._accessRights;
-	}
+    public int getAccessRights() {
+        return this._accessRights;
+    }
 
-	public void setAccessRights(final int accessRights) {
-		this._accessRights = accessRights;
-	}
+    public void setAccessRights(final int accessRights) {
+        this._accessRights = accessRights;
+    }
 
-	public short getCanonicalDataType() {
-		return this._canonicalDataType;
-	}
+    public short getCanonicalDataType() {
+        return this._canonicalDataType;
+    }
 
-	public void setCanonicalDataType(final short canonicalDataType) {
-		this._canonicalDataType = canonicalDataType;
-	}
+    public void setCanonicalDataType(final short canonicalDataType) {
+        this._canonicalDataType = canonicalDataType;
+    }
 
-	public short getReserved() {
-		return this._reserved;
-	}
+    public short getReserved() {
+        return this._reserved;
+    }
 
-	public void setReserved(final short reserved) {
-		this._reserved = reserved;
-	}
+    public void setReserved(final short reserved) {
+        this._reserved = reserved;
+    }
 
-	public int getServerHandle() {
-		return this._serverHandle;
-	}
+    public int getServerHandle() {
+        return this._serverHandle;
+    }
 
-	public void setServerHandle(final int serverHandle) {
-		this._serverHandle = serverHandle;
-	}
+    public void setServerHandle(final int serverHandle) {
+        this._serverHandle = serverHandle;
+    }
 
 }

@@ -43,64 +43,64 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcDriverAttributeBuilder {
 
-	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "remark", ignore = true)
-	@Mapping(target = "creatorId", ignore = true)
-	@Mapping(target = "creatorName", ignore = true)
-	@Mapping(target = "createTime", ignore = true)
-	@Mapping(target = "operatorId", ignore = true)
-	@Mapping(target = "operatorName", ignore = true)
-	@Mapping(target = "operateTime", ignore = true)
-	@Mapping(target = "attributeExt", ignore = true)
-	@Mapping(target = "attributeTypeFlag", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	DriverAttributeDTO buildDTOByGrpcDTO(GrpcDriverAttributeDTO entityGrpc);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "remark", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
+    @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "attributeTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    DriverAttributeDTO buildDTOByGrpcDTO(GrpcDriverAttributeDTO entityGrpc);
 
-	@AfterMapping
-	default void afterProcess(GrpcDriverAttributeDTO entityGrpc, @MappingTarget DriverAttributeDTO entityDTO) {
-		GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
+    @AfterMapping
+    default void afterProcess(GrpcDriverAttributeDTO entityGrpc, @MappingTarget DriverAttributeDTO entityDTO) {
+        GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
 
-		JsonOptional.ofNullable(entityGrpc.getAttributeExt())
-			.ifPresent(value -> entityDTO.setAttributeExt(JsonUtil.parseObject(value, DriverAttributeExt.class)));
-		Optional.ofNullable(AttributeTypeFlagEnum.ofIndex((byte) entityGrpc.getAttributeTypeFlag()))
-			.ifPresent(entityDTO::setAttributeTypeFlag);
-		EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
-	}
+        JsonOptional.ofNullable(entityGrpc.getAttributeExt())
+                .ifPresent(value -> entityDTO.setAttributeExt(JsonUtil.parseObject(value, DriverAttributeExt.class)));
+        Optional.ofNullable(AttributeTypeFlagEnum.ofIndex((byte) entityGrpc.getAttributeTypeFlag()))
+                .ifPresent(entityDTO::setAttributeTypeFlag);
+        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
+    }
 
-	@Mapping(target = "attributeExt", ignore = true)
-	@Mapping(target = "attributeTypeFlag", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	@Mapping(target = "attributeNameBytes", ignore = true)
-	@Mapping(target = "attributeCodeBytes", ignore = true)
-	@Mapping(target = "defaultValueBytes", ignore = true)
-	@Mapping(target = "attributeExtBytes", ignore = true)
-	@Mapping(target = "signatureBytes", ignore = true)
-	@Mapping(target = "mergeFrom", ignore = true)
-	@Mapping(target = "clearField", ignore = true)
-	@Mapping(target = "clearOneof", ignore = true)
-	@Mapping(target = "base", ignore = true)
-	@Mapping(target = "mergeBase", ignore = true)
-	@Mapping(target = "unknownFields", ignore = true)
-	@Mapping(target = "mergeUnknownFields", ignore = true)
-	@Mapping(target = "allFields", ignore = true)
-	GrpcDriverAttributeDTO buildGrpcDTOByDTO(DriverAttributeDTO entityDTO);
+    @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "attributeTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "attributeNameBytes", ignore = true)
+    @Mapping(target = "attributeCodeBytes", ignore = true)
+    @Mapping(target = "defaultValueBytes", ignore = true)
+    @Mapping(target = "attributeExtBytes", ignore = true)
+    @Mapping(target = "signatureBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
+    GrpcDriverAttributeDTO buildGrpcDTOByDTO(DriverAttributeDTO entityDTO);
 
-	@AfterMapping
-	default void afterProcess(DriverAttributeDTO entityDTO, @MappingTarget GrpcDriverAttributeDTO.Builder entityGrpc) {
-		GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByDTO(entityDTO);
-		entityGrpc.setBase(grpcBase);
+    @AfterMapping
+    default void afterProcess(DriverAttributeDTO entityDTO, @MappingTarget GrpcDriverAttributeDTO.Builder entityGrpc) {
+        GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByDTO(entityDTO);
+        entityGrpc.setBase(grpcBase);
 
-		Optional.ofNullable(entityDTO.getAttributeExt())
-			.ifPresent(value -> entityGrpc.setAttributeExt(JsonUtil.toJsonString(value)));
-		Optional.ofNullable(entityDTO.getAttributeTypeFlag())
-			.ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
-					() -> entityGrpc.setAttributeTypeFlag(DefaultConstant.NULL_INT));
-		Optional.ofNullable(entityDTO.getEnableFlag())
-			.ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
-					() -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
-	}
+        Optional.ofNullable(entityDTO.getAttributeExt())
+                .ifPresent(value -> entityGrpc.setAttributeExt(JsonUtil.toJsonString(value)));
+        Optional.ofNullable(entityDTO.getAttributeTypeFlag())
+                .ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
+                        () -> entityGrpc.setAttributeTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(entityDTO.getEnableFlag())
+                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                        () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
+    }
 
 }

@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-dal` is the shared Data Access Layer module of the IoT DC3 platform. It provides common VO/BO entities, DAL manager implementations, and shared data structures used
+`dc3-common-dal` is the shared Data Access Layer module of the IoT DC3 platform. It provides common VO/BO entities, DAL
+manager implementations, and shared data structures used
 across multiple service modules.
 
 ## Module Information

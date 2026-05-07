@@ -29,14 +29,15 @@ package io.github.pnoker.common.facade.api;
  */
 public interface TokenFacade {
 
-	/**
-	 * Validate a token triple against the backing auth service.
-	 * @param tenant tenant code
-	 * @param name login name
-	 * @param salt salt the client holds
-	 * @param token token the client holds
-	 * @return {@code true} when the triple is valid and unexpired
-	 */
-	boolean checkValid(String tenant, String name, String salt, String token);
+    /**
+     * Validate a token triple against the backing auth service.
+     *
+     * @param tenant tenant code
+     * @param name   login name
+     * @param salt   salt the client holds
+     * @param token  token the client holds
+     * @return {@code true} when the triple is valid and unexpired
+     */
+    boolean checkValid(String tenant, String name, String salt, String token);
 
 }

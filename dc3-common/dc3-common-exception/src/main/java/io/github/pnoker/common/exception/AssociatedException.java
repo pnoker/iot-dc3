@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class AssociatedException extends RuntimeException {
 
-	public AssociatedException() {
-		this(null);
-	}
+    public AssociatedException() {
+        this(null);
+    }
 
-	public AssociatedException(Throwable cause) {
-		super(cause);
-	}
+    public AssociatedException(Throwable cause) {
+        super(cause);
+    }
 
-	public AssociatedException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public AssociatedException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

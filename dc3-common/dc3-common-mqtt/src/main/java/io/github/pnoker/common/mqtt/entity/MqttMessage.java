@@ -40,8 +40,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class MqttMessage implements Serializable {
 
-	private MessageHeader header;
+    private MessageHeader header;
 
-	private String payload;
+    private String payload;
 
 }

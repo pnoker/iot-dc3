@@ -35,66 +35,69 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ResponseEnum {
 
-	OK((byte) 200, "R200", "Success"), TOKEN_INVALID((byte) 20301, "R20301", "Token is invalid"),
-	IP_INVALID((byte) 20302, "R20302", "Invalid IP"), FAILURE((byte) 500, "R500", "Service exception"),
-	NO_RESOURCE((byte) 404, "R404", "Resource does not exist"), OUT_RANGE((byte) 900, "R900", "Number out of range"),
+    OK((byte) 200, "R200", "Success"), TOKEN_INVALID((byte) 20301, "R20301", "Token is invalid"),
+    IP_INVALID((byte) 20302, "R20302", "Invalid IP"), FAILURE((byte) 500, "R500", "Service exception"),
+    NO_RESOURCE((byte) 404, "R404", "Resource does not exist"), OUT_RANGE((byte) 900, "R900", "Number out of range"),
 
-	ADD_SUCCESS((byte) 20001, "R20001", "Added successfully"),
-	DELETE_SUCCESS((byte) 20002, "R20002", "Deleted successfully"),
-	UPDATE_SUCCESS((byte) 20003, "R20003", "Updated successfully"),;
+    ADD_SUCCESS((byte) 20001, "R20001", "Added successfully"),
+    DELETE_SUCCESS((byte) 20002, "R20002", "Deleted successfully"),
+    UPDATE_SUCCESS((byte) 20003, "R20003", "Updated successfully"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Text
-	 */
-	private final String text;
+    /**
+     * Text
+     */
+    private final String text;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link ResponseEnum}
-	 */
-	public static ResponseEnum ofIndex(Byte index) {
-		Optional<ResponseEnum> any = Arrays.stream(ResponseEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link ResponseEnum}
+     */
+    public static ResponseEnum ofIndex(Byte index) {
+        Optional<ResponseEnum> any = Arrays.stream(ResponseEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link ResponseEnum}
-	 */
-	public static ResponseEnum ofCode(String code) {
-		Optional<ResponseEnum> any = Arrays.stream(ResponseEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link ResponseEnum}
+     */
+    public static ResponseEnum ofCode(String code) {
+        Optional<ResponseEnum> any = Arrays.stream(ResponseEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Name
-	 * @return {@link ResponseEnum}
-	 */
-	public static ResponseEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link ResponseEnum}
+     */
+    public static ResponseEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

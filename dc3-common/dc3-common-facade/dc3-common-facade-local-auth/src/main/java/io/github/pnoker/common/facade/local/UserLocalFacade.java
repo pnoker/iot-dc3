@@ -38,16 +38,16 @@ import java.util.Objects;
 @Component
 public class UserLocalFacade implements UserFacade {
 
-	@Resource
-	private UserService userService;
+    @Resource
+    private UserService userService;
 
-	@Resource
-	private FacadeUserBuilder facadeUserBuilder;
+    @Resource
+    private FacadeUserBuilder facadeUserBuilder;
 
-	@Override
-	public FacadeUserBO selectById(Long id) {
-		UserBO bo = userService.selectById(id);
-		return Objects.isNull(bo) ? null : facadeUserBuilder.toFacadeBO(bo);
-	}
+    @Override
+    public FacadeUserBO selectById(Long id) {
+        UserBO bo = userService.selectById(id);
+        return Objects.isNull(bo) ? null : facadeUserBuilder.toFacadeBO(bo);
+    }
 
 }

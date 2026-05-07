@@ -41,11 +41,11 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class UserPasswordVO extends BaseVO {
 
-	/**
-	 *
-	 */
-	@NotBlank(message = "Login password can't be empty", groups = { Add.class, Auth.class })
-	@Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "Invalid login password", groups = { Add.class, Update.class })
-	private String loginPassword;
+    /**
+     *
+     */
+    @NotBlank(message = "Login password can't be empty", groups = {Add.class, Auth.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "Invalid login password", groups = {Add.class, Update.class})
+    private String loginPassword;
 
 }

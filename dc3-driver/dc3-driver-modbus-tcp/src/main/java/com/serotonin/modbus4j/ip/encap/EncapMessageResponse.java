@@ -32,35 +32,37 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class EncapMessageResponse extends EncapMessage implements IpMessageResponse {
 
-	/**
-	 * <p>
-	 * Constructor for EncapMessageResponse.
-	 * </p>
-	 * @param modbusResponse a {@link ModbusResponse} object.
-	 */
-	public EncapMessageResponse(ModbusResponse modbusResponse) {
-		super(modbusResponse);
-	}
+    /**
+     * <p>
+     * Constructor for EncapMessageResponse.
+     * </p>
+     *
+     * @param modbusResponse a {@link ModbusResponse} object.
+     */
+    public EncapMessageResponse(ModbusResponse modbusResponse) {
+        super(modbusResponse);
+    }
 
-	static EncapMessageResponse createEncapMessageResponse(ByteQueue queue) throws ModbusTransportException {
-		// Create the modbus response.
-		ModbusResponse response = ModbusResponse.createModbusResponse(queue);
-		EncapMessageResponse encapResponse = new EncapMessageResponse(response);
+    static EncapMessageResponse createEncapMessageResponse(ByteQueue queue) throws ModbusTransportException {
+        // Create the modbus response.
+        ModbusResponse response = ModbusResponse.createModbusResponse(queue);
+        EncapMessageResponse encapResponse = new EncapMessageResponse(response);
 
-		// Check the CRC
-		ModbusUtils.checkCRC(encapResponse.modbusMessage, queue);
+        // Check the CRC
+        ModbusUtils.checkCRC(encapResponse.modbusMessage, queue);
 
-		return encapResponse;
-	}
+        return encapResponse;
+    }
 
-	/**
-	 * <p>
-	 * getModbusResponse.
-	 * </p>
-	 * @return a {@link ModbusResponse} object.
-	 */
-	public ModbusResponse getModbusResponse() {
-		return (ModbusResponse) modbusMessage;
-	}
+    /**
+     * <p>
+     * getModbusResponse.
+     * </p>
+     *
+     * @return a {@link ModbusResponse} object.
+     */
+    public ModbusResponse getModbusResponse() {
+        return (ModbusResponse) modbusMessage;
+    }
 
 }

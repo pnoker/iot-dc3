@@ -44,52 +44,52 @@ import java.time.LocalDateTime;
 @TableName("dc3_point_value_json")
 public class PointValueJsonDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	/**
-	 * Device ID
-	 */
-	@TableField("device_id")
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    @TableField("device_id")
+    private Long deviceId;
 
-	/**
-	 * Point ID
-	 */
-	@TableField("point_id")
-	private Long pointId;
+    /**
+     * Point ID
+     */
+    @TableField("point_id")
+    private Long pointId;
 
-	/**
-	 * Raw value
-	 */
-	@TableField("raw_value")
-	private Object rawValue;
+    /**
+     * Raw value
+     */
+    @TableField("raw_value")
+    private Object rawValue;
 
-	/**
-	 *
-	 */
-	@TableField("cal_value")
-	private Object calValue;
+    /**
+     *
+     */
+    @TableField("cal_value")
+    private Object calValue;
 
-	/**
-	 * Driver ID
-	 */
-	@TableField("driver_id")
-	private Long driverId;
+    /**
+     * Driver ID
+     */
+    @TableField("driver_id")
+    private Long driverId;
 
-	/**
-	 * Create Time
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operate Time
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operate Time
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
 }

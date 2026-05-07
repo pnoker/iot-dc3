@@ -56,43 +56,45 @@ import org.springframework.stereotype.Component;
 @ChannelHandler.Sharable
 public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-	/**
-	 * Static self-reference for accessing Spring-injected beans from static context.
-	 */
-	private static NettyUdpServerHandler nettyUdpServerHandler;
+    /**
+     * Static self-reference for accessing Spring-injected beans from static context.
+     */
+    private static NettyUdpServerHandler nettyUdpServerHandler;
 
-	@Resource
-	private NettyServerHandler nettyServerHandler;
+    @Resource
+    private NettyServerHandler nettyServerHandler;
 
-	/**
-	 * Initializes the handler instance after Spring dependency injection.
-	 */
-	@PostConstruct
-	public void init() {
-		nettyUdpServerHandler = this;
-	}
+    /**
+     * Initializes the handler instance after Spring dependency injection.
+     */
+    @PostConstruct
+    public void init() {
+        nettyUdpServerHandler = this;
+    }
 
-	/**
-	 * Handles incoming UDP datagram packets.
-	 * @param context The channel handler context
-	 * @param msg The received datagram packet
-	 */
-	@Override
-	@SneakyThrows
-	public void channelRead0(ChannelHandlerContext context, DatagramPacket msg) {
-		nettyUdpServerHandler.nettyServerHandler.read(context, msg.content());
-	}
+    /**
+     * Handles incoming UDP datagram packets.
+     *
+     * @param context The channel handler context
+     * @param msg     The received datagram packet
+     */
+    @Override
+    @SneakyThrows
+    public void channelRead0(ChannelHandlerContext context, DatagramPacket msg) {
+        nettyUdpServerHandler.nettyServerHandler.read(context, msg.content());
+    }
 
-	/**
-	 * Handles exceptions during UDP packet processing.
-	 * @param context The channel handler context
-	 * @param throwable The exception that occurred
-	 */
-	@Override
-	@SneakyThrows
-	public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-		log.debug(throwable.getMessage());
-		context.disconnect();
-	}
+    /**
+     * Handles exceptions during UDP packet processing.
+     *
+     * @param context   The channel handler context
+     * @param throwable The exception that occurred
+     */
+    @Override
+    @SneakyThrows
+    public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
+        log.debug(throwable.getMessage());
+        context.disconnect();
+    }
 
 }

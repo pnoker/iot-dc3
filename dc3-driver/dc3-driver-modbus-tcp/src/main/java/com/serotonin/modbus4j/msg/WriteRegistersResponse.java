@@ -31,55 +31,57 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class WriteRegistersResponse extends ModbusResponse {
 
-	private int startOffset;
+    private int startOffset;
 
-	private int numberOfRegisters;
+    private int numberOfRegisters;
 
-	WriteRegistersResponse(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    WriteRegistersResponse(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	WriteRegistersResponse(int slaveId, int startOffset, int numberOfRegisters) throws ModbusTransportException {
-		super(slaveId);
-		this.startOffset = startOffset;
-		this.numberOfRegisters = numberOfRegisters;
-	}
+    WriteRegistersResponse(int slaveId, int startOffset, int numberOfRegisters) throws ModbusTransportException {
+        super(slaveId);
+        this.startOffset = startOffset;
+        this.numberOfRegisters = numberOfRegisters;
+    }
 
-	@Override
-	public byte getFunctionCode() {
-		return FunctionCode.WRITE_REGISTERS;
-	}
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_REGISTERS;
+    }
 
-	@Override
-	protected void writeResponse(ByteQueue queue) {
-		ModbusUtils.pushShort(queue, startOffset);
-		ModbusUtils.pushShort(queue, numberOfRegisters);
-	}
+    @Override
+    protected void writeResponse(ByteQueue queue) {
+        ModbusUtils.pushShort(queue, startOffset);
+        ModbusUtils.pushShort(queue, numberOfRegisters);
+    }
 
-	@Override
-	protected void readResponse(ByteQueue queue) {
-		startOffset = ModbusUtils.popUnsignedShort(queue);
-		numberOfRegisters = ModbusUtils.popUnsignedShort(queue);
-	}
+    @Override
+    protected void readResponse(ByteQueue queue) {
+        startOffset = ModbusUtils.popUnsignedShort(queue);
+        numberOfRegisters = ModbusUtils.popUnsignedShort(queue);
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>startOffset</code>.
-	 * </p>
-	 * @return a int.
-	 */
-	public int getStartOffset() {
-		return startOffset;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>startOffset</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getStartOffset() {
+        return startOffset;
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>numberOfRegisters</code>.
-	 * </p>
-	 * @return a int.
-	 */
-	public int getNumberOfRegisters() {
-		return numberOfRegisters;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>numberOfRegisters</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getNumberOfRegisters() {
+        return numberOfRegisters;
+    }
 
 }

@@ -43,68 +43,68 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_driver_event", autoResultMap = true)
 public class DriverEventDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Primary key ID
-	 */
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    /**
+     * Primary key ID
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	/**
-	 * Driver ID
-	 */
-	@TableField("driver_id")
-	private Long driverId;
+    /**
+     * Driver ID
+     */
+    @TableField("driver_id")
+    private Long driverId;
 
-	/**
-	 * Type
-	 */
-	@TableField("event_type_flag")
-	private Byte eventTypeFlag;
+    /**
+     * Type
+     */
+    @TableField("event_type_flag")
+    private Byte eventTypeFlag;
 
-	/**
-	 *
-	 */
-	@TableField(value = "event_ext", typeHandler = JacksonTypeHandler.class)
-	private JsonExt eventExt;
+    /**
+     *
+     */
+    @TableField(value = "event_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt eventExt;
 
-	/**
-	 * ,
-	 */
-	@TableField("expired_time")
-	private Long expiredTime;
+    /**
+     * ,
+     */
+    @TableField("expired_time")
+    private Long expiredTime;
 
-	/**
-	 * , 0:, 1:
-	 */
-	@TableField("confirm_flag")
-	private Byte confirmFlag;
+    /**
+     * , 0:, 1:
+     */
+    @TableField("confirm_flag")
+    private Byte confirmFlag;
 
-	/**
-	 * Tenant ID
-	 */
-	@TableField("tenant_id")
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
 
-	/**
-	 * Create Time
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operate Time
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operate Time
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
-	/**
-	 * Logical delete flag, 0:not deleted, 1:deleted
-	 */
-	@TableLogic
-	@TableField("deleted")
-	private Byte deleted;
+    /**
+     * Logical delete flag, 0:not deleted, 1:deleted
+     */
+    @TableLogic
+    @TableField("deleted")
+    private Byte deleted;
 
 }

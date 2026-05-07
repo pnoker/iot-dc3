@@ -39,21 +39,21 @@ import java.util.List;
 @Service
 public class DictionaryForAuthServiceImpl implements DictionaryForAuthService {
 
-	@Resource
-	private TenantManager tenantManager;
+    @Resource
+    private TenantManager tenantManager;
 
-	@Override
-	public List<DictionaryBO> tenantDictionary() {
-		LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
-		wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
-		List<TenantDO> entityDOList = tenantManager.list(wrapper);
+    @Override
+    public List<DictionaryBO> tenantDictionary() {
+        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
+        wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
+        List<TenantDO> entityDOList = tenantManager.list(wrapper);
 
-		return entityDOList.stream().map(entityDO -> {
-			DictionaryBO driverDictionary = new DictionaryBO();
-			driverDictionary.setLabel(entityDO.getTenantName());
-			driverDictionary.setValue(entityDO.getId().toString());
-			return driverDictionary;
-		}).toList();
-	}
+        return entityDOList.stream().map(entityDO -> {
+            DictionaryBO driverDictionary = new DictionaryBO();
+            driverDictionary.setLabel(entityDO.getTenantName());
+            driverDictionary.setValue(entityDO.getId().toString());
+            return driverDictionary;
+        }).toList();
+    }
 
 }

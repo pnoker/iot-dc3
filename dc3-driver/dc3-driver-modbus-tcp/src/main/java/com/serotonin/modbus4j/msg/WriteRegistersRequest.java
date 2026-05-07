@@ -33,70 +33,71 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class WriteRegistersRequest extends ModbusRequest {
 
-	private int startOffset;
+    private int startOffset;
 
-	private byte[] data;
+    private byte[] data;
 
-	/**
-	 * <p>
-	 * Constructor for WriteRegistersRequest.
-	 * </p>
-	 * @param slaveId a int.
-	 * @param startOffset a int.
-	 * @param sdata an array of {@link short} objects.
-	 * @throws ModbusTransportException if any.
-	 */
-	public WriteRegistersRequest(int slaveId, int startOffset, short[] sdata) throws ModbusTransportException {
-		super(slaveId);
-		this.startOffset = startOffset;
-		data = convertToBytes(sdata);
-	}
+    /**
+     * <p>
+     * Constructor for WriteRegistersRequest.
+     * </p>
+     *
+     * @param slaveId     a int.
+     * @param startOffset a int.
+     * @param sdata       an array of {@link short} objects.
+     * @throws ModbusTransportException if any.
+     */
+    public WriteRegistersRequest(int slaveId, int startOffset, short[] sdata) throws ModbusTransportException {
+        super(slaveId);
+        this.startOffset = startOffset;
+        data = convertToBytes(sdata);
+    }
 
-	WriteRegistersRequest(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    WriteRegistersRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	@Override
-	public void validate(Modbus modbus) throws ModbusTransportException {
-		ModbusUtils.validateOffset(startOffset);
-		int registerCount = data.length / 2;
-		if (registerCount < 1 || registerCount > modbus.getMaxWriteRegisterCount())
-			throw new ModbusTransportException("Invalid number of registers: " + registerCount, slaveId);
-		ModbusUtils.validateEndOffset(startOffset + registerCount - 1);
-	}
+    @Override
+    public void validate(Modbus modbus) throws ModbusTransportException {
+        ModbusUtils.validateOffset(startOffset);
+        int registerCount = data.length / 2;
+        if (registerCount < 1 || registerCount > modbus.getMaxWriteRegisterCount())
+            throw new ModbusTransportException("Invalid number of registers: " + registerCount, slaveId);
+        ModbusUtils.validateEndOffset(startOffset + registerCount - 1);
+    }
 
-	@Override
-	protected void writeRequest(ByteQueue queue) {
-		ModbusUtils.pushShort(queue, startOffset);
-		ModbusUtils.pushShort(queue, data.length / 2);
-		ModbusUtils.pushByte(queue, data.length);
-		queue.push(data);
-	}
+    @Override
+    protected void writeRequest(ByteQueue queue) {
+        ModbusUtils.pushShort(queue, startOffset);
+        ModbusUtils.pushShort(queue, data.length / 2);
+        ModbusUtils.pushByte(queue, data.length);
+        queue.push(data);
+    }
 
-	@Override
-	ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
-		short[] sdata = convertToShorts(data);
-		for (int i = 0; i < sdata.length; i++)
-			processImage.writeHoldingRegister(startOffset + i, sdata[i]);
-		return new WriteRegistersResponse(slaveId, startOffset, sdata.length);
-	}
+    @Override
+    ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
+        short[] sdata = convertToShorts(data);
+        for (int i = 0; i < sdata.length; i++)
+            processImage.writeHoldingRegister(startOffset + i, sdata[i]);
+        return new WriteRegistersResponse(slaveId, startOffset, sdata.length);
+    }
 
-	@Override
-	public byte getFunctionCode() {
-		return FunctionCode.WRITE_REGISTERS;
-	}
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_REGISTERS;
+    }
 
-	@Override
-	ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
-		return new WriteRegistersResponse(slaveId);
-	}
+    @Override
+    ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
+        return new WriteRegistersResponse(slaveId);
+    }
 
-	@Override
-	protected void readRequest(ByteQueue queue) {
-		startOffset = ModbusUtils.popUnsignedShort(queue);
-		ModbusUtils.popUnsignedShort(queue); // register count not needed.
-		data = new byte[ModbusUtils.popUnsignedByte(queue)];
-		queue.pop(data);
-	}
+    @Override
+    protected void readRequest(ByteQueue queue) {
+        startOffset = ModbusUtils.popUnsignedShort(queue);
+        ModbusUtils.popUnsignedShort(queue); // register count not needed.
+        data = new byte[ModbusUtils.popUnsignedByte(queue)];
+        queue.pop(data);
+    }
 
 }

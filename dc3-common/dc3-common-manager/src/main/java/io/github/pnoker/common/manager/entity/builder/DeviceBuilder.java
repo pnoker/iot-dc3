@@ -46,139 +46,149 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DeviceBuilder {
 
-	/**
-	 * VO to BO
-	 * @param entityVO EntityVO
-	 * @return EntityBO
-	 */
-	@Mapping(target = "tenantId", ignore = true)
-	DeviceBO buildBOByVO(DeviceVO entityVO);
+    /**
+     * VO to BO
+     *
+     * @param entityVO EntityVO
+     * @return EntityBO
+     */
+    @Mapping(target = "tenantId", ignore = true)
+    DeviceBO buildBOByVO(DeviceVO entityVO);
 
-	/**
-	 * VOList to BOList
-	 * @param entityVOList EntityVO Array
-	 * @return EntityBO Array
-	 */
-	List<DeviceBO> buildBOListByVOList(List<DeviceVO> entityVOList);
+    /**
+     * VOList to BOList
+     *
+     * @param entityVOList EntityVO Array
+     * @return EntityBO Array
+     */
+    List<DeviceBO> buildBOListByVOList(List<DeviceVO> entityVOList);
 
-	/**
-	 * BO to DO
-	 * @param entityBO EntityBO
-	 * @return EntityDO
-	 */
-	@Mapping(target = "deviceExt", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	@Mapping(target = "deleted", ignore = true)
-	DeviceDO buildDOByBO(DeviceBO entityBO);
+    /**
+     * BO to DO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDO
+     */
+    @Mapping(target = "deviceExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    DeviceDO buildDOByBO(DeviceBO entityBO);
 
-	@AfterMapping
-	default void afterProcess(DeviceBO entityBO, @MappingTarget DeviceDO entityDO) {
-		// Code
-		if (StringUtils.isEmpty(entityBO.getDeviceCode())) {
-			entityDO.setDeviceCode(CodeUtil.getCode());
-		}
+    @AfterMapping
+    default void afterProcess(DeviceBO entityBO, @MappingTarget DeviceDO entityDO) {
+        // Code
+        if (StringUtils.isEmpty(entityBO.getDeviceCode())) {
+            entityDO.setDeviceCode(CodeUtil.getCode());
+        }
 
-		// Json Ext
-		DeviceExt entityExt = entityBO.getDeviceExt();
-		JsonExt ext = new JsonExt();
-		if (Objects.nonNull(entityExt)) {
-			ext.setType(entityExt.getType());
-			ext.setVersion(entityExt.getVersion());
-			ext.setRemark(entityExt.getRemark());
-			ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-		}
-		entityDO.setDeviceExt(ext);
+        // Json Ext
+        DeviceExt entityExt = entityBO.getDeviceExt();
+        JsonExt ext = new JsonExt();
+        if (Objects.nonNull(entityExt)) {
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+        }
+        entityDO.setDeviceExt(ext);
 
-		// Enable Flag
-		EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-		Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-	}
+        // Enable Flag
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+    }
 
-	/**
-	 * BOList to DOList
-	 * @param entityBOList EntityBO Array
-	 * @return EntityDO Array
-	 */
-	List<DeviceDO> buildDOListByBOList(List<DeviceBO> entityBOList);
+    /**
+     * BOList to DOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDO Array
+     */
+    List<DeviceDO> buildDOListByBOList(List<DeviceBO> entityBOList);
 
-	/**
-	 * DO to BO
-	 * @param entityDO EntityDO
-	 * @return EntityBO
-	 */
-	@Mapping(target = "deviceExt", ignore = true)
-	@Mapping(target = "profileIds", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	DeviceBO buildBOByDO(DeviceDO entityDO);
+    /**
+     * DO to BO
+     *
+     * @param entityDO EntityDO
+     * @return EntityBO
+     */
+    @Mapping(target = "deviceExt", ignore = true)
+    @Mapping(target = "profileIds", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    DeviceBO buildBOByDO(DeviceDO entityDO);
 
-	@AfterMapping
-	default void afterProcess(DeviceDO entityDO, @MappingTarget DeviceBO entityBO) {
-		// Json Ext
-		JsonExt entityExt = entityDO.getDeviceExt();
-		if (Objects.nonNull(entityExt)) {
-			DeviceExt ext = new DeviceExt();
-			ext.setType(entityExt.getType());
-			ext.setVersion(entityExt.getVersion());
-			ext.setRemark(entityExt.getRemark());
-			ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DeviceExt.Content.class));
-			entityBO.setDeviceExt(ext);
-		}
+    @AfterMapping
+    default void afterProcess(DeviceDO entityDO, @MappingTarget DeviceBO entityBO) {
+        // Json Ext
+        JsonExt entityExt = entityDO.getDeviceExt();
+        if (Objects.nonNull(entityExt)) {
+            DeviceExt ext = new DeviceExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DeviceExt.Content.class));
+            entityBO.setDeviceExt(ext);
+        }
 
-		// Enable Flag
-		Byte enableFlag = entityDO.getEnableFlag();
-		entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-	}
+        // Enable Flag
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
 
-	/**
-	 * DOList to BOList
-	 * @param entityDOList EntityDO Array
-	 * @return EntityBO Array
-	 */
-	List<DeviceBO> buildBOListByDOList(List<DeviceDO> entityDOList);
+    /**
+     * DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<DeviceBO> buildBOListByDOList(List<DeviceDO> entityDOList);
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	DeviceVO buildVOByBO(DeviceBO entityBO);
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    DeviceVO buildVOByBO(DeviceBO entityBO);
 
-	/**
-	 * BOList to VOList
-	 * @param entityBOList EntityBO Array
-	 * @return EntityVO Array
-	 */
-	List<DeviceVO> buildVOListByBOList(List<DeviceBO> entityBOList);
+    /**
+     * BOList to VOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityVO Array
+     */
+    List<DeviceVO> buildVOListByBOList(List<DeviceBO> entityBOList);
 
-	/**
-	 * DOPage to BOPage
-	 * @param entityPageDO EntityDO Page
-	 * @return EntityBO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<DeviceBO> buildBOPageByDOPage(Page<DeviceDO> entityPageDO);
+    /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<DeviceBO> buildBOPageByDOPage(Page<DeviceDO> entityPageDO);
 
-	/**
-	 * BOPage to VOPage
-	 * @param entityPageBO EntityBO Page
-	 * @return EntityVO Page
-	 */
-	@Mapping(target = "orders", ignore = true)
-	@Mapping(target = "countId", ignore = true)
-	@Mapping(target = "maxLimit", ignore = true)
-	@Mapping(target = "searchCount", ignore = true)
-	@Mapping(target = "optimizeCountSql", ignore = true)
-	@Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-	Page<DeviceVO> buildVOPageByBOPage(Page<DeviceBO> entityPageBO);
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<DeviceVO> buildVOPageByBOPage(Page<DeviceBO> entityPageBO);
 
-	DeviceByPointVO buildVOPointByBO(DeviceByPointBO deviceByPointBO);
+    DeviceByPointVO buildVOPointByBO(DeviceByPointBO deviceByPointBO);
 
 }

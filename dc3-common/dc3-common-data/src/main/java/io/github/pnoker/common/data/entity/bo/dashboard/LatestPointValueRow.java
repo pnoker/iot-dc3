@@ -32,20 +32,20 @@ import java.time.LocalDateTime;
 @ToString
 public class LatestPointValueRow {
 
-	private long tenantId;
+    private long tenantId;
 
-	private long deviceId;
+    private long deviceId;
 
-	private long pointId;
+    private long pointId;
 
-	private long driverId;
+    private long driverId;
 
-	private LocalDateTime createTime;
+    private LocalDateTime createTime;
 
-	private String rawValue;
+    private String rawValue;
 
-	private String calValue;
+    private String calValue;
 
-	private String valueType;
+    private String valueType;
 
 }

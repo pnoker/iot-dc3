@@ -60,222 +60,222 @@ import java.util.Objects;
 @Service
 public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
-	@Resource
-	private ResourceBuilder resourceBuilder;
+    @Resource
+    private ResourceBuilder resourceBuilder;
 
-	@Resource
-	private RoleBuilder roleBuilder;
+    @Resource
+    private RoleBuilder roleBuilder;
 
-	@Resource
-	private RoleResourceBindBuilder roleResourceBindBuilder;
+    @Resource
+    private RoleResourceBindBuilder roleResourceBindBuilder;
 
-	@Resource
-	private RoleResourceBindManager roleResourceBindManager;
+    @Resource
+    private RoleResourceBindManager roleResourceBindManager;
 
-	@Resource
-	private ResourceManager resourceManager;
+    @Resource
+    private ResourceManager resourceManager;
 
-	@Resource
-	private RoleManager roleManager;
+    @Resource
+    private RoleManager roleManager;
 
-	@Resource
-	private RoleUserBindManager roleUserBindManager;
+    @Resource
+    private RoleUserBindManager roleUserBindManager;
 
-	@Override
-	public void save(RoleResourceBindBO entityBO) {
-		if (checkDuplicate(entityBO, false)) {
-			throw new DuplicateException("Failed to create role resource bind: role resource bind has been duplicated");
-		}
+    @Override
+    public void save(RoleResourceBindBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create role resource bind: role resource bind has been duplicated");
+        }
 
-		RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
-		if (!roleResourceBindManager.save(entityDO)) {
-			throw new AddException("Failed to create role resource bind");
-		}
-	}
+        RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
+        if (!roleResourceBindManager.save(entityDO)) {
+            throw new AddException("Failed to create role resource bind");
+        }
+    }
 
-	@Override
-	public void remove(Long id) {
-		getDOById(id, true);
+    @Override
+    public void remove(Long id) {
+        getDOById(id, true);
 
-		if (!roleResourceBindManager.removeById(id)) {
-			throw new DeleteException("Failed to remove role resource bind");
-		}
-	}
+        if (!roleResourceBindManager.removeById(id)) {
+            throw new DeleteException("Failed to remove role resource bind");
+        }
+    }
 
-	@Override
-	public void update(RoleResourceBindBO entityBO) {
-		getDOById(entityBO.getId(), true);
+    @Override
+    public void update(RoleResourceBindBO entityBO) {
+        getDOById(entityBO.getId(), true);
 
-		if (checkDuplicate(entityBO, true)) {
-			throw new DuplicateException("Failed to update role resource bind: role resource bind has been duplicated");
-		}
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("Failed to update role resource bind: role resource bind has been duplicated");
+        }
 
-		RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
-		entityDO.setOperateTime(null);
-		if (!roleResourceBindManager.updateById(entityDO)) {
-			throw new UpdateException("Failed to update role resource bind");
-		}
-	}
+        RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!roleResourceBindManager.updateById(entityDO)) {
+            throw new UpdateException("Failed to update role resource bind");
+        }
+    }
 
-	@Override
-	public RoleResourceBindBO selectById(Long id) {
-		RoleResourceBindDO entityDO = getDOById(id, true);
-		return roleResourceBindBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public RoleResourceBindBO selectById(Long id) {
+        RoleResourceBindDO entityDO = getDOById(id, true);
+        return roleResourceBindBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery) {
-		return selectByPage(entityQuery, null);
-	}
+    @Override
+    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery) {
+        return selectByPage(entityQuery, null);
+    }
 
-	@Override
-	public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery, Long tenantId) {
-		if (Objects.isNull(entityQuery.getPage())) {
-			entityQuery.setPage(new Pages());
-		}
-		Page<RoleResourceBindDO> entityPageDO = roleResourceBindManager.page(PageUtil.page(entityQuery.getPage()),
-				fuzzyQuery(entityQuery, tenantId));
-		return roleResourceBindBuilder.buildBOPageByDOPage(entityPageDO);
-	}
+    @Override
+    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery, Long tenantId) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<RoleResourceBindDO> entityPageDO = roleResourceBindManager.page(PageUtil.page(entityQuery.getPage()),
+                fuzzyQuery(entityQuery, tenantId));
+        return roleResourceBindBuilder.buildBOPageByDOPage(entityPageDO);
+    }
 
-	@Override
-	public List<ResourceBO> listResourceByUserId(Long userId, Long tenantId) {
-		if (Objects.isNull(userId)) {
-			return Collections.emptyList();
-		}
-		// Step 1: roles the user is bound to.
-		LambdaQueryWrapper<RoleUserBindDO> userWrapper = Wrappers.<RoleUserBindDO>query().lambda();
-		userWrapper.eq(RoleUserBindDO::getUserId, userId);
-		userWrapper.select(RoleUserBindDO::getRoleId);
-		List<Long> roleIds = roleUserBindManager.listObjs(userWrapper, o -> (Long) o);
-		if (CollectionUtils.isEmpty(roleIds)) {
-			return Collections.emptyList();
-		}
-		// Step 2: narrow to the caller's tenant so a stale cross-tenant binding
-		// cannot leak resources outside the current scope.
-		if (Objects.nonNull(tenantId)) {
-			LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
-			roleWrapper.in(RoleDO::getId, roleIds);
-			roleWrapper.eq(RoleDO::getTenantId, tenantId);
-			roleWrapper.select(RoleDO::getId);
-			roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
-			if (CollectionUtils.isEmpty(roleIds)) {
-				return Collections.emptyList();
-			}
-		}
-		// Step 3: role -> resource bindings.
-		LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();
-		bindWrapper.in(RoleResourceBindDO::getRoleId, roleIds);
-		bindWrapper.select(RoleResourceBindDO::getResourceId);
-		List<Long> resourceIds = roleResourceBindManager.listObjs(bindWrapper, o -> (Long) o)
-			.stream()
-			.distinct()
-			.toList();
-		if (CollectionUtils.isEmpty(resourceIds)) {
-			return Collections.emptyList();
-		}
-		// Step 4: fetch resources and drop disabled ones (same rule as
-		// listResourceByRoleId).
-		List<ResourceDO> resourceDOList = resourceManager.listByIds(resourceIds)
-			.stream()
-			.filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
-			.toList();
-		return resourceBuilder.buildBOListByDOList(resourceDOList);
-	}
+    @Override
+    public List<ResourceBO> listResourceByUserId(Long userId, Long tenantId) {
+        if (Objects.isNull(userId)) {
+            return Collections.emptyList();
+        }
+        // Step 1: roles the user is bound to.
+        LambdaQueryWrapper<RoleUserBindDO> userWrapper = Wrappers.<RoleUserBindDO>query().lambda();
+        userWrapper.eq(RoleUserBindDO::getUserId, userId);
+        userWrapper.select(RoleUserBindDO::getRoleId);
+        List<Long> roleIds = roleUserBindManager.listObjs(userWrapper, o -> (Long) o);
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return Collections.emptyList();
+        }
+        // Step 2: narrow to the caller's tenant so a stale cross-tenant binding
+        // cannot leak resources outside the current scope.
+        if (Objects.nonNull(tenantId)) {
+            LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
+            roleWrapper.in(RoleDO::getId, roleIds);
+            roleWrapper.eq(RoleDO::getTenantId, tenantId);
+            roleWrapper.select(RoleDO::getId);
+            roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
+            if (CollectionUtils.isEmpty(roleIds)) {
+                return Collections.emptyList();
+            }
+        }
+        // Step 3: role -> resource bindings.
+        LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        bindWrapper.in(RoleResourceBindDO::getRoleId, roleIds);
+        bindWrapper.select(RoleResourceBindDO::getResourceId);
+        List<Long> resourceIds = roleResourceBindManager.listObjs(bindWrapper, o -> (Long) o)
+                .stream()
+                .distinct()
+                .toList();
+        if (CollectionUtils.isEmpty(resourceIds)) {
+            return Collections.emptyList();
+        }
+        // Step 4: fetch resources and drop disabled ones (same rule as
+        // listResourceByRoleId).
+        List<ResourceDO> resourceDOList = resourceManager.listByIds(resourceIds)
+                .stream()
+                .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+                .toList();
+        return resourceBuilder.buildBOListByDOList(resourceDOList);
+    }
 
-	@Override
-	public List<RoleBO> listRoleByResourceId(Long resourceId, Long tenantId) {
-		if (Objects.isNull(resourceId)) {
-			return Collections.emptyList();
-		}
-		// Step 1: role_ids currently bound to this resource.
-		LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();
-		bindWrapper.eq(RoleResourceBindDO::getResourceId, resourceId);
-		bindWrapper.select(RoleResourceBindDO::getRoleId);
-		List<Long> roleIds = roleResourceBindManager.listObjs(bindWrapper, o -> (Long) o);
-		if (CollectionUtils.isEmpty(roleIds)) {
-			return Collections.emptyList();
-		}
-		// Step 2: fetch roles; filter by tenant (caller-scoped) and enabled flag.
-		List<RoleDO> enabled = roleManager.listByIds(roleIds)
-			.stream()
-			.filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag())
-					&& (Objects.isNull(tenantId) || tenantId.equals(e.getTenantId())))
-			.toList();
-		return roleBuilder.buildBOListByDOList(enabled);
-	}
+    @Override
+    public List<RoleBO> listRoleByResourceId(Long resourceId, Long tenantId) {
+        if (Objects.isNull(resourceId)) {
+            return Collections.emptyList();
+        }
+        // Step 1: role_ids currently bound to this resource.
+        LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        bindWrapper.eq(RoleResourceBindDO::getResourceId, resourceId);
+        bindWrapper.select(RoleResourceBindDO::getRoleId);
+        List<Long> roleIds = roleResourceBindManager.listObjs(bindWrapper, o -> (Long) o);
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return Collections.emptyList();
+        }
+        // Step 2: fetch roles; filter by tenant (caller-scoped) and enabled flag.
+        List<RoleDO> enabled = roleManager.listByIds(roleIds)
+                .stream()
+                .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag())
+                        && (Objects.isNull(tenantId) || tenantId.equals(e.getTenantId())))
+                .toList();
+        return roleBuilder.buildBOListByDOList(enabled);
+    }
 
-	@Override
-	public List<ResourceBO> listResourceByRoleId(Long roleId) {
-		LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
-		wrapper.eq(RoleResourceBindDO::getRoleId, roleId);
-		List<RoleResourceBindDO> entityDOList = roleResourceBindManager.list(wrapper);
-		if (CollectionUtils.isNotEmpty(entityDOList)) {
-			List<ResourceDO> resourceDOList = resourceManager
-				.listByIds(entityDOList.stream().map(RoleResourceBindDO::getResourceId).toList());
-			List<ResourceDO> collect = resourceDOList.stream()
-				.filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
-				.toList();
-			return resourceBuilder.buildBOListByDOList(collect);
-		}
+    @Override
+    public List<ResourceBO> listResourceByRoleId(Long roleId) {
+        LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        wrapper.eq(RoleResourceBindDO::getRoleId, roleId);
+        List<RoleResourceBindDO> entityDOList = roleResourceBindManager.list(wrapper);
+        if (CollectionUtils.isNotEmpty(entityDOList)) {
+            List<ResourceDO> resourceDOList = resourceManager
+                    .listByIds(entityDOList.stream().map(RoleResourceBindDO::getResourceId).toList());
+            List<ResourceDO> collect = resourceDOList.stream()
+                    .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+                    .toList();
+            return resourceBuilder.buildBOListByDOList(collect);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * @param entityQuery {@link RoleResourceBindQuery}
-	 * @return {@link LambdaQueryWrapper}
-	 */
-	private LambdaQueryWrapper<RoleResourceBindDO> fuzzyQuery(RoleResourceBindQuery entityQuery, Long tenantId) {
-		LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
-		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleResourceBindDO::getRoleId,
-				entityQuery.getRoleId());
-		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getResourceId()), RoleResourceBindDO::getResourceId,
-				entityQuery.getResourceId());
-		if (Objects.nonNull(tenantId)) {
-			LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
-			roleWrapper.eq(RoleDO::getTenantId, tenantId);
-			roleWrapper.select(RoleDO::getId);
-			List<Long> roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
-			if (CollectionUtils.isEmpty(roleIds)) {
-				wrapper.apply("1 = 0");
-			}
-			else {
-				wrapper.in(RoleResourceBindDO::getRoleId, roleIds);
-			}
-		}
-		return wrapper;
-	}
+    /**
+     * @param entityQuery {@link RoleResourceBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<RoleResourceBindDO> fuzzyQuery(RoleResourceBindQuery entityQuery, Long tenantId) {
+        LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleResourceBindDO::getRoleId,
+                entityQuery.getRoleId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getResourceId()), RoleResourceBindDO::getResourceId,
+                entityQuery.getResourceId());
+        if (Objects.nonNull(tenantId)) {
+            LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
+            roleWrapper.eq(RoleDO::getTenantId, tenantId);
+            roleWrapper.select(RoleDO::getId);
+            List<Long> roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
+            if (CollectionUtils.isEmpty(roleIds)) {
+                wrapper.apply("1 = 0");
+            } else {
+                wrapper.in(RoleResourceBindDO::getRoleId, roleIds);
+            }
+        }
+        return wrapper;
+    }
 
-	/**
-	 * @param entityBO {@link RoleResourceBindBO}
-	 * @param isUpdate
-	 * @return
-	 */
-	private boolean checkDuplicate(RoleResourceBindBO entityBO, boolean isUpdate) {
-		LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
-		wrapper.eq(RoleResourceBindDO::getRoleId, entityBO.getRoleId());
-		wrapper.eq(RoleResourceBindDO::getResourceId, entityBO.getResourceId());
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		RoleResourceBindDO one = roleResourceBindManager.getOne(wrapper);
-		if (Objects.isNull(one)) {
-			return false;
-		}
-		return !isUpdate || !one.getId().equals(entityBO.getId());
-	}
+    /**
+     * @param entityBO {@link RoleResourceBindBO}
+     * @param isUpdate
+     * @return
+     */
+    private boolean checkDuplicate(RoleResourceBindBO entityBO, boolean isUpdate) {
+        LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        wrapper.eq(RoleResourceBindDO::getRoleId, entityBO.getRoleId());
+        wrapper.eq(RoleResourceBindDO::getResourceId, entityBO.getResourceId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        RoleResourceBindDO one = roleResourceBindManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
 
-	/**
-	 * Primary key ID
-	 * @param id ID
-	 * @param throwException
-	 * @return {@link RoleResourceBindDO}
-	 */
-	private RoleResourceBindDO getDOById(Long id, boolean throwException) {
-		RoleResourceBindDO entityDO = roleResourceBindManager.getById(id);
-		if (throwException && Objects.isNull(entityDO)) {
-			throw new NotFoundException("Role resource bind does not exist");
-		}
-		return entityDO;
-	}
+    /**
+     * Primary key ID
+     *
+     * @param id             ID
+     * @param throwException
+     * @return {@link RoleResourceBindDO}
+     */
+    private RoleResourceBindDO getDOById(Long id, boolean throwException) {
+        RoleResourceBindDO entityDO = roleResourceBindManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Role resource bind does not exist");
+        }
+        return entityDO;
+    }
 
 }

@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-driver-modbus-tcp` is the Modbus TCP protocol driver of the IoT DC3 platform. It connects to Modbus TCP slave devices, reads coil/register values periodically, and supports
+`dc3-driver-modbus-tcp` is the Modbus TCP protocol driver of the IoT DC3 platform. It connects to Modbus TCP slave
+devices, reads coil/register values periodically, and supports
 write commands for register control.
 
 ## Module Information

@@ -43,47 +43,47 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PointValueBO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Device ID associated with the point value
-	 */
-	private Long deviceId;
+    /**
+     * Device ID associated with the point value
+     */
+    private Long deviceId;
 
-	/**
-	 * Point ID associated with the value
-	 */
-	private Long pointId;
+    /**
+     * Point ID associated with the value
+     */
+    private Long pointId;
 
-	/**
-	 * Raw value as received from the device
-	 */
-	private String rawValue;
+    /**
+     * Raw value as received from the device
+     */
+    private String rawValue;
 
-	/**
-	 * Calculated/processed value after transformations
-	 */
-	private String calValue;
+    /**
+     * Calculated/processed value after transformations
+     */
+    private String calValue;
 
-	/**
-	 * Driver ID that collected the data
-	 */
-	private Long driverId;
+    /**
+     * Driver ID that collected the data
+     */
+    private Long driverId;
 
-	/**
-	 * Tenant ID the data belongs to
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID the data belongs to
+     */
+    private Long tenantId;
 
-	/**
-	 * Timestamp when the value was created
-	 */
-	private LocalDateTime createTime;
+    /**
+     * Timestamp when the value was created
+     */
+    private LocalDateTime createTime;
 
-	/**
-	 * Timestamp when the value was last operated on
-	 */
-	private LocalDateTime operateTime;
+    /**
+     * Timestamp when the value was last operated on
+     */
+    private LocalDateTime operateTime;
 
 }

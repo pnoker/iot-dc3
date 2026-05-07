@@ -19,24 +19,24 @@ package org.openscada.opc.lib.da;
 
 public class UnknownGroupException extends Exception {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	private String _name = null;
+    private String _name = null;
 
-	public UnknownGroupException(final String name) {
-		super();
-		this._name = name;
-	}
+    public UnknownGroupException(final String name) {
+        super();
+        this._name = name;
+    }
 
-	public String getName() {
-		return this._name;
-	}
+    public String getName() {
+        return this._name;
+    }
 
-	public void setName(final String name) {
-		this._name = name;
-	}
+    public void setName(final String name) {
+        this._name = name;
+    }
 
 }

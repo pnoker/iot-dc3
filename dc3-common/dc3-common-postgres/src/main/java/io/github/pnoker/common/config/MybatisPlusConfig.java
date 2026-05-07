@@ -40,15 +40,16 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class MybatisPlusConfig {
 
-	/**
-	 * Pagination interceptor bean configuration
-	 * @return Configured MybatisPlusInterceptor with PostgreSQL pagination support
-	 */
-	@Bean
-	public MybatisPlusInterceptor mybatisPlusInterceptor() {
-		MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-		interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
-		return interceptor;
-	}
+    /**
+     * Pagination interceptor bean configuration
+     *
+     * @return Configured MybatisPlusInterceptor with PostgreSQL pagination support
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
+        return interceptor;
+    }
 
 }

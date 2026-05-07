@@ -30,21 +30,22 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class AsciiMessageParser extends BaseMessageParser {
 
-	/**
-	 * <p>
-	 * Constructor for AsciiMessageParser.
-	 * </p>
-	 * @param master a boolean.
-	 */
-	public AsciiMessageParser(boolean master) {
-		super(master);
-	}
+    /**
+     * <p>
+     * Constructor for AsciiMessageParser.
+     * </p>
+     *
+     * @param master a boolean.
+     */
+    public AsciiMessageParser(boolean master) {
+        super(master);
+    }
 
-	@Override
-	protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception {
-		if (master)
-			return AsciiMessageResponse.createAsciiMessageResponse(queue);
-		return AsciiMessageRequest.createAsciiMessageRequest(queue);
-	}
+    @Override
+    protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception {
+        if (master)
+            return AsciiMessageResponse.createAsciiMessageResponse(queue);
+        return AsciiMessageRequest.createAsciiMessageRequest(queue);
+    }
 
 }

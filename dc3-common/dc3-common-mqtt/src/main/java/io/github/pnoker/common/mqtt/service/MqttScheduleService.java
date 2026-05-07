@@ -30,9 +30,9 @@ package io.github.pnoker.common.mqtt.service;
  */
 public interface MqttScheduleService {
 
-	/**
-	 * Initialize scheduling tasks
-	 */
-	void initial();
+    /**
+     * Initialize scheduling tasks
+     */
+    void initial();
 
 }

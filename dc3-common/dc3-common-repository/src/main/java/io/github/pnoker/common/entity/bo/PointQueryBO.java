@@ -42,17 +42,17 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PointQueryBO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Device ID for querying point data
-	 */
-	private Long deviceId;
+    /**
+     * Device ID for querying point data
+     */
+    private Long deviceId;
 
-	/**
-	 * Point ID for querying specific point
-	 */
-	private Long pointId;
+    /**
+     * Point ID for querying specific point
+     */
+    private Long pointId;
 
 }

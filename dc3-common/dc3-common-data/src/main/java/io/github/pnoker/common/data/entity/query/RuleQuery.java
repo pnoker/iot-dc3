@@ -44,41 +44,41 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class RuleQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	/**
-	 * Rule name
-	 */
-	private String alarmRuleName;
+    /**
+     * Rule name
+     */
+    private String alarmRuleName;
 
-	/**
-	 * Rule code
-	 */
-	private String alarmRuleCode;
+    /**
+     * Rule code
+     */
+    private String alarmRuleCode;
 
-	/**
-	 * Point ID
-	 */
-	private Long pointId;
+    /**
+     * Point ID
+     */
+    private Long pointId;
 
-	/**
-	 * Entity type flag
-	 */
-	private AlarmTypeFlagEnum alarmTypeFlag;
+    /**
+     * Entity type flag
+     */
+    private AlarmTypeFlagEnum alarmTypeFlag;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

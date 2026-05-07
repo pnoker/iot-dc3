@@ -31,40 +31,42 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class RtuMessageRequest extends RtuMessage implements OutgoingRequestMessage, IncomingRequestMessage {
 
-	/**
-	 * <p>
-	 * Constructor for RtuMessageRequest.
-	 * </p>
-	 * @param modbusRequest a {@link ModbusRequest} object.
-	 */
-	public RtuMessageRequest(ModbusRequest modbusRequest) {
-		super(modbusRequest);
-	}
+    /**
+     * <p>
+     * Constructor for RtuMessageRequest.
+     * </p>
+     *
+     * @param modbusRequest a {@link ModbusRequest} object.
+     */
+    public RtuMessageRequest(ModbusRequest modbusRequest) {
+        super(modbusRequest);
+    }
 
-	static RtuMessageRequest createRtuMessageRequest(ByteQueue queue) throws ModbusTransportException {
-		ModbusRequest request = ModbusRequest.createModbusRequest(queue);
-		RtuMessageRequest rtuRequest = new RtuMessageRequest(request);
+    static RtuMessageRequest createRtuMessageRequest(ByteQueue queue) throws ModbusTransportException {
+        ModbusRequest request = ModbusRequest.createModbusRequest(queue);
+        RtuMessageRequest rtuRequest = new RtuMessageRequest(request);
 
-		// Check the CRC
-		ModbusUtils.checkCRC(rtuRequest.modbusMessage, queue);
+        // Check the CRC
+        ModbusUtils.checkCRC(rtuRequest.modbusMessage, queue);
 
-		// Return the data.
-		return rtuRequest;
-	}
+        // Return the data.
+        return rtuRequest;
+    }
 
-	@Override
-	public boolean expectsResponse() {
-		return modbusMessage.getSlaveId() != 0;
-	}
+    @Override
+    public boolean expectsResponse() {
+        return modbusMessage.getSlaveId() != 0;
+    }
 
-	/**
-	 * <p>
-	 * getModbusRequest.
-	 * </p>
-	 * @return a {@link ModbusRequest} object.
-	 */
-	public ModbusRequest getModbusRequest() {
-		return (ModbusRequest) modbusMessage;
-	}
+    /**
+     * <p>
+     * getModbusRequest.
+     * </p>
+     *
+     * @return a {@link ModbusRequest} object.
+     */
+    public ModbusRequest getModbusRequest() {
+        return (ModbusRequest) modbusMessage;
+    }
 
 }

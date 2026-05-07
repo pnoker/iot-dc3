@@ -41,20 +41,21 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class OkHttpConfig {
 
-	/**
-	 * Configure OkHttpClient bean with optimized settings
-	 * @return Configured OkHttpClient instance
-	 */
-	@Bean
-	public OkHttpClient okHttpClient() {
-		ConnectionPool pool = new ConnectionPool(16, 5, TimeUnit.SECONDS);
-		return new OkHttpClient.Builder().retryOnConnectionFailure(true)
-			.connectionPool(pool)
-			.callTimeout(Duration.ofSeconds(15))
-			.connectTimeout(Duration.ofSeconds(15))
-			.readTimeout(Duration.ofSeconds(15))
-			.writeTimeout(Duration.ofSeconds(15))
-			.build();
-	}
+    /**
+     * Configure OkHttpClient bean with optimized settings
+     *
+     * @return Configured OkHttpClient instance
+     */
+    @Bean
+    public OkHttpClient okHttpClient() {
+        ConnectionPool pool = new ConnectionPool(16, 5, TimeUnit.SECONDS);
+        return new OkHttpClient.Builder().retryOnConnectionFailure(true)
+                .connectionPool(pool)
+                .callTimeout(Duration.ofSeconds(15))
+                .connectTimeout(Duration.ofSeconds(15))
+                .readTimeout(Duration.ofSeconds(15))
+                .writeTimeout(Duration.ofSeconds(15))
+                .build();
+    }
 
 }

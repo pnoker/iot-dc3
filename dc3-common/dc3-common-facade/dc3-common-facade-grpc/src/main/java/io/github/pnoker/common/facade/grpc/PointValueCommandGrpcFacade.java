@@ -40,28 +40,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class PointValueCommandGrpcFacade implements PointValueCommandFacade {
 
-	@Resource
-	private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
+    @Resource
+    private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
 
-	@Override
-	public boolean read(Long deviceId, Long pointId) {
-		GrpcPointValueCommandQuery request = GrpcPointValueCommandQuery.newBuilder()
-			.setDeviceId(deviceId)
-			.setPointId(pointId)
-			.build();
-		GrpcRBoolean response = pointValueApiBlockingStub.readCommand(request);
-		return response.getResult().getOk() && response.getData();
-	}
+    @Override
+    public boolean read(Long deviceId, Long pointId) {
+        GrpcPointValueCommandQuery request = GrpcPointValueCommandQuery.newBuilder()
+                .setDeviceId(deviceId)
+                .setPointId(pointId)
+                .build();
+        GrpcRBoolean response = pointValueApiBlockingStub.readCommand(request);
+        return response.getResult().getOk() && response.getData();
+    }
 
-	@Override
-	public boolean write(Long deviceId, Long pointId, String value) {
-		GrpcPointValueWriteCommand request = GrpcPointValueWriteCommand.newBuilder()
-			.setDeviceId(deviceId)
-			.setPointId(pointId)
-			.setValue(value)
-			.build();
-		GrpcRBoolean response = pointValueApiBlockingStub.writeCommand(request);
-		return response.getResult().getOk() && response.getData();
-	}
+    @Override
+    public boolean write(Long deviceId, Long pointId, String value) {
+        GrpcPointValueWriteCommand request = GrpcPointValueWriteCommand.newBuilder()
+                .setDeviceId(deviceId)
+                .setPointId(pointId)
+                .setValue(value)
+                .build();
+        GrpcRBoolean response = pointValueApiBlockingStub.writeCommand(request);
+        return response.getResult().getOk() && response.getData();
+    }
 
 }

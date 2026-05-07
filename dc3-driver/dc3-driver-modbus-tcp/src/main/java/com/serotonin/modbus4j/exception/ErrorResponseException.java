@@ -29,47 +29,50 @@ import com.serotonin.modbus4j.msg.ModbusResponse;
  */
 public class ErrorResponseException extends Exception {
 
-	private static final long serialVersionUID = -1;
+    private static final long serialVersionUID = -1;
 
-	private final ModbusRequest originalRequest;
+    private final ModbusRequest originalRequest;
 
-	private final ModbusResponse errorResponse;
+    private final ModbusResponse errorResponse;
 
-	/**
-	 * <p>
-	 * Constructor for ErrorResponseException.
-	 * </p>
-	 * @param originalRequest a {@link ModbusRequest} object.
-	 * @param errorResponse a {@link ModbusResponse} object.
-	 */
-	public ErrorResponseException(ModbusRequest originalRequest, ModbusResponse errorResponse) {
-		this.originalRequest = originalRequest;
-		this.errorResponse = errorResponse;
-	}
+    /**
+     * <p>
+     * Constructor for ErrorResponseException.
+     * </p>
+     *
+     * @param originalRequest a {@link ModbusRequest} object.
+     * @param errorResponse   a {@link ModbusResponse} object.
+     */
+    public ErrorResponseException(ModbusRequest originalRequest, ModbusResponse errorResponse) {
+        this.originalRequest = originalRequest;
+        this.errorResponse = errorResponse;
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>errorResponse</code>.
-	 * </p>
-	 * @return a {@link ModbusResponse} object.
-	 */
-	public ModbusResponse getErrorResponse() {
-		return errorResponse;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>errorResponse</code>.
+     * </p>
+     *
+     * @return a {@link ModbusResponse} object.
+     */
+    public ModbusResponse getErrorResponse() {
+        return errorResponse;
+    }
 
-	/**
-	 * <p>
-	 * Getter for the field <code>originalRequest</code>.
-	 * </p>
-	 * @return a {@link ModbusRequest} object.
-	 */
-	public ModbusRequest getOriginalRequest() {
-		return originalRequest;
-	}
+    /**
+     * <p>
+     * Getter for the field <code>originalRequest</code>.
+     * </p>
+     *
+     * @return a {@link ModbusRequest} object.
+     */
+    public ModbusRequest getOriginalRequest() {
+        return originalRequest;
+    }
 
-	@Override
-	public String getMessage() {
-		return errorResponse.getExceptionMessage();
-	}
+    @Override
+    public String getMessage() {
+        return errorResponse.getExceptionMessage();
+    }
 
 }

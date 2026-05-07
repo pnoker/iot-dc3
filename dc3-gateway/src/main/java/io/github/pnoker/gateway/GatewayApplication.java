@@ -33,12 +33,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class GatewayApplication {
 
-	/**
-	 * Main method to launch Spring Boot application
-	 * @param args Command line arguments
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(GatewayApplication.class, args);
-	}
+    /**
+     * Main method to launch Spring Boot application
+     *
+     * @param args Command line arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(GatewayApplication.class, args);
+    }
 
 }

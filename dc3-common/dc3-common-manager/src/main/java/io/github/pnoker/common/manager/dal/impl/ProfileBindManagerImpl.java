@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ProfileBindManagerImpl extends ServiceImpl<ProfileBindMapper, ProfileBindDO>
-		implements ProfileBindManager {
+        implements ProfileBindManager {
 
 }

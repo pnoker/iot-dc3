@@ -36,15 +36,15 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class TopEntityVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Device / point / driver id — the service resolves the human-readable name
-	 * asynchronously on the frontend via existing getXxxByIds APIs.
-	 */
-	private Long entityId;
+    /**
+     * Device / point / driver id — the service resolves the human-readable name
+     * asynchronously on the frontend via existing getXxxByIds APIs.
+     */
+    private Long entityId;
 
-	private long count;
+    private long count;
 
 }

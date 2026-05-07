@@ -42,21 +42,22 @@ import java.util.List;
 @Setter
 public class TreeNode implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private int id;
+    private int id;
 
-	private int parentId;
+    private int parentId;
 
-	private List<TreeNode> children = new ArrayList<>(16);
+    private List<TreeNode> children = new ArrayList<>(16);
 
-	/**
-	 * Add child node to current node
-	 * @param node Tree node to add as child
-	 */
-	public void add(TreeNode node) {
-		children.add(node);
-	}
+    /**
+     * Add child node to current node
+     *
+     * @param node Tree node to add as child
+     */
+    public void add(TreeNode node) {
+        children.add(node);
+    }
 
 }

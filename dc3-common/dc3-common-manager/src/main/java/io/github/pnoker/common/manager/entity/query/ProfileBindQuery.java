@@ -38,26 +38,26 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ProfileBindQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	/**
-	 * ID
-	 */
-	private Long profileId;
+    /**
+     * ID
+     */
+    private Long profileId;
 
-	/**
-	 * Device ID
-	 */
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    private Long deviceId;
 
 }

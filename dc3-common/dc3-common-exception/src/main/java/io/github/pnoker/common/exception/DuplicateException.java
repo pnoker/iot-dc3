@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class DuplicateException extends RuntimeException {
 
-	public DuplicateException() {
-		this(null);
-	}
+    public DuplicateException() {
+        this(null);
+    }
 
-	public DuplicateException(Throwable cause) {
-		super(cause);
-	}
+    public DuplicateException(Throwable cause) {
+        super(cause);
+    }
 
-	public DuplicateException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public DuplicateException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

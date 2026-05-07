@@ -35,24 +35,26 @@ import java.util.List;
  */
 public interface MqttReceiveService {
 
-	/**
-	 * Must implement single-point processing logic
-	 * <p>
-	 * Parse incoming data into io.github.pnoker.common.bean.point.PointValue then call
-	 * driverService.pointValueSender(pointValue) to publish data Tip: Refer to the
-	 * dc3-driver-listening-virtual driver for examples
-	 * @param mqttMessage MqttMessage
-	 */
-	void receiveValue(MqttMessage mqttMessage);
+    /**
+     * Must implement single-point processing logic
+     * <p>
+     * Parse incoming data into io.github.pnoker.common.bean.point.PointValue then call
+     * driverService.pointValueSender(pointValue) to publish data Tip: Refer to the
+     * dc3-driver-listening-virtual driver for examples
+     *
+     * @param mqttMessage MqttMessage
+     */
+    void receiveValue(MqttMessage mqttMessage);
 
-	/**
-	 * Must implement batch processing logic
-	 * <p>
-	 * Parse incoming data into io.github.pnoker.common.bean.point.PointValue then call
-	 * driverService.pointValueSender(pointValue) to publish data Tip: Refer to the
-	 * dc3-driver-listening-virtual driver for examples
-	 * @param mqttMessageList String Array List
-	 */
-	void receiveValues(List<MqttMessage> mqttMessageList);
+    /**
+     * Must implement batch processing logic
+     * <p>
+     * Parse incoming data into io.github.pnoker.common.bean.point.PointValue then call
+     * driverService.pointValueSender(pointValue) to publish data Tip: Refer to the
+     * dc3-driver-listening-virtual driver for examples
+     *
+     * @param mqttMessageList String Array List
+     */
+    void receiveValues(List<MqttMessage> mqttMessageList);
 
 }

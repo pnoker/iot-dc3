@@ -33,41 +33,41 @@ import java.io.IOException;
  */
 public class AsciiSlave extends SerialSlave {
 
-	private MessageControl conn;
+    private MessageControl conn;
 
-	/**
-	 * <p>
-	 * Constructor for AsciiSlave.
-	 * </p>
-	 * @param wrapper a {@link SerialPortWrapper} object.
-	 */
-	public AsciiSlave(SerialPortWrapper wrapper) {
-		super(wrapper);
-	}
+    /**
+     * <p>
+     * Constructor for AsciiSlave.
+     * </p>
+     *
+     * @param wrapper a {@link SerialPortWrapper} object.
+     */
+    public AsciiSlave(SerialPortWrapper wrapper) {
+        super(wrapper);
+    }
 
-	@Override
-	public void start() throws ModbusInitException {
-		super.start();
+    @Override
+    public void start() throws ModbusInitException {
+        super.start();
 
-		AsciiMessageParser asciiMessageParser = new AsciiMessageParser(false);
-		AsciiRequestHandler asciiRequestHandler = new AsciiRequestHandler(this);
+        AsciiMessageParser asciiMessageParser = new AsciiMessageParser(false);
+        AsciiRequestHandler asciiRequestHandler = new AsciiRequestHandler(this);
 
-		conn = new MessageControl();
-		conn.setExceptionHandler(getExceptionHandler());
+        conn = new MessageControl();
+        conn.setExceptionHandler(getExceptionHandler());
 
-		try {
-			conn.start(transport, asciiMessageParser, asciiRequestHandler, null);
-			transport.start("Modbus ASCII slave");
-		}
-		catch (IOException e) {
-			throw new ModbusInitException(e);
-		}
-	}
+        try {
+            conn.start(transport, asciiMessageParser, asciiRequestHandler, null);
+            transport.start("Modbus ASCII slave");
+        } catch (IOException e) {
+            throw new ModbusInitException(e);
+        }
+    }
 
-	@Override
-	public void stop() {
-		conn.close();
-		super.stop();
-	}
+    @Override
+    public void stop() {
+        conn.close();
+        super.stop();
+    }
 
 }

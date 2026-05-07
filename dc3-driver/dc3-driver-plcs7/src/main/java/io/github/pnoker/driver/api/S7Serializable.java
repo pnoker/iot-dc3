@@ -23,40 +23,42 @@ package io.github.pnoker.driver.api;
  */
 public interface S7Serializable {
 
-	/**
-	 * Extract a Java value from an S7 byte buffer.
-	 * @param <T> target type
-	 * @param targetClass the class to deserialize into
-	 * @param buffer raw byte buffer from the PLC
-	 * @param byteOffset byte offset within the buffer
-	 * @param bitOffset bit offset within the byte
-	 * @return the deserialized value
-	 */
-	<T> T extract(Class<T> targetClass, byte[] buffer, int byteOffset, int bitOffset);
+    /**
+     * Extract a Java value from an S7 byte buffer.
+     *
+     * @param <T>         target type
+     * @param targetClass the class to deserialize into
+     * @param buffer      raw byte buffer from the PLC
+     * @param byteOffset  byte offset within the buffer
+     * @param bitOffset   bit offset within the byte
+     * @return the deserialized value
+     */
+    <T> T extract(Class<T> targetClass, byte[] buffer, int byteOffset, int bitOffset);
 
-	/**
-	 * @return the S7 type this serializer handles
-	 */
-	S7Type getS7Type();
+    /**
+     * @return the S7 type this serializer handles
+     */
+    S7Type getS7Type();
 
-	/**
-	 * @return the size of this type in bits
-	 */
-	int getSizeInBits();
+    /**
+     * @return the size of this type in bits
+     */
+    int getSizeInBits();
 
-	/**
-	 * @return the size of this type in bytes
-	 */
-	int getSizeInBytes();
+    /**
+     * @return the size of this type in bytes
+     */
+    int getSizeInBytes();
 
-	/**
-	 * Insert a Java value into an S7 byte buffer.
-	 * @param javaType the value to serialize
-	 * @param buffer target byte buffer
-	 * @param byteOffset byte offset within the buffer
-	 * @param bitOffset bit offset within the byte
-	 * @param size number of elements (for arrays)
-	 */
-	void insert(Object javaType, byte[] buffer, int byteOffset, int bitOffset, int size);
+    /**
+     * Insert a Java value into an S7 byte buffer.
+     *
+     * @param javaType   the value to serialize
+     * @param buffer     target byte buffer
+     * @param byteOffset byte offset within the buffer
+     * @param bitOffset  bit offset within the byte
+     * @param size       number of elements (for arrays)
+     */
+    void insert(Object javaType, byte[] buffer, int byteOffset, int bitOffset, int size);
 
 }

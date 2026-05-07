@@ -36,36 +36,36 @@ import lombok.Setter;
  */
 public class Keys {
 
-	private Keys() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private Keys() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * AES private key for symmetric encryption
-	 */
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Aes {
+    /**
+     * AES private key for symmetric encryption
+     */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Aes {
 
-		private String privateKey;
+        private String privateKey;
 
-	}
+    }
 
-	/**
-	 * RSA key pair for asymmetric encryption
-	 */
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Rsa {
+    /**
+     * RSA key pair for asymmetric encryption
+     */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Rsa {
 
-		private String publicKey;
+        private String publicKey;
 
-		private String privateKey;
+        private String privateKey;
 
-	}
+    }
 
 }

@@ -35,20 +35,20 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AgingBacklogVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private long under1h;
+    private long under1h;
 
-	private long h1to6;
+    private long h1to6;
 
-	private long h6to24;
+    private long h6to24;
 
-	private long over24h;
+    private long over24h;
 
-	/**
-	 * Convenience sum — equals the total unconfirmed count.
-	 */
-	private long total;
+    /**
+     * Convenience sum — equals the total unconfirmed count.
+     */
+    private long total;
 
 }

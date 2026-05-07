@@ -29,19 +29,21 @@ import java.io.IOException;
  */
 public interface DataConsumer {
 
-	/**
-	 * Notifies the consumer that new data is available
-	 * @param b array of bytes representing the incoming information
-	 * @param len length of the data
-	 */
-	public void data(byte[] b, int len);
+    /**
+     * Notifies the consumer that new data is available
+     *
+     * @param b   array of bytes representing the incoming information
+     * @param len length of the data
+     */
+    public void data(byte[] b, int len);
 
-	/**
-	 * <p>
-	 * handleIOException.
-	 * </p>
-	 * @param e a {@link IOException} object.
-	 */
-	public void handleIOException(IOException e);
+    /**
+     * <p>
+     * handleIOException.
+     * </p>
+     *
+     * @param e a {@link IOException} object.
+     */
+    public void handleIOException(IOException e);
 
 }

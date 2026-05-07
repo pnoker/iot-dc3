@@ -35,78 +35,81 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ResourceScopeFlagEnum {
 
-	/**
-	 * Add
-	 */
-	ADD((byte) 0, "add", "Add"),
+    /**
+     * Add
+     */
+    ADD((byte) 0, "add", "Add"),
 
-	/**
-	 * Delete
-	 */
-	DELETE((byte) 1, "delete", "Delete"),
+    /**
+     * Delete
+     */
+    DELETE((byte) 1, "delete", "Delete"),
 
-	/**
-	 * Update
-	 */
-	UPDATE((byte) 2, "update", "Update"),
+    /**
+     * Update
+     */
+    UPDATE((byte) 2, "update", "Update"),
 
-	/**
-	 * List
-	 */
-	LIST((byte) 3, "list", "List"),;
+    /**
+     * List
+     */
+    LIST((byte) 3, "list", "List"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Remark
-	 */
-	private final String remark;
+    /**
+     * Remark
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link ResourceScopeFlagEnum}
-	 */
-	public static ResourceScopeFlagEnum ofIndex(Byte index) {
-		Optional<ResourceScopeFlagEnum> any = Arrays.stream(ResourceScopeFlagEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link ResourceScopeFlagEnum}
+     */
+    public static ResourceScopeFlagEnum ofIndex(Byte index) {
+        Optional<ResourceScopeFlagEnum> any = Arrays.stream(ResourceScopeFlagEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link ResourceScopeFlagEnum}
-	 */
-	public static ResourceScopeFlagEnum ofCode(String code) {
-		Optional<ResourceScopeFlagEnum> any = Arrays.stream(ResourceScopeFlagEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link ResourceScopeFlagEnum}
+     */
+    public static ResourceScopeFlagEnum ofCode(String code) {
+        Optional<ResourceScopeFlagEnum> any = Arrays.stream(ResourceScopeFlagEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Name
-	 * @return {@link ResourceScopeFlagEnum}
-	 */
-	public static ResourceScopeFlagEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link ResourceScopeFlagEnum}
+     */
+    public static ResourceScopeFlagEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

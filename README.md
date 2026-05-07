@@ -26,7 +26,8 @@ All components and code are open-source, ensuring transparency, flexibility, and
 
 # 1 Architecture
 
-The architecture is designed for end-to-end IoT capabilities across device connectivity, data services, operational management, and extensible application integration.
+The architecture is designed for end-to-end IoT capabilities across device connectivity, data services, operational
+management, and extensible application integration.
 
 - **Driver Layer**: Provides SDKs for rapid driver development and seamless connectivity to physical devices through
   standard or proprietary protocols. This layer handles southbound data acquisition and command execution;
@@ -55,7 +56,8 @@ The architecture is designed for end-to-end IoT capabilities across device conne
 
 > Choose one
 >
-> This base stack starts PostgreSQL and RabbitMQ. If you need a database SQL script, connect directly to the started database in the container for export.
+> This base stack starts PostgreSQL and RabbitMQ. If you need a database SQL script, connect directly to the started
+> database in the container for export.
 
 ```bash
 # Global access with standard container registry service
@@ -74,7 +76,8 @@ make dev
 make dev-all
 ```
 
-Use `REGISTRY=domestic` when you want the mainland China image registry variants. Backward-compatible aliases `REGISTRY=aliyun` and `REGISTRY=cn` still work:
+Use `REGISTRY=domestic` when you want the mainland China image registry variants. Backward-compatible aliases
+`REGISTRY=aliyun` and `REGISTRY=cn` still work:
 
 ```bash
 make dev-db REGISTRY=domestic
@@ -126,11 +129,13 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-> **Module Overview**: See [`docs/MODULES.md`](docs/MODULES.md) for the full module dependency map and runtime flow diagram.
+> **Module Overview**: See [`docs/MODULES.md`](docs/MODULES.md) for the full module dependency map and runtime flow
+> diagram.
 
 > **Local Dev Guide**: See [`docs/QUICKSTART.md`](docs/QUICKSTART.md) for a one-stop local setup workflow.
 
-> **Troubleshooting**: See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) for common build/runtime issues and resolutions.
+> **Troubleshooting**: See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) for common build/runtime issues and
+> resolutions.
 
 ## 3.3 Start Services
 

@@ -37,21 +37,21 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RuleExt extends BaseExt {
 
-	/**
-	 * Extended content.
-	 * <p>
-	 * The content can be distinguished by Type and Version.
-	 */
-	private Content content;
+    /**
+     * Extended content.
+     * <p>
+     * The content can be distinguished by Type and Version.
+     */
+    private Content content;
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Content {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Content {
 
-		private String keep;
+        private String keep;
 
-	}
+    }
 
 }

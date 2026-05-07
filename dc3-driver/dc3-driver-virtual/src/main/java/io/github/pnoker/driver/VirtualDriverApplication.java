@@ -33,13 +33,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class VirtualDriverApplication {
 
-	/**
-	 * Virtual Driver Application Main Method Start the Spring Boot application by passing
-	 * the VirtualDriverApplication class and command line arguments
-	 * @param args Command line arguments passed to the application
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(VirtualDriverApplication.class, args);
-	}
+    /**
+     * Virtual Driver Application Main Method Start the Spring Boot application by passing
+     * the VirtualDriverApplication class and command line arguments
+     *
+     * @param args Command line arguments passed to the application
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(VirtualDriverApplication.class, args);
+    }
 
 }

@@ -44,25 +44,25 @@ import java.util.Map;
 @Order(Ordered.LOWEST_PRECEDENCE - 100)
 public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
 
-	@Override
-	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
-		if (StringUtils.isEmpty(node)) {
-			node = EnvironmentUtil.getNodeId();
-		}
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
+        if (StringUtils.isEmpty(node)) {
+            node = EnvironmentUtil.getNodeId();
+        }
 
-		String tenant = environment.getProperty(EnvironmentConstant.DRIVER_TENANT, String.class);
-		String name = environment.getProperty(EnvironmentConstant.SPRING_APPLICATION_NAME, String.class);
-		String client = MessageFormat.format("{0}/{1}/{2}", tenant, name, node);
-		String service = MessageFormat.format("{0}/{1}", tenant, name);
+        String tenant = environment.getProperty(EnvironmentConstant.DRIVER_TENANT, String.class);
+        String name = environment.getProperty(EnvironmentConstant.SPRING_APPLICATION_NAME, String.class);
+        String client = MessageFormat.format("{0}/{1}/{2}", tenant, name, node);
+        String service = MessageFormat.format("{0}/{1}", tenant, name);
 
-		Map<String, Object> source = new HashMap<>(4);
-		source.put(EnvironmentConstant.DRIVER_NODE, node);
-		source.put(EnvironmentConstant.DRIVER_SERVICE, service);
-		source.put(EnvironmentConstant.DRIVER_HOST, HostUtil.localHost());
-		source.put(EnvironmentConstant.DRIVER_CLIENT, client);
-		MutablePropertySources propertySources = environment.getPropertySources();
-		propertySources.addFirst(new MapPropertySource("driver", source));
-	}
+        Map<String, Object> source = new HashMap<>(4);
+        source.put(EnvironmentConstant.DRIVER_NODE, node);
+        source.put(EnvironmentConstant.DRIVER_SERVICE, service);
+        source.put(EnvironmentConstant.DRIVER_HOST, HostUtil.localHost());
+        source.put(EnvironmentConstant.DRIVER_CLIENT, client);
+        MutablePropertySources propertySources = environment.getPropertySources();
+        propertySources.addFirst(new MapPropertySource("driver", source));
+    }
 
 }

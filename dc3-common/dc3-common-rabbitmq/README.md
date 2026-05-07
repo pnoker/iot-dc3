@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-rabbitmq` is the shared RabbitMQ configuration module of the IoT DC3 platform. It defines all topic exchanges, queue bindings, and connection configuration used for
+`dc3-common-rabbitmq` is the shared RabbitMQ configuration module of the IoT DC3 platform. It defines all topic
+exchanges, queue bindings, and connection configuration used for
 asynchronous communication between services and drivers.
 
 ## Module Information

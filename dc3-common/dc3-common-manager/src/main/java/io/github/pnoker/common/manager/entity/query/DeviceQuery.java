@@ -39,48 +39,48 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DeviceQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	/**
-	 * Device Name
-	 */
-	private String deviceName;
+    /**
+     * Device Name
+     */
+    private String deviceName;
 
-	/**
-	 * Device ID
-	 */
-	private String deviceCode;
+    /**
+     * Device ID
+     */
+    private String deviceCode;
 
-	/**
-	 * Driver ID
-	 */
-	private Long driverId;
+    /**
+     * Driver ID
+     */
+    private Long driverId;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
-	//
+    //
 
-	/**
-	 * ID
-	 */
-	private Long profileId;
+    /**
+     * ID
+     */
+    private Long profileId;
 
 }

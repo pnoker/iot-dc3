@@ -46,81 +46,81 @@ import java.util.Objects;
 @RequestMapping(DataConstant.POINT_VALUE_URL_PREFIX)
 public class PointValueController implements BaseController {
 
-	private final PointValueBuilder pointValueBuilder;
+    private final PointValueBuilder pointValueBuilder;
 
-	private final PointValueService pointValueService;
+    private final PointValueService pointValueService;
 
-	public PointValueController(PointValueBuilder pointValueBuilder, PointValueService pointValueService) {
-		this.pointValueBuilder = pointValueBuilder;
-		this.pointValueService = pointValueService;
-	}
+    public PointValueController(PointValueBuilder pointValueBuilder, PointValueService pointValueService) {
+        this.pointValueBuilder = pointValueBuilder;
+        this.pointValueService = pointValueService;
+    }
 
-	/**
-	 * Query the latest PointValue for each point in the device
-	 * @param entityQuery PointValueQuery, including pagination parameters
-	 * @return Page of PointValueVO, where each PointValueVO contains the latest value for
-	 * a point in the device
-	 */
-	@PostMapping("/latest")
-	public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
-				query.setTenantId(tenantId);
-				Page<PointValueBO> entityPageBO = pointValueService.latest(query);
-				Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-				return Mono.just(R.ok(entityPageVO));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Query the latest PointValue for each point in the device
+     *
+     * @param entityQuery PointValueQuery, including pagination parameters
+     * @return Page of PointValueVO, where each PointValueVO contains the latest value for
+     * a point in the device
+     */
+    @PostMapping("/latest")
+    public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<PointValueBO> entityPageBO = pointValueService.latest(query);
+                Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * Query the historical PointValue for each point in the device
-	 * @param entityQuery PointValueQuery, including pagination parameters
-	 * @return Page of PointValueVO, where each PointValueVO contains the historical value
-	 * for a point in the device
-	 */
-	@PostMapping("/list")
-	public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
-				query.setTenantId(tenantId);
-				Page<PointValueBO> entityPageBO = pointValueService.page(query);
-				Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-				return Mono.just(R.ok(entityPageVO));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Query the historical PointValue for each point in the device
+     *
+     * @param entityQuery PointValueQuery, including pagination parameters
+     * @return Page of PointValueVO, where each PointValueVO contains the historical value
+     * for a point in the device
+     */
+    @PostMapping("/list")
+    public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<PointValueBO> entityPageBO = pointValueService.page(query);
+                Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * Query the historical PointValue for a specific point in the device
-	 * @param deviceId Device ID
-	 * @param pointId Point ID
-	 * @return List of String, where each String is the historical value for the point
-	 */
-	@GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
-	public Mono<R<List<String>>> history(@NotNull @PathVariable(name = "deviceId") Long deviceId,
-			@NotNull @PathVariable(name = "pointId") Long pointId,
-			@RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);
-				return Mono.just(R.ok(history));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Query the historical PointValue for a specific point in the device
+     *
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @return List of String, where each String is the historical value for the point
+     */
+    @GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
+    public Mono<R<List<String>>> history(@NotNull @PathVariable(name = "deviceId") Long deviceId,
+                                         @NotNull @PathVariable(name = "pointId") Long pointId,
+                                         @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);
+                return Mono.just(R.ok(history));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
 }

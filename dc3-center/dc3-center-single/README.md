@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-center-single` is the Integrated All-in-One Center of the IoT DC3 platform. It combines authorization, data, and management services into a single deployable module for
+`dc3-center-single` is the Integrated All-in-One Center of the IoT DC3 platform. It combines authorization, data, and
+management services into a single deployable module for
 simplified single-node or lightweight deployment scenarios.
 
 ## Module Information

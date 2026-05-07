@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-auth` is the shared authentication business module of the IoT DC3 platform. It contains all controllers, service implementations, gRPC servers, mappers, and DAL classes
+`dc3-common-auth` is the shared authentication business module of the IoT DC3 platform. It contains all controllers,
+service implementations, gRPC servers, mappers, and DAL classes
 that implement the authentication center's functionality. It is wired directly into `dc3-center-auth`.
 
 ## Module Information

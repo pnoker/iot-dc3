@@ -39,49 +39,49 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PointValueVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Device ID
-	 */
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    private Long deviceId;
 
-	/**
-	 * Point ID
-	 */
-	private Long pointId;
+    /**
+     * Point ID
+     */
+    private Long pointId;
 
-	/**
-	 * Raw value
-	 */
-	private String rawValue;
+    /**
+     * Raw value
+     */
+    private String rawValue;
 
-	/**
-	 * Processed value
-	 */
-	private String calValue;
+    /**
+     * Processed value
+     */
+    private String calValue;
 
-	/**
-	 * Driver ID
-	 */
-	private Long driverId;
+    /**
+     * Driver ID
+     */
+    private Long driverId;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	/**
-	 * Create Time
-	 */
-	@JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
+    private LocalDateTime createTime;
 
-	/**
-	 * Operate Time
-	 */
-	@JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
-	private LocalDateTime operateTime;
+    /**
+     * Operate Time
+     */
+    @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
+    private LocalDateTime operateTime;
 
 }

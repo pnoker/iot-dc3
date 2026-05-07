@@ -49,80 +49,75 @@ import java.util.Objects;
 @RequestMapping(AuthConstant.API_URL_PREFIX)
 public class ApiController implements BaseController {
 
-	private final ApiBuilder apiBuilder;
+    private final ApiBuilder apiBuilder;
 
-	private final ApiService apiService;
+    private final ApiService apiService;
 
-	public ApiController(ApiBuilder apiBuilder, ApiService apiService) {
-		this.apiBuilder = apiBuilder;
-		this.apiService = apiService;
-	}
+    public ApiController(ApiBuilder apiBuilder, ApiService apiService) {
+        this.apiBuilder = apiBuilder;
+        this.apiService = apiService;
+    }
 
-	@PostMapping("/add")
-	public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
-		try {
-			ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
-			apiService.save(entityBO);
-			return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    @PostMapping("/add")
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
+        try {
+            ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
+            apiService.save(entityBO);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	@PostMapping("/delete/{id}")
-	public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-		try {
-			apiService.remove(id);
-			return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    @PostMapping("/delete/{id}")
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+        try {
+            apiService.remove(id);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	@PostMapping("/update")
-	public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
-		try {
-			ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
-			apiService.update(entityBO);
-			return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    @PostMapping("/update")
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
+        try {
+            ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
+            apiService.update(entityBO);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	@GetMapping("/id/{id}")
-	public Mono<R<ApiVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-		try {
-			ApiBO entityBO = apiService.selectById(id);
-			ApiVO entityVO = apiBuilder.buildVOByBO(entityBO);
-			return Mono.just(R.ok(entityVO));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    @GetMapping("/id/{id}")
+    public Mono<R<ApiVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+        try {
+            ApiBO entityBO = apiService.selectById(id);
+            ApiVO entityVO = apiBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	@PostMapping("/list")
-	public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
-		try {
-			if (Objects.isNull(entityQuery)) {
-				entityQuery = new ApiQuery();
-			}
-			Page<ApiBO> entityPageBO = apiService.selectByPage(entityQuery);
-			Page<ApiVO> entityPageVO = apiBuilder.buildVOPageByBOPage(entityPageBO);
-			return Mono.just(R.ok(entityPageVO));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    @PostMapping("/list")
+    public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
+        try {
+            if (Objects.isNull(entityQuery)) {
+                entityQuery = new ApiQuery();
+            }
+            Page<ApiBO> entityPageBO = apiService.selectByPage(entityQuery);
+            Page<ApiVO> entityPageVO = apiBuilder.buildVOPageByBOPage(entityPageBO);
+            return Mono.just(R.ok(entityPageVO));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
 }

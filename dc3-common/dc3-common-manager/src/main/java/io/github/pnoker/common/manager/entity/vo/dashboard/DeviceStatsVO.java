@@ -37,25 +37,25 @@ import java.util.List;
 @ToString
 public class DeviceStatsVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private long total;
+    private long total;
 
-	/**
-	 * Counts by enable flag.
-	 */
-	private List<BucketVO> byEnable = new ArrayList<>();
+    /**
+     * Counts by enable flag.
+     */
+    private List<BucketVO> byEnable = new ArrayList<>();
 
-	/**
-	 * Top-N devices grouped by driver_id — key is stringified driver id.
-	 */
-	private List<BucketVO> byDriver = new ArrayList<>();
+    /**
+     * Top-N devices grouped by driver_id — key is stringified driver id.
+     */
+    private List<BucketVO> byDriver = new ArrayList<>();
 
-	/**
-	 * Top-N profile bindings — key is stringified profile id. Note that one device may
-	 * bind to multiple profiles, so these counts are bindings, not unique devices.
-	 */
-	private List<BucketVO> byProfile = new ArrayList<>();
+    /**
+     * Top-N profile bindings — key is stringified profile id. Note that one device may
+     * bind to multiple profiles, so these counts are bindings, not unique devices.
+     */
+    private List<BucketVO> byProfile = new ArrayList<>();
 
 }

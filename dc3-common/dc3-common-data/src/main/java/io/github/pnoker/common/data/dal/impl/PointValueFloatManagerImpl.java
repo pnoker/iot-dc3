@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PointValueFloatManagerImpl extends ServiceImpl<PointValueFloatMapper, PointValueFloatDO>
-		implements PointValueFloatManager {
+        implements PointValueFloatManager {
 
 }

@@ -29,10 +29,10 @@ import lombok.ToString;
 @ToString
 public class ActivityCellRow {
 
-	private int dow;
+    private int dow;
 
-	private int hour;
+    private int hour;
 
-	private long count;
+    private long count;
 
 }

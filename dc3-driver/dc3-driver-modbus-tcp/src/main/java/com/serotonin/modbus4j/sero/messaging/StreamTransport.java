@@ -34,92 +34,96 @@ import java.io.OutputStream;
  */
 public class StreamTransport implements Transport, Runnable {
 
-	protected OutputStream out;
+    protected OutputStream out;
 
-	protected InputStream in;
+    protected InputStream in;
 
-	private InputStreamListener listener;
+    private InputStreamListener listener;
 
-	/**
-	 * <p>
-	 * Constructor for StreamTransport.
-	 * </p>
-	 * @param in a {@link InputStream} object.
-	 * @param out a {@link OutputStream} object.
-	 */
-	public StreamTransport(InputStream in, OutputStream out) {
-		this.out = out;
-		this.in = in;
-	}
+    /**
+     * <p>
+     * Constructor for StreamTransport.
+     * </p>
+     *
+     * @param in  a {@link InputStream} object.
+     * @param out a {@link OutputStream} object.
+     */
+    public StreamTransport(InputStream in, OutputStream out) {
+        this.out = out;
+        this.in = in;
+    }
 
-	/**
-	 * <p>
-	 * setReadDelay.
-	 * </p>
-	 * @param readDelay a int.
-	 */
-	public void setReadDelay(int readDelay) {
-		if (listener != null)
-			listener.setReadDelay(readDelay);
-	}
+    /**
+     * <p>
+     * setReadDelay.
+     * </p>
+     *
+     * @param readDelay a int.
+     */
+    public void setReadDelay(int readDelay) {
+        if (listener != null)
+            listener.setReadDelay(readDelay);
+    }
 
-	/**
-	 * <p>
-	 * start.
-	 * </p>
-	 * @param threadName a {@link String} object.
-	 */
-	public void start(String threadName) {
-		listener.start(threadName);
-	}
+    /**
+     * <p>
+     * start.
+     * </p>
+     *
+     * @param threadName a {@link String} object.
+     */
+    public void start(String threadName) {
+        listener.start(threadName);
+    }
 
-	/**
-	 * <p>
-	 * stop.
-	 * </p>
-	 */
-	public void stop() {
-		listener.stop();
-	}
+    /**
+     * <p>
+     * stop.
+     * </p>
+     */
+    public void stop() {
+        listener.stop();
+    }
 
-	/**
-	 * <p>
-	 * run.
-	 * </p>
-	 */
-	public void run() {
-		listener.run();
-	}
+    /**
+     * <p>
+     * run.
+     * </p>
+     */
+    public void run() {
+        listener.run();
+    }
 
-	public void setConsumer(DataConsumer consumer) {
-		listener = new InputStreamListener(in, consumer);
-	}
+    public void setConsumer(DataConsumer consumer) {
+        listener = new InputStreamListener(in, consumer);
+    }
 
-	/**
-	 * <p>
-	 * removeConsumer.
-	 * </p>
-	 */
-	public void removeConsumer() {
-		listener.stop();
-		listener = null;
-	}
+    /**
+     * <p>
+     * removeConsumer.
+     * </p>
+     */
+    public void removeConsumer() {
+        listener.stop();
+        listener = null;
+    }
 
-	/**
-	 * <p>
-	 * write.
-	 * </p>
-	 * @param data an array of {@link byte} objects.
-	 * @throws IOException if any.
-	 */
-	public void write(byte[] data) throws IOException {
-		out.write(data);
-		out.flush();
-	}
+    /**
+     * <p>
+     * write.
+     * </p>
+     *
+     * @param data an array of {@link byte} objects.
+     * @throws IOException if any.
+     */
+    public void write(byte[] data) throws IOException {
+        out.write(data);
+        out.flush();
+    }
 
-	public void write(byte[] data, int len) throws IOException {
-		out.write(data, 0, len);
-		out.flush();
-	}
+    public void write(byte[] data, int len) throws IOException {
+        out.write(data, 0, len);
+        out.flush();
+    }
 
 }

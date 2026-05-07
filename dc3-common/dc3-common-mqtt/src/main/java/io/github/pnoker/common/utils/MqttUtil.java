@@ -35,44 +35,45 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
  */
 public class MqttUtil {
 
-	private MqttUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private MqttUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Create MQTT connection options based on properties
-	 * @param mqttProperties MQTT configuration properties
-	 * @return Configured MqttConnectOptions
-	 */
-	public static MqttConnectOptions getMqttConnectOptions(MqttProperties mqttProperties) {
-		MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+    /**
+     * Create MQTT connection options based on properties
+     *
+     * @param mqttProperties MQTT configuration properties
+     * @return Configured MqttConnectOptions
+     */
+    public static MqttConnectOptions getMqttConnectOptions(MqttProperties mqttProperties) {
+        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
 
-		// Configure username & password authentication
-		if (MqttProperties.AuthTypeEnum.USERNAME.equals(mqttProperties.getAuthType())
-				|| MqttProperties.AuthTypeEnum.X509.equals(mqttProperties.getAuthType())) {
-			if (StringUtils.isNotEmpty(mqttProperties.getUsername())) {
-				mqttConnectOptions.setUserName(mqttProperties.getUsername());
-			}
-			if (StringUtils.isNotEmpty(mqttProperties.getPassword())) {
-				mqttConnectOptions.setPassword(mqttProperties.getPassword().toCharArray());
-			}
-		}
+        // Configure username & password authentication
+        if (MqttProperties.AuthTypeEnum.USERNAME.equals(mqttProperties.getAuthType())
+                || MqttProperties.AuthTypeEnum.X509.equals(mqttProperties.getAuthType())) {
+            if (StringUtils.isNotEmpty(mqttProperties.getUsername())) {
+                mqttConnectOptions.setUserName(mqttProperties.getUsername());
+            }
+            if (StringUtils.isNotEmpty(mqttProperties.getPassword())) {
+                mqttConnectOptions.setPassword(mqttProperties.getPassword().toCharArray());
+            }
+        }
 
-		// Configure TLS X509 certificate authentication
-		if (MqttProperties.AuthTypeEnum.X509.equals(mqttProperties.getAuthType())) {
-			mqttConnectOptions
-				.setSocketFactory(X509Util.getSSLSocketFactory(mqttProperties.getCaCrt(), mqttProperties.getClientCrt(),
-						mqttProperties.getClientKey(), StringUtils.isEmpty(mqttProperties.getClientKeyPass())
-								? StringUtils.EMPTY : mqttProperties.getClientKeyPass()));
+        // Configure TLS X509 certificate authentication
+        if (MqttProperties.AuthTypeEnum.X509.equals(mqttProperties.getAuthType())) {
+            mqttConnectOptions
+                    .setSocketFactory(X509Util.getSSLSocketFactory(mqttProperties.getCaCrt(), mqttProperties.getClientCrt(),
+                            mqttProperties.getClientKey(), StringUtils.isEmpty(mqttProperties.getClientKeyPass())
+                                    ? StringUtils.EMPTY : mqttProperties.getClientKeyPass()));
 
-		}
+        }
 
-		// Disable HTTPS hostname verification
-		mqttConnectOptions.setHttpsHostnameVerificationEnabled(false);
-		mqttConnectOptions.setServerURIs(new String[] { mqttProperties.getUrl() });
-		mqttConnectOptions.setKeepAliveInterval(mqttProperties.getKeepAlive());
-		return mqttConnectOptions;
+        // Disable HTTPS hostname verification
+        mqttConnectOptions.setHttpsHostnameVerificationEnabled(false);
+        mqttConnectOptions.setServerURIs(new String[]{mqttProperties.getUrl()});
+        mqttConnectOptions.setKeepAliveInterval(mqttProperties.getKeepAlive());
+        return mqttConnectOptions;
 
-	}
+    }
 
 }

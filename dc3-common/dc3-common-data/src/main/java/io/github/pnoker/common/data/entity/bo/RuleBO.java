@@ -39,49 +39,49 @@ import lombok.*;
 @ToString(callSuper = true)
 public class RuleBO extends BaseBO {
 
-	/**
-	 * Entity type flag
-	 */
-	private AlarmTypeFlagEnum entityTypeFlag;
+    /**
+     * Entity type flag
+     */
+    private AlarmTypeFlagEnum entityTypeFlag;
 
-	/**
-	 * Rule name
-	 */
-	private String ruleName;
+    /**
+     * Rule name
+     */
+    private String ruleName;
 
-	/**
-	 * Rule code
-	 */
-	private String ruleCode;
+    /**
+     * Rule code
+     */
+    private String ruleCode;
 
-	/**
-	 * Entity ID
-	 */
-	private Long entityId;
+    /**
+     * Entity ID
+     */
+    private Long entityId;
 
-	/**
-	 * Alarm notification template ID
-	 */
-	private Long notifyId;
+    /**
+     * Alarm notification template ID
+     */
+    private Long notifyId;
 
-	/**
-	 * Alarm message template ID
-	 */
-	private Long messageId;
+    /**
+     * Alarm message template ID
+     */
+    private Long messageId;
 
-	/**
-	 * Alarm rule
-	 */
-	private RuleExt ruleExt;
+    /**
+     * Alarm rule
+     */
+    private RuleExt ruleExt;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
 }

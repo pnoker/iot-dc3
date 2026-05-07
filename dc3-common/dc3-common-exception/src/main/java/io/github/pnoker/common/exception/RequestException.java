@@ -28,16 +28,16 @@ import java.text.MessageFormat;
  */
 public class RequestException extends RuntimeException {
 
-	public RequestException() {
-		this(null);
-	}
+    public RequestException() {
+        this(null);
+    }
 
-	public RequestException(Throwable cause) {
-		super(cause);
-	}
+    public RequestException(Throwable cause) {
+        super(cause);
+    }
 
-	public RequestException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public RequestException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

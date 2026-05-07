@@ -40,34 +40,34 @@ import java.util.HashSet;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DeviceBuilder {
 
-	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "remark", ignore = true)
-	@Mapping(target = "creatorId", ignore = true)
-	@Mapping(target = "creatorName", ignore = true)
-	@Mapping(target = "createTime", ignore = true)
-	@Mapping(target = "operatorId", ignore = true)
-	@Mapping(target = "operatorName", ignore = true)
-	@Mapping(target = "operateTime", ignore = true)
-	@Mapping(target = "deviceExt", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	@Mapping(target = "profileIds", ignore = true)
-	@Mapping(target = "pointIds", ignore = true)
-	@Mapping(target = "driverAttributeConfigIdMap", ignore = true)
-	@Mapping(target = "pointAttributeConfigIdMap", ignore = true)
-	DeviceBO buildDTOByGrpcDTO(GrpcDeviceDTO entityGrpc);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "remark", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
+    @Mapping(target = "deviceExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "profileIds", ignore = true)
+    @Mapping(target = "pointIds", ignore = true)
+    @Mapping(target = "driverAttributeConfigIdMap", ignore = true)
+    @Mapping(target = "pointAttributeConfigIdMap", ignore = true)
+    DeviceBO buildDTOByGrpcDTO(GrpcDeviceDTO entityGrpc);
 
-	@AfterMapping
-	default void afterProcess(GrpcDeviceDTO entityGrpc, @MappingTarget DeviceBO entityBO) {
-		GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
+    @AfterMapping
+    default void afterProcess(GrpcDeviceDTO entityGrpc, @MappingTarget DeviceBO entityBO) {
+        GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
 
-		CollectionOptional.ofNullable(entityGrpc.getProfileIdsList())
-			.ifPresent(value -> entityBO.setProfileIds(new HashSet<>(value)));
-		JsonOptional.ofNullable(entityGrpc.getDeviceExt())
-			.ifPresent(value -> entityBO.setDeviceExt(JsonUtil.parseObject(value, DeviceExt.class)));
-		EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
-	}
+        CollectionOptional.ofNullable(entityGrpc.getProfileIdsList())
+                .ifPresent(value -> entityBO.setProfileIds(new HashSet<>(value)));
+        JsonOptional.ofNullable(entityGrpc.getDeviceExt())
+                .ifPresent(value -> entityBO.setDeviceExt(JsonUtil.parseObject(value, DeviceExt.class)));
+        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
+    }
 
 }

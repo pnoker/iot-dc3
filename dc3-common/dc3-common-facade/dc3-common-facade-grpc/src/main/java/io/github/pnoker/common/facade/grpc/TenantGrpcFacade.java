@@ -40,29 +40,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class TenantGrpcFacade implements TenantFacade {
 
-	@Resource
-	private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
+    @Resource
+    private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
 
-	@Resource
-	private FacadeGrpcTenantBuilder facadeGrpcTenantBuilder;
+    @Resource
+    private FacadeGrpcTenantBuilder facadeGrpcTenantBuilder;
 
-	@Override
-	public FacadeTenantBO selectByCode(String code) {
-		GrpcRTenantDTO response = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(code).build());
-		if (!response.getResult().getOk()) {
-			guardOrThrow(response.getResult(), "selectByCode");
-			return null;
-		}
-		return facadeGrpcTenantBuilder.toFacadeBO(response.getData());
-	}
+    @Override
+    public FacadeTenantBO selectByCode(String code) {
+        GrpcRTenantDTO response = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(code).build());
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByCode");
+            return null;
+        }
+        return facadeGrpcTenantBuilder.toFacadeBO(response.getData());
+    }
 
-	private void guardOrThrow(GrpcR result, String op) {
-		String code = result.getCode();
-		if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
-			log.debug("TenantGrpcFacade.{} => no resource", op);
-			return;
-		}
-		throw new ServiceException("TenantFacade." + op + " failed: [" + code + "] " + result.getMessage());
-	}
+    private void guardOrThrow(GrpcR result, String op) {
+        String code = result.getCode();
+        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+            log.debug("TenantGrpcFacade.{} => no resource", op);
+            return;
+        }
+        throw new ServiceException("TenantFacade." + op + " failed: [" + code + "] " + result.getMessage());
+    }
 
 }

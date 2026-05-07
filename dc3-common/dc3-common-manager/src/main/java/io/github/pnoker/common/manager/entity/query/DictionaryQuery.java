@@ -36,20 +36,20 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DictionaryQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	private String label;
+    private String label;
 
-	private Long parentId;
+    private Long parentId;
 
 }

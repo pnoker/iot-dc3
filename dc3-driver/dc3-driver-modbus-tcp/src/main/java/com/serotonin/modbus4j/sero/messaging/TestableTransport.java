@@ -30,46 +30,48 @@ import java.io.OutputStream;
  */
 public class TestableTransport extends StreamTransport {
 
-	/**
-	 * <p>
-	 * Constructor for TestableTransport.
-	 * </p>
-	 * @param in a {@link InputStream} object.
-	 * @param out a {@link OutputStream} object.
-	 */
-	public TestableTransport(InputStream in, OutputStream out) {
-		super(new TestableBufferedInputStream(in), out);
-	}
+    /**
+     * <p>
+     * Constructor for TestableTransport.
+     * </p>
+     *
+     * @param in  a {@link InputStream} object.
+     * @param out a {@link OutputStream} object.
+     */
+    public TestableTransport(InputStream in, OutputStream out) {
+        super(new TestableBufferedInputStream(in), out);
+    }
 
-	/**
-	 * <p>
-	 * testInputStream.
-	 * </p>
-	 * @throws IOException if any.
-	 */
-	public void testInputStream() throws IOException {
-		((TestableBufferedInputStream) in).test();
-	}
+    /**
+     * <p>
+     * testInputStream.
+     * </p>
+     *
+     * @throws IOException if any.
+     */
+    public void testInputStream() throws IOException {
+        ((TestableBufferedInputStream) in).test();
+    }
 
-	static class TestableBufferedInputStream extends BufferedInputStream {
+    static class TestableBufferedInputStream extends BufferedInputStream {
 
-		public TestableBufferedInputStream(InputStream in) {
-			super(in);
-		}
+        public TestableBufferedInputStream(InputStream in) {
+            super(in);
+        }
 
-		@Override
-		public synchronized int read(byte[] buf) throws IOException {
-			return super.read(buf);
-		}
+        @Override
+        public synchronized int read(byte[] buf) throws IOException {
+            return super.read(buf);
+        }
 
-		public synchronized void test() throws IOException {
-			mark(1);
-			int i = read();
-			if (i == -1)
-				throw new IOException("Stream closed");
-			reset();
-		}
+        public synchronized void test() throws IOException {
+            mark(1);
+            int i = read();
+            if (i == -1)
+                throw new IOException("Stream closed");
+            reset();
+        }
 
-	}
+    }
 
 }

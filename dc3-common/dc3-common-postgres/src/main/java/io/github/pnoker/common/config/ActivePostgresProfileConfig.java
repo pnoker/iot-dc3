@@ -42,14 +42,14 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActivePostgresProfileConfig implements EnvironmentPostProcessor {
 
-	@Override
-	/**
-	 * Post-process the Spring environment to activate PostgreSQL profile
-	 * @param environment ConfigurableEnvironment to modify
-	 * @param application SpringApplication instance
-	 */
-	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		environment.addActiveProfile("postgres");
-	}
+    @Override
+    /**
+     * Post-process the Spring environment to activate PostgreSQL profile
+     * @param environment ConfigurableEnvironment to modify
+     * @param application SpringApplication instance
+     */
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        environment.addActiveProfile("postgres");
+    }
 
 }

@@ -34,29 +34,28 @@ import java.util.function.Consumer;
  */
 public final class StringOptional {
 
-	private final String value;
+    private final String value;
 
-	private StringOptional(String value) {
-		this.value = value;
-	}
+    private StringOptional(String value) {
+        this.value = value;
+    }
 
-	public static StringOptional ofNullable(String value) {
-		return new StringOptional(value);
-	}
+    public static StringOptional ofNullable(String value) {
+        return new StringOptional(value);
+    }
 
-	public void ifPresent(Consumer<String> action) {
-		if (StringUtils.isNotEmpty(value)) {
-			action.accept(value);
-		}
-	}
+    public void ifPresent(Consumer<String> action) {
+        if (StringUtils.isNotEmpty(value)) {
+            action.accept(value);
+        }
+    }
 
-	public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
-		if (StringUtils.isNotEmpty(value)) {
-			action.accept(value);
-		}
-		else {
-			emptyAction.run();
-		}
-	}
+    public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
+        if (StringUtils.isNotEmpty(value)) {
+            action.accept(value);
+        } else {
+            emptyAction.run();
+        }
+    }
 
 }

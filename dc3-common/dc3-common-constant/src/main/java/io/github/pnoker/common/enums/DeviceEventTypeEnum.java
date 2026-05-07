@@ -35,68 +35,71 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum DeviceEventTypeEnum {
 
-	/**
-	 * Heartbeat event.
-	 */
-	HEARTBEAT((byte) 0, "heartbeat", "heartbeat event"),
+    /**
+     * Heartbeat event.
+     */
+    HEARTBEAT((byte) 0, "heartbeat", "heartbeat event"),
 
-	/**
-	 * Alarm event.
-	 */
-	ALARM((byte) 1, "alarm", "alarm event"),;
+    /**
+     * Alarm event.
+     */
+    ALARM((byte) 1, "alarm", "alarm event"),
+    ;
 
-	/**
-	 * Index value stored in database.
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index value stored in database.
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code string.
-	 */
-	private final String code;
+    /**
+     * Code string.
+     */
+    private final String code;
 
-	/**
-	 * Human-readable description.
-	 */
-	private final String remark;
+    /**
+     * Human-readable description.
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index value.
-	 * @param index index value
-	 * @return {@link DeviceEventTypeEnum} or {@code null} if not found
-	 */
-	public static DeviceEventTypeEnum ofIndex(Byte index) {
-		Optional<DeviceEventTypeEnum> any = Arrays.stream(DeviceEventTypeEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index value.
+     *
+     * @param index index value
+     * @return {@link DeviceEventTypeEnum} or {@code null} if not found
+     */
+    public static DeviceEventTypeEnum ofIndex(Byte index) {
+        Optional<DeviceEventTypeEnum> any = Arrays.stream(DeviceEventTypeEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code string.
-	 * @param code code string
-	 * @return {@link DeviceEventTypeEnum} or {@code null} if not found
-	 */
-	public static DeviceEventTypeEnum ofCode(String code) {
-		Optional<DeviceEventTypeEnum> any = Arrays.stream(DeviceEventTypeEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code string.
+     *
+     * @param code code string
+     * @return {@link DeviceEventTypeEnum} or {@code null} if not found
+     */
+    public static DeviceEventTypeEnum ofCode(String code) {
+        Optional<DeviceEventTypeEnum> any = Arrays.stream(DeviceEventTypeEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by enum name.
-	 * @param name enum name
-	 * @return {@link DeviceEventTypeEnum} or {@code null} if parsing fails
-	 */
-	public static DeviceEventTypeEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by enum name.
+     *
+     * @param name enum name
+     * @return {@link DeviceEventTypeEnum} or {@code null} if parsing fails
+     */
+    public static DeviceEventTypeEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

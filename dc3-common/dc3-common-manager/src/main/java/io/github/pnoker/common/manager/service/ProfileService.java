@@ -34,27 +34,30 @@ import java.util.Set;
  */
 public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
 
-	/**
-	 * Query profile by profile name and type
-	 * @param tenantId Tenant ID
-	 * @param name Profile name
-	 * @param type Profile type {@link ProfileTypeFlagEnum}
-	 * @return ProfileBO
-	 */
-	ProfileBO selectByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type);
+    /**
+     * Query profile by profile name and type
+     *
+     * @param tenantId Tenant ID
+     * @param name     Profile name
+     * @param type     Profile type {@link ProfileTypeFlagEnum}
+     * @return ProfileBO
+     */
+    ProfileBO selectByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type);
 
-	/**
-	 * Query profiles by device ID
-	 * @param deviceId Device ID
-	 * @return ProfileBO list
-	 */
-	List<ProfileBO> selectByDeviceId(Long deviceId);
+    /**
+     * Query profiles by device ID
+     *
+     * @param deviceId Device ID
+     * @return ProfileBO list
+     */
+    List<ProfileBO> selectByDeviceId(Long deviceId);
 
-	/**
-	 * Query profiles by a set of profile IDs
-	 * @param ids Profile ID set
-	 * @return ProfileBO list
-	 */
-	List<ProfileBO> selectByIds(Set<Long> ids);
+    /**
+     * Query profiles by a set of profile IDs
+     *
+     * @param ids Profile ID set
+     * @return ProfileBO list
+     */
+    List<ProfileBO> selectByIds(Set<Long> ids);
 
 }

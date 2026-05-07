@@ -29,8 +29,8 @@ import lombok.ToString;
 @ToString
 public class LatencyBinRow {
 
-	private int bin;
+    private int bin;
 
-	private long count;
+    private long count;
 
 }

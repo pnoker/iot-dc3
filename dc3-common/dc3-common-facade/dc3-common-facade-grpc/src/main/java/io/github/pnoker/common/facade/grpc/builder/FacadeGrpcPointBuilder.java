@@ -54,72 +54,72 @@ import java.util.Optional;
 @Component
 public class FacadeGrpcPointBuilder {
 
-	public GrpcPagePointQuery toGrpcPageQuery(FacadePointQuery query) {
-		GrpcPagePointQuery.Builder builder = GrpcPagePointQuery.newBuilder();
+    public GrpcPagePointQuery toGrpcPageQuery(FacadePointQuery query) {
+        GrpcPagePointQuery.Builder builder = GrpcPagePointQuery.newBuilder();
 
-		Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
-		GrpcPage.Builder page = GrpcPage.newBuilder().setCurrent(pages.getCurrent()).setSize(pages.getSize());
-		builder.setPage(page);
+        Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
+        GrpcPage.Builder page = GrpcPage.newBuilder().setCurrent(pages.getCurrent()).setSize(pages.getSize());
+        builder.setPage(page);
 
-		LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
-		StringOptional.ofNullable(query.getPointName()).ifPresent(builder::setPointName);
-		StringOptional.ofNullable(query.getPointCode()).ifPresent(builder::setPointCode);
-		LongOptional.ofNullable(query.getDeviceId()).ifPresent(builder::setDeviceId);
+        LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
+        StringOptional.ofNullable(query.getPointName()).ifPresent(builder::setPointName);
+        StringOptional.ofNullable(query.getPointCode()).ifPresent(builder::setPointCode);
+        LongOptional.ofNullable(query.getDeviceId()).ifPresent(builder::setDeviceId);
 
-		Optional.ofNullable(query.getPointTypeFlag())
-			.ifPresentOrElse(value -> builder.setPointTypeFlag(value.getIndex()),
-					() -> builder.setPointTypeFlag(DefaultConstant.NULL_INT));
-		Optional.ofNullable(query.getRwFlag())
-			.ifPresentOrElse(value -> builder.setRwFlag(value.getIndex()),
-					() -> builder.setRwFlag(DefaultConstant.NULL_INT));
-		Optional.ofNullable(query.getProfileId())
-			.ifPresentOrElse(builder::setProfileId, () -> builder.setProfileId(DefaultConstant.NULL_INT));
-		Optional.ofNullable(query.getEnableFlag())
-			.ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
-					() -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT));
+        Optional.ofNullable(query.getPointTypeFlag())
+                .ifPresentOrElse(value -> builder.setPointTypeFlag(value.getIndex()),
+                        () -> builder.setPointTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(query.getRwFlag())
+                .ifPresentOrElse(value -> builder.setRwFlag(value.getIndex()),
+                        () -> builder.setRwFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(query.getProfileId())
+                .ifPresentOrElse(builder::setProfileId, () -> builder.setProfileId(DefaultConstant.NULL_INT));
+        Optional.ofNullable(query.getEnableFlag())
+                .ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
+                        () -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT));
 
-		return builder.build();
-	}
+        return builder.build();
+    }
 
-	public FacadePointBO toFacadeBO(GrpcPointDTO dto) {
-		if (Objects.isNull(dto)) {
-			return null;
-		}
+    public FacadePointBO toFacadeBO(GrpcPointDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
 
-		FacadePointBO bo = new FacadePointBO();
-		GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
+        FacadePointBO bo = new FacadePointBO();
+        GrpcBuilderUtil.buildBaseBOByGrpcBase(dto.getBase(), bo);
 
-		StringOptional.ofNullable(dto.getPointName()).ifPresent(bo::setPointName);
-		StringOptional.ofNullable(dto.getPointCode()).ifPresent(bo::setPointCode);
-		StringOptional.ofNullable(dto.getUnit()).ifPresent(bo::setUnit);
-		StringOptional.ofNullable(dto.getSignature()).ifPresent(bo::setSignature);
-		LongOptional.ofNullable(dto.getTenantId()).ifPresent(bo::setTenantId);
-		LongOptional.ofNullable(dto.getProfileId()).ifPresent(bo::setProfileId);
+        StringOptional.ofNullable(dto.getPointName()).ifPresent(bo::setPointName);
+        StringOptional.ofNullable(dto.getPointCode()).ifPresent(bo::setPointCode);
+        StringOptional.ofNullable(dto.getUnit()).ifPresent(bo::setUnit);
+        StringOptional.ofNullable(dto.getSignature()).ifPresent(bo::setSignature);
+        LongOptional.ofNullable(dto.getTenantId()).ifPresent(bo::setTenantId);
+        LongOptional.ofNullable(dto.getProfileId()).ifPresent(bo::setProfileId);
 
-		bo.setBaseValue(BigDecimal.valueOf(dto.getBaseValue()));
-		bo.setMultiple(BigDecimal.valueOf(dto.getMultiple()));
-		bo.setValueDecimal((byte) dto.getValueDecimal());
+        bo.setBaseValue(BigDecimal.valueOf(dto.getBaseValue()));
+        bo.setMultiple(BigDecimal.valueOf(dto.getMultiple()));
+        bo.setValueDecimal((byte) dto.getValueDecimal());
 
-		if (dto.getVersion() != DefaultConstant.DEFAULT_INT) {
-			bo.setVersion(dto.getVersion());
-		}
+        if (dto.getVersion() != DefaultConstant.DEFAULT_INT) {
+            bo.setVersion(dto.getVersion());
+        }
 
-		int pointType = dto.getPointTypeFlag();
-		if (pointType != DefaultConstant.NULL_INT) {
-			Optional.ofNullable(PointTypeFlagEnum.ofIndex((byte) pointType)).ifPresent(bo::setPointTypeFlag);
-		}
+        int pointType = dto.getPointTypeFlag();
+        if (pointType != DefaultConstant.NULL_INT) {
+            Optional.ofNullable(PointTypeFlagEnum.ofIndex((byte) pointType)).ifPresent(bo::setPointTypeFlag);
+        }
 
-		int rw = dto.getRwFlag();
-		if (rw != DefaultConstant.NULL_INT) {
-			Optional.ofNullable(RwFlagEnum.ofIndex((byte) rw)).ifPresent(bo::setRwFlag);
-		}
+        int rw = dto.getRwFlag();
+        if (rw != DefaultConstant.NULL_INT) {
+            Optional.ofNullable(RwFlagEnum.ofIndex((byte) rw)).ifPresent(bo::setRwFlag);
+        }
 
-		Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
+        Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
 
-		StringOptional.ofNullable(dto.getPointExt())
-			.ifPresent(value -> bo.setPointExt(JsonUtil.parseObject(value, PointExt.class)));
+        StringOptional.ofNullable(dto.getPointExt())
+                .ifPresent(value -> bo.setPointExt(JsonUtil.parseObject(value, PointExt.class)));
 
-		return bo;
-	}
+        return bo;
+    }
 
 }

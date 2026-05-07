@@ -29,77 +29,83 @@ import java.util.Map;
  */
 public class BatchResults<K> {
 
-	private final Map<K, Object> data = new HashMap<>();
+    private final Map<K, Object> data = new HashMap<>();
 
-	/**
-	 * <p>
-	 * addResult.
-	 * </p>
-	 * @param key a K object.
-	 * @param value a {@link Object} object.
-	 */
-	public void addResult(K key, Object value) {
-		data.put(key, value);
-	}
+    /**
+     * <p>
+     * addResult.
+     * </p>
+     *
+     * @param key   a K object.
+     * @param value a {@link Object} object.
+     */
+    public void addResult(K key, Object value) {
+        data.put(key, value);
+    }
 
-	/**
-	 * <p>
-	 * getValue.
-	 * </p>
-	 * @param key a K object.
-	 * @return a {@link Object} object.
-	 */
-	public Object getValue(K key) {
-		return data.get(key);
-	}
+    /**
+     * <p>
+     * getValue.
+     * </p>
+     *
+     * @param key a K object.
+     * @return a {@link Object} object.
+     */
+    public Object getValue(K key) {
+        return data.get(key);
+    }
 
-	/**
-	 * <p>
-	 * getIntValue.
-	 * </p>
-	 * @param key a K object.
-	 * @return a {@link Integer} object.
-	 */
-	public Integer getIntValue(K key) {
-		return (Integer) getValue(key);
-	}
+    /**
+     * <p>
+     * getIntValue.
+     * </p>
+     *
+     * @param key a K object.
+     * @return a {@link Integer} object.
+     */
+    public Integer getIntValue(K key) {
+        return (Integer) getValue(key);
+    }
 
-	/**
-	 * <p>
-	 * getLongValue.
-	 * </p>
-	 * @param key a K object.
-	 * @return a {@link Long} object.
-	 */
-	public Long getLongValue(K key) {
-		return (Long) getValue(key);
-	}
+    /**
+     * <p>
+     * getLongValue.
+     * </p>
+     *
+     * @param key a K object.
+     * @return a {@link Long} object.
+     */
+    public Long getLongValue(K key) {
+        return (Long) getValue(key);
+    }
 
-	/**
-	 * <p>
-	 * getDoubleValue.
-	 * </p>
-	 * @param key a K object.
-	 * @return a {@link Double} object.
-	 */
-	public Double getDoubleValue(K key) {
-		return (Double) getValue(key);
-	}
+    /**
+     * <p>
+     * getDoubleValue.
+     * </p>
+     *
+     * @param key a K object.
+     * @return a {@link Double} object.
+     */
+    public Double getDoubleValue(K key) {
+        return (Double) getValue(key);
+    }
 
-	/**
-	 * <p>
-	 * getFloatValue.
-	 * </p>
-	 * @param key a K object.
-	 * @return a {@link Float} object.
-	 */
-	public Float getFloatValue(K key) {
-		return (Float) getValue(key);
-	}
+    /**
+     * <p>
+     * getFloatValue.
+     * </p>
+     *
+     * @param key a K object.
+     * @return a {@link Float} object.
+     */
+    public Float getFloatValue(K key) {
+        return (Float) getValue(key);
+    }
 
-	@Override
-	public String toString() {
-		return data.toString();
-	}
+    @Override
+    public String toString() {
+        return data.toString();
+    }
 
 }

@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PointDataVolumeRunManagerImpl extends ServiceImpl<PointDataVolumeRunMapper, PointDataVolumeRunDO>
-		implements PointDataVolumeRunManager {
+        implements PointDataVolumeRunManager {
 
 }

@@ -43,44 +43,44 @@ import reactor.core.publisher.Mono;
 @RequestMapping(DataConstant.POINT_VALUE_COMMAND_URL_PREFIX)
 public class PointValueCommandController implements BaseController {
 
-	private final PointValueCommandService pointValueCommandService;
+    private final PointValueCommandService pointValueCommandService;
 
-	public PointValueCommandController(PointValueCommandService pointValueCommandService) {
-		this.pointValueCommandService = pointValueCommandService;
-	}
+    public PointValueCommandController(PointValueCommandService pointValueCommandService) {
+        this.pointValueCommandService = pointValueCommandService;
+    }
 
-	/**
-	 * Read instruction
-	 * @param entityVO PointValueReadVO
-	 * @return PointValue
-	 */
-	@PostMapping("/read")
-	public Mono<R<Boolean>> read(@Validated @RequestBody PointValueReadVO entityVO) {
-		try {
-			pointValueCommandService.read(entityVO);
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-		return Mono.just(R.ok());
-	}
+    /**
+     * Read instruction
+     *
+     * @param entityVO PointValueReadVO
+     * @return PointValue
+     */
+    @PostMapping("/read")
+    public Mono<R<Boolean>> read(@Validated @RequestBody PointValueReadVO entityVO) {
+        try {
+            pointValueCommandService.read(entityVO);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+        return Mono.just(R.ok());
+    }
 
-	/**
-	 * Write instruction
-	 * @param entityVO PointValueWriteVO
-	 * @return PointValue
-	 */
-	@PostMapping("/write")
-	public Mono<R<Boolean>> write(@Validated @RequestBody PointValueWriteVO entityVO) {
-		try {
-			pointValueCommandService.write(entityVO);
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-		return Mono.just(R.ok());
-	}
+    /**
+     * Write instruction
+     *
+     * @param entityVO PointValueWriteVO
+     * @return PointValue
+     */
+    @PostMapping("/write")
+    public Mono<R<Boolean>> write(@Validated @RequestBody PointValueWriteVO entityVO) {
+        try {
+            pointValueCommandService.write(entityVO);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+        return Mono.just(R.ok());
+    }
 
 }

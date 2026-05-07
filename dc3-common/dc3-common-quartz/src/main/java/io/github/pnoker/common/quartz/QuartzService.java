@@ -19,16 +19,7 @@ package io.github.pnoker.common.quartz;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.DateBuilder;
-import org.quartz.Job;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
+import org.quartz.*;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -48,70 +39,74 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class QuartzService {
 
-	@Resource
-	private Scheduler scheduler;
+    @Resource
+    private Scheduler scheduler;
 
-	/**
-	 * Create scheduled job with interval trigger
-	 * @param group Task group for job organization
-	 * @param name Task name for job identification
-	 * @param interval Time interval between job executions
-	 * @param intervalUnit Time unit for the interval
-	 * @param jobClass Job execution class
-	 * @throws SchedulerException SchedulerException
-	 */
-	public void createJobWithInterval(String group, String name, Integer interval,
-			DateBuilder.IntervalUnit intervalUnit, Class<? extends Job> jobClass) throws SchedulerException {
-		JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
-		Trigger trigger = TriggerBuilder.newTrigger()
-			.withIdentity(name, group)
-			.startAt(DateBuilder.futureDate(1, intervalUnit))
-			.withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(interval).repeatForever())
-			.startNow()
-			.build();
-		scheduler.scheduleJob(jobDetail, trigger);
-	}
+    /**
+     * Create scheduled job with interval trigger
+     *
+     * @param group        Task group for job organization
+     * @param name         Task name for job identification
+     * @param interval     Time interval between job executions
+     * @param intervalUnit Time unit for the interval
+     * @param jobClass     Job execution class
+     * @throws SchedulerException SchedulerException
+     */
+    public void createJobWithInterval(String group, String name, Integer interval,
+                                      DateBuilder.IntervalUnit intervalUnit, Class<? extends Job> jobClass) throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(name, group)
+                .startAt(DateBuilder.futureDate(1, intervalUnit))
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(interval).repeatForever())
+                .startNow()
+                .build();
+        scheduler.scheduleJob(jobDetail, trigger);
+    }
 
-	/**
-	 * Create scheduled job with cron trigger
-	 * @param group Task group for job organization
-	 * @param name Task name for job identification
-	 * @param cron Cron expression for scheduling
-	 * @param jobClass Job execution class
-	 * @throws SchedulerException SchedulerException
-	 */
-	public void createJobWithCron(String group, String name, String cron, Class<? extends Job> jobClass)
-			throws SchedulerException {
-		JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
-		Trigger trigger = TriggerBuilder.newTrigger()
-			.withIdentity(name, group)
-			.startAt(DateBuilder.futureDate(1, DateBuilder.IntervalUnit.SECOND))
-			.withSchedule(CronScheduleBuilder.cronSchedule(cron))
-			.startNow()
-			.build();
-		scheduler.scheduleJob(jobDetail, trigger);
-	}
+    /**
+     * Create scheduled job with cron trigger
+     *
+     * @param group    Task group for job organization
+     * @param name     Task name for job identification
+     * @param cron     Cron expression for scheduling
+     * @param jobClass Job execution class
+     * @throws SchedulerException SchedulerException
+     */
+    public void createJobWithCron(String group, String name, String cron, Class<? extends Job> jobClass)
+            throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(name, group)
+                .startAt(DateBuilder.futureDate(1, DateBuilder.IntervalUnit.SECOND))
+                .withSchedule(CronScheduleBuilder.cronSchedule(cron))
+                .startNow()
+                .build();
+        scheduler.scheduleJob(jobDetail, trigger);
+    }
 
-	/**
-	 * Start the scheduler service
-	 * @throws SchedulerException SchedulerException
-	 */
-	public void startScheduler() throws SchedulerException {
-		if (!scheduler.isShutdown()) {
-			scheduler.start();
-		}
-	}
+    /**
+     * Start the scheduler service
+     *
+     * @throws SchedulerException SchedulerException
+     */
+    public void startScheduler() throws SchedulerException {
+        if (!scheduler.isShutdown()) {
+            scheduler.start();
+        }
+    }
 
-	/**
-	 * Stop the scheduler service
-	 * <p>
-	 * Shutdown immediately without waiting for currently executing jobs to complete
-	 * @throws SchedulerException SchedulerException
-	 */
-	public void stopScheduler() throws SchedulerException {
-		if (!scheduler.isShutdown()) {
-			scheduler.shutdown();
-		}
-	}
+    /**
+     * Stop the scheduler service
+     * <p>
+     * Shutdown immediately without waiting for currently executing jobs to complete
+     *
+     * @throws SchedulerException SchedulerException
+     */
+    public void stopScheduler() throws SchedulerException {
+        if (!scheduler.isShutdown()) {
+            scheduler.shutdown();
+        }
+    }
 
 }

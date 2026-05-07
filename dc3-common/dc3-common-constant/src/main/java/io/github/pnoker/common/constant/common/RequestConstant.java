@@ -26,89 +26,89 @@ package io.github.pnoker.common.constant.common;
  */
 public class RequestConstant {
 
-	/**
-	 * Default maximum request count limit.
-	 */
-	public static final int DEFAULT_MAX_REQUEST_SIZE = 100;
+    /**
+     * Default maximum request count limit.
+     */
+    public static final int DEFAULT_MAX_REQUEST_SIZE = 100;
 
-	private RequestConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private RequestConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Custom request header related constants.
-	 *
-	 * @author pnoker
-	 * @version 2025.9.0
-	 * @since 2022.1.0
-	 */
-	public static class Header {
+    /**
+     * Custom request header related constants.
+     *
+     * @author pnoker
+     * @version 2025.9.0
+     * @since 2022.1.0
+     */
+    public static class Header {
 
-		/**
-		 * Custom tenant code request header, used by frontend requests.
-		 */
-		public static final String X_AUTH_TENANT = "X-Auth-Tenant";
+        /**
+         * Custom tenant code request header, used by frontend requests.
+         */
+        public static final String X_AUTH_TENANT = "X-Auth-Tenant";
 
-		/**
-		 * Custom user login name request header, used by frontend requests.
-		 */
-		public static final String X_AUTH_LOGIN = "X-Auth-Login";
+        /**
+         * Custom user login name request header, used by frontend requests.
+         */
+        public static final String X_AUTH_LOGIN = "X-Auth-Login";
 
-		/**
-		 * Custom token request header, used by frontend requests.
-		 */
-		public static final String X_AUTH_TOKEN = "X-Auth-Token";
+        /**
+         * Custom token request header, used by frontend requests.
+         */
+        public static final String X_AUTH_TOKEN = "X-Auth-Token";
 
-		/**
-		 * Custom user request header. Used to pass user information to other services,
-		 * including tenant ID, user ID, user nickname, and username.
-		 */
-		public static final String X_AUTH_USER = "X-Auth-User";
+        /**
+         * Custom user request header. Used to pass user information to other services,
+         * including tenant ID, user ID, user nickname, and username.
+         */
+        public static final String X_AUTH_USER = "X-Auth-User";
 
-		private Header() {
-			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-		}
+        private Header() {
+            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        }
 
-	}
+    }
 
-	/**
-	 * Custom request message related constants.
-	 *
-	 * @author pnoker
-	 * @version 2025.9.0
-	 * @since 2022.1.0
-	 */
-	public static class Message {
+    /**
+     * Custom request message related constants.
+     *
+     * @author pnoker
+     * @version 2025.9.0
+     * @since 2022.1.0
+     */
+    public static class Message {
 
-		/**
-		 * Invalid authorization request header message.
-		 */
-		public static final String INVALID_REQUEST = "Invalid request auth header";
+        /**
+         * Invalid authorization request header message.
+         */
+        public static final String INVALID_REQUEST = "Invalid request auth header";
 
-		private Message() {
-			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-		}
+        private Message() {
+            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        }
 
-	}
+    }
 
-	/**
-	 * Custom request key related constants.
-	 *
-	 * @author pnoker
-	 * @version 2025.9.0
-	 * @since 2022.1.0
-	 */
-	public static class Key {
+    /**
+     * Custom request key related constants.
+     *
+     * @author pnoker
+     * @version 2025.9.0
+     * @since 2022.1.0
+     */
+    public static class Key {
 
-		/**
-		 * User request header key used in context.
-		 */
-		public static final String USER_HEADER = "USER_HEADER_KEY";
+        /**
+         * User request header key used in context.
+         */
+        public static final String USER_HEADER = "USER_HEADER_KEY";
 
-		private Key() {
-			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-		}
+        private Key() {
+            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        }
 
-	}
+    }
 
 }

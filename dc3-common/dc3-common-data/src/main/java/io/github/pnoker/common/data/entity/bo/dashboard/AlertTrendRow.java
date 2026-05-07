@@ -29,10 +29,10 @@ import lombok.ToString;
 @ToString
 public class AlertTrendRow {
 
-	private String date;
+    private String date;
 
-	private long deviceCount;
+    private long deviceCount;
 
-	private long driverCount;
+    private long driverCount;
 
 }

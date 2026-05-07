@@ -32,41 +32,46 @@ import java.util.List;
  */
 public interface ProfileBindService extends BaseService<ProfileBindBO, ProfileBindQuery> {
 
-	/**
-	 * Device ID
-	 * @param deviceId Device ID
-	 * @return
-	 */
-	Boolean removeByDeviceId(Long deviceId);
+    /**
+     * Device ID
+     *
+     * @param deviceId Device ID
+     * @return
+     */
+    Boolean removeByDeviceId(Long deviceId);
 
-	/**
-	 * Device ID ID
-	 * @param deviceId Device ID
-	 * @param profileId Point ID
-	 * @return
-	 */
-	Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId);
+    /**
+     * Device ID ID
+     *
+     * @param deviceId  Device ID
+     * @param profileId Point ID
+     * @return
+     */
+    Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId);
 
-	/**
-	 * Device ID ID
-	 * @param deviceId Device ID
-	 * @param profileId Point ID
-	 * @return ProfileBind
-	 */
-	ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
+    /**
+     * Device ID ID
+     *
+     * @param deviceId  Device ID
+     * @param profileId Point ID
+     * @return ProfileBind
+     */
+    ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
 
-	/**
-	 * ID Device ID
-	 * @param profileId Point ID
-	 * @return Device ID
-	 */
-	List<Long> selectDeviceIdsByProfileId(Long profileId);
+    /**
+     * ID Device ID
+     *
+     * @param profileId Point ID
+     * @return Device ID
+     */
+    List<Long> selectDeviceIdsByProfileId(Long profileId);
 
-	/**
-	 * Device ID ID
-	 * @param deviceId Device ID
-	 * @return ID
-	 */
-	List<Long> selectProfileIdsByDeviceId(Long deviceId);
+    /**
+     * Device ID ID
+     *
+     * @param deviceId Device ID
+     * @return ID
+     */
+    List<Long> selectProfileIdsByDeviceId(Long deviceId);
 
 }

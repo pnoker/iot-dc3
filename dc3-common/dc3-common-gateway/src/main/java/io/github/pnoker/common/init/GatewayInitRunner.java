@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = { "io.github.pnoker.common.gateway" })
+@ComponentScan(basePackages = {"io.github.pnoker.common.gateway"})
 public class GatewayInitRunner {
 
 }

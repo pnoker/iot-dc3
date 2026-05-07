@@ -35,12 +35,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ListeningVirtualDriverApplication {
 
-	/**
-	 * Main method to start the Spring Boot application
-	 * @param args Command line arguments
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(ListeningVirtualDriverApplication.class, args);
-	}
+    /**
+     * Main method to start the Spring Boot application
+     *
+     * @param args Command line arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(ListeningVirtualDriverApplication.class, args);
+    }
 
 }

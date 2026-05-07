@@ -33,23 +33,24 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
  */
 public class RtuRequestHandler extends BaseRequestHandler {
 
-	/**
-	 * <p>
-	 * Constructor for RtuRequestHandler.
-	 * </p>
-	 * @param slave a {@link ModbusSlaveSet} object.
-	 */
-	public RtuRequestHandler(ModbusSlaveSet slave) {
-		super(slave);
-	}
+    /**
+     * <p>
+     * Constructor for RtuRequestHandler.
+     * </p>
+     *
+     * @param slave a {@link ModbusSlaveSet} object.
+     */
+    public RtuRequestHandler(ModbusSlaveSet slave) {
+        super(slave);
+    }
 
-	public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
-		RtuMessageRequest rtuRequest = (RtuMessageRequest) req;
-		ModbusRequest request = rtuRequest.getModbusRequest();
-		ModbusResponse response = handleRequestImpl(request);
-		if (response == null)
-			return null;
-		return new RtuMessageResponse(response);
-	}
+    public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
+        RtuMessageRequest rtuRequest = (RtuMessageRequest) req;
+        ModbusRequest request = rtuRequest.getModbusRequest();
+        ModbusResponse response = handleRequestImpl(request);
+        if (response == null)
+            return null;
+        return new RtuMessageResponse(response);
+    }
 
 }

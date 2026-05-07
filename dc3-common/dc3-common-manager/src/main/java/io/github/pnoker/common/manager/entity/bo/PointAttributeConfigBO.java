@@ -36,49 +36,49 @@ import lombok.*;
 @ToString(callSuper = true)
 public class PointAttributeConfigBO extends BaseBO {
 
-	/**
-	 * ID
-	 */
-	private Long attributeId;
+    /**
+     * ID
+     */
+    private Long attributeId;
 
-	/**
-	 *
-	 */
-	private String configValue;
+    /**
+     *
+     */
+    private String configValue;
 
-	/**
-	 * Device ID
-	 */
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    private Long deviceId;
 
-	/**
-	 *
-	 */
-	private JsonExt configExt;
+    /**
+     *
+     */
+    private JsonExt configExt;
 
-	/**
-	 * Point ID
-	 */
-	private Long pointId;
+    /**
+     * Point ID
+     */
+    private Long pointId;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	/**
-	 *
-	 */
-	private String signature;
+    /**
+     *
+     */
+    private String signature;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
 }

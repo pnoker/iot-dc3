@@ -48,57 +48,56 @@ import java.util.concurrent.ExecutorService;
 @Component
 public class MqttReceiveHandler {
 
-	@Value("${driver.mqtt.batch.speed}")
-	private Integer batchSpeed;
+    @Value("${driver.mqtt.batch.speed}")
+    private Integer batchSpeed;
 
-	@Resource
-	private MqttReceiveService mqttReceiveService;
+    @Resource
+    private MqttReceiveService mqttReceiveService;
 
-	@Resource
-	private ExecutorService virtualThreadExecutor;
+    @Resource
+    private ExecutorService virtualThreadExecutor;
 
-	/**
-	 * Configure MQTT inbound message handler bean
-	 * <p>
-	 * Receives data from MQTT; subscribed topics are defined in application.yml under
-	 * mqtt.receive-topics + (plus): matches exactly one word # (hash): matches multiple
-	 * words (or none)
-	 * @return Configured MessageHandler for MQTT inbound processing
-	 */
-	@Bean
-	@ServiceActivator(inputChannel = "mqttInboundChannel")
-	public MessageHandler mqttInboundReceive() {
-		return message -> {
-			try {
-				MessageHeader messageHeader = new MessageHeader(message.getHeaders());
-				String payload = message.getPayload().toString();
-				if (StringUtils.isEmpty(payload)) {
-					log.error("Invalid mqtt inbound, From: {}, Qos: {}, Payload: null",
-							messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos());
-					return;
-				}
-				MqttScheduleJob.messageCount.getAndIncrement();
-				MqttMessage mqttMessage = MqttMessage.builder().header(messageHeader).payload(payload).build();
-				log.debug("Mqtt inbound, From: {}, Qos: {}, Payload: {}", messageHeader.getMqttReceivedTopic(),
-						messageHeader.getMqttReceivedQos(), payload);
+    /**
+     * Configure MQTT inbound message handler bean
+     * <p>
+     * Receives data from MQTT; subscribed topics are defined in application.yml under
+     * mqtt.receive-topics + (plus): matches exactly one word # (hash): matches multiple
+     * words (or none)
+     *
+     * @return Configured MessageHandler for MQTT inbound processing
+     */
+    @Bean
+    @ServiceActivator(inputChannel = "mqttInboundChannel")
+    public MessageHandler mqttInboundReceive() {
+        return message -> {
+            try {
+                MessageHeader messageHeader = new MessageHeader(message.getHeaders());
+                String payload = message.getPayload().toString();
+                if (StringUtils.isEmpty(payload)) {
+                    log.error("Invalid mqtt inbound, From: {}, Qos: {}, Payload: null",
+                            messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos());
+                    return;
+                }
+                MqttScheduleJob.messageCount.getAndIncrement();
+                MqttMessage mqttMessage = MqttMessage.builder().header(messageHeader).payload(payload).build();
+                log.debug("Mqtt inbound, From: {}, Qos: {}, Payload: {}", messageHeader.getMqttReceivedTopic(),
+                        messageHeader.getMqttReceivedQos(), payload);
 
-				// Determine whether to process data in batch based on transmission speed
-				if (MqttScheduleJob.messageSpeed.get() < batchSpeed) {
-					virtualThreadExecutor.execute(() ->
-					// Process single MQTT message
-					mqttReceiveService.receiveValue(mqttMessage));
-				}
-				else {
-					// Save message to batch schedule for processing
-					MqttScheduleJob.messageLock.writeLock().lock();
-					MqttScheduleJob.addMqttMessages(mqttMessage);
-					MqttScheduleJob.messageLock.writeLock().unlock();
-				}
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		};
-	}
+                // Determine whether to process data in batch based on transmission speed
+                if (MqttScheduleJob.messageSpeed.get() < batchSpeed) {
+                    virtualThreadExecutor.execute(() ->
+                            // Process single MQTT message
+                            mqttReceiveService.receiveValue(mqttMessage));
+                } else {
+                    // Save message to batch schedule for processing
+                    MqttScheduleJob.messageLock.writeLock().lock();
+                    MqttScheduleJob.addMqttMessages(mqttMessage);
+                    MqttScheduleJob.messageLock.writeLock().unlock();
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        };
+    }
 
 }

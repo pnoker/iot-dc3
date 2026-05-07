@@ -42,42 +42,42 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class GroupVO extends BaseVO {
 
-	/**
-	 * Parent group ID.
-	 */
-	private String parentGroupId;
+    /**
+     * Parent group ID.
+     */
+    private String parentGroupId;
 
-	/**
-	 * Group type flag.
-	 */
-	private GroupTypeFlagEnum groupTypeFlag;
+    /**
+     * Group type flag.
+     */
+    private GroupTypeFlagEnum groupTypeFlag;
 
-	/**
-	 * Group name.
-	 */
-	@NotBlank(message = "分组名称不能为空", groups = { Add.class })
-	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "分组名称格式无效",
-			groups = { Add.class, Update.class })
-	private String groupName;
+    /**
+     * Group name.
+     */
+    @NotBlank(message = "分组名称不能为空", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "分组名称格式无效",
+            groups = {Add.class, Update.class})
+    private String groupName;
 
-	/**
-	 * Group code.
-	 */
-	private String groupCode;
+    /**
+     * Group code.
+     */
+    private String groupCode;
 
-	/**
-	 * Group level.
-	 */
-	private Byte groupLevel;
+    /**
+     * Group level.
+     */
+    private Byte groupLevel;
 
-	/**
-	 * Group index/order.
-	 */
-	private Integer groupIndex;
+    /**
+     * Group index/order.
+     */
+    private Integer groupIndex;
 
-	/**
-	 * Enable status flag.
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable status flag.
+     */
+    private EnableFlagEnum enableFlag;
 
 }

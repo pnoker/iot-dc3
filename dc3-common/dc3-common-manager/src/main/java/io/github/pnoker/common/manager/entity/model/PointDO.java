@@ -43,146 +43,146 @@ import java.time.LocalDateTime;
 @TableName(value = "dc3_point", autoResultMap = true)
 public class PointDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Primary key ID
-	 */
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
-	private Long id;
+    /**
+     * Primary key ID
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-	/**
-	 * Name
-	 */
-	@TableField("point_name")
-	private String pointName;
+    /**
+     * Name
+     */
+    @TableField("point_name")
+    private String pointName;
 
-	/**
-	 * Code
-	 */
-	@TableField("point_code")
-	private String pointCode;
+    /**
+     * Code
+     */
+    @TableField("point_code")
+    private String pointCode;
 
-	/**
-	 * Type
-	 */
-	@TableField("point_type_flag")
-	private Byte pointTypeFlag;
+    /**
+     * Type
+     */
+    @TableField("point_type_flag")
+    private Byte pointTypeFlag;
 
-	/**
-	 *
-	 */
-	@TableField("rw_flag")
-	private Byte rwFlag;
+    /**
+     *
+     */
+    @TableField("rw_flag")
+    private Byte rwFlag;
 
-	/**
-	 *
-	 */
-	@TableField("base_value")
-	private Double baseValue;
+    /**
+     *
+     */
+    @TableField("base_value")
+    private Double baseValue;
 
-	/**
-	 *
-	 */
-	@TableField("multiple")
-	private Double multiple;
+    /**
+     *
+     */
+    @TableField("multiple")
+    private Double multiple;
 
-	/**
-	 *
-	 */
-	@TableField("value_decimal")
-	private Byte valueDecimal;
+    /**
+     *
+     */
+    @TableField("value_decimal")
+    private Byte valueDecimal;
 
-	/**
-	 *
-	 */
-	@TableField("unit")
-	private String unit;
+    /**
+     *
+     */
+    @TableField("unit")
+    private String unit;
 
-	/**
-	 * ID
-	 */
-	@TableField("profile_id")
-	private Long profileId;
+    /**
+     * ID
+     */
+    @TableField("profile_id")
+    private Long profileId;
 
-	/**
-	 *
-	 */
-	@TableField(value = "point_ext", typeHandler = JacksonTypeHandler.class)
-	private JsonExt pointExt;
+    /**
+     *
+     */
+    @TableField(value = "point_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt pointExt;
 
-	/**
-	 * Enable flag, 0:, 1:Disable
-	 */
-	@TableField("enable_flag")
-	private Byte enableFlag;
+    /**
+     * Enable flag, 0:, 1:Disable
+     */
+    @TableField("enable_flag")
+    private Byte enableFlag;
 
-	/**
-	 * Tenant ID
-	 */
-	@TableField("tenant_id")
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
 
-	/**
-	 * Description
-	 */
-	@TableField("remark")
-	private String remark;
+    /**
+     * Description
+     */
+    @TableField("remark")
+    private String remark;
 
-	/**
-	 *
-	 */
-	@TableField("signature")
-	private String signature;
+    /**
+     *
+     */
+    @TableField("signature")
+    private String signature;
 
-	/**
-	 *
-	 */
-	@TableField("version")
-	private Integer version;
+    /**
+     *
+     */
+    @TableField("version")
+    private Integer version;
 
-	/**
-	 * Creator ID
-	 */
-	@TableField("creator_id")
-	private Long creatorId;
+    /**
+     * Creator ID
+     */
+    @TableField("creator_id")
+    private Long creatorId;
 
-	/**
-	 * Creator Name
-	 */
-	@TableField("creator_name")
-	private String creatorName;
+    /**
+     * Creator Name
+     */
+    @TableField("creator_name")
+    private String creatorName;
 
-	/**
-	 * Create Time
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operator ID
-	 */
-	@TableField("operator_id")
-	private Long operatorId;
+    /**
+     * Operator ID
+     */
+    @TableField("operator_id")
+    private Long operatorId;
 
-	/**
-	 * Operator Name
-	 */
-	@TableField("operator_name")
-	private String operatorName;
+    /**
+     * Operator Name
+     */
+    @TableField("operator_name")
+    private String operatorName;
 
-	/**
-	 * Operate Time
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operate Time
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
-	/**
-	 * Logical delete flag, 0:not deleted, 1:deleted
-	 */
-	@TableLogic
-	@TableField("deleted")
-	private Byte deleted;
+    /**
+     * Logical delete flag, 0:not deleted, 1:deleted
+     */
+    @TableLogic
+    @TableField("deleted")
+    private Byte deleted;
 
 }

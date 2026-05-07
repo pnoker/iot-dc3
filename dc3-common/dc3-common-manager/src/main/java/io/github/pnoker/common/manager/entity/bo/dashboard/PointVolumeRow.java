@@ -30,10 +30,10 @@ import lombok.ToString;
 @ToString
 public class PointVolumeRow {
 
-	private long deviceId;
+    private long deviceId;
 
-	private long pointId;
+    private long pointId;
 
-	private long cnt;
+    private long cnt;
 
 }

@@ -29,37 +29,37 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
  */
 public class StrategyConstant {
 
-	private StrategyConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private StrategyConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Storage strategy constant
-	 *
-	 * @author pnoker
-	 * @version 2025.9.0
-	 * @since 2022.1.0
-	 */
-	public static class Storage {
+    /**
+     * Storage strategy constant
+     *
+     * @author pnoker
+     * @version 2025.9.0
+     * @since 2022.1.0
+     */
+    public static class Storage {
 
-		public static final String REPOSITORY_PREFIX = "repository" + SymbolConstant.COLON;
+        public static final String REPOSITORY_PREFIX = "repository" + SymbolConstant.COLON;
 
-		public static final String POSTGRES = "postgres";
+        public static final String POSTGRES = "postgres";
 
-		public static final String INFLUXDB = "influxdb";
+        public static final String INFLUXDB = "influxdb";
 
-		public static final String TDENGINE = "tdengine";
+        public static final String TDENGINE = "tdengine";
 
-		public static final String OPENTSDB = "opentsdb";
+        public static final String OPENTSDB = "opentsdb";
 
-		public static final String MONGODB = "mongodb";
+        public static final String MONGODB = "mongodb";
 
-		public static final String ELASTICSEARCH = "elasticsearch";
+        public static final String ELASTICSEARCH = "elasticsearch";
 
-		private Storage() {
-			throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-		}
+        private Storage() {
+            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        }
 
-	}
+    }
 
 }

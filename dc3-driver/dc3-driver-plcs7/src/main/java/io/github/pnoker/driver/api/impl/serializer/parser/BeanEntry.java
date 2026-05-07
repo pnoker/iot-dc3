@@ -28,43 +28,43 @@ import java.lang.reflect.Field;
  */
 public final class BeanEntry {
 
-	/**
-	 * The Array size
-	 */
-	public int arraySize;
+    /**
+     * The Array size
+     */
+    public int arraySize;
 
-	/**
-	 * Offsets and size
-	 */
-	public int byteOffset;
+    /**
+     * Offsets and size
+     */
+    public int byteOffset;
 
-	public int bitOffset;
+    public int bitOffset;
 
-	public int size;
+    public int size;
 
-	/**
-	 * The corresponding field
-	 */
-	public Field field;
+    /**
+     * The corresponding field
+     */
+    public Field field;
 
-	/**
-	 * Array type
-	 */
-	public boolean isArray;
+    /**
+     * Array type
+     */
+    public boolean isArray;
 
-	/**
-	 * The S7 Type
-	 */
-	public S7Type s7type;
+    /**
+     * The S7 Type
+     */
+    public S7Type s7type;
 
-	/**
-	 * The corresponding serializer
-	 */
-	public S7Serializable serializer;
+    /**
+     * The corresponding serializer
+     */
+    public S7Serializable serializer;
 
-	/**
-	 * The Java type
-	 */
-	public Class<?> type;
+    /**
+     * The Java type
+     */
+    public Class<?> type;
 
 }

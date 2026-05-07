@@ -37,13 +37,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PointValueReadVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@NotNull(message = "设备ID不能为空")
-	private Long deviceId;
+    @NotNull(message = "设备ID不能为空")
+    private Long deviceId;
 
-	@NotNull(message = "位号ID不能为空")
-	private Long pointId;
+    @NotNull(message = "位号ID不能为空")
+    private Long pointId;
 
 }

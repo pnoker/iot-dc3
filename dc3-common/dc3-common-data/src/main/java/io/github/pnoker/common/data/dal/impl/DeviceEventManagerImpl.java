@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DeviceEventManagerImpl extends ServiceImpl<DeviceEventMapper, DeviceEventDO>
-		implements DeviceEventManager {
+        implements DeviceEventManager {
 
 }

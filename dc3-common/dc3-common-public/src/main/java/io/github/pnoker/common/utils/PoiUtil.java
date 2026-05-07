@@ -19,13 +19,7 @@ package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.util.Objects;
@@ -44,86 +38,91 @@ import java.util.Objects;
 @Slf4j
 public class PoiUtil {
 
-	private PoiUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private PoiUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Get a {@link CellStyle} with both horizontal and vertical alignment set to center.
-	 * @param workbook Workbook
-	 * @return Centered CellStyle
-	 */
-	public static CellStyle getCenterCellStyle(Workbook workbook) {
-		CellStyle cellStyle = workbook.createCellStyle();
-		cellStyle.setAlignment(HorizontalAlignment.CENTER);
-		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-		return cellStyle;
-	}
+    /**
+     * Get a {@link CellStyle} with both horizontal and vertical alignment set to center.
+     *
+     * @param workbook Workbook
+     * @return Centered CellStyle
+     */
+    public static CellStyle getCenterCellStyle(Workbook workbook) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        return cellStyle;
+    }
 
-	/**
-	 * Merge a range of cells.
-	 * @param sheet Sheet
-	 * @param firstRow Index of first row
-	 * @param lastRow Index of last row (inclusive), must be equal to or larger than
-	 * {@code firstRow}
-	 * @param firstCol Index of first column
-	 * @param lastCol Index of last column (inclusive), must be equal to or larger than
-	 * {@code firstCol}
-	 */
-	public static void mergedRegion(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
-		if ((lastRow - firstRow) < 1 && (lastCol - firstCol) < 1) {
-			return;
-		}
+    /**
+     * Merge a range of cells.
+     *
+     * @param sheet    Sheet
+     * @param firstRow Index of first row
+     * @param lastRow  Index of last row (inclusive), must be equal to or larger than
+     *                 {@code firstRow}
+     * @param firstCol Index of first column
+     * @param lastCol  Index of last column (inclusive), must be equal to or larger than
+     *                 {@code firstCol}
+     */
+    public static void mergedRegion(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+        if ((lastRow - firstRow) < 1 && (lastCol - firstCol) < 1) {
+            return;
+        }
 
-		sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
-	}
+        sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
+    }
 
-	/**
-	 * Get the string content of the specified cell.
-	 * @param sheet Sheet
-	 * @param rowIndex Row index
-	 * @param cellIndex Cell index
-	 * @return String value of the cell, or an empty string if the cell is null
-	 */
-	public static String getCellStringValue(Sheet sheet, int rowIndex, int cellIndex) {
-		Row driverAttributesRow = sheet.getRow(rowIndex);
-		if (Objects.isNull(driverAttributesRow)) {
-			return "";
-		}
+    /**
+     * Get the string content of the specified cell.
+     *
+     * @param sheet     Sheet
+     * @param rowIndex  Row index
+     * @param cellIndex Cell index
+     * @return String value of the cell, or an empty string if the cell is null
+     */
+    public static String getCellStringValue(Sheet sheet, int rowIndex, int cellIndex) {
+        Row driverAttributesRow = sheet.getRow(rowIndex);
+        if (Objects.isNull(driverAttributesRow)) {
+            return "";
+        }
 
-		Cell driverAttributesCell = driverAttributesRow.getCell(cellIndex);
-		if (Objects.isNull(driverAttributesCell)) {
-			return "";
-		}
+        Cell driverAttributesCell = driverAttributesRow.getCell(cellIndex);
+        if (Objects.isNull(driverAttributesCell)) {
+            return "";
+        }
 
-		DataFormatter formatter = new DataFormatter();
-		return formatter.formatCellValue(driverAttributesCell);
-	}
+        DataFormatter formatter = new DataFormatter();
+        return formatter.formatCellValue(driverAttributesCell);
+    }
 
-	/**
-	 * Create a cell with the specified value.
-	 * @param row Row
-	 * @param cellIndex Cell index
-	 * @param cellValue Cell value
-	 */
-	public static void createCell(Row row, int cellIndex, String cellValue) {
-		createCellWithStyle(row, cellIndex, cellValue, null);
-	}
+    /**
+     * Create a cell with the specified value.
+     *
+     * @param row       Row
+     * @param cellIndex Cell index
+     * @param cellValue Cell value
+     */
+    public static void createCell(Row row, int cellIndex, String cellValue) {
+        createCellWithStyle(row, cellIndex, cellValue, null);
+    }
 
-	/**
-	 * Create a cell with the specified value and style.
-	 * @param row Row
-	 * @param cellIndex Cell index
-	 * @param cellValue Cell value
-	 * @param cellStyle Cell style
-	 */
-	public static void createCellWithStyle(Row row, int cellIndex, String cellValue, CellStyle cellStyle) {
-		Cell deviceNameCell = row.createCell(cellIndex);
-		deviceNameCell.setCellValue(cellValue);
+    /**
+     * Create a cell with the specified value and style.
+     *
+     * @param row       Row
+     * @param cellIndex Cell index
+     * @param cellValue Cell value
+     * @param cellStyle Cell style
+     */
+    public static void createCellWithStyle(Row row, int cellIndex, String cellValue, CellStyle cellStyle) {
+        Cell deviceNameCell = row.createCell(cellIndex);
+        deviceNameCell.setCellValue(cellValue);
 
-		if (Objects.nonNull(cellStyle)) {
-			deviceNameCell.setCellStyle(cellStyle);
-		}
-	}
+        if (Objects.nonNull(cellStyle)) {
+            deviceNameCell.setCellStyle(cellStyle);
+        }
+    }
 
 }

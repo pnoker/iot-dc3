@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DriverEventManagerImpl extends ServiceImpl<DriverEventMapper, DriverEventDO>
-		implements DriverEventManager {
+        implements DriverEventManager {
 
 }

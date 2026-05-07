@@ -32,12 +32,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class OpcDaApplication {
 
-	/**
-	 * Main method to start the OPC-DA driver application
-	 * @param args Command line arguments passed to the application
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(OpcDaApplication.class, args);
-	}
+    /**
+     * Main method to start the OPC-DA driver application
+     *
+     * @param args Command line arguments passed to the application
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(OpcDaApplication.class, args);
+    }
 
 }

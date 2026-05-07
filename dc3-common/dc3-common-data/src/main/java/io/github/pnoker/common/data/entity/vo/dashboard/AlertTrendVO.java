@@ -37,13 +37,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AlertTrendVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String date;
+    private String date;
 
-	private long deviceCount;
+    private long deviceCount;
 
-	private long driverCount;
+    private long driverCount;
 
 }

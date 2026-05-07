@@ -34,44 +34,49 @@ import reactor.core.publisher.Mono;
  */
 public interface BaseController {
 
-	/**
-	 * Get user header information from request context
-	 * @return User header information as Mono
-	 */
-	default Mono<RequestHeader.UserHeader> getUserHeader() {
-		return UserHeaderUtil.getUserHeader();
-	}
+    /**
+     * Get user header information from request context
+     *
+     * @return User header information as Mono
+     */
+    default Mono<RequestHeader.UserHeader> getUserHeader() {
+        return UserHeaderUtil.getUserHeader();
+    }
 
-	/**
-	 * Get tenant ID from user header
-	 * @return Tenant ID as Mono
-	 */
-	default Mono<Long> getTenantId() {
-		return UserHeaderUtil.getTenantId();
-	}
+    /**
+     * Get tenant ID from user header
+     *
+     * @return Tenant ID as Mono
+     */
+    default Mono<Long> getTenantId() {
+        return UserHeaderUtil.getTenantId();
+    }
 
-	/**
-	 * Get user ID from user header
-	 * @return User ID as Mono
-	 */
-	default Mono<Long> getUserId() {
-		return UserHeaderUtil.getUserId();
-	}
+    /**
+     * Get user ID from user header
+     *
+     * @return User ID as Mono
+     */
+    default Mono<Long> getUserId() {
+        return UserHeaderUtil.getUserId();
+    }
 
-	/**
-	 * Get user nickname from user header
-	 * @return User nickname as Mono
-	 */
-	default Mono<String> getNickName() {
-		return UserHeaderUtil.getNickName();
-	}
+    /**
+     * Get user nickname from user header
+     *
+     * @return User nickname as Mono
+     */
+    default Mono<String> getNickName() {
+        return UserHeaderUtil.getNickName();
+    }
 
-	/**
-	 * Get username from user header
-	 * @return Username as Mono
-	 */
-	default Mono<String> getUserName() {
-		return UserHeaderUtil.getUserName();
-	}
+    /**
+     * Get username from user header
+     *
+     * @return Username as Mono
+     */
+    default Mono<String> getUserName() {
+        return UserHeaderUtil.getUserName();
+    }
 
 }

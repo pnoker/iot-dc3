@@ -35,20 +35,20 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class PeerDeviationVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private long profileId;
+    private long profileId;
 
-	private long deviceId;
+    private long deviceId;
 
-	private long alarmCount;
+    private long alarmCount;
 
-	private long peerMedian;
+    private long peerMedian;
 
-	/**
-	 * alarmCount / peerMedian, 2-decimal. 0 means peerMedian was 0 (fresh profile).
-	 */
-	private double ratio;
+    /**
+     * alarmCount / peerMedian, 2-decimal. 0 means peerMedian was 0 (fresh profile).
+     */
+    private double ratio;
 
 }

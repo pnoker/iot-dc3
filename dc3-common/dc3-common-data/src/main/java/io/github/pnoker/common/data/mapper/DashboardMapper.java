@@ -37,32 +37,32 @@ import java.util.List;
 @DS("history")
 public interface DashboardMapper {
 
-	long countInRange(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
-			@Param("to") LocalDateTime to);
+    long countInRange(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
+                      @Param("to") LocalDateTime to);
 
-	long countTotal(@Param("tenantId") Long tenantId);
+    long countTotal(@Param("tenantId") Long tenantId);
 
-	List<TimeBucketRow> timeseries(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
-			@Param("to") LocalDateTime to, @Param("bucket") String bucket);
+    List<TimeBucketRow> timeseries(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
+                                   @Param("to") LocalDateTime to, @Param("bucket") String bucket);
 
-	List<EntityCountRow> top(@Param("tenantId") Long tenantId, @Param("dimension") String dimension,
-			@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("limit") int limit);
+    List<EntityCountRow> top(@Param("tenantId") Long tenantId, @Param("dimension") String dimension,
+                             @Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("limit") int limit);
 
-	List<LatestPointValueRow> latestStream(@Param("tenantId") Long tenantId, @Param("limit") int limit);
+    List<LatestPointValueRow> latestStream(@Param("tenantId") Long tenantId, @Param("limit") int limit);
 
-	List<LatencyBinRow> latencyHistogram(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
-			@Param("to") LocalDateTime to);
+    List<LatencyBinRow> latencyHistogram(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
+                                         @Param("to") LocalDateTime to);
 
-	List<ActivityCellRow> hourlyActivity(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
-			@Param("to") LocalDateTime to);
+    List<ActivityCellRow> hourlyActivity(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
+                                         @Param("to") LocalDateTime to);
 
-	// ===== Phase-2 insights ====================================================
+    // ===== Phase-2 insights ====================================================
 
-	List<SilentSourceRow> silentSources(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
-			@Param("silentThreshold") LocalDateTime silentThreshold, @Param("limit") int limit);
+    List<SilentSourceRow> silentSources(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from,
+                                        @Param("silentThreshold") LocalDateTime silentThreshold, @Param("limit") int limit);
 
-	List<CoverageGapRow> coverageGapItems(@Param("tenantId") Long tenantId, @Param("limit") int limit);
+    List<CoverageGapRow> coverageGapItems(@Param("tenantId") Long tenantId, @Param("limit") int limit);
 
-	long countPointsInTenant(@Param("tenantId") Long tenantId);
+    long countPointsInTenant(@Param("tenantId") Long tenantId);
 
 }

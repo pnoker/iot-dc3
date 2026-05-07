@@ -41,22 +41,22 @@ import java.util.List;
 @ToString(callSuper = true)
 public class FacadeDeviceBO extends BaseBO {
 
-	private String deviceName;
+    private String deviceName;
 
-	private String deviceCode;
+    private String deviceCode;
 
-	private Long driverId;
+    private Long driverId;
 
-	private DeviceExt deviceExt;
+    private DeviceExt deviceExt;
 
-	private EnableFlagEnum enableFlag;
+    private EnableFlagEnum enableFlag;
 
-	private Long tenantId;
+    private Long tenantId;
 
-	private String signature;
+    private String signature;
 
-	private Integer version;
+    private Integer version;
 
-	private List<Long> profileIds;
+    private List<Long> profileIds;
 
 }

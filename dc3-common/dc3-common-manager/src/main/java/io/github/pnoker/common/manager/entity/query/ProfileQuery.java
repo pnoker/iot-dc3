@@ -41,53 +41,53 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ProfileQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	/**
-	 * Name
-	 */
-	private String profileName;
+    /**
+     * Name
+     */
+    private String profileName;
 
-	/**
-	 * Code
-	 */
-	private String profileCode;
+    /**
+     * Code
+     */
+    private String profileCode;
 
-	/**
-	 * Type
-	 */
-	private ProfileShareFlagEnum profileShareFlag;
+    /**
+     * Type
+     */
+    private ProfileShareFlagEnum profileShareFlag;
 
-	/**
-	 * Type
-	 */
-	private ProfileTypeFlagEnum profileTypeFlag;
+    /**
+     * Type
+     */
+    private ProfileTypeFlagEnum profileTypeFlag;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
-	//
+    //
 
-	/**
-	 * Device ID
-	 */
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    private Long deviceId;
 
 }

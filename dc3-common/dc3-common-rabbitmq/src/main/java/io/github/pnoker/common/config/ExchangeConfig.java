@@ -43,49 +43,54 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ExchangeConfig {
 
-	/**
-	 * Event exchange for platform-side load balancing
-	 * @return TopicExchange bean for event messages
-	 */
-	@Bean
-	TopicExchange eventExchange() {
-		return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_EVENT, true, false);
-	}
+    /**
+     * Event exchange for platform-side load balancing
+     *
+     * @return TopicExchange bean for event messages
+     */
+    @Bean
+    TopicExchange eventExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_EVENT, true, false);
+    }
 
-	/**
-	 * Metadata exchange for platform broadcasting and driver subscription
-	 * @return TopicExchange bean for metadata messages
-	 */
-	@Bean
-	TopicExchange metadataExchange() {
-		return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_METADATA, true, false);
-	}
+    /**
+     * Metadata exchange for platform broadcasting and driver subscription
+     *
+     * @return TopicExchange bean for metadata messages
+     */
+    @Bean
+    TopicExchange metadataExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_METADATA, true, false);
+    }
 
-	/**
-	 * Command exchange for driver-side load balancing
-	 * @return TopicExchange bean for command messages
-	 */
-	@Bean
-	TopicExchange commandExchange() {
-		return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND, true, false);
-	}
+    /**
+     * Command exchange for driver-side load balancing
+     *
+     * @return TopicExchange bean for command messages
+     */
+    @Bean
+    TopicExchange commandExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND, true, false);
+    }
 
-	/**
-	 * Data exchange for platform-side load balancing
-	 * @return TopicExchange bean for data messages
-	 */
-	@Bean
-	TopicExchange valueExchange() {
-		return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_VALUE, true, false);
-	}
+    /**
+     * Data exchange for platform-side load balancing
+     *
+     * @return TopicExchange bean for data messages
+     */
+    @Bean
+    TopicExchange valueExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_VALUE, true, false);
+    }
 
-	/**
-	 * MQTT exchange for platform-side load balancing
-	 * @return TopicExchange bean for MQTT messages
-	 */
-	@Bean
-	TopicExchange mqttExchange() {
-		return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_MQTT, true, false);
-	}
+    /**
+     * MQTT exchange for platform-side load balancing
+     *
+     * @return TopicExchange bean for MQTT messages
+     */
+    @Bean
+    TopicExchange mqttExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_MQTT, true, false);
+    }
 
 }

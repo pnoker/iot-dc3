@@ -35,7 +35,7 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ProfileMapper extends BaseMapper<ProfileDO> {
 
-	Page<ProfileDO> selectPageWithDevice(Page<ProfileDO> page, @Param(Constants.WRAPPER) Wrapper<ProfileDO> wrapper,
-			@Param("deviceId") Long deviceId);
+    Page<ProfileDO> selectPageWithDevice(Page<ProfileDO> page, @Param(Constants.WRAPPER) Wrapper<ProfileDO> wrapper,
+                                         @Param("deviceId") Long deviceId);
 
 }

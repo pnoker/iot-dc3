@@ -45,33 +45,33 @@ import java.util.Objects;
 @Component
 public class PointValueLocalFacade implements PointValueFacade {
 
-	@Resource
-	private PointValueService pointValueService;
+    @Resource
+    private PointValueService pointValueService;
 
-	@Resource
-	private FacadePointValueBuilder facadePointValueBuilder;
+    @Resource
+    private FacadePointValueBuilder facadePointValueBuilder;
 
-	@Override
-	public FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId) {
-		PointValueQuery query = PointValueQuery.builder()
-			.tenantId(tenantId)
-			.deviceId(deviceId)
-			.pointId(pointId)
-			.build();
-		Page<PointValueBO> page = pointValueService.latest(query);
-		if (Objects.isNull(page) || page.getRecords().isEmpty()) {
-			return null;
-		}
-		return facadePointValueBuilder.toFacadeBO(page.getRecords().getFirst());
-	}
+    @Override
+    public FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId) {
+        PointValueQuery query = PointValueQuery.builder()
+                .tenantId(tenantId)
+                .deviceId(deviceId)
+                .pointId(pointId)
+                .build();
+        Page<PointValueBO> page = pointValueService.latest(query);
+        if (Objects.isNull(page) || page.getRecords().isEmpty()) {
+            return null;
+        }
+        return facadePointValueBuilder.toFacadeBO(page.getRecords().getFirst());
+    }
 
-	@Override
-	public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
-		List<String> result = pointValueService.history(tenantId, deviceId, pointId, count);
-		if (Objects.isNull(result) || result.isEmpty()) {
-			return Collections.emptyList();
-		}
-		return result;
-	}
+    @Override
+    public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
+        List<String> result = pointValueService.history(tenantId, deviceId, pointId, count);
+        if (Objects.isNull(result) || result.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return result;
+    }
 
 }
