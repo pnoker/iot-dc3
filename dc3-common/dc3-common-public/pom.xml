@@ -92,12 +92,6 @@
             <artifactId>okhttp</artifactId>
         </dependency>
 
-        <!-- Caffeine Cache -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-        </dependency>
-
         <!-- Apache Poi -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -108,12 +102,6 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
-        </dependency>
-
-        <!-- Commons IO -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
         </dependency>
 
         <!-- Jackson Related -->
@@ -134,18 +122,6 @@
             <groupId>tools.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk8</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-parameter-names</artifactId>
-        </dependency>
 
         <!-- Bouncy Castle Related -->
         <dependency>
@@ -153,14 +129,10 @@
             <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
 
-        <!-- Hibernate Validator -->
+        <!-- Jakarta Validation API -->
         <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator-cdi</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
         </dependency>
 
         <!-- DC3 Common Related -->

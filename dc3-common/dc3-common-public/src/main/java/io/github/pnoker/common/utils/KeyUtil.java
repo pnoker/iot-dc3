@@ -159,7 +159,7 @@ public class KeyUtil {
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA)
                 .generatePublic(keySpec);
         // RSA encryption
-        Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_AES);
+        Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_RSA);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
         return DecodeUtil.byteToString(DecodeUtil.encode(cipher.doFinal(DecodeUtil.stringToByte(content))));
     }
