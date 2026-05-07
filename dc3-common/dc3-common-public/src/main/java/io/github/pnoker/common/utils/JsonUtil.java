@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.utils;
 
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.JsonException;
 import org.apache.commons.lang3.StringUtils;
@@ -62,10 +60,6 @@ public final class JsonUtil {
      * @return ObjectMapper configured with proper settings
      */
     public static JsonMapper getJsonMapper() {
-        LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(
-                LocalDateTimeUtil.getCompleteDateTimeFormatter());
-        LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer(
-                LocalDateTimeUtil.getCompleteDateTimeFormatter());
         return JsonMapper.builder()
                 .findAndAddModules()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, Boolean.FALSE)
@@ -79,10 +73,6 @@ public final class JsonUtil {
      * @return ObjectMapper configured with proper settings
      */
     public static ObjectMapper getObjectMapper() {
-        LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(
-                LocalDateTimeUtil.getCompleteDateTimeFormatter());
-        LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer(
-                LocalDateTimeUtil.getCompleteDateTimeFormatter());
         return JsonMapper.builder()
                 .findAndAddModules()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, Boolean.FALSE)
