@@ -126,6 +126,12 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
+> **Module Overview**: See [`docs/MODULES.md`](docs/MODULES.md) for the full module dependency map and runtime flow diagram.
+
+> **Local Dev Guide**: See [`docs/QUICKSTART.md`](docs/QUICKSTART.md) for a one-stop local setup workflow.
+
+> **Troubleshooting**: See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) for common build/runtime issues and resolutions.
+
 ## 3.3 Start Services
 
 > Start in order
