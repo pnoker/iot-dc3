@@ -38,6 +38,12 @@
 
     <dependencies>
 
+        <!-- Caffeine Cache -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- DC3 Api Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

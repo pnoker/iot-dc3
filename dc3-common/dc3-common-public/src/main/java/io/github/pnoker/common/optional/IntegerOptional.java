@@ -52,7 +52,7 @@ public final class IntegerOptional {
     }
 
     public void ifPresentOrElse(IntConsumer action, Runnable emptyAction) {
-        if (value > DefaultConstant.ZERO) {
+        if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
             action.accept(value);
         } else {
             emptyAction.run();

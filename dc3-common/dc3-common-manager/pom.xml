@@ -38,6 +38,18 @@
 
     <dependencies>
 
+        <!-- Commons IO -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <!-- Caffeine Cache -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- Spring gRPC Starter (client + server) -->
         <dependency>
             <groupId>org.springframework.grpc</groupId>
