@@ -23,11 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.function.Consumer;
 
 /**
- * Custom JSON Optional Class
- * <p>
- * Optional wrapper class for JSON string operations. Provides utility methods for parsing
- * and validation with null safety and empty checks.
- * </p>
+ * Optional wrapper that checks for non-empty valid JSON strings.
  *
  * @author pnoker
  * @version 2025.9.0

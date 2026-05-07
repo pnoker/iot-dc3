@@ -29,12 +29,6 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
- */
-abstract /**
- * Serial Slave
- *
- * @author pnoker
- * @version 2025.9.0
  * @since 2022.1.0
  */
 public class SerialSlave extends ModbusSlaveSet {

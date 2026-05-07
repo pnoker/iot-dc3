@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.common;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public interface Constants {
 
     public static final String IConnectionPointContainer_IID = "B196B284-BAB4-101A-B69C-00AA00341D07";

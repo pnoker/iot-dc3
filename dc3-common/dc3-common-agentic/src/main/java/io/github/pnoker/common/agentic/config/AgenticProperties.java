@@ -25,6 +25,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * <p>
  * Prefix: {@code dc3.agentic}
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

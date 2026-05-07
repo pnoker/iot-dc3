@@ -22,6 +22,11 @@ import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.mapper.SessionMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 @Service
 public class SessionManagerImpl extends ServiceImpl<SessionMapper, SessionDO> implements SessionManager {
 

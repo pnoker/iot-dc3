@@ -25,6 +25,10 @@ import java.time.LocalDate;
 
 /**
  * One day's new-row count, used by the stat-card sparklines' growth series.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

@@ -41,6 +41,10 @@ import java.util.stream.Collectors;
  * <p>
  * These tools allow the model to query devices, drivers, and points (metrics) through the
  * existing facade interfaces.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Component

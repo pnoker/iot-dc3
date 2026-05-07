@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.common;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public interface Categories {
 
     public static final String OPCDAServer10 = "63D5F430-CFE4-11d1-B2C8-0060083BA1FB";

@@ -36,6 +36,7 @@ import java.util.List;
  * as soon as the application finishes starting.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Slf4j

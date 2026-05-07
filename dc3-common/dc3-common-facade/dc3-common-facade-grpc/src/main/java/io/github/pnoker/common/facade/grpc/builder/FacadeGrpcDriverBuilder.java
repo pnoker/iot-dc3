@@ -43,6 +43,7 @@ import java.util.Optional;
  * (unlike Device, which piggy-backs on {@code DEFAULT_INT = 0}).
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Component

@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.da;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public interface Constants extends org.openscada.opc.dcom.common.Constants {
 
     public static final String IOPCServer_IID = "39C13A4D-011E-11D0-9675-0020AFD8ADB3";

@@ -35,6 +35,10 @@ import java.util.Objects;
 /**
  * Default {@link DriverScheduleService} implementation that validates cron settings and
  * registers the built-in Quartz jobs required by the driver runtime.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Service

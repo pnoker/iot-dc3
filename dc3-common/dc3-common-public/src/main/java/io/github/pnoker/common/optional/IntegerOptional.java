@@ -23,11 +23,7 @@ import java.util.Objects;
 import java.util.function.IntConsumer;
 
 /**
- * Custom Integer Optional Class
- * <p>
- * Optional wrapper class for integer operations. Provides utility methods for null safety
- * and empty checks with consumer-based conditional operations.
- * </p>
+ * Optional wrapper for {@link Integer} with positive-value checks.
  *
  * @author pnoker
  * @version 2025.9.0

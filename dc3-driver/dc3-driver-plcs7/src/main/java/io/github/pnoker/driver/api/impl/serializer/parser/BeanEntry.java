@@ -25,6 +25,8 @@ import java.lang.reflect.Field;
  * A Bean-Entry
  *
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public final class BeanEntry {
 

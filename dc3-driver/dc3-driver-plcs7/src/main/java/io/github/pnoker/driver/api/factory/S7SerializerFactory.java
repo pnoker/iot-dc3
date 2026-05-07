@@ -25,6 +25,8 @@ import io.github.pnoker.driver.api.impl.serializer.S7SerializerImpl;
  * Factory for creating S7Serializer instances bound to a given connector.
  *
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public class S7SerializerFactory {
 

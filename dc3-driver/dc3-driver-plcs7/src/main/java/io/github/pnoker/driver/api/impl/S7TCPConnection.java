@@ -33,6 +33,8 @@ import java.net.Socket;
  * <a href="http://libnodave.sourceforge.net/">http://libnodave.sourceforge.net</a>
  *
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public final class S7TCPConnection extends S7BaseConnection {
 

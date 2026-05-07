@@ -31,6 +31,8 @@ import java.util.EnumSet;
  * A class implementing base browsing
  *
  * @author Jens Reimann
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 public class BaseBrowser {

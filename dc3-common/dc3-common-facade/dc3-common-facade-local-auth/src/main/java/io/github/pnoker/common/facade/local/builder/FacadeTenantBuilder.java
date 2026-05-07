@@ -27,6 +27,7 @@ import org.mapstruct.Mapper;
  * and therefore dropped by MapStruct.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})

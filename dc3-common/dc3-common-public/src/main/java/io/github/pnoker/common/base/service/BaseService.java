@@ -20,13 +20,10 @@ package io.github.pnoker.common.base.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
- * Base Service Interface
- * <p>
- * Generic service interface defining standard CRUD operations for entity management in
- * IoT DC3 platform. Provides common methods for create, read, update, and delete
- * operations.
- * </p>
+ * Generic CRUD service interface.
  *
+ * @param <B> Business object type
+ * @param <Q> Query object type
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0

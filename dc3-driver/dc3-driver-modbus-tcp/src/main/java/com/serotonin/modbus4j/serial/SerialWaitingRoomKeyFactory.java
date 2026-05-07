@@ -29,6 +29,7 @@ import com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory;
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
+ * @since 2022.1.0
  */
 public class SerialWaitingRoomKeyFactory implements WaitingRoomKeyFactory {
 

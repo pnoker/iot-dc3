@@ -23,11 +23,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 /**
- * Custom Collection Optional Class
- * <p>
- * Optional wrapper class for collection operations. Provides utility methods for
- * conditional operations on collections with null safety and empty checks.
- * </p>
+ * Optional wrapper for {@link java.util.Collection} with null/empty checks.
  *
  * @author pnoker
  * @version 2025.9.0

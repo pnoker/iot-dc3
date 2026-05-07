@@ -28,6 +28,7 @@ import java.util.List;
  * Configuration for the resource registrar.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Getter

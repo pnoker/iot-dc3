@@ -27,11 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Time Related Utility Class
- * <p>
- * Utility class for time-related operations and formatting. Provides thread-safe date
- * formatting and time calculation methods.
- * </p>
+ * Legacy {@link Date} formatting and time calculation with thread-safe formatters.
  *
  * @author pnoker
  * @version 2025.9.0

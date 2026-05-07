@@ -24,6 +24,7 @@ package io.github.pnoker.common.manager.constant;
  * place to look, and so controller + tests can share the same symbols.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.4
  */
 public final class TopologyLimits {

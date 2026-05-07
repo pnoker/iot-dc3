@@ -29,6 +29,12 @@ import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.OPCITEMDEF;
 import org.openscada.opc.dcom.da.OPCITEMRESULT;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCItemMgt extends BaseCOMObject {
 
     public OPCItemMgt(final IJIComObject opcGroup) throws JIException {

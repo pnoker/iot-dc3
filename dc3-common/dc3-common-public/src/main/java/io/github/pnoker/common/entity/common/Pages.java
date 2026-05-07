@@ -28,11 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Pagination Configuration Class
- * <p>
- * Configuration class for pagination parameters in IoT DC3 platform. Contains settings
- * for current page, page size, time range, and sorting options for data queries.
- * </p>
+ * Pagination parameters for data queries.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -30,6 +30,12 @@ import org.openscada.opc.dcom.da.OPCDATASOURCE;
 import org.openscada.opc.dcom.da.OPCITEMSTATE;
 import org.openscada.opc.dcom.da.WriteRequest;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCSyncIO extends BaseCOMObject {
 
     public OPCSyncIO(final IJIComObject opcSyncIO) throws JIException {

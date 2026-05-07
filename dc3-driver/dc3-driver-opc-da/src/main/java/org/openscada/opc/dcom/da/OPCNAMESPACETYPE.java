@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.da;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public enum OPCNAMESPACETYPE {
 
     OPC_NS_HIERARCHIAL(1), OPC_NS_FLAT(2), OPC_NS_UNKNOWN(0);

@@ -19,6 +19,12 @@ package org.openscada.opc.dcom.common;
 
 import java.util.ArrayList;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class ResultSet<T> extends ArrayList<Result<T>> {
 
     private static final long serialVersionUID = 1L;

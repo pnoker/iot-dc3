@@ -23,6 +23,10 @@ import lombok.ToString;
 
 /**
  * Per-service driver + device rollup.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

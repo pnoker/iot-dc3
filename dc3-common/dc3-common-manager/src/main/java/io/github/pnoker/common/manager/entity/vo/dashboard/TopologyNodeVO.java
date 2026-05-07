@@ -31,6 +31,7 @@ import java.util.List;
  * {@code "others:point:51"} → dialog for profile 51's cropped points).
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.4
  */
 @Getter

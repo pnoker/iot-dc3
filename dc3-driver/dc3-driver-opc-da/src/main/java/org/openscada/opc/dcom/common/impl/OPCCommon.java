@@ -24,6 +24,12 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCCommon extends BaseCOMObject {
 
     public OPCCommon(final IJIComObject opcObject) throws IllegalArgumentException, UnknownHostException, JIException {

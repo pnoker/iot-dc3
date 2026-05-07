@@ -34,6 +34,7 @@ import org.springframework.context.annotation.FilterType;
  * matches concrete implementations).
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @AutoConfiguration

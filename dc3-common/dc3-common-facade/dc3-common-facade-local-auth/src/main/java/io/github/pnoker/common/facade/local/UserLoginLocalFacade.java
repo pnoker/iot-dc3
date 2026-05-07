@@ -33,6 +33,7 @@ import java.util.Objects;
  * {@code selectByLoginName(name, false)}.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Slf4j

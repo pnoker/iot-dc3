@@ -27,11 +27,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
- * OkHttp Configuration Class
- * <p>
- * Configuration class for OkHttp client in Spring Boot applications. Configures
- * connection pool, timeouts, and retry settings for robust HTTP client operations.
- * </p>
+ * OkHttp client auto-configuration.
  *
  * @author pnoker
  * @version 2025.9.0

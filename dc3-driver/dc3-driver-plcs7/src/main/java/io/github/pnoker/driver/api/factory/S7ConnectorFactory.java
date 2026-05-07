@@ -25,6 +25,8 @@ import io.github.pnoker.driver.api.impl.S7TCPConnection;
  * Factory for creating S7 connector instances (TCP only).
  *
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public class S7ConnectorFactory {
 

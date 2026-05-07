@@ -41,6 +41,7 @@ import static io.github.pnoker.common.data.constant.DashboardLimits.*;
 
 /**
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.2
  */
 @Slf4j

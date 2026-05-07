@@ -28,6 +28,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
 /**
  * Spring environment post-processor that ensures the {@code driver} profile is always
  * active before driver beans are initialized.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Configuration

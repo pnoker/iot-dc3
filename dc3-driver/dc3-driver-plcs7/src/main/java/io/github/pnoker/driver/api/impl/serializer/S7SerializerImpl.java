@@ -30,6 +30,10 @@ import java.lang.reflect.Array;
 
 /**
  * The Class S7Serializer is responsible for serializing S7 TCP Connection
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 public final class S7SerializerImpl implements S7Serializer {

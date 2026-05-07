@@ -32,6 +32,10 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Configures the Spring AI ChatClient with tool registration and chat memory.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Configuration
 @EnableConfigurationProperties(AgenticProperties.class)

@@ -22,6 +22,12 @@ import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JIFrameworkHelper;
 import org.openscada.opc.dcom.common.EventHandler;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class EventHandlerImpl implements EventHandler {
 
     private String identifier = null;

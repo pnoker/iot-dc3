@@ -22,6 +22,12 @@ import org.jinterop.dcom.core.JIStruct;
 import org.jinterop.dcom.core.JIVariant;
 import org.openscada.opc.dcom.common.FILETIME;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCITEMSTATE {
 
     private int _clientHandle = 0;

@@ -21,6 +21,7 @@ package org.openscada.opc.dcom.list;
  * Details about an OPC server class
  *
  * @author Jens Reimann &lt;jens.reimann@th4-systems.com&gt;
+ * @version 2025.9.0
  * @since 0.1.8
  */
 public class ClassDetails {

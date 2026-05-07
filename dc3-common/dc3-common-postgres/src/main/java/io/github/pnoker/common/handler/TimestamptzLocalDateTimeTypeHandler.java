@@ -37,6 +37,10 @@ import java.time.OffsetDateTime;
  * {@link TimeConstant#DEFAULT_ZONEID}. Writes go out as {@link OffsetDateTime} anchored
  * to the same zone so round-trips are stable. This replaces MyBatis's built-in
  * {@code LocalDateTimeTypeHandler}.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @MappedTypes(LocalDateTime.class)
 public class TimestamptzLocalDateTimeTypeHandler extends BaseTypeHandler<LocalDateTime> {

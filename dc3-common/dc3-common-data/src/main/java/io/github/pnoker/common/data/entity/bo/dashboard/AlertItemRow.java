@@ -25,6 +25,10 @@ import java.time.LocalDateTime;
 
 /**
  * One raw event row from the paged / latest list.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

@@ -24,6 +24,12 @@ import org.jinterop.dcom.core.JIString;
 import org.jinterop.dcom.core.JIStruct;
 import org.openscada.opc.dcom.common.FILETIME;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCSERVERSTATUS {
 
     private FILETIME _startTime = null;

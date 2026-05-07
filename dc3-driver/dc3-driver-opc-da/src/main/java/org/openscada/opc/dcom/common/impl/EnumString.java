@@ -25,6 +25,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class EnumString extends BaseCOMObject {
 
     public static final int DEFAULT_BATCH_SIZE = Integer.getInteger("openscada.dcom.enum-batch-size", 10);

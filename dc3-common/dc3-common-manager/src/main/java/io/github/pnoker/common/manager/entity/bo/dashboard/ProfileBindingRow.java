@@ -23,6 +23,10 @@ import lombok.ToString;
 
 /**
  * One (profile, device) link from dc3_profile_bind — M:N edge in the topology.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

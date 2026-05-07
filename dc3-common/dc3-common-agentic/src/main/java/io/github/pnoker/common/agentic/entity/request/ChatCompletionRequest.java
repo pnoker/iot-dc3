@@ -26,8 +26,11 @@ import java.util.List;
 /**
  * OpenAI-compatible chat completion request body.
  *
+ * @author pnoker
+ * @version 2025.9.0
  * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API
  * Reference</a>
+ * @since 2022.1.0
  */
 @Getter
 @Setter

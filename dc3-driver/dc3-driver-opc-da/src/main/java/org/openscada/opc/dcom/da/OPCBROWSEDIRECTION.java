@@ -17,6 +17,12 @@
 
 package org.openscada.opc.dcom.da;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public enum OPCBROWSEDIRECTION {
 
     OPC_BROWSE_UP(1), OPC_BROWSE_DOWN(2), OPC_BROWSE_TO(3), OPC_BROWSE_UNKNOWN(0);

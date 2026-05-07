@@ -28,6 +28,7 @@ import java.text.MessageFormat;
  *
  * @author pnoker
  * @version 1.0.0
+ * @since 2022.1.0
  */
 public class ServiceException extends RuntimeException {
 
