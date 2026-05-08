@@ -19,7 +19,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { addRole, deleteRole, getRoleList, getRoleTree, updateRole } from '@/api/role';
-import { bindRoleResource, unbindRoleResource } from '@/api/roleResourceBind';
+import { addRoleResourceBind, deleteRoleResourceBind } from '@/api/roleResourceBind';
 import { timestampColumn } from '@/utils/DateUtil';
 import { successMessage } from '@/utils/NotificationUtil';
 
@@ -143,8 +143,8 @@ export default defineComponent({
     const onAssignResources = async (roleId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
       try {
         await Promise.all([
-          ...addIds.map((resourceId) => bindRoleResource({ roleId, resourceId })),
-          ...removeBindIds.map((id) => unbindRoleResource(id)),
+          ...addIds.map((resourceId) => addRoleResourceBind({ roleId, resourceId })),
+          ...removeBindIds.map((id) => deleteRoleResourceBind(id)),
         ]);
         successMessage(t('settings.role.assignSaved'));
         done();

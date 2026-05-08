@@ -19,17 +19,17 @@ import { API_AUTH_BASE } from '@/config/constant/api';
 import type { PageQuery } from '@/config/entity';
 import type { RoleResourceBindForm } from '@/config/entity/crud';
 
-export const bindRoleResource = (body: RoleResourceBindForm) => httpPost(`${API_AUTH_BASE}/role-resource/add`, body);
+export const addRoleResourceBind = (body: RoleResourceBindForm) => httpPost(`${API_AUTH_BASE}/role-resource/add`, body);
 
-export const unbindRoleResource = (id: string) => httpPost(`${API_AUTH_BASE}/role-resource/delete/${id}`);
+export const deleteRoleResourceBind = (id: string) => httpPost(`${API_AUTH_BASE}/role-resource/delete/${id}`);
 
 export const getRoleResourceList = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role-resource/list`, query);
 
-export const listResourceByRoleId = (roleId: string) =>
+export const getResourceListByRoleId = (roleId: string) =>
   httpGet(`${API_AUTH_BASE}/role-resource/list-resource-by-role/${roleId}`);
 
-export const listResourceByUserId = (userId: string) =>
+export const getResourceListByUserId = (userId: string) =>
   httpGet(`${API_AUTH_BASE}/role-resource/list-resource-by-user/${userId}`);
 
-export const listRoleByResourceId = (resourceId: string) =>
+export const getRoleListByResourceId = (resourceId: string) =>
   httpGet(`${API_AUTH_BASE}/role-resource/list-role-by-resource/${resourceId}`);

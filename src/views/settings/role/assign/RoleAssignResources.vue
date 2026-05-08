@@ -94,7 +94,7 @@
   import { useI18n } from 'vue-i18n';
 
   import { getResourceTree } from '@/api/resource';
-  import { getRoleResourceList, listResourceByRoleId } from '@/api/roleResourceBind';
+  import { getResourceListByRoleId, getRoleResourceList } from '@/api/roleResourceBind';
 
   interface ResourceNode {
     id: string;
@@ -278,7 +278,7 @@
     try {
       const [treeRes, ownRes, bindsRes] = await Promise.all([
         getResourceTree({}) as Promise<any>,
-        listResourceByRoleId(reactiveData.role.id) as Promise<any>,
+        getResourceListByRoleId(reactiveData.role.id) as Promise<any>,
         getRoleResourceList({ page: { size: 1000, current: 1 }, roleId: reactiveData.role.id }) as Promise<any>,
       ]);
 
