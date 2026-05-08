@@ -18,13 +18,18 @@
  * Shared CRUD entity types consumed by every src/api/*.ts module.
  *
  * Convention:
- *   - <Entity>Form   — shape sent to add/update endpoints (from form data).
+ *   - <Entity>Form   — shape sent to add/update endpoints (matches backend VO).
  *   - <Entity>Record — shape returned by list/detail endpoints.
  *   - Everything is optional to stay flexible with backend fields; strict
  *     required flags belong in view-layer FormRules, not API signatures.
+ *
+ * Backend reference: dc3-common-{auth,manager}/.../entity/vo/*VO.java
+ * All VOs extend BaseVO: id, remark, creatorId, creatorName, createTime,
+ * operatorId, operatorName, operateTime.
  */
 
 // ─── User ────────────────────────────────────────────────────────────
+// Backend: UserVO (dc3-common-auth)
 
 export interface UserForm {
   id?: string;
@@ -39,10 +44,11 @@ export interface UserForm {
 export interface UserRecord extends UserForm {
   id: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
 }
 
 // ─── Role ────────────────────────────────────────────────────────────
+// Backend: RoleVO (dc3-common-auth)
 
 export interface RoleForm {
   id?: string;
@@ -57,11 +63,13 @@ export interface RoleForm {
 export interface RoleRecord extends RoleForm {
   id: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
   children?: RoleRecord[];
 }
 
 // ─── Menu ────────────────────────────────────────────────────────────
+// Backend: MenuVO (dc3-common-auth)
+// MenuExt.content carries titles (zh/en), icon, url as a nested object.
 
 export interface MenuForm {
   id?: string;
@@ -71,23 +79,27 @@ export interface MenuForm {
   menuTypeFlag?: string;
   menuLevel?: string;
   menuIndex?: number;
-  titleZh?: string;
-  titleEn?: string;
-  icon?: string;
-  url?: string;
   enableFlag?: string;
   remark?: string;
+  menuExt?: {
+    content?: {
+      titles?: Record<string, string>;
+      icon?: string;
+      url?: string;
+    };
+  };
   [key: string]: unknown;
 }
 
 export interface MenuRecord extends MenuForm {
   id: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
   children?: MenuRecord[];
 }
 
 // ─── Resource ────────────────────────────────────────────────────────
+// Backend: ResourceVO (dc3-common-auth)
 
 export interface ResourceForm {
   id?: string;
@@ -95,6 +107,7 @@ export interface ResourceForm {
   resourceName?: string;
   resourceCode?: string;
   resourceTypeFlag?: string;
+  resourceScopeFlag?: string;
   entityId?: string | number;
   enableFlag?: string;
   remark?: string;
@@ -104,34 +117,46 @@ export interface ResourceForm {
 export interface ResourceRecord extends ResourceForm {
   id: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
   children?: ResourceRecord[];
 }
 
 // ─── Api ─────────────────────────────────────────────────────────────
+// Backend: ApiVO (dc3-common-auth)
+// ApiExt.content carries url, title, remark as a nested object.
 
 export interface ApiForm {
   id?: string;
   apiName?: string;
   apiCode?: string;
-  apiMethod?: string;
-  apiUrl?: string;
+  serviceName?: string;
+  apiTypeFlag?: string;
+  apiGroup?: string;
   enableFlag?: string;
   remark?: string;
+  apiExt?: {
+    content?: {
+      url?: string;
+      title?: string;
+      remark?: string;
+    };
+  };
   [key: string]: unknown;
 }
 
 export interface ApiRecord extends ApiForm {
   id: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
 }
 
 // ─── Device ──────────────────────────────────────────────────────────
+// Backend: DeviceVO (dc3-common-manager)
 
 export interface DeviceForm {
   id?: string;
   deviceName?: string;
+  deviceCode?: string;
   driverId?: string;
   profileIds?: string[];
   enableFlag?: string;
@@ -142,25 +167,32 @@ export interface DeviceForm {
 export interface DeviceRecord extends DeviceForm {
   id: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
 }
 
 // ─── Driver ──────────────────────────────────────────────────────────
+// Backend: DriverVO (dc3-common-manager)
 
 export interface DriverRecord {
   id: string;
   driverName?: string;
+  driverCode?: string;
+  serviceName?: string;
+  serviceHost?: string;
+  driverTypeFlag?: string;
   enableFlag?: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
   [key: string]: unknown;
 }
 
 // ─── Profile ─────────────────────────────────────────────────────────
+// Backend: ProfileVO (dc3-common-manager)
 
 export interface ProfileForm {
   id?: string;
   profileName?: string;
+  profileCode?: string;
   enableFlag?: string;
   remark?: string;
   [key: string]: unknown;
@@ -169,14 +201,19 @@ export interface ProfileForm {
 export interface ProfileRecord extends ProfileForm {
   id: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
 }
 
 // ─── Point ───────────────────────────────────────────────────────────
+// Backend: PointVO (dc3-common-manager)
 
 export interface PointForm {
   id?: string;
   pointName?: string;
+  pointCode?: string;
+  pointTypeFlag?: string;
+  profileId?: string;
+  unit?: string;
   enableFlag?: string;
   remark?: string;
   [key: string]: unknown;
@@ -185,28 +222,32 @@ export interface PointForm {
 export interface PointRecord extends PointForm {
   id: string;
   createTime?: string;
-  updateTime?: string;
+  operateTime?: string;
 }
 
-// ─── Driver/Point Attribute Info ─────────────────────────────────────
+// ─── Driver/Point Attribute Config ───────────────────────────────────
+// Backend: DriverAttributeConfigVO / PointAttributeConfigVO
+// These are per-device attribute configurations, not per-driver.
 
 export interface DriverInfoForm {
   id?: string;
-  driverId?: string;
+  deviceId?: string;
   attributeId?: string;
-  value?: string;
+  configValue?: string;
   [key: string]: unknown;
 }
 
 export interface PointInfoForm {
   id?: string;
+  deviceId?: string;
   pointId?: string;
   attributeId?: string;
-  value?: string;
+  configValue?: string;
   [key: string]: unknown;
 }
 
 // ─── Bind payloads ───────────────────────────────────────────────────
+// Backend: RoleUserBindVO / RoleResourceBindVO (dc3-common-auth)
 
 export interface RoleUserBindForm {
   roleId?: string;
