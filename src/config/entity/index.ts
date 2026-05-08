@@ -75,3 +75,25 @@ export interface Order {
   /** Sort direction (true for ascending, false for descending) */
   asc: boolean;
 }
+
+/**
+ * Shared pagination query shape used by all list endpoints.
+ * Page + optional sort orders + arbitrary query filters.
+ */
+export interface PageQuery {
+  page?: {
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: Order[];
+  };
+  [key: string]: unknown;
+}
+
+/**
+ * Generic paginated response from the backend.
+ */
+export interface PageResult<T = unknown> {
+  total: number;
+  records: T[];
+}
