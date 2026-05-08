@@ -73,15 +73,20 @@ export default defineComponent({
       });
     };
 
-    const profileUpdate = () => {
+    const profileUpdate = async (): Promise<boolean> => {
       const form = unref(formDataRef);
-      form?.validate((valid) => {
-        if (valid) {
-          updateProfile(reactiveData.profileFormData).then((res) => {
-            reactiveData.oldProfileFormData = { ...res.data };
-          });
-        }
-      });
+      if (!form) {
+        return false;
+      }
+
+      try {
+        await form.validate();
+        const res = await updateProfile(reactiveData.profileFormData);
+        reactiveData.oldProfileFormData = { ...res.data };
+        return true;
+      } catch {
+        return false;
+      }
     };
 
     const pre = () => {
@@ -89,9 +94,12 @@ export default defineComponent({
       changeActive(reactiveData.active);
     };
 
-    const next = () => {
+    const next = async () => {
       if (reactiveData.active === 0) {
-        profileUpdate();
+        const ok = await profileUpdate();
+        if (!ok) {
+          return;
+        }
       }
 
       reactiveData.active++;

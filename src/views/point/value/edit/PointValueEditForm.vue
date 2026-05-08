@@ -28,14 +28,14 @@
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
       <el-form-item :label="$t('pointValue.edit.pointValue')" prop="value">
         <el-input
-          v-model="formData.value"
+          v-model="reactiveData.formData.value"
           clearable
           :placeholder="$t('pointValue.edit.pointValuePlaceholder')"
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('pointValue.edit.description')" prop="remark">
         <el-input
-          v-model="reactiveData.remark"
+          v-model="reactiveData.formData.remark"
           clearable
           maxlength="300"
           :placeholder="$t('pointValue.edit.descriptionPlaceholder')"
@@ -54,7 +54,95 @@
   </el-dialog>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { reactive, ref, unref } from 'vue';
+  import type { PropType } from 'vue';
+  import type { FormInstance, FormRules } from 'element-plus';
+  import { useI18n } from 'vue-i18n';
+
+  import { successMessage } from '@/utils/NotificationUtil';
+
+  type PointValueFormData = Record<string, unknown> & { value?: string | number; remark?: string };
+
+  const props = defineProps({
+    formData: {
+      type: Object as PropType<PointValueFormData>,
+      default: () => ({}),
+    },
+  });
+
+  const emit = defineEmits<{
+    (e: 'update-thing', formData: PointValueFormData, done: () => void): void;
+  }>();
+
+  const { t } = useI18n();
+  const formDataRef = ref<FormInstance>();
+
+  const reactiveData = reactive({
+    formVisible: false,
+    formData: {} as PointValueFormData,
+  });
+
+  const formRule = reactive<FormRules>({
+    value: [
+      {
+        required: true,
+        message: t('pointValue.edit.valueRequired'),
+        trigger: 'blur',
+      },
+    ],
+    remark: [
+      {
+        max: 300,
+        message: t('common.remarkLength'),
+        trigger: 'blur',
+      },
+    ],
+  });
+
+  const syncFormData = () => {
+    reactiveData.formData = { ...props.formData };
+  };
+
+  const show = () => {
+    syncFormData();
+    reactiveData.formVisible = true;
+  };
+
+  const cancel = () => {
+    reactiveData.formVisible = false;
+  };
+
+  const reset = () => {
+    const form = unref(formDataRef);
+    form?.resetFields();
+  };
+
+  const updateThing = async () => {
+    const form = unref(formDataRef);
+    if (!form) {
+      return;
+    }
+
+    try {
+      await form.validate();
+      emit('update-thing', { ...reactiveData.formData }, () => {
+        cancel();
+        reset();
+        successMessage();
+      });
+    } catch {
+      // validation errors are displayed by Element Plus
+    }
+  };
+
+  defineExpose({
+    show,
+    cancel,
+    reset,
+    updateThing,
+  });
+</script>
 
 <style lang="scss" scoped>
   @use '@/styles/things-dialog.scss';

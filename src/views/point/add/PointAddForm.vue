@@ -105,7 +105,131 @@
   </el-dialog>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { reactive, ref, unref } from 'vue';
+  import type { FormInstance, FormRules } from 'element-plus';
+  import { useI18n } from 'vue-i18n';
+
+  import { successMessage } from '@/utils/NotificationUtil';
+  import { DECIMAL_PATTERN, nameRules, remarkRules } from '@/utils/FormRuleUtil';
+
+  interface PointAddFormData {
+    pointName?: string;
+    pointTypeFlag: string;
+    rwFlag: string;
+    baseValue: number;
+    multiple: number;
+    valueDecimal: number;
+    unit: string;
+    profileId: string;
+    remark?: string;
+  }
+
+  const props = withDefaults(
+    defineProps<{
+      profileId?: string;
+    }>(),
+    {
+      profileId: '',
+    }
+  );
+
+  const emit = defineEmits<{
+    (e: 'add-thing', formData: PointAddFormData, done: () => void): void;
+  }>();
+
+  const { t } = useI18n();
+  const formDataRef = ref<FormInstance>();
+
+  const reactiveData = reactive({
+    formData: {
+      pointTypeFlag: 'FLOAT',
+      rwFlag: 'R',
+      baseValue: 0,
+      multiple: 1,
+      valueDecimal: 3,
+      unit: '',
+      profileId: props.profileId,
+    } as PointAddFormData,
+    formVisible: false,
+  });
+
+  const formRule = reactive<FormRules>({
+    pointName: nameRules(t, '位号'),
+    pointTypeFlag: [
+      {
+        required: true,
+        message: t('point.add.dataTypeRequired'),
+        trigger: 'change',
+      },
+    ],
+    rwFlag: [
+      {
+        required: true,
+        message: t('point.add.rwTypeRequired'),
+        trigger: 'change',
+      },
+    ],
+    baseValue: [
+      {
+        pattern: DECIMAL_PATTERN,
+        message: t('point.add.baseValueFormat'),
+      },
+    ],
+    multiple: [
+      {
+        pattern: DECIMAL_PATTERN,
+        message: t('point.add.ratioFormat'),
+      },
+    ],
+    valueDecimal: [
+      {
+        required: true,
+        message: t('point.add.accuracyFormat'),
+        trigger: 'blur',
+      },
+    ],
+    remark: remarkRules(t),
+  });
+
+  const show = () => {
+    reactiveData.formVisible = true;
+  };
+
+  const cancel = () => {
+    reactiveData.formVisible = false;
+  };
+
+  const reset = () => {
+    const form = unref(formDataRef);
+    form?.resetFields();
+  };
+
+  const addThing = async () => {
+    const form = unref(formDataRef);
+    if (!form) {
+      return;
+    }
+
+    try {
+      await form.validate();
+      emit('add-thing', { ...reactiveData.formData }, () => {
+        cancel();
+        reset();
+        successMessage();
+      });
+    } catch {
+      // validation errors are displayed by Element Plus
+    }
+  };
+
+  defineExpose({
+    show,
+    cancel,
+    reset,
+    addThing,
+  });
+</script>
 
 <style lang="scss" scoped>
   @use '@/styles/things-dialog.scss';

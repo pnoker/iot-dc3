@@ -77,19 +77,20 @@ export default defineComponent({
         });
     };
 
-    const pointUpdate = () => {
+    const pointUpdate = async (): Promise<boolean> => {
       const form = unref(formDataRef);
-      form?.validate((valid) => {
-        if (valid) {
-          getPointUpdate(reactiveData.pointFormData)
-            .then((res) => {
-              reactiveData.oldPointFormData = { ...res.data };
-            })
-            .catch(() => {
-              // nothing to do
-            });
-        }
-      });
+      if (!form) {
+        return false;
+      }
+
+      try {
+        await form.validate();
+        const res = await getPointUpdate(reactiveData.pointFormData);
+        reactiveData.oldPointFormData = { ...res.data };
+        return true;
+      } catch {
+        return false;
+      }
     };
 
     const pre = () => {
@@ -97,9 +98,12 @@ export default defineComponent({
       changeActive(reactiveData.active);
     };
 
-    const next = () => {
+    const next = async () => {
       if (reactiveData.active === 0) {
-        pointUpdate();
+        const ok = await pointUpdate();
+        if (!ok) {
+          return;
+        }
       }
 
       reactiveData.active++;

@@ -95,7 +95,150 @@
   </el-dialog>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { reactive, ref, unref } from 'vue';
+  import type { FormInstance, FormRules } from 'element-plus';
+  import { useI18n } from 'vue-i18n';
+
+  import type { Dictionary } from '@/config/entity';
+
+  import { successMessage } from '@/utils/NotificationUtil';
+  import { nameRules, remarkRules } from '@/utils/FormRuleUtil';
+  import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
+
+  interface DeviceAddFormData {
+    deviceName: string;
+    driverId: string;
+    profileIds: string[];
+    remark: string;
+  }
+
+  interface DictionaryPage {
+    records: Dictionary[];
+  }
+
+  type DictionaryResponse = R<DictionaryPage>;
+
+  const emit = defineEmits<{
+    (e: 'add-thing', formData: DeviceAddFormData, done: () => void): void;
+  }>();
+
+  const { t } = useI18n();
+  const formDataRef = ref<FormInstance>();
+
+  const reactiveData = reactive({
+    formData: {
+      deviceName: '',
+      driverId: '',
+      profileIds: [],
+      remark: '',
+    } as DeviceAddFormData,
+    formVisible: false,
+    driverDictionary: [] as Dictionary[],
+    driverLoading: false,
+    profileDictionary: [] as Dictionary[],
+    profileLoading: false,
+  });
+
+  const formRule = reactive<FormRules>({
+    deviceName: nameRules(t, '设备'),
+    driverId: [
+      {
+        required: true,
+        message: () => t('device.add.driverRequired'),
+        trigger: 'change',
+      },
+    ],
+    remark: remarkRules(t),
+  });
+
+  const driverDictionary = async (query = '') => {
+    reactiveData.driverLoading = true;
+    try {
+      const res = await getDriverDictionary<DictionaryResponse>({
+        page: { size: 50, current: 1 },
+        label: query,
+      });
+      reactiveData.driverDictionary = res.data.records ?? [];
+    } catch {
+      // nothing to do
+    } finally {
+      reactiveData.driverLoading = false;
+    }
+  };
+
+  const driverDictionaryVisible = (visible: boolean) => {
+    if (visible) {
+      void driverDictionary();
+    }
+  };
+
+  const profileDictionary = async (query = '') => {
+    reactiveData.profileLoading = true;
+    try {
+      const res = await getProfileDictionary<DictionaryResponse>({
+        page: { size: 50, current: 1 },
+        label: query,
+      });
+      reactiveData.profileDictionary = res.data.records ?? [];
+    } catch {
+      // nothing to do
+    } finally {
+      reactiveData.profileLoading = false;
+    }
+  };
+
+  const profileDictionaryVisible = (visible: boolean) => {
+    if (visible) {
+      void profileDictionary();
+    }
+  };
+
+  const show = () => {
+    reactiveData.formVisible = true;
+  };
+
+  const cancel = () => {
+    reactiveData.formVisible = false;
+  };
+
+  const reset = () => {
+    const form = unref(formDataRef);
+    form?.resetFields();
+  };
+
+  const addThing = async () => {
+    const form = unref(formDataRef);
+    if (!form) {
+      return;
+    }
+
+    try {
+      await form.validate();
+      emit(
+        'add-thing',
+        {
+          ...reactiveData.formData,
+          profileIds: [...reactiveData.formData.profileIds],
+        },
+        () => {
+          cancel();
+          reset();
+          successMessage();
+        }
+      );
+    } catch {
+      // validation errors are displayed by Element Plus
+    }
+  };
+
+  defineExpose({
+    show,
+    cancel,
+    reset,
+    addThing,
+  });
+</script>
 
 <style lang="scss" scoped>
   @use '@/styles/things-dialog.scss';

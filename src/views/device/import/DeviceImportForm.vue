@@ -104,7 +104,190 @@
   </el-dialog>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { UploadFilled } from '@element-plus/icons-vue';
+  import type { UploadInstance, UploadProps, UploadRawFile, UploadRequestOptions } from 'element-plus';
+  import { genFileId } from 'element-plus';
+  import type { FormInstance, FormRules } from 'element-plus';
+  import { reactive, ref, unref } from 'vue';
+  import { useI18n } from 'vue-i18n';
+
+  import type { Dictionary } from '@/config/entity';
+
+  import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
+  import { successMessage } from '@/utils/NotificationUtil';
+
+  interface DictionaryPage {
+    records: Dictionary[];
+  }
+
+  interface DeviceImportFormData {
+    driverId: string;
+    profileIds: string[];
+    file?: UploadRawFile;
+  }
+
+  type DictionaryResponse = R<DictionaryPage>;
+
+  const emit = defineEmits<{
+    (e: 'import-template', formData: DeviceImportFormData, done: () => void): void;
+    (e: 'import-thing', formData: DeviceImportFormData, done: () => void): void;
+  }>();
+
+  const { t } = useI18n();
+  const formDataRef = ref<FormInstance>();
+  const formUploadRef = ref<UploadInstance>();
+
+  const reactiveData = reactive({
+    formData: {
+      driverId: '',
+      profileIds: [],
+    } as DeviceImportFormData,
+    formVisible: false,
+    formLoading: false,
+    driverDictionary: [] as Dictionary[],
+    driverLoading: false,
+    profileDictionary: [] as Dictionary[],
+    profileLoading: false,
+  });
+
+  const formRule = reactive<FormRules>({
+    driverId: [
+      {
+        required: true,
+        message: () => t('device.add.driverRequired'),
+        trigger: 'change',
+      },
+    ],
+    profileIds: [
+      {
+        required: true,
+        message: () => t('device.add.profileRequired'),
+        trigger: 'change',
+      },
+    ],
+  });
+
+  const driverDictionary = async (query = '') => {
+    reactiveData.driverLoading = true;
+    try {
+      const res = await getDriverDictionary<DictionaryResponse>({
+        page: { size: 50, current: 1 },
+        label: query,
+      });
+      reactiveData.driverDictionary = res.data.records ?? [];
+    } catch {
+      // nothing to do
+    } finally {
+      reactiveData.driverLoading = false;
+    }
+  };
+
+  const driverDictionaryVisible = (visible: boolean) => {
+    if (visible) {
+      void driverDictionary();
+    }
+  };
+
+  const profileDictionary = async (query = '') => {
+    reactiveData.profileLoading = true;
+    try {
+      const res = await getProfileDictionary<DictionaryResponse>({
+        page: { size: 50, current: 1 },
+        label: query,
+      });
+      reactiveData.profileDictionary = res.data.records ?? [];
+    } catch {
+      // nothing to do
+    } finally {
+      reactiveData.profileLoading = false;
+    }
+  };
+
+  const profileDictionaryVisible = (visible: boolean) => {
+    if (visible) {
+      void profileDictionary();
+    }
+  };
+
+  const show = () => {
+    reactiveData.formVisible = true;
+    reactiveData.formLoading = false;
+  };
+
+  const cancel = () => {
+    reactiveData.formVisible = false;
+    reactiveData.formLoading = false;
+  };
+
+  const reset = () => {
+    const form = unref(formDataRef);
+    form?.resetFields();
+    formUploadRef.value?.clearFiles();
+  };
+
+  const importTemplate = async () => {
+    const form = unref(formDataRef);
+    if (!form) {
+      return;
+    }
+
+    try {
+      await form.validate();
+      emit('import-template', { ...reactiveData.formData }, () => {
+        successMessage(t('device.import.templateSuccess'));
+      });
+    } catch {
+      // validation errors are displayed by Element Plus
+    }
+  };
+
+  const uploadRequest = (param: UploadRequestOptions): Promise<unknown> => {
+    emit(
+      'import-thing',
+      {
+        ...reactiveData.formData,
+        file: param.file as UploadRawFile,
+      },
+      () => {
+        cancel();
+        reset();
+        successMessage(t('device.import.importSuccess'));
+      }
+    );
+    return Promise.resolve();
+  };
+
+  const importThing = async () => {
+    const form = unref(formDataRef);
+    if (!form) {
+      return;
+    }
+
+    try {
+      await form.validate();
+      formUploadRef.value?.submit();
+      reactiveData.formLoading = true;
+    } catch {
+      // validation errors are displayed by Element Plus
+    }
+  };
+
+  const handleExceed: UploadProps['onExceed'] = (files) => {
+    formUploadRef.value?.clearFiles();
+    const file = files[0] as UploadRawFile;
+    file.uid = genFileId();
+    formUploadRef.value?.handleStart(file);
+  };
+
+  defineExpose({
+    show,
+    cancel,
+    reset,
+    importTemplate,
+    importThing,
+  });
+</script>
 
 <style lang="scss" scoped>
   @use '@/styles/things-dialog.scss';

@@ -54,7 +54,74 @@
   </el-dialog>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { reactive, ref, unref } from 'vue';
+  import type { FormInstance, FormRules } from 'element-plus';
+  import { useI18n } from 'vue-i18n';
+
+  import { successMessage } from '@/utils/NotificationUtil';
+  import { nameRules, remarkRules } from '@/utils/FormRuleUtil';
+
+  interface ProfileAddFormData {
+    profileName?: string;
+    remark?: string;
+  }
+
+  const emit = defineEmits<{
+    (e: 'add-thing', formData: ProfileAddFormData, done: () => void): void;
+  }>();
+
+  const { t } = useI18n();
+  const formDataRef = ref<FormInstance>();
+
+  const formRule = reactive<FormRules>({
+    profileName: nameRules(t, '模板'),
+    remark: remarkRules(t),
+  });
+
+  const reactiveData = reactive({
+    formData: {} as ProfileAddFormData,
+    formVisible: false,
+  });
+
+  const show = () => {
+    reactiveData.formVisible = true;
+  };
+
+  const cancel = () => {
+    reactiveData.formVisible = false;
+  };
+
+  const reset = () => {
+    const form = unref(formDataRef);
+    form?.resetFields();
+  };
+
+  const addThing = async () => {
+    const form = unref(formDataRef);
+    if (!form) {
+      return;
+    }
+
+    try {
+      await form.validate();
+      emit('add-thing', { ...reactiveData.formData }, () => {
+        cancel();
+        reset();
+        successMessage();
+      });
+    } catch {
+      // validation errors are displayed by Element Plus
+    }
+  };
+
+  defineExpose({
+    show,
+    cancel,
+    reset,
+    addThing,
+  });
+</script>
 
 <style lang="scss" scoped>
   @use '@/styles/things-dialog.scss';

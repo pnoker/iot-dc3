@@ -316,27 +316,33 @@ export default defineComponent({
         });
     };
 
-    const deviceUpdate = () => {
+    const deviceUpdate = async (): Promise<boolean> => {
       const form = unref(deviceFormRef);
-      form?.validate((valid) => {
-        if (valid) {
-          updateDevice(reactiveData.deviceFormData)
-            .then((res) => {
-              reactiveData.oldDeviceFormData = { ...res.data };
-            })
-            .catch(() => {
-              // nothing to do
-            });
-        }
-      });
+      if (!form) {
+        return false;
+      }
+
+      try {
+        await form.validate();
+        const res = await updateDevice(reactiveData.deviceFormData);
+        reactiveData.oldDeviceFormData = { ...res.data };
+        return true;
+      } catch {
+        return false;
+      }
     };
 
-    const driverUpdate = () => {
+    const driverUpdate = async (): Promise<boolean> => {
       const form = unref(driverFormRef);
-      form?.validate((valid) => {
-        if (valid) {
-          const driverFormData: Record<string, any> = {};
-          reactiveData.driverAttributes.forEach((attribute) => {
+      if (!form) {
+        return false;
+      }
+
+      try {
+        await form.validate();
+        const driverFormData: Record<string, unknown> = {};
+        await Promise.all(
+          reactiveData.driverAttributes.map((attribute) => {
             const driverInfo = {
               id: reactiveData.driverFormData[attribute.attributeCode].id,
               attributeId: attribute.id,
@@ -344,35 +350,36 @@ export default defineComponent({
               configValue: reactiveData.driverFormData[attribute.attributeCode].configValue,
             };
 
-            driverInfo.id
-              ? updateDriverInfo(driverInfo)
-                  .then(() => loadFormData(driverInfo))
-                  .catch(() => {
-                    // nothing to do
-                  })
-              : addDriverInfo(driverInfo)
-                  .then(() => loadFormData(driverInfo))
-                  .catch(() => {
-                    // nothing to do
-                  });
-
-            function loadFormData(res: { id: any; attributeId?: any; deviceId?: string; configValue: any }) {
-              driverFormData[attribute.attributeCode] = {
-                id: res.id,
-                configValue: res.configValue,
-              };
-              reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(driverFormData));
-            }
-          });
-        }
-      });
+            const persist = driverInfo.id ? updateDriverInfo(driverInfo) : addDriverInfo(driverInfo);
+            return persist
+              .then(() => {
+                driverFormData[attribute.attributeCode] = {
+                  id: driverInfo.id,
+                  configValue: driverInfo.configValue,
+                };
+                reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(driverFormData));
+              })
+              .catch(() => {
+                // nothing to do
+              });
+          })
+        );
+        return true;
+      } catch {
+        return false;
+      }
     };
 
-    const pointUpdate = () => {
+    const pointUpdate = async (): Promise<boolean> => {
       const form = unref(pointFormRef);
-      form?.validate((valid) => {
-        if (valid) {
-          reactiveData.pointAttributes.forEach((attribute) => {
+      if (!form) {
+        return false;
+      }
+
+      try {
+        await form.validate();
+        await Promise.all(
+          reactiveData.pointAttributes.map((attribute) => {
             const pointInfo = {
               id: reactiveData.pointFormData[attribute.attributeCode].id,
               attributeId: attribute.id,
@@ -381,39 +388,29 @@ export default defineComponent({
               configValue: reactiveData.pointFormData[attribute.attributeCode].configValue,
             };
 
-            pointInfo.id
-              ? updatePointInfo(pointInfo)
-                  .then(() => loadFormData(pointInfo))
-                  .catch(() => {
-                    // nothing to do
-                  })
-              : addPointInfo(pointInfo)
-                  .then(() => loadFormData(pointInfo))
-                  .catch(() => {
-                    // nothing to do
-                  });
-
-            function loadFormData(res: {
-              id: any;
-              attributeId?: any;
-              deviceId?: string;
-              pointId?: any;
-              configValue: any;
-            }) {
-              reactiveData.pointInfoData.forEach((pointInfo) => {
-                if (pointInfo.id === reactiveData.pointFormData.id) {
-                  pointInfo[attribute.attributeCode] = {
-                    id: res.id,
-                    configValue: res.configValue,
-                  };
-                  reactiveData.oldPointFormData = JSON.parse(JSON.stringify(pointInfo));
-                }
-                return pointInfo;
+            const persist = pointInfo.id ? updatePointInfo(pointInfo) : addPointInfo(pointInfo);
+            return persist
+              .then(() => {
+                reactiveData.pointInfoData.forEach((row) => {
+                  if (row.id === reactiveData.pointFormData.id) {
+                    row[attribute.attributeCode] = {
+                      id: pointInfo.id,
+                      configValue: pointInfo.configValue,
+                    };
+                    reactiveData.oldPointFormData = JSON.parse(JSON.stringify(row));
+                  }
+                  return row;
+                });
+              })
+              .catch(() => {
+                // nothing to do
               });
-            }
-          });
-        }
-      });
+          })
+        );
+        return true;
+      } catch {
+        return false;
+      }
     };
 
     const selectPoint = (row: { [x: string]: { id: null; configValue: string }; id: any }) => {
@@ -445,12 +442,18 @@ export default defineComponent({
       changeActive(reactiveData.active);
     };
 
-    const next = () => {
+    const next = async () => {
       if (reactiveData.active === 0) {
-        deviceUpdate();
+        const ok = await deviceUpdate();
+        if (!ok) {
+          return;
+        }
       }
       if (reactiveData.active === 1) {
-        driverUpdate();
+        const ok = await driverUpdate();
+        if (!ok) {
+          return;
+        }
       }
 
       let step = 1;

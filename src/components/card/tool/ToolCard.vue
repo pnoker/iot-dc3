@@ -116,11 +116,19 @@
   const { t } = useI18n();
   const formRef = ref<FormInstance>();
 
-  const search = () => {
+  const search = async () => {
     const form = unref(formRef);
-    form?.validate((valid) => {
-      if (valid) emit('search', props.formModel);
-    });
+    if (!form) {
+      emit('search', props.formModel);
+      return;
+    }
+
+    try {
+      await form.validate();
+      emit('search', props.formModel);
+    } catch {
+      // validation errors are displayed by Element Plus
+    }
   };
 
   const reset = () => {

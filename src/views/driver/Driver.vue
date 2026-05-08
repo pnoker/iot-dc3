@@ -43,6 +43,118 @@
   </div>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { computed, reactive } from 'vue';
+
+  import { getDriverList, getDriverStatus } from '@/api/driver';
+
+  import type { Order } from '@/config/entity';
+
+  import BlankCard from '@/components/card/blank/BlankCard.vue';
+  import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+  import DriverCard from './card/DriverCard.vue';
+  import DriverTool from './tool/DriverTool.vue';
+
+  interface DriverListItem {
+    id: string;
+    [key: string]: unknown;
+  }
+
+  interface DriverListPage {
+    total: number;
+    records: DriverListItem[];
+  }
+
+  interface DriverQuery extends Record<string, unknown> {
+    type: 'driver';
+  }
+
+  type DriverListResponse = R<DriverListPage>;
+  type DriverStatusResponse = R<Record<string, unknown>>;
+
+  const reactiveData = reactive({
+    loading: true,
+    statusTable: {} as Record<string, string>,
+    listData: [] as DriverListItem[],
+    query: {
+      type: 'driver',
+    } as DriverQuery,
+    order: false,
+    page: {
+      total: 0,
+      size: 12,
+      current: 1,
+      orders: [] as Order[],
+    },
+  });
+
+  const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
+
+  const list = () => {
+    const listPromise = getDriverList<DriverListResponse>({
+      page: reactiveData.page,
+      ...reactiveData.query,
+    })
+      .then((res) => {
+        const data = res.data;
+        reactiveData.page.total = data.total;
+        reactiveData.listData = data.records;
+      })
+      .catch(() => {
+        // nothing to do
+      });
+
+    const statusPromise = getDriverStatus({
+      page: reactiveData.page,
+      ...reactiveData.query,
+    })
+      .then((res: DriverStatusResponse) => {
+        reactiveData.statusTable = res.data as Record<string, string>;
+      })
+      .catch(() => {
+        // nothing to do
+      });
+
+    Promise.all([listPromise, statusPromise]).finally(() => {
+      reactiveData.loading = false;
+    });
+  };
+
+  const search = (params: Record<string, unknown>) => {
+    reactiveData.query = { ...params, type: 'driver' };
+    list();
+  };
+
+  const reset = () => {
+    reactiveData.query = { type: 'driver' };
+    list();
+  };
+
+  const refresh = () => {
+    list();
+  };
+
+  const sort = () => {
+    reactiveData.order = !reactiveData.order;
+    if (reactiveData.order) {
+      reactiveData.page.orders = [{ column: 'create_time', asc: true }];
+    } else {
+      reactiveData.page.orders = [{ column: 'create_time', asc: false }];
+    }
+    list();
+  };
+
+  const sizeChange = (size: number) => {
+    reactiveData.page.size = size;
+    list();
+  };
+
+  const currentChange = (current: number) => {
+    reactiveData.page.current = current;
+    list();
+  };
+
+  list();
+</script>
 
 <style lang="scss" scoped></style>
