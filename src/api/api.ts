@@ -16,13 +16,15 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
+import type { PageQuery, PageResult } from '@/config/entity';
+import type { ApiForm, ApiRecord } from '@/config/entity/crud';
 
-export const addApi = (api: any) => httpPost(`${API_AUTH_BASE}/api/add`, api);
+export const addApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BASE}/api/add`, api);
 
 export const deleteApi = (id: string) => httpPost(`${API_AUTH_BASE}/api/delete/${id}`);
 
-export const updateApi = (api: any) => httpPost(`${API_AUTH_BASE}/api/update`, api);
+export const updateApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BASE}/api/update`, api);
 
-export const getApiById = (id: string) => httpGet(`${API_AUTH_BASE}/api/id/${id}`);
+export const getApiById = (id: string) => httpGet<R<ApiRecord>>(`${API_AUTH_BASE}/api/id/${id}`);
 
-export const getApiList = (query: any) => httpPost(`${API_AUTH_BASE}/api/list`, query);
+export const getApiList = (query: PageQuery) => httpPost<R<PageResult<ApiRecord>>>(`${API_AUTH_BASE}/api/list`, query);

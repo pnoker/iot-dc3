@@ -16,15 +16,18 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
+import type { PageQuery, PageResult } from '@/config/entity';
+import type { MenuForm, MenuRecord } from '@/config/entity/crud';
 
-export const addMenu = (menu: any) => httpPost(`${API_AUTH_BASE}/menu/add`, menu);
+export const addMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/add`, menu);
 
 export const deleteMenu = (id: string) => httpPost(`${API_AUTH_BASE}/menu/delete/${id}`);
 
-export const updateMenu = (menu: any) => httpPost(`${API_AUTH_BASE}/menu/update`, menu);
+export const updateMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/update`, menu);
 
 export const getMenuById = (id: string) => httpGet(`${API_AUTH_BASE}/menu/id/${id}`);
 
-export const getMenuList = (query: any) => httpPost(`${API_AUTH_BASE}/menu/list`, query);
+export const getMenuList = <T = R<PageResult<MenuRecord>>>(query: PageQuery) =>
+  httpPost<T>(`${API_AUTH_BASE}/menu/list`, query);
 
-export const getMenuTree = (query: any = {}) => httpPost(`${API_AUTH_BASE}/menu/tree`, query);
+export const getMenuTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/menu/tree`, query);

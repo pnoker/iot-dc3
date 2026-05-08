@@ -16,5 +16,6 @@
 
 import { httpPost } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
+import type { PageQuery } from '@/config/entity';
 
-export const getFlowsList = (flowsQuery: any) => httpPost(`${API_MANAGER_BASE}/ruleengine/flowsList`, flowsQuery);
+export const getFlowsList = (query: PageQuery) => httpPost(`${API_MANAGER_BASE}/ruleengine/flowsList`, query);

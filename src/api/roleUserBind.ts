@@ -16,12 +16,14 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
+import type { PageQuery } from '@/config/entity';
+import type { RoleUserBindForm } from '@/config/entity/crud';
 
-export const bindRoleUser = (body: any) => httpPost(`${API_AUTH_BASE}/role-user/add`, body);
+export const bindRoleUser = (body: RoleUserBindForm) => httpPost(`${API_AUTH_BASE}/role-user/add`, body);
 
 export const unbindRoleUser = (id: string) => httpPost(`${API_AUTH_BASE}/role-user/delete/${id}`);
 
-export const getRoleUserList = (query: any) => httpPost(`${API_AUTH_BASE}/role-user/list`, query);
+export const getRoleUserList = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role-user/list`, query);
 
 export const listRoleByUserId = (userId: string, tenantId?: string | number) => {
   // Only append numeric tenantId; string tenant names would cause Long type-mismatch on the backend.

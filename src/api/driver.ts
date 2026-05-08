@@ -16,11 +16,16 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
+import type { PageQuery, PageResult } from '@/config/entity';
+import type { DriverRecord } from '@/config/entity/crud';
 
-export const getDriverById = (id: string) => httpGet(`${API_MANAGER_BASE}/driver/id/${id}`);
+export const getDriverById = (id: string) => httpGet<R<DriverRecord>>(`${API_MANAGER_BASE}/driver/id/${id}`);
 
-export const getDriverByIds = (driverIds: any) => httpPost(`${API_MANAGER_BASE}/driver/ids`, driverIds);
+export const getDriverByIds = (driverIds: string[]) =>
+  httpPost<R<Record<string, DriverRecord>>>(`${API_MANAGER_BASE}/driver/ids`, driverIds);
 
-export const getDriverList = <T = R>(driver: unknown) => httpPost<T>(`${API_MANAGER_BASE}/driver/list`, driver);
+export const getDriverList = <T = R<PageResult<DriverRecord>>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/driver/list`, query);
 
-export const getDriverStatus = (driver: any) => httpPost(`${API_DATA_BASE}/driver/status/driver`, driver);
+export const getDriverStatus = (query: Record<string, unknown>) =>
+  httpPost(`${API_DATA_BASE}/driver/status/driver`, query);

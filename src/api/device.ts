@@ -16,25 +16,31 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
+import type { PageQuery, PageResult } from '@/config/entity';
+import type { DeviceForm, DeviceRecord } from '@/config/entity/crud';
 
-export const addDevice = (device: unknown) => httpPost(`${API_MANAGER_BASE}/device/add`, device);
+export const addDevice = (device: DeviceForm) => httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/add`, device);
 
 export const deleteDevice = (id: string) => httpPost(`${API_MANAGER_BASE}/device/delete/${id}`);
 
-export const updateDevice = (device: unknown) => httpPost(`${API_MANAGER_BASE}/device/update`, device);
+export const updateDevice = (device: DeviceForm) =>
+  httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/update`, device);
 
-export const getDeviceById = (id: string) => httpGet(`${API_MANAGER_BASE}/device/id/${id}`);
+export const getDeviceById = (id: string) => httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/id/${id}`);
 
-export const getDeviceByIds = (deviceIds: any) => httpPost(`${API_MANAGER_BASE}/device/ids`, deviceIds);
+export const getDeviceByIds = (deviceIds: string[]) =>
+  httpPost<R<Record<string, DeviceRecord>>>(`${API_MANAGER_BASE}/device/ids`, deviceIds);
 
 export const getDeviceByDriverId = (driverId: string) => httpGet(`${API_MANAGER_BASE}/device/driver_id/${driverId}`);
 
 export const getDeviceByProfileId = (profileId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/profile_id/${profileId}`);
 
-export const getDeviceList = <T = R>(device: unknown) => httpPost<T>(`${API_MANAGER_BASE}/device/list`, device);
+export const getDeviceList = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
 
-export const getDeviceStatus = (device: any) => httpPost(`${API_DATA_BASE}/device/status/device`, device);
+export const getDeviceStatus = (query: Record<string, unknown>) =>
+  httpPost(`${API_DATA_BASE}/device/status/device`, query);
 
 export const getDeviceStatusByDriverId = (driverId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/device/driver_id/${driverId}`);
@@ -42,10 +48,10 @@ export const getDeviceStatusByDriverId = (driverId: string) =>
 export const getDeviceStatusByProfileId = (profileId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/device/profile_id/${profileId}`);
 
-export const importDeviceTemplate = (device: any) =>
+export const importDeviceTemplate = (device: Record<string, unknown>) =>
   httpPost(`${API_MANAGER_BASE}/device/export/import_template`, device, { responseType: 'blob' });
 
-export const importDevice = (device: any) =>
+export const importDevice = (device: Record<string, unknown>) =>
   httpPost(`${API_MANAGER_BASE}/device/import`, device, {
     timeout: 0,
     headers: { 'Content-Type': 'multipart/form-data' },

@@ -16,17 +16,23 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
+import type { PageQuery, PageResult } from '@/config/entity';
+import type { ProfileForm, ProfileRecord } from '@/config/entity/crud';
 
-export const addProfile = (profile: any) => httpPost(`${API_MANAGER_BASE}/profile/add`, profile);
+export const addProfile = (profile: ProfileForm) =>
+  httpPost<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/add`, profile);
 
 export const deleteProfile = (id: string) => httpPost(`${API_MANAGER_BASE}/profile/delete/${id}`);
 
-export const updateProfile = (profile: any) => httpPost(`${API_MANAGER_BASE}/profile/update`, profile);
+export const updateProfile = (profile: ProfileForm) =>
+  httpPost<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/update`, profile);
 
-export const getProfileById = (id: string) => httpGet(`${API_MANAGER_BASE}/profile/id/${id}`);
+export const getProfileById = (id: string) => httpGet<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/id/${id}`);
 
-export const getProfileByIds = (profileIds: any) => httpPost(`${API_MANAGER_BASE}/profile/ids`, profileIds);
+export const getProfileByIds = (profileIds: string[]) =>
+  httpPost<R<Record<string, ProfileRecord>>>(`${API_MANAGER_BASE}/profile/ids`, profileIds);
 
 export const getProfileByDeviceId = (deviceId: string) => httpGet(`${API_MANAGER_BASE}/profile/device_id/${deviceId}`);
 
-export const getProfileList = <T = R>(profile: unknown) => httpPost<T>(`${API_MANAGER_BASE}/profile/list`, profile);
+export const getProfileList = <T = R<PageResult<ProfileRecord>>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/profile/list`, query);

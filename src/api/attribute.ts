@@ -16,9 +16,10 @@
 
 import { httpGet } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
+import type { Attribute } from '@/config/entity';
 
 export const getDriverAttributeByDriverId = (id: string) =>
-  httpGet(`${API_MANAGER_BASE}/driver_attribute/driver_id/${id}`);
+  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/driver_attribute/driver_id/${id}`);
 
 export const getPointAttributeByDriverId = (id: string) =>
-  httpGet(`${API_MANAGER_BASE}/point_attribute/driver_id/${id}`);
+  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/point_attribute/driver_id/${id}`);

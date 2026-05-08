@@ -16,15 +16,18 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
+import type { PageQuery, PageResult } from '@/config/entity';
+import type { ResourceForm, ResourceRecord } from '@/config/entity/crud';
 
-export const addResource = (resource: any) => httpPost(`${API_AUTH_BASE}/resource/add`, resource);
+export const addResource = (resource: ResourceForm) => httpPost(`${API_AUTH_BASE}/resource/add`, resource);
 
 export const deleteResource = (id: string) => httpPost(`${API_AUTH_BASE}/resource/delete/${id}`);
 
-export const updateResource = (resource: any) => httpPost(`${API_AUTH_BASE}/resource/update`, resource);
+export const updateResource = (resource: ResourceForm) => httpPost(`${API_AUTH_BASE}/resource/update`, resource);
 
 export const getResourceById = (id: string) => httpGet(`${API_AUTH_BASE}/resource/id/${id}`);
 
-export const getResourceList = (query: any) => httpPost(`${API_AUTH_BASE}/resource/list`, query);
+export const getResourceList = <T = R<PageResult<ResourceRecord>>>(query: PageQuery) =>
+  httpPost<T>(`${API_AUTH_BASE}/resource/list`, query);
 
-export const getResourceTree = (query: any = {}) => httpPost(`${API_AUTH_BASE}/resource/tree`, query);
+export const getResourceTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/resource/tree`, query);

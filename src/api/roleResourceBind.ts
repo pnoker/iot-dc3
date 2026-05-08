@@ -16,12 +16,14 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
+import type { PageQuery } from '@/config/entity';
+import type { RoleResourceBindForm } from '@/config/entity/crud';
 
-export const bindRoleResource = (body: any) => httpPost(`${API_AUTH_BASE}/role-resource/add`, body);
+export const bindRoleResource = (body: RoleResourceBindForm) => httpPost(`${API_AUTH_BASE}/role-resource/add`, body);
 
 export const unbindRoleResource = (id: string) => httpPost(`${API_AUTH_BASE}/role-resource/delete/${id}`);
 
-export const getRoleResourceList = (query: any) => httpPost(`${API_AUTH_BASE}/role-resource/list`, query);
+export const getRoleResourceList = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role-resource/list`, query);
 
 export const listResourceByRoleId = (roleId: string) =>
   httpGet(`${API_AUTH_BASE}/role-resource/list-resource-by-role/${roleId}`);

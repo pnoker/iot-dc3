@@ -16,11 +16,12 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
+import type { DriverInfoForm, PointInfoForm } from '@/config/entity/crud';
 
-export const addDriverInfo = (driverInfo: any) =>
+export const addDriverInfo = (driverInfo: DriverInfoForm) =>
   httpPost(`${API_MANAGER_BASE}/driver_attribute_config/add`, driverInfo);
 
-export const updateDriverInfo = (driverInfo: any) =>
+export const updateDriverInfo = (driverInfo: DriverInfoForm) =>
   httpPost(`${API_MANAGER_BASE}/driver_attribute_config/update`, driverInfo);
 
 export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attributeId: string) =>
@@ -29,9 +30,10 @@ export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attribut
 export const getDriverInfoByDeviceId = (deviceId: string) =>
   httpGet(`${API_MANAGER_BASE}/driver_attribute_config/device_id/${deviceId}`);
 
-export const addPointInfo = (pointInfo: any) => httpPost(`${API_MANAGER_BASE}/point_attribute_config/add`, pointInfo);
+export const addPointInfo = (pointInfo: PointInfoForm) =>
+  httpPost(`${API_MANAGER_BASE}/point_attribute_config/add`, pointInfo);
 
-export const updatePointInfo = (pointInfo: any) =>
+export const updatePointInfo = (pointInfo: PointInfoForm) =>
   httpPost(`${API_MANAGER_BASE}/point_attribute_config/update`, pointInfo);
 
 export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: string) =>

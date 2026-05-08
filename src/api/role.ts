@@ -16,15 +16,18 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
+import type { PageQuery, PageResult } from '@/config/entity';
+import type { RoleForm, RoleRecord } from '@/config/entity/crud';
 
-export const addRole = (role: any) => httpPost(`${API_AUTH_BASE}/role/add`, role);
+export const addRole = (role: RoleForm) => httpPost(`${API_AUTH_BASE}/role/add`, role);
 
 export const deleteRole = (id: string) => httpPost(`${API_AUTH_BASE}/role/delete/${id}`);
 
-export const updateRole = (role: any) => httpPost(`${API_AUTH_BASE}/role/update`, role);
+export const updateRole = (role: RoleForm) => httpPost(`${API_AUTH_BASE}/role/update`, role);
 
 export const getRoleById = (id: string) => httpGet(`${API_AUTH_BASE}/role/id/${id}`);
 
-export const getRoleList = (query: any) => httpPost(`${API_AUTH_BASE}/role/list`, query);
+export const getRoleList = <T = R<PageResult<RoleRecord>>>(query: PageQuery) =>
+  httpPost<T>(`${API_AUTH_BASE}/role/list`, query);
 
-export const getRoleTree = (query: any = {}) => httpPost(`${API_AUTH_BASE}/role/tree`, query);
+export const getRoleTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/role/tree`, query);
