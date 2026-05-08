@@ -17,11 +17,14 @@
 import { httpPost } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
 
-export const getDriverDictionary = (dictionary: any) => httpPost(`${API_MANAGER_BASE}/dictionary/driver`, dictionary);
+export const getDriverDictionary = <T = R>(dictionary: unknown) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/driver`, dictionary);
 
-export const getDeviceDictionary = (dictionary: any) => httpPost(`${API_MANAGER_BASE}/dictionary/device`, dictionary);
+export const getDeviceDictionary = <T = R>(dictionary: unknown) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/device`, dictionary);
 
-export const getProfileDictionary = (dictionary: any) => httpPost(`${API_MANAGER_BASE}/dictionary/profile`, dictionary);
+export const getProfileDictionary = <T = R>(dictionary: unknown) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/profile`, dictionary);
 
-export const getPointDictionary = (dictionary: any) =>
-  httpPost(`${API_MANAGER_BASE}/dictionary/device_point`, dictionary);
+export const getPointDictionary = <T = R>(dictionary: unknown) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/device_point`, dictionary);

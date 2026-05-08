@@ -21,6 +21,6 @@ export const getDriverById = (id: string) => httpGet(`${API_MANAGER_BASE}/driver
 
 export const getDriverByIds = (driverIds: any) => httpPost(`${API_MANAGER_BASE}/driver/ids`, driverIds);
 
-export const getDriverList = (driver: any) => httpPost(`${API_MANAGER_BASE}/driver/list`, driver);
+export const getDriverList = <T = R>(driver: unknown) => httpPost<T>(`${API_MANAGER_BASE}/driver/list`, driver);
 
 export const getDriverStatus = (driver: any) => httpPost(`${API_DATA_BASE}/driver/status/driver`, driver);

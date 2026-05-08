@@ -28,6 +28,12 @@ import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtil';
 import { isNull } from '@/utils/ValidationUtil';
 import { md5 } from 'js-md5';
 
+interface LoginForm {
+  tenant: string;
+  name: string;
+  password: string;
+}
+
 export const useAuthStore = defineStore('auth', () => {
   // State
   const tenant = ref('default');
@@ -58,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
     removeStorage(AUTH_HEADERS.TOKEN);
   };
 
-  const login = async (form: any) => {
+  const login = async (form: LoginForm) => {
     const loading = ElLoading.service({
       lock: true,
       text: i18n.global.t('login.loading'),

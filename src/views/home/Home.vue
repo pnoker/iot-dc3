@@ -100,7 +100,305 @@
   </div>
 </template>
 
-<script lang="ts" src="./index.ts"></script>
+<script lang="ts" setup>
+  import { computed, onMounted, reactive } from 'vue';
+  import type { Component } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { useRouter } from 'vue-router';
+  import { Bell, List, Management, Promotion, TrendCharts, Warning } from '@element-plus/icons-vue';
+
+  import { getDeviceList } from '@/api/device';
+  import { getPointList } from '@/api/point';
+  import { getProfileList } from '@/api/profile';
+  import { getDriverList } from '@/api/driver';
+  import { alertStats, dailyGrowth, statsTimeseries, statsToday } from '@/api/dashboard';
+  import type {
+    AlertStatsSummary,
+    DailyGrowthSummary,
+    StatsTimeBucket,
+    StatsTodaySummary,
+  } from '@/config/entity/dashboard';
+
+  import StatCard from '@/components/card/stat/StatCard.vue';
+  import LiveDataFeed from './components/LiveDataFeed.vue';
+  import AnalyticsTabs from './components/AnalyticsTabs.vue';
+  import SlaBadge from './components/SlaBadge.vue';
+  import TopologySankey from './components/TopologySankey.vue';
+  import TrendChart from './components/TrendChart.vue';
+  import HomeBanner from './components/HomeBanner.vue';
+  import AlertList from './components/AlertList.vue';
+  import LatencyChart from './components/LatencyChart.vue';
+  import ActivityHeatmap from './components/ActivityHeatmap.vue';
+
+  type Tone = 'blue' | 'green' | 'orange' | 'purple' | 'red';
+
+  interface CardModel {
+    key: string;
+    title: string;
+    value: number | string;
+    subtitle: string;
+    icon: Component;
+    tone: Tone;
+    trend: { direction: 'up' | 'down' | 'flat'; label: string } | null;
+    sparkline: number[];
+    onClick: () => void;
+    onRefresh: () => Promise<void> | void;
+  }
+
+  interface HomeState {
+    driverCount: number;
+    deviceCount: number;
+    pointCount: number;
+    profileCount: number;
+    todayCount: number;
+    todayPercentChange: number;
+    todaySparkline: number[];
+    totalCount: number;
+    alertCount: number;
+    alertUnconfirmed: number;
+    deviceAlertCount: number;
+    driverAlertCount: number;
+    deviceUnconfirmed: number;
+    driverUnconfirmed: number;
+    todayDeviceAlarms: number;
+    todayDriverAlarms: number;
+    todayDeviceUnconfirmed: number;
+    todayDriverUnconfirmed: number;
+    driverSparkline: number[];
+    deviceSparkline: number[];
+    pointSparkline: number[];
+    alertSparkline: number[];
+  }
+
+  interface ListPageSummary {
+    total?: number;
+  }
+
+  type ListPageResponse = R<ListPageSummary>;
+
+  const { t } = useI18n();
+  const router = useRouter();
+
+  const state = reactive<HomeState>({
+    driverCount: 0,
+    deviceCount: 0,
+    pointCount: 0,
+    profileCount: 0,
+    todayCount: 0,
+    todayPercentChange: 0,
+    todaySparkline: [],
+    totalCount: 0,
+    alertCount: 0,
+    alertUnconfirmed: 0,
+    deviceAlertCount: 0,
+    driverAlertCount: 0,
+    deviceUnconfirmed: 0,
+    driverUnconfirmed: 0,
+    todayDeviceAlarms: 0,
+    todayDriverAlarms: 0,
+    todayDeviceUnconfirmed: 0,
+    todayDriverUnconfirmed: 0,
+    driverSparkline: [],
+    deviceSparkline: [],
+    pointSparkline: [],
+    alertSparkline: [],
+  });
+
+  const emptyPage = { current: 1, size: 1 };
+  const toNumber = (value: number | string | null | undefined) => Number(value) || 0;
+  const toNumberArray = (values: Array<number | string | null | undefined>) => values.map((value) => toNumber(value));
+  const getSettledTotal = (result: PromiseSettledResult<ListPageResponse>) =>
+    result.status === 'fulfilled' ? toNumber(result.value.data.total) : 0;
+
+  const loadTotals = async () => {
+    const [driverRes, deviceRes, pointRes, profileRes] = await Promise.allSettled([
+      getDriverList<ListPageResponse>({ page: emptyPage }),
+      getDeviceList<ListPageResponse>({ page: emptyPage }),
+      getPointList<ListPageResponse>({ page: emptyPage }),
+      getProfileList<ListPageResponse>({ page: emptyPage }),
+    ]);
+
+    state.driverCount = getSettledTotal(driverRes);
+    state.deviceCount = getSettledTotal(deviceRes);
+    state.pointCount = getSettledTotal(pointRes);
+    state.profileCount = getSettledTotal(profileRes);
+  };
+
+  const loadToday = async () => {
+    try {
+      const res = await statsToday();
+      const data: StatsTodaySummary = res.data;
+      state.todayCount = toNumber(data.today);
+      state.todayPercentChange = toNumber(data.percentChange);
+      state.totalCount = toNumber(data.total);
+    } catch {
+      // handled globally
+    }
+  };
+
+  const loadSparkline = async () => {
+    try {
+      const res = await statsTimeseries({ granularity: 'hour', rangeKey: '24h' });
+      const buckets: StatsTimeBucket[] = res.data;
+      state.todaySparkline = buckets.map((bucket) => toNumber(bucket.count));
+    } catch {
+      // handled globally
+    }
+  };
+
+  const loadAlerts = async () => {
+    try {
+      const res = await alertStats();
+      const data: AlertStatsSummary = res.data;
+      state.alertCount = toNumber(data.total);
+      state.alertUnconfirmed = toNumber(data.unconfirmed);
+      state.deviceAlertCount = toNumber(data.deviceAlerts);
+      state.driverAlertCount = toNumber(data.driverAlerts);
+      state.deviceUnconfirmed = toNumber(data.deviceUnconfirmed);
+      state.driverUnconfirmed = toNumber(data.driverUnconfirmed);
+      state.todayDeviceAlarms = toNumber(data.todayDeviceAlarms);
+      state.todayDriverAlarms = toNumber(data.todayDriverAlarms);
+      state.todayDeviceUnconfirmed = toNumber(data.todayDeviceUnconfirmed);
+      state.todayDriverUnconfirmed = toNumber(data.todayDriverUnconfirmed);
+      state.alertSparkline = toNumberArray(data.sparkline24h ?? []);
+    } catch {
+      // handled globally
+    }
+  };
+
+  const loadGrowth = async () => {
+    try {
+      const res = await dailyGrowth(7);
+      const data: DailyGrowthSummary = res.data;
+      state.driverSparkline = toNumberArray(data.driver ?? []);
+      state.deviceSparkline = toNumberArray(data.device ?? []);
+      state.pointSparkline = toNumberArray(data.point ?? []);
+    } catch {
+      // handled globally
+    }
+  };
+
+  onMounted(() => {
+    void loadTotals();
+    void loadToday();
+    void loadSparkline();
+    void loadAlerts();
+    void loadGrowth();
+  });
+
+  const percentTrend = computed(() => {
+    const percent = state.todayPercentChange;
+    if (percent > 0) {
+      return { direction: 'up' as const, label: `${percent}% ${t('home.vsYesterday')}` };
+    }
+    if (percent < 0) {
+      return { direction: 'down' as const, label: `${percent}% ${t('home.vsYesterday')}` };
+    }
+    return { direction: 'flat' as const, label: `0% ${t('home.vsYesterday')}` };
+  });
+
+  const refreshDriver = async () => {
+    await Promise.all([loadTotals(), loadGrowth()]);
+  };
+  const refreshDevice = refreshDriver;
+  const refreshPoint = refreshDriver;
+  const refreshData = async () => {
+    await Promise.all([loadToday(), loadSparkline()]);
+  };
+  const refreshAlert = loadAlerts;
+
+  const sparkTrend = (spark: number[]): { direction: 'up' | 'down' | 'flat'; label: string } | null => {
+    if (spark.length < 2) {
+      return null;
+    }
+
+    const previous = spark[spark.length - 2] ?? 0;
+    const current = spark[spark.length - 1] ?? 0;
+    const diff = current - previous;
+    if (diff > 0) {
+      return { direction: 'up', label: `+${diff}` };
+    }
+    if (diff < 0) {
+      return { direction: 'down', label: `${diff}` };
+    }
+    return { direction: 'flat', label: '0' };
+  };
+
+  const cards = computed<CardModel[]>(() => [
+    {
+      key: 'driver',
+      title: t('home.driverCount'),
+      value: state.driverCount,
+      subtitle: t('home.entityAlarms', { n: state.driverAlertCount }),
+      icon: Promotion,
+      tone: 'blue',
+      trend: sparkTrend(state.driverSparkline),
+      sparkline: state.driverSparkline,
+      onClick: () => router.push({ name: 'driver' }),
+      onRefresh: refreshDriver,
+    },
+    {
+      key: 'device',
+      title: t('home.deviceCount'),
+      value: state.deviceCount,
+      subtitle: t('home.entityAlarms', { n: state.deviceAlertCount }),
+      icon: Management,
+      tone: 'purple',
+      trend: sparkTrend(state.deviceSparkline),
+      sparkline: state.deviceSparkline,
+      onClick: () => router.push({ name: 'device' }),
+      onRefresh: refreshDevice,
+    },
+    {
+      key: 'point',
+      title: t('home.pointCount'),
+      value: state.pointCount,
+      subtitle: t('home.pointsAcrossProfiles', { n: state.profileCount }),
+      icon: List,
+      tone: 'orange',
+      trend: sparkTrend(state.pointSparkline),
+      sparkline: state.pointSparkline,
+      onClick: () => router.push({ name: 'profile' }),
+      onRefresh: refreshPoint,
+    },
+    {
+      key: 'data',
+      title: t('home.todayData'),
+      value: state.todayCount,
+      subtitle: state.totalCount > 0 ? t('home.todayTotal', { n: state.totalCount }) : '',
+      icon: TrendCharts,
+      tone: 'green',
+      trend: percentTrend.value,
+      sparkline: state.todaySparkline,
+      onClick: () => router.push({ name: 'pointValue' }),
+      onRefresh: refreshData,
+    },
+    {
+      key: 'alert',
+      title: t('home.driverAlarms'),
+      value: state.todayDriverAlarms,
+      subtitle: t('home.alertUnconfirmed', { n: state.todayDriverUnconfirmed }),
+      icon: Bell,
+      tone: 'red',
+      trend: sparkTrend(state.alertSparkline),
+      sparkline: state.alertSparkline,
+      onClick: () => router.push({ name: 'settingsDriverEvent' }),
+      onRefresh: refreshAlert,
+    },
+    {
+      key: 'deviceAlert',
+      title: t('home.deviceAlarms'),
+      value: state.todayDeviceAlarms,
+      subtitle: t('home.alertUnconfirmed', { n: state.todayDeviceUnconfirmed }),
+      icon: Warning,
+      tone: 'orange',
+      trend: sparkTrend(state.alertSparkline),
+      sparkline: state.alertSparkline,
+      onClick: () => router.push({ name: 'settingsDeviceEvent' }),
+      onRefresh: refreshAlert,
+    },
+  ]);
+</script>
 
 <style lang="scss" scoped>
   .home {

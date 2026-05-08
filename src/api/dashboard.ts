@@ -18,24 +18,28 @@ import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 import type {
   AlertPageQuery,
+  AlertStatsSummary,
   AlertSource,
+  DailyGrowthSummary,
   Granularity,
+  StatsTimeBucket,
+  StatsTodaySummary,
   TimeRangeParams,
   TopDimension,
   TopologyMode,
 } from '@/config/entity/dashboard';
 
-export const statsToday = () => httpGet(`${API_DATA_BASE}/dashboard/stats/today`);
+export const statsToday = () => httpGet<R<StatsTodaySummary>>(`${API_DATA_BASE}/dashboard/stats/today`);
 
 export const statsTimeseries = (params: TimeRangeParams & { granularity?: Granularity } = {}) =>
-  httpGet(`${API_DATA_BASE}/dashboard/stats/timeseries`, { params });
+  httpGet<R<StatsTimeBucket[]>>(`${API_DATA_BASE}/dashboard/stats/timeseries`, { params });
 
 export const statsTop = (params: TimeRangeParams & { dimension?: TopDimension; limit?: number } = {}) =>
   httpGet(`${API_DATA_BASE}/dashboard/top`, { params });
 
 export const streamLatest = (size = 20) => httpGet(`${API_DATA_BASE}/dashboard/stream`, { params: { size } });
 
-export const alertStats = () => httpGet(`${API_DATA_BASE}/dashboard/alert/stats`);
+export const alertStats = () => httpGet<R<AlertStatsSummary>>(`${API_DATA_BASE}/dashboard/alert/stats`);
 
 export const alertLatest = (size = 10) => httpGet(`${API_DATA_BASE}/dashboard/alert/latest`, { params: { size } });
 
@@ -47,7 +51,8 @@ export const statsActivity = (params: TimeRangeParams = { rangeKey: '7d' }) =>
 
 export const systemHealth = () => httpGet(`${API_DATA_BASE}/dashboard/system/health`);
 
-export const dailyGrowth = (days = 7) => httpGet(`${API_MANAGER_BASE}/dashboard/growth`, { params: { days } });
+export const dailyGrowth = (days = 7) =>
+  httpGet<R<DailyGrowthSummary>>(`${API_MANAGER_BASE}/dashboard/growth`, { params: { days } });
 
 export const alertPage = (body: AlertPageQuery = {}) => httpPost(`${API_DATA_BASE}/dashboard/alert/page`, body);
 

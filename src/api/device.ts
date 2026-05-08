@@ -17,11 +17,11 @@
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 
-export const addDevice = (device: any) => httpPost(`${API_MANAGER_BASE}/device/add`, device);
+export const addDevice = (device: unknown) => httpPost(`${API_MANAGER_BASE}/device/add`, device);
 
 export const deleteDevice = (id: string) => httpPost(`${API_MANAGER_BASE}/device/delete/${id}`);
 
-export const updateDevice = (device: any) => httpPost(`${API_MANAGER_BASE}/device/update`, device);
+export const updateDevice = (device: unknown) => httpPost(`${API_MANAGER_BASE}/device/update`, device);
 
 export const getDeviceById = (id: string) => httpGet(`${API_MANAGER_BASE}/device/id/${id}`);
 
@@ -32,7 +32,7 @@ export const getDeviceByDriverId = (driverId: string) => httpGet(`${API_MANAGER_
 export const getDeviceByProfileId = (profileId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/profile_id/${profileId}`);
 
-export const getDeviceList = (device: any) => httpPost(`${API_MANAGER_BASE}/device/list`, device);
+export const getDeviceList = <T = R>(device: unknown) => httpPost<T>(`${API_MANAGER_BASE}/device/list`, device);
 
 export const getDeviceStatus = (device: any) => httpPost(`${API_DATA_BASE}/device/status/device`, device);
 

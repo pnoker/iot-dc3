@@ -29,4 +29,4 @@ export const getProfileByIds = (profileIds: any) => httpPost(`${API_MANAGER_BASE
 
 export const getProfileByDeviceId = (deviceId: string) => httpGet(`${API_MANAGER_BASE}/profile/device_id/${deviceId}`);
 
-export const getProfileList = (profile: any) => httpPost(`${API_MANAGER_BASE}/profile/list`, profile);
+export const getProfileList = <T = R>(profile: unknown) => httpPost<T>(`${API_MANAGER_BASE}/profile/list`, profile);

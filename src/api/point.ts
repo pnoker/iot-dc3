@@ -27,7 +27,7 @@ export const getPointById = (id: string) => httpGet(`${API_MANAGER_BASE}/point/i
 
 export const getPointByIds = (pointIds: any) => httpPost(`${API_MANAGER_BASE}/point/ids`, pointIds);
 
-export const getPointList = (point: any) => httpPost(`${API_MANAGER_BASE}/point/list`, point);
+export const getPointList = <T = R>(point: unknown) => httpPost<T>(`${API_MANAGER_BASE}/point/list`, point);
 
 export const getPointUnit = (pointIds: any) => httpPost(`${API_MANAGER_BASE}/point/unit`, pointIds);
 

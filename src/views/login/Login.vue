@@ -82,6 +82,18 @@
 
   import Particles from '@/components/particles/particles.vue';
 
+  interface LoginFormModel {
+    tenant: string;
+    name: string;
+    password: string;
+  }
+
+  interface LoginViewState {
+    isHide: 'View' | 'Hide';
+    passwordType: '' | 'password';
+    formData: LoginFormModel;
+  }
+
   const { t } = useI18n();
   const authStore = useAuthStore();
   // 定义表单引用
@@ -90,12 +102,12 @@
   // 定义响应式数据
   const tenant = authStore.getTenant || 'default';
   const name = authStore.getName || 'dc3';
-  const reactiveData = reactive({
+  const reactiveData = reactive<LoginViewState>({
     isHide: 'View',
     passwordType: 'password',
     formData: {
-      tenant: tenant,
-      name: name,
+      tenant,
+      name,
       password: 'dc3dc3dc3',
     },
   });
@@ -117,11 +129,18 @@
   };
 
   // 登录
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const form = unref(formDataRef);
-    form?.validate((valid) => {
-      if (valid) authStore.login(reactiveData.formData);
-    });
+    if (!form) {
+      return;
+    }
+
+    try {
+      await form.validate();
+      await authStore.login(reactiveData.formData);
+    } catch {
+      // validation errors are displayed by Element Plus
+    }
   };
 </script>
 

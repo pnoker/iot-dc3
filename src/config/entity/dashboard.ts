@@ -179,3 +179,35 @@ export interface CoverageGap {
   missingPoints: number;
   items: CoverageGapItem[];
 }
+
+// ---- Home dashboard summaries ---------------------------------------
+
+export interface StatsTodaySummary {
+  today: number;
+  percentChange: number;
+  total: number;
+}
+
+export interface StatsTimeBucket {
+  count: number;
+}
+
+export interface AlertStatsSummary {
+  total: number;
+  unconfirmed: number;
+  deviceAlerts: number;
+  driverAlerts: number;
+  deviceUnconfirmed: number;
+  driverUnconfirmed: number;
+  todayDeviceAlarms: number;
+  todayDriverAlarms: number;
+  todayDeviceUnconfirmed: number;
+  todayDriverUnconfirmed: number;
+  sparkline24h: number[];
+}
+
+export interface DailyGrowthSummary {
+  driver: number[];
+  device: number[];
+  point: number[];
+}
