@@ -23,7 +23,7 @@ import { useI18n } from 'vue-i18n';
 import router from '@/config/router';
 import { useRoute } from 'vue-router';
 
-import { getPointById, getPointUpdate } from '@/api/point';
+import { getPointById, updatePoint } from '@/api/point';
 
 import pointList from '@/views/point/Point.vue';
 
@@ -85,7 +85,7 @@ export default defineComponent({
 
       try {
         await form.validate();
-        const res = await getPointUpdate(reactiveData.pointFormData);
+        const res = await updatePoint(reactiveData.pointFormData);
         reactiveData.oldPointFormData = { ...res.data };
         return true;
       } catch {

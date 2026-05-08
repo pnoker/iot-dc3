@@ -188,6 +188,7 @@ export default defineComponent({
             const profiles = res.data;
             for (const key in profiles) {
               const profile = profiles[key];
+              if (!profile) continue;
               reactiveData.profileDictionary.push({
                 label: profile.profileName,
                 value: profile.id,

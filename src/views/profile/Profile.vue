@@ -158,21 +158,21 @@
   };
 
   const addThing = (form: unknown, done: () => void) => {
-    addProfile(form).then(() => {
+    addProfile(form as Record<string, unknown>).then(() => {
       list();
       done();
     });
   };
 
   const disableThing = (id: number | string, done: () => void) => {
-    updateProfile({ id, enableFlag: 'DISABLE' }).then(() => {
+    updateProfile({ id: String(id), enableFlag: 'DISABLE' }).then(() => {
       list();
       done();
     });
   };
 
   const enableThing = (id: number | string, done: () => void) => {
-    updateProfile({ id, enableFlag: 'ENABLE' }).then(() => {
+    updateProfile({ id: String(id), enableFlag: 'ENABLE' }).then(() => {
       list();
       done();
     });

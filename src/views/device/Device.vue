@@ -231,7 +231,7 @@
   };
 
   const addThing = (form: unknown, done: () => void) => {
-    addDevice(form)
+    addDevice(form as Record<string, unknown>)
       .then(() => {
         list();
         done();
@@ -246,7 +246,7 @@
   };
 
   const importTemplate = (form: unknown, done: () => void) => {
-    importDeviceTemplate(form)
+    importDeviceTemplate(form as Record<string, unknown>)
       .then((res) => {
         const templateResponse = res as unknown as {
           data: DeviceImportTemplateResult;
@@ -269,7 +269,7 @@
   };
 
   const importThing = (form: unknown, done: () => void) => {
-    importDevice(form)
+    importDevice(form as Record<string, unknown>)
       .then(() => {
         list();
         done();

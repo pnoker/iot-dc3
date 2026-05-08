@@ -60,7 +60,7 @@
 <script lang="ts" setup>
   import { computed, reactive, ref } from 'vue';
 
-  import { getPointList, getPointUpdate, pointAddApi, pointDeleteApi } from '@/api/point';
+  import { addPoint, deletePoint, getPointList, updatePoint } from '@/api/point';
   import { getProfileByIds } from '@/api/profile';
 
   import type { Order } from '@/config/entity';
@@ -197,7 +197,7 @@
   };
 
   const addThing = (form: unknown, done: () => void) => {
-    pointAddApi(form)
+    addPoint(form as Record<string, unknown>)
       .then(() => {
         list();
         done();
@@ -208,7 +208,7 @@
   };
 
   const disableThing = (id: string, profileId: string, done: () => void) => {
-    getPointUpdate({ id, profileId, enableFlag: 'DISABLE' })
+    updatePoint({ id, profileId, enableFlag: 'DISABLE' })
       .then(() => {
         list();
         done();
@@ -219,7 +219,7 @@
   };
 
   const enableThing = (id: string, profileId: string, done: () => void) => {
-    getPointUpdate({ id, profileId, enableFlag: 'ENABLE' })
+    updatePoint({ id, profileId, enableFlag: 'ENABLE' })
       .then(() => {
         list();
         done();
@@ -230,7 +230,7 @@
   };
 
   const deleteThing = (id: string, done: () => void) => {
-    pointDeleteApi(id)
+    deletePoint(id)
       .then((res) => {
         if (res.data.ok) {
           list();

@@ -79,7 +79,7 @@ export default defineComponent({
           // profile
           const profileIds = Array.from(
             new Set(
-              reactiveData.listDeviceData.reduce((pre, cur) => {
+              reactiveData.listDeviceData.reduce<string[]>((pre, cur) => {
                 pre.push(...cur.profileIds);
                 return pre;
               }, [])
