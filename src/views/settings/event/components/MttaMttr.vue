@@ -41,7 +41,7 @@
   import { alertMtta } from '@/api/dashboard';
   import type { MttaTrend } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/useAsyncLoader';
   import { formatMs } from '@/utils/time';
 
   const { t } = useI18n();

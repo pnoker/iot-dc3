@@ -38,7 +38,7 @@
   import { alertAging } from '@/api/dashboard';
   import type { AgingBacklog } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/useAsyncLoader';
 
   const { t } = useI18n();
   const { loading, run } = useAsyncLoader();

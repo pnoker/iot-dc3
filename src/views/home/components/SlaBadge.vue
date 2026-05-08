@@ -44,7 +44,7 @@
 
   import { alertAging, silentSources } from '@/api/dashboard';
   import type { AgingBacklog, SilentSource } from '@/config/entity/dashboard';
-  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/useAsyncLoader';
 
   const router = useRouter();
   const { run } = useAsyncLoader();

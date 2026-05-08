@@ -59,7 +59,7 @@
   import { silentSources as apiSilentSources } from '@/api/dashboard';
   import type { SilentSource } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/useAsyncLoader';
   import { useEntityNames } from '@/composables/useEntityNames';
   import { formatDateTime, humanDuration } from '@/utils/time';
 

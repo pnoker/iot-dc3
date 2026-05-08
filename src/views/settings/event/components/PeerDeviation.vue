@@ -69,7 +69,7 @@
   import { alertPeerDeviation } from '@/api/dashboard';
   import type { PeerDeviation } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/useAsyncLoader';
   import { useEntityNames } from '@/composables/useEntityNames';
   import { jumpToSourceEvents } from '@/utils/jump';
 

@@ -43,7 +43,7 @@
   import { alertCorrelation } from '@/api/dashboard';
   import type { CorrelationPair } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/useAsyncLoader';
   import { useEntityNames } from '@/composables/useEntityNames';
   import { DASHBOARD_PALETTE } from '@/config/constant/palette';
 
