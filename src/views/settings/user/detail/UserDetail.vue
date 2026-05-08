@@ -94,7 +94,7 @@
   import { getResourceListByUserId } from '@/api/roleResourceBind';
   import { getRoleListByUserId } from '@/api/roleUserBind';
   import { getUserById } from '@/api/user';
-  import { timestamp } from '@/utils/DateUtil';
+  import { timestamp } from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';

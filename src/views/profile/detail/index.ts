@@ -29,7 +29,7 @@ import pointCard from '@/views/point/card/PointCard.vue';
 import device from '@/views/device/Device.vue';
 import point from '@/views/point/Point.vue';
 
-import { timestamp } from '@/utils/DateUtil';
+import { timestamp } from '@/utils/dateUtil';
 
 export default defineComponent({
   components: {

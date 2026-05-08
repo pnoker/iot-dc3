@@ -103,7 +103,7 @@
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
-  import type { Dictionary } from '@/config/entity';
+  import type { Dictionary } from '@/config/types';
   import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary';
 
   defineProps({

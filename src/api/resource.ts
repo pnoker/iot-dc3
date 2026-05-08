@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/entity';
-import type { ResourceForm, ResourceRecord } from '@/config/entity/crud';
+import type { PageQuery, PageResult } from '@/config/types';
+import type { ResourceForm, ResourceRecord } from '@/config/types/auth';
 
 export const addResource = (resource: ResourceForm) => httpPost(`${API_AUTH_BASE}/resource/add`, resource);
 

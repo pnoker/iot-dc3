@@ -20,10 +20,10 @@ import { useRouter } from 'vue-router';
 
 import { addUser, deleteUser, getUserList, updateUser } from '@/api/user';
 import { addRoleUserBind, deleteRoleUserBind } from '@/api/roleUserBind';
-import { timestampColumn } from '@/utils/DateUtil';
-import { successMessage } from '@/utils/NotificationUtil';
+import { timestampColumn } from '@/utils/dateUtil';
+import { successMessage } from '@/utils/notificationUtil';
 
-import type { Order } from '@/config/entity';
+import type { Order } from '@/config/types';
 
 import userTool from './tool/UserTool.vue';
 import userEditForm from './edit/UserEditForm.vue';

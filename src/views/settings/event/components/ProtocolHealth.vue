@@ -60,9 +60,9 @@
   import { useI18n } from 'vue-i18n';
 
   import { protocolHealth } from '@/api/dashboard';
-  import type { ProtocolHealth } from '@/config/entity/dashboard';
+  import type { ProtocolHealth } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
 
   const { t } = useI18n();
   const { loading, run } = useAsyncLoader();

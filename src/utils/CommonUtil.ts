@@ -16,7 +16,7 @@
 
 import router from '@/config/router';
 import { useAuthStore } from '@/store';
-import { setCopyContent } from '@/utils/ClipboardUtil';
+import { setCopyContent } from '@/utils/clipboardUtil';
 
 /**
  * Copy content to clipboard with success message

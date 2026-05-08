@@ -23,7 +23,7 @@ import type {
   StatsTodaySummary,
   TimeRangeParams,
   TopDimension,
-} from '@/config/entity/dashboard';
+} from '@/config/types/dashboard';
 
 export const statsToday = () => httpGet<R<StatsTodaySummary>>(`${API_DATA_BASE}/dashboard/stats/today`);
 

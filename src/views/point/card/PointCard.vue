@@ -120,10 +120,10 @@
   import type { PropType } from 'vue';
   import { Edit, List, Location, Sunset } from '@element-plus/icons-vue';
   import router from '@/config/router';
-  import { copy } from '@/utils/CommonUtil';
-  import { timestamp } from '@/utils/DateUtil';
-  import { successMessage } from '@/utils/NotificationUtil';
-  import { pointTypeKey, rwFlagKey } from '@/utils/PointFormatUtil';
+  import { copy } from '@/utils/commonUtil';
+  import { timestamp } from '@/utils/dateUtil';
+  import { successMessage } from '@/utils/notificationUtil';
+  import { pointTypeKey, rwFlagKey } from '@/utils/pointFormatUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
   import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
 

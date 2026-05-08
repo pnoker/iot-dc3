@@ -17,7 +17,7 @@
 import { computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { decode } from 'js-base64';
-import { isUrl } from '@/utils/ValidationUtil';
+import { isUrl } from '@/utils/validationUtil';
 
 export default defineComponent({
   props: {

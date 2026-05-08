@@ -60,7 +60,7 @@
   import pointValueTool from './tool/PointValueTool.vue';
   import pointValueCard from './card/PointValueCard.vue';
 
-  import { isNull } from '@/utils/ValidationUtil';
+  import { isNull } from '@/utils/validationUtil';
 
   const props = defineProps({
     embedded: {

@@ -25,8 +25,8 @@ import { getDeviceByIds } from '@/api/device';
 import { getPointByIds } from '@/api/point';
 import { getProfileByIds } from '@/api/profile';
 import { useMenuStore } from '@/store';
-import { timestampColumn } from '@/utils/DateUtil';
-import { successMessage } from '@/utils/NotificationUtil';
+import { timestampColumn } from '@/utils/dateUtil';
+import { successMessage } from '@/utils/notificationUtil';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import resourceTool from './tool/ResourceTool.vue';

@@ -160,8 +160,8 @@
   import { alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
   import { getDriverByIds } from '@/api/driver';
-  import { timestampColumn } from '@/utils/DateUtil';
-  import { successMessage } from '@/utils/NotificationUtil';
+  import { timestampColumn } from '@/utils/dateUtil';
+  import { successMessage } from '@/utils/notificationUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';

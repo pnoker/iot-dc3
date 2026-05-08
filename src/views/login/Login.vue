@@ -80,7 +80,7 @@
 
   import { useAuthStore } from '@/store';
 
-  import Particles from '@/components/particles/particles.vue';
+  import Particles from '@/components/particles/Particles.vue';
 
   interface LoginFormModel {
     tenant: string;

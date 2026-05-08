@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/entity';
-import type { MenuForm, MenuRecord } from '@/config/entity/crud';
+import type { PageQuery, PageResult } from '@/config/types';
+import type { MenuForm, MenuRecord } from '@/config/types/auth';
 
 export const addMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/add`, menu);
 

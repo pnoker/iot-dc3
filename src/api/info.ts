@@ -16,7 +16,7 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
-import type { DriverInfoForm, PointInfoForm } from '@/config/entity/crud';
+import type { DriverInfoForm, PointInfoForm } from '@/config/types/manager';
 
 export const addDriverInfo = (driverInfo: DriverInfoForm) =>
   httpPost(`${API_MANAGER_BASE}/driver_attribute_config/add`, driverInfo);

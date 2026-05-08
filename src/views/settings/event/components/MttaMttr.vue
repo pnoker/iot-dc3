@@ -39,10 +39,10 @@
   import { Chart } from '@antv/g2';
 
   import { alertMtta } from '@/api/dashboard';
-  import type { MttaTrend } from '@/config/entity/dashboard';
+  import type { MttaTrend } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
-  import { formatMs } from '@/utils/time';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
+  import { formatMs } from '@/utils/timeUtil';
 
   const { t } = useI18n();
   const { loading, run } = useAsyncLoader();

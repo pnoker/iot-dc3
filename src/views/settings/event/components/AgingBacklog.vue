@@ -36,9 +36,9 @@
   import { Chart } from '@antv/g2';
 
   import { alertAging } from '@/api/dashboard';
-  import type { AgingBacklog } from '@/config/entity/dashboard';
+  import type { AgingBacklog } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
 
   const { t } = useI18n();
   const { loading, run } = useAsyncLoader();

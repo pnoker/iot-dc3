@@ -54,13 +54,13 @@
   import { useRouter } from 'vue-router';
 
   import { alertChangeImpact } from '@/api/dashboard';
-  import type { ChangeImpact } from '@/config/entity/dashboard';
+  import type { ChangeImpact } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
   import { useEntityNames } from '@/composables/useEntityNames';
   import { resolveDashboardColour } from '@/config/constant/palette';
-  import { jumpToEntity } from '@/utils/jump';
-  import { formatDateTime } from '@/utils/time';
+  import { jumpToEntity } from '@/utils/jumpUtil';
+  import { formatDateTime } from '@/utils/timeUtil';
 
   const { t } = useI18n();
   const router = useRouter();

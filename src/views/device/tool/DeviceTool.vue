@@ -81,7 +81,7 @@
   import { reactive, ref } from 'vue';
   import { Plus, Upload } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
-  import type { Dictionary } from '@/config/entity';
+  import type { Dictionary } from '@/config/types';
   import { getDriverDictionary } from '@/api/dictionary';
 
   defineProps({

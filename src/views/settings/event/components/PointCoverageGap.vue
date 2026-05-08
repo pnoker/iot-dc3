@@ -62,11 +62,11 @@
   import { useRouter } from 'vue-router';
 
   import { coverageGap } from '@/api/dashboard';
-  import type { CoverageGap, CoverageGapItem } from '@/config/entity/dashboard';
+  import type { CoverageGap, CoverageGapItem } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
   import { useEntityNames } from '@/composables/useEntityNames';
-  import { jumpToEntity } from '@/utils/jump';
+  import { jumpToEntity } from '@/utils/jumpUtil';
 
   const { t } = useI18n();
   const router = useRouter();

@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/entity';
-import type { DeviceForm, DeviceRecord } from '@/config/entity/crud';
+import type { PageQuery, PageResult } from '@/config/types';
+import type { DeviceForm, DeviceRecord } from '@/config/types/manager';
 
 export const addDevice = (device: DeviceForm) => httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/add`, device);
 

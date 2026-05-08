@@ -83,7 +83,7 @@
 
   import { getMenuById } from '@/api/menu';
   import { useMenuStore } from '@/store';
-  import { timestamp } from '@/utils/DateUtil';
+  import { timestamp } from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';

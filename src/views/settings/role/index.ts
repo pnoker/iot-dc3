@@ -20,10 +20,10 @@ import { useRouter } from 'vue-router';
 
 import { addRole, deleteRole, getRoleList, getRoleTree, updateRole } from '@/api/role';
 import { addRoleResourceBind, deleteRoleResourceBind } from '@/api/roleResourceBind';
-import { timestampColumn } from '@/utils/DateUtil';
-import { successMessage } from '@/utils/NotificationUtil';
+import { timestampColumn } from '@/utils/dateUtil';
+import { successMessage } from '@/utils/notificationUtil';
 
-import type { Order } from '@/config/entity';
+import type { Order } from '@/config/types';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import roleTool from './tool/RoleTool.vue';

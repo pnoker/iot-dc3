@@ -63,12 +63,12 @@
   import { addPoint, deletePoint, getPointList, updatePoint } from '@/api/point';
   import { getProfileByIds } from '@/api/profile';
 
-  import type { Order } from '@/config/entity';
+  import type { Order } from '@/config/types';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
-  import { failMessage } from '@/utils/NotificationUtil';
-  import { isNull } from '@/utils/ValidationUtil';
+  import { failMessage } from '@/utils/notificationUtil';
+  import { isNull } from '@/utils/validationUtil';
   import PointAddForm from './add/PointAddForm.vue';
   import PointCard from './card/PointCard.vue';
   import PointTool from './tool/PointTool.vue';

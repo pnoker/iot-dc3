@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/entity';
-import type { RoleForm, RoleRecord } from '@/config/entity/crud';
+import type { PageQuery, PageResult } from '@/config/types';
+import type { RoleForm, RoleRecord } from '@/config/types/auth';
 
 export const addRole = (role: RoleForm) => httpPost(`${API_AUTH_BASE}/role/add`, role);
 

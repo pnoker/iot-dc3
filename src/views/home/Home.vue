@@ -117,7 +117,7 @@
     DailyGrowthSummary,
     StatsTimeBucket,
     StatsTodaySummary,
-  } from '@/config/entity/dashboard';
+  } from '@/config/types/dashboard';
 
   import StatCard from '@/components/card/stat/StatCard.vue';
   import LiveDataFeed from './components/LiveDataFeed.vue';

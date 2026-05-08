@@ -16,7 +16,7 @@
 
 import { httpGet } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
-import type { Attribute } from '@/config/entity';
+import type { Attribute } from '@/config/types';
 
 export const getDriverAttributeByDriverId = (id: string) =>
   httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/driver_attribute/driver_id/${id}`);

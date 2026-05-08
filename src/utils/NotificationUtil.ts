@@ -15,7 +15,7 @@
  */
 
 import { ElNotification } from 'element-plus';
-import { isNull } from './ValidationUtil';
+import { isNull } from './validationUtil';
 
 /**
  * Show success notification

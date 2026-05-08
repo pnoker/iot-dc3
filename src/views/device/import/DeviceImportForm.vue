@@ -112,10 +112,10 @@
   import { reactive, ref, unref } from 'vue';
   import { useI18n } from 'vue-i18n';
 
-  import type { Dictionary } from '@/config/entity';
+  import type { Dictionary } from '@/config/types';
 
   import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
-  import { successMessage } from '@/utils/NotificationUtil';
+  import { successMessage } from '@/utils/notificationUtil';
 
   interface DictionaryPage {
     records: Dictionary[];

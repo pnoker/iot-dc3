@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/entity';
-import type { PointForm, PointRecord } from '@/config/entity/crud';
+import type { PageQuery, PageResult } from '@/config/types';
+import type { PointForm, PointRecord } from '@/config/types/manager';
 
 export const addPoint = (point: PointForm) => httpPost<R<PointRecord>>(`${API_MANAGER_BASE}/point/add`, point);
 

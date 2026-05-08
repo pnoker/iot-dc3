@@ -57,11 +57,11 @@
   import { useRouter } from 'vue-router';
 
   import { silentSources as apiSilentSources } from '@/api/dashboard';
-  import type { SilentSource } from '@/config/entity/dashboard';
+  import type { SilentSource } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
   import { useEntityNames } from '@/composables/useEntityNames';
-  import { formatDateTime, humanDuration } from '@/utils/time';
+  import { formatDateTime, humanDuration } from '@/utils/timeUtil';
 
   const { t } = useI18n();
   const router = useRouter();

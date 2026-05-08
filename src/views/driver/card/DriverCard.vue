@@ -76,8 +76,8 @@
   import { computed } from 'vue';
   import { Edit, Monitor, Promotion, Sunset } from '@element-plus/icons-vue';
   import router from '@/config/router';
-  import { copy } from '@/utils/CommonUtil';
-  import { timestamp } from '@/utils/DateUtil';
+  import { copy } from '@/utils/commonUtil';
+  import { timestamp } from '@/utils/dateUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 
   const props = defineProps({

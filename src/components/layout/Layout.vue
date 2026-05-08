@@ -108,7 +108,7 @@
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
   import { useAuthStore, useMenuStore } from '@/store';
-  import { resolveMenuTitle } from '@/utils/MenuUtil';
+  import { resolveMenuTitle } from '@/utils/menuUtil';
 
   const { t, locale } = useI18n();
   const route = useRoute();

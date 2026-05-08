@@ -32,7 +32,7 @@ import driverCard from '@/views/driver/card/DriverCard.vue';
 import deviceCard from '@/views/device/card/DeviceCard.vue';
 import pointCard from '@/views/point/card/PointCard.vue';
 
-import { timestamp } from '@/utils/DateUtil';
+import { timestamp } from '@/utils/dateUtil';
 
 export default defineComponent({
   name: 'DriverDetail',

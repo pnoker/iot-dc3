@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/entity';
-import type { ProfileForm, ProfileRecord } from '@/config/entity/crud';
+import type { PageQuery, PageResult } from '@/config/types';
+import type { ProfileForm, ProfileRecord } from '@/config/types/manager';
 
 export const addProfile = (profile: ProfileForm) =>
   httpPost<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/add`, profile);

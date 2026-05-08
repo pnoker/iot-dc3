@@ -43,8 +43,8 @@
   import { Warning } from '@element-plus/icons-vue';
 
   import { alertAging, silentSources } from '@/api/dashboard';
-  import type { AgingBacklog, SilentSource } from '@/config/entity/dashboard';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
+  import type { AgingBacklog, SilentSource } from '@/config/types/dashboard';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
 
   const router = useRouter();
   const { run } = useAsyncLoader();

@@ -43,7 +43,7 @@
   import type { PropType } from 'vue';
   import { computed } from 'vue';
   import { Goblet } from '@element-plus/icons-vue';
-  import type { Attribute } from '@/config/entity';
+  import type { Attribute } from '@/config/types';
 
   const props = defineProps({
     data: {

@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/entity';
-import type { ApiForm, ApiRecord } from '@/config/entity/crud';
+import type { PageQuery, PageResult } from '@/config/types';
+import type { ApiForm, ApiRecord } from '@/config/types/auth';
 
 export const addApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BASE}/api/add`, api);
 

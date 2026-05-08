@@ -41,9 +41,9 @@
   import { Graph } from '@antv/g6';
 
   import { alertCorrelation } from '@/api/dashboard';
-  import type { CorrelationPair } from '@/config/entity/dashboard';
+  import type { CorrelationPair } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
   import { useEntityNames } from '@/composables/useEntityNames';
   import { DASHBOARD_PALETTE } from '@/config/constant/palette';
 

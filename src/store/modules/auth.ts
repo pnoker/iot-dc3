@@ -23,9 +23,9 @@ import { ElLoading } from 'element-plus';
 import { cancelToken, generateSalt, generateToken } from '@/api/token';
 
 import { AUTH_HEADERS } from '@/config/constant/common';
-import type { Login } from '@/config/entity';
-import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtil';
-import { isNull } from '@/utils/ValidationUtil';
+import type { Login } from '@/config/types';
+import { getStorage, removeStorage, setStorage } from '@/utils/storageUtil';
+import { isNull } from '@/utils/validationUtil';
 import { md5 } from 'js-md5';
 
 interface LoginForm {

@@ -95,7 +95,7 @@
   import { Back, Check, Plus, RefreshLeft, Search } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
-  import type { Dictionary } from '@/config/entity';
+  import type { Dictionary } from '@/config/types';
   import { getProfileDictionary } from '@/api/dictionary';
 
   defineProps({

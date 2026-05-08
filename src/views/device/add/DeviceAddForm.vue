@@ -100,10 +100,10 @@
   import type { FormInstance, FormRules } from 'element-plus';
   import { useI18n } from 'vue-i18n';
 
-  import type { Dictionary } from '@/config/entity';
+  import type { Dictionary } from '@/config/types';
 
-  import { successMessage } from '@/utils/NotificationUtil';
-  import { nameRules, remarkRules } from '@/utils/FormRuleUtil';
+  import { successMessage } from '@/utils/notificationUtil';
+  import { nameRules, remarkRules } from '@/utils/formRuleUtil';
   import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
 
   interface DeviceAddFormData {

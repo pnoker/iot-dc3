@@ -67,7 +67,7 @@
   import profile from '@/views/profile/Profile.vue';
   import point from '@/views/point/Point.vue';
   import pointValue from '@/views/point/value/PointValue.vue';
-  import { timestamp } from '@/utils/DateUtil';
+  import { timestamp } from '@/utils/dateUtil';
 
   const route = useRoute();
   const profileViewRef: any = ref<InstanceType<typeof profile>>();

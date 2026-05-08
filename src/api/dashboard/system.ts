@@ -16,7 +16,7 @@
 
 import { httpGet } from '@/api/common';
 import { API_DATA_BASE } from '@/config/constant/api';
-import type { AlertStatsSummary } from '@/config/entity/dashboard';
+import type { AlertStatsSummary } from '@/config/types/dashboard';
 
 export const alertStats = () => httpGet<R<AlertStatsSummary>>(`${API_DATA_BASE}/dashboard/alert/stats`);
 

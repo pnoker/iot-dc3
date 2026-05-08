@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/entity';
-import type { DriverRecord } from '@/config/entity/crud';
+import type { PageQuery, PageResult } from '@/config/types';
+import type { DriverRecord } from '@/config/types/manager';
 
 export const getDriverById = (id: string) => httpGet<R<DriverRecord>>(`${API_MANAGER_BASE}/driver/id/${id}`);
 

@@ -57,12 +57,12 @@
 
   import { addProfile, deleteProfile, getProfileList, updateProfile } from '@/api/profile';
 
-  import type { Order } from '@/config/entity';
+  import type { Order } from '@/config/types';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
-  import { failMessage } from '@/utils/NotificationUtil';
-  import { isNull } from '@/utils/ValidationUtil';
+  import { failMessage } from '@/utils/notificationUtil';
+  import { isNull } from '@/utils/validationUtil';
   import ProfileAddForm from '@/views/profile/add/ProfileAddForm.vue';
   import ProfileCard from '@/views/profile/card/ProfileCard.vue';
   import ProfileTool from '@/views/profile/tool/ProfileTool.vue';

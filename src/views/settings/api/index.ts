@@ -19,9 +19,9 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { getApiList } from '@/api/api';
-import { timestampColumn } from '@/utils/DateUtil';
+import { timestampColumn } from '@/utils/dateUtil';
 
-import type { Order } from '@/config/entity';
+import type { Order } from '@/config/types';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import apiTool from './tool/ApiTool.vue';

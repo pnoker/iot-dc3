@@ -56,11 +56,11 @@
   import { Warning } from '@element-plus/icons-vue';
 
   import { alertFlapping } from '@/api/dashboard';
-  import type { FlappingSource } from '@/config/entity/dashboard';
+  import type { FlappingSource } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/useAsyncLoader';
+  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
   import { useEntityNames } from '@/composables/useEntityNames';
-  import { jumpToSourceEvents } from '@/utils/jump';
+  import { jumpToSourceEvents } from '@/utils/jumpUtil';
 
   const { t } = useI18n();
   const router = useRouter();

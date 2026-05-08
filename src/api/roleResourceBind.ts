@@ -16,8 +16,8 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
-import type { PageQuery } from '@/config/entity';
-import type { RoleResourceBindForm } from '@/config/entity/crud';
+import type { PageQuery } from '@/config/types';
+import type { RoleResourceBindForm } from '@/config/types/auth';
 
 export const addRoleResourceBind = (body: RoleResourceBindForm) => httpPost(`${API_AUTH_BASE}/role-resource/add`, body);
 

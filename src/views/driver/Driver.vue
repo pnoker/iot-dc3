@@ -48,7 +48,7 @@
 
   import { getDriverList, getDriverStatus } from '@/api/driver';
 
-  import type { Order } from '@/config/entity';
+  import type { Order } from '@/config/types';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';

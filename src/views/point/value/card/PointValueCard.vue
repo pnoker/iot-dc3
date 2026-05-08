@@ -113,8 +113,8 @@
   import { useI18n } from 'vue-i18n';
 
   import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
-  import { copy } from '@/utils/CommonUtil';
-  import { timestamp } from '@/utils/DateUtil';
+  import { copy } from '@/utils/commonUtil';
+  import { timestamp } from '@/utils/dateUtil';
   import { getPointValueHistory } from '@/api/point';
 
   const { t } = useI18n();

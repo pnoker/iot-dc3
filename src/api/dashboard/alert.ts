@@ -16,7 +16,7 @@
 
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE } from '@/config/constant/api';
-import type { AlertPageQuery, AlertSource } from '@/config/entity/dashboard';
+import type { AlertPageQuery, AlertSource } from '@/config/types/dashboard';
 
 export const alertPage = (body: AlertPageQuery = {}) => httpPost(`${API_DATA_BASE}/dashboard/alert/page`, body);
 

@@ -33,15 +33,15 @@ import {
   updatePointInfo,
 } from '@/api/info';
 
-import type { Dictionary } from '@/config/entity';
+import type { Dictionary } from '@/config/types';
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue';
-import { isNull } from '@/utils/ValidationUtil';
+import { isNull } from '@/utils/validationUtil';
 import { getDriverById } from '@/api/driver';
 import { getProfileByIds } from '@/api/profile';
 import { getPointByDeviceId } from '@/api/point';
-import { nameRules, remarkRules } from '@/utils/FormRuleUtil';
+import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({

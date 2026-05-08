@@ -17,7 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
-import { nameRules, remarkRules } from '@/utils/FormRuleUtil';
+import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
 
 import router from '@/config/router';

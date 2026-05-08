@@ -57,7 +57,7 @@
   import { useRoute, useRouter } from 'vue-router';
 
   import { useMenuStore } from '@/store';
-  import { resolveMenuTitle } from '@/utils/MenuUtil';
+  import { resolveMenuTitle } from '@/utils/menuUtil';
 
   const { t } = useI18n();
   const route = useRoute();
