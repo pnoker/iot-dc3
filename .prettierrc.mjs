@@ -19,7 +19,7 @@ export default {
   printWidth: 120,
   semi: true,
   singleQuote: true,
-  endOfLine: 'lf',
+  endOfLine: 'auto',
   trailingComma: 'es5',
   bracketSpacing: true,
   arrowParens: 'always',

@@ -33,9 +33,10 @@
     "preview": "vite preview",
     "check": "vue-tsc --noEmit --skipLibCheck",
     "type-check": "vue-tsc --noEmit --skipLibCheck",
-    "format": "prettier --write \"src/**/*.{vue,ts,js,jsx,tsx,scss,css,json,md}\"",
-    "lint": "eslint --fix \"src/**/*.{vue,ts,js,jsx,tsx}\" && prettier --write \"src/**/*.{scss,css,json,md}\"",
-    "lint:check": "eslint \"src/**/*.{vue,ts,js,jsx,tsx}\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --fix && prettier --write .",
+    "lint:check": "eslint . && prettier --check .",
     "tauri": "tauri",
     "clean": "rimraf dist"
   },
@@ -92,14 +93,14 @@
     "vue-tsc": "^3.2.7"
   },
   "lint-staged": {
-    "*.{vue,js,ts,jsx,tsx}": [
+    "*.{vue,js,mjs,cjs,ts,jsx,tsx}": [
       "eslint --fix",
       "prettier --write"
     ],
     "*.{scss,css}": [
       "prettier --write"
     ],
-    "*.{json,md}": [
+    "*.{json,md,html,yml,yaml}": [
       "prettier --write"
     ]
   }

@@ -18,6 +18,7 @@ import js from '@eslint/js';
 import pluginVue from 'eslint-plugin-vue';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
+import configPrettier from 'eslint-config-prettier/flat';
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
 import prettier from 'eslint-plugin-prettier';
 import vueParser from 'vue-eslint-parser';
@@ -45,6 +46,7 @@ export default [
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
   ...defineConfigWithVueTs(vueTsConfigs.recommended),
+  configPrettier,
   {
     files: ['**/*.{ts,tsx,vue}'],
     languageOptions: {
