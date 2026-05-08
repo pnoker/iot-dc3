@@ -17,34 +17,12 @@
 import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import type { AxiosInstance } from 'axios';
 
+import { AXIOS_CONFIG, AXIOS_ERROR_MESSAGES } from '@/config/constant/axios';
 import { AUTH_HEADERS } from '@/config/constant/common';
-import { failMessage, warnMessage } from '@/utils/NotificationUtil';
-import { getStorage } from '@/utils/StorageUtil';
-import { isNull } from '@/utils/ValidationUtil';
+import { failMessage, warnMessage } from '@/utils/notificationUtil';
+import { getStorage } from '@/utils/storageUtil';
+import { isNull } from '@/utils/validationUtil';
 import JSONBigInt from 'json-bigint';
-
-/**
- * Configuration constants for the Axios instance
- */
-const AXIOS_CONFIG = {
-  TIMEOUT: 15000,
-  MIN_STATUS: 200,
-  MAX_STATUS: 500,
-  UNAUTHORIZED_STATUS: 401,
-  HEADERS: {
-    ACCEPT: 'application/json',
-    CONTENT_TYPE: 'application/json',
-  },
-} as const;
-
-/**
- * Error messages
- */
-const ERROR_MESSAGES = {
-  UNAUTHORIZED: 'You are not logged in or your login credentials have expired. Please log in again!',
-  UNAUTHORIZED_TITLE: 'Login credentials expired',
-  REQUEST_ERROR: 'API request error. Please contact the system administrator.',
-} as const;
 
 /**
  * JSONBigInt parser instance with storeAsString option
@@ -133,13 +111,13 @@ request.interceptors.response.use(
 
     // Handle unauthorized access
     if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
-      warnMessage(ERROR_MESSAGES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED_TITLE);
+      warnMessage(AXIOS_ERROR_MESSAGES.UNAUTHORIZED, AXIOS_ERROR_MESSAGES.UNAUTHORIZED_TITLE);
       // Clear storage and redirect to login
       localStorage.clear();
       sessionStorage.clear();
       window.location.hash = '#/login';
     } else {
-      failMessage(ERROR_MESSAGES.REQUEST_ERROR, response.data?.code, response.data);
+      failMessage(AXIOS_ERROR_MESSAGES.REQUEST_ERROR, response.data?.code, response.data);
     }
     // Reject with the server payload so callers can inspect code/message if needed.
     // Existing no-op `.catch(() => {})` sites remain valid because they ignore the argument.

@@ -14,72 +14,40 @@
  * limitations under the License.
  */
 
-/**
- * Common entity types used throughout the application
- */
-
-/**
- * Login information interface
- */
+/** Login information */
 export interface Login {
-  /** Tenant identifier */
   tenant?: string;
-  /** Username */
   name?: string;
-  /** Salt value for password encryption */
   salt?: string;
-  /** Encrypted password */
   password?: string;
-  /** Authentication token */
   token?: string;
 }
 
-/**
- * Attribute information interface
- */
+/** Attribute information */
 export interface Attribute {
-  /** Attribute ID */
   id: string;
-  /** Attribute display name */
   name: string;
-  /** Attribute internal name */
   attributeName: string;
-  /** Attribute code */
   attributeCode: string;
 }
 
-/**
- * Dictionary interface for hierarchical data structures
- */
+/** Dictionary item */
 export interface Dictionary {
-  /** Dictionary type/category */
   type: string;
-  /** Display label */
   label: string;
-  /** Internal value */
   value: string;
-  /** Whether the item is disabled */
   disabled: boolean;
-  /** Whether the item is expanded */
   expand: boolean;
-  /** Child dictionary items */
   children: Array<Dictionary>;
 }
 
-/**
- * Sort order interface for table sorting
- */
+/** Sort order for table queries */
 export interface Order {
-  /** Column name to sort by */
   column: string;
-  /** Sort direction (true for ascending, false for descending) */
   asc: boolean;
 }
 
-/**
- * Shared pagination query shape used by all list endpoints.
- * Page + optional sort orders + arbitrary query filters.
- */
+/** Pagination query shape used by all list endpoints */
 export interface PageQuery {
   page?: {
     total?: number;
@@ -90,9 +58,7 @@ export interface PageQuery {
   [key: string]: unknown;
 }
 
-/**
- * Generic paginated response from the backend.
- */
+/** Generic paginated response */
 export interface PageResult<T = unknown> {
   total: number;
   records: T[];

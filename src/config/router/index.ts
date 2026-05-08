@@ -23,8 +23,8 @@ import commonRouters from './common';
 import operateRouters from './operate';
 import settingsRouters from './settings';
 import viewsRouters from './views';
-import { getStorage } from '@/utils/StorageUtil';
-import { isNull } from '@/utils/ValidationUtil';
+import { getStorage } from '@/utils/storageUtil';
+import { isNull } from '@/utils/validationUtil';
 import { AUTH_HEADERS } from '@/config/constant/common';
 
 /**

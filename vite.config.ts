@@ -100,11 +100,11 @@ export default (configEnv: ConfigEnv) => {
             'element-plus': ['FormInstance', 'FormRules'],
           },
         ],
-        dts: 'src/config/types/auto-imports.d.ts',
+        dts: 'src/config/ambient/auto-imports.d.ts',
       }),
       Components({
         resolvers: [ElementPlusResolver()],
-        dts: 'src/config/types/components.d.ts',
+        dts: 'src/config/ambient/components.d.ts',
       }),
     ],
     optimizeDeps: {
