@@ -65,3 +65,50 @@ export const MENU_LEVEL_OPTIONS: EnumOption[] = [
   { label: 'C3', value: 'C3' },
   { label: 'C4', value: 'C4' },
 ];
+
+// Backend: DriverTypeFlagEnum
+export const DRIVER_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'DRIVER_CLIENT', value: 'DRIVER_CLIENT' },
+  { label: 'DRIVER_SERVER', value: 'DRIVER_SERVER' },
+  { label: 'GATEWAY', value: 'GATEWAY' },
+  { label: 'CONNECT', value: 'CONNECT' },
+];
+
+// Backend: ProfileTypeFlagEnum
+export const PROFILE_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'SYSTEM', value: 'SYSTEM' },
+  { label: 'DRIVER', value: 'DRIVER' },
+  { label: 'USER', value: 'USER' },
+];
+
+// Backend: PointTypeFlagEnum
+export const POINT_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'STRING', value: 'STRING' },
+  { label: 'BYTE', value: 'BYTE' },
+  { label: 'SHORT', value: 'SHORT' },
+  { label: 'INT', value: 'INT' },
+  { label: 'LONG', value: 'LONG' },
+  { label: 'FLOAT', value: 'FLOAT' },
+  { label: 'DOUBLE', value: 'DOUBLE' },
+  { label: 'BOOLEAN', value: 'BOOLEAN' },
+];
+
+// Backend: ProfileShareFlagEnum
+export const PROFILE_SHARE_OPTIONS: EnumOption[] = [
+  { label: 'TENANT', value: 'TENANT' },
+  { label: 'DRIVER', value: 'DRIVER' },
+  { label: 'USER', value: 'USER' },
+];
+
+// Backend: RwFlagEnum
+export const RW_FLAG_OPTIONS: EnumOption[] = [
+  { label: 'R', value: 'R' },
+  { label: 'W', value: 'W' },
+  { label: 'RW', value: 'RW' },
+];
+
+// Backend: DeviceEventTypeEnum / DriverEventTypeEnum (same values)
+export const EVENT_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'HEARTBEAT', value: 'HEARTBEAT' },
+  { label: 'ALARM', value: 'ALARM' },
+];
