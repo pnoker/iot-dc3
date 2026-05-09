@@ -47,7 +47,6 @@ and enumeration types used across services, drivers, and common modules.
 | `DefaultConstant`                   | Platform defaults (page size, etc.)           |
 | `TimeConstant`                      | Date/time format strings                      |
 | `RequestConstant`                   | HTTP header key names (tenant/user injection) |
-| `ExceptionConstant`                 | Standard exception messages                   |
 | `PrefixConstant` / `SuffixConstant` | Common Redis key prefixes/suffixes            |
 
 ### Enumerations
@@ -77,4 +76,3 @@ Used as a dependency by virtually all other `dc3-common-*` and `dc3-center-*` mo
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

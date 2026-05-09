@@ -40,7 +40,7 @@ public class FolderConstant {
     public static final String TEMP_FILE_PATH = System.getProperty("java.io.tmpdir") + "/dc3/upload/";
 
     private FolderConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

@@ -75,7 +75,7 @@ public class SymbolConstant {
     public static final String DOUBLE_SLASH = "//";
 
     private SymbolConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

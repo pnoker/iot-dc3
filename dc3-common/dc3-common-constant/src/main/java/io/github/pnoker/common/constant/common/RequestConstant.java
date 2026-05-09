@@ -32,7 +32,7 @@ public class RequestConstant {
     public static final int DEFAULT_MAX_REQUEST_SIZE = 100;
 
     private RequestConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
     /**
@@ -76,7 +76,7 @@ public class RequestConstant {
         public static final String X_AUTH_SIGN = "X-Auth-Sign";
 
         private Header() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }
@@ -96,7 +96,7 @@ public class RequestConstant {
         public static final String INVALID_REQUEST = "Invalid request auth header";
 
         private Message() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }
@@ -116,7 +116,7 @@ public class RequestConstant {
         public static final String USER_HEADER = "USER_HEADER_KEY";
 
         private Key() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }

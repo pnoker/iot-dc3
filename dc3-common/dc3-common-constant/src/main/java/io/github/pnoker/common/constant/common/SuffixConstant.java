@@ -191,7 +191,7 @@ public class SuffixConstant {
     public static final String RESOURCE = "_resource";
 
     private SuffixConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }
