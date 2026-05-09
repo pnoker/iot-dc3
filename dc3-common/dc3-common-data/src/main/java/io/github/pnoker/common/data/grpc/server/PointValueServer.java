@@ -68,13 +68,19 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .latest(query);
 
             GrpcRPointValueDTO.Builder response = GrpcRPointValueDTO.newBuilder();
-            response.setResult(GrpcR.newBuilder()
-                    .setOk(true)
-                    .setCode(ResponseEnum.OK.getCode())
-                    .setMessage(ResponseEnum.OK.getText())
-                    .build());
+            if (page == null || page.getRecords().isEmpty()) {
+                response.setResult(GrpcR.newBuilder()
+                        .setOk(false)
+                        .setCode(ResponseEnum.NO_RESOURCE.getCode())
+                        .setMessage(ResponseEnum.NO_RESOURCE.getText())
+                        .build());
+            } else {
+                response.setResult(GrpcR.newBuilder()
+                        .setOk(true)
+                        .setCode(ResponseEnum.OK.getCode())
+                        .setMessage(ResponseEnum.OK.getText())
+                        .build());
 
-            if (page != null && !page.getRecords().isEmpty()) {
                 io.github.pnoker.common.entity.bo.PointValueBO bo = page.getRecords().getFirst();
                 response.setData(GrpcPointValueDTO.newBuilder()
                         .setId(0)
@@ -139,7 +145,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
             PointValueReadVO vo = new PointValueReadVO();
             vo.setDeviceId(request.getDeviceId());
             vo.setPointId(request.getPointId());
-            pointValueCommandService.read(vo);
+            pointValueCommandService.read(request.getTenantId(), vo);
 
             responseObserver.onNext(GrpcRBoolean.newBuilder()
                     .setResult(GrpcR.newBuilder()
@@ -171,7 +177,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
             vo.setDeviceId(request.getDeviceId());
             vo.setPointId(request.getPointId());
             vo.setValue(request.getValue());
-            pointValueCommandService.write(vo);
+            pointValueCommandService.write(request.getTenantId(), vo);
 
             responseObserver.onNext(GrpcRBoolean.newBuilder()
                     .setResult(GrpcR.newBuilder()

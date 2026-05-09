@@ -44,21 +44,21 @@ public class PointValueCommandLocalFacade implements PointValueCommandFacade {
     private PointValueCommandService pointValueCommandService;
 
     @Override
-    public boolean read(Long deviceId, Long pointId) {
+    public boolean read(Long tenantId, Long deviceId, Long pointId) {
         PointValueReadVO readVO = new PointValueReadVO();
         readVO.setDeviceId(deviceId);
         readVO.setPointId(pointId);
-        pointValueCommandService.read(readVO);
+        pointValueCommandService.read(tenantId, readVO);
         return true;
     }
 
     @Override
-    public boolean write(Long deviceId, Long pointId, String value) {
+    public boolean write(Long tenantId, Long deviceId, Long pointId, String value) {
         PointValueWriteVO writeVO = new PointValueWriteVO();
         writeVO.setDeviceId(deviceId);
         writeVO.setPointId(pointId);
         writeVO.setValue(value);
-        pointValueCommandService.write(writeVO);
+        pointValueCommandService.write(tenantId, writeVO);
         return true;
     }
 
