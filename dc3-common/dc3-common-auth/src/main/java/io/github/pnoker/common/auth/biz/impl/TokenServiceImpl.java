@@ -111,6 +111,12 @@ public class TokenServiceImpl implements TokenService {
             return tokenValid;
         }
 
+        UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
+        if (Objects.isNull(userLogin) || Objects.isNull(tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(),
+                userLogin.getUserId()))) {
+            return tokenValid;
+        }
+
         try {
             Claims claims = KeyUtil.parserToken(loginName, salt, token, tenantBO.getId());
             tokenValid.setValid(true);

@@ -62,6 +62,11 @@ public class UserLoginQuery implements Serializable {
     private Long userPasswordId;
 
     /**
+     * Tenant scope resolved through user-tenant binding.
+     */
+    private Long tenantId;
+
+    /**
      * Enable flag
      */
     private EnableFlagEnum enableFlag;
