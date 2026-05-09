@@ -1,7 +1,5 @@
 server:
   port: ${SERVER_PORT:8600}
-  servlet:
-    context-path: /agentic
 
 spring:
   application:
