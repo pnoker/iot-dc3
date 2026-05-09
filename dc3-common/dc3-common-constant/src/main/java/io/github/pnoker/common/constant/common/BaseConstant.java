@@ -15,37 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.constant.cache;
-
-import io.github.pnoker.common.constant.common.BaseConstant;
-
+package io.github.pnoker.common.constant.common;
 
 /**
- * Timeout constant
+ * Ultra-low-level constants used internally by the constants module itself.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.10
+ * @since 2026.5.10
  */
-public class TimeoutConstant {
+public class BaseConstant {
 
-    /**
-     * salt cache timeout, minutes
-     */
-    public static final int SALT_CACHE_TIMEOUT = 5;
+    public static final String UTILITY_CLASS = "Utility class";
 
-    /**
-     * user login limit timeout, minutes
-     */
-    public static final int USER_LIMIT_TIMEOUT = 5;
-
-    /**
-     * token cache timeout, hours
-     */
-    public static final int TOKEN_CACHE_TIMEOUT = 12;
-
-    private TimeoutConstant() {
-        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+    private BaseConstant() {
+        throw new IllegalStateException(UTILITY_CLASS);
     }
 
 }

@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.service;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 
 /**
  * Data service constant
@@ -64,7 +65,7 @@ public class DataConstant {
     public static final String RABBITMQ_CLUSTER_URL_PREFIX = "/rabbitmq/cluster";
 
     private DataConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

@@ -35,7 +35,7 @@ public class QueryWrapperConstant {
     public static final String LIMIT_ONE = "LIMIT 1";
 
     private QueryWrapperConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

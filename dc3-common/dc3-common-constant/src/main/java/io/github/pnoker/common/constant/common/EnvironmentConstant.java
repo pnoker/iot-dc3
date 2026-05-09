@@ -117,7 +117,7 @@ public class EnvironmentConstant {
     public static final String MQTT_PREFIX = "dc3.driver.mqtt.topic-prefix";
 
     private EnvironmentConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

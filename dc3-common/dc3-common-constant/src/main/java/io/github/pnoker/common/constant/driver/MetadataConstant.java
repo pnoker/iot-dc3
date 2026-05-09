@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.driver;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 
@@ -31,7 +32,7 @@ import io.github.pnoker.common.constant.common.SuffixConstant;
 public class MetadataConstant {
 
     private MetadataConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
     /**
@@ -50,7 +51,7 @@ public class MetadataConstant {
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.PROFILE;
 
         private Profile() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }
@@ -71,7 +72,7 @@ public class MetadataConstant {
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.POINT;
 
         private Point() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }
@@ -92,7 +93,7 @@ public class MetadataConstant {
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.DEVICE;
 
         private Device() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }
@@ -113,7 +114,7 @@ public class MetadataConstant {
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
 
         private DriverConfig() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }
@@ -134,7 +135,7 @@ public class MetadataConstant {
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
 
         private PointConfig() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }

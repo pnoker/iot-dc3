@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.driver;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 import io.github.pnoker.common.constant.common.SymbolConstant;
 
 /**
@@ -30,7 +31,7 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 public class StrategyConstant {
 
     private StrategyConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
     /**
@@ -57,7 +58,7 @@ public class StrategyConstant {
         public static final String ELASTICSEARCH = "elasticsearch";
 
         private Storage() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }

@@ -71,7 +71,7 @@ public class AlgorithmConstant {
     public static final String CERTIFICATE_JKS = "jks";
 
     private AlgorithmConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }
