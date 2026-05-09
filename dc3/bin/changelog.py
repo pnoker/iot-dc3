@@ -77,6 +77,7 @@ TYPE_TO_CATEGORY = {
     "doc": "Documentation",
     "build": "Build",
     "ci": "CI",
+    "security": "Security",
     "test": "Tests",
     "tests": "Tests",
     "chore": "Chores",
@@ -86,6 +87,10 @@ TYPE_TO_CATEGORY = {
 
 CONVENTIONAL_RE = re.compile(r"^(?P<type>[a-zA-Z]+)(?:\((?P<scope>[^)]+)\))?(?P<breaking>!)?: (?P<desc>.+)$")
 VERSION_RE = re.compile(r"^### .*?(?P<version>\d+\.\d+\.\d+).*$", re.MULTILINE)
+GENERATED_DATE_RE = re.compile(
+    r"^### .*?(?P<version>\d+\.\d+\.\d+)\s*\n\s*_Generated on (?P<date>\d{4}-\d{2}-\d{2})\._",
+    re.MULTILINE,
+)
 
 
 @dataclass(frozen=True)
@@ -245,13 +250,12 @@ def build_summary(commits: list[Commit], from_ref: str, to_ref: str) -> list[str
     return lines
 
 
-def build_release_block(version: str, commits: list[Commit], from_ref: str, to_ref: str) -> str:
-    today = dt.date.today().isoformat()
+def build_release_block(version: str, commits: list[Commit], from_ref: str, to_ref: str, generated_date: str) -> str:
     grouped: dict[str, list[Commit]] = defaultdict(list)
     for commit in commits:
         grouped[commit.category].append(commit)
 
-    lines = [f"### \U0001f4cc {version}", "", f"_Generated on {today}._", "", "#### Summary"]
+    lines = [f"### \U0001f4cc {version}", "", f"_Generated on {generated_date}._", "", "#### Summary"]
     lines.extend(build_summary(commits, from_ref, to_ref))
 
     for category in CATEGORY_ORDER:
@@ -280,6 +284,13 @@ def strip_header(top: str) -> str:
 
 def known_versions(markdown: str) -> set[str]:
     return set(VERSION_RE.findall(markdown))
+
+
+def existing_generated_date(markdown: str, version: str) -> str:
+    for match in GENERATED_DATE_RE.finditer(markdown):
+        if match.group("version") == version:
+            return match.group("date")
+    return ""
 
 
 def merge_historical(top: str, details: str, version: str) -> str:
@@ -336,10 +347,13 @@ def main() -> int:
     version = args.version or read_project_version(repo_root)
     from_ref = args.from_ref or previous_release_tag(args.to_ref, args.tag_pattern)
     change_file = Path(args.change_file)
+    change_path = repo_root / change_file
+    existing = change_path.read_text(encoding="utf-8") if change_path.exists() else ""
+    generated_date = existing_generated_date(existing, version) or dt.date.today().isoformat()
     commits = read_commits(from_ref, args.to_ref, args.include_merges)
     commits = filter_commits(commits, change_file, args.include_changelog_commits)
-    release_block = build_release_block(version, commits, from_ref, args.to_ref)
-    update_changelog(repo_root / change_file, release_block, version)
+    release_block = build_release_block(version, commits, from_ref, args.to_ref, generated_date)
+    update_changelog(change_path, release_block, version)
 
     print(f"Updated {args.change_file}")
     print(f"Version: {version}")
