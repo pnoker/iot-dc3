@@ -23,8 +23,8 @@ import io.github.pnoker.common.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.dal.entity.builder.DictionaryBuilder;
 import io.github.pnoker.common.utils.MapStructUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * Dictionary For Auth Builder
@@ -54,13 +54,9 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<DictionaryBO> buildVOPageByTenantBOPage(Page<TenantBO> entityPageBO);
+    default Page<DictionaryBO> buildVOPageByTenantBOPage(Page<TenantBO> entityPageBO) {
+        return PageUtil.copyPage(entityPageBO, this::buildVOByTenantBO);
+    }
 
     //
 
@@ -80,12 +76,8 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<DictionaryBO> buildVOPageByUserLoginBOPage(Page<UserLoginBO> entityPageBO);
+    default Page<DictionaryBO> buildVOPageByUserLoginBOPage(Page<UserLoginBO> entityPageBO) {
+        return PageUtil.copyPage(entityPageBO, this::buildVOByUserLoginBO);
+    }
 
 }

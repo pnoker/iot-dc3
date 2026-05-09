@@ -27,6 +27,7 @@ import io.github.pnoker.common.manager.entity.model.DriverAttributeDO;
 import io.github.pnoker.common.manager.entity.vo.DriverAttributeVO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -168,13 +169,9 @@ public interface DriverAttributeBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<DriverAttributeBO> buildBOPageByDOPage(Page<DriverAttributeDO> entityPageDO);
+    default Page<DriverAttributeBO> buildBOPageByDOPage(Page<DriverAttributeDO> entityPageDO) {
+        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
+    }
 
     /**
      * BOPage to VOPage
@@ -182,12 +179,8 @@ public interface DriverAttributeBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<DriverAttributeVO> buildVOPageByBOPage(Page<DriverAttributeBO> entityPageBO);
+    default Page<DriverAttributeVO> buildVOPageByBOPage(Page<DriverAttributeBO> entityPageBO) {
+        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
 
 }

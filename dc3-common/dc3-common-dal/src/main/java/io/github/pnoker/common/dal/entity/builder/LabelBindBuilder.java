@@ -23,6 +23,7 @@ import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 import io.github.pnoker.common.dal.entity.vo.LabelBindVO;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -129,13 +130,9 @@ public interface LabelBindBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelBindVO> buildVOPageByBOPage(Page<LabelBindBO> entityPageBO);
+    default Page<LabelBindVO> buildVOPageByBOPage(Page<LabelBindBO> entityPageBO) {
+        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
 
     /**
      * DOPage to BOPage
@@ -143,12 +140,8 @@ public interface LabelBindBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelBindBO> buildBOPageByDOPage(Page<LabelBindDO> entityPageDO);
+    default Page<LabelBindBO> buildBOPageByDOPage(Page<LabelBindDO> entityPageDO) {
+        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
+    }
 
 }

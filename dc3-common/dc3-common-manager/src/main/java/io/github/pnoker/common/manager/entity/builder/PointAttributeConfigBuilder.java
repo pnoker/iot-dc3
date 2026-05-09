@@ -23,6 +23,7 @@ import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.common.manager.entity.vo.PointAttributeConfigVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -129,13 +130,9 @@ public interface PointAttributeConfigBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<PointAttributeConfigBO> buildBOPageByDOPage(Page<PointAttributeConfigDO> entityPageDO);
+    default Page<PointAttributeConfigBO> buildBOPageByDOPage(Page<PointAttributeConfigDO> entityPageDO) {
+        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
+    }
 
     /**
      * BOPage to VOPage
@@ -143,12 +140,8 @@ public interface PointAttributeConfigBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<PointAttributeConfigVO> buildVOPageByBOPage(Page<PointAttributeConfigBO> entityPageBO);
+    default Page<PointAttributeConfigVO> buildVOPageByBOPage(Page<PointAttributeConfigBO> entityPageBO) {
+        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
 
 }

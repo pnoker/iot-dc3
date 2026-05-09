@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Converts {@code Pages} DTO to MyBatis-Plus {@code Page}.
@@ -77,6 +78,36 @@ public class PageUtil {
                 .toList();
         page.setOrders(orderItemList);
         return page;
+    }
+
+    /**
+     * Copy pagination metadata from {@code source} and map every record through
+     * {@code mapper}.
+     * <p>
+     * Used by every {@code @Mapper} interface in place of a hand-written MapStruct
+     * page-mapping method. Replacing those abstract methods with a {@code default}
+     * delegation kills six {@code @Mapping(target=..., ignore=true)} annotations per
+     * builder — those existed only because MapStruct couldn't figure out what to do with
+     * MyBatis-Plus's {@code Page} bookkeeping fields ({@code orders}, {@code countId},
+     * {@code maxLimit}, etc.).
+     *
+     * @param source source page (may be {@code null})
+     * @param mapper per-record mapping function
+     * @param <S>    source record type
+     * @param <T>    target record type
+     * @return target page with the same {@code current/size/total/pages} as {@code source}
+     * (empty page when {@code source} is {@code null}).
+     */
+    public static <S, T> Page<T> copyPage(Page<S> source, Function<? super S, ? extends T> mapper) {
+        if (Objects.isNull(source)) {
+            return new Page<>();
+        }
+        Page<T> target = new Page<>(source.getCurrent(), source.getSize(), source.getTotal());
+        List<S> records = source.getRecords();
+        if (Objects.nonNull(records)) {
+            target.setRecords(records.stream().<T>map(mapper).toList());
+        }
+        return target;
     }
 
 }

@@ -21,6 +21,7 @@ import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -51,20 +52,12 @@ public interface SessionBuilder {
 
     List<SessionDO> buildDOListByBOList(List<SessionBO> entityBOList);
 
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<SessionVO> buildVOPageByBOPage(Page<SessionBO> entityPageBO);
+    default Page<SessionVO> buildVOPageByBOPage(Page<SessionBO> entityPageBO) {
+        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
 
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<SessionBO> buildBOPageByDOPage(Page<SessionDO> entityPageDO);
+    default Page<SessionBO> buildBOPageByDOPage(Page<SessionDO> entityPageDO) {
+        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
+    }
 
 }
