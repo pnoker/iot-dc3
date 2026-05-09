@@ -28,7 +28,7 @@ ENV SERVER_NAME=dc3-center-single
 ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
 ENV APM_SERVICE=http://dc3-apm:9300
-ENV GRPC_PORT=9100
+ENV GRPC_SERVER_PORT=9100
 
 # Default JVM and GC environment variables
 ENV JAVA_OPS="-Xms256m \
@@ -54,7 +54,7 @@ RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 
 # Expose server and gRPC ports
 EXPOSE ${SERVER_PORT}
-EXPOSE ${GRPC_PORT}
+EXPOSE ${GRPC_SERVER_PORT}
 # Mount logs volume
 VOLUME /dc3-center/dc3-center-single/dc3/logs
 
