@@ -242,9 +242,8 @@ public class PointServiceImpl implements PointService {
         }
         List<DeviceDO> deviceDOList = deviceMapper
                 .selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
-        List<Long> zero = Collections.nCopies(7, 0L);
-        ArrayList<Long> zeroList = new ArrayList<>(zero);
         deviceDOList.forEach(deviceDO -> {
+            ArrayList<Long> zeroList = new ArrayList<>(Collections.nCopies(7, 0L));
             LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
             wrapper.eq(PointDataVolumeRunDO::getPointId, pointId)
                     .eq(PointDataVolumeRunDO::getDeviceId, deviceDO.getId())
@@ -252,8 +251,8 @@ public class PointServiceImpl implements PointService {
             PointDataVolumeRunBO pointDataVolumeRunBO = new PointDataVolumeRunBO();
             pointDataVolumeRunBO.setDeviceName(deviceDO.getDeviceName());
             List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper);
-            if (Objects.nonNull(pointDataVolumeRunDOList)) {
-                for (int i = 0; i < 7; i++) {
+            if (CollectionUtils.isNotEmpty(pointDataVolumeRunDOList)) {
+                for (int i = 0; i < Math.min(7, pointDataVolumeRunDOList.size()); i++) {
                     zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
                 }
             }
@@ -330,9 +329,8 @@ public class PointServiceImpl implements PointService {
             return list;
         }
         List<PointDO> pointDOList = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, pointIds));
-        List<Long> zero = Collections.nCopies(7, 0L);
-        ArrayList<Long> zeroList = new ArrayList<>(zero);
         pointDOList.forEach(pointDO -> {
+            ArrayList<Long> zeroList = new ArrayList<>(Collections.nCopies(7, 0L));
             LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
             wrapper.eq(PointDataVolumeRunDO::getPointId, pointDO.getId())
                     .eq(PointDataVolumeRunDO::getDeviceId, deviceId)
@@ -340,8 +338,8 @@ public class PointServiceImpl implements PointService {
             DeviceDataVolumeRunBO deviceDataVolumeRunBO = new DeviceDataVolumeRunBO();
             deviceDataVolumeRunBO.setPointName(pointDO.getPointName());
             List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper);
-            if (Objects.nonNull(pointDataVolumeRunDOList)) {
-                for (int i = 0; i < pointDataVolumeRunDOList.size(); i++) {
+            if (CollectionUtils.isNotEmpty(pointDataVolumeRunDOList)) {
+                for (int i = 0; i < Math.min(7, pointDataVolumeRunDOList.size()); i++) {
                     zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
                 }
             }
@@ -399,7 +397,7 @@ public class PointServiceImpl implements PointService {
             result.setTotal(zeroList);
             return result;
         }
-        for (int i = 0; i < pointDataVolumeRunDOList.size(); i++) {
+        for (int i = 0; i < Math.min(7, pointDataVolumeRunDOList.size()); i++) {
             zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
         }
         result.setTotal(zeroList);

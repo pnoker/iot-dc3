@@ -129,7 +129,7 @@ public class RValue implements Serializable {
     private byte getByteValue(String rawValue, BigDecimal base, BigDecimal multiple) {
         try {
             BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            return multiply.byteValue();
+            return multiply.byteValueExact();
         } catch (Exception e) {
             throw new OutRangeException("Out of byte range: {} ~ {}, current: {}", Byte.MIN_VALUE, Byte.MAX_VALUE,
                     rawValue);
@@ -145,7 +145,7 @@ public class RValue implements Serializable {
     private short getShortValue(String rawValue, BigDecimal base, BigDecimal multiple) {
         try {
             BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            return multiply.shortValue();
+            return multiply.shortValueExact();
         } catch (Exception e) {
             throw new OutRangeException("Out of short range: {} ~ {}, current: {}", Short.MIN_VALUE, Short.MAX_VALUE,
                     rawValue);
@@ -161,7 +161,7 @@ public class RValue implements Serializable {
     private int getIntegerValue(String rawValue, BigDecimal base, BigDecimal multiple) {
         try {
             BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            return multiply.intValue();
+            return multiply.intValueExact();
         } catch (Exception e) {
             throw new OutRangeException("Out of int range: {} ~ {}, current: {}", Integer.MIN_VALUE, Integer.MAX_VALUE,
                     rawValue);
@@ -177,7 +177,7 @@ public class RValue implements Serializable {
     private long getLongValue(String rawValue, BigDecimal base, BigDecimal multiple) {
         try {
             BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            return multiply.longValue();
+            return multiply.longValueExact();
         } catch (Exception e) {
             throw new OutRangeException("Out of long range: {} ~ {}, current: {}", Long.MIN_VALUE, Long.MAX_VALUE,
                     rawValue);
@@ -193,10 +193,11 @@ public class RValue implements Serializable {
     private float getFloatValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
         try {
             BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            if (Float.isInfinite(multiply.floatValue())) {
+            float result = multiply.floatValue();
+            if (!Float.isFinite(result)) {
                 throw new OutRangeException();
             }
-            return ArithmeticUtil.round(multiply.floatValue(), decimal);
+            return ArithmeticUtil.round(result, decimal);
         } catch (Exception e) {
             throw new OutRangeException("Out of float range: |{} ~ {}|, current: {}", Float.MIN_VALUE, Float.MAX_VALUE,
                     rawValue);
@@ -212,10 +213,11 @@ public class RValue implements Serializable {
     private double getDoubleValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
         try {
             BigDecimal multiply = getLinearValue(multiple, rawValue, base);
-            if (Double.isInfinite(multiply.doubleValue())) {
+            double result = multiply.doubleValue();
+            if (!Double.isFinite(result)) {
                 throw new OutRangeException();
             }
-            return ArithmeticUtil.round(multiply.doubleValue(), decimal);
+            return ArithmeticUtil.round(result, decimal);
         } catch (Exception e) {
             throw new OutRangeException("Out of double range: |{} ~ {}|, current: {}", Double.MIN_VALUE,
                     Double.MAX_VALUE, rawValue);
