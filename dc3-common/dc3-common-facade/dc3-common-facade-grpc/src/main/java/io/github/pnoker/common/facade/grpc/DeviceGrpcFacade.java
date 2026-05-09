@@ -30,8 +30,10 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * gRPC implementation: forwards each call to Manager Center via
@@ -63,6 +65,19 @@ public class DeviceGrpcFacade implements DeviceFacade {
             return null;
         }
         return facadeGrpcDeviceBuilder.toFacadeBO(response.getData());
+    }
+
+    /**
+     * Manager doesn't (yet) expose a batch RPC, so we fan out to {@link #selectById}
+     * concurrently. This collapses N round-trip latencies into roughly one. When
+     * call-volume justifies it, replace with a server-side batch RPC.
+     */
+    @Override
+    public List<FacadeDeviceBO> selectByIds(Collection<Long> ids) {
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return ids.parallelStream().distinct().map(this::selectById).filter(Objects::nonNull).toList();
     }
 
     @Override
