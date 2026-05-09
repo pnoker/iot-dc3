@@ -22,6 +22,7 @@ import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.RabbitAckUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -60,15 +61,15 @@ public class DeviceCommandReceiver {
     @RabbitHandler
     @RabbitListener(queues = "#{deviceCommandQueue.name}")
     public void deviceCommandReceive(Channel channel, Message message, DeviceCommandDTO entityDTO) {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            // Acknowledge message receipt
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             log.info("Receive device command: {}", JsonUtil.toJsonString(entityDTO));
 
             // Validate command data
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getType())
                     || StringUtils.isEmpty(entityDTO.getContent())) {
                 log.error("Invalid device command: {}", entityDTO);
+                RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
@@ -86,10 +87,14 @@ public class DeviceCommandReceiver {
                     // to do something
                     break;
                 default:
-                    break;
+                    log.error("Unsupported device command type: {}", entityDTO.getType());
+                    RabbitAckUtil.reject(channel, deliveryTag);
+                    return;
             }
+            RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }
 

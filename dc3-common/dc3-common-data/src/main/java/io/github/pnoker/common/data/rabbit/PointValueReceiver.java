@@ -22,6 +22,7 @@ import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.job.PointValueJob;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.RabbitAckUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -31,7 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
 
 /**
  *
@@ -50,18 +50,16 @@ public class PointValueReceiver {
     private Integer batchSpeed;
 
     @Resource
-    private ExecutorService virtualThreadExecutor;
-
-    @Resource
     private PointValueService pointValueService;
 
     @RabbitHandler
     @RabbitListener(queues = "#{pointValueQueue.name}")
     public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             if (Objects.isNull(pointValueBO) || Objects.isNull(pointValueBO.getDeviceId())) {
                 log.error("Invalid point value: {}", pointValueBO);
+                RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
             PointValueJob.VALUE_COUNT.getAndIncrement();
@@ -71,9 +69,8 @@ public class PointValueReceiver {
             // Judge whether to process data in batch according to the data transmission
             // speed
             if (PointValueJob.VALUE_SPEED.get() < batchSpeed) {
-                virtualThreadExecutor.execute(() ->
-                        // Save point value to Redis & PostgreSQL
-                        pointValueService.save(pointValueBO));
+                // Save point value to Redis & PostgreSQL
+                pointValueService.save(pointValueBO);
             } else {
                 // Save point value to schedule
                 PointValueJob.VALUE_LOCK.writeLock().lock();
@@ -83,8 +80,10 @@ public class PointValueReceiver {
                     PointValueJob.VALUE_LOCK.writeLock().unlock();
                 }
             }
+            RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }
 
