@@ -5,17 +5,23 @@
 _Generated on 2026-05-09._
 
 #### Summary
+
 - Generated from `dc3.release.20251005.00` to `HEAD`.
-- Included 227 commits across 10 categories: Security 3, Features 57, Bug Fixes 71, Performance 1, Refactoring 41, Documentation 22, Build 1, CI 1, Chores 28, Other 2.
+- Included 227 commits across 10 categories: Security 3, Features 57, Bug Fixes 71, Performance 1, Refactoring 41,
+  Documentation 22, Build 1, CI 1, Chores 28, Other 2.
 - Most active scopes: dashboard(17), auth(12), data(8), agentic(5), env(5), build(5).
-- Highlights: add security quality checks; security: enforce gateway user and command tenant scope; Revise SECURITY.md with updated support and practices; release: generate changelog from git commits; auth: HMAC-sign X-Auth-User header end to end.
+- Highlights: add security quality checks; security: enforce gateway user and command tenant scope; Revise SECURITY.md
+  with updated support and practices; release: generate changelog from git commits; auth: HMAC-sign X-Auth-User header
+  end to end.
 
 #### Security
+
 - add security quality checks (`2197454be`)
 - **security**: enforce gateway user and command tenant scope (`37f86b18f`)
 - Revise SECURITY.md with updated support and practices (`86e4d563e`)
 
 #### Features
+
 - **release**: generate changelog from git commits (`8c7a2b024`)
 - **auth**: HMAC-sign X-Auth-User header end to end (`085966276`)
 - **facade,data**: add selectByIds bulk lookup and use it in dashboard live feed (`1fd58e688`)
@@ -75,6 +81,7 @@ _Generated on 2026-05-09._
 - update pom (`f9e7f89ac`)
 
 #### Bug Fixes
+
 - **config**: use webflux base paths (`16fc57bb4`)
 - **agentic**: remove servlet context path (`69d623276`)
 - **release**: preserve changelog idempotency across dates (`203a9bc16`)
@@ -132,7 +139,8 @@ _Generated on 2026-05-09._
 - move gRPC server configuration under Spring application settings in application.yml (`36a6caed0`)
 - downgrade JDK version from 25 to 21 in Dockerfile and related configurations (`08457f915`)
 - downgrade JRE version in Dockerfile from 25 to 21 (`152578849`)
-- update Mybatis and Dynamic Datasource dependencies to version 4, remove Redis exporter from docker-compose files (`297c9ce6d`)
+- update Mybatis and Dynamic Datasource dependencies to version 4, remove Redis exporter from docker-compose files (
+  `297c9ce6d`)
 - remove Redis module and dependency from pom.xml (`7dc5faaac`)
 - remove Redis configuration from application profiles (`73fe31c82`)
 - remove Redis configuration from application profiles (`6183042ce`)
@@ -148,9 +156,11 @@ _Generated on 2026-05-09._
 - standardize comment language in POM files (`0bd4e2e96`)
 
 #### Performance
+
 - **manager**: batch driver-registration attribute diff into 3 round-trips (`c07d873a3`)
 
 #### Refactoring
+
 - **agentic**: centralize service constants (`b011d8843`)
 - **log**: standardize core logging conventions (`4cb6c7b8e`)
 - **agentic**: tighten chat orchestration boundaries (`0787be15b`)
@@ -179,21 +189,26 @@ _Generated on 2026-05-09._
 - **manager**: route TenantApi call through Facade (`831a3df36`)
 - optimize dc3-gateway and dc3-common-gateway (`cb5e6d452`)
 - optimize root, dc3-common and dc3-api pom.xml (`b1f42ba5c`)
-- replace `NioEventLoopGroup` with `MultiThreadIoEventLoopGroup` to utilize `NioIoHandler` factory in UDP and TCP Netty servers (`75225a53f`)
+- replace `NioEventLoopGroup` with `MultiThreadIoEventLoopGroup` to utilize `NioIoHandler` factory in UDP and TCP Netty
+  servers (`75225a53f`)
 - replace deprecated `EnvironmentPostProcessor` imports and update `JsonMapper` references (`381414548`)
 - **proto**: 优化proto文件注释和结构 (`342fb4df1`)
-- standardize and translate comments across driver services, implementations, and application files for clarity and consistency (`80d1ef4d6`)
-- standardize and translate comments across Protobuf files and environment script for clarity and consistency (`313308b8d`)
+- standardize and translate comments across driver services, implementations, and application files for clarity and
+  consistency (`80d1ef4d6`)
+- standardize and translate comments across Protobuf files and environment script for clarity and consistency (
+  `313308b8d`)
 - standardize and translate comments in Protobuf files for improved clarity and consistency across modules (`d6d918ec8`)
 - standardize and translate comments across driver modules for consistency and clarity (`782572484`)
 - translate and standardize comments in configuration files across all driver modules for consistency (`47dd8f37f`)
-- standardize and translate comments across Protobuf files, Java services, and configuration classes for consistency and clarity (`a6f91d24d`)
+- standardize and translate comments across Protobuf files, Java services, and configuration classes for consistency and
+  clarity (`a6f91d24d`)
 - remove unused files, standardize code comments and documentation across modules (`2893a84db`)
 - standardize descriptions, comments, and documentation across POM files and Protobuf definitions (`0cb5ab320`)
 - update Java docs, README files, and Protobuf comments for consistent language and formatting (`65d48101b`)
 - standardize protobuf annotations and document translations (`4bc31532e`)
 
 #### Documentation
+
 - **agent**: add shared coding agent guidance (`a1a8cee2d`)
 - **env**: document environment variable reference (`086ade9d8`)
 - align governance and environment guides (`aa65b330c`)
@@ -218,12 +233,15 @@ _Generated on 2026-05-09._
 - 更新多个驱动模块的类注释文档 (`8a2d9829c`)
 
 #### Build
+
 - **git**: add commit message validation hook (`35377c628`)
 
 #### CI
+
 - harden github workflows (`d797a253b`)
 
 #### Chores
+
 - **mqtt**: remove hardcoded paho version, inherit from parent dependencyManagement (`eff7d4b3b`)
 - reorganize POM dependencies with consistent category comments (`0e916774d`)
 - remove duplicate java.version property (inherited from dc3-parent) (`69252d890`)
@@ -254,6 +272,7 @@ _Generated on 2026-05-09._
 - bump version to 2026.4.18.3 and optimize pom.xml dependencies (`e13d75cbd`)
 
 #### Other Changes
+
 - Revert "fix(data): include public in history DS search_path" (`b1e1b0609`)
 - . (`bb12374ff`)
 

@@ -15,17 +15,17 @@ OPC-compliant industrial devices and SCADA systems.
 
 ## Driver Attributes (Device-level)
 
-| Attribute      | Description                             |
-|----------------|-----------------------------------------|
-| Host           | OPC DA server hostname or IP            |
-| CLSID          | OPC server CLSID (COM class identifier) |
-| Username       | Windows DCOM authentication username    |
-| Password       | Windows DCOM authentication password    |
+| Attribute | Description                             |
+|-----------|-----------------------------------------|
+| Host      | OPC DA server hostname or IP            |
+| CLSID     | OPC server CLSID (COM class identifier) |
+| Username  | Windows DCOM authentication username    |
+| Password  | Windows DCOM authentication password    |
 
 ## Point Attributes
 
-| Attribute  | Description            |
-|------------|------------------------|
+| Attribute | Description            |
+|-----------|------------------------|
 | Group     | OPC DA item group name |
 | Tag       | OPC DA item tag name   |
 

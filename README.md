@@ -110,12 +110,14 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-> **Module Overview**: See [`dc3/doc/MODULES.md`](dc3/doc/MODULES.md) for the full module dependency map and runtime flow
+> **Module Overview**: See [`dc3/doc/MODULES.md`](dc3/doc/MODULES.md) for the full module dependency map and runtime
+> flow
 > diagram.
 
 > **Local Dev Guide**: See [`dc3/doc/QUICKSTART.md`](dc3/doc/QUICKSTART.md) for a one-stop local setup workflow.
 
-> **Troubleshooting**: See [`dc3/doc/TROUBLESHOOTING.md`](dc3/doc/TROUBLESHOOTING.md) for common build/runtime issues and
+> **Troubleshooting**: See [`dc3/doc/TROUBLESHOOTING.md`](dc3/doc/TROUBLESHOOTING.md) for common build/runtime issues
+> and
 > resolutions.
 
 ## 3.3 Start Services
@@ -163,5 +165,5 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 
 # 6 License
 
-The `IoT DC3` open-source platform is licensed under the [AGPL 3.0 License](./LICENSE-AGPL.txt). 
+The `IoT DC3` open-source platform is licensed under the [AGPL 3.0 License](./LICENSE-AGPL.txt).
 See [LICENSE.txt](./LICENSE.txt) for the repository license notice and commercial licensing clarification.

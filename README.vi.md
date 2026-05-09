@@ -116,7 +116,8 @@ mvn -s .mvn/settings.xml clean package
 
 > **Tổng quan module**: Xem [`dc3/doc/MODULES.md`](dc3/doc/MODULES.md) để biết sơ đồ phụ thuộc module và luồng runtime.
 
-> **Hướng dẫn dev cục bộ**: Xem [`dc3/doc/QUICKSTART.md`](dc3/doc/QUICKSTART.md) để biết quy trình thiết lập môi trường local.
+> **Hướng dẫn dev cục bộ**: Xem [`dc3/doc/QUICKSTART.md`](dc3/doc/QUICKSTART.md) để biết quy trình thiết lập môi trường
+> local.
 
 > **Khắc phục sự cố**: Xem [`dc3/doc/TROUBLESHOOTING.md`](dc3/doc/TROUBLESHOOTING.md) để biết các vấn đề thường gặp khi
 > build/runtime và cách giải quyết.
