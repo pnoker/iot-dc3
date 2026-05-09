@@ -31,6 +31,12 @@ message GrpcDriverQuery {
   int64 driver_id = 1;
 }
 
+// Driver ids query structure for batch driver lookup
+message GrpcDriverIdsQuery {
+  // Identifies driver instances
+  repeated int64 driver_ids = 1;
+}
+
 // Profile template query structure for querying template information by profile ID
 message GrpcProfileQuery {
   // Profile template ID that identifies specific configuration template
@@ -43,11 +49,22 @@ message GrpcPointQuery {
   int64 point_id = 1;
 }
 
+// Point ids query structure for batch point lookup
+message GrpcPointIdsQuery {
+  // Identifies point instances
+  repeated int64 point_ids = 1;
+}
+
 // Device query structure for querying device information by device ID
 message GrpcDeviceQuery {
   // Device ID that identifies specific device
   int64 device_id = 1;
 }
 
+// Device ids query structure for batch device lookup
+message GrpcDeviceIdsQuery {
+  // Identifies device instances
+  repeated int64 device_ids = 1;
+}
 
 

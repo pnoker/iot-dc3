@@ -32,6 +32,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -107,6 +108,33 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
             builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void selectByDriverIds(GrpcDriverIdsQuery request, StreamObserver<GrpcRDriverListDTO> responseObserver) {
+        GrpcRDriverListDTO.Builder builder = GrpcRDriverListDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+
+        List<DriverBO> entityBOList = driverService.selectByIds(new HashSet<>(request.getDriverIdsList()));
+        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+
+            List<GrpcDriverDTO> entityGrpcDTOList = entityBOList.stream()
+                    .map(grpcDriverBuilder::buildGrpcDTOByBO)
+                    .toList();
+
+            builder.addAllData(entityGrpcDTOList);
         }
 
         builder.setResult(rBuilder);
