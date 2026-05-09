@@ -16,8 +16,6 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import tools.jackson.databind.DatabindException;
-import tools.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
@@ -42,6 +40,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.ArrayList;

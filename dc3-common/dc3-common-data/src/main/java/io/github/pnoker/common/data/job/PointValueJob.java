@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.data.job;
 
-import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.data.biz.PointValueService;
+import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
