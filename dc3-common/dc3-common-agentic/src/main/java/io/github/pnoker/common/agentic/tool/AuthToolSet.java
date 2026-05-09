@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tool;
 
+import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.api.UserFacade;
 import io.github.pnoker.common.facade.api.UserLoginFacade;
@@ -59,8 +60,9 @@ public class AuthToolSet {
     public String lookupTenantByCode(
             @ToolParam(description = "The unique tenant code, e.g. 'default'") String tenantCode) {
         log.debug("Tool: lookupTenantByCode({})", tenantCode);
+        Long tenantId = AgenticRequestContext.requireTenantId();
         FacadeTenantBO bo = tenantFacade.selectByCode(tenantCode);
-        if (Objects.isNull(bo)) {
+        if (Objects.isNull(bo) || !Objects.equals(tenantId, bo.getId())) {
             return "Tenant not found for code: " + tenantCode;
         }
         return String.format("Tenant: name=%s, code=%s, enabled=%s", bo.getTenantName(), bo.getTenantCode(),
@@ -70,6 +72,9 @@ public class AuthToolSet {
     @Tool(description = "Look up a user by their numeric ID. Returns nickname, username, email, and phone.")
     public String lookupUserById(@ToolParam(description = "The numeric user ID") Long userId) {
         log.debug("Tool: lookupUserById({})", userId);
+        if (!Objects.equals(AgenticRequestContext.requireUserId(), userId)) {
+            return "User not found for ID: " + userId;
+        }
         FacadeUserBO bo = userFacade.selectById(userId);
         if (Objects.isNull(bo)) {
             return "User not found for ID: " + userId;
@@ -83,7 +88,7 @@ public class AuthToolSet {
             @ToolParam(description = "The login name (username used for authentication)") String loginName) {
         log.debug("Tool: lookupUserLoginByName({})", loginName);
         FacadeUserLoginBO bo = userLoginFacade.selectByName(loginName);
-        if (Objects.isNull(bo)) {
+        if (Objects.isNull(bo) || !Objects.equals(AgenticRequestContext.requireUserId(), bo.getUserId())) {
             return "User login not found for name: " + loginName;
         }
         return String.format("UserLogin: loginName=%s, userId=%d, enabled=%s", bo.getLoginName(), bo.getUserId(),

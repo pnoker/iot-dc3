@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.controller;
 
 import io.github.pnoker.common.agentic.constant.AgenticConstant;
+import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
@@ -24,6 +25,7 @@ import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.agentic.skill.SkillDefinition;
 import io.github.pnoker.common.agentic.skill.SkillRegistry;
 import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -73,33 +75,37 @@ public class ChatController implements BaseController {
      */
     @PostMapping(value = "/completions", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> streamChatCompletion(@RequestBody ChatCompletionRequest request) {
-        log.debug("Stream chat request: model={}, messages={}, conversationId={}, skill={}", request.getModel(),
-                request.getMessages().size(), request.getConversationId(), request.getSkill());
+        return getUserHeader().flatMapMany(header -> {
+            log.debug("Stream chat request: model={}, messages={}, conversationId={}, skill={}", request.getModel(),
+                    request.getMessages().size(), request.getConversationId(), request.getSkill());
 
-        String userMessage = extractLastUserMessage(request);
-        String conversationId = resolveConversationId(request);
-        String systemAddition = resolveSkillSystemPrompt(request);
+            String userMessage = extractLastUserMessage(request);
+            String conversationId = scopedConversationId(header, resolveConversationId(request));
+            String systemAddition = resolveSkillSystemPrompt(request);
 
-        touchSession(conversationId, request);
+            touchSession(conversationId, request, header);
 
-        var promptSpec = chatClient.prompt()
-                .user(userMessage)
-                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId));
-        if (systemAddition != null) {
-            promptSpec = promptSpec.system(systemAddition);
-        }
+            var promptSpec = chatClient.prompt()
+                    .user(userMessage)
+                    .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId));
+            if (systemAddition != null) {
+                promptSpec = promptSpec.system(systemAddition);
+            }
 
-        Flux<String> contentFlux = promptSpec.stream().content();
+            Flux<String> contentFlux = promptSpec.stream().content()
+                    .doOnSubscribe(subscription -> AgenticRequestContext.set(header))
+                    .doFinally(signalType -> AgenticRequestContext.clear());
 
-        String chatId = "chatcmpl-" + UUID.randomUUID().toString().replace("-", "").substring(0, 24);
-        long created = Instant.now().getEpochSecond();
-        String model = request.getModel() != null ? request.getModel() : "dc3-agentic";
+            String chatId = "chatcmpl-" + UUID.randomUUID().toString().replace("-", "").substring(0, 24);
+            long created = Instant.now().getEpochSecond();
+            String model = request.getModel() != null ? request.getModel() : "dc3-agentic";
 
-        return contentFlux
-                .map(chunk -> ServerSentEvent.<String>builder().data(formatChunk(chatId, created, model, chunk)).build())
-                .concatWith(
-                        Mono.just(ServerSentEvent.<String>builder().data(formatFinalChunk(chatId, created, model)).build()))
-                .concatWith(Mono.just(ServerSentEvent.<String>builder().data("[DONE]").build()));
+            return contentFlux
+                    .map(chunk -> ServerSentEvent.<String>builder().data(formatChunk(chatId, created, model, chunk)).build())
+                    .concatWith(
+                            Mono.just(ServerSentEvent.<String>builder().data(formatFinalChunk(chatId, created, model)).build()))
+                    .concatWith(Mono.just(ServerSentEvent.<String>builder().data("[DONE]").build()));
+        });
     }
 
     /**
@@ -108,38 +114,46 @@ public class ChatController implements BaseController {
      */
     @PostMapping(value = "/completions", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ChatCompletionResponse> chatCompletion(@RequestBody ChatCompletionRequest request) {
-        log.debug("Chat request: model={}, messages={}, conversationId={}, skill={}", request.getModel(),
-                request.getMessages().size(), request.getConversationId(), request.getSkill());
+        return getUserHeader().flatMap(header -> {
+            log.debug("Chat request: model={}, messages={}, conversationId={}, skill={}", request.getModel(),
+                    request.getMessages().size(), request.getConversationId(), request.getSkill());
 
-        String userMessage = extractLastUserMessage(request);
-        String conversationId = resolveConversationId(request);
-        String systemAddition = resolveSkillSystemPrompt(request);
+            String userMessage = extractLastUserMessage(request);
+            String conversationId = scopedConversationId(header, resolveConversationId(request));
+            String systemAddition = resolveSkillSystemPrompt(request);
 
-        touchSession(conversationId, request);
+            touchSession(conversationId, request, header);
 
-        return Mono.fromCallable(() -> {
-            var promptSpec = chatClient.prompt()
-                    .user(userMessage)
-                    .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId));
-            if (systemAddition != null) {
-                promptSpec = promptSpec.system(systemAddition);
-            }
+            return Mono.fromCallable(() -> {
+                var promptSpec = chatClient.prompt()
+                        .user(userMessage)
+                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId));
+                if (systemAddition != null) {
+                    promptSpec = promptSpec.system(systemAddition);
+                }
 
-            String content = promptSpec.call().content();
+                String content;
+                AgenticRequestContext.set(header);
+                try {
+                    content = promptSpec.call().content();
+                } finally {
+                    AgenticRequestContext.clear();
+                }
 
-            String chatId = "chatcmpl-" + UUID.randomUUID().toString().replace("-", "").substring(0, 24);
-            return ChatCompletionResponse.builder()
-                    .id(chatId)
-                    .object("chat.completion")
-                    .created(Instant.now().getEpochSecond())
-                    .model(request.getModel() != null ? request.getModel() : "dc3-agentic")
-                    .choices(List.of(ChatCompletionResponse.Choice.builder()
-                            .index(0)
-                            .message(new ChatCompletionResponse.Message("assistant", content))
-                            .finishReason("stop")
-                            .build()))
-                    .usage(new ChatCompletionResponse.Usage(0, 0, 0))
-                    .build();
+                String chatId = "chatcmpl-" + UUID.randomUUID().toString().replace("-", "").substring(0, 24);
+                return ChatCompletionResponse.builder()
+                        .id(chatId)
+                        .object("chat.completion")
+                        .created(Instant.now().getEpochSecond())
+                        .model(request.getModel() != null ? request.getModel() : "dc3-agentic")
+                        .choices(List.of(ChatCompletionResponse.Choice.builder()
+                                .index(0)
+                                .message(new ChatCompletionResponse.Message("assistant", content))
+                                .finishReason("stop")
+                                .build()))
+                        .usage(new ChatCompletionResponse.Usage(0, 0, 0))
+                        .build();
+            });
         });
     }
 
@@ -216,9 +230,13 @@ public class ChatController implements BaseController {
         }
     }
 
-    private void touchSession(String conversationId, ChatCompletionRequest request) {
+    private String scopedConversationId(RequestHeader.UserHeader header, String conversationId) {
+        return header.getTenantId() + ":" + header.getUserId() + ":" + conversationId;
+    }
+
+    private void touchSession(String conversationId, ChatCompletionRequest request, RequestHeader.UserHeader header) {
         try {
-            sessionService.touch(conversationId, request.getSkill());
+            sessionService.touch(conversationId, request.getSkill(), header.getTenantId(), header.getUserId());
         } catch (Exception e) {
             log.warn("Failed to touch session for {}: {}", conversationId, e.getMessage());
         }
