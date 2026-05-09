@@ -17,69 +17,37 @@
 
 package io.github.pnoker.common.config;
 
-import io.github.pnoker.common.constant.common.EnvironmentConstant;
-import io.github.pnoker.common.utils.EnvironmentUtil;
-import io.github.pnoker.common.utils.HostUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Spring environment post-processor that derives and injects runtime driver properties
- * such as node, service, host, and client identifiers.
+ * Maps legacy {@code server.thread.*} keys to the canonical {@code dc3.thread.*}
+ * namespace so external deployments can migrate gradually.
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2026.5.9
  */
-@Slf4j
-@Configuration
 @Order(Ordered.LOWEST_PRECEDENCE - 100)
-public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
+public class ThreadEnvironmentConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        addLegacyDriverAliases(environment);
-
-        String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
-        if (StringUtils.isEmpty(node)) {
-            node = EnvironmentUtil.getNodeId();
-        }
-
-        String tenant = environment.getProperty(EnvironmentConstant.DRIVER_TENANT, String.class);
-        String name = environment.getProperty(EnvironmentConstant.SPRING_APPLICATION_NAME, String.class);
-        String client = MessageFormat.format("{0}/{1}/{2}", tenant, name, node);
-        String service = MessageFormat.format("{0}/{1}", tenant, name);
-
-        Map<String, Object> source = new HashMap<>(4);
-        source.put(EnvironmentConstant.DRIVER_NODE, node);
-        source.put(EnvironmentConstant.DRIVER_SERVICE, service);
-        source.put(EnvironmentConstant.DRIVER_HOST, HostUtil.localHost());
-        source.put(EnvironmentConstant.DRIVER_CLIENT, client);
-        MutablePropertySources propertySources = environment.getPropertySources();
-        propertySources.addFirst(new MapPropertySource("driver", source));
-    }
-
-    private void addLegacyDriverAliases(ConfigurableEnvironment environment) {
         Map<String, Object> aliases = new HashMap<>();
         for (PropertySource<?> propertySource : environment.getPropertySources()) {
             if (propertySource instanceof EnumerablePropertySource<?> enumerablePropertySource) {
                 for (String propertyName : enumerablePropertySource.getPropertyNames()) {
-                    if (propertyName.startsWith("driver.")) {
-                        String aliasName = "dc3." + propertyName;
+                    if (propertyName.startsWith("server.thread.")) {
+                        String aliasName = "dc3.thread." + propertyName.substring("server.thread.".length());
                         if (!environment.containsProperty(aliasName)) {
                             aliases.put(aliasName, enumerablePropertySource.getProperty(propertyName));
                         }
@@ -88,7 +56,7 @@ public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
             }
         }
         if (!aliases.isEmpty()) {
-            environment.getPropertySources().addLast(new MapPropertySource("legacyDriverAliases", aliases));
+            environment.getPropertySources().addLast(new MapPropertySource("legacyThreadAliases", aliases));
         }
     }
 

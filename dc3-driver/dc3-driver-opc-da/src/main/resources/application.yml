@@ -15,52 +15,53 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-driver:
-  tenant: default
-  name: OpcDa驱动
-  code: OpcDaDriver
-  type: DRIVER_CLIENT
-  remark: @project.description@
-  schedule:
-    # Read data regularly
-    read:
-      enable: true
-      cron: '0/30 * * * * ?'
-    custom:
-      enable: true
-      cron: '0/5 * * * * ?'
-  driver-attribute:
-    - attribute-name: 主机
-      attribute-code: host
-      attribute-type-flag: STRING
-      default-value: localhost
-      remark: Opc Da Host
-    - attribute-name: CLSID
-      attribute-code: clsId
-      attribute-type-flag: STRING
-      default-value: F8582CF2-88FB-11D0-B850-00C0F0104305
-      remark: Opc Da Server CLAID
-    - attribute-name: 用户名
-      attribute-code: username
-      attribute-type-flag: STRING
-      default-value: dc3
-      remark: Opc Da UserName
-    - attribute-name: 密码
-      attribute-code: password
-      attribute-type-flag: STRING
-      default-value: dc3dc3
-      remark: Opc Da Passward
-  point-attribute:
-    - attribute-name: 分组
-      attribute-code: group
-      attribute-type-flag: STRING
-      default-value: GROUP
-      remark: 分组名称
-    - attribute-name: 位号
-      attribute-code: tag
-      attribute-type-flag: STRING
-      default-value: TAG
-      remark: 位号名称
+dc3:
+  driver:
+    tenant: default
+    name: OpcDa驱动
+    code: OpcDaDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    driver-attribute:
+      - attribute-name: 主机
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: localhost
+        remark: Opc Da Host
+      - attribute-name: CLSID
+        attribute-code: clsId
+        attribute-type-flag: STRING
+        default-value: F8582CF2-88FB-11D0-B850-00C0F0104305
+        remark: Opc Da Server CLAID
+      - attribute-name: 用户名
+        attribute-code: username
+        attribute-type-flag: STRING
+        default-value: dc3
+        remark: Opc Da UserName
+      - attribute-name: 密码
+        attribute-code: password
+        attribute-type-flag: STRING
+        default-value: dc3dc3
+        remark: Opc Da Passward
+    point-attribute:
+      - attribute-name: 分组
+        attribute-code: group
+        attribute-type-flag: STRING
+        default-value: GROUP
+        remark: 分组名称
+      - attribute-name: 位号
+        attribute-code: tag
+        attribute-type-flag: STRING
+        default-value: TAG
+        remark: 位号名称
 
 spring:
   application:

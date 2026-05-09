@@ -18,18 +18,19 @@
 # # The following content will be overwritten by application-[dev|test|pre|pro].yml,
 # that is: if the following properties are configured in application-[dev|test|pre|pro].yml,
 # the property values configured in application.yml will be the main ones.
-driver:
-  mqtt:
-    ca-crt: classpath:/certs/ca.crt
-    client-crt: classpath:/certs/client.crt
-    client-key: classpath:/certs/client.key
-    client-key-pass: dc3-client
-    topic-prefix: dc3/${driver.tenant}/${spring.application.name}/
-    default-send-topic:
-      qos: 1
-      name: command
-    keep-alive: 15
-    completion-timeout: 3000
-    batch:
-      speed: ${MQTT_BATCH_SPEED:100}
-      interval: ${MQTT_BATCH_INTERVAL:5}
+dc3:
+  driver:
+    mqtt:
+      ca-crt: classpath:/certs/ca.crt
+      client-crt: classpath:/certs/client.crt
+      client-key: classpath:/certs/client.key
+      client-key-pass: dc3-client
+      topic-prefix: dc3/${dc3.driver.tenant}/${spring.application.name}/
+      default-send-topic:
+        qos: 1
+        name: command
+      keep-alive: 15
+      completion-timeout: 3000
+      batch:
+        speed: ${MQTT_BATCH_SPEED:100}
+        interval: ${MQTT_BATCH_INTERVAL:5}

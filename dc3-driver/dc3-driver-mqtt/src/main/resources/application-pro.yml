@@ -16,20 +16,21 @@
 #
 
 # Production environment configuration will overwrite the content configured in application-*.yml
-driver:
-  schedule:
-    # Read data regularly
-    read:
-      cron: '0 0/15 * * * ?'
-  mqtt:
-    url: tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:1883}
-    auth-type: USERNAME
-    username: ${MQTT_USERNAME:dc3}
-    password: ${MQTT_PASSWORD:dc3dc3dc3}
-    topic-prefix: dc3/${driver.tenant}/${spring.application.name}/
-    receive-topics:
-      - qos: 1
-        name: data
+dc3:
+  driver:
+    schedule:
+      # Read data regularly
+      read:
+        cron: '0 0/15 * * * ?'
+    mqtt:
+      url: tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:1883}
+      auth-type: USERNAME
+      username: ${MQTT_USERNAME:dc3}
+      password: ${MQTT_PASSWORD:dc3dc3dc3}
+      topic-prefix: dc3/${dc3.driver.tenant}/${spring.application.name}/
+      receive-topics:
+        - qos: 1
+          name: data
 
 spring:
   rabbitmq:

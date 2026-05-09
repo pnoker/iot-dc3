@@ -49,7 +49,7 @@ public interface DriverCustomService {
      * Custom Scheduling Interface
      * <p>
      * This interface is used to execute custom scheduling tasks, which can be configured
-     * through the configuration file {@code driver.schedule.custom}. Developers can
+     * through the configuration file {@code dc3.driver.schedule.custom}. Developers can
      * implement custom scheduling logic here, such as timed tasks, periodic tasks, etc.
      * <p>
      * Note: The execution frequency and trigger conditions of scheduling tasks should be

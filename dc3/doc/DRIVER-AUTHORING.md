@@ -92,49 +92,50 @@ public class BacnetDriverApplication {
 
 ## Step 4 — `application.yml`
 
-This is the most important file: the keys under `driver:` are read by the SDK at startup
+This is the most important file: the keys under `dc3.driver:` are read by the SDK at startup
 and pushed to Manager during registration. They define the **schema** of attributes that
 operators will fill in when configuring a device or point in the UI.
 
 ```yaml
-driver:
-  tenant: default
-  name: BACnet驱动            # human-readable name
-  code: BacnetDriver          # ⚠️ unique routing key — see "Naming" below
-  type: DRIVER_CLIENT
-  remark: @project.description@
+dc3:
+  driver:
+    tenant: default
+    name: BACnet驱动            # human-readable name
+    code: BacnetDriver          # unique routing key — see "Naming" below
+    type: DRIVER_CLIENT
+    remark: @project.description@
 
-  schedule:
-    read:                     # periodic read of every point
-      enable: true
-      cron: '0/30 * * * * ?'  # every 30s
-    custom:                   # your DriverCustomService#schedule() callback
-      enable: true
-      cron: '0/5 * * * * ?'
+    schedule:
+      read:                     # periodic read of every point
+        enable: true
+        cron: '0/30 * * * * ?'  # every 30s
+      custom:                   # your DriverCustomService#schedule() callback
+        enable: true
+        cron: '0/5 * * * * ?'
 
-  driver-attribute:           # per-device config (one row per device)
-    - attribute-name: 主机
-      attribute-code: host
-      attribute-type-flag: STRING
-      default-value: localhost
-      remark: BACnet host
-    - attribute-name: 端口
-      attribute-code: port
-      attribute-type-flag: INT
-      default-value: 47808
-      remark: BACnet port
+    driver-attribute:           # per-device config (one row per device)
+      - attribute-name: 主机
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: localhost
+        remark: BACnet host
+      - attribute-name: 端口
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 47808
+        remark: BACnet port
 
-  point-attribute:            # per-point config (one row per point on the device)
-    - attribute-name: 对象类型
-      attribute-code: objectType
-      attribute-type-flag: STRING
-      default-value: analog-input
-      remark: BACnet object type
-    - attribute-name: 实例号
-      attribute-code: instance
-      attribute-type-flag: INT
-      default-value: 0
-      remark: Object instance number
+    point-attribute:            # per-point config (one row per point on the device)
+      - attribute-name: 对象类型
+        attribute-code: objectType
+        attribute-type-flag: STRING
+        default-value: analog-input
+        remark: BACnet object type
+      - attribute-name: 实例号
+        attribute-code: instance
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Object instance number
 
 spring:
   application:
@@ -176,7 +177,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void initial() { /* ... */ }
 
     /**
-     * Called on the cron defined by `driver.schedule.custom.cron`. Use it for anything
+     * Called on the cron defined by `dc3.driver.schedule.custom.cron`. Use it for anything
      * that doesn't fit `read` (e.g. heartbeat, status polling, reconnect retries).
      * Typically you push status updates here:
      */
@@ -195,7 +196,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     /**
      * Read a single point value. Called once per (device, point) on the
-     * `driver.schedule.read.cron`. driverConfig holds the device-level attributes the
+     * `dc3.driver.schedule.read.cron`. driverConfig holds the device-level attributes the
      * operator filled in; pointConfig holds the per-point attributes.
      *
      * Return RValue with the raw string; the framework will run any configured
@@ -244,16 +245,16 @@ flips to OFFLINE between two heartbeats. For example, with `cron: '0/5 * * * * ?
 
 Three identifiers participate in driver routing:
 
-- **`driver.code`** (from `application.yml`) — the unique driver-type key Manager uses to
+- **`dc3.driver.code`** (from `application.yml`) — the unique driver-type key Manager uses to
   reject duplicate registrations. Validated by a strict regex: `^[A-Za-z0-9][...]{1,31}$`.
-- **`driver.service`** (auto-derived; can be overridden) — the per-instance routing
+- **`dc3.driver.service`** (auto-derived; can be overridden) — the per-instance routing
   identifier used as the suffix on RabbitMQ command queues (`dc3.q.command.driver.<service>`)
   and routing keys (`dc3.r.command.driver.<service>`). See
   [`RabbitConstant`](../../dc3-common/dc3-common-constant/src/main/java/io/github/pnoker/common/constant/driver/RabbitConstant.java).
 - **`spring.application.name`** (`@project.artifactId@`) — controls log filenames and
   Actuator metadata. Has no routing implication.
 
-**Pick `driver.code` once and never change it.** Renaming it after the driver has any
+**Pick `dc3.driver.code` once and never change it.** Renaming it after the driver has any
 devices configured against it requires a migration of `dc3_driver`,
 `dc3_driver_attribute`, and the RabbitMQ bindings.
 
@@ -283,7 +284,7 @@ and bind **Points**.
 
 1. Create a device via the UI → fill in `host` / `port` (your `driver-attribute` schema).
 2. Bind a point → fill in `objectType` / `instance` (your `point-attribute` schema).
-3. Wait one `driver.schedule.read.cron` cycle.
+3. Wait one `dc3.driver.schedule.read.cron` cycle.
 4. Inspect a value either in the **Live values** dashboard, in the database
    (`select * from dc3_point_value order by create_time desc limit 5;`), or with `curl`
    against `dc3-gateway` (`/api/v3/data/point_value/...`).
@@ -291,7 +292,7 @@ and bind **Points**.
 
 ## Common gotchas
 
-- **`driver.code` collides with another driver.** Manager rejects the registration. Pick a
+- **`dc3.driver.code` collides with another driver.** Manager rejects the registration. Pick a
   unique code; convention is PascalCase ending in `Driver`.
 - **`DriverCustomServiceImpl` not picked up.** The class needs `@Service` *and* must live in
   a package scanned from your `@SpringBootApplication` class — i.e. same package or below.
