@@ -13,9 +13,6 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  MAVEN_SETTINGS: .mvn/settings.xml
-
 jobs:
   compile:
     runs-on: ubuntu-latest
@@ -35,4 +32,4 @@ jobs:
       - name: Compile
         run: |
           set -euo pipefail
-          mvn -s "$MAVEN_SETTINGS" -U -e -B -DskipTests compile --no-transfer-progress
+          mvn -U -e -B -DskipTests compile --no-transfer-progress
