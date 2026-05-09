@@ -19,6 +19,7 @@ package io.github.pnoker.common.manager.grpc.server.manager;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.DeviceApiGrpc;
+import io.github.pnoker.api.center.manager.GrpcDeviceIdsQuery;
 import io.github.pnoker.api.center.manager.GrpcDeviceQuery;
 import io.github.pnoker.api.center.manager.GrpcDriverQuery;
 import io.github.pnoker.api.center.manager.GrpcPageDeviceDTO;

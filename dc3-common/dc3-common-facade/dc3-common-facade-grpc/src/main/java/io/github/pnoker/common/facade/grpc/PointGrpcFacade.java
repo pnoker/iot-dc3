@@ -19,9 +19,11 @@ package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.manager.GrpcPagePointDTO;
 import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
+import io.github.pnoker.api.center.manager.GrpcPointIdsQuery;
 import io.github.pnoker.api.center.manager.GrpcPointQuery;
 import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
 import io.github.pnoker.api.center.manager.GrpcRPointDTO;
+import io.github.pnoker.api.center.manager.GrpcRPointListDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
