@@ -40,7 +40,7 @@ Then rebuild.
 
 ## 4. Ports already in use
 
-**Symptom**: Application fails to start due to occupied ports (8000/8300/8400/8500/9300/9400/9500).
+**Symptom**: Application fails to start due to occupied ports (8000/8300/8400/8500/8600/9300/9400/9500).
 
 **Resolution**: Override ports using environment variables or `.env` values.
 

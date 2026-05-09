@@ -44,3 +44,5 @@ export CENTER_AGENTIC_HOST=localhost
 export OPENAI_BASE_URL=https://api.openai.com
 export OPENAI_API_KEY=sk-your-api-key
 export OPENAI_MODEL=gpt-4o
+export OPENAI_TEMPERATURE=0.7
+export OPENAI_MAX_TOKENS=2048

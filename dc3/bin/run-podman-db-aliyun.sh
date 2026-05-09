@@ -17,10 +17,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-set -e
+set -euo pipefail
 
-cd dc3
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+compose_file="${script_dir}/../docker-compose-db-aliyun.yml"
 
-podman compose -f docker-compose-db-aliyun.yml pull
-podman compose -f docker-compose-db-aliyun.yml down -v
-podman compose -f docker-compose-db-aliyun.yml up -d
+podman compose -f "${compose_file}" pull
+if [[ "${RESET_VOLUMES:-false}" == "true" ]]; then
+    podman compose -f "${compose_file}" down -v
+else
+    podman compose -f "${compose_file}" down
+fi
+podman compose -f "${compose_file}" up -d

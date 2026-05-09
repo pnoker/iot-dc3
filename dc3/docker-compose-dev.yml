@@ -32,7 +32,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -54,7 +54,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_GRPC_PORT:-9300}:9300"
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -76,7 +76,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_GRPC_PORT:-9400}:9400"
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -98,7 +98,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_GRPC_PORT:-9500}:9500"
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -108,6 +108,32 @@ services:
       dc3net:
         aliases:
           - dc3-center-data
+
+  agentic:
+    build:
+      context: ../dc3-center/dc3-center-agentic/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.5}
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AGENTIC_PORT:-8600}:8600"
+    environment:
+      - NODE_ENV=test
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
+      - OPENAI_TEMPERATURE=${OPENAI_TEMPERATURE:-0.7}
+      - OPENAI_MAX_TOKENS=${OPENAI_MAX_TOKENS:-2048}
+    container_name: dc3-center-agentic
+    hostname: dc3-center-agentic
+    volumes:
+      - logs:/dc3-center/dc3-center-agentic/dc3/logs
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-agentic
 
   listening-virtual:
     build:
@@ -120,7 +146,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_GRPC_PORT:-6271}:6271"
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -139,7 +165,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -158,7 +184,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -177,7 +203,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -196,7 +222,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -215,7 +241,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -234,7 +260,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
-      - APM_AGENT_ENABLE=false
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:

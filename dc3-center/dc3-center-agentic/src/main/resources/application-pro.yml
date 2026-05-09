@@ -1,2 +1,28 @@
+# Production environment configuration
 spring:
   env: pro
+  datasource:
+    dynamic:
+      datasource:
+        master:
+          url: jdbc:postgresql://${POSTGRES_HOST:dc3-postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dc3}?currentSchema=${POSTGRES_SCHEMA:dc3_agentic}&applicationName=dc3&ssl=false&stringtype=unspecified&clientEncoding=UTF8&serverTimezone=Asia/Shanghai
+          username: ${POSTGRES_USERNAME:dc3}
+          password: ${POSTGRES_PASSWORD:dc3dc3dc3}
+  grpc:
+    client:
+      channels:
+        dc3-center-auth:
+          address: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
+          enable-keep-alive: true
+          keep-alive-without-calls: true
+          negotiation-type: PLAINTEXT
+        dc3-center-manager:
+          address: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9400'
+          enable-keep-alive: true
+          keep-alive-without-calls: true
+          negotiation-type: PLAINTEXT
+        dc3-center-data:
+          address: 'static://${CENTER_DATA_HOST:dc3-center-data}:9500'
+          enable-keep-alive: true
+          keep-alive-without-calls: true
+          negotiation-type: PLAINTEXT
