@@ -42,6 +42,9 @@ source dc3/env/dev.env.sh
 Review the file first; it exports development defaults for databases, message brokers,
 gRPC targets, and optional AI integration.
 
+For the difference between root `.env.example` and `dc3/env/dev.env(.sh)`, see
+[`ENVIRONMENT.md`](ENVIRONMENT.md).
+
 ## 4. Build from source
 
 ```bash
@@ -123,7 +126,8 @@ make compose-restart STACK=dev
 ## 10. Common pitfalls
 
 - If Nacos is required in pre/pro profile, make sure the register service is available.
-- If ports are occupied, override them through .env or environment variables.
+- If ports are occupied, override Compose published ports through root `.env`,
+  or override per-process ports with service-specific environment variables.
 - If you want to run everything in one JVM for debugging, use dc3-center-single.
 
 ```bash

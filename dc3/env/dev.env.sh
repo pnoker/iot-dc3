@@ -15,6 +15,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+# Local source-run environment for IDE or Maven runs.
+# This file mirrors the "Local source-run defaults" section in ../../.env.example.
+# It intentionally excludes Compose-only variables such as DC3_IMAGE_* and DC3_*_PORT.
+
 # Postgres
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=35432
@@ -37,8 +41,8 @@ export MQTT_PASSWORD=dc3dc3dc3
 
 #Grpc
 export CENTER_AUTH_HOST=localhost
-export CENTER_DATA_HOST=localhost
 export CENTER_MANAGER_HOST=localhost
+export CENTER_DATA_HOST=localhost
 export CENTER_AGENTIC_HOST=localhost
 
 # Runtime
@@ -51,10 +55,24 @@ export MQTT_BATCH_INTERVAL=5
 
 # Spring AI
 export OPENAI_BASE_URL=https://api.openai.com
-export OPENAI_API_KEY=sk-your-api-key
+export OPENAI_API_KEY=
 export OPENAI_MODEL=gpt-4o
 export OPENAI_TEMPERATURE=0.7
 export OPENAI_MAX_TOKENS=2048
 export AGENTIC_MEMORY_SCHEMA_INIT=always
 export AGENTIC_MEMORY_MAX_MESSAGES=50
 export AGENTIC_SESSION_TTL_HOURS=72
+
+# Per-process overrides. Uncomment only for a single service process.
+# export SERVER_PORT=8000
+# export GRPC_SERVER_PORT=9300
+# export TCP_PORT=6270
+# export UDP_PORT=6271
+# export POSTGRES_SCHEMA=dc3_manager
+
+# Gateway route overrides. Usually CENTER_*_HOST is enough for local runs.
+# export GATEWAY_ROUTE_AUTH_TOKEN_URI=http://localhost:8300/
+# export GATEWAY_ROUTE_AUTH_URI=http://localhost:8300
+# export GATEWAY_ROUTE_MANAGER_URI=http://localhost:8400
+# export GATEWAY_ROUTE_DATA_URI=http://localhost:8500
+# export GATEWAY_ROUTE_AGENTIC_URI=http://localhost:8600

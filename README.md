@@ -95,6 +95,9 @@ Copy the example file before changing any published ports, image tags, or observ
 cp .env.example .env
 ```
 
+For the difference between root `.env` and `dc3/env/dev.env(.sh)`, see
+[`dc3/doc/ENVIRONMENT.md`](dc3/doc/ENVIRONMENT.md).
+
 Common overrides used by the Compose stacks in `dc3/`:
 
 | Variable                                                                | Default                 | Purpose                                                                     |
@@ -115,7 +118,7 @@ Common overrides used by the Compose stacks in `dc3/`:
 | `DC3_MANAGER_PORT` / `DC3_MANAGER_GRPC_PORT`                            | `8400` / `9400`         | Manager center HTTP and gRPC ports                                          |
 | `DC3_DATA_PORT` / `DC3_DATA_GRPC_PORT`                                  | `8500` / `9500`         | Data center HTTP and gRPC ports                                             |
 | `DC3_AGENTIC_PORT`                                                      | `8600`                  | Agentic center HTTP port                                                    |
-| `DC3_LISTENING_VIRTUAL_DRIVER_PORT` / `DC3_LISTENING_VIRTUAL_GRPC_PORT` | `6270` / `6271`         | Listening virtual driver ports                                              |
+| `DC3_LISTENING_VIRTUAL_TCP_PORT` / `DC3_LISTENING_VIRTUAL_UDP_PORT`     | `6270` / `6271`         | Listening virtual driver TCP / UDP ports                                    |
 | `OPENAI_BASE_URL` / `OPENAI_MODEL`                                      | `https://api.openai.com` / `gpt-4o` | OpenAI-compatible endpoint and chat model for Agentic center       |
 | `OPENAI_API_KEY`                                                        | empty                   | OpenAI-compatible API key for Agentic center                                |
 | `DC3_EMQX_WS_PORT` / `DC3_EMQX_WSS_PORT`                                | `38083` / `38084`       | EMQX WebSocket endpoints                                                    |
