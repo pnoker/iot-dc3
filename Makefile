@@ -31,25 +31,27 @@ MVN := mvn -s $(MVN_SETTINGS)
 MVN_SUB := mvn -s ../$(MVN_SETTINGS)
 
 ifeq ($(REGISTRY),global)
-REGISTRY_SUFFIX :=
+DEFAULT_IMAGE_REGISTRY := pnoker
 else ifeq ($(REGISTRY),overseas)
-REGISTRY_SUFFIX :=
+DEFAULT_IMAGE_REGISTRY := pnoker
 else ifeq ($(REGISTRY),international)
-REGISTRY_SUFFIX :=
+DEFAULT_IMAGE_REGISTRY := pnoker
 else ifeq ($(REGISTRY),domestic)
-REGISTRY_SUFFIX := -aliyun
+DEFAULT_IMAGE_REGISTRY := registry.cn-beijing.aliyuncs.com/dc3
 else ifeq ($(REGISTRY),aliyun)
-REGISTRY_SUFFIX := -aliyun
+DEFAULT_IMAGE_REGISTRY := registry.cn-beijing.aliyuncs.com/dc3
 else ifeq ($(REGISTRY),cn)
-REGISTRY_SUFFIX := -aliyun
+DEFAULT_IMAGE_REGISTRY := registry.cn-beijing.aliyuncs.com/dc3
 else
 $(error Unsupported REGISTRY '$(REGISTRY)'. Use REGISTRY=global|overseas or REGISTRY=domestic|aliyun|cn)
 endif
 
+DC3_IMAGE_REGISTRY ?= $(DEFAULT_IMAGE_REGISTRY)
+COMPOSE_ENV := DC3_IMAGE_REGISTRY="$(DC3_IMAGE_REGISTRY)"
 STACK_SUFFIX := $(if $(filter app,$(STACK)),,-$(STACK))
 
 ifeq ($(origin COMPOSE_FILE), undefined)
-RESOLVED_COMPOSE_FILE := $(COMPOSE_DIR)/docker-compose$(STACK_SUFFIX)$(REGISTRY_SUFFIX).yml
+RESOLVED_COMPOSE_FILE := $(COMPOSE_DIR)/docker-compose$(STACK_SUFFIX).yml
 MAKE_COMPOSE_OVERRIDE :=
 else
 RESOLVED_COMPOSE_FILE := $(if $(findstring /,$(COMPOSE_FILE)),$(COMPOSE_FILE),$(COMPOSE_DIR)/$(COMPOSE_FILE))
@@ -79,8 +81,8 @@ help:
 	&& echo ' - make compose-file STACK=<...>: print the resolved compose file path' \
 	&& echo ' - make deploy: deploy with mvn -s .mvn/settings.xml' \
 	&& echo 'Registry aliases:' \
-	&& echo '   global / overseas / international -> Docker Hub' \
-	&& echo '   domestic / aliyun / cn           -> Aliyun registry' \
+	&& echo '   global / overseas / international -> DC3_IMAGE_REGISTRY=pnoker' \
+	&& echo '   domestic / aliyun / cn           -> DC3_IMAGE_REGISTRY=registry.cn-beijing.aliyuncs.com/dc3' \
 	&& echo 'Examples:' \
 	&& echo '   make dev' \
 	&& echo '   make dev REGISTRY=domestic' \
@@ -105,28 +107,28 @@ compose-file: check-compose
 	@echo "$(RESOLVED_COMPOSE_FILE)"
 
 compose-up: check-compose
-	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" up -d
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" up -d
 
 compose-down: check-compose
-	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" down
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" down
 
 compose-ps: check-compose
-	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" ps
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" ps
 
 compose-config: check-compose
-	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" config
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" config
 
 compose-build: check-compose
-	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" build
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" build
 
 compose-pull: check-compose
-	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" pull
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" pull
 
 compose-logs: check-compose
-	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" logs -f --tail=200
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" logs -f --tail=200
 
 compose-restart: check-compose
-	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" restart
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" restart
 
 app:
 	@$(MAKE) compose-up STACK=app REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)

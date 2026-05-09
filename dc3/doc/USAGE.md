@@ -63,15 +63,16 @@ All images are built for multiple platforms:
 
 | Description              | Docker Hub                                               | Aliyun Container Registry                                                          |
 |--------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------|
-| Gateway                  | `pnoker/dc3-gateway:${SERVICE_VERSION}`                  | `registry.cn-beijing.aliyuncs.com/dc3-gateway:${SERVICE_VERSION}`                  |
-| Auth Center              | `pnoker/dc3-center-auth:${SERVICE_VERSION}`              | `registry.cn-beijing.aliyuncs.com/dc3-center-auth:${SERVICE_VERSION}`              |
-| Data Center              | `pnoker/dc3-center-data:${SERVICE_VERSION}`              | `registry.cn-beijing.aliyuncs.com/dc3-center-data:${SERVICE_VERSION}`              |
-| Manager Center           | `pnoker/dc3-center-manager:${SERVICE_VERSION}`           | `registry.cn-beijing.aliyuncs.com/dc3-center-manager:${SERVICE_VERSION}`           |
-| Single Center            | `pnoker/dc3-center-single:${SERVICE_VERSION}`            | `registry.cn-beijing.aliyuncs.com/dc3-center-single:${SERVICE_VERSION}`            |
-| Listening Virtual Driver | `pnoker/dc3-driver-listening-virtual:${SERVICE_VERSION}` | `registry.cn-beijing.aliyuncs.com/dc3-driver-listening-virtual:${SERVICE_VERSION}` |
-| Modbus TCP Driver        | `pnoker/dc3-driver-modbus-tcp:${SERVICE_VERSION}`        | `registry.cn-beijing.aliyuncs.com/dc3-driver-modbus-tcp:${SERVICE_VERSION}`        |
-| MQTT Driver              | `pnoker/dc3-driver-mqtt:${SERVICE_VERSION}`              | `registry.cn-beijing.aliyuncs.com/dc3-driver-mqtt:${SERVICE_VERSION}`              |
-| OPC DA Driver            | `pnoker/dc3-driver-opc-da:${SERVICE_VERSION}`            | `registry.cn-beijing.aliyuncs.com/dc3-driver-opc-da:${SERVICE_VERSION}`            |
-| OPC UA Driver            | `pnoker/dc3-driver-opc-ua:${SERVICE_VERSION}`            | `registry.cn-beijing.aliyuncs.com/dc3-driver-opc-ua:${SERVICE_VERSION}`            |
-| Siemens S7 Driver        | `pnoker/dc3-driver-plcs7:${SERVICE_VERSION}`             | `registry.cn-beijing.aliyuncs.com/dc3-driver-plcs7:${SERVICE_VERSION}`             |
-| Virtual Driver           | `pnoker/dc3-driver-virtual:${SERVICE_VERSION}`           | `registry.cn-beijing.aliyuncs.com/dc3-driver-virtual:${SERVICE_VERSION}`           |
+| Gateway                  | `pnoker/dc3-gateway:${SERVICE_VERSION}`                  | `registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:${SERVICE_VERSION}`                  |
+| Agentic Center           | `pnoker/dc3-center-agentic:${SERVICE_VERSION}`           | `registry.cn-beijing.aliyuncs.com/dc3/dc3-center-agentic:${SERVICE_VERSION}`           |
+| Auth Center              | `pnoker/dc3-center-auth:${SERVICE_VERSION}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:${SERVICE_VERSION}`              |
+| Data Center              | `pnoker/dc3-center-data:${SERVICE_VERSION}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:${SERVICE_VERSION}`              |
+| Manager Center           | `pnoker/dc3-center-manager:${SERVICE_VERSION}`           | `registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:${SERVICE_VERSION}`           |
+| Single Center            | `pnoker/dc3-center-single:${SERVICE_VERSION}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-center-single:${SERVICE_VERSION}`            |
+| Listening Virtual Driver | `pnoker/dc3-driver-listening-virtual:${SERVICE_VERSION}` | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:${SERVICE_VERSION}` |
+| Modbus TCP Driver        | `pnoker/dc3-driver-modbus-tcp:${SERVICE_VERSION}`        | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:${SERVICE_VERSION}`        |
+| MQTT Driver              | `pnoker/dc3-driver-mqtt:${SERVICE_VERSION}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:${SERVICE_VERSION}`              |
+| OPC DA Driver            | `pnoker/dc3-driver-opc-da:${SERVICE_VERSION}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:${SERVICE_VERSION}`            |
+| OPC UA Driver            | `pnoker/dc3-driver-opc-ua:${SERVICE_VERSION}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:${SERVICE_VERSION}`            |
+| Siemens S7 Driver        | `pnoker/dc3-driver-plcs7:${SERVICE_VERSION}`             | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:${SERVICE_VERSION}`             |
+| Virtual Driver           | `pnoker/dc3-driver-virtual:${SERVICE_VERSION}`           | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:${SERVICE_VERSION}`           |

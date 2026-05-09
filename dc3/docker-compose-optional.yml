@@ -23,7 +23,7 @@ x-logging: &default-logging
 
 services:
   emqx:
-    image: pnoker/dc3-emqx:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-emqx:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_EMQX_WS_PORT:-38083}:8083"
