@@ -25,9 +25,9 @@ import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProper
 import io.github.pnoker.common.resource.registrar.scan.ApiEndpointScanner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 
 import java.util.List;
 
@@ -48,14 +48,14 @@ public class ResourceRegistrar {
 
     private final ResourceRegistrarProperties properties;
 
-    private final String fallbackServiceName;
+    private final Environment environment;
 
     public ResourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
-                             ResourceRegistrarProperties properties, @Value("${spring.application.name:}") String fallbackServiceName) {
+                             ResourceRegistrarProperties properties, Environment environment) {
         this.scanner = scanner;
         this.facade = facade;
         this.properties = properties;
-        this.fallbackServiceName = fallbackServiceName;
+        this.environment = environment;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -96,7 +96,7 @@ public class ResourceRegistrar {
 
     private String resolveServiceName() {
         String name = properties.getServiceName();
-        return StringUtils.isBlank(name) ? fallbackServiceName : name;
+        return StringUtils.isBlank(name) ? environment.getProperty("spring.application.name") : name;
     }
 
 }

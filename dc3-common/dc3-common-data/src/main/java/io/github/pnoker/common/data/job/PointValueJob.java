@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.data.job;
 
+import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
@@ -50,17 +50,17 @@ public class PointValueJob extends QuartzJobBean {
 
     private static final List<PointValueBO> POINT_VALUE_LIST = new ArrayList<>();
 
-    @Value("${data.point.batch.speed}")
-    private Integer batchSpeed;
-
-    @Value("${data.point.batch.interval}")
-    private Integer interval;
+    private final PointBatchProperties pointBatchProperties;
 
     @Resource
     private PointValueService pointValueService;
 
     @Resource
     private ExecutorService virtualThreadExecutor;
+
+    public PointValueJob(PointBatchProperties pointBatchProperties) {
+        this.pointBatchProperties = pointBatchProperties;
+    }
 
     /**
      * PointValue
@@ -92,10 +92,10 @@ public class PointValueJob extends QuartzJobBean {
         // Statistical point value receive rate
         long speed = VALUE_COUNT.getAndSet(0);
         VALUE_SPEED.set(speed);
-        speed /= interval;
-        if (speed >= batchSpeed) {
+        speed /= pointBatchProperties.getInterval();
+        if (speed >= pointBatchProperties.getSpeed()) {
             log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, getPointValuesSize(),
-                    interval);
+                    pointBatchProperties.getInterval());
         }
 
         // Swap out the accumulated buffer under the lock; run the save on a private
