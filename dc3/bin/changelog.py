@@ -151,6 +151,7 @@ def previous_release_tag(to_ref: str, tag_pattern: str) -> str:
 
 
 def parse_commit(record: str) -> Commit:
+    record = record.strip()
     full_hash, short_hash, subject, author = record.split("\x1f")
     match = CONVENTIONAL_RE.match(subject)
     if match:
