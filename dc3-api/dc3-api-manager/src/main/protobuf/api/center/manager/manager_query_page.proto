@@ -51,7 +51,7 @@ message GrpcPageDriverQuery {
   // Driver type flag, distinguishes different types of drivers
   int32 driver_type_flag = 7;
 
-  // Enable flag, 1 for enabled, 0 for disabled
+  // Enable flag: 0 for enabled, 1 for disabled, -1 for unset
   int32 enable_flag = 8;
 
   // Version number for version management
@@ -85,7 +85,7 @@ message GrpcPagePointQuery {
   // Group ID for point group management
   int64 group_id = 8;
 
-  // Enable flag, 1 for enabled, 0 for disabled
+  // Enable flag: 0 for enabled, 1 for disabled, -1 for unset
   int32 enable_flag = 9;
 
   // Version number for version management
@@ -117,7 +117,7 @@ message GrpcPageDeviceQuery {
   // Group ID for device group management
   int64 group_id = 6;
 
-  // Enable flag, 1 for enabled, 0 for disabled
+  // Enable flag: 0 for enabled, 1 for disabled, -1 for unset
   int32 enable_flag = 7;
 
   // Version number for version management

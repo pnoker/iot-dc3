@@ -66,7 +66,7 @@ public class FacadeGrpcDriverBuilder {
                         () -> builder.setDriverTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(query.getEnableFlag())
                 .ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
-                        () -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT));
+                        () -> builder.setEnableFlag(DefaultConstant.NULL_INT));
 
         return builder.build();
     }
