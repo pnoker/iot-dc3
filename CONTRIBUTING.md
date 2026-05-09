@@ -1,62 +1,92 @@
-# IoT DC3 Contributor’s Guide
+# IoT DC3 Contributor Guide
 
-Are you looking for ways to start contributing to IoT DC3? This guide will help you understand how to contribute to the
-project, giving you an understanding of the types of
-contributions you can make, the standards for each type of contribution, the overall organization of the IoT DC3
-project, and the contribution process.
+Thank you for contributing to IoT DC3. This guide keeps contributions predictable for maintainers and safe for users.
 
-## Types of Contributions
+## Ways to Contribute
 
-While one of the most common ways to contribute to open source software is through code, there are many other ways to
-participate in the community development and maintenance of
-IoT DC3. In addition to code pull requests, you can contribute through bug reports, documentation fixes, feature
-requests, labeling templates, storage backends, and machine
-learning examples. You can also participate in the IoT DC3 community by engaging with the rest of the community and
-answering questions. No contribution is too small!
+- Report reproducible bugs with logs, versions, configuration, and steps to reproduce.
+- Propose features with the target scenario, expected behavior, and compatibility impact.
+- Improve documentation, examples, translations, and troubleshooting notes.
+- Submit code changes with focused commits and tests or verification notes.
 
-### Docs Update
+## Development Environment
 
-One of the easiest ways to contribute to IoT DC3 is through documentation updates. Documentation is one of the first
-ways that new users will engage with IoT DC3, and should help
-to guide users throughout their journey with IoT DC3. Helping to craft clear and correct documentation can have a
-lasting impact on the experience of the entire user community.
+Use the supported toolchain:
 
-In addition to the change itself, docs updates should include a description of the documentation problem in the pull
-request, and how the pull request addresses the issue.
+- JDK 21
+- Maven 3.9+
+- Podman or Docker
+- Make, optional but recommended
 
-Use the Docs Update template for your pull request, and prefix your pull request title with `docs:`.
+Start the local dependency stack from the repository root:
 
-### Bug Report
+```bash
+make dev-db
+make dev-optional
+```
 
-Bug reports help identify issues the development team may have missed in testing, or edge cases that diminish the user
-experience. A good bug report not only alerts the development
-team to an issue, but also provides the conditions to reproduce, verify, and fix the bug.
+For source-run Java processes, load runtime variables from:
 
-When filling out a bug report, please include as much of the following information as possible. If the development team
-can't reproduce your bug, they can’t take the necessary
-steps to fix it.
+```bash
+source dc3/env/dev.env.sh
+```
 
-A bug report can enter several different states, including:
+For Docker Compose interpolation, copy the root template first:
 
-- **verified**: The bug report has been verified and is in the development pipeline to be fixed
-- **not a bug**: The report does not describe a bug, which might be the result of expected behavior, or misconfiguration
-  of the platform
-- **needs information**: The development team couldn’t verify the bug, and needs additional information before action
-  can be taken
-- **fixed**: The bug report describes a bug that has been fixed in the latest version of IoT DC3
+```bash
+cp .env.example .env
+```
 
-When a bug report enters the “fixed” or “not a bug” states, the issue will be closed.
+See `dc3/doc/ENVIRONMENT.md` for the difference between `.env.example`, `.env`, `dc3/env/dev.env`, and
+`dc3/env/dev.env.sh`, including JetBrains IDEA usage.
 
-Use the Bug Report template for your issue.
+## Branches and Pull Requests
 
-### Bug Fix
+- Create feature and fix branches from the latest `main` branch unless a maintainer asks otherwise.
+- Use descriptive branch names such as `feature/<name>/<topic>` or `fix/<name>/<topic>`.
+- Open pull requests against `develop`.
+- Keep pull requests focused. Avoid mixing refactors, formatting churn, and behavior changes unless they are necessary
+  for the same fix.
+- Reference related issues in the pull request description.
 
-Bug fixes build upon bug reports, and provide code that addresses the issue. Before submitting a bug fix, please submit
-a bug report to provide the necessary context for the
-development team. Bug fixes should follow the coding standards for IoT DC3 and include tests. Unit tests are necessary
-to demonstrate the bug has been fixed, and to also provide a
-safeguard against future regressions. In addition to unit tests, you should provide acceptance criteria that the QA team
-can use to verify the application's behavior. Bug fixes
-must reference the original bug report.
+## Commit Messages
 
-Use the Bug Fix template for your pull request, and prefix your pull request title with `fix:`.
+Use concise Conventional Commit-style subjects:
+
+```text
+fix(manager): validate tenant scope for device queries
+docs(env): explain JetBrains IDEA environment variables
+refactor(container): deduplicate compose registry overrides
+```
+
+## Build and Verification
+
+Before opening a pull request, run the checks that match the touched area:
+
+```bash
+mvn -s .mvn/settings.xml clean package
+docker compose -f dc3/docker-compose-db.yml config
+```
+
+For documentation-only changes, at least check links, commands, and formatting manually. For container changes, run
+`docker compose config` for every touched compose file.
+
+## Coding Guidelines
+
+- Follow the existing package structure, naming, validation, exception, logging, and facade patterns.
+- Keep tenant-aware behavior explicit. New queries, gRPC calls, cache keys, and data mutations must preserve tenant
+  scope.
+- Prefer typed configuration properties with validation over scattered `@Value` usage for grouped settings.
+- Add tests or focused verification for behavior changes, especially shared common modules and cross-service contracts.
+- Do not commit secrets, generated local files, IDE metadata, or machine-specific configuration.
+
+## Documentation and Translation
+
+When changing root README content, keep `README.md`, `README.zh.md`, `README.ja.md`, and `README.vi.md` structurally
+aligned. If a translated update is not possible in the same pull request, call it out clearly in the pull request
+description.
+
+## License
+
+IoT DC3 Community Edition is licensed under the GNU Affero General Public License v3.0 or later. See
+`LICENSE-AGPL.txt` and `LICENSE.txt` for the project license notice.

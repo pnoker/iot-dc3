@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Local source-run environment for IDE or Maven runs.
+# Local source-run environment for IDE, EnvFile plugins, or Maven runs.
 # This file mirrors the "Local source-run defaults" section in ../../.env.example.
 # It intentionally excludes Compose-only variables such as DC3_IMAGE_* and DC3_*_PORT.
 
@@ -39,7 +39,7 @@ export MQTT_BROKER_PORT=31883
 export MQTT_USERNAME=dc3
 export MQTT_PASSWORD=dc3dc3dc3
 
-#Grpc
+# gRPC
 export CENTER_AUTH_HOST=localhost
 export CENTER_MANAGER_HOST=localhost
 export CENTER_DATA_HOST=localhost

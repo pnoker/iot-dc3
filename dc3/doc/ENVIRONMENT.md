@@ -61,6 +61,30 @@ DC3_FACADE_MODE=grpc
 `dc3/env/dev.env` contains the same source-run variables without `export`, which
 is convenient for IDE run configurations.
 
+## JetBrains IDEA Usage
+
+`dc3/env/dev.env` is kept for IDE usage and is not a duplicate of root `.env`.
+It intentionally contains only variables needed by local Java processes, while
+root `.env` also contains Compose-only image, port, logging, and observability
+interpolation variables.
+
+Recommended IDEA setup:
+
+1. Install the JetBrains EnvFile plugin.
+2. Open the run configuration for the service you want to start.
+3. Enable EnvFile for that run configuration.
+4. Add `dc3/env/dev.env`.
+5. Add only service-specific overrides in the same run configuration when
+   needed, for example `SERVER_PORT`, `GRPC_SERVER_PORT`, `TCP_PORT`,
+   `UDP_PORT`, or `POSTGRES_SCHEMA`.
+
+If you do not use the EnvFile plugin, open the run configuration, edit
+`Environment variables`, and paste the key-value pairs from `dc3/env/dev.env`.
+
+Do not point IDEA at `.env.example`; it is a template and is not loaded at
+runtime. Do not use root `.env` as the default IDEA file unless you explicitly
+want Compose-only variables to appear in the local Java process environment.
+
 ## Alignment Rules
 
 - Compose-only variables stay in `.env.example`.
@@ -80,6 +104,9 @@ is convenient for IDE run configurations.
 ## Common Pitfalls
 
 - Editing `.env.example` has no runtime effect. Copy it to `.env` first.
+- `dc3/env/dev.env` looks similar to part of root `.env.example`, but it serves
+  a different reader: IDE/source-run processes instead of Compose
+  interpolation.
 - Setting `POSTGRES_HOST=localhost` in root `.env` does not automatically change
   every app container; the compose service must pass the variable into the
   container.
