@@ -61,7 +61,7 @@ public class ThreadPoolConfig {
         return new ThreadPoolExecutor(thread.getCorePoolSize(), thread.getMaximumPoolSize(), thread.getKeepAliveTime(),
                 TimeUnit.SECONDS, new LinkedBlockingQueue<>(thread.getMaximumPoolSize() * 2),
                 r -> new Thread(r, "[T]" + thread.getPrefix() + threadPoolAtomic.getAndIncrement()),
-                (r, e) -> new BlockingRejectedExecutionHandler());
+                new BlockingRejectedExecutionHandler());
     }
 
     /**
@@ -86,7 +86,7 @@ public class ThreadPoolConfig {
     public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
         return new ScheduledThreadPoolExecutor(thread.getCorePoolSize(),
                 r -> new Thread(r, "[ST]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
-                (r, e) -> new BlockingRejectedExecutionHandler());
+                new BlockingRejectedExecutionHandler());
     }
 
     /**
