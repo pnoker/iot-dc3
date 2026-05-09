@@ -27,11 +27,19 @@ import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.manager.dal.DeviceManager;
+import io.github.pnoker.common.manager.dal.PointAttributeManager;
 import io.github.pnoker.common.manager.dal.PointAttributeConfigManager;
+import io.github.pnoker.common.manager.dal.PointManager;
+import io.github.pnoker.common.manager.dal.ProfileBindManager;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.builder.PointAttributeConfigBuilder;
+import io.github.pnoker.common.manager.entity.model.DeviceDO;
+import io.github.pnoker.common.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
+import io.github.pnoker.common.manager.entity.model.PointDO;
+import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.common.manager.entity.query.PointAttributeConfigQuery;
 import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.service.PointAttributeConfigService;
@@ -72,8 +80,22 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     @Resource
     private PointService pointService;
 
+    @Resource
+    private DeviceManager deviceManager;
+
+    @Resource
+    private PointManager pointManager;
+
+    @Resource
+    private PointAttributeManager pointAttributeManager;
+
+    @Resource
+    private ProfileBindManager profileBindManager;
+
     @Override
     public void save(PointAttributeConfigBO entityBO) {
+        validateTenantRelations(entityBO);
+
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException(
                     "Failed to create point attribute config: point attribute config has been duplicated");
@@ -92,6 +114,8 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO) {
+        validateTenantRelations(entityBO);
+
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException(
                     "Failed to create point attribute config: point attribute config has been duplicated");
@@ -121,7 +145,11 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public void update(PointAttributeConfigBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        PointAttributeConfigDO current = getDOById(entityBO.getId(), true);
+        if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+        validateTenantRelations(entityBO);
 
         if (checkDuplicate(entityBO, true)) {
             throw new DuplicateException(
@@ -150,6 +178,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     public PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId,
                                                                            Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
+                .eq(PointAttributeConfigDO::getAttributeId, attributeId)
                 .eq(PointAttributeConfigDO::getDeviceId, deviceId)
                 .eq(PointAttributeConfigDO::getPointId, pointId)
                 .last(QueryWrapperConstant.LIMIT_ONE);
@@ -233,6 +262,28 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
+
+    private void validateTenantRelations(PointAttributeConfigBO entityBO) {
+        DeviceDO deviceDO = deviceManager.getById(entityBO.getDeviceId());
+        PointDO pointDO = pointManager.getById(entityBO.getPointId());
+        PointAttributeDO attributeDO = pointAttributeManager.getById(entityBO.getAttributeId());
+        if (Objects.isNull(deviceDO) || Objects.isNull(pointDO) || Objects.isNull(attributeDO)
+                || !Objects.equals(entityBO.getTenantId(), deviceDO.getTenantId())
+                || !Objects.equals(entityBO.getTenantId(), pointDO.getTenantId())
+                || !Objects.equals(entityBO.getTenantId(), attributeDO.getTenantId())
+                || !Objects.equals(deviceDO.getDriverId(), attributeDO.getDriverId())
+                || !profileBindExists(entityBO.getTenantId(), deviceDO.getId(), pointDO.getProfileId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+    }
+
+    private boolean profileBindExists(Long tenantId, Long deviceId, Long profileId) {
+        return profileBindManager.lambdaQuery()
+                .eq(ProfileBindDO::getTenantId, tenantId)
+                .eq(ProfileBindDO::getDeviceId, deviceId)
+                .eq(ProfileBindDO::getProfileId, profileId)
+                .count() > 0;
     }
 
     /**

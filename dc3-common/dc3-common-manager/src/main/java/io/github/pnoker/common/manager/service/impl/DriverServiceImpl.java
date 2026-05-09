@@ -95,7 +95,10 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public void update(DriverBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        DriverDO current = getDOById(entityBO.getId(), true);
+        if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
 
         checkDuplicate(entityBO, true, true);
 

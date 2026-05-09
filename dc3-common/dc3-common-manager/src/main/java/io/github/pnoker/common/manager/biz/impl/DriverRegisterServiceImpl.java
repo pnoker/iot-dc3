@@ -115,6 +115,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
 
         Map<String, DriverAttributeBO> oldDriverAttributeMap = driverAttributeService.selectByDriverId(entityBO.getId())
                 .stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
                 .collect(Collectors.toMap(DriverAttributeBO::getAttributeCode, Function.identity()));
 
         // Diff into three buckets, then issue at most three round-trips (was N round-trips
@@ -124,6 +125,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         for (Map.Entry<String, DriverAttributeBO> entry : newDriverAttributeMap.entrySet()) {
             DriverAttributeBO attribute = entry.getValue();
             attribute.setDriverId(entityBO.getId());
+            attribute.setTenantId(entityBO.getTenantId());
             DriverAttributeBO existing = oldDriverAttributeMap.get(entry.getKey());
             if (existing != null) {
                 attribute.setId(existing.getId());
@@ -144,7 +146,9 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         driverAttributeService.updateBatch(toUpdate);
         driverAttributeService.removeByIds(toRemoveIds);
 
-        return driverAttributeService.selectByDriverId(entityBO.getId());
+        return driverAttributeService.selectByDriverId(entityBO.getId()).stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .toList();
     }
 
     @Override
@@ -156,6 +160,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
 
         Map<String, PointAttributeBO> oldPointAttributeMap = pointAttributeService.selectByDriverId(entityBO.getId())
                 .stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
                 .collect(Collectors.toMap(PointAttributeBO::getAttributeCode, Function.identity()));
 
         // See registerDriverAttribute — same three-bucket batch pattern.
@@ -164,6 +169,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         for (Map.Entry<String, PointAttributeBO> entry : newPointAttributeMap.entrySet()) {
             PointAttributeBO attribute = entry.getValue();
             attribute.setDriverId(entityBO.getId());
+            attribute.setTenantId(entityBO.getTenantId());
             PointAttributeBO existing = oldPointAttributeMap.get(entry.getKey());
             if (existing != null) {
                 attribute.setId(existing.getId());
@@ -184,7 +190,9 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         pointAttributeService.updateBatch(pointToUpdate);
         pointAttributeService.removeByIds(pointToRemoveIds);
 
-        return pointAttributeService.selectByDriverId(entityBO.getId());
+        return pointAttributeService.selectByDriverId(entityBO.getId()).stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .toList();
     }
 
 }

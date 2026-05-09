@@ -27,6 +27,7 @@ import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.entity.vo.DeviceVO;
 import io.github.pnoker.common.manager.service.DeviceService;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.utils.FileUtil;
 import io.github.pnoker.common.utils.ResponseUtil;
 import io.github.pnoker.common.valid.Add;
@@ -40,6 +41,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -64,9 +66,12 @@ public class DeviceController implements BaseController {
 
     private final DeviceService deviceService;
 
-    public DeviceController(DeviceBuilder deviceBuilder, DeviceService deviceService) {
+    private final DriverService driverService;
+
+    public DeviceController(DeviceBuilder deviceBuilder, DeviceService deviceService, DriverService driverService) {
         this.deviceBuilder = deviceBuilder;
         this.deviceService = deviceService;
+        this.driverService = driverService;
     }
 
     /**
@@ -91,10 +96,11 @@ public class DeviceController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, deviceService.selectById(id));
             deviceService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -106,6 +112,7 @@ public class DeviceController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
+            requireTenant(tenantId, deviceService.selectById(entityBO.getId()));
             deviceService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -119,11 +126,11 @@ public class DeviceController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<DeviceVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
-            DeviceBO entityBO = deviceService.selectById(id);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DeviceBO entityBO = requireTenant(tenantId, deviceService.selectById(id));
             DeviceVO entityVO = deviceBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -134,12 +141,12 @@ public class DeviceController implements BaseController {
      */
     @PostMapping("/ids")
     public Mono<R<Map<Long, DeviceVO>>> selectByIds(@RequestBody List<Long> deviceIds) {
-        return async(() -> {
-            List<DeviceBO> entityBOList = deviceService.selectByIds(deviceIds);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.selectByIds(deviceIds));
             Map<Long, DeviceVO> deviceMap = entityBOList.stream()
                     .collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
-        });
+        }));
     }
 
     /**
@@ -187,10 +194,13 @@ public class DeviceController implements BaseController {
      * @return
      */
     @PostMapping("/export/import_template")
-    public ResponseEntity<Resource> importTemplate(@Validated(Upload.class) @RequestBody DeviceVO entityVO) {
-        DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-        Path filePath = deviceService.generateImportTemplate(entityBO);
-        return ResponseUtil.responseFile(filePath);
+    public Mono<ResponseEntity<Resource>> importTemplate(@Validated(Upload.class) @RequestBody DeviceVO entityVO) {
+        return getTenantId().flatMap(tenantId -> Mono.fromCallable(() -> {
+            DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(tenantId);
+            Path filePath = deviceService.generateImportTemplate(entityBO);
+            return ResponseUtil.responseFile(filePath);
+        }).subscribeOn(Schedulers.boundedElastic()));
     }
 
     /**
@@ -199,10 +209,11 @@ public class DeviceController implements BaseController {
      */
     @GetMapping("/getDeviceByDriverId/{driverId}")
     public Mono<R<String>> getDeviceByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
-        return async(() -> {
-            List<DeviceBO> deviceBOList = deviceService.selectByDriverId(driverId);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, driverService.selectById(driverId));
+            List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.selectByDriverId(driverId));
             return R.ok(String.valueOf(deviceBOList.size()));
-        });
+        }));
     }
 
 }

@@ -28,6 +28,7 @@ import io.github.pnoker.common.manager.entity.builder.DriverAttributeBuilder;
 import io.github.pnoker.common.manager.entity.query.DriverAttributeQuery;
 import io.github.pnoker.common.manager.entity.vo.DriverAttributeVO;
 import io.github.pnoker.common.manager.service.DriverAttributeService;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
@@ -56,10 +57,13 @@ public class DriverAttributeController implements BaseController {
 
     private final DriverAttributeService driverAttributeService;
 
+    private final DriverService driverService;
+
     public DriverAttributeController(DriverAttributeBuilder driverAttributeBuilder,
-                                     DriverAttributeService driverAttributeService) {
+                                     DriverAttributeService driverAttributeService, DriverService driverService) {
         this.driverAttributeBuilder = driverAttributeBuilder;
         this.driverAttributeService = driverAttributeService;
+        this.driverService = driverService;
     }
 
     /**
@@ -86,10 +90,11 @@ public class DriverAttributeController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, driverAttributeService.selectById(id));
             driverAttributeService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -103,6 +108,7 @@ public class DriverAttributeController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
+            requireTenant(tenantId, driverAttributeService.selectById(entityBO.getId()));
             driverAttributeService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -116,11 +122,11 @@ public class DriverAttributeController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<DriverAttributeVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
-            DriverAttributeBO entityBO = driverAttributeService.selectById(id);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DriverAttributeBO entityBO = requireTenant(tenantId, driverAttributeService.selectById(id));
             DriverAttributeVO entityVO = driverAttributeBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -131,15 +137,16 @@ public class DriverAttributeController implements BaseController {
      */
     @GetMapping("/driver_id/{id}")
     public Mono<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             try {
-                List<DriverAttributeBO> entityBOList = driverAttributeService.selectByDriverId(id);
+                requireTenant(tenantId, driverService.selectById(id));
+                List<DriverAttributeBO> entityBOList = filterTenant(tenantId, driverAttributeService.selectByDriverId(id));
                 List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
             } catch (NotFoundException ne) {
                 return R.ok(Collections.emptyList());
             }
-        });
+        }));
     }
 
     /**

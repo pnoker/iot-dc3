@@ -26,6 +26,7 @@ import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.builder.ProfileBuilder;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.manager.entity.vo.ProfileVO;
+import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -57,9 +58,12 @@ public class ProfileController implements BaseController {
 
     private final ProfileService profileService;
 
-    public ProfileController(ProfileBuilder profileBuilder, ProfileService profileService) {
+    private final DeviceService deviceService;
+
+    public ProfileController(ProfileBuilder profileBuilder, ProfileService profileService, DeviceService deviceService) {
         this.profileBuilder = profileBuilder;
         this.profileService = profileService;
+        this.deviceService = deviceService;
     }
 
     /**
@@ -86,10 +90,11 @@ public class ProfileController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, profileService.selectById(id));
             profileService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -103,6 +108,7 @@ public class ProfileController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
+            requireTenant(tenantId, profileService.selectById(entityBO.getId()));
             profileService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -116,11 +122,11 @@ public class ProfileController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<ProfileVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
-            ProfileBO entityBO = profileService.selectById(id);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            ProfileBO entityBO = requireTenant(tenantId, profileService.selectById(id));
             ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -131,12 +137,12 @@ public class ProfileController implements BaseController {
      */
     @PostMapping("/ids")
     public Mono<R<Map<Long, ProfileVO>>> selectByIds(@RequestBody Set<Long> profileIds) {
-        return async(() -> {
-            List<ProfileBO> entityBOList = profileService.selectByIds(profileIds);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.selectByIds(profileIds));
             Map<Long, ProfileVO> deviceMap = entityBOList.stream()
                     .collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
-        });
+        }));
     }
 
     /**
@@ -147,11 +153,12 @@ public class ProfileController implements BaseController {
      */
     @GetMapping("/device_id/{deviceId}")
     public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
-        return async(() -> {
-            List<ProfileBO> entityBOList = profileService.selectByDeviceId(deviceId);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, deviceService.selectById(deviceId));
+            List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.selectByDeviceId(deviceId));
             List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
-        });
+        }));
     }
 
     /**
