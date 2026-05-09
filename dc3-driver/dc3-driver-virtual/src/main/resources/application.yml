@@ -15,37 +15,38 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-driver:
-  tenant: default
-  name: 虚拟驱动
-  code: VirtualDriver
-  type: DRIVER_CLIENT
-  remark: @project.description@
-  schedule:
-    # Read data regularly
-    read:
-      enable: true
-      cron: '0/30 * * * * ?'
-    custom:
-      enable: true
-      cron: '0/5 * * * * ?'
-  driver-attribute:
-    - attribute-name: 主机
-      attribute-code: host
-      attribute-type-flag: STRING
-      default-value: localhost
-      remark: Ip
-    - attribute-name: 端口
-      attribute-code: port
-      attribute-type-flag: INT
-      default-value: 18600
-      remark: Port
-  point-attribute:
-    - attribute-name: 位号
-      attribute-code: tag
-      attribute-type-flag: STRING
-      default-value: TAG
-      remark: 位号名称
+dc3:
+  driver:
+    tenant: default
+    name: 虚拟驱动
+    code: VirtualDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    driver-attribute:
+      - attribute-name: 主机
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: localhost
+        remark: Ip
+      - attribute-name: 端口
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 18600
+        remark: Port
+    point-attribute:
+      - attribute-name: 位号
+        attribute-code: tag
+        attribute-type-flag: STRING
+        default-value: TAG
+        remark: 位号名称
 
 spring:
   application:

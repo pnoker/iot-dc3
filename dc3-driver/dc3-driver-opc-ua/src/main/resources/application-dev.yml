@@ -16,11 +16,12 @@
 #
 
 # Development environment configuration will overwrite the content configured in application-*.yml
-driver:
-  schedule:
-    # Read data regularly
-    read:
-      cron: '0/5 * * * * ?'
+dc3:
+  driver:
+    schedule:
+      # Read data regularly
+      read:
+        cron: '0/5 * * * * ?'
 
 spring:
   # When enabling env and group, auth, manager and data services need to be started locally

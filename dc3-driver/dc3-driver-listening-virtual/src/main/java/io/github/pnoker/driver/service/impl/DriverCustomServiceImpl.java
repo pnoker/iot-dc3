@@ -61,10 +61,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     DriverMetadata driverMetadata;
 
-    @Value("${driver.custom.tcp.port}")
+    @Value("${dc3.driver.custom.tcp.port}")
     private Integer tcpPort;
 
-    @Value("${driver.custom.udp.port}")
+    @Value("${dc3.driver.custom.udp.port}")
     private Integer udpPort;
 
     @Resource

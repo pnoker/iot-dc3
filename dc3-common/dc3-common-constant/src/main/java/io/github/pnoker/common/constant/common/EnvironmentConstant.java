@@ -77,44 +77,44 @@ public class EnvironmentConstant {
     public static final String SPRING_APPLICATION_NAME = "spring.application.name";
 
     /**
-     * Driver tenant name configuration key: "driver.tenant"
+     * Driver tenant name configuration key: "dc3.driver.tenant"
      */
-    public static final String DRIVER_TENANT = "driver.tenant";
+    public static final String DRIVER_TENANT = "dc3.driver.tenant";
 
     /**
-     * Driver node configuration key: "driver.node"
+     * Driver node configuration key: "dc3.driver.node"
      */
-    public static final String DRIVER_NODE = "driver.node";
+    public static final String DRIVER_NODE = "dc3.driver.node";
 
     /**
-     * Driver service configuration key: "driver.service"
+     * Driver service configuration key: "dc3.driver.service"
      */
-    public static final String DRIVER_SERVICE = "driver.service";
+    public static final String DRIVER_SERVICE = "dc3.driver.service";
 
     /**
-     * Driver host configuration key: "driver.host"
+     * Driver host configuration key: "dc3.driver.host"
      */
-    public static final String DRIVER_HOST = "driver.host";
+    public static final String DRIVER_HOST = "dc3.driver.host";
 
     /**
-     * Driver client name configuration key: "driver.client"
+     * Driver client name configuration key: "dc3.driver.client"
      */
-    public static final String DRIVER_CLIENT = "driver.client";
+    public static final String DRIVER_CLIENT = "dc3.driver.client";
 
     /**
-     * Driver port configuration key: "driver.port"
+     * Driver port configuration key: "dc3.driver.port"
      */
-    public static final String DRIVER_PORT = "driver.port";
+    public static final String DRIVER_PORT = "dc3.driver.port";
 
     /**
-     * Driver MQTT client name configuration key: "driver.mqtt.client"
+     * Driver MQTT client name configuration key: "dc3.driver.mqtt.client"
      */
-    public static final String MQTT_CLIENT = "driver.mqtt.client";
+    public static final String MQTT_CLIENT = "dc3.driver.mqtt.client";
 
     /**
-     * Driver MQTT topic prefix configuration key: "driver.mqtt.topic-prefix"
+     * Driver MQTT topic prefix configuration key: "dc3.driver.mqtt.topic-prefix"
      */
-    public static final String MQTT_PREFIX = "driver.mqtt.topic-prefix";
+    public static final String MQTT_PREFIX = "dc3.driver.mqtt.topic-prefix";
 
     private EnvironmentConstant() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);

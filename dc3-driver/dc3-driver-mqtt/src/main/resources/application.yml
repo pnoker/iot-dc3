@@ -15,31 +15,32 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-driver:
-  tenant: default
-  name: Mqtt驱动
-  code: MqttDriver
-  type: DRIVER_SERVER
-  remark: @project.description@
-  schedule:
-    # Read data regularly
-    read:
-      enable: false
-      cron: '0/30 * * * * ?'
-    custom:
-      enable: true
-      cron: '0/5 * * * * ?'
-  point-attribute:
-    - attribute-name: 指令Topic
-      attribute-code: commandTopic
-      attribute-type-flag: STRING
-      default-value: commandTopic
-      remark: 测点/设备接收下行指令的Mqtt主题
-    - attribute-name: 指令Qos
-      attribute-code: commandQos
-      attribute-type-flag: INT
-      default-value: 2
-      remark: 测点/设备接收下行指令的Mqtt主题的Qos
+dc3:
+  driver:
+    tenant: default
+    name: Mqtt驱动
+    code: MqttDriver
+    type: DRIVER_SERVER
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: false
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    point-attribute:
+      - attribute-name: 指令Topic
+        attribute-code: commandTopic
+        attribute-type-flag: STRING
+        default-value: commandTopic
+        remark: 测点/设备接收下行指令的Mqtt主题
+      - attribute-name: 指令Qos
+        attribute-code: commandQos
+        attribute-type-flag: INT
+        default-value: 2
+        remark: 测点/设备接收下行指令的Mqtt主题的Qos
 
 spring:
   application:

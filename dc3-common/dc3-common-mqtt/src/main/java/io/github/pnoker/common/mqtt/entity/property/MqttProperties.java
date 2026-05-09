@@ -43,7 +43,7 @@ import java.util.List;
 @Getter
 @Setter
 @Validated
-@ConfigurationProperties(prefix = "driver.mqtt")
+@ConfigurationProperties(prefix = "dc3.driver.mqtt")
 public class MqttProperties {
 
     @NotBlank(message = "Url can't be empty, ssl://host:port")

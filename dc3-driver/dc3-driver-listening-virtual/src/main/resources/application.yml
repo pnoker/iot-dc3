@@ -15,46 +15,47 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-driver:
-  tenant: default
-  name: 虚拟Tcp/Udp驱动
-  code: ListeningVirtualDriver
-  type: DRIVER_SERVER
-  remark: @project.description@
-  custom:
-    tcp:
-      port: ${TCP_PORT:6270}
-    udp:
-      port: ${UDP_PORT:6271}
-  schedule:
-    # Read data regularly
-    read:
-      enable: false
-      cron: '0/30 * * * * ?'
+dc3:
+  driver:
+    tenant: default
+    name: 虚拟Tcp/Udp驱动
+    code: ListeningVirtualDriver
+    type: DRIVER_SERVER
+    remark: @project.description@
     custom:
-      enable: true
-      cron: '0/5 * * * * ?'
-  point-attribute:
-    - attribute-name: 关键字
-      attribute-code: key
-      attribute-type-flag: STRING
-      default-value: 62
-      remark: 报文关键字
-    - attribute-name: 起始字节
-      attribute-code: start
-      attribute-type-flag: INT
-      default-value: 0
-      remark: 起始字节, 包含该字节
-    - attribute-name: 结束字节
-      attribute-code: end
-      attribute-type-flag: INT
-      default-value: 8
-      remark: 结束字节, 不包含该字节
-    - attribute-name: 类型
-      attribute-code: type
-      attribute-type-flag: STRING
-      default-value: string
-      remark: 解析类型, short, int, long, float, double, boolean, string
+      tcp:
+        port: ${TCP_PORT:6270}
+      udp:
+        port: ${UDP_PORT:6271}
+    schedule:
+      # Read data regularly
+      read:
+        enable: false
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    point-attribute:
+      - attribute-name: 关键字
+        attribute-code: key
+        attribute-type-flag: STRING
+        default-value: 62
+        remark: 报文关键字
+      - attribute-name: 起始字节
+        attribute-code: start
+        attribute-type-flag: INT
+        default-value: 0
+        remark: 起始字节, 包含该字节
+      - attribute-name: 结束字节
+        attribute-code: end
+        attribute-type-flag: INT
+        default-value: 8
+        remark: 结束字节, 不包含该字节
+      - attribute-name: 类型
+        attribute-code: type
+        attribute-type-flag: STRING
+        default-value: string
+        remark: 解析类型, short, int, long, float, double, boolean, string
 
 spring:
   application:

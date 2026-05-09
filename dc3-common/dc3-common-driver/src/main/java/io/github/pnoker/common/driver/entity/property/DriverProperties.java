@@ -43,7 +43,7 @@ import java.util.List;
 @Getter
 @Setter
 @Validated
-@ConfigurationProperties(prefix = "driver")
+@ConfigurationProperties(prefix = "dc3.driver")
 public class DriverProperties {
 
     /**

@@ -26,10 +26,11 @@ values on a configurable schedule without connecting to real hardware.
 Configured in `application-dev.yml`:
 
 ```yaml
-driver:
-  schedule:
-    read:
-      cron: '0/1 * * * * ?'   # Every second
+dc3:
+  driver:
+    schedule:
+      read:
+        cron: '0/1 * * * * ?'   # Every second
 ```
 
 ## Running Locally
@@ -65,4 +66,3 @@ Driver register success, service name: dc3-driver-virtual
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-
