@@ -50,29 +50,38 @@ public class SessionController implements BaseController {
 
     @GetMapping
     public Mono<R<Page<SessionVO>>> list(SessionQuery query) {
-        return async(() -> {
-            Page<SessionBO> page = sessionService.selectByPage(query);
+        return getUserHeader().flatMap(header -> async(() -> {
+            SessionQuery scopedQuery = query == null ? new SessionQuery() : query;
+            scopedQuery.setTenantId(header.getTenantId());
+            scopedQuery.setUserId(header.getUserId());
+            Page<SessionBO> page = sessionService.selectByPage(scopedQuery);
             return R.ok(sessionBuilder.buildVOPageByBOPage(page));
-        });
+        }));
     }
 
     @GetMapping("/{conversationId}")
     public Mono<R<SessionVO>> get(@PathVariable String conversationId) {
-        return async(() -> {
-            SessionBO session = sessionService.getByConversationId(conversationId);
+        return getUserHeader().flatMap(header -> async(() -> {
+            SessionBO session = sessionService.getByConversationId(scopedConversationId(header.getTenantId(),
+                    header.getUserId(), conversationId));
             if (session == null) {
                 return R.fail("Session not found");
             }
             return R.ok(sessionBuilder.buildVOByBO(session));
-        });
+        }));
     }
 
     @DeleteMapping("/{conversationId}")
     public Mono<R<Boolean>> delete(@PathVariable String conversationId) {
-        return async(() -> {
-            sessionService.removeByConversationId(conversationId);
+        return getUserHeader().flatMap(header -> async(() -> {
+            sessionService.removeByConversationId(scopedConversationId(header.getTenantId(), header.getUserId(),
+                    conversationId));
             return R.ok();
-        });
+        }));
+    }
+
+    private String scopedConversationId(Long tenantId, Long userId, String conversationId) {
+        return tenantId + ":" + userId + ":" + conversationId;
     }
 
 }

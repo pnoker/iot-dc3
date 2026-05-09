@@ -53,18 +53,22 @@ public class SessionServiceImpl implements SessionService {
     private ChatMemory agenticChatMemory;
 
     @Override
-    public SessionBO touch(String conversationId, String skill) {
+    public SessionBO touch(String conversationId, String skill, Long tenantId, Long userId) {
         SessionDO existing = findByConversationId(conversationId);
         if (existing != null) {
             if (StringUtils.isNotEmpty(skill)) {
                 existing.setSkill(skill);
             }
+            existing.setTenantId(tenantId);
+            existing.setUserId(userId);
             sessionManager.updateById(existing);
             return sessionBuilder.buildBOByDO(existing);
         }
 
         SessionDO entityDO = new SessionDO();
         entityDO.setConversationId(conversationId);
+        entityDO.setTenantId(tenantId);
+        entityDO.setUserId(userId);
         entityDO.setTitle("New Conversation");
         entityDO.setSkill(StringUtils.defaultString(skill, ""));
         entityDO.setStatus((byte) 0);

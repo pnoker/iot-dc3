@@ -34,9 +34,11 @@ public interface SessionService {
      *
      * @param conversationId conversation ID
      * @param skill          active skill name (may be null)
+     * @param tenantId       tenant scope
+     * @param userId         user scope
      * @return the session BO
      */
-    SessionBO touch(String conversationId, String skill);
+    SessionBO touch(String conversationId, String skill, Long tenantId, Long userId);
 
     /**
      * Get session by conversation ID.
