@@ -110,12 +110,13 @@ make compose-restart STACK=dev
 | Auth Center    | 8300 | 9300 |
 | Manager Center | 8400 | 9400 |
 | Data Center    | 8500 | 9500 |
+| Agentic Center | 8600 | -    |
 
 ## 9. Recommended local workflow
 
 1. `make dev-db`
 2. `mvn -s .mvn/settings.xml clean package`
-3. Run Gateway -> Auth -> Data -> Manager -> Driver
+3. Run Gateway -> Auth -> Data -> Manager -> Agentic -> Driver
 4. Test APIs via Gateway at http://localhost:8000/api/v3/...
 5. If using observability stack, start Grafana/ELK after the core platform is stable
 

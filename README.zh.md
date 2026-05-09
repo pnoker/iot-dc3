@@ -89,7 +89,8 @@ cp .env.example .env
 ```
 
 根目录 `.env` 用于 `dc3/` 下 Compose 文件的变量插值；应用运行时环境变量仍然位于 `dc3/env/dev.env` 或
-`dc3/env/dev.env.sh`。
+`dc3/env/dev.env.sh`。如果启用 Agentic Center，请在 `.env` 或当前 shell 中配置 `OPENAI_BASE_URL`、
+`OPENAI_API_KEY`、`OPENAI_MODEL` 等 OpenAI 兼容参数。
 
 ## 3.2 准备工作
 
@@ -120,6 +121,9 @@ java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
 
 # 管理中心
 java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+
+# Agentic 中心
+java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
 
 # 虚拟驱动
 java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
