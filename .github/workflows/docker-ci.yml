@@ -15,7 +15,6 @@ concurrency:
 
 env:
   PROFILE: pro
-  MAVEN_SETTINGS: .mvn/settings.xml
   DOCKER_REGISTRY_DEFAULT: pnoker
   DOCKER_REGISTRY_ALIYUN: registry.cn-beijing.aliyuncs.com/dc3
 
@@ -39,7 +38,7 @@ jobs:
         id: variables
         run: |
           set -euo pipefail
-          VERSION=$(mvn -s "$MAVEN_SETTINGS" -q help:evaluate -Dexpression=project.version -DforceStdout)
+          VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
           SERIES="$VERSION"
           if [[ "$VERSION" == *.*.* ]]; then
             SERIES="${VERSION%.*}"
@@ -50,7 +49,7 @@ jobs:
       - name: Build with Maven
         run: |
           set -euo pipefail
-          mvn -s "$MAVEN_SETTINGS" -U -e -B clean package -DskipTests -P "$PROFILE" --no-transfer-progress
+          mvn -U -e -B clean package -DskipTests -P "$PROFILE" --no-transfer-progress
 
       - name: Set QEMU
         uses: docker/setup-qemu-action@v3
@@ -137,7 +136,7 @@ jobs:
         id: variables
         run: |
           set -euo pipefail
-          VERSION=$(mvn -s "$MAVEN_SETTINGS" -q help:evaluate -Dexpression=project.version -DforceStdout)
+          VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
           echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Generate release notes

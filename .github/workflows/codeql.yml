@@ -30,23 +30,33 @@ jobs:
           - language: actions
             build-mode: none
           - language: java-kotlin
-            build-mode: none
+            build-mode: manual
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: 21
+          cache: maven
+          cache-dependency-path: "**/pom.xml"
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
+          queries: +security-and-quality
 
-      - if: matrix.build-mode == 'manual'
-        shell: bash
+      - name: Build Java for CodeQL
+        if: matrix.build-mode == 'manual'
         run: |
-          echo 'Manual build mode is configured but no build command is provided.'
-          exit 1
+          set -euo pipefail
+          mvn -U -e -B -DskipTests compile --no-transfer-progress
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
