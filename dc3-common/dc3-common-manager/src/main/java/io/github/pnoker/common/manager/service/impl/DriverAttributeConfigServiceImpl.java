@@ -28,8 +28,12 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.manager.dal.DriverAttributeConfigManager;
+import io.github.pnoker.common.manager.dal.DeviceManager;
+import io.github.pnoker.common.manager.dal.DriverAttributeManager;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.builder.DriverAttributeConfigBuilder;
+import io.github.pnoker.common.manager.entity.model.DeviceDO;
+import io.github.pnoker.common.manager.entity.model.DriverAttributeDO;
 import io.github.pnoker.common.manager.entity.model.DriverAttributeConfigDO;
 import io.github.pnoker.common.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
@@ -63,8 +67,16 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     @Resource
     private MetadataEventPublisher metadataEventPublisher;
 
+    @Resource
+    private DeviceManager deviceManager;
+
+    @Resource
+    private DriverAttributeManager driverAttributeManager;
+
     @Override
     public void save(DriverAttributeConfigBO entityBO) {
+        validateTenantRelations(entityBO);
+
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException(
                     "Failed to create driver attribute config: driver attribute config has been duplicated");
@@ -83,6 +95,8 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
 
     @Override
     public DriverAttributeConfigBO innerSave(DriverAttributeConfigBO entityBO) {
+        validateTenantRelations(entityBO);
+
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException(
                     "Failed to create driver attribute config: driver attribute config has been duplicated");
@@ -112,7 +126,11 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
 
     @Override
     public void update(DriverAttributeConfigBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        DriverAttributeConfigDO current = getDOById(entityBO.getId(), true);
+        if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+        validateTenantRelations(entityBO);
 
         if (checkDuplicate(entityBO, true)) {
             throw new DuplicateException(
@@ -204,6 +222,17 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
+
+    private void validateTenantRelations(DriverAttributeConfigBO entityBO) {
+        DeviceDO deviceDO = deviceManager.getById(entityBO.getDeviceId());
+        DriverAttributeDO attributeDO = driverAttributeManager.getById(entityBO.getAttributeId());
+        if (Objects.isNull(deviceDO) || Objects.isNull(attributeDO)
+                || !Objects.equals(entityBO.getTenantId(), deviceDO.getTenantId())
+                || !Objects.equals(entityBO.getTenantId(), attributeDO.getTenantId())
+                || !Objects.equals(deviceDO.getDriverId(), attributeDO.getDriverId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
     /**

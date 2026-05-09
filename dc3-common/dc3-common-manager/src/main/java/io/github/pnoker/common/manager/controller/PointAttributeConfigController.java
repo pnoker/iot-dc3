@@ -22,11 +22,18 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.manager.entity.bo.DeviceBO;
+import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
+import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.builder.PointAttributeConfigBuilder;
 import io.github.pnoker.common.manager.entity.query.PointAttributeConfigQuery;
 import io.github.pnoker.common.manager.entity.vo.PointAttributeConfigVO;
+import io.github.pnoker.common.manager.service.DeviceService;
+import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.manager.service.PointAttributeConfigService;
+import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
@@ -54,10 +61,21 @@ public class PointAttributeConfigController implements BaseController {
 
     private final PointAttributeConfigService pointAttributeConfigService;
 
+    private final DeviceService deviceService;
+
+    private final PointService pointService;
+
+    private final PointAttributeService pointAttributeService;
+
     public PointAttributeConfigController(PointAttributeConfigBuilder pointAttributeConfigBuilder,
-                                          PointAttributeConfigService pointAttributeConfigService) {
+                                          PointAttributeConfigService pointAttributeConfigService,
+                                          DeviceService deviceService, PointService pointService,
+                                          PointAttributeService pointAttributeService) {
         this.pointAttributeConfigBuilder = pointAttributeConfigBuilder;
         this.pointAttributeConfigService = pointAttributeConfigService;
+        this.deviceService = deviceService;
+        this.pointService = pointService;
+        this.pointAttributeService = pointAttributeService;
     }
 
     /**
@@ -84,10 +102,11 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, pointAttributeConfigService.selectById(id));
             pointAttributeConfigService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -101,6 +120,7 @@ public class PointAttributeConfigController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
+            requireTenant(tenantId, pointAttributeConfigService.selectById(entityBO.getId()));
             pointAttributeConfigService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -114,11 +134,11 @@ public class PointAttributeConfigController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<PointAttributeConfigVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
-            PointAttributeConfigBO entityBO = pointAttributeConfigService.selectById(id);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            PointAttributeConfigBO entityBO = requireTenant(tenantId, pointAttributeConfigService.selectById(id));
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -134,12 +154,14 @@ public class PointAttributeConfigController implements BaseController {
             @NotNull @PathVariable(value = "attributeId") Long attributeId,
             @NotNull @PathVariable(value = "deviceId") Long deviceId,
             @NotNull @PathVariable(value = "pointId") Long pointId) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requirePointConfigRelations(tenantId, deviceId, pointId, attributeId);
             PointAttributeConfigBO entityBO = pointAttributeConfigService
                     .selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
+            requireTenant(tenantId, entityBO);
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -153,12 +175,13 @@ public class PointAttributeConfigController implements BaseController {
     public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceIdAndPointId(
             @NotNull @PathVariable(value = "deviceId") Long deviceId,
             @NotNull @PathVariable(value = "pointId") Long pointId) {
-        return async(() -> {
-            List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId,
-                    pointId);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requirePointConfigRelations(tenantId, deviceId, pointId, null);
+            List<PointAttributeConfigBO> entityBOList = filterTenant(tenantId,
+                    pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId));
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
-        });
+        }));
     }
 
     /**
@@ -170,11 +193,13 @@ public class PointAttributeConfigController implements BaseController {
     @GetMapping("/device_id/{deviceId}")
     public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceId(
             @NotNull @PathVariable(value = "deviceId") Long deviceId) {
-        return async(() -> {
-            List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceId(deviceId);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, deviceService.selectById(deviceId));
+            List<PointAttributeConfigBO> entityBOList = filterTenant(tenantId,
+                    pointAttributeConfigService.selectByDeviceId(deviceId));
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
-        });
+        }));
     }
 
     /**
@@ -195,6 +220,21 @@ public class PointAttributeConfigController implements BaseController {
                     .buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));
+    }
+
+    private void requirePointConfigRelations(Long tenantId, Long deviceId, Long pointId, Long attributeId) {
+        DeviceBO deviceBO = requireTenant(tenantId, deviceService.selectById(deviceId));
+        PointBO pointBO = requireTenant(tenantId, pointService.selectById(pointId));
+        if (Objects.isNull(deviceBO.getProfileIds()) || !deviceBO.getProfileIds().contains(pointBO.getProfileId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+
+        if (Objects.nonNull(attributeId)) {
+            PointAttributeBO attributeBO = requireTenant(tenantId, pointAttributeService.selectById(attributeId));
+            if (!Objects.equals(deviceBO.getDriverId(), attributeBO.getDriverId())) {
+                throw new NotFoundException("Resource does not exist");
+            }
+        }
     }
 
 }

@@ -19,10 +19,15 @@ package io.github.pnoker.common.base;
 
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.utils.UserHeaderUtil;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -54,6 +59,40 @@ public interface BaseController {
      */
     default Mono<Long> getTenantId() {
         return UserHeaderUtil.getTenantId();
+    }
+
+    /**
+     * Fail closed when an ID-based lookup returns an entity outside the caller's tenant.
+     * Returning 404 avoids exposing whether a cross-tenant resource exists.
+     */
+    default <T> T requireTenant(Long tenantId, T entity) {
+        if (Objects.isNull(entity) || !Objects.equals(tenantId, resolveTenantId(entity))) {
+            throw new NotFoundException("Resource does not exist");
+        }
+        return entity;
+    }
+
+    /**
+     * Keep only entities that belong to the caller's tenant for bulk lookup endpoints.
+     */
+    default <T> List<T> filterTenant(Long tenantId, Collection<T> entities) {
+        if (Objects.isNull(entities) || entities.isEmpty()) {
+            return List.of();
+        }
+        return entities.stream()
+                .filter(Objects::nonNull)
+                .filter(entity -> Objects.equals(tenantId, resolveTenantId(entity)))
+                .toList();
+    }
+
+    private Long resolveTenantId(Object entity) {
+        try {
+            Method method = entity.getClass().getMethod("getTenantId");
+            Object tenantId = method.invoke(entity);
+            return tenantId instanceof Long value ? value : null;
+        } catch (ReflectiveOperationException e) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
     /**

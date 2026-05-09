@@ -44,6 +44,11 @@ public class TopicQuery implements Serializable {
     private Pages page;
 
     /**
+     * Tenant ID
+     */
+    private Long tenantId;
+
+    /**
      *
      */
 

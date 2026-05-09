@@ -20,6 +20,7 @@ package io.github.pnoker.common.manager.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Topic Service Impl
@@ -45,6 +47,9 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
 
     @Override
     public Page<List<TopicVO>> query(TopicQuery topicQuery) {
+        if (Objects.isNull(topicQuery.getPage())) {
+            topicQuery.setPage(new Pages());
+        }
         int page = (int) topicQuery.getPage().getCurrent();
         int size = (int) topicQuery.getPage().getSize();
         Page<List<TopicVO>> resultPage = new Page<>(page, size);
@@ -57,7 +62,8 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
         }
         String dName = topicQuery.getDeviceName();
         List<DeviceDO> deviceList = lambdaQuery().eq(deviceIdL != null, DeviceDO::getId, deviceIdL)
-                .eq(!dName.isEmpty(), DeviceDO::getDeviceName, dName)
+                .eq(Objects.nonNull(topicQuery.getTenantId()), DeviceDO::getTenantId, topicQuery.getTenantId())
+                .eq(Objects.nonNull(dName) && !dName.isEmpty(), DeviceDO::getDeviceName, dName)
                 // .eq(DeviceDO::getEnableFlag, 1)
                 .list();
 
@@ -66,11 +72,13 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
             Long deviceId = device.getId();
             ProfileBindDO profileBind = Db.lambdaQuery(ProfileBindDO.class)
                     .eq(ProfileBindDO::getDeviceId, deviceId)
+                    .eq(Objects.nonNull(topicQuery.getTenantId()), ProfileBindDO::getTenantId, topicQuery.getTenantId())
                     .one();
             if (profileBind != null) {
                 Long profileBindId = profileBind.getProfileId();
                 List<PointDO> points = Db.lambdaQuery(PointDO.class)
                         .eq(PointDO::getProfileId, profileBindId)
+                        .eq(Objects.nonNull(topicQuery.getTenantId()), PointDO::getTenantId, topicQuery.getTenantId())
                         // .eq(PointDO::getEnableFlag, 1)
                         .eq(PointDO::getDeleted, 0)
                         .list();

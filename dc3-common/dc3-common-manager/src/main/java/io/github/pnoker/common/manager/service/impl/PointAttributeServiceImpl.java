@@ -25,10 +25,12 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.manager.dal.PointAttributeManager;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.builder.PointAttributeBuilder;
 import io.github.pnoker.common.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.common.manager.entity.query.PointAttributeQuery;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -58,8 +60,12 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Resource
     private PointAttributeManager pointAttributeManager;
 
+    @Resource
+    private DriverService driverService;
+
     @Override
     public void save(PointAttributeBO entityBO) {
+        validateTenantRelations(entityBO);
         checkDuplicate(entityBO, false, true);
 
         PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
@@ -79,7 +85,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     public void update(PointAttributeBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        PointAttributeDO current = getDOById(entityBO.getId(), true);
+        if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+        validateTenantRelations(entityBO);
 
         checkDuplicate(entityBO, true, true);
 
@@ -119,6 +129,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
             return;
         }
+        entityBOList.forEach(this::validateTenantRelations);
         List<PointAttributeDO> doList = entityBOList.stream().map(pointAttributeBuilder::buildDOByBO).toList();
         if (!pointAttributeManager.saveBatch(doList)) {
             throw new AddException("Failed to batch create point attributes");
@@ -130,6 +141,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
             return;
         }
+        entityBOList.forEach(this::validateTenantRelations);
         List<PointAttributeDO> doList = entityBOList.stream().map(bo -> {
             PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(bo);
             entityDO.setOperateTime(null);
@@ -200,6 +212,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             throw new DuplicateException("Point attribute has been duplicated");
         }
         return duplicate;
+    }
+
+    private void validateTenantRelations(PointAttributeBO entityBO) {
+        DriverBO driverBO = driverService.selectById(entityBO.getDriverId());
+        if (Objects.isNull(driverBO) || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
     /**

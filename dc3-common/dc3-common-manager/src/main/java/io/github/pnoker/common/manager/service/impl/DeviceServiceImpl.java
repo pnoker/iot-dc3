@@ -63,8 +63,10 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * DeviceService Impl
@@ -93,6 +95,12 @@ public class DeviceServiceImpl implements DeviceService {
     private ProfileBindService profileBindService;
 
     @Resource
+    private DriverService driverService;
+
+    @Resource
+    private ProfileService profileService;
+
+    @Resource
     private DriverAttributeService driverAttributeService;
 
     @Resource
@@ -106,6 +114,8 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void save(DeviceBO entityBO) {
+        validateTenantRelations(entityBO);
+
         boolean duplicate = checkDuplicate(entityBO, false);
         if (duplicate) {
             throw new DuplicateException("Failed to create device: device has been duplicated");
@@ -147,6 +157,10 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public void update(DeviceBO entityBO) {
         DeviceDO entityDO = getDOById(entityBO.getId(), true);
+        if (!Objects.equals(entityBO.getTenantId(), entityDO.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+        validateTenantRelations(entityBO);
 
         boolean duplicate = checkDuplicate(entityBO, true);
         if (duplicate) {
@@ -264,9 +278,19 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void importDevice(DeviceBO entityBO, File file) {
-        List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds());
-        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.selectByDriverId(entityBO.getDriverId());
-        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.selectByDriverId(entityBO.getDriverId());
+        validateTenantRelations(entityBO);
+
+        List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds()).stream()
+                .filter(pointBO -> Objects.equals(entityBO.getTenantId(), pointBO.getTenantId()))
+                .toList();
+        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.selectByDriverId(entityBO.getDriverId())
+                .stream()
+                .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
+                .toList();
+        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.selectByDriverId(entityBO.getDriverId())
+                .stream()
+                .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
+                .toList();
 
         Workbook workbook;
         try {
@@ -307,9 +331,19 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public Path generateImportTemplate(DeviceBO entityBO) {
-        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.selectByDriverId(entityBO.getDriverId());
-        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.selectByDriverId(entityBO.getDriverId());
-        List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds());
+        validateTenantRelations(entityBO);
+
+        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.selectByDriverId(entityBO.getDriverId())
+                .stream()
+                .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
+                .toList();
+        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.selectByDriverId(entityBO.getDriverId())
+                .stream()
+                .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
+                .toList();
+        List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds()).stream()
+                .filter(pointBO -> Objects.equals(entityBO.getTenantId(), pointBO.getTenantId()))
+                .toList();
 
         Workbook workbook = new XSSFWorkbook();
         CellStyle cellStyle = PoiUtil.getCenterCellStyle(workbook);
@@ -482,6 +516,29 @@ public class DeviceServiceImpl implements DeviceService {
             }
         });
 
+    }
+
+    private void validateTenantRelations(DeviceBO entityBO) {
+        Long tenantId = entityBO.getTenantId();
+        DriverBO driverBO = driverService.selectById(entityBO.getDriverId());
+        if (Objects.isNull(driverBO) || !Objects.equals(tenantId, driverBO.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+
+        if (CollectionUtils.isEmpty(entityBO.getProfileIds())) {
+            return;
+        }
+
+        Set<Long> profileIds = new HashSet<>(entityBO.getProfileIds());
+        if (profileIds.remove(null)) {
+            throw new NotFoundException("Resource does not exist");
+        }
+
+        List<ProfileBO> profileBOList = profileService.selectByIds(profileIds);
+        if (profileBOList.size() != profileIds.size() || profileBOList.stream()
+                .anyMatch(profileBO -> !Objects.equals(tenantId, profileBO.getTenantId()))) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
     /**

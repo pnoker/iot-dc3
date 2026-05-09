@@ -24,12 +24,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.dal.DriverAttributeManager;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.builder.DriverAttributeBuilder;
 import io.github.pnoker.common.manager.entity.model.DriverAttributeDO;
 import io.github.pnoker.common.manager.entity.query.DriverAttributeQuery;
 import io.github.pnoker.common.manager.service.DriverAttributeService;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
@@ -58,8 +60,12 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Resource
     private DriverAttributeManager driverAttributeManager;
 
+    @Resource
+    private DriverService driverService;
+
     @Override
     public void save(DriverAttributeBO entityBO) {
+        validateTenantRelations(entityBO);
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException("Failed to create driver attribute: driver attribute has been duplicated");
         }
@@ -81,7 +87,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     public void update(DriverAttributeBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        DriverAttributeDO current = getDOById(entityBO.getId(), true);
+        if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+        validateTenantRelations(entityBO);
 
         if (checkDuplicate(entityBO, true)) {
             throw new DuplicateException("Failed to update driver attribute: driver attribute has been duplicated");
@@ -123,6 +133,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
             return;
         }
+        entityBOList.forEach(this::validateTenantRelations);
         List<DriverAttributeDO> doList = entityBOList.stream().map(driverAttributeBuilder::buildDOByBO).toList();
         if (!driverAttributeManager.saveBatch(doList)) {
             throw new AddException("Failed to batch create driver attributes");
@@ -134,6 +145,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
             return;
         }
+        entityBOList.forEach(this::validateTenantRelations);
         List<DriverAttributeDO> doList = entityBOList.stream().map(bo -> {
             DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(bo);
             entityDO.setOperateTime(null);
@@ -199,6 +211,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
+
+    private void validateTenantRelations(DriverAttributeBO entityBO) {
+        DriverBO driverBO = driverService.selectById(entityBO.getDriverId());
+        if (Objects.isNull(driverBO) || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
     /**
