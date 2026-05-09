@@ -16,7 +16,7 @@
 #
 
 server:
-  port: ${SERVER_PORT:8100}
+  port: ${DC3_SINGLE_PORT:8100}
 
 spring:
   application:
@@ -25,20 +25,34 @@ spring:
     base-path: /single
   grpc:
     server:
-      port: ${GRPC_SERVER_PORT:9100}
+      port: ${DC3_SINGLE_GRPC_PORT:9100}
   profiles:
     active:
       - ${NODE_ENV:dev}
 
-data:
-  point:
-    batch:
-      speed: ${POINT_BATCH_SPEED:100}
-      interval: ${POINT_BATCH_INTERVAL:5}
-
 dc3:
+  data:
+    point:
+      batch:
+        speed: ${POINT_BATCH_SPEED:100}
+        interval: ${POINT_BATCH_INTERVAL:5}
   facade:
     mode: ${DC3_FACADE_MODE:local}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
 
 logging:
   file:

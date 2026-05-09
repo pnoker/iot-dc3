@@ -17,7 +17,7 @@
 
 # Server configuration
 server:
-  port: 8000
+  port: ${DC3_GATEWAY_PORT:8000}
 
 # Spring application configuration
 spring:
@@ -31,6 +31,21 @@ spring:
 dc3:
   facade:
     mode: ${DC3_FACADE_MODE:grpc}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
 
 # Logging configuration
 logging:

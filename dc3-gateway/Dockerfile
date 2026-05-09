@@ -23,7 +23,7 @@ LABEL dc3.author.email=pnokers.icloud.com
 # Default environment variables
 ENV PARAMS=''
 ENV NODE_ENV=test
-ENV SERVER_PORT=8000
+ENV DC3_GATEWAY_PORT=8000
 ENV SERVER_NAME=dc3-gateway
 ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
@@ -52,7 +52,7 @@ COPY target/dc3-gateway.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 
 # Expose server port
-EXPOSE ${SERVER_PORT}
+EXPOSE ${DC3_GATEWAY_PORT}
 # Mount logs volume
 VOLUME /dc3-gateway/dc3/logs
 
