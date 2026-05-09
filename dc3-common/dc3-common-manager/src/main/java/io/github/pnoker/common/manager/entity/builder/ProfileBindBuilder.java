@@ -22,6 +22,7 @@ import io.github.pnoker.common.manager.entity.bo.ProfileBindBO;
 import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.common.manager.entity.vo.ProfileBindVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -109,13 +110,9 @@ public interface ProfileBindBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ProfileBindBO> buildBOPageByDOPage(Page<ProfileBindDO> entityPageDO);
+    default Page<ProfileBindBO> buildBOPageByDOPage(Page<ProfileBindDO> entityPageDO) {
+        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
+    }
 
     /**
      * BOPage to VOPage
@@ -123,12 +120,8 @@ public interface ProfileBindBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ProfileBindVO> buildVOPageByBOPage(Page<ProfileBindBO> entityPageBO);
+    default Page<ProfileBindVO> buildVOPageByBOPage(Page<ProfileBindBO> entityPageBO) {
+        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
 
 }
