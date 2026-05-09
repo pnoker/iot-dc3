@@ -112,9 +112,12 @@ public class FilterServiceImpl implements FilterService {
 
     @Override
     public RequestHeader.UserHeader getUser(FacadeUserLoginBO userLogin, FacadeTenantBO tenant) {
-        // Preserves the existing (surprising) behavior: lookup UserApi by UserLogin.id,
-        // not UserLogin.userId. Changing that belongs in a separate bug-fix PR.
-        FacadeUserBO user = userCache.get(userLogin.getId(), id -> Optional.ofNullable(userFacade.selectById(id)))
+        Long userId = userLogin.getUserId();
+        if (Objects.isNull(userId)) {
+            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+        }
+
+        FacadeUserBO user = userCache.get(userId, id -> Optional.ofNullable(userFacade.selectById(id)))
                 .orElse(null);
         if (Objects.isNull(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
