@@ -16,8 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
@@ -291,7 +291,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     private String toJson(Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
+        } catch (DatabindException e) {
             log.error("Agentic response serialization failed, responseType={}", obj.getClass().getSimpleName(), e);
             return "{}";
         }
