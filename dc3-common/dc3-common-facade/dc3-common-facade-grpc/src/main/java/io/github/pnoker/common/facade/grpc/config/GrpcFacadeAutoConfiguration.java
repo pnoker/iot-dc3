@@ -19,6 +19,7 @@ package io.github.pnoker.common.facade.grpc.config;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -33,6 +34,7 @@ import org.springframework.context.annotation.ComponentScan;
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "grpc", matchIfMissing = true)
 @ComponentScan("io.github.pnoker.common.facade.grpc")
+@EnableConfigurationProperties(GrpcFacadeProperties.class)
 public class GrpcFacadeAutoConfiguration {
 
 }

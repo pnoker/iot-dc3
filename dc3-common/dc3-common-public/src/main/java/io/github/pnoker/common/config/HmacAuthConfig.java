@@ -18,9 +18,11 @@
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.utils.HmacAuthSigner;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 
 /**
  * Auto-configuration for the shared {@link HmacAuthSigner} bean. Picked up by every
@@ -33,10 +35,12 @@ import org.springframework.context.annotation.Bean;
  * @since 2026.5.5
  */
 @AutoConfiguration
+@EnableConfigurationProperties(HmacAuthProperties.class)
 public class HmacAuthConfig {
 
     @Bean
-    public HmacAuthSigner hmacAuthSigner(@Value("${dc3.auth.hmac.secret:${AUTH_HMAC_SECRET:}}") String secret) {
+    public HmacAuthSigner hmacAuthSigner(HmacAuthProperties properties, Environment environment) {
+        String secret = StringUtils.defaultIfBlank(properties.getSecret(), environment.getProperty("AUTH_HMAC_SECRET", ""));
         return new HmacAuthSigner(secret);
     }
 

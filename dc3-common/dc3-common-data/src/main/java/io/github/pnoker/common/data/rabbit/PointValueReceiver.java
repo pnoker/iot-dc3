@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.PointValueService;
+import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.data.job.PointValueJob;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -28,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -46,11 +46,14 @@ import java.util.Objects;
 @Component
 public class PointValueReceiver {
 
-    @Value("${data.point.batch.speed}")
-    private Integer batchSpeed;
+    private final PointBatchProperties pointBatchProperties;
 
     @Resource
     private PointValueService pointValueService;
+
+    public PointValueReceiver(PointBatchProperties pointBatchProperties) {
+        this.pointBatchProperties = pointBatchProperties;
+    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{pointValueQueue.name}")
@@ -68,7 +71,7 @@ public class PointValueReceiver {
 
             // Judge whether to process data in batch according to the data transmission
             // speed
-            if (PointValueJob.VALUE_SPEED.get() < batchSpeed) {
+            if (PointValueJob.VALUE_SPEED.get() < pointBatchProperties.getSpeed()) {
                 // Save point value to Redis & PostgreSQL
                 pointValueService.save(pointValueBO);
             } else {
