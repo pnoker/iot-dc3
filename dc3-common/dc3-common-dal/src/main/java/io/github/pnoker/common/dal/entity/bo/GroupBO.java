@@ -18,6 +18,7 @@
 package io.github.pnoker.common.dal.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.GroupTypeFlagEnum;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class GroupBO extends BaseBO {
+public class GroupBO extends BaseBO implements TenantOwned {
 
     /**
      * Parent group ID.
