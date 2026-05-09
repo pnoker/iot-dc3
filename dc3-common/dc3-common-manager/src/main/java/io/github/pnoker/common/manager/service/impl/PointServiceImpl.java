@@ -41,6 +41,7 @@ import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.mapper.DriverMapper;
 import io.github.pnoker.common.manager.mapper.PointMapper;
 import io.github.pnoker.common.manager.service.PointService;
+import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
@@ -89,6 +90,9 @@ public class PointServiceImpl implements PointService {
     private ProfileBindService profileBindService;
 
     @Resource
+    private ProfileService profileService;
+
+    @Resource
     private PointAttributeConfigManager pointAttributeConfigManager;
 
     @Resource
@@ -99,6 +103,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public void save(PointBO entityBO) {
+        validateTenantRelations(entityBO);
         checkDuplicate(entityBO, false, true);
 
         PointDO entityDO = pointBuilder.buildDOByBO(entityBO);
@@ -133,7 +138,11 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public void update(PointBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        PointDO current = getDOById(entityBO.getId(), true);
+        if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+        validateTenantRelations(entityBO);
 
         checkDuplicate(entityBO, true, true);
 
@@ -166,11 +175,19 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<PointBO> selectByDeviceId(Long deviceId) {
+        DeviceDO deviceDO = deviceMapper.selectById(deviceId);
+        if (Objects.isNull(deviceDO)) {
+            return Collections.emptyList();
+        }
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
+                .eq(ProfileBindDO::getTenantId, deviceDO.getTenantId())
                 .eq(ProfileBindDO::getDeviceId, deviceId);
         List<ProfileBindDO> entityDOList = wrapper.list();
         List<Long> profileIds = entityDOList.stream().map(ProfileBindDO::getProfileId).toList();
-        return selectByProfileIds(profileIds);
+        return selectByProfileIds(profileIds)
+                .stream()
+                .filter(point -> Objects.equals(deviceDO.getTenantId(), point.getTenantId()))
+                .toList();
     }
 
     @Override
@@ -444,6 +461,13 @@ public class PointServiceImpl implements PointService {
             throw new DuplicateException("Point has been duplicated");
         }
         return duplicate;
+    }
+
+    private void validateTenantRelations(PointBO entityBO) {
+        ProfileBO profileBO = profileService.selectById(entityBO.getProfileId());
+        if (Objects.isNull(profileBO) || !Objects.equals(entityBO.getTenantId(), profileBO.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
     /**

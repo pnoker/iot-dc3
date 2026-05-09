@@ -27,6 +27,7 @@ import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.builder.PointAttributeBuilder;
 import io.github.pnoker.common.manager.entity.query.PointAttributeQuery;
 import io.github.pnoker.common.manager.entity.vo.PointAttributeVO;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -56,10 +57,13 @@ public class PointAttributeController implements BaseController {
 
     private final PointAttributeService pointAttributeService;
 
+    private final DriverService driverService;
+
     public PointAttributeController(PointAttributeBuilder pointAttributeBuilder,
-                                    PointAttributeService pointAttributeService) {
+                                    PointAttributeService pointAttributeService, DriverService driverService) {
         this.pointAttributeBuilder = pointAttributeBuilder;
         this.pointAttributeService = pointAttributeService;
+        this.driverService = driverService;
     }
 
     /**
@@ -86,10 +90,11 @@ public class PointAttributeController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, pointAttributeService.selectById(id));
             pointAttributeService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -103,6 +108,7 @@ public class PointAttributeController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
+            requireTenant(tenantId, pointAttributeService.selectById(entityBO.getId()));
             pointAttributeService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -116,11 +122,11 @@ public class PointAttributeController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<PointAttributeVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
-            PointAttributeBO entityBO = pointAttributeService.selectById(id);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            PointAttributeBO entityBO = requireTenant(tenantId, pointAttributeService.selectById(id));
             PointAttributeVO entityVO = pointAttributeBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -131,15 +137,16 @@ public class PointAttributeController implements BaseController {
      */
     @GetMapping("/driver_id/{id}")
     public Mono<R<List<PointAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             try {
-                List<PointAttributeBO> entityBOList = pointAttributeService.selectByDriverId(id);
+                requireTenant(tenantId, driverService.selectById(id));
+                List<PointAttributeBO> entityBOList = filterTenant(tenantId, pointAttributeService.selectByDriverId(id));
                 List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
             } catch (NotFoundException ne) {
                 return R.ok(Collections.emptyList());
             }
-        });
+        }));
     }
 
     /**

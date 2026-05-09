@@ -78,10 +78,11 @@ public class GroupController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, groupService.selectById(id));
             groupService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -93,6 +94,7 @@ public class GroupController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
+            requireTenant(tenantId, groupService.selectById(entityBO.getId()));
             groupService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -104,11 +106,11 @@ public class GroupController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<GroupVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
-            GroupBO entityBO = groupService.selectById(id);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            GroupBO entityBO = requireTenant(tenantId, groupService.selectById(id));
             GroupVO entityVO = groupBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**

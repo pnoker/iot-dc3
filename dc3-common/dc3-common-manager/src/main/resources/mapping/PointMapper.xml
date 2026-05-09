@@ -49,7 +49,12 @@
             inner join dc3_profile_bind dpb
             on dp.profile_id = dpb.profile_id
             and dpb.device_id = #{deviceId}
+            and dpb.tenant_id = dp.tenant_id
             and dpb.deleted = 0
+            inner join dc3_device dd
+            on dpb.device_id = dd.id
+            and dd.tenant_id = dp.tenant_id
+            and dd.deleted = 0
         </if>
         ${ew.customSqlSegment}
     </select>

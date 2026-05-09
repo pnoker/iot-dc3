@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Topic Controller
@@ -54,10 +55,12 @@ public class TopicController implements BaseController {
 
     @PostMapping("/list")
     public Mono<R<Page<List<TopicVO>>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
-        return async(() -> {
-            Page<List<TopicVO>> topicVOList = topicService.query(topicQuery);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            TopicQuery query = Objects.isNull(topicQuery) ? new TopicQuery() : topicQuery;
+            query.setTenantId(tenantId);
+            Page<List<TopicVO>> topicVOList = topicService.query(query);
             return R.ok(topicVOList);
-        });
+        }));
     }
 
 }

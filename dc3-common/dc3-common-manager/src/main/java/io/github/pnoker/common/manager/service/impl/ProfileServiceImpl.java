@@ -34,7 +34,9 @@ import io.github.pnoker.common.manager.entity.builder.ProfileBuilder;
 import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.common.manager.entity.model.ProfileDO;
+import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
+import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.mapper.ProfileMapper;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.utils.PageUtil;
@@ -76,6 +78,9 @@ public class ProfileServiceImpl implements ProfileService {
     @Resource
     private ProfileMapper profileMapper;
 
+    @Resource
+    private DeviceMapper deviceMapper;
+
     @Override
     public void save(ProfileBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
@@ -106,7 +111,10 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void update(ProfileBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        ProfileDO current = getDOById(entityBO.getId(), true);
+        if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
 
         if (checkDuplicate(entityBO, true)) {
             throw new DuplicateException("Failed to update profile: profile has been duplicated");
@@ -147,11 +155,19 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<ProfileBO> selectByDeviceId(Long deviceId) {
+        DeviceDO deviceDO = deviceMapper.selectById(deviceId);
+        if (Objects.isNull(deviceDO)) {
+            return Collections.emptyList();
+        }
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
+                .eq(ProfileBindDO::getTenantId, deviceDO.getTenantId())
                 .eq(ProfileBindDO::getDeviceId, deviceId);
         List<ProfileBindDO> entityDOList = wrapper.list();
         Set<Long> profileIds = entityDOList.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
-        return selectByIds(profileIds);
+        return selectByIds(profileIds)
+                .stream()
+                .filter(profile -> Objects.equals(deviceDO.getTenantId(), profile.getTenantId()))
+                .toList();
     }
 
     @Override

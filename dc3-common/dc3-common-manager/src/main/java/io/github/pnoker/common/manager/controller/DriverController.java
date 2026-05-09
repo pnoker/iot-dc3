@@ -86,10 +86,11 @@ public class DriverController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, driverService.selectById(id));
             driverService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -103,6 +104,7 @@ public class DriverController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
+            requireTenant(tenantId, driverService.selectById(entityBO.getId()));
             driverService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -116,11 +118,11 @@ public class DriverController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<DriverVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
-            DriverBO entityBO = driverService.selectById(id);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DriverBO entityBO = requireTenant(tenantId, driverService.selectById(id));
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -131,12 +133,12 @@ public class DriverController implements BaseController {
      */
     @PostMapping("/ids")
     public Mono<R<Map<Long, DriverVO>>> selectByIds(@RequestBody Set<Long> driverIds) {
-        return async(() -> {
-            List<DriverBO> entityBOList = driverService.selectByIds(driverIds);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            List<DriverBO> entityBOList = filterTenant(tenantId, driverService.selectByIds(driverIds));
             Map<Long, DriverVO> driverMap = entityBOList.stream()
                     .collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
             return R.ok(driverMap);
-        });
+        }));
     }
 
     /**

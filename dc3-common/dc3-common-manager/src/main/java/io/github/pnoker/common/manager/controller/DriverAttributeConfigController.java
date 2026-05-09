@@ -22,10 +22,15 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.manager.entity.bo.DeviceBO;
+import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.builder.DriverAttributeConfigBuilder;
 import io.github.pnoker.common.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.common.manager.entity.vo.DriverAttributeConfigVO;
+import io.github.pnoker.common.manager.service.DeviceService;
+import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -54,10 +59,18 @@ public class DriverAttributeConfigController implements BaseController {
 
     private final DriverAttributeConfigService driverAttributeConfigService;
 
+    private final DeviceService deviceService;
+
+    private final DriverAttributeService driverAttributeService;
+
     public DriverAttributeConfigController(DriverAttributeConfigBuilder driverAttributeConfigBuilder,
-                                           DriverAttributeConfigService driverAttributeConfigService) {
+                                           DriverAttributeConfigService driverAttributeConfigService,
+                                           DeviceService deviceService,
+                                           DriverAttributeService driverAttributeService) {
         this.driverAttributeConfigBuilder = driverAttributeConfigBuilder;
         this.driverAttributeConfigService = driverAttributeConfigService;
+        this.deviceService = deviceService;
+        this.driverAttributeService = driverAttributeService;
     }
 
     /**
@@ -84,10 +97,11 @@ public class DriverAttributeConfigController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, driverAttributeConfigService.selectById(id));
             driverAttributeConfigService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -101,6 +115,7 @@ public class DriverAttributeConfigController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
+            requireTenant(tenantId, driverAttributeConfigService.selectById(entityBO.getId()));
             driverAttributeConfigService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -114,11 +129,11 @@ public class DriverAttributeConfigController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<DriverAttributeConfigVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
-            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectById(id);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DriverAttributeConfigBO entityBO = requireTenant(tenantId, driverAttributeConfigService.selectById(id));
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -132,12 +147,14 @@ public class DriverAttributeConfigController implements BaseController {
     public Mono<R<DriverAttributeConfigVO>> selectByDeviceIdAndAttributeId(
             @NotNull @PathVariable(value = "deviceId") Long deviceId,
             @NotNull @PathVariable(value = "attributeId") Long attributeId) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireDriverConfigRelations(tenantId, deviceId, attributeId);
             DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(deviceId,
                     attributeId);
+            requireTenant(tenantId, entityBO);
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -149,11 +166,12 @@ public class DriverAttributeConfigController implements BaseController {
     @GetMapping("/device_id/{deviceId}")
     public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(
             @NotNull @PathVariable(value = "deviceId") Long deviceId) {
-        return async(() -> {
-            List<DriverAttributeConfigBO> entityBOList = driverAttributeConfigService.selectByDeviceId(deviceId);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, deviceService.selectById(deviceId));
+            List<DriverAttributeConfigBO> entityBOList = filterTenant(tenantId, driverAttributeConfigService.selectByDeviceId(deviceId));
             List<DriverAttributeConfigVO> entityVOList = driverAttributeConfigBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
-        });
+        }));
     }
 
     /**
@@ -174,6 +192,14 @@ public class DriverAttributeConfigController implements BaseController {
                     .buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));
+    }
+
+    private void requireDriverConfigRelations(Long tenantId, Long deviceId, Long attributeId) {
+        DeviceBO deviceBO = requireTenant(tenantId, deviceService.selectById(deviceId));
+        DriverAttributeBO attributeBO = requireTenant(tenantId, driverAttributeService.selectById(attributeId));
+        if (!Objects.equals(deviceBO.getDriverId(), attributeBO.getDriverId())) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
 }
