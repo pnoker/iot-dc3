@@ -65,14 +65,14 @@ public class SkillLoader implements ApplicationRunner {
                     registry.register(skill);
                     loaded.add(skill.getName());
                 } else {
-                    log.debug("Skipping disabled skill: {}", skill.getName());
+                    log.debug("Agentic skill skipped, skill={}, reason=disabled", skill.getName());
                 }
             } catch (Exception e) {
-                log.error("Failed to load skill from {}: {}", resource.getDescription(), e.getMessage(), e);
+                log.error("Agentic skill load failed, resource={}", resource.getDescription(), e);
             }
         }
 
-        log.info("Loaded {} skills: {}", loaded.size(), loaded);
+        log.info("Agentic skills loaded, count={}, skills={}", loaded.size(), loaded);
     }
 
     @SuppressWarnings("unchecked")

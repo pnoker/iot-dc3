@@ -2,7 +2,7 @@ name: data-monitor
 description: "Data reading and monitoring capability"
 enabled: true
 system-prompt-addition: |
-  When the user needs device data, use lastValue for real-time values and history for historical trends.
+  When the user needs device data, use getLatestPointValue for real-time values and getPointValueHistory for historical trends.
   Include timestamps and unit information when presenting data.
 tools:
   - getLatestPointValue

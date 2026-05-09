@@ -24,6 +24,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -58,9 +59,11 @@ public class AuthToolSet {
 
     @Tool(description = "Look up a tenant by its unique code. Returns tenant name, code, and enable status.")
     public String lookupTenantByCode(
-            @ToolParam(description = "The unique tenant code, e.g. 'default'") String tenantCode) {
-        log.debug("Tool: lookupTenantByCode({})", tenantCode);
-        Long tenantId = AgenticRequestContext.requireTenantId();
+            @ToolParam(description = "The unique tenant code, e.g. 'default'") String tenantCode,
+            ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, tenantCode={}", "lookupTenantByCode", tenantId,
+                tenantCode);
         FacadeTenantBO bo = tenantFacade.selectByCode(tenantCode);
         if (Objects.isNull(bo) || !Objects.equals(tenantId, bo.getId())) {
             return "Tenant not found for code: " + tenantCode;
@@ -70,9 +73,11 @@ public class AuthToolSet {
     }
 
     @Tool(description = "Look up a user by their numeric ID. Returns nickname, username, email, and phone.")
-    public String lookupUserById(@ToolParam(description = "The numeric user ID") Long userId) {
-        log.debug("Tool: lookupUserById({})", userId);
-        if (!Objects.equals(AgenticRequestContext.requireUserId(), userId)) {
+    public String lookupUserById(@ToolParam(description = "The numeric user ID") Long userId, ToolContext toolContext) {
+        Long requestUserId = AgenticRequestContext.requireUserId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, requestUserId={}, userId={}", "lookupUserById", requestUserId,
+                userId);
+        if (!Objects.equals(requestUserId, userId)) {
             return "User not found for ID: " + userId;
         }
         FacadeUserBO bo = userFacade.selectById(userId);
@@ -85,10 +90,13 @@ public class AuthToolSet {
 
     @Tool(description = "Look up a user login record by login name. Returns the login name, associated user ID, and enable status.")
     public String lookupUserLoginByName(
-            @ToolParam(description = "The login name (username used for authentication)") String loginName) {
-        log.debug("Tool: lookupUserLoginByName({})", loginName);
+            @ToolParam(description = "The login name (username used for authentication)") String loginName,
+            ToolContext toolContext) {
+        Long userId = AgenticRequestContext.requireUserId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, userId={}, loginName={}", "lookupUserLoginByName", userId,
+                loginName);
         FacadeUserLoginBO bo = userLoginFacade.selectByName(loginName);
-        if (Objects.isNull(bo) || !Objects.equals(AgenticRequestContext.requireUserId(), bo.getUserId())) {
+        if (Objects.isNull(bo) || !Objects.equals(userId, bo.getUserId())) {
             return "User login not found for name: " + loginName;
         }
         return String.format("UserLogin: loginName=%s, userId=%d, enabled=%s", bo.getLoginName(), bo.getUserId(),

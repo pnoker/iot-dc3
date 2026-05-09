@@ -21,6 +21,7 @@ import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -53,9 +54,11 @@ public class DataToolSet {
 
     @Tool(description = "Get the latest point value for a specific device and point. Returns the current value.")
     public String getLatestPointValue(@ToolParam(description = "The device ID") Long deviceId,
-                                      @ToolParam(description = "The point (metric) ID") Long pointId) {
-        Long tenantId = AgenticRequestContext.requireTenantId();
-        log.debug("Tool: getLatestPointValue(tenantId={}, deviceId={}, pointId={})", tenantId, deviceId, pointId);
+                                      @ToolParam(description = "The point (metric) ID") Long pointId,
+                                      ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "getLatestPointValue",
+                tenantId, deviceId, pointId);
         try {
             FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, pointId);
             if (value == null) {
@@ -64,7 +67,8 @@ public class DataToolSet {
             return String.format("Device %d / Point %d: value=%s, rawValue=%s, time=%d", value.getDeviceId(),
                     value.getPointId(), value.getValue(), value.getRawValue(), value.getCreateTime());
         } catch (Exception e) {
-            log.error("Failed to get latest point value: {}", e.getMessage());
+            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "getLatestPointValue",
+                    tenantId, deviceId, pointId, e);
             return "Error retrieving latest value: " + e.getMessage();
         }
     }
@@ -72,10 +76,11 @@ public class DataToolSet {
     @Tool(description = "Get historical point values for a specific device and point. Returns a list of value strings.")
     public String getPointValueHistory(@ToolParam(description = "The device ID") Long deviceId,
                                        @ToolParam(description = "The point (metric) ID") Long pointId,
-                                       @ToolParam(description = "Number of historical records to retrieve") int count) {
-        Long tenantId = AgenticRequestContext.requireTenantId();
-        log.debug("Tool: getPointValueHistory(tenantId={}, deviceId={}, pointId={}, count={})", tenantId, deviceId,
-                pointId, count);
+                                       @ToolParam(description = "Number of historical records to retrieve") int count,
+                                       ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
+                "getPointValueHistory", tenantId, deviceId, pointId, count);
         try {
             List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, count);
             if (history == null || history.isEmpty()) {
@@ -83,22 +88,26 @@ public class DataToolSet {
             }
             return "History values (" + history.size() + " records): " + String.join(", ", history);
         } catch (Exception e) {
-            log.error("Failed to get point value history: {}", e.getMessage());
+            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
+                    "getPointValueHistory", tenantId, deviceId, pointId, count, e);
             return "Error retrieving history: " + e.getMessage();
         }
     }
 
     @Tool(description = "Send a read command to a device for a specific point. The driver will read the current value from the physical device.")
     public String readPointValue(@ToolParam(description = "The device ID") Long deviceId,
-                                 @ToolParam(description = "The point (metric) ID to read") Long pointId) {
-        Long tenantId = AgenticRequestContext.requireTenantId();
-        log.debug("Tool: readPointValue(tenantId={}, deviceId={}, pointId={})", tenantId, deviceId, pointId);
+                                 @ToolParam(description = "The point (metric) ID to read") Long pointId,
+                                 ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
+                deviceId, pointId);
         try {
             boolean success = pointValueCommandFacade.read(tenantId, deviceId, pointId);
             return success ? "Read command sent successfully for device " + deviceId + " point " + pointId
                     : "Read command failed for device " + deviceId + " point " + pointId;
         } catch (Exception e) {
-            log.error("Failed to send read command: {}", e.getMessage());
+            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
+                    deviceId, pointId, e);
             return "Error sending read command: " + e.getMessage();
         }
     }
@@ -106,17 +115,19 @@ public class DataToolSet {
     @Tool(description = "Send a write command to a device for a specific point. Sets the point to the specified value on the physical device.")
     public String writePointValue(@ToolParam(description = "The device ID") Long deviceId,
                                   @ToolParam(description = "The point (metric) ID to write") Long pointId,
-                                  @ToolParam(description = "The value to write (as a string)") String value) {
-        Long tenantId = AgenticRequestContext.requireTenantId();
-        log.debug("Tool: writePointValue(tenantId={}, deviceId={}, pointId={}, value={})", tenantId, deviceId, pointId,
-                value);
+                                  @ToolParam(description = "The value to write (as a string)") String value,
+                                  ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, valueLength={}",
+                "writePointValue", tenantId, deviceId, pointId, value == null ? 0 : value.length());
         try {
             boolean success = pointValueCommandFacade.write(tenantId, deviceId, pointId, value);
             return success
                     ? "Write command sent successfully for device " + deviceId + " point " + pointId + " value=" + value
                     : "Write command failed for device " + deviceId + " point " + pointId;
         } catch (Exception e) {
-            log.error("Failed to send write command: {}", e.getMessage());
+            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "writePointValue", tenantId,
+                    deviceId, pointId, e);
             return "Error sending write command: " + e.getMessage();
         }
     }

@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.context;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import org.springframework.ai.chat.model.ToolContext;
 
 import java.util.Objects;
 
@@ -30,6 +31,10 @@ import java.util.Objects;
  * @since 2026.5.9
  */
 public class AgenticRequestContext {
+
+    public static final String TENANT_ID_CONTEXT_KEY = "dc3TenantId";
+
+    public static final String USER_ID_CONTEXT_KEY = "dc3UserId";
 
     private static final ThreadLocal<RequestHeader.UserHeader> USER_HEADER = new InheritableThreadLocal<>();
 
@@ -54,12 +59,36 @@ public class AgenticRequestContext {
         return userHeader;
     }
 
+    public static Long requireTenantId(ToolContext toolContext) {
+        Long tenantId = getLongContextValue(toolContext, TENANT_ID_CONTEXT_KEY);
+        return tenantId != null ? tenantId : requireTenantId();
+    }
+
     public static Long requireTenantId() {
         return requireUserHeader().getTenantId();
     }
 
+    public static Long requireUserId(ToolContext toolContext) {
+        Long userId = getLongContextValue(toolContext, USER_ID_CONTEXT_KEY);
+        return userId != null ? userId : requireUserId();
+    }
+
     public static Long requireUserId() {
         return requireUserHeader().getUserId();
+    }
+
+    private static Long getLongContextValue(ToolContext toolContext, String key) {
+        if (Objects.isNull(toolContext) || Objects.isNull(toolContext.getContext())) {
+            return null;
+        }
+        Object value = toolContext.getContext().get(key);
+        if (value instanceof Long longValue) {
+            return longValue;
+        }
+        if (value instanceof Number numberValue) {
+            return numberValue.longValue();
+        }
+        return null;
     }
 
 }
