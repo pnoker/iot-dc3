@@ -52,6 +52,9 @@ public class PointValueGrpcFacade implements PointValueFacade {
     @Resource
     private FacadeGrpcPointValueBuilder facadeGrpcPointValueBuilder;
 
+    @Resource
+    private GrpcFacadeSupport grpcFacadeSupport;
+
     @Override
     public FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId) {
         GrpcPointValueQuery request = GrpcPointValueQuery.newBuilder()
@@ -59,9 +62,13 @@ public class PointValueGrpcFacade implements PointValueFacade {
                 .setPointId(pointId)
                 .setTenantId(tenantId)
                 .build();
-        GrpcRPointValueDTO response = pointValueApiBlockingStub.lastValue(request);
+        GrpcRPointValueDTO response = grpcFacadeSupport.call("PointValueFacade.lastValue", pointValueApiBlockingStub,
+                stub -> stub.lastValue(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "lastValue");
+            return null;
+        }
+        if (!response.hasData()) {
             return null;
         }
         return facadeGrpcPointValueBuilder.toFacadeBO(response.getData());
@@ -75,7 +82,8 @@ public class PointValueGrpcFacade implements PointValueFacade {
                 .setTenantId(tenantId)
                 .setCount(count)
                 .build();
-        GrpcRPointValueStringList response = pointValueApiBlockingStub.historyValue(request);
+        GrpcRPointValueStringList response = grpcFacadeSupport.call("PointValueFacade.history", pointValueApiBlockingStub,
+                stub -> stub.historyValue(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "history");
             return Collections.emptyList();
