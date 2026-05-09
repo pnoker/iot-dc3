@@ -24,6 +24,7 @@ import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.api.common.driver.*;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
@@ -33,6 +34,7 @@ import io.github.pnoker.common.manager.grpc.builder.GrpcDriverAttributeConfigBui
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeConfigBuilder;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverAttributeConfigService;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.optional.CollectionOptional;
@@ -68,6 +70,9 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     private DeviceService deviceService;
 
     @Resource
+    private DriverService driverService;
+
+    @Resource
     private PointService pointService;
 
     @Resource
@@ -83,7 +88,8 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
         DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
-        Page<DeviceBO> entityPage = deviceService.selectByPage(query);
+        Page<DeviceBO> entityPage = driverInTenant(query.getTenantId(), query.getDriverId())
+                ? deviceService.selectByPage(query) : null;
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -120,8 +126,11 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceBO entityBO = deviceService.selectById(request.getDeviceId());
-        if (Objects.isNull(entityBO)) {
+        DriverBO driverBO = selectDriver(request.getDriverId());
+        DeviceBO entityBO = selectDevice(request.getDeviceId());
+        if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
+                || !Objects.equals(entityBO.getDriverId(), driverBO.getId())
+                || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -136,6 +145,27 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
+    }
+
+    private boolean driverInTenant(Long tenantId, Long driverId) {
+        DriverBO driverBO = selectDriver(driverId);
+        return Objects.nonNull(driverBO) && Objects.equals(tenantId, driverBO.getTenantId());
+    }
+
+    private DriverBO selectDriver(Long driverId) {
+        try {
+            return driverService.selectById(driverId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private DeviceBO selectDevice(Long deviceId) {
+        try {
+            return deviceService.selectById(deviceId);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private GrpcRDeviceAttachDTO.Builder getDeviceAttachDTO(DeviceBO entityBO) {

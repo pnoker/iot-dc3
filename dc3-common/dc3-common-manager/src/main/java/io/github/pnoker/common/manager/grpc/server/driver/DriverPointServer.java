@@ -23,17 +23,25 @@ import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.api.common.driver.*;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.manager.entity.bo.DeviceBO;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointBuilder;
+import io.github.pnoker.common.manager.service.DeviceService;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Api
@@ -52,6 +60,12 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
     @Resource
     private PointService pointService;
 
+    @Resource
+    private DriverService driverService;
+
+    @Resource
+    private DeviceService deviceService;
+
     @Override
     public void selectByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
         GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
@@ -59,7 +73,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
 
         PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
 
-        Page<PointBO> entityPage = pointService.selectByPage(query);
+        Page<PointBO> entityPage = selectDriverScopedPage(request, query);
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -96,8 +110,11 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
         GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        PointBO entityBO = pointService.selectById(request.getPointId());
-        if (Objects.isNull(entityBO)) {
+        DriverBO driverBO = selectDriver(request.getDriverId());
+        PointBO entityBO = selectPoint(request.getPointId());
+        if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
+                || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())
+                || !driverHasPoint(driverBO, entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -112,6 +129,104 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
         builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
+    }
+
+    private Page<PointBO> selectDriverScopedPage(GrpcPagePointQuery request, PointQuery query) {
+        Page<PointBO> page = new Page<>(query.getPage().getCurrent(), query.getPage().getSize());
+        DriverBO driverBO = selectDriver(request.getDriverId());
+        if (Objects.isNull(driverBO) || !Objects.equals(query.getTenantId(), driverBO.getTenantId())) {
+            return null;
+        }
+
+        Set<Long> profileIds = resolveDriverProfileIds(request, driverBO);
+        if (profileIds.isEmpty()) {
+            page.setRecords(Collections.emptyList());
+            return page;
+        }
+
+        List<PointBO> points = pointService.selectByProfileIds(profileIds.stream().toList())
+                .stream()
+                .filter(point -> Objects.equals(driverBO.getTenantId(), point.getTenantId()))
+                .filter(point -> request.getPointId() <= 0 || Objects.equals(point.getId(), request.getPointId()))
+                .toList();
+
+        long total = points.size();
+        long current = page.getCurrent();
+        long size = page.getSize();
+        int from = (int) Math.min((current - 1) * size, total);
+        int to = (int) Math.min(from + size, total);
+
+        page.setTotal(total);
+        page.setRecords(points.subList(from, to));
+        return page;
+    }
+
+    private Set<Long> resolveDriverProfileIds(GrpcPagePointQuery request, DriverBO driverBO) {
+        if (request.getDeviceId() > 0) {
+            DeviceBO deviceBO = selectDevice(request.getDeviceId());
+            if (Objects.isNull(deviceBO) || !Objects.equals(deviceBO.getDriverId(), driverBO.getId())
+                    || !Objects.equals(deviceBO.getTenantId(), driverBO.getTenantId())) {
+                return Collections.emptySet();
+            }
+            return filterProfileId(request, deviceBO.getProfileIds());
+        }
+
+        Set<Long> profileIds = deviceService.selectByDriverId(driverBO.getId())
+                .stream()
+                .filter(device -> Objects.equals(driverBO.getTenantId(), device.getTenantId()))
+                .filter(device -> Objects.nonNull(device.getProfileIds()))
+                .flatMap(device -> device.getProfileIds().stream())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        return filterProfileId(request, profileIds);
+    }
+
+    private Set<Long> filterProfileId(GrpcPagePointQuery request, List<Long> profileIds) {
+        if (Objects.isNull(profileIds)) {
+            return Collections.emptySet();
+        }
+        return filterProfileId(request, new LinkedHashSet<>(profileIds));
+    }
+
+    private Set<Long> filterProfileId(GrpcPagePointQuery request, Set<Long> profileIds) {
+        if (request.getProfileId() <= 0) {
+            return profileIds;
+        }
+        return profileIds.contains(request.getProfileId()) ? Set.of(request.getProfileId()) : Collections.emptySet();
+    }
+
+    private boolean driverHasPoint(DriverBO driverBO, PointBO pointBO) {
+        return deviceService.selectByDriverId(driverBO.getId())
+                .stream()
+                .filter(device -> Objects.equals(driverBO.getTenantId(), device.getTenantId()))
+                .map(DeviceBO::getProfileIds)
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .anyMatch(profileId -> Objects.equals(profileId, pointBO.getProfileId()));
+    }
+
+    private DriverBO selectDriver(Long driverId) {
+        try {
+            return driverService.selectById(driverId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private DeviceBO selectDevice(Long deviceId) {
+        try {
+            return deviceService.selectById(deviceId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private PointBO selectPoint(Long pointId) {
+        try {
+            return pointService.selectById(pointId);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }
