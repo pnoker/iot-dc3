@@ -15,8 +15,8 @@ commands to devices via MQTT publish.
 
 ## Point Attributes
 
-| Attribute               | Description                                 |
-|-------------------------|---------------------------------------------|
+| Attribute     | Description                                 |
+|---------------|---------------------------------------------|
 | Command Topic | MQTT topic for sending write commands       |
 | Command QoS   | MQTT QoS level for command messages (0/1/2) |
 

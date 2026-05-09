@@ -92,7 +92,8 @@ cp .env.example .env
 `dc3/env/dev.env` 或 `dc3/env/dev.env.sh`。如果启用 Agentic Center，请在 `.env` 或当前 shell 中配置 `OPENAI_BASE_URL`、
 `OPENAI_API_KEY`、`OPENAI_MODEL` 等 OpenAI 兼容参数。
 
-Compose 只会注入 Compose 文件显式引用的变量，例如镜像仓库、镜像版本、发布端口、日志选项和可选观测栈参数。本地源码方式启动 Java
+Compose 只会注入 Compose 文件显式引用的变量，例如镜像仓库、镜像版本、发布端口、日志选项和可选观测栈参数。本地源码方式启动
+Java
 进程时，请使用 `dc3/env/dev.env` 或 `dc3/env/dev.env.sh`。
 
 根目录 `.env` 与 `dc3/env/dev.env(.sh)` 的具体区别见 [`dc3/doc/ENVIRONMENT.md`](dc3/doc/ENVIRONMENT.md)。
@@ -151,5 +152,5 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 
 # 6 开源协议
 
-`IoT DC3` 开源平台基于 [AGPL 3.0 License](./LICENSE-AGPL.txt) 协议。 
+`IoT DC3` 开源平台基于 [AGPL 3.0 License](./LICENSE-AGPL.txt) 协议。
 仓库许可证说明和商业授权关系请参阅 [LICENSE.txt](./LICENSE.txt)。

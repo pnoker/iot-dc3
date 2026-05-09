@@ -61,8 +61,8 @@ All images are built for multiple platforms:
 
 ### 🍉 Images
 
-| Description              | Docker Hub                                               | Aliyun Container Registry                                                          |
-|--------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------|
+| Description              | Docker Hub                                               | Aliyun Container Registry                                                              |
+|--------------------------|----------------------------------------------------------|----------------------------------------------------------------------------------------|
 | Gateway                  | `pnoker/dc3-gateway:${SERVICE_VERSION}`                  | `registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:${SERVICE_VERSION}`                  |
 | Agentic Center           | `pnoker/dc3-center-agentic:${SERVICE_VERSION}`           | `registry.cn-beijing.aliyuncs.com/dc3/dc3-center-agentic:${SERVICE_VERSION}`           |
 | Auth Center              | `pnoker/dc3-center-auth:${SERVICE_VERSION}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:${SERVICE_VERSION}`              |

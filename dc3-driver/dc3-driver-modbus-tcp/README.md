@@ -15,16 +15,16 @@ write commands for register control.
 
 ## Driver Attributes (Device-level)
 
-| Attribute       | Description                     |
-|-----------------|---------------------------------|
-| Host     | Modbus slave IP address         |
-| Port     | Modbus TCP port (typically 502) |
-| Slave ID | Modbus slave unit ID            |
+| Attribute | Description                     |
+|-----------|---------------------------------|
+| Host      | Modbus slave IP address         |
+| Port      | Modbus TCP port (typically 502) |
+| Slave ID  | Modbus slave unit ID            |
 
 ## Point Attributes
 
-| Attribute           | Description                        |
-|---------------------|------------------------------------|
+| Attribute     | Description                        |
+|---------------|------------------------------------|
 | Function Code | Modbus function code (01/02/03/04) |
 | Offset        | Register/coil address offset       |
 

@@ -106,11 +106,14 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-> **モジュール概要**: モジュールの依存関係マップとランタイムフロー図は [`dc3/doc/MODULES.md`](dc3/doc/MODULES.md) を参照してください。
+> **モジュール概要**: モジュールの依存関係マップとランタイムフロー図は [`dc3/doc/MODULES.md`](dc3/doc/MODULES.md)
+> を参照してください。
 
-> **ローカル開発ガイド**: ワンストップのローカルセットアップ手順は [`dc3/doc/QUICKSTART.md`](dc3/doc/QUICKSTART.md) を参照してください。
+> **ローカル開発ガイド**: ワンストップのローカルセットアップ手順は [`dc3/doc/QUICKSTART.md`](dc3/doc/QUICKSTART.md)
+> を参照してください。
 
-> **トラブルシューティング**: よくあるビルド/ランタイムの問題と解決策は [`dc3/doc/TROUBLESHOOTING.md`](dc3/doc/TROUBLESHOOTING.md) を参照してください。
+> **トラブルシューティング**: よくあるビルド/ランタイムの問題と解決策は [
+`dc3/doc/TROUBLESHOOTING.md`](dc3/doc/TROUBLESHOOTING.md) を参照してください。
 
 ## 3.3 サービスの起動
 

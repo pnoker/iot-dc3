@@ -17,13 +17,13 @@ and write data block registers.
 
 | Attribute | Description                 |
 |-----------|-----------------------------|
-| Host | PLC IP address              |
-| Port | S7 TCP port (typically 102) |
+| Host      | PLC IP address              |
+| Port      | S7 TCP port (typically 102) |
 
 ## Point Attributes
 
-| Attribute           | Description                                     |
-|---------------------|-------------------------------------------------|
+| Attribute   | Description                                     |
+|-------------|-------------------------------------------------|
 | DB Number   | Siemens data block number                       |
 | Byte Offset | Byte offset within the data block               |
 | Bit Offset  | Bit offset within the byte (for boolean points) |
