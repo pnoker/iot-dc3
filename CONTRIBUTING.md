@@ -59,6 +59,19 @@ docs(env): explain JetBrains IDEA environment variables
 refactor(container): deduplicate compose registry overrides
 ```
 
+Allowed types are `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `test`, `chore`, `style`, `security`, and
+`revert`. Use English, keep the subject specific, and avoid vague descriptions such as `update`, `fix`, `misc`, `wip`,
+or `.` because release notes are generated from commit history.
+
+Install the local commit-message hook before contributing:
+
+```bash
+make install-hooks
+```
+
+The hook validates the commit subject during `git commit`. It is intentionally strict because `dc3/doc/CHANGE.md` is
+generated from commit messages.
+
 ## Build and Verification
 
 Before opening a pull request, run the checks that match the touched area:

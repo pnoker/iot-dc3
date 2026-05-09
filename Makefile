@@ -18,7 +18,7 @@
 # tip:
 # make -f ./Makefile help
 
-.PHONY: help clean package app app-all dev dev-all dev-db dev-optional build deploy tag changelog \
+.PHONY: help clean package app app-all dev dev-all dev-db dev-optional build deploy tag changelog install-hooks \
 	check-compose compose-file compose-up compose-down compose-ps compose-config compose-build \
 	compose-logs compose-pull compose-refresh compose-reset compose-restart
 
@@ -68,6 +68,7 @@ help:
 	&& echo ' - make clean: clean Maven build artifacts' \
 	&& echo ' - make package: package all modules with Maven' \
 	&& echo ' - make changelog [FROM=<ref>] [TO=HEAD] [VERSION=<version>]: update dc3/doc/CHANGE.md from git commits' \
+	&& echo ' - make install-hooks: install repository Git hooks' \
 	&& echo ' - make tag: git tag' \
 	&& echo ' - make app: run the packaged application stack (docker-compose.yml)' \
 	&& echo ' - make app-all: run db + optional + packaged application stacks' \
@@ -109,6 +110,10 @@ tag:
 
 changelog:
 	@FROM="$(FROM)" TO="$(TO)" VERSION="$(VERSION)" CHANGE_FILE="$(CHANGE_FILE)" dc3/bin/changelog.py
+
+install-hooks:
+	git config core.hooksPath .githooks
+	chmod +x .githooks/commit-msg dc3/bin/commit_msg_lint.py dc3/bin/changelog.py
 
 check-compose:
 	@test -f "$(RESOLVED_COMPOSE_FILE)" || (echo "Compose file not found: $(RESOLVED_COMPOSE_FILE)" && exit 1)
