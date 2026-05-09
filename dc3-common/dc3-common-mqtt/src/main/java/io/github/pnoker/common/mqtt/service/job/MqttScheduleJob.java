@@ -18,12 +18,12 @@
 package io.github.pnoker.common.mqtt.service.job;
 
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
+import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
@@ -56,11 +56,8 @@ public class MqttScheduleJob extends QuartzJobBean {
 
     private static final List<MqttMessage> mqttMessages = new ArrayList<>();
 
-    @Value("${driver.mqtt.batch.speed}")
-    private Integer batchSpeed;
-
-    @Value("${driver.mqtt.batch.interval}")
-    private Integer interval;
+    @Resource
+    private MqttProperties mqttProperties;
 
     @Resource
     private MqttReceiveService mqttReceiveService;
@@ -93,17 +90,18 @@ public class MqttScheduleJob extends QuartzJobBean {
         mqttMessages.add(mqttMessage);
     }
 
-    @Override
     /**
      * Execute scheduled job for batch MQTT message processing
      * @param context Job execution context
      * @throws JobExecutionException if job execution fails
      */
+    @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // Calculate MQTT message receive rate
-        long speed = messageCount.getAndSet(0);
+        Integer interval = mqttProperties.getBatch().getInterval();
+        Integer batchSpeed = mqttProperties.getBatch().getSpeed();
+        long speed = messageCount.getAndSet(0) / interval;
         messageSpeed.set(speed);
-        speed /= interval;
         if (speed >= batchSpeed) {
             log.debug("Mqtt message receiver speed: {} /s, value size: {}, interval: {}", speed, getMqttMessagesSize(),
                     interval);
@@ -112,11 +110,14 @@ public class MqttScheduleJob extends QuartzJobBean {
         // Process batch MQTT messages
         virtualThreadExecutor.execute(() -> {
             messageLock.writeLock().lock();
-            if (!mqttMessages.isEmpty()) {
-                mqttReceiveService.receiveValues(mqttMessages);
-                clearMqttMessages();
+            try {
+                if (!mqttMessages.isEmpty()) {
+                    mqttReceiveService.receiveValues(mqttMessages);
+                    clearMqttMessages();
+                }
+            } finally {
+                messageLock.writeLock().unlock();
             }
-            messageLock.writeLock().unlock();
         });
     }
 

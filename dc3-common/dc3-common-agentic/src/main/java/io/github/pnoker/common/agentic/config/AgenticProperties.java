@@ -16,9 +16,11 @@
  */
 package io.github.pnoker.common.agentic.config;
 
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Configuration properties for the agentic module.
@@ -32,6 +34,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
+@Validated
 @ConfigurationProperties(prefix = "dc3.agentic")
 public class AgenticProperties {
 
@@ -43,11 +46,13 @@ public class AgenticProperties {
     /**
      * Maximum number of messages retained per conversation for chat memory.
      */
+    @Min(value = 1, message = "Memory max messages must be greater than 0")
     private int memoryMaxMessages = 50;
 
     /**
      * Session time-to-live in hours. Sessions older than this are marked expired.
      */
+    @Min(value = 1, message = "Session TTL hours must be greater than 0")
     private int sessionTtlHours = 72;
 
 }

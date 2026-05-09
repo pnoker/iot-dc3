@@ -17,9 +17,11 @@
 
 package io.github.pnoker.common.resource.registrar.config;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@Validated
 @ConfigurationProperties(prefix = "dc3.resource-registrar")
 public class ResourceRegistrarProperties {
 
@@ -51,12 +54,13 @@ public class ResourceRegistrarProperties {
      * soft-deleted. Leave false in production to avoid accidental wipes during rolling
      * deploys of older binaries.
      */
-    private boolean deleteMissing = true;
+    private boolean deleteMissing = false;
 
     /**
      * Path patterns (Ant-style) to exclude from the scan, in addition to the built-in
      * actuator/error defaults.
      */
+    @NotNull(message = "Resource registrar exclude paths can't be null")
     private List<String> excludePaths = new ArrayList<>();
 
     /**

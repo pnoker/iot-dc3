@@ -19,12 +19,12 @@ package io.github.pnoker.common.mqtt.handler;
 
 import io.github.pnoker.common.mqtt.entity.MessageHeader;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
+import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.MessageHandler;
@@ -48,8 +48,8 @@ import java.util.concurrent.ExecutorService;
 @Component
 public class MqttReceiveHandler {
 
-    @Value("${driver.mqtt.batch.speed}")
-    private Integer batchSpeed;
+    @Resource
+    private MqttProperties mqttProperties;
 
     @Resource
     private MqttReceiveService mqttReceiveService;
@@ -84,6 +84,7 @@ public class MqttReceiveHandler {
                         messageHeader.getMqttReceivedQos(), payload);
 
                 // Determine whether to process data in batch based on transmission speed
+                Integer batchSpeed = mqttProperties.getBatch().getSpeed();
                 if (MqttScheduleJob.messageSpeed.get() < batchSpeed) {
                     virtualThreadExecutor.execute(() ->
                             // Process single MQTT message
@@ -91,8 +92,11 @@ public class MqttReceiveHandler {
                 } else {
                     // Save message to batch schedule for processing
                     MqttScheduleJob.messageLock.writeLock().lock();
-                    MqttScheduleJob.addMqttMessages(mqttMessage);
-                    MqttScheduleJob.messageLock.writeLock().unlock();
+                    try {
+                        MqttScheduleJob.addMqttMessages(mqttMessage);
+                    } finally {
+                        MqttScheduleJob.messageLock.writeLock().unlock();
+                    }
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
