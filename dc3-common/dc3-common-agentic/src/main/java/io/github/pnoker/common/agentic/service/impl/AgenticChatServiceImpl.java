@@ -29,6 +29,7 @@ import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.agentic.skill.SkillDefinition;
 import io.github.pnoker.common.agentic.skill.SkillRegistry;
 import io.github.pnoker.common.agentic.util.AgenticConversationIds;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
 import lombok.extern.slf4j.Slf4j;
@@ -143,8 +144,8 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         String skillSystemPrompt = skill == null ? null : buildSkillSystemPrompt(skill);
         String model = StringUtils.defaultIfBlank(request.getModel(), DEFAULT_MODEL);
         Map<String, Object> toolContext = Map.of(
-                AgenticRequestContext.TENANT_ID_CONTEXT_KEY, userHeader.getTenantId(),
-                AgenticRequestContext.USER_ID_CONTEXT_KEY, userHeader.getUserId());
+                AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId(),
+                AgenticConstant.ToolContextKey.USER_ID, userHeader.getUserId());
 
         log.debug(
                 "Agentic chat request received, mode={}, model={}, messageCount={}, conversationIdPresent={}, skill={}, tenantId={}, userId={}",

@@ -16,10 +16,10 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
-import io.github.pnoker.common.agentic.constant.AgenticConstant;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
 import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
