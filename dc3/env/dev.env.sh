@@ -48,6 +48,8 @@ export CENTER_AGENTIC_HOST=localhost
 # Runtime
 export NODE_ENV=dev
 export DC3_FACADE_MODE=grpc
+export DC3_FACADE_GRPC_DEADLINE_MS=3000
+export AUTH_HMAC_SECRET=
 export POINT_BATCH_SPEED=100
 export POINT_BATCH_INTERVAL=5
 export MQTT_BATCH_SPEED=100
@@ -64,8 +66,6 @@ export AGENTIC_MEMORY_MAX_MESSAGES=50
 export AGENTIC_SESSION_TTL_HOURS=72
 
 # Per-process overrides. Uncomment only for a single service process.
-# export SERVER_PORT=8000
-# export GRPC_SERVER_PORT=9300
 # export TCP_PORT=6270
 # export UDP_PORT=6271
 # export POSTGRES_SCHEMA=dc3_manager

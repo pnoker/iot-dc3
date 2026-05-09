@@ -179,6 +179,18 @@ want Compose-only variables to appear in the local Java process environment.
 | `POINT_BATCH_SPEED`    | Runtime | Point-value processing speed threshold for switching between direct and batch handling.                                                 |
 | `POINT_BATCH_INTERVAL` | Runtime | Point-value batch scheduler interval in seconds.                                                                                        |
 
+### gRPC Facade
+
+| Variable                      | Scope   | Meaning                                                                                              |
+|-------------------------------|---------|------------------------------------------------------------------------------------------------------|
+| `DC3_FACADE_GRPC_DEADLINE_MS` | Runtime | Per-request gRPC facade deadline in milliseconds. Set `0` to disable the client-side deadline.      |
+
+### Auth and HMAC Signing
+
+| Variable           | Scope   | Meaning                                                                                                                                                                                                                                    |
+|--------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `AUTH_HMAC_SECRET` | Runtime | Shared HMAC-SHA256 secret for `X-Auth-User` header signing between the gateway and backend services. When empty, signing is disabled and backend services trust the header without verification. Set a strong random string in production. |
+
 ### Optional and Observability Stacks
 
 | Variable                  | Scope   | Meaning                                        |
@@ -202,7 +214,8 @@ want Compose-only variables to appear in the local Java process environment.
 - Local source-run variables must match between `.env.example`,
   `dc3/env/dev.env`, and `dc3/env/dev.env.sh`.
   Examples: `POSTGRES_HOST`, `RABBITMQ_HOST`, `CENTER_*_HOST`,
-  `OPENAI_*`, `AGENTIC_*`, `POINT_*`, `MQTT_*`.
+  `OPENAI_*`, `AGENTIC_*`, `DC3_FACADE_GRPC_*`, `AUTH_HMAC_SECRET`,
+  `POINT_*`, `MQTT_*`.
 - Per-process variables are documented as commented examples only.
   Examples: `SERVER_PORT`, `GRPC_SERVER_PORT`, `TCP_PORT`, `UDP_PORT`,
   `POSTGRES_SCHEMA`.

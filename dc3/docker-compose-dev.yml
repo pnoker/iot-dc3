@@ -28,15 +28,31 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      auth:
+        condition: service_healthy
+      manager:
+        condition: service_healthy
+      data:
+        condition: service_healthy
+      agentic:
+        condition: service_healthy
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
       - logs:/dc3-gateway/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8000/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     logging: *default-logging
     networks:
       dc3net:
@@ -55,10 +71,17 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
       - logs:/dc3-center/dc3-center-auth/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8300/auth/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     logging: *default-logging
     networks:
       dc3net:
@@ -71,16 +94,26 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      auth:
+        condition: service_healthy
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_PORT:-8400}:8400"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_GRPC_PORT:-9400}:9400"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
       - logs:/dc3-center/dc3-center-manager/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8400/manager/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     logging: *default-logging
     networks:
       dc3net:
@@ -93,16 +126,28 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      auth:
+        condition: service_healthy
+      manager:
+        condition: service_healthy
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_PORT:-8500}:8500"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_GRPC_PORT:-9500}:9500"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
       - logs:/dc3-center/dc3-center-data/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8500/data/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     logging: *default-logging
     networks:
       dc3net:
@@ -115,11 +160,19 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      auth:
+        condition: service_healthy
+      manager:
+        condition: service_healthy
+      data:
+        condition: service_healthy
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AGENTIC_PORT:-8600}:8600"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
@@ -129,6 +182,12 @@ services:
     hostname: dc3-center-agentic
     volumes:
       - logs:/dc3-center/dc3-center-agentic/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8600/agentic/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     logging: *default-logging
     networks:
       dc3net:
@@ -141,12 +200,16 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_TCP_PORT:-6270}:6270"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_UDP_PORT:-6271}:6271"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -163,9 +226,13 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -182,9 +249,13 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -201,9 +272,13 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -220,9 +295,13 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -239,9 +318,13 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -258,9 +341,13 @@ services:
       dockerfile: ./Dockerfile
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:
