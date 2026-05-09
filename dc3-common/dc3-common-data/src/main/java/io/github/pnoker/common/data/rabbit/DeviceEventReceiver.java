@@ -21,6 +21,7 @@ import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DeviceEventService;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.core.Message;
@@ -28,7 +29,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -51,12 +51,13 @@ public class DeviceEventReceiver {
     @RabbitHandler
     @RabbitListener(queues = "#{deviceEventQueue.name}")
     public void deviceEventReceive(Channel channel, Message message, DeviceEventDTO entityDTO) {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             log.debug("Receive device event: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getType())
                     || StringUtils.isEmpty(entityDTO.getContent())) {
                 log.error("Invalid device event: {}", entityDTO);
+                RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
@@ -69,10 +70,13 @@ public class DeviceEventReceiver {
                     break;
                 default:
                     log.error("Invalid event type, {}", entityDTO.getType());
-                    break;
+                    RabbitAckUtil.reject(channel, deliveryTag);
+                    return;
             }
-        } catch (IOException e) {
+            RabbitAckUtil.ack(channel, deliveryTag);
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
+            RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }
 
