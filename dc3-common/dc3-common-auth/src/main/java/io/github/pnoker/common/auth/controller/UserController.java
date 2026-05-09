@@ -18,15 +18,18 @@
 package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.query.UserQuery;
 import io.github.pnoker.common.auth.entity.vo.UserVO;
+import io.github.pnoker.common.auth.service.TenantBindService;
 import io.github.pnoker.common.auth.service.UserService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
@@ -53,9 +56,12 @@ public class UserController implements BaseController {
 
     private final UserService userService;
 
-    public UserController(UserBuilder userBuilder, UserService userService) {
+    private final TenantBindService tenantBindService;
+
+    public UserController(UserBuilder userBuilder, UserService userService, TenantBindService tenantBindService) {
         this.userBuilder = userBuilder;
         this.userService = userService;
+        this.tenantBindService = tenantBindService;
     }
 
     @PostMapping("/add")
@@ -73,10 +79,11 @@ public class UserController implements BaseController {
 
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenantMember(tenantId, id);
             userService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     @PostMapping("/update")
@@ -85,6 +92,7 @@ public class UserController implements BaseController {
             UserBO entityBO = userBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
+            requireTenantMember(header.getTenantId(), entityBO.getId());
             userService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -92,23 +100,25 @@ public class UserController implements BaseController {
 
     @GetMapping("/id/{id}")
     public Mono<R<UserVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenantMember(tenantId, id);
             UserBO entityBO = userService.selectById(id);
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     @GetMapping("/name/{name}")
     public Mono<R<UserVO>> selectByName(@NotNull @PathVariable(value = "name") String name) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO entityBO = userService.selectByUserName(name, false);
             if (Objects.isNull(entityBO)) {
                 return R.fail(ResponseEnum.NO_RESOURCE.getText());
             }
+            requireTenantMember(tenantId, entityBO.getId());
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     @PostMapping("/list")
@@ -122,6 +132,13 @@ public class UserController implements BaseController {
             Page<UserVO> entityPageVO = userBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));
+    }
+
+    private void requireTenantMember(Long tenantId, Long userId) {
+        TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, userId);
+        if (Objects.isNull(tenantBind)) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
 }

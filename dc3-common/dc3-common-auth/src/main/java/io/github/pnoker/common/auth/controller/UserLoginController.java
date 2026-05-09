@@ -18,16 +18,19 @@
 package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.auth.entity.builder.UserLoginBuilder;
 import io.github.pnoker.common.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.common.auth.entity.vo.UserLoginVO;
+import io.github.pnoker.common.auth.service.TenantBindService;
 import io.github.pnoker.common.auth.service.UserLoginService;
 import io.github.pnoker.common.auth.service.UserPasswordService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
@@ -56,11 +59,14 @@ public class UserLoginController implements BaseController {
 
     private final UserPasswordService userPasswordService;
 
+    private final TenantBindService tenantBindService;
+
     public UserLoginController(UserLoginBuilder userLoginBuilder, UserLoginService userLoginService,
-                               UserPasswordService userPasswordService) {
+                               UserPasswordService userPasswordService, TenantBindService tenantBindService) {
         this.userLoginBuilder = userLoginBuilder;
         this.userLoginService = userLoginService;
         this.userPasswordService = userPasswordService;
+        this.tenantBindService = tenantBindService;
     }
 
     /**
@@ -69,11 +75,12 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserLoginVO entityVO) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
+            requireTenantMember(tenantId, entityBO.getUserId());
             userLoginService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -84,10 +91,12 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            UserLoginBO entityBO = userLoginService.selectById(id);
+            requireTenantMember(tenantId, entityBO.getUserId());
             userLoginService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -102,11 +111,14 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserLoginVO entityVO) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
+            UserLoginBO current = userLoginService.selectById(entityBO.getId());
+            requireTenantMember(tenantId, current.getUserId());
+            requireTenantMember(tenantId, entityBO.getUserId());
             userLoginService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -117,10 +129,16 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/reset/{id}")
     public Mono<R<Boolean>> restPassword(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            UserLoginQuery query = new UserLoginQuery();
+            query.setUserPasswordId(id);
+            query.setTenantId(tenantId);
+            if (userLoginService.selectByPage(query).getRecords().isEmpty()) {
+                throw new NotFoundException("Resource does not exist");
+            }
             userPasswordService.restPassword(id);
             return R.ok();
-        });
+        }));
     }
 
     /**
@@ -131,11 +149,12 @@ public class UserLoginController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<UserLoginVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.selectById(id);
+            requireTenantMember(tenantId, entityBO.getUserId());
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -146,11 +165,15 @@ public class UserLoginController implements BaseController {
      */
     @GetMapping("/name/{name}")
     public Mono<R<UserLoginVO>> selectByName(@NotNull @PathVariable(value = "name") String name) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.selectByLoginName(name, false);
+            if (Objects.isNull(entityBO)) {
+                return R.fail(ResponseEnum.NO_RESOURCE.getText());
+            }
+            requireTenantMember(tenantId, entityBO.getUserId());
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -161,12 +184,13 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<UserLoginVO>>> list(@RequestBody(required = false) UserLoginQuery entityQuery) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginQuery query = Objects.isNull(entityQuery) ? new UserLoginQuery() : entityQuery;
+            query.setTenantId(tenantId);
             Page<UserLoginBO> entityPageBO = userLoginService.selectByPage(query);
             Page<UserLoginVO> entityPageVO = userLoginBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
-        });
+        }));
     }
 
     /**
@@ -178,6 +202,13 @@ public class UserLoginController implements BaseController {
     @GetMapping("/check/{name}")
     public Mono<R<Boolean>> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name) {
         return async(() -> Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? R.ok() : R.fail());
+    }
+
+    private void requireTenantMember(Long tenantId, Long userId) {
+        TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, userId);
+        if (Objects.isNull(tenantBind)) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
 }

@@ -20,6 +20,7 @@ package io.github.pnoker.common.auth.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleUserBindBO;
+import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleUserBindBuilder;
@@ -28,11 +29,14 @@ import io.github.pnoker.common.auth.entity.query.RoleUserBindQuery;
 import io.github.pnoker.common.auth.entity.vo.RoleUserBindVO;
 import io.github.pnoker.common.auth.entity.vo.RoleVO;
 import io.github.pnoker.common.auth.entity.vo.UserVO;
+import io.github.pnoker.common.auth.service.RoleService;
 import io.github.pnoker.common.auth.service.RoleUserBindService;
+import io.github.pnoker.common.auth.service.TenantBindService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -63,18 +67,27 @@ public class RoleUserBindController implements BaseController {
 
     private final UserBuilder userBuilder;
 
+    private final RoleService roleService;
+
+    private final TenantBindService tenantBindService;
+
     public RoleUserBindController(RoleUserBindBuilder roleUserBindBuilder, RoleUserBindService roleUserBindService,
-                                  RoleBuilder roleBuilder, UserBuilder userBuilder) {
+                                  RoleBuilder roleBuilder, UserBuilder userBuilder, RoleService roleService,
+                                  TenantBindService tenantBindService) {
         this.roleUserBindBuilder = roleUserBindBuilder;
         this.roleUserBindService = roleUserBindService;
         this.roleBuilder = roleBuilder;
         this.userBuilder = userBuilder;
+        this.roleService = roleService;
+        this.tenantBindService = tenantBindService;
     }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleUserBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleUserBindBO entityBO = roleUserBindBuilder.buildBOByVO(entityVO);
+            requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
+            requireTenantMember(tenantId, entityBO.getUserId());
             roleUserBindService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
@@ -82,10 +95,13 @@ public class RoleUserBindController implements BaseController {
 
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            RoleUserBindBO entityBO = roleUserBindService.selectById(id);
+            requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
+            requireTenantMember(tenantId, entityBO.getUserId());
             roleUserBindService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     @PostMapping("/list")
@@ -100,21 +116,33 @@ public class RoleUserBindController implements BaseController {
 
     @GetMapping("/list-role-by-user/{userId}")
     public Mono<R<List<RoleVO>>> listRoleByUser(@NotNull @PathVariable(value = "userId") Long userId,
-                                                @RequestParam(value = "tenantId", required = false) Long tenantId) {
-        return async(() -> {
+                                                @RequestParam(value = "tenantId", required = false) Long ignoredTenantId) {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenantMember(tenantId, userId);
             List<RoleBO> entityBOList = roleUserBindService.listRoleByTenantIdAndUserId(tenantId, userId);
             List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
-        });
+        }));
     }
 
     @GetMapping("/list-user-by-role/{roleId}")
     public Mono<R<List<UserVO>>> listUserByRole(@NotNull @PathVariable(value = "roleId") Long roleId) {
-        return async(() -> {
-            List<UserBO> entityBOList = roleUserBindService.listUserByRoleId(roleId);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            requireTenant(tenantId, roleService.selectById(roleId));
+            List<UserBO> entityBOList = roleUserBindService.listUserByRoleId(roleId)
+                    .stream()
+                    .filter(user -> Objects.nonNull(tenantBindService.selectByTenantIdAndUserId(tenantId, user.getId())))
+                    .toList();
             List<UserVO> entityVOList = userBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
-        });
+        }));
+    }
+
+    private void requireTenantMember(Long tenantId, Long userId) {
+        TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, userId);
+        if (Objects.isNull(tenantBind)) {
+            throw new NotFoundException("Resource does not exist");
+        }
     }
 
 }
