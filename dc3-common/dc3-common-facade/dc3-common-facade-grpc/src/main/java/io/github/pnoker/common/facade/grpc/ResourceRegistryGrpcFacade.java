@@ -47,6 +47,9 @@ public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
     @Resource
     private ResourceRegistryApiGrpc.ResourceRegistryApiBlockingStub resourceRegistryApiBlockingStub;
 
+    @Resource
+    private GrpcFacadeSupport grpcFacadeSupport;
+
     @Override
     public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
         GrpcSyncRequest.Builder request = GrpcSyncRequest.newBuilder()
@@ -65,7 +68,9 @@ public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
                         .build());
             }
         }
-        GrpcRSyncResult response = resourceRegistryApiBlockingStub.sync(request.build());
+        GrpcSyncRequest syncRequest = request.build();
+        GrpcRSyncResult response = grpcFacadeSupport.call("ResourceRegistryFacade.sync", resourceRegistryApiBlockingStub,
+                stub -> stub.sync(syncRequest));
         if (!response.getResult().getOk()) {
             throw new ServiceException("ResourceRegistryFacade.sync failed: [" + response.getResult().getCode() + "] "
                     + response.getResult().getMessage());

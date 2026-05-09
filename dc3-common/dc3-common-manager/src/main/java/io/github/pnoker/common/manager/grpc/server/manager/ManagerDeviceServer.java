@@ -147,6 +147,33 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
+    public void selectByDeviceIds(GrpcDeviceIdsQuery request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
+        GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+
+        List<DeviceBO> entityBOList = deviceService.selectByIds(request.getDeviceIdsList().stream().distinct().toList());
+        if (CollectionUtils.isEmpty(entityBOList)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+
+            List<GrpcDeviceDTO> entityGrpcDTOList = entityBOList.stream()
+                    .map(grpcDeviceBuilder::buildGrpcDTOByBO)
+                    .toList();
+
+            builder.addAllData(entityGrpcDTOList);
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();

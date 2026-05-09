@@ -37,6 +37,8 @@ service DriverApi {
   rpc SelectByPage (GrpcPageDriverQuery) returns (GrpcRPageDriverDTO);
   // Query driver information by Driver ID
   rpc SelectByDriverId (GrpcDriverQuery) returns (GrpcRDriverDTO);
+  // Batch query driver information by Driver IDs
+  rpc SelectByDriverIds (GrpcDriverIdsQuery) returns (GrpcRDriverListDTO);
   // Query associated driver information by Device ID
   rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDriverDTO);
 }
@@ -56,6 +58,15 @@ message GrpcPageDriverDTO {
   GrpcPage page = 1;
 
   // List of driver data
+  repeated GrpcDriverDTO data = 2;
+}
+
+// Response wrapper for driver list query
+message GrpcRDriverListDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Returned driver list data
   repeated GrpcDriverDTO data = 2;
 }
 

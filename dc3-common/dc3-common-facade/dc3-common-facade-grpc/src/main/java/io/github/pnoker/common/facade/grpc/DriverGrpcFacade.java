@@ -53,10 +53,14 @@ public class DriverGrpcFacade implements DriverFacade {
     @Resource
     private FacadeGrpcDriverBuilder facadeGrpcDriverBuilder;
 
+    @Resource
+    private GrpcFacadeSupport grpcFacadeSupport;
+
     @Override
     public FacadeDriverBO selectById(Long id) {
         GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(id).build();
-        GrpcRDriverDTO response = driverApiBlockingStub.selectByDriverId(request);
+        GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectById", driverApiBlockingStub,
+                stub -> stub.selectByDriverId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectById");
             return null;
@@ -64,23 +68,31 @@ public class DriverGrpcFacade implements DriverFacade {
         return facadeGrpcDriverBuilder.toFacadeBO(response.getData());
     }
 
-    /**
-     * Manager doesn't (yet) expose a batch RPC, so we fan out to {@link #selectById}
-     * concurrently. This collapses N round-trip latencies into roughly one. When
-     * call-volume justifies it, replace with a server-side batch RPC.
-     */
     @Override
     public List<FacadeDriverBO> selectByIds(Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return ids.parallelStream().distinct().map(this::selectById).filter(Objects::nonNull).toList();
+        List<Long> driverIds = ids.stream().filter(Objects::nonNull).distinct().toList();
+        if (driverIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        GrpcDriverIdsQuery request = GrpcDriverIdsQuery.newBuilder().addAllDriverIds(driverIds).build();
+        GrpcRDriverListDTO response = grpcFacadeSupport.call("DriverFacade.selectByIds", driverApiBlockingStub,
+                stub -> stub.selectByDriverIds(request));
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByIds");
+            return Collections.emptyList();
+        }
+        return response.getDataList().stream().map(facadeGrpcDriverBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
         GrpcPageDriverQuery request = facadeGrpcDriverBuilder.toGrpcPageQuery(query);
-        GrpcRPageDriverDTO response = driverApiBlockingStub.selectByPage(request);
+        GrpcRPageDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectByPage", driverApiBlockingStub,
+                stub -> stub.selectByPage(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByPage");
             return FacadePage.empty();
@@ -96,7 +108,8 @@ public class DriverGrpcFacade implements DriverFacade {
     @Override
     public FacadeDriverBO selectByDeviceId(Long deviceId) {
         GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
-        GrpcRDriverDTO response = driverApiBlockingStub.selectByDeviceId(request);
+        GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectByDeviceId", driverApiBlockingStub,
+                stub -> stub.selectByDeviceId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByDeviceId");
             return null;

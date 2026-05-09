@@ -47,9 +47,14 @@ public class TenantGrpcFacade implements TenantFacade {
     @Resource
     private FacadeGrpcTenantBuilder facadeGrpcTenantBuilder;
 
+    @Resource
+    private GrpcFacadeSupport grpcFacadeSupport;
+
     @Override
     public FacadeTenantBO selectByCode(String code) {
-        GrpcRTenantDTO response = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(code).build());
+        GrpcCodeQuery request = GrpcCodeQuery.newBuilder().setCode(code).build();
+        GrpcRTenantDTO response = grpcFacadeSupport.call("TenantFacade.selectByCode", tenantApiBlockingStub,
+                stub -> stub.selectByCode(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByCode");
             return null;

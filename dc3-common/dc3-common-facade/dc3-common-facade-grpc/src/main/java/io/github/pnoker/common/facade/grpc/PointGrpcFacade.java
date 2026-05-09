@@ -53,10 +53,14 @@ public class PointGrpcFacade implements PointFacade {
     @Resource
     private FacadeGrpcPointBuilder facadeGrpcPointBuilder;
 
+    @Resource
+    private GrpcFacadeSupport grpcFacadeSupport;
+
     @Override
     public FacadePointBO selectById(Long id) {
         GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).build();
-        GrpcRPointDTO response = pointApiBlockingStub.selectById(request);
+        GrpcRPointDTO response = grpcFacadeSupport.call("PointFacade.selectById", pointApiBlockingStub,
+                stub -> stub.selectById(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectById");
             return null;
@@ -64,23 +68,31 @@ public class PointGrpcFacade implements PointFacade {
         return facadeGrpcPointBuilder.toFacadeBO(response.getData());
     }
 
-    /**
-     * Manager doesn't (yet) expose a batch RPC, so we fan out to {@link #selectById}
-     * concurrently. This collapses N round-trip latencies into roughly one. When
-     * call-volume justifies it, replace with a server-side batch RPC.
-     */
     @Override
     public List<FacadePointBO> selectByIds(Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return ids.parallelStream().distinct().map(this::selectById).filter(Objects::nonNull).toList();
+        List<Long> pointIds = ids.stream().filter(Objects::nonNull).distinct().toList();
+        if (pointIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        GrpcPointIdsQuery request = GrpcPointIdsQuery.newBuilder().addAllPointIds(pointIds).build();
+        GrpcRPointListDTO response = grpcFacadeSupport.call("PointFacade.selectByIds", pointApiBlockingStub,
+                stub -> stub.selectByIds(request));
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByIds");
+            return Collections.emptyList();
+        }
+        return response.getDataList().stream().map(facadeGrpcPointBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadePointBO> selectByPage(FacadePointQuery query) {
         GrpcPagePointQuery request = facadeGrpcPointBuilder.toGrpcPageQuery(query);
-        GrpcRPagePointDTO response = pointApiBlockingStub.selectByPage(request);
+        GrpcRPagePointDTO response = grpcFacadeSupport.call("PointFacade.selectByPage", pointApiBlockingStub,
+                stub -> stub.selectByPage(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByPage");
             return FacadePage.empty();

@@ -41,6 +41,8 @@ service DeviceApi {
   rpc SelectByDriverId (GrpcDriverQuery) returns (GrpcRDeviceListDTO);
   // Query single device information by Device ID
   rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
+  // Batch query device information by Device IDs
+  rpc SelectByDeviceIds (GrpcDeviceIdsQuery) returns (GrpcRDeviceListDTO);
 }
 
 // Response wrapper for paginated device query
