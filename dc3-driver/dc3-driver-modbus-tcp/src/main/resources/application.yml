@@ -15,47 +15,48 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-driver:
-  tenant: default
-  name: Modbus-Tcp驱动
-  code: ModbusTcpDriver
-  type: DRIVER_CLIENT
-  remark: @project.description@
-  schedule:
-    # Read data regularly
-    read:
-      enable: true
-      cron: '0/30 * * * * ?'
-    custom:
-      enable: true
-      cron: '0/5 * * * * ?'
-  driver-attribute:
-    - attribute-name: 主机
-      attribute-code: host
-      attribute-type-flag: STRING
-      default-value: localhost
-      remark: Modbus IP
-    - attribute-name: 端口
-      attribute-code: port
-      attribute-type-flag: INT
-      default-value: 502
-      remark: Modbus Port
-  point-attribute:
-    - attribute-name: 从站编号
-      attribute-code: slaveId
-      attribute-type-flag: INT
-      default-value: 1
-      remark: 从站编号
-    - attribute-name: 功能码
-      attribute-code: functionCode
-      attribute-type-flag: INT
-      default-value: 1
-      remark: 功能码 [1, 2, 3, 4]
-    - attribute-name: 偏移量
-      attribute-code: offset
-      attribute-type-flag: INT
-      default-value: 0
-      remark: 偏移量
+dc3:
+  driver:
+    tenant: default
+    name: Modbus-Tcp驱动
+    code: ModbusTcpDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    driver-attribute:
+      - attribute-name: 主机
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: localhost
+        remark: Modbus IP
+      - attribute-name: 端口
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 502
+        remark: Modbus Port
+    point-attribute:
+      - attribute-name: 从站编号
+        attribute-code: slaveId
+        attribute-type-flag: INT
+        default-value: 1
+        remark: 从站编号
+      - attribute-name: 功能码
+        attribute-code: functionCode
+        attribute-type-flag: INT
+        default-value: 1
+        remark: 功能码 [1, 2, 3, 4]
+      - attribute-name: 偏移量
+        attribute-code: offset
+        attribute-type-flag: INT
+        default-value: 0
+        remark: 偏移量
 
 spring:
   application:

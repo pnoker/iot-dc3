@@ -29,7 +29,7 @@ import org.springframework.validation.annotation.Validated;
  * Thread Pool Configuration Properties
  * <p>
  * Configuration properties for thread pools in Spring Boot applications. Supports
- * configuration through application.yml with prefix "server.thread". Includes settings
+ * configuration through application.yml with prefix "dc3.thread". Includes settings
  * for core pool size, maximum pool size, keep alive time, and thread name prefix.
  * </p>
  *
@@ -40,7 +40,7 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @Setter
 @Validated
-@ConfigurationProperties(prefix = "server.thread")
+@ConfigurationProperties(prefix = "dc3.thread")
 public class ThreadProperties {
 
     /**

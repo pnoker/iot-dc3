@@ -26,8 +26,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -52,6 +54,8 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        addLegacyMqttAliases(environment);
+
         String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
         if (StringUtils.isEmpty(node)) {
             node = EnvironmentUtil.getNodeId();
@@ -62,7 +66,7 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
         String client = MessageFormat.format("{0}/{1}/{2}", tenant, name, node);
 
         String prefix = environment.getProperty(EnvironmentConstant.MQTT_PREFIX, String.class);
-        if (StringUtils.isEmpty(node)) {
+        if (StringUtils.isEmpty(prefix)) {
             prefix = MessageFormat.format("dc3/{0}/{1}/", tenant, name);
         }
 
@@ -72,6 +76,25 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
         source.put(EnvironmentConstant.MQTT_PREFIX, prefix);
         MutablePropertySources propertySources = environment.getPropertySources();
         propertySources.addFirst(new MapPropertySource("mqtt", source));
+    }
+
+    private void addLegacyMqttAliases(ConfigurableEnvironment environment) {
+        Map<String, Object> aliases = new HashMap<>();
+        for (PropertySource<?> propertySource : environment.getPropertySources()) {
+            if (propertySource instanceof EnumerablePropertySource<?> enumerablePropertySource) {
+                for (String propertyName : enumerablePropertySource.getPropertyNames()) {
+                    if (propertyName.startsWith("driver.mqtt.")) {
+                        String aliasName = "dc3." + propertyName;
+                        if (!environment.containsProperty(aliasName)) {
+                            aliases.put(aliasName, enumerablePropertySource.getProperty(propertyName));
+                        }
+                    }
+                }
+            }
+        }
+        if (!aliases.isEmpty()) {
+            environment.getPropertySources().addLast(new MapPropertySource("legacyMqttAliases", aliases));
+        }
     }
 
 }

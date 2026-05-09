@@ -16,11 +16,12 @@
 #
 
 # Production environment configuration will overwrite the content configured in application-*.yml
-driver:
-  schedule:
-    # Read data regularly
-    read:
-      cron: '0 0/15 * * * ?'
+dc3:
+  driver:
+    schedule:
+      # Read data regularly
+      read:
+        cron: '0 0/15 * * * ?'
 
 spring:
   rabbitmq:
