@@ -155,6 +155,15 @@ Current custom prefixes:
 - `dc3.resource-registrar`
 - `dc3.thread`
 
+### Logging
+
+Use the repository logging convention in `dc3/doc/LOGGING.md`.
+
+- Use English, stable event names, and parameterized SLF4J placeholders.
+- Prefer key-value fields such as `tenantId={}, userId={}, deviceId={}` over prose-only messages.
+- Do not log secrets, tokens, passwords, full request bodies, or raw private payloads at `info`.
+- Pass the exception object to warn/error logs for caught exceptions unless the stack trace is intentionally suppressed.
+
 ### Driver Metadata
 
 Driver `application.yml` files are user-facing metadata. Keep `name`, `attribute-name`, and `remark` values in English.
