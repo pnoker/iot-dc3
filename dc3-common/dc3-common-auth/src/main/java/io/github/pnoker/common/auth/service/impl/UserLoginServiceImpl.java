@@ -25,6 +25,7 @@ import io.github.pnoker.common.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.auth.entity.builder.UserLoginBuilder;
 import io.github.pnoker.common.auth.entity.model.UserLoginDO;
 import io.github.pnoker.common.auth.entity.query.UserLoginQuery;
+import io.github.pnoker.common.auth.service.TenantBindService;
 import io.github.pnoker.common.auth.service.UserLoginService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -35,7 +36,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -52,6 +55,9 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Resource
     private UserLoginManager userLoginManager;
+
+    @Resource
+    private TenantBindService tenantBindService;
 
     @Override
     public void save(UserLoginBO entityBO) {
@@ -116,7 +122,10 @@ public class UserLoginServiceImpl implements UserLoginService {
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserLoginDO userLogin = userLoginManager.getOne(wrapper);
         if (Objects.isNull(userLogin)) {
-            throw new NotFoundException();
+            if (throwException) {
+                throw new NotFoundException();
+            }
+            return null;
         }
         return userLoginBuilder.buildBOByDO(userLogin);
     }
@@ -139,6 +148,19 @@ public class UserLoginServiceImpl implements UserLoginService {
         LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getLoginName()), UserLoginDO::getLoginName,
                 entityQuery.getLoginName());
+        wrapper.eq(Objects.nonNull(entityQuery.getUserId()), UserLoginDO::getUserId, entityQuery.getUserId());
+        wrapper.eq(Objects.nonNull(entityQuery.getUserPasswordId()), UserLoginDO::getUserPasswordId,
+                entityQuery.getUserPasswordId());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), UserLoginDO::getEnableFlag,
+                entityQuery.getEnableFlag());
+        if (Objects.nonNull(entityQuery.getTenantId())) {
+            List<Long> userIds = tenantBindService.listUserIdsByTenantId(entityQuery.getTenantId());
+            if (CollectionUtils.isEmpty(userIds)) {
+                wrapper.apply("1 = 0");
+            } else {
+                wrapper.in(UserLoginDO::getUserId, userIds);
+            }
+        }
         return wrapper;
     }
 
