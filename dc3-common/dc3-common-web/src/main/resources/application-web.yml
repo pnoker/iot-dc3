@@ -37,8 +37,17 @@ spring:
       fail-on-unknown-properties: false
 
 management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
   endpoints:
     web:
       exposure:
-        # Expose the Prometheus endpoint for metrics collection and scraping.
-        include: prometheus
+        # Expose health and Prometheus endpoints for readiness and metrics scraping.
+        include: health,prometheus
