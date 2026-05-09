@@ -1,0 +1,42 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:20"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: docker
+    directories:
+      - /
+      - /dc3-gateway
+      - /dc3-center/dc3-center-agentic
+      - /dc3-center/dc3-center-auth
+      - /dc3-center/dc3-center-data
+      - /dc3-center/dc3-center-manager
+      - /dc3-center/dc3-center-single
+      - /dc3-driver/dc3-driver-listening-virtual
+      - /dc3-driver/dc3-driver-modbus-tcp
+      - /dc3-driver/dc3-driver-mqtt
+      - /dc3-driver/dc3-driver-opc-da
+      - /dc3-driver/dc3-driver-opc-ua
+      - /dc3-driver/dc3-driver-plcs7
+      - /dc3-driver/dc3-driver-virtual
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:40"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
