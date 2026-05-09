@@ -30,6 +30,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,6 +57,18 @@ public class DriverLocalFacade implements DriverFacade {
     public FacadeDriverBO selectById(Long id) {
         DriverBO managerBO = driverService.selectById(id);
         return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
+    }
+
+    @Override
+    public List<FacadeDriverBO> selectByIds(Collection<Long> ids) {
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<DriverBO> list = driverService.selectByIds(new HashSet<>(ids));
+        if (Objects.isNull(list) || list.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return list.stream().map(facadeDriverBuilder::toFacadeBO).toList();
     }
 
     @Override

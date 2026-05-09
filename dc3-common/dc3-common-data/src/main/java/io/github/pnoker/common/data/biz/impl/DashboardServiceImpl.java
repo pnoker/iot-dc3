@@ -296,28 +296,14 @@ public class DashboardServiceImpl implements DashboardService {
         // Point-value tables live in the history data source; device / point /
         // driver metadata lives in the master data source (and in remote
         // Manager in distributed deployments), so we cannot JOIN them in SQL.
-        // Resolve names via the Facade once per distinct id — the live feed
-        // is a manual-refresh endpoint capped at 100 rows, so at most a few
-        // dozen facade calls per request. The Facade implementation (local
-        // or gRPC) already sits behind Manager's own caching.
-        Map<Long, String> deviceNames = new HashMap<>(deviceIds.size());
-        for (Long id : deviceIds) {
-            FacadeDeviceBO bo = deviceFacade.selectById(id);
-            if (Objects.nonNull(bo))
-                deviceNames.put(id, bo.getDeviceName());
-        }
-        Map<Long, String> pointNames = new HashMap<>(pointIds.size());
-        for (Long id : pointIds) {
-            FacadePointBO bo = pointFacade.selectById(id);
-            if (Objects.nonNull(bo))
-                pointNames.put(id, bo.getPointName());
-        }
-        Map<Long, String> driverNames = new HashMap<>(driverIds.size());
-        for (Long id : driverIds) {
-            FacadeDriverBO bo = driverFacade.selectById(id);
-            if (Objects.nonNull(bo))
-                driverNames.put(id, bo.getDriverName());
-        }
+        // Resolve names in bulk — local facade does it in one SQL, gRPC fans
+        // out concurrently — to avoid the per-id round-trip storm.
+        Map<Long, String> deviceNames = deviceFacade.selectByIds(deviceIds).stream()
+                .collect(java.util.stream.Collectors.toMap(FacadeDeviceBO::getId, FacadeDeviceBO::getDeviceName, (a, b) -> a));
+        Map<Long, String> pointNames = pointFacade.selectByIds(pointIds).stream()
+                .collect(java.util.stream.Collectors.toMap(FacadePointBO::getId, FacadePointBO::getPointName, (a, b) -> a));
+        Map<Long, String> driverNames = driverFacade.selectByIds(driverIds).stream()
+                .collect(java.util.stream.Collectors.toMap(FacadeDriverBO::getId, FacadeDriverBO::getDriverName, (a, b) -> a));
 
         for (LatestPointValueVO vo : out) {
             if (vo.getDeviceId() != null)

@@ -21,6 +21,9 @@ import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Protocol-neutral point facade. Mirrors the two RPCs on
  * {@code api.center.manager.PointApi}.
@@ -35,6 +38,13 @@ public interface PointFacade {
      * @return the point, or {@code null} when it does not exist.
      */
     FacadePointBO selectById(Long id);
+
+    /**
+     * Bulk lookup. Avoids the N+1 cost of calling {@link #selectById(Long)} in a loop.
+     *
+     * @return list of resolved points (missing ids are simply omitted; never {@code null}).
+     */
+    List<FacadePointBO> selectByIds(Collection<Long> ids);
 
     /**
      * @return a page of points (never {@code null}; empty page when nothing matches).
