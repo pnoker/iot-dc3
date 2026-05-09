@@ -74,6 +74,12 @@
             <artifactId>spring-cloud-gateway-server-webflux</artifactId>
         </dependency>
 
+        <!-- Cache (auth lookups in FilterServiceImpl) -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.gateway.service.impl;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -37,7 +39,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author pnoker
@@ -47,6 +51,22 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class FilterServiceImpl implements FilterService {
+
+    /**
+     * Short TTL — long enough to amortise the gRPC round-trip across a burst of requests
+     * from the same tenant/user, short enough that disabling a tenant or user takes effect
+     * within a minute. Optional<> wraps the value so we can negative-cache misses too.
+     */
+    private static final Duration AUTH_LOOKUP_TTL = Duration.ofSeconds(60);
+
+    private final Cache<String, Optional<FacadeTenantBO>> tenantCache = Caffeine.newBuilder()
+            .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
+
+    private final Cache<String, Optional<FacadeUserLoginBO>> userLoginCache = Caffeine.newBuilder()
+            .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
+
+    private final Cache<Long, Optional<FacadeUserBO>> userCache = Caffeine.newBuilder()
+            .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
 
     @Resource
     private TenantFacade tenantFacade;
@@ -67,7 +87,8 @@ public class FilterServiceImpl implements FilterService {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        FacadeTenantBO tenant = tenantFacade.selectByCode(code);
+        FacadeTenantBO tenant = tenantCache.get(code, key -> Optional.ofNullable(tenantFacade.selectByCode(key)))
+                .orElse(null);
         if (Objects.isNull(tenant) || tenant.getEnableFlag() != EnableFlagEnum.ENABLE) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
@@ -81,7 +102,8 @@ public class FilterServiceImpl implements FilterService {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        FacadeUserLoginBO userLogin = userLoginFacade.selectByName(name);
+        FacadeUserLoginBO userLogin = userLoginCache.get(name, key -> Optional.ofNullable(userLoginFacade.selectByName(key)))
+                .orElse(null);
         if (Objects.isNull(userLogin) || userLogin.getEnableFlag() != EnableFlagEnum.ENABLE) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
@@ -92,7 +114,8 @@ public class FilterServiceImpl implements FilterService {
     public RequestHeader.UserHeader getUser(FacadeUserLoginBO userLogin, FacadeTenantBO tenant) {
         // Preserves the existing (surprising) behavior: lookup UserApi by UserLogin.id,
         // not UserLogin.userId. Changing that belongs in a separate bug-fix PR.
-        FacadeUserBO user = userFacade.selectById(userLogin.getId());
+        FacadeUserBO user = userCache.get(userLogin.getId(), id -> Optional.ofNullable(userFacade.selectById(id)))
+                .orElse(null);
         if (Objects.isNull(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
@@ -118,6 +141,7 @@ public class FilterServiceImpl implements FilterService {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
+        // Token validity is intentionally NOT cached — it's the freshness check.
         boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), userLogin.getLoginName(), header.getSalt(),
                 header.getToken());
         if (!valid) {
