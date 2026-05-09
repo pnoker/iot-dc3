@@ -20,6 +20,7 @@ package io.github.pnoker.common.driver.entity.property;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -80,17 +81,18 @@ public class DriverProperties {
     /**
      * Schedule configuration for periodic driver tasks.
      */
+    @Valid
     private ScheduleProperties schedule;
 
     /**
      * Driver-level attribute definitions declared in configuration.
      */
-    private List<DriverAttributeDTO> driverAttribute;
+    private List<@Valid DriverAttributeDTO> driverAttribute;
 
     /**
      * Point-level attribute definitions declared in configuration.
      */
-    private List<PointAttributeDTO> pointAttribute;
+    private List<@Valid PointAttributeDTO> pointAttribute;
 
     /**
      * Generated or configured driver node identifier.
@@ -127,12 +129,14 @@ public class DriverProperties {
         /**
          * Periodic read job configuration.
          */
-        private ScheduleConfig read;
+        @Valid
+        private ScheduleConfig read = new ScheduleConfig();
 
         /**
          * Custom job configuration.
          */
-        private ScheduleConfig custom;
+        @Valid
+        private ScheduleConfig custom = new ScheduleConfig();
 
         /**
          * Cron-based schedule definition.
