@@ -17,7 +17,6 @@
 package io.github.pnoker.common.agentic.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.agentic.constant.AgenticConstant;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
@@ -25,6 +24,7 @@ import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.agentic.util.AgenticConversationIds;
 import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
