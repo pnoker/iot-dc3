@@ -107,7 +107,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     public void restPassword(Long id) {
         UserPasswordBO userPasswordBO = selectById(id);
         if (Objects.nonNull(userPasswordBO)) {
-            userPasswordBO.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
+            userPasswordBO.setLoginPassword(AlgorithmConstant.DEFAULT_PASSWORD);
             update(userPasswordBO);
         }
     }
