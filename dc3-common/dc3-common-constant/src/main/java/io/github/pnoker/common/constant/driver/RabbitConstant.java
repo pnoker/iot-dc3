@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.driver;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 
 /**
  * RabbitMQ constant
@@ -89,7 +90,7 @@ public class RabbitConstant {
     public static String QUEUE_MQTT = "dc3.q.mqtt";
 
     private RabbitConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.driver;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 
 /**
  * Event related constants
@@ -29,7 +30,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 public class EventConstant {
 
     private EventConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
     /**
@@ -56,7 +57,7 @@ public class EventConstant {
         public static final String REGISTER_BACK = "driver_register_back";
 
         private Driver() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }
@@ -81,7 +82,7 @@ public class EventConstant {
         public static final String ERROR = "device_error";
 
         private Device() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }

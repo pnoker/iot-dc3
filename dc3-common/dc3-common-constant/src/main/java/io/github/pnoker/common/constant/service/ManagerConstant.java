@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.service;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 
 /**
  * Manager service constant
@@ -64,7 +65,7 @@ public class ManagerConstant {
     public static final String TOPIC_URL_PREFIX = "/topic";
 
     private ManagerConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

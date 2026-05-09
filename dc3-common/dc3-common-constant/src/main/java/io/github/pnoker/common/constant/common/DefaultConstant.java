@@ -67,7 +67,7 @@ public class DefaultConstant {
     public static final Integer MAX_PAGE_SIZE = 100;
 
     private DefaultConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

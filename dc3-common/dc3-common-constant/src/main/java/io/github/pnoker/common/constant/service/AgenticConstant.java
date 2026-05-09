@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.service;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 
 /**
  * Agentic service related constants.
@@ -45,7 +46,7 @@ public class AgenticConstant {
     public static final String SESSION_URL_PREFIX = "/session";
 
     private AgenticConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
     /**
@@ -62,7 +63,7 @@ public class AgenticConstant {
         public static final String USER_ID = "dc3.agentic.userId";
 
         private ToolContextKey() {
-            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }

@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.driver;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 
 /**
  * Schedule constant
@@ -64,7 +65,7 @@ public class ScheduleConstant {
     public static final String MANAGER_SCHEDULE_GROUP = "manager-schedule-group";
 
     private ScheduleConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

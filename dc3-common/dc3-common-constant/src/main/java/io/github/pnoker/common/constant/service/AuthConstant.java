@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.constant.service;
 
-import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.BaseConstant;
+
 
 /**
  * Auth service related constants.
@@ -56,7 +57,7 @@ public class AuthConstant {
     public static final String MENU_URL_PREFIX = "/menu";
 
     private AuthConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }
