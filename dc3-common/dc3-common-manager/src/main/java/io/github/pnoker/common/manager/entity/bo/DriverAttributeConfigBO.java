@@ -18,6 +18,7 @@
 package io.github.pnoker.common.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class DriverAttributeConfigBO extends BaseBO {
+public class DriverAttributeConfigBO extends BaseBO implements TenantOwned {
 
     /**
      * ID
