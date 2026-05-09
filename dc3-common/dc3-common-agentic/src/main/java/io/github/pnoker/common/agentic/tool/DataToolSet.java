@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tool;
 
+import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
@@ -51,9 +52,9 @@ public class DataToolSet {
     }
 
     @Tool(description = "Get the latest point value for a specific device and point. Returns the current value.")
-    public String getLatestPointValue(@ToolParam(description = "The tenant ID") Long tenantId,
-                                      @ToolParam(description = "The device ID") Long deviceId,
+    public String getLatestPointValue(@ToolParam(description = "The device ID") Long deviceId,
                                       @ToolParam(description = "The point (metric) ID") Long pointId) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: getLatestPointValue(tenantId={}, deviceId={}, pointId={})", tenantId, deviceId, pointId);
         try {
             FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, pointId);
@@ -69,10 +70,10 @@ public class DataToolSet {
     }
 
     @Tool(description = "Get historical point values for a specific device and point. Returns a list of value strings.")
-    public String getPointValueHistory(@ToolParam(description = "The tenant ID") Long tenantId,
-                                       @ToolParam(description = "The device ID") Long deviceId,
+    public String getPointValueHistory(@ToolParam(description = "The device ID") Long deviceId,
                                        @ToolParam(description = "The point (metric) ID") Long pointId,
                                        @ToolParam(description = "Number of historical records to retrieve") int count) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: getPointValueHistory(tenantId={}, deviceId={}, pointId={}, count={})", tenantId, deviceId,
                 pointId, count);
         try {
@@ -88,9 +89,9 @@ public class DataToolSet {
     }
 
     @Tool(description = "Send a read command to a device for a specific point. The driver will read the current value from the physical device.")
-    public String readPointValue(@ToolParam(description = "The tenant ID") Long tenantId,
-                                 @ToolParam(description = "The device ID") Long deviceId,
+    public String readPointValue(@ToolParam(description = "The device ID") Long deviceId,
                                  @ToolParam(description = "The point (metric) ID to read") Long pointId) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: readPointValue(tenantId={}, deviceId={}, pointId={})", tenantId, deviceId, pointId);
         try {
             boolean success = pointValueCommandFacade.read(tenantId, deviceId, pointId);
@@ -103,10 +104,10 @@ public class DataToolSet {
     }
 
     @Tool(description = "Send a write command to a device for a specific point. Sets the point to the specified value on the physical device.")
-    public String writePointValue(@ToolParam(description = "The tenant ID") Long tenantId,
-                                  @ToolParam(description = "The device ID") Long deviceId,
+    public String writePointValue(@ToolParam(description = "The device ID") Long deviceId,
                                   @ToolParam(description = "The point (metric) ID to write") Long pointId,
                                   @ToolParam(description = "The value to write (as a string)") String value) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: writePointValue(tenantId={}, deviceId={}, pointId={}, value={})", tenantId, deviceId, pointId,
                 value);
         try {

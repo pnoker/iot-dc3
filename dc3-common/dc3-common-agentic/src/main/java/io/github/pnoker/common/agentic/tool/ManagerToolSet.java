@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tool;
 
+import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
@@ -66,8 +67,9 @@ public class ManagerToolSet {
 
     @Tool(description = "Look up a device by its numeric ID. Returns device name, code, driver ID, enable status, and profile IDs.")
     public String lookupDeviceById(@ToolParam(description = "The numeric device ID") Long deviceId) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: lookupDeviceById({})", deviceId);
-        FacadeDeviceBO bo = deviceFacade.selectById(deviceId);
+        FacadeDeviceBO bo = deviceFacade.selectById(tenantId, deviceId);
         if (Objects.isNull(bo)) {
             return "Device not found for ID: " + deviceId;
         }
@@ -88,6 +90,7 @@ public class ManagerToolSet {
         query.setDeviceName(deviceName);
         query.setDeviceCode(deviceCode);
         query.setDriverId(driverId);
+        query.setTenantId(AgenticRequestContext.requireTenantId());
         Pages p = new Pages();
         p.setCurrent(page);
         p.setSize(size);
@@ -99,8 +102,9 @@ public class ManagerToolSet {
 
     @Tool(description = "List all devices attached to a given driver ID.")
     public String listDevicesByDriverId(@ToolParam(description = "The driver ID") Long driverId) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: listDevicesByDriverId({})", driverId);
-        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(driverId);
+        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
         if (devices.isEmpty()) {
             return "No devices found for driver ID: " + driverId;
         }
@@ -110,8 +114,9 @@ public class ManagerToolSet {
 
     @Tool(description = "List all devices that use a given profile (device template) ID.")
     public String listDevicesByProfileId(@ToolParam(description = "The profile ID") Long profileId) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: listDevicesByProfileId({})", profileId);
-        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(profileId);
+        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(tenantId, profileId);
         if (devices.isEmpty()) {
             return "No devices found for profile ID: " + profileId;
         }
@@ -123,8 +128,9 @@ public class ManagerToolSet {
 
     @Tool(description = "Look up a driver by its numeric ID. Returns driver name, code, service name, host, type, and enable status.")
     public String lookupDriverById(@ToolParam(description = "The numeric driver ID") Long driverId) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: lookupDriverById({})", driverId);
-        FacadeDriverBO bo = driverFacade.selectById(driverId);
+        FacadeDriverBO bo = driverFacade.selectById(tenantId, driverId);
         if (Objects.isNull(bo)) {
             return "Driver not found for ID: " + driverId;
         }
@@ -133,8 +139,9 @@ public class ManagerToolSet {
 
     @Tool(description = "Resolve the driver that owns a given device. Returns the driver details.")
     public String lookupDriverByDeviceId(@ToolParam(description = "The device ID") Long deviceId) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: lookupDriverByDeviceId({})", deviceId);
-        FacadeDriverBO bo = driverFacade.selectByDeviceId(deviceId);
+        FacadeDriverBO bo = driverFacade.selectByDeviceId(tenantId, deviceId);
         if (Objects.isNull(bo)) {
             return "No driver found for device ID: " + deviceId;
         }
@@ -150,6 +157,7 @@ public class ManagerToolSet {
 
         FacadeDriverQuery query = new FacadeDriverQuery();
         query.setDriverName(driverName);
+        query.setTenantId(AgenticRequestContext.requireTenantId());
         Pages p = new Pages();
         p.setCurrent(page);
         p.setSize(size);
@@ -163,8 +171,9 @@ public class ManagerToolSet {
 
     @Tool(description = "Look up a point (data point / metric) by its numeric ID. Returns point name, code, type, read/write flag, unit, base value, and multiplier.")
     public String lookupPointById(@ToolParam(description = "The numeric point ID") Long pointId) {
+        Long tenantId = AgenticRequestContext.requireTenantId();
         log.debug("Tool: lookupPointById({})", pointId);
-        FacadePointBO bo = pointFacade.selectById(pointId);
+        FacadePointBO bo = pointFacade.selectById(tenantId, pointId);
         if (Objects.isNull(bo)) {
             return "Point not found for ID: " + pointId;
         }
@@ -182,6 +191,7 @@ public class ManagerToolSet {
         FacadePointQuery query = new FacadePointQuery();
         query.setPointName(pointName);
         query.setProfileId(profileId);
+        query.setTenantId(AgenticRequestContext.requireTenantId());
         Pages p = new Pages();
         p.setCurrent(page);
         p.setSize(size);
