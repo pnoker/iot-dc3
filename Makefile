@@ -20,7 +20,7 @@
 
 .PHONY: help clean package app app-all dev dev-all dev-db dev-optional build deploy tag \
 	check-compose compose-file compose-up compose-down compose-ps compose-config compose-build \
-	compose-logs compose-pull compose-restart
+	compose-logs compose-pull compose-refresh compose-reset compose-restart
 
 COMPOSE ?= podman compose
 COMPOSE_DIR ?= dc3
@@ -76,8 +76,10 @@ help:
 	&& echo ' - make compose-ps STACK=<...>: list containers in the selected compose stack' \
 	&& echo ' - make compose-config STACK=<...>: print the rendered compose configuration' \
 	&& echo ' - make compose-pull STACK=<...>: pull images for the selected compose stack' \
+	&& echo ' - make compose-refresh STACK=<...>: pull, stop, and start the selected compose stack' \
 	&& echo ' - make compose-logs STACK=<...>: tail logs for the selected compose stack' \
 	&& echo ' - make compose-restart STACK=<...>: restart the selected compose stack' \
+	&& echo ' - make compose-reset STACK=<...> CONFIRM_RESET_VOLUMES=true: stop stack and delete volumes' \
 	&& echo ' - make compose-file STACK=<...>: print the resolved compose file path' \
 	&& echo ' - make deploy: deploy with mvn -s .mvn/settings.xml' \
 	&& echo 'Registry aliases:' \
@@ -123,6 +125,15 @@ compose-build: check-compose
 
 compose-pull: check-compose
 	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" pull
+
+compose-refresh: check-compose
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" pull
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" down
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" up -d
+
+compose-reset: check-compose
+	@test "$(CONFIRM_RESET_VOLUMES)" = "true" || (echo "Refusing to delete volumes. Re-run with CONFIRM_RESET_VOLUMES=true" && exit 1)
+	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" down -v
 
 compose-logs: check-compose
 	$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" logs -f --tail=200
