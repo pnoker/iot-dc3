@@ -18,13 +18,13 @@
 # Server configuration
 server:
   port: ${SERVER_PORT:8300}
-  servlet:
-    context-path: /auth
 
 # Spring application configuration
 spring:
   application:
     name: @project.artifactId@
+  webflux:
+    base-path: /auth
   # gRPC server configuration
   grpc:
     server:

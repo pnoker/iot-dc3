@@ -17,12 +17,12 @@
 
 server:
   port: ${SERVER_PORT:8500}
-  servlet:
-    context-path: /data
 
 spring:
   application:
     name: @project.artifactId@
+  webflux:
+    base-path: /data
   grpc:
     server:
       port: ${GRPC_SERVER_PORT:9500}
