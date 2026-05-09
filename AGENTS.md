@@ -146,6 +146,8 @@ stub configuration instead of ad hoc channel construction.
 - Prefer typed properties with validation over scattered `@Value` usage.
 - Keep legacy aliases only when they protect existing deployments during migration.
 - YAML should use `${ENV:default}` placeholders for deploy-time values.
+- Services built on `dc3-common-web` use WebFlux; configure request base paths with `spring.webflux.base-path`, not
+  `server.servlet.context-path`.
 
 Current custom prefixes:
 
