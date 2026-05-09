@@ -1,11 +1,13 @@
 # Authoring a New Driver
 
 This guide walks you through creating a new device driver from scratch using
-[`dc3-driver-virtual`](../dc3-driver/dc3-driver-virtual) as a template. Drivers connect the
+[`dc3-driver-virtual`](../../dc3-driver/dc3-driver-virtual) as a template. Drivers connect the
 DC3 platform to physical devices via a specific protocol (Modbus, OPC, MQTT, S7, …) and are
 the southbound I/O layer of the system.
 
 If you only want to *use* an existing driver, see [QUICKSTART.md](./QUICKSTART.md) instead.
+
+Unless stated otherwise, run commands from the repository root.
 
 ## What a driver does
 
@@ -47,7 +49,7 @@ just rename them to your driver.
 
 ## Step 2 — Wire into the parent POM
 
-Add your module to [`dc3-driver/pom.xml`](../dc3-driver/pom.xml) `<modules>`:
+Add your module to [`dc3-driver/pom.xml`](../../dc3-driver/pom.xml) `<modules>`:
 
 ```xml
 <modules>
@@ -149,7 +151,7 @@ logging:
 You'll also typically copy `application-dev.yml` / `-pre.yml` / `-pro.yml` from
 `dc3-driver-virtual` and adjust the schedule cron. **Never hardcode `localhost`** —
 everything goes through `${ENV:default}` placeholders. See
-[`dc3/env/dev.env.sh`](../dc3/env/dev.env.sh) for the env-var contract.
+[`dc3/env/dev.env.sh`](../env/dev.env.sh) for the env-var contract.
 
 ### Attribute types
 
@@ -247,7 +249,7 @@ Three identifiers participate in driver routing:
 - **`driver.service`** (auto-derived; can be overridden) — the per-instance routing
   identifier used as the suffix on RabbitMQ command queues (`dc3.q.command.driver.<service>`)
   and routing keys (`dc3.r.command.driver.<service>`). See
-  [`RabbitConstant`](../dc3-common/dc3-common-constant/src/main/java/io/github/pnoker/common/constant/driver/RabbitConstant.java).
+  [`RabbitConstant`](../../dc3-common/dc3-common-constant/src/main/java/io/github/pnoker/common/constant/driver/RabbitConstant.java).
 - **`spring.application.name`** (`@project.artifactId@`) — controls log filenames and
   Actuator metadata. Has no routing implication.
 
@@ -309,8 +311,8 @@ and bind **Points**.
 
 ## Reference
 
-- SDK base interface: [`DriverCustomService.java`](../dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverCustomService.java)
-- Sender service: [`DriverSenderService.java`](../dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverSenderService.java)
+- SDK base interface: [`DriverCustomService.java`](../../dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverCustomService.java)
+- Sender service: [`DriverSenderService.java`](../../dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverSenderService.java)
 - Working examples: `dc3-driver-virtual` (simplest), `dc3-driver-modbus-tcp` (TCP polling),
   `dc3-driver-mqtt` (push-style subscriber), `dc3-driver-listening-virtual` (push-style
   template), `dc3-driver-opc-ua` (subscription model).
