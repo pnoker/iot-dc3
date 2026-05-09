@@ -30,7 +30,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-public class ReadResponse extends ModbusResponse {
+public abstract class ReadResponse extends ModbusResponse {
 
     private byte[] data;
 

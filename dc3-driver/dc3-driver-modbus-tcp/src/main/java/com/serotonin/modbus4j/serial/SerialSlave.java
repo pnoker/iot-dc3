@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-public class SerialSlave extends ModbusSlaveSet {
+public abstract class SerialSlave extends ModbusSlaveSet {
 
     private final Log LOG = LogFactory.getLog(SerialSlave.class);
 
