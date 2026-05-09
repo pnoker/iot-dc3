@@ -2,6 +2,8 @@
 
 One-stop workflow for running IoT DC3 locally from source.
 
+Unless stated otherwise, run the commands below from the repository root.
+
 ## Prerequisites
 
 - JDK 21
@@ -37,7 +39,8 @@ Typically used for MQTT broker dependencies such as EMQX.
 source dc3/env/dev.env.sh
 ```
 
-Review the file first; it uses `source KEY=value` style lines in some environments.
+Review the file first; it exports development defaults for databases, message brokers,
+gRPC targets, and optional AI integration.
 
 ## 4. Build from source
 

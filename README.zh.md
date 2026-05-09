@@ -98,11 +98,11 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-> **模块概览**: 完整的模块依赖关系和运行时流程图请参阅 [`docs/MODULES.md`](docs/MODULES.md)。
+> **模块概览**: 完整的模块依赖关系和运行时流程图请参阅 [`dc3/doc/MODULES.md`](dc3/doc/MODULES.md)。
 
-> **本地开发指南**: 一站式本地环境搭建流程请参阅 [`docs/QUICKSTART.md`](docs/QUICKSTART.md)。
+> **本地开发指南**: 一站式本地环境搭建流程请参阅 [`dc3/doc/QUICKSTART.md`](dc3/doc/QUICKSTART.md)。
 
-> **常见问题排查**: 常见的构建/运行时问题及解决方案请参阅 [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)。
+> **常见问题排查**: 常见的构建/运行时问题及解决方案请参阅 [`dc3/doc/TROUBLESHOOTING.md`](dc3/doc/TROUBLESHOOTING.md)。
 
 ## 3.3 启动服务
 
