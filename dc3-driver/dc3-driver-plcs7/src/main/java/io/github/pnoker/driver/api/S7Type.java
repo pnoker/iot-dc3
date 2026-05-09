@@ -16,7 +16,17 @@
  */
 package io.github.pnoker.driver.api;
 
-import io.github.pnoker.driver.api.impl.serializer.converter.*;
+import io.github.pnoker.driver.api.impl.serializer.converter.BitConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.ByteConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.DateAndTimeConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.DateConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.IntegerConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.LongConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.RealConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.ShortConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.StringConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.StructConverter;
+import io.github.pnoker.driver.api.impl.serializer.converter.TimeConverter;
 
 /**
  * S7 PLC data types with their associated serializers and sizes.
