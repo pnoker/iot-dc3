@@ -88,11 +88,12 @@ public class DataToolSet {
     }
 
     @Tool(description = "Send a read command to a device for a specific point. The driver will read the current value from the physical device.")
-    public String readPointValue(@ToolParam(description = "The device ID") Long deviceId,
+    public String readPointValue(@ToolParam(description = "The tenant ID") Long tenantId,
+                                 @ToolParam(description = "The device ID") Long deviceId,
                                  @ToolParam(description = "The point (metric) ID to read") Long pointId) {
-        log.debug("Tool: readPointValue(deviceId={}, pointId={})", deviceId, pointId);
+        log.debug("Tool: readPointValue(tenantId={}, deviceId={}, pointId={})", tenantId, deviceId, pointId);
         try {
-            boolean success = pointValueCommandFacade.read(deviceId, pointId);
+            boolean success = pointValueCommandFacade.read(tenantId, deviceId, pointId);
             return success ? "Read command sent successfully for device " + deviceId + " point " + pointId
                     : "Read command failed for device " + deviceId + " point " + pointId;
         } catch (Exception e) {
@@ -102,12 +103,14 @@ public class DataToolSet {
     }
 
     @Tool(description = "Send a write command to a device for a specific point. Sets the point to the specified value on the physical device.")
-    public String writePointValue(@ToolParam(description = "The device ID") Long deviceId,
+    public String writePointValue(@ToolParam(description = "The tenant ID") Long tenantId,
+                                  @ToolParam(description = "The device ID") Long deviceId,
                                   @ToolParam(description = "The point (metric) ID to write") Long pointId,
                                   @ToolParam(description = "The value to write (as a string)") String value) {
-        log.debug("Tool: writePointValue(deviceId={}, pointId={}, value={})", deviceId, pointId, value);
+        log.debug("Tool: writePointValue(tenantId={}, deviceId={}, pointId={}, value={})", tenantId, deviceId, pointId,
+                value);
         try {
-            boolean success = pointValueCommandFacade.write(deviceId, pointId, value);
+            boolean success = pointValueCommandFacade.write(tenantId, deviceId, pointId, value);
             return success
                     ? "Write command sent successfully for device " + deviceId + " point " + pointId + " value=" + value
                     : "Write command failed for device " + deviceId + " point " + pointId;

@@ -26,6 +26,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * gRPC implementation: forwards command calls to Data Center via
  * {@link PointValueApiGrpc.PointValueApiBlockingStub}.
@@ -44,24 +46,31 @@ public class PointValueCommandGrpcFacade implements PointValueCommandFacade {
     @Resource
     private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
 
+    @Resource
+    private GrpcFacadeSupport grpcFacadeSupport;
+
     @Override
-    public boolean read(Long deviceId, Long pointId) {
+    public boolean read(Long tenantId, Long deviceId, Long pointId) {
         GrpcPointValueCommandQuery request = GrpcPointValueCommandQuery.newBuilder()
+                .setTenantId(Objects.requireNonNull(tenantId, "tenantId"))
                 .setDeviceId(deviceId)
                 .setPointId(pointId)
                 .build();
-        GrpcRBoolean response = pointValueApiBlockingStub.readCommand(request);
+        GrpcRBoolean response = grpcFacadeSupport.call("PointValueCommandFacade.read", pointValueApiBlockingStub,
+                stub -> stub.readCommand(request));
         return response.getResult().getOk() && response.getData();
     }
 
     @Override
-    public boolean write(Long deviceId, Long pointId, String value) {
+    public boolean write(Long tenantId, Long deviceId, Long pointId, String value) {
         GrpcPointValueWriteCommand request = GrpcPointValueWriteCommand.newBuilder()
+                .setTenantId(Objects.requireNonNull(tenantId, "tenantId"))
                 .setDeviceId(deviceId)
                 .setPointId(pointId)
                 .setValue(value)
                 .build();
-        GrpcRBoolean response = pointValueApiBlockingStub.writeCommand(request);
+        GrpcRBoolean response = grpcFacadeSupport.call("PointValueCommandFacade.write", pointValueApiBlockingStub,
+                stub -> stub.writeCommand(request));
         return response.getResult().getOk() && response.getData();
     }
 
