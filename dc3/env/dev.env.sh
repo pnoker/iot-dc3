@@ -20,6 +20,7 @@ export POSTGRES_HOST=localhost
 export POSTGRES_PORT=35432
 export POSTGRES_USERNAME=dc3
 export POSTGRES_PASSWORD=dc3dc3dc3
+export POSTGRES_DB=dc3
 
 # RabbitMQ
 export RABBITMQ_VIRTUAL_HOST=dc3
@@ -40,9 +41,20 @@ export CENTER_DATA_HOST=localhost
 export CENTER_MANAGER_HOST=localhost
 export CENTER_AGENTIC_HOST=localhost
 
+# Runtime
+export NODE_ENV=dev
+export DC3_FACADE_MODE=grpc
+export POINT_BATCH_SPEED=100
+export POINT_BATCH_INTERVAL=5
+export MQTT_BATCH_SPEED=100
+export MQTT_BATCH_INTERVAL=5
+
 # Spring AI
 export OPENAI_BASE_URL=https://api.openai.com
 export OPENAI_API_KEY=sk-your-api-key
 export OPENAI_MODEL=gpt-4o
 export OPENAI_TEMPERATURE=0.7
 export OPENAI_MAX_TOKENS=2048
+export AGENTIC_MEMORY_SCHEMA_INIT=always
+export AGENTIC_MEMORY_MAX_MESSAGES=50
+export AGENTIC_SESSION_TTL_HOURS=72
