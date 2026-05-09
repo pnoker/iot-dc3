@@ -17,9 +17,9 @@ values on a configurable schedule without connecting to real hardware.
 
 | Attribute | Description               |
 |-----------|---------------------------|
-| Host | Simulated target hostname |
-| Port | Simulated target port     |
-| Tag  | Point tag identifier      |
+| Host      | Simulated target hostname |
+| Port      | Simulated target port     |
+| Tag       | Point tag identifier      |
 
 ## Data Collection Schedule
 

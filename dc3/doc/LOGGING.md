@@ -30,7 +30,8 @@ log.error("Failed to register device: {}", e.getMessage());
 - `trace`: very high-frequency diagnostics, disabled by default.
 - `debug`: request details, tool invocation, query filters, and branch decisions useful during troubleshooting.
 - `info`: lifecycle events, startup summaries, successful long-running job summaries, and important state transitions.
-- `warn`: recoverable failures, invalid client input, retries, degraded behavior, or external dependency failures handled by fallback behavior.
+- `warn`: recoverable failures, invalid client input, retries, degraded behavior, or external dependency failures
+  handled by fallback behavior.
 - `error`: unrecoverable failures that require operator attention or break the current operation.
 
 When logging a caught exception, pass the exception object unless the stack trace is intentionally suppressed:

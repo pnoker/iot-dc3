@@ -22,8 +22,8 @@ devices that push data. It demonstrates listening-type driver patterns supportin
 
 ## Driver Attributes
 
-| Attribute         | Description                   |
-|-------------------|-------------------------------|
+| Attribute  | Description                   |
+|------------|-------------------------------|
 | Keyword    | Packet identification keyword |
 | Start Byte | Data start byte offset        |
 | End Byte   | Data end byte offset          |

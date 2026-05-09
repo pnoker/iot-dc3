@@ -17,14 +17,14 @@ automation systems using the OPC UA binary protocol.
 
 | Attribute | Description                          |
 |-----------|--------------------------------------|
-| Host | OPC UA server hostname or IP         |
-| Port | OPC UA server port (typically 4840)  |
-| Path | OPC UA endpoint path (e.g., `/milo`) |
+| Host      | OPC UA server hostname or IP         |
+| Port      | OPC UA server port (typically 4840)  |
+| Path      | OPC UA endpoint path (e.g., `/milo`) |
 
 ## Point Attributes
 
-| Attribute        | Description                 |
-|------------------|-----------------------------|
+| Attribute | Description                 |
+|-----------|-----------------------------|
 | Namespace | OPC UA node namespace index |
 | Tag       | OPC UA node identifier      |
 
