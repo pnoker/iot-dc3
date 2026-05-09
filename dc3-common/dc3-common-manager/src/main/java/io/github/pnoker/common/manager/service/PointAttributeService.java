@@ -21,6 +21,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.query.PointAttributeQuery;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,5 +49,21 @@ public interface PointAttributeService extends BaseService<PointAttributeBO, Poi
      * @return Array
      */
     List<PointAttributeBO> selectByDriverId(Long driverId);
+
+    /**
+     * Bulk insert. Use during driver registration so attribute changes don't degenerate
+     * into N round-trips.
+     */
+    void saveBatch(List<PointAttributeBO> entityBOList);
+
+    /**
+     * Bulk update by id.
+     */
+    void updateBatch(List<PointAttributeBO> entityBOList);
+
+    /**
+     * Bulk delete by id.
+     */
+    void removeByIds(Collection<Long> ids);
 
 }
