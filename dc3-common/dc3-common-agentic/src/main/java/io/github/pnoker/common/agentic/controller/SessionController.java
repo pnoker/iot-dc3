@@ -23,8 +23,10 @@ import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.SessionService;
+import io.github.pnoker.common.agentic.util.AgenticConversationIds;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -55,33 +57,40 @@ public class SessionController implements BaseController {
             scopedQuery.setTenantId(header.getTenantId());
             scopedQuery.setUserId(header.getUserId());
             Page<SessionBO> page = sessionService.selectByPage(scopedQuery);
-            return R.ok(sessionBuilder.buildVOPageByBOPage(page));
+            Page<SessionVO> voPage = sessionBuilder.buildVOPageByBOPage(page);
+            voPage.getRecords().forEach(session -> sanitizeSession(header, session));
+            return R.ok(voPage);
         }));
     }
 
     @GetMapping("/{conversationId}")
     public Mono<R<SessionVO>> get(@PathVariable String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            SessionBO session = sessionService.getByConversationId(scopedConversationId(header.getTenantId(),
+            SessionBO session = sessionService.getByConversationId(AgenticConversationIds.scope(header.getTenantId(),
                     header.getUserId(), conversationId));
             if (session == null) {
                 return R.fail("Session not found");
             }
-            return R.ok(sessionBuilder.buildVOByBO(session));
+            SessionVO vo = sessionBuilder.buildVOByBO(session);
+            sanitizeSession(header, vo);
+            return R.ok(vo);
         }));
     }
 
     @DeleteMapping("/{conversationId}")
     public Mono<R<Boolean>> delete(@PathVariable String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            sessionService.removeByConversationId(scopedConversationId(header.getTenantId(), header.getUserId(),
+            sessionService.removeByConversationId(AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
             return R.ok();
         }));
     }
 
-    private String scopedConversationId(Long tenantId, Long userId, String conversationId) {
-        return tenantId + ":" + userId + ":" + conversationId;
+    private void sanitizeSession(RequestHeader.UserHeader header, SessionVO session) {
+        session.setConversationId(AgenticConversationIds.stripScope(header.getTenantId(), header.getUserId(),
+                session.getConversationId()));
+        session.setTenantId(null);
+        session.setUserId(null);
     }
 
 }

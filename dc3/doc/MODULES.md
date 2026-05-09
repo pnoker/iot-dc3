@@ -64,6 +64,7 @@ iot-dc3 (root pom)
 | dc3-common-data    | Data business logic    | dc3-api-*, dal, facade-api, postgres, rabbitmq, redis, repository, quartz, web    |
 | dc3-common-driver  | Driver SDK             | dc3-api-driver, constant, exception, log, model, public, quartz, rabbitmq, thread |
 | dc3-common-gateway | Gateway filter         | facade-api, log, model, public, web                                               |
+| dc3-common-agentic | AI chat and tool logic | facade-api, postgres, web, Spring AI                                              |
 
 ## dc3-center - Deployable Services
 
@@ -92,7 +93,7 @@ All drivers depend on dc3-common-driver. Communicate with Manager via gRPC + Rab
 ## dc3-gateway
 
 Depends on: dc3-common-gateway + dc3-common-facade-grpc.
-Routes /api/v3/* to center services with StripPrefix=2 and Authentic filter.
+Routes /api/v3/* to center services with StripPrefix=2 and Authentic filter, including `/api/v3/agentic/**`.
 
 ## Runtime Flow
 
