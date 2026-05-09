@@ -92,6 +92,8 @@ cp .env.example .env
 `dc3/env/dev.env` 或 `dc3/env/dev.env.sh`。如果启用 Agentic Center，请在 `.env` 或当前 shell 中配置 `OPENAI_BASE_URL`、
 `OPENAI_API_KEY`、`OPENAI_MODEL` 等 OpenAI 兼容参数。
 
+根目录 `.env` 与 `dc3/env/dev.env(.sh)` 的具体区别见 [`dc3/doc/ENVIRONMENT.md`](dc3/doc/ENVIRONMENT.md)。
+
 ## 3.2 准备工作
 
 ```bash

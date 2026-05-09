@@ -124,8 +124,8 @@ services:
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_DRIVER_PORT:-6270}:6270"
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_GRPC_PORT:-6271}:6271"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_TCP_PORT:-6270}:6270"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_UDP_PORT:-6271}:6271"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
