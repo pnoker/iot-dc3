@@ -103,6 +103,7 @@ Common overrides used by the Compose stacks in `dc3/`:
 | `DC3_LOG_MAX_SIZE`                                                      | `10M`                   | Maximum size per container log file                                         |
 | `DC3_LOG_MAX_FILE`                                                      | `20`                    | Number of rotated log files to keep                                         |
 | `DC3_BIND_HOST`                                                         | `127.0.0.1`             | Host address used for published ports; set `0.0.0.0` if you need LAN access |
+| `APM_AGENT_ENABLE`                                                      | `false`                 | Enables the Java APM agent in application containers                        |
 | `POSTGRES_USERNAME`                                                     | `dc3`                   | Username used by the Postgres health check                                  |
 | `POSTGRES_DB`                                                           | `dc3`                   | Database name used by the Postgres health check                             |
 | `DC3_POSTGRES_PORT`                                                     | `35432`                 | Published PostgreSQL port                                                   |
@@ -112,7 +113,10 @@ Common overrides used by the Compose stacks in `dc3/`:
 | `DC3_AUTH_PORT` / `DC3_AUTH_GRPC_PORT`                                  | `8300` / `9300`         | Auth center HTTP and gRPC ports                                             |
 | `DC3_MANAGER_PORT` / `DC3_MANAGER_GRPC_PORT`                            | `8400` / `9400`         | Manager center HTTP and gRPC ports                                          |
 | `DC3_DATA_PORT` / `DC3_DATA_GRPC_PORT`                                  | `8500` / `9500`         | Data center HTTP and gRPC ports                                             |
+| `DC3_AGENTIC_PORT`                                                      | `8600`                  | Agentic center HTTP port                                                    |
 | `DC3_LISTENING_VIRTUAL_DRIVER_PORT` / `DC3_LISTENING_VIRTUAL_GRPC_PORT` | `6270` / `6271`         | Listening virtual driver ports                                              |
+| `OPENAI_BASE_URL` / `OPENAI_MODEL`                                      | `https://api.openai.com` / `gpt-4o` | OpenAI-compatible endpoint and chat model for Agentic center       |
+| `OPENAI_API_KEY`                                                        | empty                   | OpenAI-compatible API key for Agentic center                                |
 | `DC3_EMQX_WS_PORT` / `DC3_EMQX_WSS_PORT`                                | `38083` / `38084`       | EMQX WebSocket endpoints                                                    |
 | `DC3_EMQX_MQTT_PORT` / `DC3_EMQX_MQTTS_PORT`                            | `31883` / `38883`       | EMQX MQTT / MQTTS ports                                                     |
 | `DC3_EMQX_DASHBOARD_PORT`                                               | `18083`                 | EMQX dashboard port                                                         |
@@ -153,6 +157,9 @@ java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
 
 # Manager Center
 java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+
+# Agentic Center
+java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
 
 # Virtual Driver
 java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar

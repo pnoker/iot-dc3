@@ -73,6 +73,7 @@ jobs:
 
           services=(
             "dc3-gateway:dc3-gateway"
+            "dc3-center-agentic:dc3-center/dc3-center-agentic"
             "dc3-center-auth:dc3-center/dc3-center-auth"
             "dc3-center-data:dc3-center/dc3-center-data"
             "dc3-center-manager:dc3-center/dc3-center-manager"

@@ -72,6 +72,7 @@ iot-dc3 (root pom)
 | dc3-center-auth    | dc3-common-auth                  | 8300 | 9300 |
 | dc3-center-data    | dc3-common-data, facade-grpc     | 8500 | 9500 |
 | dc3-center-manager | dc3-common-manager, facade-grpc  | 8400 | 9400 |
+| dc3-center-agentic | dc3-common-agentic, facade-grpc  | 8600 | -    |
 | dc3-center-single  | auth+manager+data (facade-local) | 8200 | 9200 |
 
 ## dc3-driver - Protocol Drivers

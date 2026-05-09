@@ -1,5 +1,6 @@
 spring:
   env: dev
+  group: ${user.name}
   datasource:
     dynamic:
       datasource:
