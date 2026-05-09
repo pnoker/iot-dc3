@@ -67,18 +67,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PostMapping("/driver")
     public Mono<R<Page<DictionaryVO>>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<DictionaryBO> entityPageBO = dictionaryForManagerService.driverDictionary(query);
-                Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.driverDictionary(query);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
     /**
@@ -89,18 +84,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PostMapping("/profile")
     public Mono<R<Page<DictionaryVO>>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<DictionaryBO> entityPageBO = dictionaryForManagerService.profileDictionary(query);
-                Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.profileDictionary(query);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
     /**
@@ -112,18 +102,13 @@ public class DictionaryForManagerController implements BaseController {
     @PostMapping("/profile_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForProfile(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<DictionaryBO> entityPageBO = dictionaryForManagerService.pointDictionaryForProfile(query);
-                Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.pointDictionaryForProfile(query);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
     /**
@@ -135,18 +120,13 @@ public class DictionaryForManagerController implements BaseController {
     @PostMapping("/device_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForDevice(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<DictionaryBO> entityPageBO = dictionaryForManagerService.pointDictionaryForDevice(query);
-                Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.pointDictionaryForDevice(query);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
     /**
@@ -157,18 +137,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PostMapping("/device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<DictionaryBO> entityPageBO = dictionaryForManagerService.deviceDictionary(query);
-                Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.deviceDictionary(query);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
     /**
@@ -180,17 +155,13 @@ public class DictionaryForManagerController implements BaseController {
     @PostMapping("/driver_device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionaryForDriver(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<DictionaryBO> entityPageBO = dictionaryForManagerService.deviceDictionaryForDriver(query);
-                Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DictionaryQuery query = Objects.isNull(entityQuery) ? new DictionaryQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.deviceDictionaryForDriver(query);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
 }

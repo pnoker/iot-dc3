@@ -17,9 +17,13 @@
 
 package io.github.pnoker.common.base;
 
+import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.utils.UserHeaderUtil;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+import java.util.function.Supplier;
 
 /**
  * Base Controller Interface
@@ -77,6 +81,19 @@ public interface BaseController {
      */
     default Mono<String> getUserName() {
         return UserHeaderUtil.getUserName();
+    }
+
+    /**
+     * Run a synchronous (typically JDBC / blocking-IO) supplier on the bounded-elastic
+     * scheduler so the Netty event loop stays free.
+     * <p>
+     * Use this in reactive controllers that wrap blocking service calls. Exceptions
+     * thrown by the supplier propagate as {@code Mono.error(...)} and are mapped to
+     * {@code R.fail(...)} by the global {@code ExceptionConfig}, so callers should not
+     * try/catch around the supplier.
+     */
+    default <T> Mono<R<T>> async(Supplier<R<T>> supplier) {
+        return Mono.fromCallable(supplier::get).subscribeOn(Schedulers.boundedElastic());
     }
 
 }

@@ -64,18 +64,13 @@ public class PointValueController implements BaseController {
      */
     @PostMapping("/latest")
     public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<PointValueBO> entityPageBO = pointValueService.latest(query);
-                Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<PointValueBO> entityPageBO = pointValueService.latest(query);
+            Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
     /**
@@ -87,18 +82,13 @@ public class PointValueController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<PointValueBO> entityPageBO = pointValueService.page(query);
-                Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<PointValueBO> entityPageBO = pointValueService.page(query);
+            Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
     /**
@@ -112,15 +102,10 @@ public class PointValueController implements BaseController {
     public Mono<R<List<String>>> history(@NotNull @PathVariable(name = "deviceId") Long deviceId,
                                          @NotNull @PathVariable(name = "pointId") Long pointId,
                                          @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);
-                return Mono.just(R.ok(history));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);
+            return R.ok(history);
+        }));
     }
 
 }

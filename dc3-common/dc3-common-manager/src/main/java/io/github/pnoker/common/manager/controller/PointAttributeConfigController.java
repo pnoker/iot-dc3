@@ -68,17 +68,12 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeConfigVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                pointAttributeConfigService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(tenantId);
+            pointAttributeConfigService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        }));
     }
 
     /**
@@ -89,13 +84,10 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             pointAttributeConfigService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     /**
@@ -106,17 +98,12 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeConfigVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                pointAttributeConfigService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(tenantId);
+            pointAttributeConfigService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        }));
     }
 
     /**
@@ -127,14 +114,11 @@ public class PointAttributeConfigController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<PointAttributeConfigVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             PointAttributeConfigBO entityBO = pointAttributeConfigService.selectById(id);
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     /**
@@ -150,15 +134,12 @@ public class PointAttributeConfigController implements BaseController {
             @NotNull @PathVariable(value = "attributeId") Long attributeId,
             @NotNull @PathVariable(value = "deviceId") Long deviceId,
             @NotNull @PathVariable(value = "pointId") Long pointId) {
-        try {
+        return async(() -> {
             PointAttributeConfigBO entityBO = pointAttributeConfigService
                     .selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     /**
@@ -172,15 +153,12 @@ public class PointAttributeConfigController implements BaseController {
     public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceIdAndPointId(
             @NotNull @PathVariable(value = "deviceId") Long deviceId,
             @NotNull @PathVariable(value = "pointId") Long pointId) {
-        try {
+        return async(() -> {
             List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId,
                     pointId);
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVOList);
+        });
     }
 
     /**
@@ -192,13 +170,11 @@ public class PointAttributeConfigController implements BaseController {
     @GetMapping("/device_id/{deviceId}")
     public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceId(
             @NotNull @PathVariable(value = "deviceId") Long deviceId) {
-        try {
+        return async(() -> {
             List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceId(deviceId);
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
-        } catch (Exception e) {
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVOList);
+        });
     }
 
     /**
@@ -210,19 +186,15 @@ public class PointAttributeConfigController implements BaseController {
     @PostMapping("/list")
     public Mono<R<Page<PointAttributeConfigVO>>> list(
             @RequestBody(required = false) PointAttributeConfigQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                PointAttributeConfigQuery query = Objects.isNull(entityQuery) ? new PointAttributeConfigQuery()
-                        : entityQuery;
-                query.setTenantId(tenantId);
-                Page<PointAttributeConfigBO> entityPageBO = pointAttributeConfigService.selectByPage(query);
-                Page<PointAttributeConfigVO> entityPageVO = pointAttributeConfigBuilder
-                        .buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            PointAttributeConfigQuery query = Objects.isNull(entityQuery) ? new PointAttributeConfigQuery()
+                    : entityQuery;
+            query.setTenantId(tenantId);
+            Page<PointAttributeConfigBO> entityPageBO = pointAttributeConfigService.selectByPage(query);
+            Page<PointAttributeConfigVO> entityPageVO = pointAttributeConfigBuilder
+                    .buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
 }

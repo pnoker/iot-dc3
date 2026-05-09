@@ -69,14 +69,11 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserLoginVO entityVO) {
-        try {
+        return async(() -> {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
             userLoginService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        });
     }
 
     /**
@@ -87,13 +84,10 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             userLoginService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     /**
@@ -108,14 +102,11 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserLoginVO entityVO) {
-        try {
+        return async(() -> {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
             userLoginService.update(entityBO);
-            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        });
     }
 
     /**
@@ -126,13 +117,10 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/reset/{id}")
     public Mono<R<Boolean>> restPassword(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             userPasswordService.restPassword(id);
-            return Mono.just(R.ok());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok();
+        });
     }
 
     /**
@@ -143,14 +131,11 @@ public class UserLoginController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<UserLoginVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             UserLoginBO entityBO = userLoginService.selectById(id);
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     /**
@@ -161,14 +146,11 @@ public class UserLoginController implements BaseController {
      */
     @GetMapping("/name/{name}")
     public Mono<R<UserLoginVO>> selectByName(@NotNull @PathVariable(value = "name") String name) {
-        try {
+        return async(() -> {
             UserLoginBO entityBO = userLoginService.selectByLoginName(name, false);
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     /**
@@ -179,17 +161,12 @@ public class UserLoginController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<UserLoginVO>>> list(@RequestBody(required = false) UserLoginQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new UserLoginQuery();
-            }
-            Page<UserLoginBO> entityPageBO = userLoginService.selectByPage(entityQuery);
+        return async(() -> {
+            UserLoginQuery query = Objects.isNull(entityQuery) ? new UserLoginQuery() : entityQuery;
+            Page<UserLoginBO> entityPageBO = userLoginService.selectByPage(query);
             Page<UserLoginVO> entityPageVO = userLoginBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityPageVO);
+        });
     }
 
     /**
@@ -200,13 +177,7 @@ public class UserLoginController implements BaseController {
      */
     @GetMapping("/check/{name}")
     public Mono<R<Boolean>> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name) {
-        try {
-            return Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? Mono.just(R.ok())
-                    : Mono.just(R.fail());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return async(() -> Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? R.ok() : R.fail());
     }
 
 }

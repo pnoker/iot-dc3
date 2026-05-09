@@ -56,17 +56,12 @@ public class DeviceStatusController implements BaseController {
      */
     @PostMapping("/device")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                DeviceQuery query = Objects.isNull(deviceQuery) ? new DeviceQuery() : deviceQuery;
-                query.setTenantId(tenantId);
-                Map<Long, String> statuses = deviceStatusService.selectByPage(query);
-                return Mono.just(R.ok(statuses));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DeviceQuery query = Objects.isNull(deviceQuery) ? new DeviceQuery() : deviceQuery;
+            query.setTenantId(tenantId);
+            Map<Long, String> statuses = deviceStatusService.selectByPage(query);
+            return R.ok(statuses);
+        }));
     }
 
     /**
@@ -77,15 +72,12 @@ public class DeviceStatusController implements BaseController {
      */
     @GetMapping("/device/driver_id/{driverId}")
     public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
-        try {
+        return async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
             Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
-            return Mono.just(R.ok(statuses));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(statuses);
+        });
     }
 
     /**
@@ -97,13 +89,10 @@ public class DeviceStatusController implements BaseController {
     @GetMapping("/device/profile_id/{profileId}")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
             @NotNull @PathVariable(value = "profileId") Long profileId) {
-        try {
+        return async(() -> {
             Map<Long, String> statuses = deviceStatusService.selectByProfileId(profileId);
-            return Mono.just(R.ok(statuses));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(statuses);
+        });
     }
 
 }

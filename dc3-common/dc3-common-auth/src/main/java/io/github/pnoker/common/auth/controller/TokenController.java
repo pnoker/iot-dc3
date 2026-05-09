@@ -58,8 +58,10 @@ public class TokenController implements BaseController {
      */
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
-        String salt = tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
-        return Objects.nonNull(salt) ? Mono.just(R.ok(salt, "The salt will expire in 5 minutes")) : Mono.just(R.fail());
+        return async(() -> {
+            String salt = tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
+            return Objects.nonNull(salt) ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
+        });
     }
 
     /**
@@ -70,10 +72,11 @@ public class TokenController implements BaseController {
      */
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
-        String token = tokenService.generateToken(entityVO.getName(), entityVO.getSalt(), entityVO.getPassword(),
-                entityVO.getTenant());
-        return Objects.nonNull(token) ? Mono.just(R.ok(token, "The token will expire in 12 hours."))
-                : Mono.just(R.fail());
+        return async(() -> {
+            String token = tokenService.generateToken(entityVO.getName(), entityVO.getSalt(), entityVO.getPassword(),
+                    entityVO.getTenant());
+            return Objects.nonNull(token) ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
+        });
     }
 
     /**
@@ -84,20 +87,22 @@ public class TokenController implements BaseController {
      */
     @PostMapping("/check")
     public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
-        TokenValid tokenValid = tokenService.checkValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(),
-                entityVO.getTenant());
+        return async(() -> {
+            TokenValid tokenValid = tokenService.checkValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(),
+                    entityVO.getTenant());
 
-        boolean valid = tokenValid.isValid();
-        String message = "The token has expired";
-        if (valid && Objects.nonNull(tokenValid.getExpireTime())) {
-            String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
-            message = "The token will expire in " + expireTime;
-        } else if (!valid && Objects.nonNull(tokenValid.getExpireTime())) {
-            String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
-            message = "The token has expired in " + expireTime;
-        }
+            boolean valid = tokenValid.isValid();
+            String message = "The token has expired";
+            if (valid && Objects.nonNull(tokenValid.getExpireTime())) {
+                String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
+                message = "The token will expire in " + expireTime;
+            } else if (!valid && Objects.nonNull(tokenValid.getExpireTime())) {
+                String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
+                message = "The token has expired in " + expireTime;
+            }
 
-        return Mono.just(R.ok(valid, message));
+            return R.ok(valid, message);
+        });
     }
 
 }

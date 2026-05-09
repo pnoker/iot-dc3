@@ -54,13 +54,10 @@ public class TopicController implements BaseController {
 
     @PostMapping("/list")
     public Mono<R<Page<List<TopicVO>>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
-        try {
+        return async(() -> {
             Page<List<TopicVO>> topicVOList = topicService.query(topicQuery);
-            return Mono.just(R.ok(topicVOList));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(topicVOList);
+        });
     }
 
 }

@@ -64,89 +64,65 @@ public class ResourceController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ResourceVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                ResourceBO entityBO = resourceBuilder.buildBOByVO(entityVO);
-                entityBO.setCreatorId(header.getUserId());
-                entityBO.setCreatorName(header.getNickName());
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                resourceService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getUserHeader().flatMap(header -> async(() -> {
+            ResourceBO entityBO = resourceBuilder.buildBOByVO(entityVO);
+            entityBO.setCreatorId(header.getUserId());
+            entityBO.setCreatorName(header.getNickName());
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            resourceService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        }));
     }
 
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             resourceService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ResourceVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                ResourceBO entityBO = resourceBuilder.buildBOByVO(entityVO);
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                resourceService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getUserHeader().flatMap(header -> async(() -> {
+            ResourceBO entityBO = resourceBuilder.buildBOByVO(entityVO);
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            resourceService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        }));
     }
 
     @GetMapping("/id/{id}")
     public Mono<R<ResourceVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             ResourceBO entityBO = resourceService.selectById(id);
             ResourceVO entityVO = resourceBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     @PostMapping("/list")
     public Mono<R<Page<ResourceVO>>> list(@RequestBody(required = false) ResourceQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new ResourceQuery();
-            }
-            Page<ResourceBO> entityPageBO = resourceService.selectByPage(entityQuery);
+        return async(() -> {
+            ResourceQuery query = Objects.isNull(entityQuery) ? new ResourceQuery() : entityQuery;
+            Page<ResourceBO> entityPageBO = resourceService.selectByPage(query);
             Page<ResourceVO> entityPageVO = resourceBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityPageVO);
+        });
     }
 
     @PostMapping("/tree")
     public Mono<R<List<ResourceTreeVO>>> tree(@RequestBody(required = false) ResourceQuery entityQuery) {
-        try {
+        return async(() -> {
             List<ResourceTreeBO> entityBOList = resourceService.selectTree(entityQuery);
             List<ResourceTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
             for (ResourceTreeBO node : entityBOList) {
                 entityVOList.add(toTreeVO(node));
             }
-            return Mono.just(R.ok(entityVOList));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVOList);
+        });
     }
 
     private ResourceTreeVO toTreeVO(ResourceTreeBO node) {
