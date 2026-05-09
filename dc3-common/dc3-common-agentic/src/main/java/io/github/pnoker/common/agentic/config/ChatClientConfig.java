@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.config;
 
-import io.github.pnoker.common.agentic.skill.SkillRegistry;
 import io.github.pnoker.common.agentic.tool.AuthToolSet;
 import io.github.pnoker.common.agentic.tool.DataToolSet;
 import io.github.pnoker.common.agentic.tool.ManagerToolSet;
@@ -41,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(AgenticProperties.class)
 public class ChatClientConfig {
 
-    private static final String SYSTEM_PROMPT = """
+    public static final String SYSTEM_PROMPT = """
             You are an intelligent assistant for the IoT DC3 platform.
             
             You can help users manage IoT devices, query real-time and historical data,
@@ -69,8 +68,8 @@ public class ChatClientConfig {
 
     @Bean
     public ChatClient agenticChatClient(ChatClient.Builder builder, AuthToolSet authToolSet,
-                                        ManagerToolSet managerToolSet, DataToolSet dataToolSet, ChatMemory agenticChatMemory,
-                                        SkillRegistry skillRegistry) {
+                                        ManagerToolSet managerToolSet, DataToolSet dataToolSet,
+                                        ChatMemory agenticChatMemory) {
         return builder.defaultSystem(SYSTEM_PROMPT)
                 .defaultTools(authToolSet, managerToolSet, dataToolSet)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(agenticChatMemory).build())

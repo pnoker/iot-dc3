@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.dal.SessionManager;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -43,6 +45,10 @@ import java.util.Objects;
 @Service
 public class SessionServiceImpl implements SessionService {
 
+    private static final byte STATUS_ACTIVE = 0;
+
+    private static final byte STATUS_EXPIRED = 1;
+
     @Resource
     private SessionBuilder sessionBuilder;
 
@@ -52,8 +58,12 @@ public class SessionServiceImpl implements SessionService {
     @Resource
     private ChatMemory agenticChatMemory;
 
+    @Resource
+    private AgenticProperties agenticProperties;
+
     @Override
     public SessionBO touch(String conversationId, String skill, Long tenantId, Long userId) {
+        LocalDateTime expireTime = nextExpireTime();
         SessionDO existing = findByConversationId(conversationId);
         if (existing != null) {
             if (StringUtils.isNotEmpty(skill)) {
@@ -61,6 +71,8 @@ public class SessionServiceImpl implements SessionService {
             }
             existing.setTenantId(tenantId);
             existing.setUserId(userId);
+            existing.setStatus(STATUS_ACTIVE);
+            existing.setExpireTime(expireTime);
             sessionManager.updateById(existing);
             return sessionBuilder.buildBOByDO(existing);
         }
@@ -71,7 +83,8 @@ public class SessionServiceImpl implements SessionService {
         entityDO.setUserId(userId);
         entityDO.setTitle("New Conversation");
         entityDO.setSkill(StringUtils.defaultString(skill, ""));
-        entityDO.setStatus((byte) 0);
+        entityDO.setStatus(STATUS_ACTIVE);
+        entityDO.setExpireTime(expireTime);
         entityDO.setEnableFlag((byte) 0);
         sessionManager.save(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
@@ -80,6 +93,10 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public SessionBO getByConversationId(String conversationId) {
         SessionDO entityDO = findByConversationId(conversationId);
+        if (isExpired(entityDO)) {
+            expireSession(entityDO);
+            return null;
+        }
         return entityDO != null ? sessionBuilder.buildBOByDO(entityDO) : null;
     }
 
@@ -94,6 +111,9 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public Page<SessionBO> selectByPage(SessionQuery query) {
+        if (Objects.isNull(query)) {
+            query = new SessionQuery();
+        }
         if (Objects.isNull(query.getPage())) {
             query.setPage(new io.github.pnoker.common.entity.common.Pages());
         }
@@ -114,9 +134,28 @@ public class SessionServiceImpl implements SessionService {
         wrapper.eq(Objects.nonNull(query.getTenantId()), SessionDO::getTenantId, query.getTenantId());
         wrapper.eq(Objects.nonNull(query.getUserId()), SessionDO::getUserId, query.getUserId());
         wrapper.eq(Objects.nonNull(query.getStatus()), SessionDO::getStatus, query.getStatus());
+        if (Objects.isNull(query.getStatus()) || Objects.equals(STATUS_ACTIVE, query.getStatus())) {
+            LocalDateTime now = LocalDateTime.now();
+            wrapper.and(nested -> nested.isNull(SessionDO::getExpireTime).or().ge(SessionDO::getExpireTime, now));
+        }
         wrapper.like(StringUtils.isNotEmpty(query.getConversationId()), SessionDO::getConversationId,
                 query.getConversationId());
         return wrapper;
+    }
+
+    private LocalDateTime nextExpireTime() {
+        return LocalDateTime.now().plusHours(agenticProperties.getSessionTtlHours());
+    }
+
+    private boolean isExpired(SessionDO session) {
+        return session != null && session.getExpireTime() != null
+                && session.getExpireTime().isBefore(LocalDateTime.now());
+    }
+
+    private void expireSession(SessionDO session) {
+        session.setStatus(STATUS_EXPIRED);
+        sessionManager.updateById(session);
+        agenticChatMemory.clear(session.getConversationId());
     }
 
 }
