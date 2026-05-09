@@ -52,7 +52,7 @@ import java.util.Map;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-public class ModbusMaster extends Modbus {
+public abstract class ModbusMaster extends Modbus {
 
     private final Map<Integer, SlaveProfile> slaveProfiles = new HashMap<>();
 
