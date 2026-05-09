@@ -11,15 +11,15 @@ values on a configurable schedule without connecting to real hardware.
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-virtual
 - **Version**: 2026.5.5
-- **Driver Name**: 虚拟驱动
+- **Driver Name**: Virtual Driver
 
 ## Driver Attributes
 
 | Attribute | Description               |
 |-----------|---------------------------|
-| 主机 (Host) | Simulated target hostname |
-| 端口 (Port) | Simulated target port     |
-| 位号 (Tag)  | Point tag identifier      |
+| Host | Simulated target hostname |
+| Port | Simulated target port     |
+| Tag  | Point tag identifier      |
 
 ## Data Collection Schedule
 

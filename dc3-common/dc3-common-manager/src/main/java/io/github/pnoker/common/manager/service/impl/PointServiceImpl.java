@@ -108,7 +108,7 @@ public class PointServiceImpl implements PointService {
 
         PointDO entityDO = pointBuilder.buildDOByBO(entityBO);
         if (!pointManager.save(entityDO)) {
-            throw new AddException("Failed to create 位号");
+            throw new AddException("Failed to create point");
         }
 
         //

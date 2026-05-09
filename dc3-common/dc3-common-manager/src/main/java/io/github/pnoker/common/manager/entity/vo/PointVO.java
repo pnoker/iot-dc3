@@ -50,8 +50,8 @@ public class PointVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "位号名称不能为空", groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "位号名称格式无效",
+    @NotBlank(message = "Point name can't be empty", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid point name format",
             groups = {Add.class, Update.class})
     private String pointName;
 
@@ -93,7 +93,7 @@ public class PointVO extends BaseVO {
     /**
      * ID
      */
-    @NotNull(message = "模版ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
     private Long profileId;
 
     /**

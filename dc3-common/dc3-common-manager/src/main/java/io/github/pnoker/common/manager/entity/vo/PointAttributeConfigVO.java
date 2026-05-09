@@ -44,19 +44,19 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      * ID
      */
-    @NotNull(message = "位号属性ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Point attribute ID can't be empty", groups = {Add.class, Update.class})
     private Long attributeId;
 
     /**
      *
      */
-    @NotNull(message = "位号属性配置值不能为空")
+    @NotNull(message = "Point attribute config value can't be empty")
     private String configValue;
 
     /**
      * Device ID
      */
-    @NotNull(message = "设备ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
     private Long deviceId;
 
     /**
@@ -67,7 +67,7 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      * Point ID
      */
-    @NotNull(message = "位号ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Point ID can't be empty", groups = {Add.class, Update.class})
     private Long pointId;
 
     /**

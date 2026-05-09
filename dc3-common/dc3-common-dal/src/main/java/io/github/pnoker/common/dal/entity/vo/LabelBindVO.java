@@ -44,19 +44,19 @@ public class LabelBindVO extends BaseVO {
     /**
      * Entity type flag.
      */
-    @NotNull(message = "实体类型标识不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
      * Label ID.
      */
-    @NotNull(message = "标签ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Label ID can't be empty", groups = {Add.class, Update.class})
     private Long labelId;
 
     /**
      * Entity ID.
      */
-    @NotNull(message = "实体ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
 
 }

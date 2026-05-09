@@ -11,23 +11,23 @@ OPC-compliant industrial devices and SCADA systems.
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-opc-da
 - **Version**: 2026.5.5
-- **Driver Name**: OpcDa驱动
+- **Driver Name**: OPC DA Driver
 
 ## Driver Attributes (Device-level)
 
 | Attribute      | Description                             |
 |----------------|-----------------------------------------|
-| 主机 (Host)      | OPC DA server hostname or IP            |
+| Host           | OPC DA server hostname or IP            |
 | CLSID          | OPC server CLSID (COM class identifier) |
-| 用户名 (Username) | Windows DCOM authentication username    |
-| 密码 (Password)  | Windows DCOM authentication password    |
+| Username       | Windows DCOM authentication username    |
+| Password       | Windows DCOM authentication password    |
 
 ## Point Attributes
 
 | Attribute  | Description            |
 |------------|------------------------|
-| 分组 (Group) | OPC DA item group name |
-| 位号 (Tag)   | OPC DA item tag name   |
+| Group     | OPC DA item group name |
+| Tag       | OPC DA item tag name   |
 
 ## Prerequisites
 
@@ -60,4 +60,3 @@ java -jar dc3-driver/dc3-driver-opc-da/target/dc3-driver-opc-da.jar
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-
