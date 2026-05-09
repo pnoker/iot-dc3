@@ -35,6 +35,7 @@ HEADER = "# \u2728 What's Changed"
 DETAILS_OPEN = "<details>"
 DETAILS_SUMMARY = "<summary>\U0001f4dd Historical Version Description, Click to Expand</summary>"
 DEFAULT_TAG_PATTERN = "dc3.release.*"
+GENERATED_CHANGELOG_RE = re.compile(r"^(docs|chore)\(release\): update generated changelog$")
 
 CATEGORY_ORDER = [
     "Breaking Changes",
@@ -184,6 +185,24 @@ def read_commits(from_ref: str, to_ref: str, include_merges: bool) -> list[Commi
     return [parse_commit(record) for record in output.strip("\x1e").split("\x1e") if record.strip()]
 
 
+def changed_files(commit_hash: str) -> set[str]:
+    output = run_git("diff-tree", "--no-commit-id", "--name-only", "-r", commit_hash)
+    return {line for line in output.splitlines() if line}
+
+
+def is_generated_changelog_commit(commit: Commit, change_file: Path) -> bool:
+    if not GENERATED_CHANGELOG_RE.match(commit.subject):
+        return False
+    normalized_change_file = change_file.as_posix()
+    return changed_files(commit.full_hash) == {normalized_change_file}
+
+
+def filter_commits(commits: list[Commit], change_file: Path, include_changelog_commits: bool) -> list[Commit]:
+    if include_changelog_commits:
+        return commits
+    return [commit for commit in commits if not is_generated_changelog_commit(commit, change_file)]
+
+
 def format_commit(commit: Commit) -> str:
     if commit.scope:
         return f"- **{commit.scope}**: {commit.description} (`{commit.short_hash}`)"
@@ -300,6 +319,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--file", dest="change_file", default=os.getenv("CHANGE_FILE", "dc3/doc/CHANGE.md"))
     parser.add_argument("--tag-pattern", default=os.getenv("TAG_PATTERN", DEFAULT_TAG_PATTERN))
     parser.add_argument("--include-merges", action="store_true", default=os.getenv("INCLUDE_MERGES", "") == "true")
+    parser.add_argument(
+        "--include-changelog-commits",
+        action="store_true",
+        default=os.getenv("INCLUDE_CHANGELOG_COMMITS", "") == "true",
+    )
     return parser.parse_args()
 
 
@@ -310,9 +334,11 @@ def main() -> int:
 
     version = args.version or read_project_version(repo_root)
     from_ref = args.from_ref or previous_release_tag(args.to_ref, args.tag_pattern)
+    change_file = Path(args.change_file)
     commits = read_commits(from_ref, args.to_ref, args.include_merges)
+    commits = filter_commits(commits, change_file, args.include_changelog_commits)
     release_block = build_release_block(version, commits, from_ref, args.to_ref)
-    update_changelog(repo_root / args.change_file, release_block, version)
+    update_changelog(repo_root / change_file, release_block, version)
 
     print(f"Updated {args.change_file}")
     print(f"Version: {version}")
