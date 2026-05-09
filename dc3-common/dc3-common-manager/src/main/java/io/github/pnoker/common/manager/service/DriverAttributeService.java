@@ -21,6 +21,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.query.DriverAttributeQuery;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,5 +49,21 @@ public interface DriverAttributeService extends BaseService<DriverAttributeBO, D
      * @return DriverAttribute
      */
     DriverAttributeBO selectByNameAndDriverId(String name, Long driverId);
+
+    /**
+     * Bulk insert. Use during driver registration so attribute changes don't degenerate
+     * into N round-trips.
+     */
+    void saveBatch(List<DriverAttributeBO> entityBOList);
+
+    /**
+     * Bulk update by id.
+     */
+    void updateBatch(List<DriverAttributeBO> entityBOList);
+
+    /**
+     * Bulk delete by id.
+     */
+    void removeByIds(Collection<Long> ids);
 
 }

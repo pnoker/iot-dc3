@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -111,6 +112,42 @@ public class PointAttributeServiceImpl implements PointAttributeService {
                 .eq(PointAttributeDO::getDriverId, driverId);
         List<PointAttributeDO> entityDO = wrapper.list();
         return pointAttributeBuilder.buildBOListByDOList(entityDO);
+    }
+
+    @Override
+    public void saveBatch(List<PointAttributeBO> entityBOList) {
+        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+            return;
+        }
+        List<PointAttributeDO> doList = entityBOList.stream().map(pointAttributeBuilder::buildDOByBO).toList();
+        if (!pointAttributeManager.saveBatch(doList)) {
+            throw new AddException("Failed to batch create point attributes");
+        }
+    }
+
+    @Override
+    public void updateBatch(List<PointAttributeBO> entityBOList) {
+        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+            return;
+        }
+        List<PointAttributeDO> doList = entityBOList.stream().map(bo -> {
+            PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(bo);
+            entityDO.setOperateTime(null);
+            return entityDO;
+        }).toList();
+        if (!pointAttributeManager.updateBatchById(doList)) {
+            throw new UpdateException("Failed to batch update point attributes");
+        }
+    }
+
+    @Override
+    public void removeByIds(Collection<Long> ids) {
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return;
+        }
+        if (!pointAttributeManager.removeByIds(ids)) {
+            throw new DeleteException("Failed to batch remove point attributes");
+        }
     }
 
     @Override

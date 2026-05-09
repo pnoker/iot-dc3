@@ -37,9 +37,12 @@ import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -114,29 +117,32 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                 .stream()
                 .collect(Collectors.toMap(DriverAttributeBO::getAttributeCode, Function.identity()));
 
+        // Diff into three buckets, then issue at most three round-trips (was N round-trips
+        // when a driver came up with many attributes — re-registration storms hit the DB).
+        List<DriverAttributeBO> toInsert = new ArrayList<>();
+        List<DriverAttributeBO> toUpdate = new ArrayList<>();
         for (Map.Entry<String, DriverAttributeBO> entry : newDriverAttributeMap.entrySet()) {
-            String name = entry.getKey();
-            DriverAttributeBO attribute = newDriverAttributeMap.get(name);
+            DriverAttributeBO attribute = entry.getValue();
             attribute.setDriverId(entityBO.getId());
-            if (oldDriverAttributeMap.containsKey(name)) {
-                log.debug("The driver attributes have been registered, update is performed: {}",
-                        JsonUtil.toJsonString(attribute));
-                attribute.setId(oldDriverAttributeMap.get(name).getId());
-                driverAttributeService.update(attribute);
+            DriverAttributeBO existing = oldDriverAttributeMap.get(entry.getKey());
+            if (existing != null) {
+                attribute.setId(existing.getId());
+                toUpdate.add(attribute);
             } else {
-                log.debug("The driver attributes are not registered, perform new addition: {}",
-                        JsonUtil.toJsonString(attribute));
-                driverAttributeService.save(attribute);
+                toInsert.add(attribute);
             }
         }
-
+        Set<Long> toRemoveIds = new HashSet<>();
         for (Map.Entry<String, DriverAttributeBO> entry : oldDriverAttributeMap.entrySet()) {
-            String name = entry.getKey();
-            if (!newDriverAttributeMap.containsKey(name)) {
-                log.debug("Driver attribute is redundant, deleting: {}", oldDriverAttributeMap.get(name));
-                driverAttributeService.remove(oldDriverAttributeMap.get(name).getId());
+            if (!newDriverAttributeMap.containsKey(entry.getKey())) {
+                toRemoveIds.add(entry.getValue().getId());
             }
         }
+        log.debug("Driver attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+                toInsert.size(), toUpdate.size(), toRemoveIds.size());
+        driverAttributeService.saveBatch(toInsert);
+        driverAttributeService.updateBatch(toUpdate);
+        driverAttributeService.removeByIds(toRemoveIds);
 
         return driverAttributeService.selectByDriverId(entityBO.getId());
     }
@@ -152,29 +158,31 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                 .stream()
                 .collect(Collectors.toMap(PointAttributeBO::getAttributeCode, Function.identity()));
 
+        // See registerDriverAttribute — same three-bucket batch pattern.
+        List<PointAttributeBO> pointToInsert = new ArrayList<>();
+        List<PointAttributeBO> pointToUpdate = new ArrayList<>();
         for (Map.Entry<String, PointAttributeBO> entry : newPointAttributeMap.entrySet()) {
-            String name = entry.getKey();
-            PointAttributeBO attribute = newPointAttributeMap.get(name);
+            PointAttributeBO attribute = entry.getValue();
             attribute.setDriverId(entityBO.getId());
-            if (oldPointAttributeMap.containsKey(name)) {
-                log.debug("The point attribute has been registered, update is performed: {}",
-                        JsonUtil.toJsonString(attribute));
-                attribute.setId(oldPointAttributeMap.get(name).getId());
-                pointAttributeService.update(attribute);
+            PointAttributeBO existing = oldPointAttributeMap.get(entry.getKey());
+            if (existing != null) {
+                attribute.setId(existing.getId());
+                pointToUpdate.add(attribute);
             } else {
-                log.debug("The point attribute is not registered, perform update: {}",
-                        JsonUtil.toJsonString(attribute));
-                pointAttributeService.save(attribute);
+                pointToInsert.add(attribute);
             }
         }
-
+        Set<Long> pointToRemoveIds = new HashSet<>();
         for (Map.Entry<String, PointAttributeBO> entry : oldPointAttributeMap.entrySet()) {
-            String name = entry.getKey();
-            if (!newPointAttributeMap.containsKey(name)) {
-                log.debug("Point attribute is redundant, deleting: {}", oldPointAttributeMap.get(name));
-                pointAttributeService.remove(oldPointAttributeMap.get(name).getId());
+            if (!newPointAttributeMap.containsKey(entry.getKey())) {
+                pointToRemoveIds.add(entry.getValue().getId());
             }
         }
+        log.debug("Point attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+                pointToInsert.size(), pointToUpdate.size(), pointToRemoveIds.size());
+        pointAttributeService.saveBatch(pointToInsert);
+        pointAttributeService.updateBatch(pointToUpdate);
+        pointAttributeService.removeByIds(pointToRemoveIds);
 
         return pointAttributeService.selectByDriverId(entityBO.getId());
     }
