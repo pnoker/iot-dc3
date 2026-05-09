@@ -18,6 +18,7 @@
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.manager.DeviceApiGrpc;
+import io.github.pnoker.api.center.manager.GrpcDeviceIdsQuery;
 import io.github.pnoker.api.center.manager.GrpcDeviceQuery;
 import io.github.pnoker.api.center.manager.GrpcDriverQuery;
 import io.github.pnoker.api.center.manager.GrpcPageDeviceDTO;
