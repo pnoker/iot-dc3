@@ -6,8 +6,8 @@ _Generated on 2026-05-09._
 
 #### Summary
 - Generated from `dc3.release.20251005.00` to `HEAD`.
-- Included 222 commits across 10 categories: Security 3, Features 57, Bug Fixes 69, Performance 1, Refactoring 38, Documentation 22, Build 1, CI 1, Chores 28, Other 2.
-- Most active scopes: dashboard(17), auth(12), data(8), env(5), build(5), alert(5).
+- Included 227 commits across 10 categories: Security 3, Features 57, Bug Fixes 71, Performance 1, Refactoring 41, Documentation 22, Build 1, CI 1, Chores 28, Other 2.
+- Most active scopes: dashboard(17), auth(12), data(8), agentic(5), env(5), build(5).
 - Highlights: add security quality checks; security: enforce gateway user and command tenant scope; Revise SECURITY.md with updated support and practices; release: generate changelog from git commits; auth: HMAC-sign X-Auth-User header end to end.
 
 #### Security
@@ -75,6 +75,8 @@ _Generated on 2026-05-09._
 - update pom (`f9e7f89ac`)
 
 #### Bug Fixes
+- **config**: use webflux base paths (`16fc57bb4`)
+- **agentic**: remove servlet context path (`69d623276`)
 - **release**: preserve changelog idempotency across dates (`203a9bc16`)
 - **release**: trim changelog commit records (`e5e95e658`)
 - **release**: keep changelog generation idempotent (`0a21864f4`)
@@ -149,6 +151,9 @@ _Generated on 2026-05-09._
 - **manager**: batch driver-registration attribute diff into 3 round-trips (`c07d873a3`)
 
 #### Refactoring
+- **agentic**: centralize service constants (`b011d8843`)
+- **log**: standardize core logging conventions (`4cb6c7b8e`)
+- **agentic**: tighten chat orchestration boundaries (`0787be15b`)
 - **i18n**: standardize user-facing text in english (`033b64e90`)
 - **config**: standardize dc3 property prefixes (`4fd6ca33f`)
 - **container**: remove redundant podman scripts (`d9c68ea9b`)
