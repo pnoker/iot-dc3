@@ -181,9 +181,9 @@ want Compose-only variables to appear in the local Java process environment.
 
 ### gRPC Facade
 
-| Variable                      | Scope   | Meaning                                                                                              |
-|-------------------------------|---------|------------------------------------------------------------------------------------------------------|
-| `DC3_FACADE_GRPC_DEADLINE_MS` | Runtime | Per-request gRPC facade deadline in milliseconds. Set `0` to disable the client-side deadline.      |
+| Variable                      | Scope   | Meaning                                                                                        |
+|-------------------------------|---------|------------------------------------------------------------------------------------------------|
+| `DC3_FACADE_GRPC_DEADLINE_MS` | Runtime | Per-request gRPC facade deadline in milliseconds. Set `0` to disable the client-side deadline. |
 
 ### Auth and HMAC Signing
 
