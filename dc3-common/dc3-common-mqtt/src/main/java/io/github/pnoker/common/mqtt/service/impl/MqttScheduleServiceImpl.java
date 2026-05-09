@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.mqtt.service.impl;
 
+import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttScheduleService;
 import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
 import io.github.pnoker.common.quartz.QuartzService;
@@ -24,7 +25,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,8 +42,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class MqttScheduleServiceImpl implements MqttScheduleService {
 
-    @Value("${driver.mqtt.batch.interval}")
-    private Integer interval;
+    @Resource
+    private MqttProperties mqttProperties;
 
     @Resource
     private QuartzService quartzService;
@@ -51,6 +51,7 @@ public class MqttScheduleServiceImpl implements MqttScheduleService {
     @Override
     public void initial() {
         try {
+            Integer interval = mqttProperties.getBatch().getInterval();
             quartzService.createJobWithInterval("ScheduleGroup", "MqttScheduleJob", interval,
                     DateBuilder.IntervalUnit.SECOND, MqttScheduleJob.class);
 

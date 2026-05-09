@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.mqtt.entity.property;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -69,17 +70,24 @@ public class MqttProperties {
     @NotBlank(message = "Topic prefix name can't be empty")
     private String topicPrefix;
 
+    @Valid
     @NotNull(message = "Default topic can't be empty")
     private Topic defaultSendTopic = new Topic("dc3/d/v/dc3-driver-mqtt_default", 2);
 
     @Size(min = 1, message = "Receive topic at least one topic")
-    private List<Topic> receiveTopics;
+    private List<@Valid Topic> receiveTopics;
 
     @NotNull(message = "Keep alive interval can't be empty")
+    @Min(value = 1, message = "Keep alive interval must be greater than 0")
     private Integer keepAlive = 15;
 
     @NotNull(message = "Completion timeout can't be empty")
+    @Min(value = 1, message = "Completion timeout must be greater than 0")
     private Integer completionTimeout = 3000;
+
+    @Valid
+    @NotNull(message = "MQTT batch config can't be empty")
+    private Batch batch = new Batch();
 
     /**
      * MQTT authentication type enum
@@ -100,9 +108,24 @@ public class MqttProperties {
         @NotBlank(message = "Topic name can't be empty")
         private String name;
 
+        @NotNull(message = "Topic qos can't be empty")
         @Min(0)
         @Max(2)
         private Integer qos;
+
+    }
+
+    @Getter
+    @Setter
+    public static class Batch {
+
+        @NotNull(message = "MQTT batch speed can't be empty")
+        @Min(value = 1, message = "MQTT batch speed must be greater than 0")
+        private Integer speed = 100;
+
+        @NotNull(message = "MQTT batch interval can't be empty")
+        @Min(value = 1, message = "MQTT batch interval must be greater than 0")
+        private Integer interval = 5;
 
     }
 

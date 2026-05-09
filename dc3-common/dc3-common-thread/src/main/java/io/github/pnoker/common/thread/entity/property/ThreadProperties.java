@@ -17,6 +17,9 @@
 
 package io.github.pnoker.common.thread.entity.property;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -43,21 +46,30 @@ public class ThreadProperties {
     /**
      * Thread name prefix
      */
-    private String prefix;
+    @NotBlank(message = "Thread name prefix can't be empty")
+    private String prefix = "dc3-thread-";
 
     /**
      * Number of thread pool core threads
      */
-    private int corePoolSize;
+    @Min(value = 1, message = "Core pool size must be greater than 0")
+    private int corePoolSize = 4;
 
     /**
      * Maximum number of thread pool threads
      */
-    private int maximumPoolSize;
+    @Min(value = 1, message = "Maximum pool size must be greater than 0")
+    private int maximumPoolSize = 32;
 
     /**
      * Idle thread waiting time, unit: seconds
      */
-    private int keepAliveTime;
+    @Min(value = 1, message = "Keep alive time must be greater than 0")
+    private int keepAliveTime = 15;
+
+    @AssertTrue(message = "Maximum pool size must be greater than or equal to core pool size")
+    public boolean isPoolSizeValid() {
+        return maximumPoolSize >= corePoolSize;
+    }
 
 }
