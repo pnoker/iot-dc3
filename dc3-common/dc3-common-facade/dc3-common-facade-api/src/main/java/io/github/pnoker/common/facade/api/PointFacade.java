@@ -22,7 +22,9 @@ import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Protocol-neutral point facade. Mirrors the two RPCs on
@@ -40,6 +42,18 @@ public interface PointFacade {
     FacadePointBO selectById(Long id);
 
     /**
+     * Tenant-scoped single lookup. Returns {@code null} when the point is missing or
+     * belongs to another tenant.
+     */
+    default FacadePointBO selectById(Long tenantId, Long id) {
+        if (Objects.isNull(tenantId)) {
+            return null;
+        }
+        FacadePointBO point = selectById(id);
+        return matchesTenant(tenantId, point) ? point : null;
+    }
+
+    /**
      * Bulk lookup. Avoids the N+1 cost of calling {@link #selectById(Long)} in a loop.
      *
      * @return list of resolved points (missing ids are simply omitted; never {@code null}).
@@ -47,8 +61,24 @@ public interface PointFacade {
     List<FacadePointBO> selectByIds(Collection<Long> ids);
 
     /**
+     * Tenant-scoped bulk lookup. Missing or cross-tenant points are omitted.
+     */
+    default List<FacadePointBO> selectByIds(Long tenantId, Collection<Long> ids) {
+        if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return selectByIds(ids).stream()
+                .filter(point -> matchesTenant(tenantId, point))
+                .toList();
+    }
+
+    /**
      * @return a page of points (never {@code null}; empty page when nothing matches).
      */
     FacadePage<FacadePointBO> selectByPage(FacadePointQuery query);
+
+    private static boolean matchesTenant(Long tenantId, FacadePointBO point) {
+        return Objects.nonNull(point) && Objects.equals(tenantId, point.getTenantId());
+    }
 
 }
