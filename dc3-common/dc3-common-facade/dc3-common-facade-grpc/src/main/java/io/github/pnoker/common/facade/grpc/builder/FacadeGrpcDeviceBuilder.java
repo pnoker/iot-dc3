@@ -65,7 +65,7 @@ public class FacadeGrpcDeviceBuilder {
         LongOptional.ofNullable(query.getProfileId()).ifPresent(builder::setProfileId);
         Optional.ofNullable(query.getEnableFlag())
                 .ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
-                        () -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT));
+                        () -> builder.setEnableFlag(DefaultConstant.NULL_INT));
 
         return builder.build();
     }
