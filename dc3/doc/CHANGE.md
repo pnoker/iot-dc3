@@ -7,12 +7,12 @@ _Generated on 2026-05-09._
 #### Summary
 
 - Generated from `dc3.release.20251005.00` to `HEAD`.
-- Included 227 commits across 10 categories: Security 3, Features 57, Bug Fixes 71, Performance 1, Refactoring 41,
-  Documentation 22, Build 1, CI 1, Chores 28, Other 2.
-- Most active scopes: dashboard(17), auth(12), data(8), agentic(5), env(5), build(5).
+- Included 244 commits across 10 categories: Security 3, Features 60, Bug Fixes 73, Performance 1, Refactoring 45,
+  Documentation 24, Build 1, CI 1, Chores 34, Other 2.
+- Most active scopes: dashboard(17), auth(12), data(8), agentic(6), config(5), env(5).
 - Highlights: add security quality checks; security: enforce gateway user and command tenant scope; Revise SECURITY.md
-  with updated support and practices; release: generate changelog from git commits; auth: HMAC-sign X-Auth-User header
-  end to end.
+  with updated support and practices; web: add health probes to shared web configuration; config: add AUTH_HMAC_SECRET
+  to all deployment configurations.
 
 #### Security
 
@@ -22,6 +22,9 @@ _Generated on 2026-05-09._
 
 #### Features
 
+- **web**: add health probes to shared web configuration (`363fc14a1`)
+- **config**: add AUTH_HMAC_SECRET to all deployment configurations (`edaaab90d`)
+- introduce TenantOwned interface for type-safe tenant filtering (`a08f15904`)
 - **release**: generate changelog from git commits (`8c7a2b024`)
 - **auth**: HMAC-sign X-Auth-User header end to end (`085966276`)
 - **facade,data**: add selectByIds bulk lookup and use it in dashboard live feed (`1fd58e688`)
@@ -82,6 +85,8 @@ _Generated on 2026-05-09._
 
 #### Bug Fixes
 
+- **agentic**: migrate ObjectMapper to Jackson 3.x (tools.jackson) (`db780bb6f`)
+- **deps**: replace jakarta.validation-api with spring-boot-starter-validation (`d7eec55d1`)
 - **config**: use webflux base paths (`16fc57bb4`)
 - **agentic**: remove servlet context path (`69d623276`)
 - **release**: preserve changelog idempotency across dates (`203a9bc16`)
@@ -161,6 +166,10 @@ _Generated on 2026-05-09._
 
 #### Refactoring
 
+- **constant**: extract BaseConstant to break circular dependency on dc3-common-exception (`8db13631c`)
+- **config**: use per-service port variables from .env.example (`8ad47b12c`)
+- replace @Value with @ConfigurationProperties beans (`b0094f69b`)
+- **grpc**: add explicit imports for batch query types (`5a33280b2`)
 - **agentic**: centralize service constants (`b011d8843`)
 - **log**: standardize core logging conventions (`4cb6c7b8e`)
 - **agentic**: tighten chat orchestration boundaries (`0787be15b`)
@@ -209,6 +218,8 @@ _Generated on 2026-05-09._
 
 #### Documentation
 
+- align markdown tables and wrap long lines (`8b6b407a0`)
+- align markdown tables and wrap long lines (`811c0b721`)
 - **agent**: add shared coding agent guidance (`a1a8cee2d`)
 - **env**: document environment variable reference (`086ade9d8`)
 - align governance and environment guides (`aa65b330c`)
@@ -242,6 +253,12 @@ _Generated on 2026-05-09._
 
 #### Chores
 
+- **java**: sort imports alphabetically (`b5ea88eb9`)
+- **java**: expand wildcard imports to explicit imports (`421804a5f`)
+- **githooks**: add AGPL license header to commit-msg hook (`7524905ae`)
+- add AI coding assistants compatibility entrypoint (`000426cbf`)
+- **java**: expand wildcard imports to explicit imports (`5180ac734`)
+- remove CLAUDE.md files (`fe2d2bf8c`)
 - **mqtt**: remove hardcoded paho version, inherit from parent dependencyManagement (`eff7d4b3b`)
 - reorganize POM dependencies with consistent category comments (`0e916774d`)
 - remove duplicate java.version property (inherited from dc3-parent) (`69252d890`)
