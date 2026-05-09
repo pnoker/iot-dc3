@@ -32,15 +32,37 @@ public interface PointValueCommandService {
     /**
      * Read command
      *
+     * @param tenantId current tenant id
      * @param entityVO PointValueReadVO
      */
-    void read(PointValueReadVO entityVO);
+    void read(Long tenantId, PointValueReadVO entityVO);
+
+    /**
+     * Read command from trusted internal callers that do not carry request tenant
+     * context.
+     *
+     * @param entityVO PointValueReadVO
+     */
+    default void read(PointValueReadVO entityVO) {
+        read(null, entityVO);
+    }
 
     /**
      * Write command
      *
+     * @param tenantId current tenant id
      * @param entityVO PointValueWriteVO
      */
-    void write(PointValueWriteVO entityVO);
+    void write(Long tenantId, PointValueWriteVO entityVO);
+
+    /**
+     * Write command from trusted internal callers that do not carry request tenant
+     * context.
+     *
+     * @param entityVO PointValueWriteVO
+     */
+    default void write(PointValueWriteVO entityVO) {
+        write(null, entityVO);
+    }
 
 }

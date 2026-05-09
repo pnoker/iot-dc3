@@ -57,10 +57,10 @@ public class PointValueCommandController implements BaseController {
      */
     @PostMapping("/read")
     public Mono<R<Boolean>> read(@Validated @RequestBody PointValueReadVO entityVO) {
-        return async(() -> {
-            pointValueCommandService.read(entityVO);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            pointValueCommandService.read(tenantId, entityVO);
             return R.ok();
-        });
+        }));
     }
 
     /**
@@ -71,10 +71,10 @@ public class PointValueCommandController implements BaseController {
      */
     @PostMapping("/write")
     public Mono<R<Boolean>> write(@Validated @RequestBody PointValueWriteVO entityVO) {
-        return async(() -> {
-            pointValueCommandService.write(entityVO);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            pointValueCommandService.write(tenantId, entityVO);
             return R.ok();
-        });
+        }));
     }
 
 }
