@@ -18,7 +18,9 @@
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
 import jakarta.annotation.Resource;
@@ -27,8 +29,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -50,6 +59,9 @@ public class WebFilterConfig {
 
     @Resource
     private ServerProperties serverProperties;
+
+    @Resource
+    private HmacAuthSigner hmacAuthSigner;
 
     /**
      * Custom context path filter
@@ -80,27 +92,49 @@ public class WebFilterConfig {
             ServerHttpRequest request = exchange.getRequest();
             String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
 
-            if (StringUtils.isNotEmpty(user)) {
-                try {
-                    RequestHeader.UserHeader userHeader = JsonUtil.parseObject(user, RequestHeader.UserHeader.class);
+            if (StringUtils.isEmpty(user)) {
+                return chain.filter(exchange);
+            }
 
-                    if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId())
-                            || Objects.isNull(userHeader.getUserId())) {
-                        log.warn("Invalid user header: {}", JsonUtil.toJsonString(userHeader));
-                        return chain.filter(exchange)
-                                .contextWrite(context -> context.delete(RequestConstant.Key.USER_HEADER));
-                    } else {
-                        log.debug("User header: {}", JsonUtil.toJsonString(userHeader));
-                        return chain.filter(exchange)
-                                .contextWrite(context -> context.put(RequestConstant.Key.USER_HEADER, userHeader));
-                    }
-                } catch (Exception e) {
-                    log.error("Error parsing user header", e);
+            // When signing is enabled, every X-Auth-User must come with a valid signature.
+            // Without this, any client able to reach a backend port directly can spoof a
+            // tenant by crafting their own X-Auth-User header.
+            if (hmacAuthSigner.isEnabled()) {
+                String sign = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_SIGN);
+                if (!hmacAuthSigner.verify(user, sign)) {
+                    log.warn("Rejecting X-Auth-User with missing/invalid signature, Url: {}", request.getURI());
+                    return writeUnauthorized(exchange);
                 }
+            }
+
+            try {
+                RequestHeader.UserHeader userHeader = JsonUtil.parseObject(user, RequestHeader.UserHeader.class);
+
+                if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId())
+                        || Objects.isNull(userHeader.getUserId())) {
+                    log.warn("Invalid user header: {}", JsonUtil.toJsonString(userHeader));
+                    return chain.filter(exchange)
+                            .contextWrite(context -> context.delete(RequestConstant.Key.USER_HEADER));
+                } else {
+                    log.debug("User header: {}", JsonUtil.toJsonString(userHeader));
+                    return chain.filter(exchange)
+                            .contextWrite(context -> context.put(RequestConstant.Key.USER_HEADER, userHeader));
+                }
+            } catch (Exception e) {
+                log.error("Error parsing user header", e);
             }
 
             return chain.filter(exchange);
         };
+    }
+
+    private Mono<Void> writeUnauthorized(ServerWebExchange exchange) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        DataBuffer buffer = response.bufferFactory()
+                .wrap(JsonUtil.toJsonBytes(R.fail(RequestConstant.Message.INVALID_REQUEST)));
+        return response.writeWith(Mono.just(buffer));
     }
 
 }

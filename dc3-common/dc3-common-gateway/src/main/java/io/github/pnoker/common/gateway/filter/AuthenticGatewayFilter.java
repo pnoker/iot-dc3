@@ -24,6 +24,7 @@ import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.gateway.service.FilterService;
+import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -37,6 +38,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Request Header
@@ -51,31 +53,48 @@ public class AuthenticGatewayFilter implements GatewayFilter {
 
     private final FilterService filterService;
 
-    public AuthenticGatewayFilter(FilterService filterService) {
+    private final HmacAuthSigner hmacAuthSigner;
+
+    public AuthenticGatewayFilter(FilterService filterService, HmacAuthSigner hmacAuthSigner) {
         this.filterService = filterService;
+        this.hmacAuthSigner = hmacAuthSigner;
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
-        try {
-            FacadeTenantBO tenant = filterService.getTenant(request);
-            FacadeUserLoginBO userLogin = filterService.getUserLogin(request);
-            filterService.checkValid(request, tenant, userLogin);
+        // The auth lookups (tenant / user / token) are blocking gRPC calls. Run the whole
+        // synchronous block on boundedElastic so the Netty event loop stays free to accept
+        // new connections under load. FilterServiceImpl caches the lookups for ~60s.
+        return Mono.fromCallable(() -> resolveUserHeader(request)).subscribeOn(Schedulers.boundedElastic())
+                .flatMap(userHeader -> {
+                    String userJson = JsonUtil.toJsonString(userHeader);
+                    ServerHttpRequest mutated = request.mutate().headers(headers -> {
+                        headers.set(RequestConstant.Header.X_AUTH_USER, userJson);
+                        if (hmacAuthSigner.isEnabled()) {
+                            headers.set(RequestConstant.Header.X_AUTH_SIGN, hmacAuthSigner.sign(userJson));
+                        } else {
+                            // Strip any inbound sign header so a downstream service can't be
+                            // tricked into trusting a client-supplied one.
+                            headers.remove(RequestConstant.Header.X_AUTH_SIGN);
+                        }
+                    }).build();
+                    return chain.filter(exchange.mutate().request(mutated).build());
+                }).onErrorResume(UnAuthorizedException.class, e -> {
+                    log.warn("AuthenticGatewayFilter unauthorized: {}, Url: {}", e.getMessage(), request.getURI());
+                    return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
+                }).onErrorResume(e -> {
+                    log.error("AuthenticGatewayFilter unexpected error, Url: {}", request.getURI(), e);
+                    return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+                });
+    }
 
-            RequestHeader.UserHeader userHeader = filterService.getUser(userLogin, tenant);
-            ServerHttpRequest build = request.mutate()
-                    .headers(headers -> headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(userHeader)))
-                    .build();
-            return chain.filter(exchange.mutate().request(build).build());
-        } catch (UnAuthorizedException e) {
-            log.warn("AuthenticGatewayFilter unauthorized: {}, Url: {}", e.getMessage(), request.getURI());
-            return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
-        } catch (Exception e) {
-            log.error("AuthenticGatewayFilter unexpected error, Url: {}", request.getURI(), e);
-            return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
-        }
+    private RequestHeader.UserHeader resolveUserHeader(ServerHttpRequest request) {
+        FacadeTenantBO tenant = filterService.getTenant(request);
+        FacadeUserLoginBO userLogin = filterService.getUserLogin(request);
+        filterService.checkValid(request, tenant, userLogin);
+        return filterService.getUser(userLogin, tenant);
     }
 
     private Mono<Void> writeErrorResponse(ServerWebExchange exchange, HttpStatus status, String message) {

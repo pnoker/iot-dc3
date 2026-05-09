@@ -65,6 +65,16 @@ public class RequestConstant {
          */
         public static final String X_AUTH_USER = "X-Auth-User";
 
+        /**
+         * HMAC-SHA256 signature of the {@link #X_AUTH_USER} JSON payload, hex-encoded.
+         * Set by the gateway when {@code dc3.auth.hmac.secret} is configured; backend
+         * services reject the request if the signature does not match. Without this
+         * header (or with signing disabled), backend services trust X-Auth-User
+         * unverified, which means any client that can reach a backend port directly can
+         * spoof any tenant.
+         */
+        public static final String X_AUTH_SIGN = "X-Auth-Sign";
+
         private Header() {
             throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
         }
