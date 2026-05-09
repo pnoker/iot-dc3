@@ -17,7 +17,7 @@
 
 # Server configuration
 server:
-  port: ${SERVER_PORT:8300}
+  port: ${DC3_AUTH_PORT:8300}
 
 # Spring application configuration
 spring:
@@ -28,7 +28,7 @@ spring:
   # gRPC server configuration
   grpc:
     server:
-      port: ${GRPC_SERVER_PORT:9300}
+      port: ${DC3_AUTH_GRPC_PORT:9300}
   # Active profile configuration, defaults to 'dev' if NODE_ENV is not set
   profiles:
     active:
@@ -38,6 +38,21 @@ spring:
 dc3:
   facade:
     mode: local
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
 
 # Logging configuration
 logging:

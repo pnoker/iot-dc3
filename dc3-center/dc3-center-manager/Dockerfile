@@ -23,12 +23,12 @@ LABEL dc3.author.email=pnokers.icloud.com
 # Default environment variables
 ENV PARAMS=''
 ENV NODE_ENV=test
-ENV SERVER_PORT=8400
+ENV DC3_MANAGER_PORT=8400
 ENV SERVER_NAME=dc3-center-manager
 ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
 ENV APM_SERVICE=http://dc3-apm:9300
-ENV GRPC_SERVER_PORT=9400
+ENV DC3_MANAGER_GRPC_PORT=9400
 
 # Default JVM and GC environment variables
 ENV JAVA_OPS="-Xms256m \
@@ -53,8 +53,8 @@ COPY target/dc3-center-manager.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 
 # Expose server and gRPC ports
-EXPOSE ${SERVER_PORT}
-EXPOSE ${GRPC_SERVER_PORT}
+EXPOSE ${DC3_MANAGER_PORT}
+EXPOSE ${DC3_MANAGER_GRPC_PORT}
 # Mount logs volume
 VOLUME /dc3-center/dc3-center-manager/dc3/logs
 
