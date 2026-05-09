@@ -19,6 +19,7 @@ package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -64,11 +65,8 @@ public class ExceptionConfig {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Mono<R<String>> globalException(Exception exception, ServerHttpRequest request) {
-        log.error("""
-                Global exception
-                Request: {}
-                Exception: {}
-                """, request.getURI().getRawPath(), exception.getMessage(), exception);
+        log.error("Global exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
+                exception);
         return Mono.just(R.fail(exception.getMessage()));
     }
 
@@ -105,6 +103,20 @@ public class ExceptionConfig {
     }
 
     /**
+     * Handle RequestException
+     *
+     * @param exception RequestException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response
+     */
+    @ExceptionHandler(RequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Mono<R<String>> requestException(RequestException exception, ServerHttpRequest request) {
+        log.warn("Request exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage());
+        return Mono.just(R.fail(exception.getMessage()));
+    }
+
+    /**
      * Handle NotFoundException
      *
      * @param exception NotFoundException to handle
@@ -114,7 +126,8 @@ public class ExceptionConfig {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Mono<R<String>> notFoundException(NotFoundException exception, ServerHttpRequest request) {
-        log.warn("NotFound exception handler: {}", exception.getMessage(), exception);
+        log.warn("Not found exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
+                exception);
         return Mono.just(R.fail(exception.getMessage()));
     }
 
@@ -128,7 +141,8 @@ public class ExceptionConfig {
     @ExceptionHandler(UnAuthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Mono<R<String>> unAuthorizedException(UnAuthorizedException exception, ServerHttpRequest request) {
-        log.warn("UnAuthorized exception handler: {}", exception.getMessage(), exception);
+        log.warn("Unauthorized exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
+                exception);
         return Mono.just(R.fail(exception.getMessage()));
     }
 
@@ -146,8 +160,8 @@ public class ExceptionConfig {
         HashMap<String, String> map = new HashMap<>(4);
         List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
         errorList.forEach(error -> {
-            log.warn("Method argument not valid exception handler: {}: {}", error.getField(),
-                    error.getDefaultMessage());
+            log.warn("Method argument validation failed, path={}, field={}, message={}", request.getURI().getRawPath(),
+                    error.getField(), error.getDefaultMessage());
             map.put(error.getField(), error.getDefaultMessage());
         });
         return Mono.just(R.fail(JsonUtil.toJsonString(map)));

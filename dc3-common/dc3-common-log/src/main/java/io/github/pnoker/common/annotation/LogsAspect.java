@@ -65,15 +65,16 @@ public class LogsAspect {
         String className = proceedingJoinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = proceedingJoinPoint.getSignature().getName();
         long startTime = System.currentTimeMillis();
-        log.info("Start => [{}].[{}.{}]: {}", uuid, className, methodName, logs.value());
+        log.info("Annotated operation started, operationId={}, class={}, method={}, action={}", uuid, className,
+                methodName, logs.value());
         try {
             Object proceed = proceedingJoinPoint.proceed();
-            log.info("End   <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName,
-                    System.currentTimeMillis() - startTime, logs.value());
+            log.info("Annotated operation completed, operationId={}, class={}, method={}, durationMs={}, action={}",
+                    uuid, className, methodName, System.currentTimeMillis() - startTime, logs.value());
             return proceed;
         } catch (Throwable throwable) {
-            log.info("End   <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName,
-                    System.currentTimeMillis() - startTime, logs.value());
+            log.warn("Annotated operation failed, operationId={}, class={}, method={}, durationMs={}, action={}",
+                    uuid, className, methodName, System.currentTimeMillis() - startTime, logs.value(), throwable);
             throw throwable;
         }
     }
