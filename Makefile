@@ -18,7 +18,7 @@
 # tip:
 # make -f ./Makefile help
 
-.PHONY: help clean package app app-all dev dev-all dev-db dev-optional build deploy tag \
+.PHONY: help clean package app app-all dev dev-all dev-db dev-optional build deploy tag changelog \
 	check-compose compose-file compose-up compose-down compose-ps compose-config compose-build \
 	compose-logs compose-pull compose-refresh compose-reset compose-restart
 
@@ -49,6 +49,10 @@ endif
 DC3_IMAGE_REGISTRY ?= $(DEFAULT_IMAGE_REGISTRY)
 COMPOSE_ENV := DC3_IMAGE_REGISTRY="$(DC3_IMAGE_REGISTRY)"
 STACK_SUFFIX := $(if $(filter app,$(STACK)),,-$(STACK))
+CHANGE_FILE ?= dc3/doc/CHANGE.md
+FROM ?=
+TO ?= HEAD
+VERSION ?=
 
 ifeq ($(origin COMPOSE_FILE), undefined)
 RESOLVED_COMPOSE_FILE := $(COMPOSE_DIR)/docker-compose$(STACK_SUFFIX).yml
@@ -60,9 +64,10 @@ endif
 
 help:
 	echo 'You can use make to execute the following commands:' \
-	&& echo 'Usage: make [help | clean | package | app | app-all | dev-db | dev-optional | dev | dev-all | build | deploy | tag]' \
+	&& echo 'Usage: make [help | clean | package | changelog | app | app-all | dev-db | dev-optional | dev | dev-all | build | deploy | tag]' \
 	&& echo ' - make clean: clean Maven build artifacts' \
 	&& echo ' - make package: package all modules with Maven' \
+	&& echo ' - make changelog [FROM=<ref>] [TO=HEAD] [VERSION=<version>]: update dc3/doc/CHANGE.md from git commits' \
 	&& echo ' - make tag: git tag' \
 	&& echo ' - make app: run the packaged application stack (docker-compose.yml)' \
 	&& echo ' - make app-all: run db + optional + packaged application stacks' \
@@ -101,6 +106,9 @@ package:
 
 tag:
 	dc3/bin/tag.sh
+
+changelog:
+	@FROM="$(FROM)" TO="$(TO)" VERSION="$(VERSION)" CHANGE_FILE="$(CHANGE_FILE)" dc3/bin/changelog.py
 
 check-compose:
 	@test -f "$(RESOLVED_COMPOSE_FILE)" || (echo "Compose file not found: $(RESOLVED_COMPOSE_FILE)" && exit 1)
