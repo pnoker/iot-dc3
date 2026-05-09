@@ -86,6 +86,10 @@ tag, and updates `dc3/doc/CHANGE.md`. You can override the range or version when
 make changelog FROM=dc3.release.20251005.00 TO=HEAD VERSION=2026.5.5
 ```
 
+Generated changelog-only release commits are skipped by default so rerunning the command after committing
+`CHANGE.md` remains stable. Set `INCLUDE_CHANGELOG_COMMITS=true` only when those commits should appear in
+release notes.
+
 ## Coding Guidelines
 
 - Follow the existing package structure, naming, validation, exception, logging, and facade patterns.
