@@ -23,8 +23,11 @@ import io.github.pnoker.common.data.cache.PointValueLocalCacheService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RepositoryException;
+import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
@@ -52,6 +55,9 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Resource
     private PointFacade pointFacade;
+
+    @Resource
+    private DeviceFacade deviceFacade;
 
     @Resource
     private PointValueLocalCacheService pointValueLocalCacheService;
@@ -96,6 +102,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (Objects.isNull(tenantId) || Objects.isNull(deviceId) || Objects.isNull(pointId)) {
             return Collections.emptyList();
         }
+        validateMetadataScope(tenantId, deviceId, pointId);
         if (count < 1) {
             count = 100;
         }
@@ -112,6 +119,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
+        validateMetadataScope(entityQuery.getTenantId(), entityQuery.getDeviceId(), entityQuery.getPointId());
 
         Page<PointValueBO> entityPageBO = new Page<>();
         entityPageBO.setCurrent(entityQuery.getPage().getCurrent()).setSize(entityQuery.getPage().getSize());
@@ -155,6 +163,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
+        validateMetadataScope(entityQuery.getTenantId(), entityQuery.getDeviceId(), entityQuery.getPointId());
         if (entityQuery.getCreateTimeFrom() == null) {
             java.time.LocalDateTime from = io.github.pnoker.common.utils.TimeRangeUtil
                     .resolveFrom(entityQuery.getRangeKey(), entityQuery.getRangeHours());
@@ -205,6 +214,37 @@ public class PointValueServiceImpl implements PointValueService {
         } catch (Exception e) {
             log.error("Save point values to error {}", e.getMessage());
         }
+    }
+
+    private void validateMetadataScope(Long tenantId, Long deviceId, Long pointId) {
+        if (Objects.isNull(tenantId)) {
+            return;
+        }
+
+        FacadeDeviceBO device = null;
+        if (isValidId(deviceId)) {
+            device = deviceFacade.selectById(tenantId, deviceId);
+            if (Objects.isNull(device)) {
+                throw new NotFoundException("Device does not exist");
+            }
+        }
+
+        FacadePointBO point = null;
+        if (isValidId(pointId)) {
+            point = pointFacade.selectById(tenantId, pointId);
+            if (Objects.isNull(point)) {
+                throw new NotFoundException("Point does not exist");
+            }
+        }
+
+        if (Objects.nonNull(device) && Objects.nonNull(point)
+                && (Objects.isNull(device.getProfileIds()) || !device.getProfileIds().contains(point.getProfileId()))) {
+            throw new NotFoundException("Point does not exist");
+        }
+    }
+
+    private boolean isValidId(Long id) {
+        return Objects.nonNull(id) && id > 0;
     }
 
     /**

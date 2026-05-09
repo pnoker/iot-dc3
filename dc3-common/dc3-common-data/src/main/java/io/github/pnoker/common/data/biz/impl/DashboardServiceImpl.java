@@ -298,11 +298,11 @@ public class DashboardServiceImpl implements DashboardService {
         // Manager in distributed deployments), so we cannot JOIN them in SQL.
         // Resolve names in bulk — local facade does it in one SQL, gRPC fans
         // out concurrently — to avoid the per-id round-trip storm.
-        Map<Long, String> deviceNames = deviceFacade.selectByIds(deviceIds).stream()
+        Map<Long, String> deviceNames = deviceFacade.selectByIds(tenantId, deviceIds).stream()
                 .collect(java.util.stream.Collectors.toMap(FacadeDeviceBO::getId, FacadeDeviceBO::getDeviceName, (a, b) -> a));
-        Map<Long, String> pointNames = pointFacade.selectByIds(pointIds).stream()
+        Map<Long, String> pointNames = pointFacade.selectByIds(tenantId, pointIds).stream()
                 .collect(java.util.stream.Collectors.toMap(FacadePointBO::getId, FacadePointBO::getPointName, (a, b) -> a));
-        Map<Long, String> driverNames = driverFacade.selectByIds(driverIds).stream()
+        Map<Long, String> driverNames = driverFacade.selectByIds(tenantId, driverIds).stream()
                 .collect(java.util.stream.Collectors.toMap(FacadeDriverBO::getId, FacadeDriverBO::getDriverName, (a, b) -> a));
 
         for (LatestPointValueVO vo : out) {

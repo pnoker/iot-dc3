@@ -72,12 +72,13 @@ public class DeviceStatusController implements BaseController {
      */
     @GetMapping("/device/driver_id/{driverId}")
     public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
+            deviceQuery.setTenantId(tenantId);
             Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
             return R.ok(statuses);
-        });
+        }));
     }
 
     /**
@@ -89,10 +90,13 @@ public class DeviceStatusController implements BaseController {
     @GetMapping("/device/profile_id/{profileId}")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
             @NotNull @PathVariable(value = "profileId") Long profileId) {
-        return async(() -> {
-            Map<Long, String> statuses = deviceStatusService.selectByProfileId(profileId);
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            DeviceQuery deviceQuery = new DeviceQuery();
+            deviceQuery.setProfileId(profileId);
+            deviceQuery.setTenantId(tenantId);
+            Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
             return R.ok(statuses);
-        });
+        }));
     }
 
 }

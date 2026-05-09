@@ -42,17 +42,19 @@ public interface DriverStatusService {
     /**
      * Count of currently online devices under the driver.
      *
+     * @param tenantId Tenant ID
      * @param driverId Driver ID
      * @return Number of online devices, as a string
      */
-    String getDeviceOnlineByDriverId(Long driverId);
+    String getDeviceOnlineByDriverId(Long tenantId, Long driverId);
 
     /**
      * Count of currently offline devices under the driver.
      *
+     * @param tenantId Tenant ID
      * @param driverId Driver ID
      * @return Number of offline devices, as a string
      */
-    String getDeviceOfflineByDriverId(Long driverId);
+    String getDeviceOfflineByDriverId(Long tenantId, Long driverId);
 
 }

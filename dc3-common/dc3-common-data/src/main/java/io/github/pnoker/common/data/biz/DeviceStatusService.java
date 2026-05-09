@@ -42,10 +42,11 @@ public interface DeviceStatusService {
     /**
      * Query device status by profile ID
      *
+     * @param tenantId  Tenant ID
      * @param profileId Profile ID
      * @return Map Long:String, where Long is the device ID and String is the device
      * status
      */
-    Map<Long, String> selectByProfileId(Long profileId);
+    Map<Long, String> selectByProfileId(Long tenantId, Long profileId);
 
 }

@@ -77,8 +77,8 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     }
 
     @Override
-    public String getDeviceOnlineByDriverId(Long driverId) {
-        List<String> list = getDeviceStatuses(driverId);
+    public String getDeviceOnlineByDriverId(Long tenantId, Long driverId) {
+        List<String> list = getDeviceStatuses(tenantId, driverId);
         if (list == null) {
             return String.valueOf(0L);
         }
@@ -87,8 +87,8 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     }
 
     @Override
-    public String getDeviceOfflineByDriverId(Long driverId) {
-        List<String> list = getDeviceStatuses(driverId);
+    public String getDeviceOfflineByDriverId(Long tenantId, Long driverId) {
+        List<String> list = getDeviceStatuses(tenantId, driverId);
         if (list == null) {
             return String.valueOf(0L);
         }
@@ -100,8 +100,13 @@ public class DriverStatusServiceImpl implements DriverStatusService {
      * Load the status of every device attached to the given driver. Returns {@code null}
      * when the driver has no devices (preserves legacy "0" signal).
      */
-    private List<String> getDeviceStatuses(Long driverId) {
-        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(driverId);
+    private List<String> getDeviceStatuses(Long tenantId, Long driverId) {
+        FacadeDriverBO driver = driverFacade.selectById(tenantId, driverId);
+        if (Objects.isNull(driver)) {
+            return null;
+        }
+
+        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
         if (devices.isEmpty()) {
             return null;
         }

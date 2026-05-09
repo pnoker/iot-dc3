@@ -65,7 +65,7 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
     public void read(Long tenantId, PointValueReadVO entityVO) {
         validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getPointId());
 
-        FacadeDriverBO driver = driverFacade.selectByDeviceId(entityVO.getDeviceId());
+        FacadeDriverBO driver = driverFacade.selectByDeviceId(tenantId, entityVO.getDeviceId());
         if (Objects.isNull(driver)) {
             return;
         }
@@ -82,7 +82,7 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
     public void write(Long tenantId, PointValueWriteVO entityVO) {
         validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getPointId());
 
-        FacadeDriverBO driver = driverFacade.selectByDeviceId(entityVO.getDeviceId());
+        FacadeDriverBO driver = driverFacade.selectByDeviceId(tenantId, entityVO.getDeviceId());
         if (Objects.isNull(driver)) {
             return;
         }
@@ -96,20 +96,14 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
     }
 
     private void validateCommandScope(Long tenantId, Long deviceId, Long pointId) {
-        FacadeDeviceBO device = deviceFacade.selectById(deviceId);
+        FacadeDeviceBO device = deviceFacade.selectById(tenantId, deviceId);
         if (Objects.isNull(device)) {
             throw new NotFoundException("Device does not exist");
         }
-        if (Objects.nonNull(tenantId) && !tenantId.equals(device.getTenantId())) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
 
-        FacadePointBO point = pointFacade.selectById(pointId);
+        FacadePointBO point = pointFacade.selectById(tenantId, pointId);
         if (Objects.isNull(point)) {
             throw new NotFoundException("Point does not exist");
-        }
-        if (Objects.nonNull(tenantId) && !tenantId.equals(point.getTenantId())) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
         if (Objects.isNull(device.getProfileIds()) || !device.getProfileIds().contains(point.getProfileId())) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
