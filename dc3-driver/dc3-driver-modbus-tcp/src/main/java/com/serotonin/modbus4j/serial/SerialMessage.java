@@ -28,7 +28,7 @@ import com.serotonin.modbus4j.msg.ModbusMessage;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-public class SerialMessage {
+public abstract class SerialMessage {
 
     protected final ModbusMessage modbusMessage;
 

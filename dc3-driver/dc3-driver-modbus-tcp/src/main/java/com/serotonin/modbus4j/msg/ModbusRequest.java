@@ -34,7 +34,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-public class ModbusRequest extends ModbusMessage {
+public abstract class ModbusRequest extends ModbusMessage {
 
     ModbusRequest(int slaveId) throws ModbusTransportException {
         super(slaveId);

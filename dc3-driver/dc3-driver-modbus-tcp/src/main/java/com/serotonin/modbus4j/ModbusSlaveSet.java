@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-public class ModbusSlaveSet extends Modbus {
+public abstract class ModbusSlaveSet extends Modbus {
 
     private LinkedHashMap<Integer, ProcessImage> processImages = new LinkedHashMap<>();
 
