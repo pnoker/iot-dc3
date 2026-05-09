@@ -2,9 +2,9 @@ name: CodeQL Advanced
 
 on:
   push:
-    branches: [ release, main ]
+    branches: [ develop, release, main ]
   pull_request:
-    branches: [ release, main ]
+    branches: [ develop, release, main ]
   schedule:
     - cron: '36 18 * * 3'
 
@@ -21,7 +21,7 @@ concurrency:
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 90
     strategy:
       fail-fast: false

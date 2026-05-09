@@ -15,6 +15,7 @@ concurrency:
 
 env:
   PROFILE: pro
+  MAVEN_SETTINGS: .mvn/settings.xml
   DOCKER_REGISTRY_DEFAULT: pnoker
   DOCKER_REGISTRY_ALIYUN: registry.cn-beijing.aliyuncs.com/dc3
 
@@ -38,19 +39,24 @@ jobs:
         id: variables
         run: |
           set -euo pipefail
-          VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
+          VERSION=$(mvn -s "$MAVEN_SETTINGS" -q help:evaluate -Dexpression=project.version -DforceStdout)
+          SERIES="$VERSION"
+          if [[ "$VERSION" == *.*.* ]]; then
+            SERIES="${VERSION%.*}"
+          fi
           echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "service_series=$SERIES" >> "$GITHUB_OUTPUT"
 
       - name: Build with Maven
         run: |
           set -euo pipefail
-          mvn -U -e -B clean package -DskipTests -P "$PROFILE" --no-transfer-progress
-
-      - name: Set Docker Buildx
-        uses: docker/setup-buildx-action@v3
+          mvn -s "$MAVEN_SETTINGS" -U -e -B clean package -DskipTests -P "$PROFILE" --no-transfer-progress
 
       - name: Set QEMU
         uses: docker/setup-qemu-action@v3
+
+      - name: Set Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login Docker Default Registry
         uses: docker/login-action@v3
@@ -68,6 +74,7 @@ jobs:
       - name: Build and push all images
         env:
           SERVICE_VERSION: ${{ steps.variables.outputs.service_version }}
+          SERVICE_SERIES: ${{ steps.variables.outputs.service_series }}
         run: |
           set -euo pipefail
 
@@ -97,8 +104,10 @@ jobs:
               --file "$path/Dockerfile" \
               --push \
               --tag "$DOCKER_REGISTRY_DEFAULT/$name:latest" \
+              --tag "$DOCKER_REGISTRY_DEFAULT/$name:$SERVICE_SERIES" \
               --tag "$DOCKER_REGISTRY_DEFAULT/$name:$SERVICE_VERSION" \
               --tag "$DOCKER_REGISTRY_ALIYUN/$name:latest" \
+              --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_SERIES" \
               --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_VERSION" \
               "$path"
           done
@@ -106,6 +115,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: build-push
+    if: startsWith(github.ref, 'refs/tags/dc3.release.')
     timeout-minutes: 20
     permissions:
       contents: write
@@ -127,7 +137,7 @@ jobs:
         id: variables
         run: |
           set -euo pipefail
-          VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
+          VERSION=$(mvn -s "$MAVEN_SETTINGS" -q help:evaluate -Dexpression=project.version -DforceStdout)
           echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Generate release notes
@@ -138,14 +148,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "release_notes<<EOF" >> "$GITHUB_OUTPUT"
-          echo "" >> "$GITHUB_OUTPUT"
-          envsubst < "$SERVICE_WORKSPACE/dc3/doc/TITLE.md" >> "$GITHUB_OUTPUT"
-          echo "" >> "$GITHUB_OUTPUT"
-          envsubst < "$SERVICE_WORKSPACE/dc3/doc/CHANGE.md" >> "$GITHUB_OUTPUT"
-          echo "" >> "$GITHUB_OUTPUT"
-          envsubst < "$SERVICE_WORKSPACE/dc3/doc/USAGE.md" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          {
+            echo "release_notes<<RELEASE_NOTES_EOF"
+            echo ""
+            perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/TITLE.md"
+            echo ""
+            perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/CHANGE.md"
+            echo ""
+            perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/USAGE.md"
+            echo "RELEASE_NOTES_EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
