@@ -17,7 +17,15 @@
 
 package io.github.pnoker.common.facade.grpc;
 
-import io.github.pnoker.api.center.manager.*;
+import io.github.pnoker.api.center.manager.DeviceApiGrpc;
+import io.github.pnoker.api.center.manager.GrpcDeviceQuery;
+import io.github.pnoker.api.center.manager.GrpcDriverQuery;
+import io.github.pnoker.api.center.manager.GrpcPageDeviceDTO;
+import io.github.pnoker.api.center.manager.GrpcPageDeviceQuery;
+import io.github.pnoker.api.center.manager.GrpcProfileQuery;
+import io.github.pnoker.api.center.manager.GrpcRDeviceDTO;
+import io.github.pnoker.api.center.manager.GrpcRDeviceListDTO;
+import io.github.pnoker.api.center.manager.GrpcRPageDeviceDTO;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.ServiceException;

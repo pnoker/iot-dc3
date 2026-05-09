@@ -17,7 +17,12 @@
 
 package io.github.pnoker.common.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Custom annotation for logging method execution in DC3 IoT Platform. This annotation can

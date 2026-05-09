@@ -18,7 +18,11 @@ package io.github.pnoker.common.agentic.skill;
 
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Central registry that holds all {@link SkillDefinition} instances loaded at startup.

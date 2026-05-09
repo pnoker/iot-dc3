@@ -18,7 +18,11 @@ package io.github.pnoker.driver.api.annotation;
 
 import io.github.pnoker.driver.api.S7Type;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Annotation for mapping a Java field to an S7 PLC data block variable. Specifies the S7

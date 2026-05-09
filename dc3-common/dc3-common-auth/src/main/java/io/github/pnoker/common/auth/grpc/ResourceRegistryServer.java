@@ -17,7 +17,11 @@
 
 package io.github.pnoker.common.auth.grpc;
 
-import io.github.pnoker.api.center.auth.*;
+import io.github.pnoker.api.center.auth.GrpcRSyncResult;
+import io.github.pnoker.api.center.auth.GrpcScannedApiDTO;
+import io.github.pnoker.api.center.auth.GrpcSyncRequest;
+import io.github.pnoker.api.center.auth.GrpcSyncResultDTO;
+import io.github.pnoker.api.center.auth.ResourceRegistryApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.auth.biz.ResourceRegistrySyncService;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistryScannedApi;

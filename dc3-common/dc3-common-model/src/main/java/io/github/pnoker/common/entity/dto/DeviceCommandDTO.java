@@ -19,7 +19,12 @@ package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.DeviceCommandTypeEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;

@@ -38,6 +38,10 @@ import java.util.Objects;
  */
 public interface DriverFacade {
 
+    private static boolean matchesTenant(Long tenantId, FacadeDriverBO driver) {
+        return Objects.nonNull(driver) && Objects.equals(tenantId, driver.getTenantId());
+    }
+
     /**
      * @return the driver, or {@code null} when it does not exist.
      */
@@ -97,10 +101,6 @@ public interface DriverFacade {
         }
         FacadeDriverBO driver = selectByDeviceId(deviceId);
         return matchesTenant(tenantId, driver) ? driver : null;
-    }
-
-    private static boolean matchesTenant(Long tenantId, FacadeDriverBO driver) {
-        return Objects.nonNull(driver) && Objects.equals(tenantId, driver.getTenantId());
     }
 
 }

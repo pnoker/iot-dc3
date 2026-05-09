@@ -18,7 +18,13 @@
 package org.openscada.opc.dcom.list.impl;
 
 import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.core.*;
+import org.jinterop.dcom.core.IJIComObject;
+import org.jinterop.dcom.core.JIArray;
+import org.jinterop.dcom.core.JICallBuilder;
+import org.jinterop.dcom.core.JIClsid;
+import org.jinterop.dcom.core.JIFlags;
+import org.jinterop.dcom.core.JIPointer;
+import org.jinterop.dcom.core.JIString;
 import org.openscada.opc.dcom.common.impl.BaseCOMObject;
 import org.openscada.opc.dcom.common.impl.EnumGUID;
 import org.openscada.opc.dcom.common.impl.Helper;

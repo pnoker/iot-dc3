@@ -21,7 +21,11 @@ import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Check;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
