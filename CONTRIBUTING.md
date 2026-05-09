@@ -71,6 +71,21 @@ docker compose -f dc3/docker-compose-db.yml config
 For documentation-only changes, at least check links, commands, and formatting manually. For container changes, run
 `docker compose config` for every touched compose file.
 
+## Release Notes
+
+Before tagging a release, generate the categorized changelog from git:
+
+```bash
+make changelog
+```
+
+By default this reads the current version from `pom.xml`, compares `HEAD` with the latest reachable `dc3.release.*`
+tag, and updates `dc3/doc/CHANGE.md`. You can override the range or version when needed:
+
+```bash
+make changelog FROM=dc3.release.20251005.00 TO=HEAD VERSION=2026.5.5
+```
+
 ## Coding Guidelines
 
 - Follow the existing package structure, naming, validation, exception, logging, and facade patterns.
