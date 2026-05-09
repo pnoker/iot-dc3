@@ -27,6 +27,9 @@ package io.github.pnoker.common.exception;
  */
 final class ExceptionMessageFormatter {
 
+    private ExceptionMessageFormatter() {
+    }
+
     static String format(String template, Object... params) {
         if (template == null || params == null || params.length == 0) {
             return template;
@@ -46,9 +49,6 @@ final class ExceptionMessageFormatter {
         }
         builder.append(template, searchIndex, template.length());
         return builder.toString();
-    }
-
-    private ExceptionMessageFormatter() {
     }
 
 }

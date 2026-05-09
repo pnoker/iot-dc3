@@ -23,7 +23,11 @@ import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Label binding view object (VO) representing the association between labels and

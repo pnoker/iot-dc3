@@ -31,7 +31,12 @@ import com.serotonin.modbus4j.ip.xa.XaMessageRequest;
 import com.serotonin.modbus4j.ip.xa.XaWaitingRoomKeyFactory;
 import com.serotonin.modbus4j.msg.ModbusRequest;
 import com.serotonin.modbus4j.msg.ModbusResponse;
-import com.serotonin.modbus4j.sero.messaging.*;
+import com.serotonin.modbus4j.sero.messaging.EpollStreamTransport;
+import com.serotonin.modbus4j.sero.messaging.MessageControl;
+import com.serotonin.modbus4j.sero.messaging.OutgoingRequestMessage;
+import com.serotonin.modbus4j.sero.messaging.StreamTransport;
+import com.serotonin.modbus4j.sero.messaging.Transport;
+import com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -16,7 +16,11 @@
  */
 package io.github.pnoker.driver.api.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Annotation for marking fields as arrays in S7 PLC data structures. This annotation is

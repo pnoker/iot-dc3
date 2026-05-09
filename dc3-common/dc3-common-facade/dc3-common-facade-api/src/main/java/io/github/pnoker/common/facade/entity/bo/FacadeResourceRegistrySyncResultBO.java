@@ -17,7 +17,12 @@
 
 package io.github.pnoker.common.facade.entity.bo;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Facade-level counters summarizing a resource-registry sync run.

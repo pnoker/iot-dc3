@@ -33,6 +33,10 @@ import java.io.IOException;
 @Slf4j
 public class RabbitAckUtil {
 
+    private RabbitAckUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
+
     public static void ack(Channel channel, long deliveryTag) throws IOException {
         channel.basicAck(deliveryTag, false);
     }
@@ -51,10 +55,6 @@ public class RabbitAckUtil {
         } catch (IOException e) {
             log.error("RabbitMQ nack failed, deliveryTag: {}, requeue: {}", deliveryTag, requeue, e);
         }
-    }
-
-    private RabbitAckUtil() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
 }

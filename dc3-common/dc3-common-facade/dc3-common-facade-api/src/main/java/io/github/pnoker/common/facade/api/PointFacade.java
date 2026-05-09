@@ -36,6 +36,10 @@ import java.util.Objects;
  */
 public interface PointFacade {
 
+    private static boolean matchesTenant(Long tenantId, FacadePointBO point) {
+        return Objects.nonNull(point) && Objects.equals(tenantId, point.getTenantId());
+    }
+
     /**
      * @return the point, or {@code null} when it does not exist.
      */
@@ -76,9 +80,5 @@ public interface PointFacade {
      * @return a page of points (never {@code null}; empty page when nothing matches).
      */
     FacadePage<FacadePointBO> selectByPage(FacadePointQuery query);
-
-    private static boolean matchesTenant(Long tenantId, FacadePointBO point) {
-        return Objects.nonNull(point) && Objects.equals(tenantId, point.getTenantId());
-    }
 
 }

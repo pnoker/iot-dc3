@@ -19,7 +19,12 @@ package io.github.pnoker.common.driver.entity.bean;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;

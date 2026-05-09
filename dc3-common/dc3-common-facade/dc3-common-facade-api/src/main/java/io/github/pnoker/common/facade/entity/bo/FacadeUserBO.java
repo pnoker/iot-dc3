@@ -18,7 +18,11 @@
 package io.github.pnoker.common.facade.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Facade-level user BO. Field set matches {@code api.center.auth.UserApi} wire shape —

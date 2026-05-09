@@ -92,6 +92,7 @@ public class MqttScheduleJob extends QuartzJobBean {
 
     /**
      * Execute scheduled job for batch MQTT message processing
+     *
      * @param context Job execution context
      * @throws JobExecutionException if job execution fails
      */

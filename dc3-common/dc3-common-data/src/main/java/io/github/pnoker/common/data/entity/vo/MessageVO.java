@@ -22,7 +22,11 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.MessageExt;
 import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * <p>
