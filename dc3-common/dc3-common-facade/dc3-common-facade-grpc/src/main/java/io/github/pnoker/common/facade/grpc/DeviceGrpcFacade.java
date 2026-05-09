@@ -56,10 +56,14 @@ public class DeviceGrpcFacade implements DeviceFacade {
     @Resource
     private FacadeGrpcDeviceBuilder facadeGrpcDeviceBuilder;
 
+    @Resource
+    private GrpcFacadeSupport grpcFacadeSupport;
+
     @Override
     public FacadeDeviceBO selectById(Long id) {
         GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(id).build();
-        GrpcRDeviceDTO response = deviceApiBlockingStub.selectByDeviceId(request);
+        GrpcRDeviceDTO response = grpcFacadeSupport.call("DeviceFacade.selectById", deviceApiBlockingStub,
+                stub -> stub.selectByDeviceId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectById");
             return null;
@@ -67,23 +71,31 @@ public class DeviceGrpcFacade implements DeviceFacade {
         return facadeGrpcDeviceBuilder.toFacadeBO(response.getData());
     }
 
-    /**
-     * Manager doesn't (yet) expose a batch RPC, so we fan out to {@link #selectById}
-     * concurrently. This collapses N round-trip latencies into roughly one. When
-     * call-volume justifies it, replace with a server-side batch RPC.
-     */
     @Override
     public List<FacadeDeviceBO> selectByIds(Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return ids.parallelStream().distinct().map(this::selectById).filter(Objects::nonNull).toList();
+        List<Long> deviceIds = ids.stream().filter(Objects::nonNull).distinct().toList();
+        if (deviceIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        GrpcDeviceIdsQuery request = GrpcDeviceIdsQuery.newBuilder().addAllDeviceIds(deviceIds).build();
+        GrpcRDeviceListDTO response = grpcFacadeSupport.call("DeviceFacade.selectByIds", deviceApiBlockingStub,
+                stub -> stub.selectByDeviceIds(request));
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByIds");
+            return Collections.emptyList();
+        }
+        return response.getDataList().stream().map(facadeGrpcDeviceBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query) {
         GrpcPageDeviceQuery request = facadeGrpcDeviceBuilder.toGrpcPageQuery(query);
-        GrpcRPageDeviceDTO response = deviceApiBlockingStub.selectByPage(request);
+        GrpcRPageDeviceDTO response = grpcFacadeSupport.call("DeviceFacade.selectByPage", deviceApiBlockingStub,
+                stub -> stub.selectByPage(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByPage");
             return FacadePage.empty();
@@ -99,7 +111,8 @@ public class DeviceGrpcFacade implements DeviceFacade {
     @Override
     public List<FacadeDeviceBO> selectByProfileId(Long profileId) {
         GrpcProfileQuery request = GrpcProfileQuery.newBuilder().setProfileId(profileId).build();
-        GrpcRDeviceListDTO response = deviceApiBlockingStub.selectByProfileId(request);
+        GrpcRDeviceListDTO response = grpcFacadeSupport.call("DeviceFacade.selectByProfileId", deviceApiBlockingStub,
+                stub -> stub.selectByProfileId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByProfileId");
             return Collections.emptyList();
@@ -110,7 +123,8 @@ public class DeviceGrpcFacade implements DeviceFacade {
     @Override
     public List<FacadeDeviceBO> selectByDriverId(Long driverId) {
         GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(driverId).build();
-        GrpcRDeviceListDTO response = deviceApiBlockingStub.selectByDriverId(request);
+        GrpcRDeviceListDTO response = grpcFacadeSupport.call("DeviceFacade.selectByDriverId", deviceApiBlockingStub,
+                stub -> stub.selectByDriverId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByDriverId");
             return Collections.emptyList();

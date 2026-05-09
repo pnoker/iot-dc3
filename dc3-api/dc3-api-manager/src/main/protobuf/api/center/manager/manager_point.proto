@@ -37,6 +37,8 @@ service PointApi {
   rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
   // Query single point information by point ID
   rpc SelectById (GrpcPointQuery) returns (GrpcRPointDTO);
+  // Batch query point information by point IDs
+  rpc SelectByIds (GrpcPointIdsQuery) returns (GrpcRPointListDTO);
 }
 
 // Response wrapper for paginated point query
@@ -57,6 +59,15 @@ message GrpcPagePointDTO {
   repeated GrpcPointDTO data = 2;
 }
 
+// Response wrapper for point list query
+message GrpcRPointListDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Returned point list data
+  repeated GrpcPointDTO data = 2;
+}
+
 // Response wrapper for single point query
 message GrpcRPointDTO {
   // Common result wrapper containing status code, message, etc.
@@ -65,4 +76,3 @@ message GrpcRPointDTO {
   // Returned single point data
   GrpcPointDTO data = 2;
 }
-

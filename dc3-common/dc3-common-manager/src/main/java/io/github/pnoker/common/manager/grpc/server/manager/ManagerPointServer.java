@@ -32,6 +32,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -84,6 +85,33 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
             pagePointBuilder.addAllData(entityGrpcDTOList);
 
             builder.setData(pagePointBuilder);
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void selectByIds(GrpcPointIdsQuery request, StreamObserver<GrpcRPointListDTO> responseObserver) {
+        GrpcRPointListDTO.Builder builder = GrpcRPointListDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+
+        List<PointBO> entityBOList = pointService.selectByIds(new HashSet<>(request.getPointIdsList()));
+        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+
+            List<GrpcPointDTO> entityGrpcDTOList = entityBOList.stream()
+                    .map(grpcPointBuilder::buildGrpcDTOByBO)
+                    .toList();
+
+            builder.addAllData(entityGrpcDTOList);
         }
 
         builder.setResult(rBuilder);

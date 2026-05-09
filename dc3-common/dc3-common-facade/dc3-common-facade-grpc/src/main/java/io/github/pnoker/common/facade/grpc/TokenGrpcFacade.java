@@ -39,6 +39,9 @@ public class TokenGrpcFacade implements TokenFacade {
     @Resource
     private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
 
+    @Resource
+    private GrpcFacadeSupport grpcFacadeSupport;
+
     @Override
     public boolean checkValid(String tenant, String name, String salt, String token) {
         GrpcLoginQuery login = GrpcLoginQuery.newBuilder()
@@ -47,7 +50,8 @@ public class TokenGrpcFacade implements TokenFacade {
                 .setSalt(salt)
                 .setToken(token)
                 .build();
-        GrpcRTokenDTO response = tokenApiBlockingStub.checkValid(login);
+        GrpcRTokenDTO response = grpcFacadeSupport.call("TokenFacade.checkValid", tokenApiBlockingStub,
+                stub -> stub.checkValid(login));
         return response.getResult().getOk();
     }
 
