@@ -1,0 +1,4 @@
+#!/bin/sh
+
+dc3/bin/commit_msg_lint.py "$1"
+
