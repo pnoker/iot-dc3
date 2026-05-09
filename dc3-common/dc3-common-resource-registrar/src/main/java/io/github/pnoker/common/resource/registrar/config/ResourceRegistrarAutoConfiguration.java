@@ -20,13 +20,13 @@ package io.github.pnoker.common.resource.registrar.config;
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.resource.registrar.ResourceRegistrar;
 import io.github.pnoker.common.resource.registrar.scan.ApiEndpointScanner;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 /**
@@ -53,8 +53,8 @@ public class ResourceRegistrarAutoConfiguration {
     @Bean
     @ConditionalOnBean(ResourceRegistryFacade.class)
     public ResourceRegistrar resourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
-                                               ResourceRegistrarProperties properties, @Value("${spring.application.name:}") String applicationName) {
-        return new ResourceRegistrar(scanner, facade, properties, applicationName);
+                                               ResourceRegistrarProperties properties, Environment environment) {
+        return new ResourceRegistrar(scanner, facade, properties, environment);
     }
 
 }

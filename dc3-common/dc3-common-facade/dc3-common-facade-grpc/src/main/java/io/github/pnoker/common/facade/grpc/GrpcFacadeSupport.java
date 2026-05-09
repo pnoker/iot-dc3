@@ -18,10 +18,10 @@
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.facade.grpc.config.GrpcFacadeProperties;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.AbstractStub;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -38,8 +38,11 @@ import java.util.function.Function;
 @Component
 public class GrpcFacadeSupport {
 
-    @Value("${dc3.facade.grpc.deadline-ms:3000}")
-    private long deadlineMs;
+    private final GrpcFacadeProperties properties;
+
+    public GrpcFacadeSupport(GrpcFacadeProperties properties) {
+        this.properties = properties;
+    }
 
     public <S extends AbstractStub<S>, T> T call(String operation, S stub, Function<S, T> invocation) {
         try {
@@ -52,6 +55,7 @@ public class GrpcFacadeSupport {
     }
 
     private <S extends AbstractStub<S>> S withDeadline(S stub) {
+        long deadlineMs = properties.getDeadlineMs();
         if (deadlineMs <= 0) {
             return stub;
         }
