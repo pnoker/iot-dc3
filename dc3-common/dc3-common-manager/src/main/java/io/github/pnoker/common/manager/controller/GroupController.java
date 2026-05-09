@@ -64,17 +64,12 @@ public class GroupController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                groupService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(tenantId);
+            groupService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        }));
     }
 
     /**
@@ -83,13 +78,10 @@ public class GroupController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             groupService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     /**
@@ -98,17 +90,12 @@ public class GroupController implements BaseController {
      */
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
-                groupService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(tenantId);
+            groupService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        }));
     }
 
     /**
@@ -117,14 +104,11 @@ public class GroupController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<GroupVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             GroupBO entityBO = groupService.selectById(id);
             GroupVO entityVO = groupBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     /**
@@ -133,18 +117,13 @@ public class GroupController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<GroupVO>>> list(@RequestBody(required = false) GroupQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                GroupQuery query = Objects.isNull(entityQuery) ? new GroupQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<GroupBO> entityPageBO = groupService.selectByPage(query);
-                Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            GroupQuery query = Objects.isNull(entityQuery) ? new GroupQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<GroupBO> entityPageBO = groupService.selectByPage(query);
+            Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
 }

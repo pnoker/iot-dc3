@@ -64,96 +64,70 @@ public class RoleController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(header.getTenantId());
-                entityBO.setCreatorId(header.getUserId());
-                entityBO.setCreatorName(header.getNickName());
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                roleService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getUserHeader().flatMap(header -> async(() -> {
+            RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(header.getTenantId());
+            entityBO.setCreatorId(header.getUserId());
+            entityBO.setCreatorName(header.getNickName());
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            roleService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        }));
     }
 
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             roleService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(header.getTenantId());
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                roleService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getUserHeader().flatMap(header -> async(() -> {
+            RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(header.getTenantId());
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            roleService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        }));
     }
 
     @GetMapping("/id/{id}")
     public Mono<R<RoleVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             RoleBO entityBO = roleService.selectById(id);
             RoleVO entityVO = roleBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     @PostMapping("/list")
     public Mono<R<Page<RoleVO>>> list(@RequestBody(required = false) RoleQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                Page<RoleBO> entityPageBO = roleService.selectByPage(query);
-                Page<RoleVO> entityPageVO = roleBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            Page<RoleBO> entityPageBO = roleService.selectByPage(query);
+            Page<RoleVO> entityPageVO = roleBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
     @PostMapping("/tree")
     public Mono<R<List<RoleTreeVO>>> tree(@RequestBody(required = false) RoleQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
-                query.setTenantId(tenantId);
-                List<RoleTreeBO> entityBOList = roleService.selectTree(query);
-                List<RoleTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
-                for (RoleTreeBO node : entityBOList) {
-                    entityVOList.add(toTreeVO(node));
-                }
-                return Mono.just(R.ok(entityVOList));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            List<RoleTreeBO> entityBOList = roleService.selectTree(query);
+            List<RoleTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
+            for (RoleTreeBO node : entityBOList) {
+                entityVOList.add(toTreeVO(node));
             }
-        });
+            return R.ok(entityVOList);
+        }));
     }
 
     private RoleTreeVO toTreeVO(RoleTreeBO node) {

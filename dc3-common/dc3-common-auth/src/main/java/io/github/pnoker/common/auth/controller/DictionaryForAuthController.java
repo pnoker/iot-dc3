@@ -61,14 +61,11 @@ public class DictionaryForAuthController implements BaseController {
      */
     @GetMapping("/tenant")
     public Mono<R<List<DictionaryVO>>> tenantDictionary() {
-        try {
+        return async(() -> {
             List<DictionaryBO> entityBOList = dictionaryForAuthService.tenantDictionary();
             List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVOList);
+        });
     }
 
 }
