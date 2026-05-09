@@ -16,3 +16,4 @@
 #
 
 io.github.pnoker.common.config.OkHttpConfig
+io.github.pnoker.common.config.HmacAuthConfig
