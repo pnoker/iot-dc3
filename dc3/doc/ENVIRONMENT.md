@@ -85,6 +85,115 @@ Do not point IDEA at `.env.example`; it is a template and is not loaded at
 runtime. Do not use root `.env` as the default IDEA file unless you explicitly
 want Compose-only variables to appear in the local Java process environment.
 
+## Variable Reference
+
+### Shared Compose Defaults
+
+| Variable | Scope | Meaning |
+|----------|-------|---------|
+| `DC3_IMAGE_REGISTRY` | Compose | Image registry namespace used by all DC3 images. Use `registry.cn-beijing.aliyuncs.com/dc3` for Aliyun. |
+| `DC3_IMAGE_TAG` | Compose | Image tag shared by application, database, EMQX, and observability images. |
+| `DC3_LOG_MAX_SIZE` | Compose | Maximum size of a single container log file before rotation. |
+| `DC3_LOG_MAX_FILE` | Compose | Number of rotated container log files to keep. |
+| `DC3_BIND_HOST` | Compose | Host address for published ports. Keep `127.0.0.1` for local-only access; use `0.0.0.0` for LAN access. |
+| `APM_AGENT_ENABLE` | Compose/runtime | Enables or disables the Java APM agent in application containers. |
+
+### Database and RabbitMQ
+
+| Variable | Scope | Meaning |
+|----------|-------|---------|
+| `POSTGRES_HOST` | Runtime | PostgreSQL host used by local Java processes and containers that pass it through. |
+| `POSTGRES_PORT` | Runtime | PostgreSQL port seen by the Java process. For local source runs this is usually the published host port `35432`. |
+| `POSTGRES_USERNAME` | Runtime/Compose | PostgreSQL username used by applications and compose health checks. |
+| `POSTGRES_PASSWORD` | Runtime | PostgreSQL password used by applications. |
+| `POSTGRES_DB` | Runtime/Compose | PostgreSQL database name used by applications and compose health checks. |
+| `POSTGRES_SCHEMA` | Per-process | Optional schema override for one service process, for example `dc3_manager` or `dc3_data`. |
+| `DC3_POSTGRES_PORT` | Compose | Published host port for the PostgreSQL container. |
+| `RABBITMQ_VIRTUAL_HOST` | Runtime | RabbitMQ virtual host used by Spring AMQP. |
+| `RABBITMQ_HOST` | Runtime | RabbitMQ host used by local Java processes and containers that pass it through. |
+| `RABBITMQ_PORT` | Runtime | RabbitMQ AMQP port seen by the Java process. For local source runs this is usually `35672`. |
+| `RABBITMQ_USERNAME` | Runtime | RabbitMQ username used by applications. |
+| `RABBITMQ_PASSWORD` | Runtime | RabbitMQ password used by applications. |
+| `DC3_RABBITMQ_TLS_PORT` | Compose | Published host port for RabbitMQ TLS. |
+| `DC3_RABBITMQ_PORT` | Compose | Published host port for RabbitMQ AMQP. |
+| `DC3_RABBITMQ_MANAGEMENT_PORT` | Compose | Published host port for the RabbitMQ management UI. |
+
+### Application Ports and Runtime Mode
+
+| Variable | Scope | Meaning |
+|----------|-------|---------|
+| `DC3_GATEWAY_PORT` | Compose | Published host HTTP port for `dc3-gateway`. |
+| `DC3_AUTH_PORT` | Compose | Published host HTTP port for `dc3-center-auth`. |
+| `DC3_AUTH_GRPC_PORT` | Compose | Published host gRPC port for `dc3-center-auth`. |
+| `DC3_MANAGER_PORT` | Compose | Published host HTTP port for `dc3-center-manager`. |
+| `DC3_MANAGER_GRPC_PORT` | Compose | Published host gRPC port for `dc3-center-manager`. |
+| `DC3_DATA_PORT` | Compose | Published host HTTP port for `dc3-center-data`. |
+| `DC3_DATA_GRPC_PORT` | Compose | Published host gRPC port for `dc3-center-data`. |
+| `DC3_AGENTIC_PORT` | Compose | Published host HTTP port for `dc3-center-agentic`. |
+| `DC3_LISTENING_VIRTUAL_TCP_PORT` | Compose | Published host TCP port for the listening virtual driver. |
+| `DC3_LISTENING_VIRTUAL_UDP_PORT` | Compose | Published host UDP port for the listening virtual driver. |
+| `SERVER_PORT` | Per-process | Spring Boot HTTP port override for one local service process. |
+| `GRPC_SERVER_PORT` | Per-process | Spring gRPC server port override for one local center service process. |
+| `TCP_PORT` | Per-process | Internal TCP listening port for one listening virtual driver process. |
+| `UDP_PORT` | Per-process | Internal UDP listening port for one listening virtual driver process. |
+| `NODE_ENV` | Runtime | Active runtime profile group, usually `dev` for local source runs and `test` in compose app stacks. |
+| `DC3_FACADE_MODE` | Runtime | Cross-service facade transport mode. `grpc` uses remote gRPC calls; local facade modules can override this for single-process modes. |
+
+### Center Service Discovery and Gateway Routes
+
+| Variable | Scope | Meaning |
+|----------|-------|---------|
+| `CENTER_AUTH_HOST` | Runtime | Hostname used by local processes to reach Auth Center gRPC/HTTP endpoints. |
+| `CENTER_MANAGER_HOST` | Runtime | Hostname used by local processes to reach Manager Center gRPC/HTTP endpoints. |
+| `CENTER_DATA_HOST` | Runtime | Hostname used by local processes to reach Data Center gRPC/HTTP endpoints. |
+| `CENTER_AGENTIC_HOST` | Runtime | Hostname used by local processes to reach Agentic Center HTTP endpoints. |
+| `GATEWAY_ROUTE_AUTH_TOKEN_URI` | Per-process | Optional gateway route override for Auth token endpoints. |
+| `GATEWAY_ROUTE_AUTH_URI` | Per-process | Optional gateway route override for Auth service endpoints. |
+| `GATEWAY_ROUTE_MANAGER_URI` | Per-process | Optional gateway route override for Manager service endpoints. |
+| `GATEWAY_ROUTE_DATA_URI` | Per-process | Optional gateway route override for Data service endpoints. |
+| `GATEWAY_ROUTE_AGENTIC_URI` | Per-process | Optional gateway route override for Agentic service endpoints. |
+
+### Agentic and OpenAI-Compatible API
+
+| Variable | Scope | Meaning |
+|----------|-------|---------|
+| `OPENAI_BASE_URL` | Runtime | OpenAI-compatible API base URL used by Agentic Center. |
+| `OPENAI_API_KEY` | Runtime | API key for the OpenAI-compatible provider. Leave empty when Agentic Center is disabled or mocked. |
+| `OPENAI_MODEL` | Runtime | Chat model name used by Agentic Center. |
+| `OPENAI_TEMPERATURE` | Runtime | Sampling temperature for chat completions. |
+| `OPENAI_MAX_TOKENS` | Runtime | Maximum output token budget for one model response. |
+| `AGENTIC_MEMORY_SCHEMA_INIT` | Runtime | Spring AI JDBC memory schema initialization mode, typically `always` for local dev. |
+| `AGENTIC_MEMORY_MAX_MESSAGES` | Runtime | Maximum chat messages retained per conversation window. |
+| `AGENTIC_SESSION_TTL_HOURS` | Runtime | Agentic session time-to-live in hours. |
+
+### MQTT and Point Processing
+
+| Variable | Scope | Meaning |
+|----------|-------|---------|
+| `MQTT_BROKER_HOST` | Runtime | MQTT broker host used by MQTT-enabled services and drivers. |
+| `MQTT_BROKER_PORT` | Runtime | MQTT broker port seen by the Java process. For local source runs this is usually the EMQX published port `31883`. |
+| `MQTT_USERNAME` | Runtime | MQTT username. |
+| `MQTT_PASSWORD` | Runtime | MQTT password. |
+| `MQTT_BATCH_SPEED` | Runtime | MQTT message speed threshold. Below the threshold, messages are handled individually; above it, they are buffered for batch processing. |
+| `MQTT_BATCH_INTERVAL` | Runtime | MQTT batch scheduler interval in seconds. |
+| `POINT_BATCH_SPEED` | Runtime | Point-value processing speed threshold for switching between direct and batch handling. |
+| `POINT_BATCH_INTERVAL` | Runtime | Point-value batch scheduler interval in seconds. |
+
+### Optional and Observability Stacks
+
+| Variable | Scope | Meaning |
+|----------|-------|---------|
+| `DC3_EMQX_WS_PORT` | Compose | Published host port for EMQX WebSocket. |
+| `DC3_EMQX_WSS_PORT` | Compose | Published host port for EMQX secure WebSocket. |
+| `DC3_EMQX_MQTT_PORT` | Compose | Published host port for EMQX MQTT. |
+| `DC3_EMQX_MQTTS_PORT` | Compose | Published host port for EMQX MQTTS. |
+| `DC3_EMQX_DASHBOARD_PORT` | Compose | Published host port for the EMQX dashboard. |
+| `GF_SERVER_ROOT_URL` | Compose | External root URL used by Grafana. |
+| `DC3_GRAFANA_PORT` | Compose | Published host port for Grafana. |
+| `DC3_KIBANA_PORT` | Compose | Published host port for Kibana. |
+| `DC3_ES_JAVA_OPTS` | Compose | JVM heap options for Elasticsearch. |
+| `DC3_LS_JAVA_OPTS` | Compose | JVM heap options for Logstash. |
+
 ## Alignment Rules
 
 - Compose-only variables stay in `.env.example`.
