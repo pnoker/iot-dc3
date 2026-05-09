@@ -58,7 +58,7 @@ IoT DC3 是一个基于 Spring Cloud 构建的完全开源、分布式物联网 
 podman compose -f dc3/docker-compose-db.yml up -d
 
 # 针对中国大陆用户优化的镜像仓库服务
-podman compose -f dc3/docker-compose-db-aliyun.yml up -d
+DC3_IMAGE_REGISTRY=registry.cn-beijing.aliyuncs.com/dc3 podman compose -f dc3/docker-compose-db.yml up -d
 ```
 
 可选的 `make` 快捷命令：
@@ -88,8 +88,8 @@ make compose-logs STACK=dev REGISTRY=global
 cp .env.example .env
 ```
 
-根目录 `.env` 用于 `dc3/` 下 Compose 文件的变量插值；应用运行时环境变量仍然位于 `dc3/env/dev.env` 或
-`dc3/env/dev.env.sh`。如果启用 Agentic Center，请在 `.env` 或当前 shell 中配置 `OPENAI_BASE_URL`、
+根目录 `.env` 用于 `dc3/` 下 Compose 文件的变量插值；镜像仓库可通过 `DC3_IMAGE_REGISTRY` 切换，应用运行时环境变量仍然位于
+`dc3/env/dev.env` 或 `dc3/env/dev.env.sh`。如果启用 Agentic Center，请在 `.env` 或当前 shell 中配置 `OPENAI_BASE_URL`、
 `OPENAI_API_KEY`、`OPENAI_MODEL` 等 OpenAI 兼容参数。
 
 ## 3.2 准备工作

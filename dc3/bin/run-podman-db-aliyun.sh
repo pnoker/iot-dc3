@@ -20,7 +20,9 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-compose_file="${script_dir}/../docker-compose-db-aliyun.yml"
+compose_file="${script_dir}/../docker-compose-db.yml"
+
+export DC3_IMAGE_REGISTRY="${DC3_IMAGE_REGISTRY:-registry.cn-beijing.aliyuncs.com/dc3}"
 
 podman compose -f "${compose_file}" pull
 if [[ "${RESET_VOLUMES:-false}" == "true" ]]; then
