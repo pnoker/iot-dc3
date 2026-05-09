@@ -21,6 +21,9 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Protocol-neutral driver facade.
  * <p>
@@ -37,6 +40,14 @@ public interface DriverFacade {
      * @return the driver, or {@code null} when it does not exist.
      */
     FacadeDriverBO selectById(Long id);
+
+    /**
+     * Bulk lookup. Avoids the N+1 cost of calling {@link #selectById(Long)} in a loop.
+     *
+     * @return list of resolved drivers (missing ids are simply omitted; never {@code
+     * null}).
+     */
+    List<FacadeDriverBO> selectByIds(Collection<Long> ids);
 
     /**
      * @return a page of drivers (never {@code null}; empty page when nothing matches).

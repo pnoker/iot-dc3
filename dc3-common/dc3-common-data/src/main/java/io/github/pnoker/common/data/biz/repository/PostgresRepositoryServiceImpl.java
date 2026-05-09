@@ -82,7 +82,10 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
         wrapper.eq(PointValueDO::getDeviceId, deviceId);
         wrapper.eq(PointValueDO::getPointId, pointId);
         wrapper.orderByDesc(PointValueDO::getCreateTime);
-        wrapper.last("limit %s".formatted(count));
+        // Caller (PointValueServiceImpl#history) clamps `count` to [1, 500]; concatenate
+        // an int into the LIMIT clause to match the LIMIT_ONE constant style elsewhere
+        // and avoid a wasteful COUNT(*) round-trip from Page<>.
+        wrapper.last("LIMIT " + Math.max(1, count));
 
         List<PointValueDO> entityPageDO = pointValueManager.list(wrapper);
         return entityPageDO.stream().map(PointValueDO::getCalValue).toList();

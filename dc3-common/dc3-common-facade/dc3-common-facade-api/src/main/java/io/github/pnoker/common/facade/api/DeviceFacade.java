@@ -21,6 +21,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,6 +49,14 @@ public interface DeviceFacade {
      * @return the device, or {@code null} when the device does not exist.
      */
     FacadeDeviceBO selectById(Long id);
+
+    /**
+     * Bulk lookup. Avoids the N+1 cost of calling {@link #selectById(Long)} in a loop.
+     *
+     * @return list of resolved devices (missing ids are simply omitted; never {@code
+     * null}).
+     */
+    List<FacadeDeviceBO> selectByIds(Collection<Long> ids);
 
     /**
      * Paginated query.
