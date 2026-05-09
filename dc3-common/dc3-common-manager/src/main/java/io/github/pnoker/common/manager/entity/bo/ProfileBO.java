@@ -18,6 +18,7 @@
 package io.github.pnoker.common.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareFlagEnum;
@@ -40,7 +41,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class ProfileBO extends BaseBO {
+public class ProfileBO extends BaseBO implements TenantOwned {
 
     /**
      * Name

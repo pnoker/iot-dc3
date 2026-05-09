@@ -18,6 +18,7 @@
 package io.github.pnoker.common.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
@@ -42,7 +43,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class PointBO extends BaseBO {
+public class PointBO extends BaseBO implements TenantOwned {
 
     /**
      * Name
