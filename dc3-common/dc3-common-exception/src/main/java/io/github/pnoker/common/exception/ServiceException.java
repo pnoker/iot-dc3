@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.exception;
 
-import java.text.MessageFormat;
-
 /**
  * Service Layer Exception
  * <p>
@@ -50,13 +48,14 @@ public class ServiceException extends RuntimeException {
 
     /**
      * Constructs a ServiceException with the specified template message and parameters.
-     * The template will be formatted using MessageFormat with the provided parameters.
+     * The template will be formatted using {@code {}} placeholders with the provided
+     * parameters.
      *
      * @param template the message template
      * @param params   the parameters to format the template
      */
     public ServiceException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params));
     }
 
 }

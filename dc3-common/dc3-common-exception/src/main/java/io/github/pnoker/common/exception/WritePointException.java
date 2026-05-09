@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.exception;
 
-import java.text.MessageFormat;
-
 /**
  *
  * @author pnoker
@@ -36,7 +34,7 @@ public class WritePointException extends RuntimeException {
     }
 
     public WritePointException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params));
     }
 
 }
