@@ -117,7 +117,7 @@ public class DeviceClient {
                 .setPage(page);
         GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.selectByPage(query.build());
         if (!rPageDeviceDTO.getResult().getOk()) {
-            throw new ServiceException("获取设备列表失败");
+            throw new ServiceException("Failed to fetch device list");
         }
         return rPageDeviceDTO;
     }

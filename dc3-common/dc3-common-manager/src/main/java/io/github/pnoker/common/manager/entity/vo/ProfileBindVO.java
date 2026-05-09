@@ -42,13 +42,13 @@ public class ProfileBindVO extends BaseVO {
     /**
      * ID
      */
-    @NotNull(message = "模版ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
     private Long profileId;
 
     /**
      * Device ID
      */
-    @NotNull(message = "设备ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
     private Long deviceId;
 
 }

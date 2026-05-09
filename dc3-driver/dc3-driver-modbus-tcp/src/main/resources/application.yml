@@ -18,7 +18,7 @@
 dc3:
   driver:
     tenant: default
-    name: Modbus-Tcp驱动
+    name: Modbus TCP Driver
     code: ModbusTcpDriver
     type: DRIVER_CLIENT
     remark: @project.description@
@@ -31,32 +31,32 @@ dc3:
         enable: true
         cron: '0/5 * * * * ?'
     driver-attribute:
-      - attribute-name: 主机
+      - attribute-name: Host
         attribute-code: host
         attribute-type-flag: STRING
         default-value: localhost
         remark: Modbus IP
-      - attribute-name: 端口
+      - attribute-name: Port
         attribute-code: port
         attribute-type-flag: INT
         default-value: 502
         remark: Modbus Port
     point-attribute:
-      - attribute-name: 从站编号
+      - attribute-name: Slave ID
         attribute-code: slaveId
         attribute-type-flag: INT
         default-value: 1
-        remark: 从站编号
-      - attribute-name: 功能码
+        remark: Modbus slave unit ID
+      - attribute-name: Function Code
         attribute-code: functionCode
         attribute-type-flag: INT
         default-value: 1
-        remark: 功能码 [1, 2, 3, 4]
-      - attribute-name: 偏移量
+        remark: Modbus function code [1, 2, 3, 4]
+      - attribute-name: Offset
         attribute-code: offset
         attribute-type-flag: INT
         default-value: 0
-        remark: 偏移量
+        remark: Register or coil address offset
 
 spring:
   application:

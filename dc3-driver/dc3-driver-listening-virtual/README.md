@@ -11,7 +11,7 @@ devices that push data. It demonstrates listening-type driver patterns supportin
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-listening-virtual
 - **Version**: 2026.5.5
-- **Driver Name**: 虚拟Tcp/Udp驱动
+- **Driver Name**: Listening Virtual TCP/UDP Driver
 
 ## Service Ports
 
@@ -24,10 +24,10 @@ devices that push data. It demonstrates listening-type driver patterns supportin
 
 | Attribute         | Description                   |
 |-------------------|-------------------------------|
-| 关键字 (Keyword)     | Packet identification keyword |
-| 起始字节 (Start Byte) | Data start byte offset        |
-| 结束字节 (End Byte)   | Data end byte offset          |
-| 类型 (Type)         | Data type interpretation      |
+| Keyword    | Packet identification keyword |
+| Start Byte | Data start byte offset        |
+| End Byte   | Data end byte offset          |
+| Type       | Data type interpretation      |
 
 ## Running Locally
 
@@ -54,4 +54,3 @@ java -jar dc3-driver/dc3-driver-listening-virtual/target/dc3-driver-listening-vi
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

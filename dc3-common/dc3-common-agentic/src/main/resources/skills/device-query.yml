@@ -1,9 +1,9 @@
 name: device-query
-description: "设备、驱动、位号查询能力"
+description: "Device, driver, and point query capability"
 enabled: true
 system-prompt-addition: |
-  当用户询问设备信息时，优先使用 lookupDeviceById 或 searchDevices 工具。
-  返回设备信息时，用表格形式展示关键字段（ID、名称、编码、状态）。
+  When the user asks for device information, prefer lookupDeviceById or searchDevices.
+  Present key fields such as ID, name, code, and status in a table.
 tools:
   - lookupDeviceById
   - searchDevices
@@ -15,5 +15,5 @@ tools:
   - lookupPointById
   - searchPoints
 examples:
-  - user: "查看驱动 1 下有哪些设备"
-    assistant: "我来查询驱动 1 下的设备列表..."
+  - user: "Show devices under driver 1"
+    assistant: "Querying the device list under driver 1..."

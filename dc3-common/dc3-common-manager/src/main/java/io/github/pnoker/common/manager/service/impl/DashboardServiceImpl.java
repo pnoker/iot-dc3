@@ -440,7 +440,7 @@ public class DashboardServiceImpl implements DashboardService {
         // ---- Profile set (bound to kept devices) -----------------------
         // In volume mode drop profiles whose points collectively got no
         // samples — otherwise the profile column paints a tile with no
-        // outgoing band, exactly the "空模板" case the operator flagged.
+        // outgoing band, exactly the "empty profile" case the operator flagged.
         Set<Long> keptProfileIds = new LinkedHashSet<>();
         for (Long did : topDeviceIdSet) {
             Set<Long> pids = profilesByDevice.get(did);

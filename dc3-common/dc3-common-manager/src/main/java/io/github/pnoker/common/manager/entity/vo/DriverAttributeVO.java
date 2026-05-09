@@ -47,16 +47,16 @@ public class DriverAttributeVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "属性名称不能为空", groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "属性名称格式无效",
+    @NotBlank(message = "Attribute name can't be empty", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid attribute name format",
             groups = {Add.class, Update.class})
     private String attributeName;
 
     /**
      * Code
      */
-    @NotBlank(message = "属性编号不能为空", groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "属性编号格式无效",
+    @NotBlank(message = "Attribute code can't be empty", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid attribute code format",
             groups = {Add.class, Update.class})
     private String attributeCode;
 
@@ -73,7 +73,7 @@ public class DriverAttributeVO extends BaseVO {
     /**
      * Driver ID
      */
-    @NotNull(message = "驱动ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class})
     private Long driverId;
 
     /**

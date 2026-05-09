@@ -46,8 +46,8 @@ public class DriverVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "驱动名称不能为空", groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "驱动名称格式无效",
+    @NotBlank(message = "Driver name can't be empty", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid driver name format",
             groups = {Add.class, Update.class})
     private String driverName;
 
@@ -59,17 +59,17 @@ public class DriverVO extends BaseVO {
     /**
      * Driver service name
      */
-    @NotBlank(message = "服务名称不能为空", groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$", message = "服务名称格式无效",
+    @NotBlank(message = "Service name can't be empty", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$", message = "Invalid service name format",
             groups = {Add.class, Update.class})
     private String serviceName;
 
     /**
      *
      */
-    @NotBlank(message = "服务主机不能为空", groups = {Add.class})
+    @NotBlank(message = "Service host can't be empty", groups = {Add.class})
     @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
-            message = "服务主机格式无效", groups = {Add.class, Update.class})
+            message = "Invalid service host format", groups = {Add.class, Update.class})
     private String serviceHost;
 
     /**

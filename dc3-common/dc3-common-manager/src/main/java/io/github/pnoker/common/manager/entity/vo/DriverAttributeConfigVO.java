@@ -44,19 +44,19 @@ public class DriverAttributeConfigVO extends BaseVO {
     /**
      * ID
      */
-    @NotNull(message = "驱动属性ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Driver attribute ID can't be empty", groups = {Add.class, Update.class})
     private Long attributeId;
 
     /**
      *
      */
-    @NotNull(message = "驱动属性配置值不能为空")
+    @NotNull(message = "Driver attribute config value can't be empty")
     private String configValue;
 
     /**
      * Device ID
      */
-    @NotNull(message = "设备ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
     private Long deviceId;
 
     /**
