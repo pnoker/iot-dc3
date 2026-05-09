@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.context;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.springframework.ai.chat.model.ToolContext;
@@ -31,10 +32,6 @@ import java.util.Objects;
  * @since 2026.5.9
  */
 public class AgenticRequestContext {
-
-    public static final String TENANT_ID_CONTEXT_KEY = "dc3TenantId";
-
-    public static final String USER_ID_CONTEXT_KEY = "dc3UserId";
 
     private static final ThreadLocal<RequestHeader.UserHeader> USER_HEADER = new InheritableThreadLocal<>();
 
@@ -60,7 +57,7 @@ public class AgenticRequestContext {
     }
 
     public static Long requireTenantId(ToolContext toolContext) {
-        Long tenantId = getLongContextValue(toolContext, TENANT_ID_CONTEXT_KEY);
+        Long tenantId = getLongContextValue(toolContext, AgenticConstant.ToolContextKey.TENANT_ID);
         return tenantId != null ? tenantId : requireTenantId();
     }
 
@@ -69,7 +66,7 @@ public class AgenticRequestContext {
     }
 
     public static Long requireUserId(ToolContext toolContext) {
-        Long userId = getLongContextValue(toolContext, USER_ID_CONTEXT_KEY);
+        Long userId = getLongContextValue(toolContext, AgenticConstant.ToolContextKey.USER_ID);
         return userId != null ? userId : requireUserId();
     }
 

@@ -14,10 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.constant;
+
+package io.github.pnoker.common.constant.service;
+
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 
 /**
- * Agentic service constants.
+ * Agentic service related constants.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -25,10 +28,13 @@ package io.github.pnoker.common.agentic.constant;
  */
 public class AgenticConstant {
 
+    /**
+     * Service name registered in service discovery.
+     */
     public static final String SERVICE_NAME = "dc3-center-agentic";
 
     /**
-     * URL prefix for the chat REST API. Gateway: /api/v3/agentic/chat/** →
+     * URL prefix for the chat REST API. Gateway: /api/v3/agentic/chat/** ->
      * agentic:8600/agentic/chat/**
      */
     public static final String CHAT_URL_PREFIX = "/chat";
@@ -39,6 +45,26 @@ public class AgenticConstant {
     public static final String SESSION_URL_PREFIX = "/session";
 
     private AgenticConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
+
+    /**
+     * Spring AI tool context keys used to pass request scope into tool calls.
+     *
+     * @author pnoker
+     * @version 2025.9.0
+     * @since 2022.1.0
+     */
+    public static class ToolContextKey {
+
+        public static final String TENANT_ID = "dc3.agentic.tenantId";
+
+        public static final String USER_ID = "dc3.agentic.userId";
+
+        private ToolContextKey() {
+            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        }
+
     }
 
 }
