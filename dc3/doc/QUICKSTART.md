@@ -45,7 +45,16 @@ gRPC targets, and optional AI integration.
 For the difference between root `.env.example` and `dc3/env/dev.env(.sh)`, see
 [`ENVIRONMENT.md`](ENVIRONMENT.md).
 
-## 4. Build from source
+## 4. Run from JetBrains IDEA
+
+For IDEA run configurations, use `dc3/env/dev.env` with the EnvFile plugin, or
+paste its key-value pairs into the run configuration's environment variables.
+Use per-service overrides only when needed, such as `SERVER_PORT`,
+`GRPC_SERVER_PORT`, `TCP_PORT`, `UDP_PORT`, or `POSTGRES_SCHEMA`.
+
+See [`ENVIRONMENT.md`](ENVIRONMENT.md#jetbrains-idea-usage) for details.
+
+## 5. Build from source
 
 ```bash
 # Fast build with parallel threads
@@ -62,17 +71,18 @@ The repository is configured with:
 - Enforced JDK 21 and Maven 3.9+
 - Spring Java Format validation
 
-## 5. Run services (recommended order)
+## 6. Run services (recommended order)
 
 ```bash
 java -jar dc3-gateway/target/dc3-gateway.jar
 java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar
 java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
 java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
 java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 ```
 
-## 6. Run via Docker Compose (alternative)
+## 7. Run via Docker Compose (alternative)
 
 ```bash
 # Local dev stack
@@ -89,7 +99,7 @@ make app REGISTRY=domestic
 make app-all REGISTRY=aliyun
 ```
 
-## 7. Useful maintenance commands
+## 8. Useful maintenance commands
 
 ```bash
 # Print resolved compose file
@@ -105,7 +115,7 @@ make compose-ps STACK=dev
 make compose-restart STACK=dev
 ```
 
-## 8. Service default endpoints
+## 9. Service default endpoints
 
 | Service        | HTTP | gRPC |
 |----------------|------|------|
@@ -115,7 +125,7 @@ make compose-restart STACK=dev
 | Data Center    | 8500 | 9500 |
 | Agentic Center | 8600 | -    |
 
-## 9. Recommended local workflow
+## 10. Recommended local workflow
 
 1. `make dev-db`
 2. `mvn -s .mvn/settings.xml clean package`
@@ -123,7 +133,7 @@ make compose-restart STACK=dev
 4. Test APIs via Gateway at http://localhost:8000/api/v3/...
 5. If using observability stack, start Grafana/ELK after the core platform is stable
 
-## 10. Common pitfalls
+## 11. Common pitfalls
 
 - If Nacos is required in pre/pro profile, make sure the register service is available.
 - If ports are occupied, override Compose published ports through root `.env`,

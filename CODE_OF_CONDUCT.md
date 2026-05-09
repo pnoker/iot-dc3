@@ -1,23 +1,34 @@
 # Contributor Code of Conduct
 
-As contributors and maintainers of this project, we pledge to respect all people who contribute through reporting
-issues, posting feature requests, updating documentation,
-submitting pull requests or patches, and other activities.
+## Our Pledge
 
-We are committed to making participation in this project a harassment-free experience for everyone, regardless of level
-of experience, gender, gender identity and expression,
-sexual orientation, disability, personal appearance, body size, race, ethnicity, age, or religion.
+We as contributors and maintainers pledge to make participation in the IoT DC3 community a harassment-free experience
+for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience,
+education, nationality, personal appearance, race, religion, sexual identity and orientation, or any other personal
+characteristic.
 
-Examples of unacceptable behavior by participants include the use of sexual language or imagery, derogatory comments or
-personal attacks, trolling, public or private harassment,
-insults, or other unprofessional conduct.
+## Expected Behavior
 
-Project maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits,
-issues, and other contributions that are not aligned to this
-Code of Conduct. Project maintainers who do not follow the Code of Conduct may be removed from the project team.
+- Use welcoming and inclusive language.
+- Respect differing viewpoints and experiences.
+- Accept constructive feedback gracefully.
+- Focus on what is best for the project and its users.
+- Show empathy toward other community members.
+
+## Unacceptable Behavior
+
+Unacceptable behavior includes harassment, intimidation, discriminatory language, sexualized language or imagery,
+personal attacks, sustained disruption, publishing private information without permission, or any other conduct that
+maintainers reasonably consider inappropriate in a professional community.
+
+## Enforcement
+
+Project maintainers may remove, edit, or reject comments, commits, code, issues, pull requests, wiki edits, or other
+contributions that do not align with this Code of Conduct. Maintainers may also temporarily or permanently ban
+participants whose behavior is harmful to the community.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by opening an issue or contacting
-one or more of the project maintainers.
+one or more project maintainers. Reports will be reviewed and investigated promptly and fairly.
 
-This Code of Conduct is adapted from the [Contributor Covenant](http:contributor-covenant.org), version 1.0.0, available
-at https://www.contributor-covenant.org/version/1/0/0/code-of-conduct.html
+This Code of Conduct is adapted from the Contributor Covenant, version 2.1:
+https://www.contributor-covenant.org/version/2/1/code_of_conduct/

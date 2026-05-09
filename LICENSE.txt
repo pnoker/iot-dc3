@@ -1,60 +1,48 @@
-IoT DC3 License Agreement
+IoT DC3 License Notice
 
-Version: 2025.6
-Effective Date: June, 2025
+Version: 2026.5
 
-This License Agreement (hereinafter referred to as the "Agreement") is published by the copyright owner of IoT DC3 (hereinafter referred to as the "Software") to regulate the use of the Software by users.
+This notice describes the license relationship for IoT DC3. It is intended to clarify the repository licensing model and
+does not add extra restrictions to rights granted by the GNU Affero General Public License v3.0 or later.
 
-1. Definitions
+1. Community Edition
 
-1.1 Community Edition
-Refers to the version of IoT DC3 released under the GNU Affero General Public License v3.0 (“AGPL-3.0”).
+The IoT DC3 Community Edition source code in this repository is licensed under the GNU Affero General Public License
+version 3.0 or later (AGPL-3.0-or-later).
 
-1.2 Commercial Edition
-Refers to the version of IoT DC3 obtained through signing a commercial license agreement.
+You may use, copy, modify, distribute, and run the Community Edition under the terms of AGPL-3.0-or-later. When the
+software is modified and used to interact with users remotely through a computer network, AGPL section 13 requires that
+the corresponding source code of the modified version be offered to those users.
 
-1.3 Commercial Plugins
-Refers to plugins, modules, or extensions developed and licensed separately by the copyright owner, typically designed to enhance the industrial application capabilities of IoT DC3.
+The full AGPL-3.0 text is available in LICENSE-AGPL.txt.
 
-2. Licensing Models
+2. Commercial Licensing
 
-2.1 Community Edition License
-- The Community Edition is released under the AGPL-3.0 license.
-- Users may use, copy, modify, and distribute the Software in compliance with the terms of AGPL-3.0.
-- Restriction: It is prohibited to directly provide IoT SaaS platforms or commercial services to the public based on the Community Edition.
+Commercial licensing may be available separately from the copyright owner for users who need terms outside the
+AGPL-3.0-or-later license, such as closed-source derivative products, commercial plugin usage, private redistribution
+terms, branding removal, or other separately negotiated permissions.
 
-2.2 Commercial Edition License
-- The Commercial Edition requires signing a separate commercial license agreement and paying the license fee.
-- The Commercial Edition allows closed-source usage. Users may develop derivative products based on the Commercial Edition and deploy or distribute them commercially.
-- Commercial Edition users are entitled to remove IoT DC3 branding and identification.
-- The Commercial Edition license is granted only to the authorized party and may not be sublicensed, redistributed, or resold.
+A commercial license applies only after a separate written commercial agreement is signed by the authorized parties.
+Unless that agreement says otherwise, commercial licenses may not be sublicensed, redistributed, or resold.
 
-2.3 Commercial Plugins License
-- Commercial Plugins may only be used after signing a commercial license agreement.
-- Reverse engineering, decompilation, distribution, or resale of Commercial Plugin source code is strictly prohibited.
+3. Commercial Plugins
 
-3. Restrictions
+Commercial plugins, modules, extensions, or other separately distributed artifacts may be licensed under their own
+commercial terms. Those terms are independent from the AGPL-licensed Community Edition source code unless explicitly
+stated otherwise.
 
-- Without commercial authorization, it is prohibited to use the Community Edition or Commercial Plugins to build, operate, or provide public cloud or SaaS services.
-- The Software may not be used for illegal or unlawful purposes.
-- The copyright notice of the Software may not be removed or modified.
+Commercial plugin source code, binaries, documentation, and license keys may not be reverse engineered, decompiled,
+distributed, resold, or shared except as permitted by the applicable commercial agreement.
 
-4. Intellectual Property
+4. Copyright and Trademarks
 
-- All intellectual property rights of IoT DC3 belong to the copyright owner.
-- Any rights not expressly granted under this Agreement are reserved by the copyright owner.
+Copyright notices, license notices, and attribution notices in the source code must be preserved as required by the
+applicable license.
+
+IoT DC3 names, logos, and other project identifiers may be subject to trademark, branding, or other rights. The
+AGPL-3.0-or-later license governs copyright permissions for the software, but it does not grant trademark rights.
 
 5. Disclaimer
 
-- The Software is provided “as-is” without warranties of any kind, either express or implied, including but not limited to merchantability, fitness for a particular purpose, or non-infringement.
-- To the maximum extent permitted by applicable law, the copyright owner shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from the use of the Software.
-
-6. Termination
-
-- If the user breaches any terms of this Agreement, the license shall terminate immediately and automatically.
-- Upon termination, the user must immediately cease using the Software and destroy all copies in their possession.
-
-7. Governing Law and Dispute Resolution
-
-- This Agreement shall be governed by the laws of the People’s Republic of China.
-- Any dispute arising from or in connection with this Agreement shall be submitted to the Beijing Arbitration Commission for arbitration.
+Unless required by applicable law or agreed to in writing, IoT DC3 is provided "as is", without warranties or conditions
+of any kind. See LICENSE-AGPL.txt for the AGPL warranty disclaimer and limitation of liability.

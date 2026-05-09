@@ -66,7 +66,7 @@ và tích hợp ứng dụng mở rộng.
 podman compose -f dc3/docker-compose-db.yml up -d
 
 # Dịch vụ đăng ký được tối ưu hóa cho người dùng ở Trung Quốc đại lục
-podman compose -f dc3/docker-compose-db-aliyun.yml up -d
+DC3_IMAGE_REGISTRY=registry.cn-beijing.aliyuncs.com/dc3 podman compose -f dc3/docker-compose-db.yml up -d
 ```
 
 Các lệnh tắt `make` hữu ích:
@@ -100,6 +100,13 @@ cp .env.example .env
 Tệp `.env` ở thư mục gốc được dùng cho nội suy biến trong các file Compose dưới `dc3/`; các biến runtime của ứng dụng
 vẫn nằm trong `dc3/env/dev.env` hoặc `dc3/env/dev.env.sh`.
 
+Compose chỉ truyền các biến được tham chiếu rõ ràng trong file Compose vào container, chẳng hạn registry image, tag
+image, cổng publish, tùy chọn log và cấu hình observability tùy chọn. Nếu bật Agentic Center, hãy cấu hình
+`OPENAI_BASE_URL`, `OPENAI_API_KEY` và `OPENAI_MODEL` trong môi trường của process hoặc container đó.
+
+Xem [`dc3/doc/ENVIRONMENT.md`](dc3/doc/ENVIRONMENT.md) để biết sự khác nhau giữa `.env` ở thư mục gốc và
+`dc3/env/dev.env(.sh)`.
+
 ## 3.2 Chuẩn bị
 
 ```bash
@@ -131,6 +138,9 @@ java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
 # Manager Center
 java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
 
+# Agentic Center
+java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
+
 # Virtual Driver
 java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 
@@ -157,3 +167,4 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 # 6 Giấy phép
 
 Nền tảng mã nguồn mở `IoT DC3` được cấp phép theo [Giấy phép AGPL 3.0](./LICENSE-AGPL.txt).
+Xem [LICENSE.txt](./LICENSE.txt) để biết thông báo giấy phép của repository và giải thích về giấy phép thương mại.
