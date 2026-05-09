@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.exception;
 
-import java.text.MessageFormat;
-
 /**
  * Type
  *
@@ -37,7 +35,7 @@ public class TypeException extends RuntimeException {
     }
 
     public TypeException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params));
     }
 
 }

@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.exception;
 
-import java.text.MessageFormat;
-
 /**
  * Cron
  *
@@ -37,7 +35,7 @@ public class CronException extends RuntimeException {
     }
 
     public CronException(String template, Object... params) {
-        super(MessageFormat.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params));
     }
 
 }
