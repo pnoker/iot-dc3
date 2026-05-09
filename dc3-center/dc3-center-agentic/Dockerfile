@@ -23,7 +23,7 @@ LABEL dc3.author.email=pnokers.icloud.com
 # Default environment variables
 ENV PARAMS=''
 ENV NODE_ENV=test
-ENV SERVER_PORT=8600
+ENV DC3_AGENTIC_PORT=8600
 ENV SERVER_NAME=dc3-center-agentic
 ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
@@ -52,7 +52,7 @@ COPY target/dc3-center-agentic.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 
 # Expose server port (no gRPC — agentic is a pure consumer)
-EXPOSE ${SERVER_PORT}
+EXPOSE ${DC3_AGENTIC_PORT}
 # Mount logs volume
 VOLUME /dc3-center/dc3-center-agentic/dc3/logs
 
