@@ -11,22 +11,22 @@ write commands for register control.
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-modbus-tcp
 - **Version**: 2026.5.5
-- **Driver Name**: Modbus-Tcp驱动
+- **Driver Name**: Modbus TCP Driver
 
 ## Driver Attributes (Device-level)
 
 | Attribute       | Description                     |
 |-----------------|---------------------------------|
-| 主机 (Host)       | Modbus slave IP address         |
-| 端口 (Port)       | Modbus TCP port (typically 502) |
-| 从站编号 (Slave ID) | Modbus slave unit ID            |
+| Host     | Modbus slave IP address         |
+| Port     | Modbus TCP port (typically 502) |
+| Slave ID | Modbus slave unit ID            |
 
 ## Point Attributes
 
 | Attribute           | Description                        |
 |---------------------|------------------------------------|
-| 功能码 (Function Code) | Modbus function code (01/02/03/04) |
-| 偏移量 (Offset)        | Register/coil address offset       |
+| Function Code | Modbus function code (01/02/03/04) |
+| Offset        | Register/coil address offset       |
 
 ## Prerequisites
 
@@ -57,4 +57,3 @@ java -jar dc3-driver/dc3-driver-modbus-tcp/target/dc3-driver-modbus-tcp.jar
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

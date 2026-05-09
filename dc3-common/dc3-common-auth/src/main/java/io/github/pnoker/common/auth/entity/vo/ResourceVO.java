@@ -85,7 +85,7 @@ public class ResourceVO extends BaseVO {
     /**
      * Entity ID
      */
-    @NotNull(message = "实体ID不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
 
     /**

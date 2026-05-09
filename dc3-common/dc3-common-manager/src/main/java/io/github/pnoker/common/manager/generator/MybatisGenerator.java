@@ -27,7 +27,7 @@ import io.github.pnoker.common.utils.MybatisUtil;
  * <p>
  * :
  * <p>
- * dc3-common-manager , path 。
+ * dc3-common-manager path.
  *
  * @author pnoker
  * @version 2025.9.0

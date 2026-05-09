@@ -18,7 +18,7 @@
 dc3:
   driver:
     tenant: default
-    name: OpcUa驱动
+    name: OPC UA Driver
     code: OpcUaDriver
     type: DRIVER_CLIENT
     remark: @project.description@
@@ -31,32 +31,32 @@ dc3:
         enable: true
         cron: '0/5 * * * * ?'
     driver-attribute:
-      - attribute-name: 主机
+      - attribute-name: Host
         attribute-code: host
         attribute-type-flag: STRING
         default-value: localhost
-        remark: Opc Ua IP
-      - attribute-name: 端口
+        remark: OPC UA host
+      - attribute-name: Port
         attribute-code: port
         attribute-type-flag: INT
         default-value: 18600
-        remark: Opc Ua Port
-      - attribute-name: 路径
+        remark: OPC UA port
+      - attribute-name: Path
         attribute-code: path
         attribute-type-flag: STRING
         default-value: /
-        remark: Opc Ua Path
+        remark: OPC UA endpoint path
     point-attribute:
-      - attribute-name: 命名空间
+      - attribute-name: Namespace
         attribute-code: namespace
         attribute-type-flag: INT
         default-value: 5
-        remark: 命名空间索引
-      - attribute-name: 位号
+        remark: OPC UA namespace index
+      - attribute-name: Tag
         attribute-code: tag
         attribute-type-flag: STRING
         default-value: TAG
-        remark: 位号名称
+        remark: OPC UA node tag name
 
 spring:
   application:

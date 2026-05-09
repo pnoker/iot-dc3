@@ -18,7 +18,7 @@
 dc3:
   driver:
     tenant: default
-    name: PlcS7驱动
+    name: PLC S7 Driver
     code: PlcS7Driver
     type: DRIVER_CLIENT
     remark: @project.description@
@@ -31,37 +31,37 @@ dc3:
         enable: true
         cron: '0/5 * * * * ?'
     driver-attribute:
-      - attribute-name: 主机
+      - attribute-name: Host
         attribute-code: host
         attribute-type-flag: STRING
         default-value: 192.168.0.20
         remark: Ip
-      - attribute-name: 端口
+      - attribute-name: Port
         attribute-code: port
         attribute-type-flag: INT
         default-value: 102
         remark: Port
     point-attribute:
-      - attribute-name: DB序号
+      - attribute-name: DB Number
         attribute-code: dbNum
         attribute-type-flag: INT
         default-value: 0
-        remark: 数据块号, 从 0 开始计数
-      - attribute-name: 字偏移
+        remark: Data block number, counted from 0
+      - attribute-name: Byte Offset
         attribute-code: byteOffset
         attribute-type-flag: INT
         default-value: 0
-        remark: 字偏移
-      - attribute-name: 位偏移
+        remark: Byte offset
+      - attribute-name: Bit Offset
         attribute-code: bitOffset
         attribute-type-flag: INT
         default-value: 0
-        remark: 位偏移
-      - attribute-name: 数据块长度
+        remark: Bit offset
+      - attribute-name: Data Block Length
         attribute-code: blockSize
         attribute-type-flag: INT
         default-value: 8
-        remark: 数据块长度
+        remark: Data block length
 
 spring:
   application:

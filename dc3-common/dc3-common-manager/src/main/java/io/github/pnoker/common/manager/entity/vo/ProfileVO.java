@@ -47,8 +47,8 @@ public class ProfileVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "模版名称不能为空", groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "模版名称格式无效",
+    @NotBlank(message = "Profile name can't be empty", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid profile name format",
             groups = {Add.class, Update.class})
     private String profileName;
 

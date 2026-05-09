@@ -100,7 +100,7 @@ public class PointClient {
                 .setPage(page);
         GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.selectByPage(query.build());
         if (!rPagePointDTO.getResult().getOk()) {
-            throw new ServiceException("获取设备列表失败");
+            throw new ServiceException("Failed to fetch point list");
         }
         return rPagePointDTO;
     }

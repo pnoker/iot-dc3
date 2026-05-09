@@ -18,7 +18,7 @@
 dc3:
   driver:
     tenant: default
-    name: Mqtt驱动
+    name: MQTT Driver
     code: MqttDriver
     type: DRIVER_SERVER
     remark: @project.description@
@@ -31,16 +31,16 @@ dc3:
         enable: true
         cron: '0/5 * * * * ?'
     point-attribute:
-      - attribute-name: 指令Topic
+      - attribute-name: Command Topic
         attribute-code: commandTopic
         attribute-type-flag: STRING
         default-value: commandTopic
-        remark: 测点/设备接收下行指令的Mqtt主题
-      - attribute-name: 指令Qos
+        remark: MQTT topic used by the point or device to receive downstream commands
+      - attribute-name: Command QoS
         attribute-code: commandQos
         attribute-type-flag: INT
         default-value: 2
-        remark: 测点/设备接收下行指令的Mqtt主题的Qos
+        remark: QoS level for the downstream command topic
 
 spring:
   application:

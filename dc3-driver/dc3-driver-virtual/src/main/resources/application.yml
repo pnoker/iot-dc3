@@ -18,7 +18,7 @@
 dc3:
   driver:
     tenant: default
-    name: 虚拟驱动
+    name: Virtual Driver
     code: VirtualDriver
     type: DRIVER_CLIENT
     remark: @project.description@
@@ -31,22 +31,22 @@ dc3:
         enable: true
         cron: '0/5 * * * * ?'
     driver-attribute:
-      - attribute-name: 主机
+      - attribute-name: Host
         attribute-code: host
         attribute-type-flag: STRING
         default-value: localhost
         remark: Ip
-      - attribute-name: 端口
+      - attribute-name: Port
         attribute-code: port
         attribute-type-flag: INT
         default-value: 18600
         remark: Port
     point-attribute:
-      - attribute-name: 位号
+      - attribute-name: Tag
         attribute-code: tag
         attribute-type-flag: STRING
         default-value: TAG
-        remark: 位号名称
+        remark: Point tag name
 
 spring:
   application:

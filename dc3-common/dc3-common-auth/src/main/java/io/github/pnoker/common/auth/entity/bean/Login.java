@@ -43,19 +43,19 @@ public class Login implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "租户不能为空", groups = {Auth.class})
+    @NotBlank(message = "Tenant can't be empty", groups = {Auth.class})
     private String tenant;
 
-    @NotBlank(message = "名称不能为空", groups = {Check.class, Auth.class, Update.class})
+    @NotBlank(message = "Name can't be empty", groups = {Check.class, Auth.class, Update.class})
     private String name;
 
-    @NotBlank(message = "盐值不能为空", groups = {Check.class, Auth.class})
+    @NotBlank(message = "Salt can't be empty", groups = {Check.class, Auth.class})
     private String salt;
 
-    @NotBlank(message = "密码不能为空", groups = {Auth.class})
+    @NotBlank(message = "Password can't be empty", groups = {Auth.class})
     private String password;
 
-    @NotBlank(message = "令牌不能为空", groups = {Check.class})
+    @NotBlank(message = "Token can't be empty", groups = {Check.class})
     private String token;
 
 }

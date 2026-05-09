@@ -49,8 +49,8 @@ public class DeviceVO extends BaseVO {
     /**
      * Device Name
      */
-    @NotBlank(message = "设备名称不能为空", groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "设备名称格式无效",
+    @NotBlank(message = "Device name can't be empty", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid device name format",
             groups = {Add.class, Update.class})
     private String deviceName;
 
@@ -62,7 +62,7 @@ public class DeviceVO extends BaseVO {
     /**
      * Driver ID
      */
-    @NotNull(message = "驱动ID不能为空", groups = {Add.class, Update.class, Upload.class})
+    @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class, Upload.class})
     private Long driverId;
 
     /**

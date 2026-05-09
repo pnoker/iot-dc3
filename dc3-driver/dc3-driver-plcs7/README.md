@@ -11,23 +11,23 @@ and write data block registers.
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-plcs7
 - **Version**: 2026.5.5
-- **Driver Name**: PlcS7驱动
+- **Driver Name**: PLC S7 Driver
 
 ## Driver Attributes (Device-level)
 
 | Attribute | Description                 |
 |-----------|-----------------------------|
-| 主机 (Host) | PLC IP address              |
-| 端口 (Port) | S7 TCP port (typically 102) |
+| Host | PLC IP address              |
+| Port | S7 TCP port (typically 102) |
 
 ## Point Attributes
 
 | Attribute           | Description                                     |
 |---------------------|-------------------------------------------------|
-| DB序号 (DB Number)    | Siemens data block number                       |
-| 字偏移 (Byte Offset)   | Byte offset within the data block               |
-| 位偏移 (Bit Offset)    | Bit offset within the byte (for boolean points) |
-| 数据块长度 (Data Length) | Length of data to read in bytes                 |
+| DB Number   | Siemens data block number                       |
+| Byte Offset | Byte offset within the data block               |
+| Bit Offset  | Bit offset within the byte (for boolean points) |
+| Data Length | Length of data to read in bytes                 |
 
 ## Prerequisites
 
@@ -60,4 +60,3 @@ java -jar dc3-driver/dc3-driver-plcs7/target/dc3-driver-plcs7.jar
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

@@ -49,7 +49,7 @@ public class BaseVO implements Serializable {
     /**
      * Primary key ID
      */
-    @NotNull(message = "主键ID不能为空", groups = {Update.class})
+    @NotNull(message = "Primary key ID can't be empty", groups = {Update.class})
     private Long id;
 
     /**

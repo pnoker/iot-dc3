@@ -155,7 +155,7 @@ public class TenantServiceImpl implements TenantService {
     private TenantDO getDOById(Long id, boolean throwException) {
         TenantDO entityDO = tenantManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("租户");
+            throw new NotFoundException("Tenant");
         }
         return entityDO;
     }

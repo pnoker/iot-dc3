@@ -11,22 +11,22 @@ automation systems using the OPC UA binary protocol.
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-opc-ua
 - **Version**: 2026.5.5
-- **Driver Name**: OpcUa驱动
+- **Driver Name**: OPC UA Driver
 
 ## Driver Attributes (Device-level)
 
 | Attribute | Description                          |
 |-----------|--------------------------------------|
-| 主机 (Host) | OPC UA server hostname or IP         |
-| 端口 (Port) | OPC UA server port (typically 4840)  |
-| 路径 (Path) | OPC UA endpoint path (e.g., `/milo`) |
+| Host | OPC UA server hostname or IP         |
+| Port | OPC UA server port (typically 4840)  |
+| Path | OPC UA endpoint path (e.g., `/milo`) |
 
 ## Point Attributes
 
 | Attribute        | Description                 |
 |------------------|-----------------------------|
-| 命名空间 (Namespace) | OPC UA node namespace index |
-| 位号 (Tag)         | OPC UA node identifier      |
+| Namespace | OPC UA node namespace index |
+| Tag       | OPC UA node identifier      |
 
 ## Prerequisites
 
@@ -57,4 +57,3 @@ java -jar dc3-driver/dc3-driver-opc-ua/target/dc3-driver-opc-ua.jar
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

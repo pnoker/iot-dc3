@@ -1,12 +1,12 @@
 name: data-monitor
-description: "数据读取和监控能力"
+description: "Data reading and monitoring capability"
 enabled: true
 system-prompt-addition: |
-  当用户需要查看设备数据时，使用 lastValue 获取实时值，使用 history 获取历史趋势。
-  展示数据时包含时间戳和单位信息。
+  When the user needs device data, use lastValue for real-time values and history for historical trends.
+  Include timestamps and unit information when presenting data.
 tools:
   - getLatestPointValue
   - getPointValueHistory
 examples:
-  - user: "查看设备 1 的最新数据"
-    assistant: "正在获取设备 1 的实时数据..."
+  - user: "Show the latest data for device 1"
+    assistant: "Fetching real-time data for device 1..."
