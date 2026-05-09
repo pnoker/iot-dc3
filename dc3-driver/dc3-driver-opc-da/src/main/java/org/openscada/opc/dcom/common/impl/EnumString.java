@@ -18,7 +18,11 @@
 package org.openscada.opc.dcom.common.impl;
 
 import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.core.*;
+import org.jinterop.dcom.core.IJIComObject;
+import org.jinterop.dcom.core.JIArray;
+import org.jinterop.dcom.core.JICallBuilder;
+import org.jinterop.dcom.core.JIFlags;
+import org.jinterop.dcom.core.JIString;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;

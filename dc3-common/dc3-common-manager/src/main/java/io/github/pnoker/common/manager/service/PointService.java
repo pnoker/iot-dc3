@@ -18,7 +18,12 @@
 package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.base.service.BaseService;
-import io.github.pnoker.common.manager.entity.bo.*;
+import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
+import io.github.pnoker.common.manager.entity.bo.DeviceDataVolumeRunBO;
+import io.github.pnoker.common.manager.entity.bo.PointBO;
+import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
+import io.github.pnoker.common.manager.entity.bo.PointDataStatisticsByDriverIdBO;
+import io.github.pnoker.common.manager.entity.bo.PointDataVolumeRunBO;
 import io.github.pnoker.common.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 

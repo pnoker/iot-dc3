@@ -42,7 +42,12 @@ import org.jinterop.dcom.core.JIVariant;
 import org.openscada.opc.lib.common.AlreadyConnectedException;
 import org.openscada.opc.lib.common.ConnectionInformation;
 import org.openscada.opc.lib.common.NotConnectedException;
-import org.openscada.opc.lib.da.*;
+import org.openscada.opc.lib.da.AddFailedException;
+import org.openscada.opc.lib.da.DuplicateGroupException;
+import org.openscada.opc.lib.da.Group;
+import org.openscada.opc.lib.da.Item;
+import org.openscada.opc.lib.da.Server;
+import org.openscada.opc.lib.da.UnknownGroupException;
 import org.springframework.stereotype.Service;
 
 import java.net.UnknownHostException;

@@ -21,7 +21,13 @@ import com.serotonin.modbus4j.base.ReadFunctionGroup;
 import com.serotonin.modbus4j.base.SlaveAndRange;
 import com.serotonin.modbus4j.locator.BaseLocator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A class for defining the information required to obtain in a batch.

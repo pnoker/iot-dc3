@@ -19,7 +19,12 @@ package io.github.pnoker.common.driver.grpc.client;
 
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
-import io.github.pnoker.api.common.driver.*;
+import io.github.pnoker.api.common.driver.GrpcPagePointDTO;
+import io.github.pnoker.api.common.driver.GrpcPagePointQuery;
+import io.github.pnoker.api.common.driver.GrpcPointQuery;
+import io.github.pnoker.api.common.driver.GrpcRPagePointDTO;
+import io.github.pnoker.api.common.driver.GrpcRPointDTO;
+import io.github.pnoker.api.common.driver.PointApiGrpc;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.entity.builder.PointBuilder;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;

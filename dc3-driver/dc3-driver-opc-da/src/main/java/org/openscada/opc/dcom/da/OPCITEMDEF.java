@@ -18,7 +18,11 @@
 package org.openscada.opc.dcom.da;
 
 import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.core.*;
+import org.jinterop.dcom.core.JIFlags;
+import org.jinterop.dcom.core.JIPointer;
+import org.jinterop.dcom.core.JIString;
+import org.jinterop.dcom.core.JIStruct;
+import org.jinterop.dcom.core.JIVariant;
 
 /**
  *

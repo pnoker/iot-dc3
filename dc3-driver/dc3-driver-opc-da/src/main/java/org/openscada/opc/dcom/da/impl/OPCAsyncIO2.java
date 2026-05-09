@@ -18,7 +18,11 @@
 package org.openscada.opc.dcom.da.impl;
 
 import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.core.*;
+import org.jinterop.dcom.core.IJIComObject;
+import org.jinterop.dcom.core.JIArray;
+import org.jinterop.dcom.core.JICallBuilder;
+import org.jinterop.dcom.core.JIFlags;
+import org.jinterop.dcom.core.JIPointer;
 import org.openscada.opc.dcom.common.Result;
 import org.openscada.opc.dcom.common.ResultSet;
 import org.openscada.opc.dcom.common.impl.BaseCOMObject;

@@ -19,15 +19,30 @@ package org.openscada.opc.lib.da;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
-import org.openscada.opc.dcom.common.*;
-import org.openscada.opc.dcom.da.*;
+import org.openscada.opc.dcom.common.EventHandler;
+import org.openscada.opc.dcom.common.KeyedResult;
+import org.openscada.opc.dcom.common.KeyedResultSet;
+import org.openscada.opc.dcom.common.Result;
+import org.openscada.opc.dcom.common.ResultSet;
+import org.openscada.opc.dcom.da.IOPCDataCallback;
+import org.openscada.opc.dcom.da.OPCDATASOURCE;
+import org.openscada.opc.dcom.da.OPCITEMDEF;
+import org.openscada.opc.dcom.da.OPCITEMRESULT;
+import org.openscada.opc.dcom.da.OPCITEMSTATE;
 import org.openscada.opc.dcom.da.impl.OPCAsyncIO2;
 import org.openscada.opc.dcom.da.impl.OPCGroupStateMgt;
 import org.openscada.opc.dcom.da.impl.OPCItemMgt;
 import org.openscada.opc.dcom.da.impl.OPCSyncIO;
 
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author pnoker

@@ -18,7 +18,12 @@
 package io.github.pnoker.common.manager.grpc.server.manager;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.*;
+import io.github.pnoker.api.center.manager.GrpcPagePointDTO;
+import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
+import io.github.pnoker.api.center.manager.GrpcPointQuery;
+import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
+import io.github.pnoker.api.center.manager.GrpcRPointDTO;
+import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.GrpcR;

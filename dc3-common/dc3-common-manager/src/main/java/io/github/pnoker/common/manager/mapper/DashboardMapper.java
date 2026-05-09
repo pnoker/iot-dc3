@@ -17,7 +17,14 @@
 
 package io.github.pnoker.common.manager.mapper;
 
-import io.github.pnoker.common.manager.entity.bo.dashboard.*;
+import io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow;
+import io.github.pnoker.common.manager.entity.bo.dashboard.DailyGrowthRow;
+import io.github.pnoker.common.manager.entity.bo.dashboard.PointVolumeRow;
+import io.github.pnoker.common.manager.entity.bo.dashboard.ProfileBindingRow;
+import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDeviceRow;
+import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDriverRow;
+import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyPointRow;
+import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyProfileRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

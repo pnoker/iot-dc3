@@ -18,8 +18,19 @@
 package org.openscada.opc.dcom.da.impl;
 
 import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.core.*;
-import org.openscada.opc.dcom.common.*;
+import org.jinterop.dcom.core.JIArray;
+import org.jinterop.dcom.core.JIFlags;
+import org.jinterop.dcom.core.JILocalCoClass;
+import org.jinterop.dcom.core.JILocalInterfaceDefinition;
+import org.jinterop.dcom.core.JILocalMethodDescriptor;
+import org.jinterop.dcom.core.JILocalParamsDescriptor;
+import org.jinterop.dcom.core.JIStruct;
+import org.jinterop.dcom.core.JIVariant;
+import org.openscada.opc.dcom.common.FILETIME;
+import org.openscada.opc.dcom.common.KeyedResult;
+import org.openscada.opc.dcom.common.KeyedResultSet;
+import org.openscada.opc.dcom.common.Result;
+import org.openscada.opc.dcom.common.ResultSet;
 import org.openscada.opc.dcom.common.impl.EventHandlerImpl;
 import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.IOPCDataCallback;

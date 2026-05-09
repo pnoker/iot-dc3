@@ -45,6 +45,10 @@ import java.util.Objects;
  */
 public interface DeviceFacade {
 
+    private static boolean matchesTenant(Long tenantId, FacadeDeviceBO device) {
+        return Objects.nonNull(device) && Objects.equals(tenantId, device.getTenantId());
+    }
+
     /**
      * Query a single device by id.
      *
@@ -127,10 +131,6 @@ public interface DeviceFacade {
         return selectByDriverId(driverId).stream()
                 .filter(device -> matchesTenant(tenantId, device))
                 .toList();
-    }
-
-    private static boolean matchesTenant(Long tenantId, FacadeDeviceBO device) {
-        return Objects.nonNull(device) && Objects.equals(tenantId, device.getTenantId());
     }
 
 }

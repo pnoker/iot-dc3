@@ -18,7 +18,13 @@
 package io.github.pnoker.common.data.mapper;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import io.github.pnoker.common.data.entity.bo.dashboard.*;
+import io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.CoverageGapRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.EntityCountRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.LatencyBinRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.LatestPointValueRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.SilentSourceRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.TimeBucketRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
