@@ -6,7 +6,7 @@ _Generated on 2026-05-09._
 
 #### Summary
 - Generated from `dc3.release.20251005.00` to `HEAD`.
-- Included 219 commits across 9 categories: Security 3, Features 57, Bug Fixes 68, Performance 1, Refactoring 38, Documentation 21, CI 1, Chores 28, Other 2.
+- Included 222 commits across 10 categories: Security 3, Features 57, Bug Fixes 69, Performance 1, Refactoring 38, Documentation 22, Build 1, CI 1, Chores 28, Other 2.
 - Most active scopes: dashboard(17), auth(12), data(8), env(5), build(5), alert(5).
 - Highlights: add security quality checks; security: enforce gateway user and command tenant scope; Revise SECURITY.md with updated support and practices; release: generate changelog from git commits; auth: HMAC-sign X-Auth-User header end to end.
 
@@ -75,6 +75,7 @@ _Generated on 2026-05-09._
 - update pom (`f9e7f89ac`)
 
 #### Bug Fixes
+- **release**: preserve changelog idempotency across dates (`203a9bc16`)
 - **release**: trim changelog commit records (`e5e95e658`)
 - **release**: keep changelog generation idempotent (`0a21864f4`)
 - **config**: harden configuration properties (`11a95e5ee`)
@@ -188,6 +189,7 @@ _Generated on 2026-05-09._
 - standardize protobuf annotations and document translations (`4bc31532e`)
 
 #### Documentation
+- **agent**: add shared coding agent guidance (`a1a8cee2d`)
 - **env**: document environment variable reference (`086ade9d8`)
 - align governance and environment guides (`aa65b330c`)
 - **env**: align runtime environment variables (`1c615b194`)
@@ -209,6 +211,9 @@ _Generated on 2026-05-09._
 - **utils**: 更新工具类文档注释为英文并补充详细说明 (`24c75ec69`)
 - **application**: 更新应用类注释以提供更清晰的描述 (`f7779cd45`)
 - 更新多个驱动模块的类注释文档 (`8a2d9829c`)
+
+#### Build
+- **git**: add commit message validation hook (`35377c628`)
 
 #### CI
 - harden github workflows (`d797a253b`)
