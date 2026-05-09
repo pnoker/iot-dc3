@@ -66,14 +66,11 @@ public class TenantController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
-        try {
+        return async(() -> {
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
             tenantService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        });
     }
 
     /**
@@ -84,13 +81,10 @@ public class TenantController implements BaseController {
      */
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             tenantService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     /**
@@ -105,14 +99,11 @@ public class TenantController implements BaseController {
      */
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody TenantVO entityVO) {
-        try {
+        return async(() -> {
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
             tenantService.update(entityBO);
-            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        });
     }
 
     /**
@@ -123,14 +114,11 @@ public class TenantController implements BaseController {
      */
     @GetMapping("/id/{id}")
     public Mono<R<TenantVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             TenantBO entityBO = tenantService.selectById(id);
             TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     /**
@@ -141,16 +129,13 @@ public class TenantController implements BaseController {
      */
     @GetMapping("/code/{code}")
     public Mono<R<TenantBO>> selectByCode(@NotNull @PathVariable(value = "code") String code) {
-        try {
+        return async(() -> {
             TenantBO select = tenantService.selectByCode(code);
             if (Objects.nonNull(select)) {
-                return Mono.just(R.ok(select));
+                return R.ok(select);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-        return Mono.just(R.fail(ResponseEnum.NO_RESOURCE.getText()));
+            return R.fail(ResponseEnum.NO_RESOURCE.getText());
+        });
     }
 
     /**
@@ -161,17 +146,12 @@ public class TenantController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<TenantVO>>> list(@RequestBody(required = false) TenantQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new TenantQuery();
-            }
-            Page<TenantBO> entityPageBO = tenantService.selectByPage(entityQuery);
+        return async(() -> {
+            TenantQuery query = Objects.isNull(entityQuery) ? new TenantQuery() : entityQuery;
+            Page<TenantBO> entityPageBO = tenantService.selectByPage(query);
             Page<TenantVO> entityPageVO = tenantBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityPageVO);
+        });
     }
 
 }

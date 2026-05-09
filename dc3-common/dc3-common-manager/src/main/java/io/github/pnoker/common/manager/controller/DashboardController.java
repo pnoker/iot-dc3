@@ -58,26 +58,12 @@ public class DashboardController implements BaseController {
 
     @GetMapping("/driver/stats")
     public Mono<R<DriverStatsVO>> driverStats() {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                return Mono.just(R.ok(dashboardService.driverStats(tenantId)));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.driverStats(tenantId))));
     }
 
     @GetMapping("/device/stats")
     public Mono<R<DeviceStatsVO>> deviceStats(@RequestParam(value = "topN", defaultValue = "10") int topN) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                return Mono.just(R.ok(dashboardService.deviceStats(tenantId, topN)));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.deviceStats(tenantId, topN))));
     }
 
     /**
@@ -87,14 +73,7 @@ public class DashboardController implements BaseController {
      */
     @GetMapping("/growth")
     public Mono<R<GrowthVO>> dailyGrowth(@RequestParam(value = "days", defaultValue = "7") int days) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                return Mono.just(R.ok(dashboardService.dailyGrowth(tenantId, days)));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.dailyGrowth(tenantId, days))));
     }
 
     /**
@@ -112,14 +91,7 @@ public class DashboardController implements BaseController {
     @GetMapping("/topology")
     public Mono<R<TopologyVO>> topology(@RequestParam(value = "mode", defaultValue = "cardinality") String mode,
                                         @RequestParam(value = "rangeKey", required = false) String rangeKey) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                return Mono.just(R.ok(dashboardService.topology(tenantId, mode, rangeKey)));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.topology(tenantId, mode, rangeKey))));
     }
 
 }

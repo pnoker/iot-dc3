@@ -60,92 +60,68 @@ public class UserController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                UserBO entityBO = userBuilder.buildBOByVO(entityVO);
-                entityBO.setCreatorId(header.getUserId());
-                entityBO.setCreatorName(header.getNickName());
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                userService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getUserHeader().flatMap(header -> async(() -> {
+            UserBO entityBO = userBuilder.buildBOByVO(entityVO);
+            entityBO.setCreatorId(header.getUserId());
+            entityBO.setCreatorName(header.getNickName());
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            userService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        }));
     }
 
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             userService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                UserBO entityBO = userBuilder.buildBOByVO(entityVO);
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                userService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getUserHeader().flatMap(header -> async(() -> {
+            UserBO entityBO = userBuilder.buildBOByVO(entityVO);
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            userService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        }));
     }
 
     @GetMapping("/id/{id}")
     public Mono<R<UserVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             UserBO entityBO = userService.selectById(id);
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     @GetMapping("/name/{name}")
     public Mono<R<UserVO>> selectByName(@NotNull @PathVariable(value = "name") String name) {
-        try {
+        return async(() -> {
             UserBO entityBO = userService.selectByUserName(name, false);
             if (Objects.isNull(entityBO)) {
-                return Mono.just(R.fail(ResponseEnum.NO_RESOURCE.getText()));
+                return R.fail(ResponseEnum.NO_RESOURCE.getText());
             }
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     @PostMapping("/list")
     public Mono<R<Page<UserVO>>> list(@RequestBody(required = false) UserQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                UserQuery query = Objects.isNull(entityQuery) ? new UserQuery() : entityQuery;
-                // Overwrite whatever the client sent. Tenant scope is a hard
-                // boundary, not a filter — a caller cannot reach across tenants.
-                query.setTenantId(tenantId);
-                Page<UserBO> entityPageBO = userService.selectByPage(query);
-                Page<UserVO> entityPageVO = userBuilder.buildVOPageByBOPage(entityPageBO);
-                return Mono.just(R.ok(entityPageVO));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            UserQuery query = Objects.isNull(entityQuery) ? new UserQuery() : entityQuery;
+            // Overwrite whatever the client sent. Tenant scope is a hard
+            // boundary, not a filter — a caller cannot reach across tenants.
+            query.setTenantId(tenantId);
+            Page<UserBO> entityPageBO = userService.selectByPage(query);
+            Page<UserVO> entityPageVO = userBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        }));
     }
 
 }

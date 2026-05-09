@@ -60,64 +60,47 @@ public class ApiController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
-        try {
+        return async(() -> {
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        });
     }
 
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             apiService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
-        try {
+        return async(() -> {
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.update(entityBO);
-            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        });
     }
 
     @GetMapping("/id/{id}")
     public Mono<R<ApiVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             ApiBO entityBO = apiService.selectById(id);
             ApiVO entityVO = apiBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     @PostMapping("/list")
     public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new ApiQuery();
-            }
-            Page<ApiBO> entityPageBO = apiService.selectByPage(entityQuery);
+        return async(() -> {
+            ApiQuery query = Objects.isNull(entityQuery) ? new ApiQuery() : entityQuery;
+            Page<ApiBO> entityPageBO = apiService.selectByPage(query);
             Page<ApiVO> entityPageVO = apiBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityPageVO);
+        });
     }
 
 }

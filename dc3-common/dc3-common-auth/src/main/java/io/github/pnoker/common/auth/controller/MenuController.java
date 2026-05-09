@@ -64,89 +64,65 @@ public class MenuController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
-                entityBO.setCreatorId(header.getUserId());
-                entityBO.setCreatorName(header.getNickName());
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                menuService.save(entityBO);
-                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getUserHeader().flatMap(header -> async(() -> {
+            MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
+            entityBO.setCreatorId(header.getUserId());
+            entityBO.setCreatorName(header.getNickName());
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            menuService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        }));
     }
 
     @PostMapping("/delete/{id}")
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             menuService.remove(id);
-            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        });
     }
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MenuVO entityVO) {
-        return getUserHeader().flatMap(header -> {
-            try {
-                MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
-                entityBO.setOperatorId(header.getUserId());
-                entityBO.setOperatorName(header.getNickName());
-                menuService.update(entityBO);
-                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
+        return getUserHeader().flatMap(header -> async(() -> {
+            MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            menuService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        }));
     }
 
     @GetMapping("/id/{id}")
     public Mono<R<MenuVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-        try {
+        return async(() -> {
             MenuBO entityBO = menuService.selectById(id);
             MenuVO entityVO = menuBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVO);
+        });
     }
 
     @PostMapping("/list")
     public Mono<R<Page<MenuVO>>> list(@RequestBody(required = false) MenuQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new MenuQuery();
-            }
-            Page<MenuBO> entityPageBO = menuService.selectByPage(entityQuery);
+        return async(() -> {
+            MenuQuery query = Objects.isNull(entityQuery) ? new MenuQuery() : entityQuery;
+            Page<MenuBO> entityPageBO = menuService.selectByPage(query);
             Page<MenuVO> entityPageVO = menuBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityPageVO);
+        });
     }
 
     @PostMapping("/tree")
     public Mono<R<List<MenuTreeVO>>> tree(@RequestBody(required = false) MenuQuery entityQuery) {
-        try {
+        return async(() -> {
             List<MenuTreeBO> entityBOList = menuService.selectTree(entityQuery);
             List<MenuTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
             for (MenuTreeBO node : entityBOList) {
                 entityVOList.add(toTreeVO(node));
             }
-            return Mono.just(R.ok(entityVOList));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+            return R.ok(entityVOList);
+        });
     }
 
     private MenuTreeVO toTreeVO(MenuTreeBO node) {
