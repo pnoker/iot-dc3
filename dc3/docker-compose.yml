@@ -23,7 +23,7 @@ x-logging: &default-logging
 
 services:
   gateway:
-    image: pnoker/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
@@ -41,7 +41,7 @@ services:
           - dc3-gateway
 
   auth:
-    image: pnoker/dc3-center-auth:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_PORT:-8300}:8300"
@@ -60,7 +60,7 @@ services:
           - dc3-center-auth
 
   manager:
-    image: pnoker/dc3-center-manager:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_PORT:-8400}:8400"
@@ -79,7 +79,7 @@ services:
           - dc3-center-manager
 
   data:
-    image: pnoker/dc3-center-data:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_PORT:-8500}:8500"
@@ -98,7 +98,7 @@ services:
           - dc3-center-data
 
   agentic:
-    image: pnoker/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AGENTIC_PORT:-8600}:8600"
@@ -121,7 +121,7 @@ services:
           - dc3-center-agentic
 
   listening-virtual:
-    image: pnoker/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_DRIVER_PORT:-6270}:6270"
@@ -140,7 +140,7 @@ services:
           - dc3-driver-listening-virtual
 
   modbus-tcp:
-    image: pnoker/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -156,7 +156,7 @@ services:
           - dc3-driver-modbus-tcp
 
   mqtt:
-    image: pnoker/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -172,7 +172,7 @@ services:
           - dc3-driver-mqtt
 
   opc-da:
-    image: pnoker/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -188,7 +188,7 @@ services:
           - dc3-driver-opc-da
 
   opc-ua:
-    image: pnoker/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -204,7 +204,7 @@ services:
           - dc3-driver-opc-ua
 
   plcs7:
-    image: pnoker/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -220,7 +220,7 @@ services:
           - dc3-driver-plcs7
 
   virtual:
-    image: pnoker/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test

@@ -64,7 +64,7 @@ management, and extensible application integration.
 podman compose -f dc3/docker-compose-db.yml up -d
 
 # Optimized registry service for users in mainland China
-podman compose -f dc3/docker-compose-db-aliyun.yml up -d
+DC3_IMAGE_REGISTRY=registry.cn-beijing.aliyuncs.com/dc3 podman compose -f dc3/docker-compose-db.yml up -d
 ```
 
 Optional helper targets:
@@ -99,6 +99,7 @@ Common overrides used by the Compose stacks in `dc3/`:
 
 | Variable                                                                | Default                 | Purpose                                                                     |
 |-------------------------------------------------------------------------|-------------------------|-----------------------------------------------------------------------------|
+| `DC3_IMAGE_REGISTRY`                                                    | `pnoker`                | Image registry namespace; use `registry.cn-beijing.aliyuncs.com/dc3` for Aliyun |
 | `DC3_IMAGE_TAG`                                                         | `2026.5`                | Shared image tag for application, database, EMQX, and observability images  |
 | `DC3_LOG_MAX_SIZE`                                                      | `10M`                   | Maximum size per container log file                                         |
 | `DC3_LOG_MAX_FILE`                                                      | `20`                    | Number of rotated log files to keep                                         |

@@ -23,7 +23,7 @@ x-logging: &default-logging
 
 services:
   elasticsearch:
-    image: pnoker/dc3-elasticsearch:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-elasticsearch:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - "ES_JAVA_OPTS=${DC3_ES_JAVA_OPTS:--Xms512m -Xmx512m}"
@@ -44,7 +44,7 @@ services:
           - dc3-elasticsearch
 
   logstash:
-    image: pnoker/dc3-logstash:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-logstash:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
       - elasticsearch
@@ -62,7 +62,7 @@ services:
           - dc3-logstash
 
   kibana:
-    image: pnoker/dc3-kibana:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-kibana:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
       - elasticsearch
@@ -83,7 +83,7 @@ services:
           - dc3-kibana
 
   apm:
-    image: pnoker/dc3-apm:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-apm:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
       - elasticsearch
