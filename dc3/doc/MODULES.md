@@ -10,7 +10,7 @@ iot-dc3 (root pom)
 +-- dc3-common       <- Reusable business libraries
 +-- dc3-center       <- Deployable center services
 +-- dc3-driver       <- Protocol drivers
--- dc3-gateway      <- Spring Cloud Gateway
++-- dc3-gateway      <- Spring Cloud Gateway
 ```
 
 ## dc3-api - gRPC Contract Layer
