@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.bo.UserPasswordBO;
 import io.github.pnoker.common.auth.entity.model.UserPasswordDO;
 import io.github.pnoker.common.auth.entity.vo.UserPasswordVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -108,13 +109,9 @@ public interface UserPasswordBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<UserPasswordBO> buildBOPageByDOPage(Page<UserPasswordDO> entityPageDO);
+    default Page<UserPasswordBO> buildBOPageByDOPage(Page<UserPasswordDO> entityPageDO) {
+        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
+    }
 
     /**
      * BOPage to VOPage
@@ -122,12 +119,8 @@ public interface UserPasswordBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<UserPasswordVO> buildVOPageByBOPage(Page<UserPasswordBO> entityPageBO);
+    default Page<UserPasswordVO> buildVOPageByBOPage(Page<UserPasswordBO> entityPageBO) {
+        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
 
 }
