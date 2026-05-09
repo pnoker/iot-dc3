@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -115,6 +116,42 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
                 .eq(DriverAttributeDO::getDriverId, driverId);
         List<DriverAttributeDO> entityDO = wrapper.list();
         return driverAttributeBuilder.buildBOListByDOList(entityDO);
+    }
+
+    @Override
+    public void saveBatch(List<DriverAttributeBO> entityBOList) {
+        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+            return;
+        }
+        List<DriverAttributeDO> doList = entityBOList.stream().map(driverAttributeBuilder::buildDOByBO).toList();
+        if (!driverAttributeManager.saveBatch(doList)) {
+            throw new AddException("Failed to batch create driver attributes");
+        }
+    }
+
+    @Override
+    public void updateBatch(List<DriverAttributeBO> entityBOList) {
+        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+            return;
+        }
+        List<DriverAttributeDO> doList = entityBOList.stream().map(bo -> {
+            DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(bo);
+            entityDO.setOperateTime(null);
+            return entityDO;
+        }).toList();
+        if (!driverAttributeManager.updateBatchById(doList)) {
+            throw new UpdateException("Failed to batch update driver attributes");
+        }
+    }
+
+    @Override
+    public void removeByIds(Collection<Long> ids) {
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return;
+        }
+        if (!driverAttributeManager.removeByIds(ids)) {
+            throw new DeleteException("Failed to batch remove driver attributes");
+        }
     }
 
     @Override
