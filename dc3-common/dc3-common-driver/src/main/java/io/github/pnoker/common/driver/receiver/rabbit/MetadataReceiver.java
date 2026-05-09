@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.RabbitAckUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -70,15 +71,16 @@ public class MetadataReceiver {
     @RabbitHandler
     @RabbitListener(queues = "#{metadataQueue.name}")
     public void metadataReceive(Channel channel, Message message, MetadataEventDTO entityDTO) {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            // Acknowledge message receipt
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             log.info("Receive driver metadata: {}", JsonUtil.toJsonString(entityDTO));
 
             // Validate metadata event
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getMetadataType())
+            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getId())
+                    || Objects.isNull(entityDTO.getMetadataType())
                     || Objects.isNull(entityDTO.getOperateType())) {
                 log.error("Invalid driver metadata: {}", entityDTO);
+                RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
@@ -113,9 +115,15 @@ public class MetadataReceiver {
                 // Publish point metadata event
                 metadataEventPublisher.publishEvent(
                         new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.POINT, entityDTO.getOperateType()));
+            } else {
+                log.error("Unsupported metadata type: {}", entityDTO.getMetadataType());
+                RabbitAckUtil.reject(channel, deliveryTag);
+                return;
             }
+            RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }
 

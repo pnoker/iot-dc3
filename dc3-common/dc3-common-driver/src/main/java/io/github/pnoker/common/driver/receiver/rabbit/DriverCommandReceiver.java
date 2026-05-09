@@ -19,11 +19,14 @@ package io.github.pnoker.common.driver.receiver.rabbit;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.entity.dto.DriverCommandDTO;
+import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * RabbitMQ consumer for driver-level commands.
@@ -46,14 +49,20 @@ public class DriverCommandReceiver {
     @RabbitHandler
     @RabbitListener(queues = "#{driverCommandQueue.name}")
     public void driverCommandReceive(Channel channel, Message message, DriverCommandDTO driverCommandDTO) {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            // Acknowledge the message receipt to RabbitMQ
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             // Log the received driver command
             log.info("driver command: {}", driverCommandDTO);
+            if (Objects.isNull(driverCommandDTO)) {
+                log.error("Invalid driver command: {}", driverCommandDTO);
+                RabbitAckUtil.reject(channel, deliveryTag);
+                return;
+            }
+            RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
             // Log any errors that occur during message processing
             log.error(e.getMessage(), e);
+            RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }
 
