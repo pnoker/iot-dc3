@@ -132,11 +132,11 @@ public final class DeviceMetadata {
         }
 
         Map<Long, DriverAttributeConfigDTO> attributeConfigMap = device.getDriverAttributeConfigIdMap();
-        if (MapUtils.isEmpty(attributeConfigMap)) {
-            throw new ConfigException("Failed to get driver config, the driver attribute config is empty");
-        }
-        if (!attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
-            throw new ConfigException("Failed to get driver config, the driver attribute config is incomplete");
+        if (MapUtils.isEmpty(attributeConfigMap)
+                || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
+            log.warn("Driver attribute config incomplete for device[{}], required={}, configured={}",
+                    deviceId, attributeMap.keySet(), attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
+            return Map.of();
         }
 
         return attributeMap.entrySet()
