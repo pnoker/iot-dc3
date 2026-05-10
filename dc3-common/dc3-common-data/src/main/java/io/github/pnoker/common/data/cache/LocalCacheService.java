@@ -28,9 +28,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.Objects;
 
 /**
  * Thin Caffeine wrapper with a Redis-like surface (setKey/getKey with optional TTL, batch

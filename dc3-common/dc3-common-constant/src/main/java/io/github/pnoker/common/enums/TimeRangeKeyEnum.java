@@ -21,8 +21,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Time-range preset used by dashboard / alert / point-value list endpoints.

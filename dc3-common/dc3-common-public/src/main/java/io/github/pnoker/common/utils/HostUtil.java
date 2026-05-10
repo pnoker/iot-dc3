@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Local host IP, hostname, and MAC address lookup.
