@@ -19,11 +19,14 @@ package io.github.pnoker.common.agentic.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.dal.ModelConfigManager;
+import io.github.pnoker.common.agentic.dal.ModelProviderManager;
 import io.github.pnoker.common.agentic.entity.model.ModelConfigDO;
+import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
 import io.github.pnoker.common.agentic.entity.request.ModelConfigRequest;
 import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
+import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +42,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
 
     private static final byte ENABLED = 0;
     private final ModelConfigManager modelConfigManager;
+    private final ModelProviderManager modelProviderManager;
     @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
     private String fallbackModel;
     @Value("${spring.ai.openai.base-url:https://api.openai.com}")
@@ -48,8 +52,9 @@ public class ModelConfigServiceImpl implements ModelConfigService {
     @Value("${spring.ai.openai.chat.options.max-tokens:2048}")
     private Integer fallbackMaxTokens;
 
-    public ModelConfigServiceImpl(ModelConfigManager modelConfigManager) {
+    public ModelConfigServiceImpl(ModelConfigManager modelConfigManager, ModelProviderManager modelProviderManager) {
         this.modelConfigManager = modelConfigManager;
+        this.modelProviderManager = modelProviderManager;
     }
 
     @Override
@@ -70,39 +75,27 @@ public class ModelConfigServiceImpl implements ModelConfigService {
                 .lambda()
                 .orderByDesc(ModelConfigDO::getDefaultFlag)
                 .orderByAsc(ModelConfigDO::getModel));
-        if (configs.isEmpty()) {
-            ModelConfigDO fallback = new ModelConfigDO();
-            fallback.setModel(fallbackModel);
-            fallback.setLabel(fallbackModel);
-            fallback.setProvider("openai-compatible");
-            fallback.setBaseUrl(fallbackBaseUrl);
-            fallback.setStream(true);
-            fallback.setToolCall(true);
-            fallback.setVision(true);
-            fallback.setReasoning(false);
-            fallback.setTemperature(fallbackTemperature);
-            fallback.setMaxTokens(fallbackMaxTokens);
-            fallback.setDefaultFlag((byte) 1);
-            fallback.setEnableFlag(ENABLED);
-            return List.of(toVO(fallback));
-        }
         return configs.stream().map(this::toVO).toList();
     }
 
     @Override
-    public ModelConfigVO save(ModelConfigRequest request) {
+    public ModelConfigVO save(ModelConfigRequest request, RequestHeader.UserHeader header) {
         validate(request);
         ModelConfigDO entity = new ModelConfigDO();
         apply(entity, request);
         entity.setCreateTime(LocalDateTime.now());
         entity.setOperateTime(entity.getCreateTime());
+        entity.setCreatorId(header.getUserId());
+        entity.setCreatorName(header.getUserName());
+        entity.setOperatorId(header.getUserId());
+        entity.setOperatorName(header.getUserName());
         modelConfigManager.save(entity);
         normalizeDefault(entity);
         return toVO(entity);
     }
 
     @Override
-    public ModelConfigVO update(ModelConfigRequest request) {
+    public ModelConfigVO update(ModelConfigRequest request, RequestHeader.UserHeader header) {
         if (Objects.isNull(request) || Objects.isNull(request.getId())) {
             throw new RequestException("Model config ID is required");
         }
@@ -113,6 +106,8 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         }
         apply(entity, request);
         entity.setOperateTime(LocalDateTime.now());
+        entity.setOperatorId(header.getUserId());
+        entity.setOperatorName(header.getUserName());
         modelConfigManager.updateById(entity);
         normalizeDefault(entity);
         return toVO(entity);
@@ -136,6 +131,13 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         if (Objects.isNull(request) || StringUtils.isBlank(request.getModel())) {
             throw new RequestException("Model is required");
         }
+        if (Objects.isNull(request.getProviderId()) || request.getProviderId() == 0) {
+            throw new RequestException("Provider is required");
+        }
+        ModelProviderDO provider = modelProviderManager.getById(request.getProviderId());
+        if (Objects.isNull(provider)) {
+            throw new NotFoundException("Provider does not exist");
+        }
         if (Objects.nonNull(request.getTemperature())
                 && (request.getTemperature() < 0.0 || request.getTemperature() > 2.0)) {
             throw new RequestException("Temperature must be between 0.0 and 2.0");
@@ -148,8 +150,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
     private void apply(ModelConfigDO entity, ModelConfigRequest request) {
         entity.setModel(request.getModel().trim());
         entity.setLabel(StringUtils.defaultIfBlank(request.getLabel(), request.getModel()).trim());
-        entity.setProvider(StringUtils.defaultIfBlank(request.getProvider(), "openai-compatible").trim());
-        entity.setBaseUrl(StringUtils.defaultIfBlank(request.getBaseUrl(), fallbackBaseUrl).trim());
+        entity.setProviderId(request.getProviderId());
         entity.setStream(defaultBool(request.getStream(), true));
         entity.setToolCall(defaultBool(request.getToolCall(), true));
         entity.setVision(defaultBool(request.getVision(), false));
@@ -186,8 +187,8 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         vo.setId(entity.getId());
         vo.setModel(entity.getModel());
         vo.setLabel(entity.getLabel());
-        vo.setProvider(entity.getProvider());
-        vo.setBaseUrl(entity.getBaseUrl());
+        vo.setProviderId(entity.getProviderId());
+        vo.setProviderName(resolveProviderName(entity.getProviderId()));
         vo.setStream(entity.getStream());
         vo.setToolCall(entity.getToolCall());
         vo.setVision(entity.getVision());
@@ -200,6 +201,14 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         vo.setCreateTime(entity.getCreateTime());
         vo.setOperateTime(entity.getOperateTime());
         return vo;
+    }
+
+    private String resolveProviderName(Long providerId) {
+        if (Objects.isNull(providerId) || providerId == 0) {
+            return null;
+        }
+        ModelProviderDO provider = modelProviderManager.getById(providerId);
+        return Objects.isNull(provider) ? null : provider.getName();
     }
 
 }

@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.service;
 import io.github.pnoker.common.agentic.entity.request.ModelConfigRequest;
 import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
+import io.github.pnoker.common.entity.common.RequestHeader;
 
 import java.util.List;
 
@@ -28,9 +29,9 @@ public interface ModelConfigService {
 
     List<ModelConfigVO> listConfigs();
 
-    ModelConfigVO save(ModelConfigRequest request);
+    ModelConfigVO save(ModelConfigRequest request, RequestHeader.UserHeader header);
 
-    ModelConfigVO update(ModelConfigRequest request);
+    ModelConfigVO update(ModelConfigRequest request, RequestHeader.UserHeader header);
 
     void remove(Long id);
 
