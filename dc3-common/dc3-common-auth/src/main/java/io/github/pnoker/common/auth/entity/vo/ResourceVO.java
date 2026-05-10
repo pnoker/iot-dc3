@@ -53,7 +53,7 @@ public class ResourceVO extends BaseVO {
     /**
      * ID
      */
-    @NotBlank(message = "Resource parent id can't be empty", groups = {Add.class, Update.class})
+    @NotNull(message = "Resource parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentResourceId;
 
     /**
