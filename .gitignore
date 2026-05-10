@@ -1,5 +1,6 @@
 *target
 *logs
+dc3/data/
 .idea
 *.iws
 *.iml
