@@ -50,9 +50,18 @@ public class AgenticProperties {
     private int memoryMaxMessages = 50;
 
     /**
-     * Session time-to-live in hours. Sessions older than this are marked expired.
+     * Whether Spring AI chat memory is sent back to the model provider.
      */
-    @Min(value = 1, message = "Session TTL hours must be greater than 0")
-    private int sessionTtlHours = 72;
+    private boolean memoryEnabled = false;
+
+    /**
+     * Whether Spring AI should execute provider-native tool calls.
+     */
+    private boolean toolCallingEnabled = false;
+
+    /**
+     * Directory used to persist uploaded agentic attachment files.
+     */
+    private String attachmentStoragePath = "dc3/data/agentic/attachments";
 
 }

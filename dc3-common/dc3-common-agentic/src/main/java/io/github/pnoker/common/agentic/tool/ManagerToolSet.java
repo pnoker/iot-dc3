@@ -71,6 +71,7 @@ public class ManagerToolSet {
                                    ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "lookupDeviceById", tenantId, deviceId);
+        recordTool(toolContext, "lookupDeviceById", "Query device by ID");
         FacadeDeviceBO bo = deviceFacade.selectById(tenantId, deviceId);
         if (Objects.isNull(bo)) {
             return "Device not found for ID: " + deviceId;
@@ -90,6 +91,7 @@ public class ManagerToolSet {
         log.debug(
                 "Agentic tool invoked, tool={}, tenantId={}, deviceName={}, deviceCode={}, driverId={}, page={}, size={}",
                 "searchDevices", tenantId, deviceName, deviceCode, driverId, page, size);
+        recordTool(toolContext, "searchDevices", "Search devices");
 
         FacadeDeviceQuery query = new FacadeDeviceQuery();
         query.setDeviceName(deviceName);
@@ -111,6 +113,7 @@ public class ManagerToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "listDevicesByDriverId", tenantId,
                 driverId);
+        recordTool(toolContext, "listDevicesByDriverId", "List devices by driver");
         List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
         if (devices.isEmpty()) {
             return "No devices found for driver ID: " + driverId;
@@ -125,6 +128,7 @@ public class ManagerToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "listDevicesByProfileId", tenantId,
                 profileId);
+        recordTool(toolContext, "listDevicesByProfileId", "List devices by profile");
         List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(tenantId, profileId);
         if (devices.isEmpty()) {
             return "No devices found for profile ID: " + profileId;
@@ -140,6 +144,7 @@ public class ManagerToolSet {
                                    ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "lookupDriverById", tenantId, driverId);
+        recordTool(toolContext, "lookupDriverById", "Query driver by ID");
         FacadeDriverBO bo = driverFacade.selectById(tenantId, driverId);
         if (Objects.isNull(bo)) {
             return "Driver not found for ID: " + driverId;
@@ -153,6 +158,7 @@ public class ManagerToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "lookupDriverByDeviceId", tenantId,
                 deviceId);
+        recordTool(toolContext, "lookupDriverByDeviceId", "Query device driver");
         FacadeDriverBO bo = driverFacade.selectByDeviceId(tenantId, deviceId);
         if (Objects.isNull(bo)) {
             return "No driver found for device ID: " + deviceId;
@@ -169,6 +175,7 @@ public class ManagerToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverName={}, page={}, size={}", "searchDrivers",
                 tenantId, driverName, page, size);
+        recordTool(toolContext, "searchDrivers", "Search drivers");
 
         FacadeDriverQuery query = new FacadeDriverQuery();
         query.setDriverName(driverName);
@@ -189,6 +196,7 @@ public class ManagerToolSet {
                                   ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointId={}", "lookupPointById", tenantId, pointId);
+        recordTool(toolContext, "lookupPointById", "Query point by ID");
         FacadePointBO bo = pointFacade.selectById(tenantId, pointId);
         if (Objects.isNull(bo)) {
             return "Point not found for ID: " + pointId;
@@ -206,6 +214,7 @@ public class ManagerToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointName={}, profileId={}, page={}, size={}",
                 "searchPoints", tenantId, pointName, profileId, page, size);
+        recordTool(toolContext, "searchPoints", "Search points");
 
         FacadePointQuery query = new FacadePointQuery();
         query.setPointName(pointName);
@@ -262,6 +271,10 @@ public class ManagerToolSet {
         }
         String items = page.getRecords().stream().map(this::formatPoint).collect(Collectors.joining("\n"));
         return String.format("Page %d/%d (total %d):\n%s", page.getCurrent(), page.getPages(), page.getTotal(), items);
+    }
+
+    private void recordTool(ToolContext toolContext, String toolName, String description) {
+        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "manager", description);
     }
 
 }

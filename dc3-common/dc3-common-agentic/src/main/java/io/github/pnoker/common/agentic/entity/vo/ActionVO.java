@@ -14,41 +14,42 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.query;
+package io.github.pnoker.common.agentic.entity.vo;
 
-import io.github.pnoker.common.entity.common.Pages;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import io.github.pnoker.common.entity.base.BaseVO;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
+ * Agentic action confirmation response.
+ *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.10
+ * @since 2026.5.10
  */
 @Getter
 @Setter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class SessionQuery implements Serializable {
+@ToString(callSuper = true)
+public class ActionVO extends BaseVO {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    private Pages page;
-
-    private Long tenantId;
-
-    private Long userId;
+    private String actionId;
 
     private String conversationId;
+
+    private String actionType;
+
+    private String title;
+
+    private String description;
+
+    private Map<String, Object> payload;
+
+    private Byte status;
+
+    private LocalDateTime expireTime;
 
 }

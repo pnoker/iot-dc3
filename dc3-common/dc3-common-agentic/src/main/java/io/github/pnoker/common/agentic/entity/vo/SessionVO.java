@@ -24,8 +24,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 /**
  * @author pnoker
  * @version 2025.9.0
@@ -43,16 +41,8 @@ public class SessionVO extends BaseVO {
 
     private String title;
 
-    private String skill;
-
-    private Byte status;
-
-    private LocalDateTime expireTime;
-
     private Long tenantId;
 
     private Long userId;
-
-    private Byte enableFlag;
 
 }

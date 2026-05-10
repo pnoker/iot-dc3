@@ -22,7 +22,9 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.springframework.ai.chat.model.ToolContext;
 
+import java.time.Instant;
 import java.util.Objects;
+import java.util.Queue;
 
 /**
  * Request-scoped auth context used by Spring AI tools.
@@ -74,11 +76,33 @@ public class AgenticRequestContext {
         return requireUserHeader().getUserId();
     }
 
-    private static Long getLongContextValue(ToolContext toolContext, String key) {
-        if (Objects.isNull(toolContext) || Objects.isNull(toolContext.getContext())) {
-            return null;
+    public static String requireConversationId(ToolContext toolContext) {
+        Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.CONVERSATION_ID);
+        if (value instanceof String stringValue && !stringValue.isBlank()) {
+            return stringValue;
         }
-        Object value = toolContext.getContext().get(key);
+        throw new UnAuthorizedException("Unable to get agentic conversation ID");
+    }
+
+    public static boolean confirmActions(ToolContext toolContext) {
+        Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.CONFIRM_ACTIONS);
+        if (value instanceof Boolean booleanValue) {
+            return booleanValue;
+        }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void recordToolInvocation(ToolContext toolContext, String toolName, String domain,
+                                            String description) {
+        Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.TOOL_EVENTS);
+        if (value instanceof Queue<?>) {
+            ((Queue<ToolEvent>) value).offer(new ToolEvent(toolName, domain, description, Instant.now().toEpochMilli()));
+        }
+    }
+
+    private static Long getLongContextValue(ToolContext toolContext, String key) {
+        Object value = getContextValue(toolContext, key);
         if (value instanceof Long longValue) {
             return longValue;
         }
@@ -86,6 +110,16 @@ public class AgenticRequestContext {
             return numberValue.longValue();
         }
         return null;
+    }
+
+    private static Object getContextValue(ToolContext toolContext, String key) {
+        if (Objects.isNull(toolContext) || Objects.isNull(toolContext.getContext())) {
+            return null;
+        }
+        return toolContext.getContext().get(key);
+    }
+
+    public record ToolEvent(String toolName, String domain, String description, long timestamp) {
     }
 
 }

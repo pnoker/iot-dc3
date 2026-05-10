@@ -19,21 +19,19 @@ package io.github.pnoker.common.agentic.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.dal.SessionManager;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
+import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -41,13 +39,8 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Slf4j
 @Service
 public class SessionServiceImpl implements SessionService {
-
-    private static final byte STATUS_ACTIVE = 0;
-
-    private static final byte STATUS_EXPIRED = 1;
 
     @Resource
     private SessionBuilder sessionBuilder;
@@ -58,21 +51,12 @@ public class SessionServiceImpl implements SessionService {
     @Resource
     private ChatMemory agenticChatMemory;
 
-    @Resource
-    private AgenticProperties agenticProperties;
-
     @Override
-    public SessionBO touch(String conversationId, String skill, Long tenantId, Long userId) {
-        LocalDateTime expireTime = nextExpireTime();
+    public SessionBO touch(String conversationId, Long tenantId, Long userId) {
         SessionDO existing = findByConversationId(conversationId);
         if (Objects.nonNull(existing)) {
-            if (StringUtils.isNotEmpty(skill)) {
-                existing.setSkill(skill);
-            }
             existing.setTenantId(tenantId);
             existing.setUserId(userId);
-            existing.setStatus(STATUS_ACTIVE);
-            existing.setExpireTime(expireTime);
             sessionManager.updateById(existing);
             return sessionBuilder.buildBOByDO(existing);
         }
@@ -82,10 +66,6 @@ public class SessionServiceImpl implements SessionService {
         entityDO.setTenantId(tenantId);
         entityDO.setUserId(userId);
         entityDO.setTitle("New Conversation");
-        entityDO.setSkill(Objects.toString(skill, ""));
-        entityDO.setStatus(STATUS_ACTIVE);
-        entityDO.setExpireTime(expireTime);
-        entityDO.setEnableFlag((byte) 0);
         sessionManager.save(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
     }
@@ -93,10 +73,6 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public SessionBO getByConversationId(String conversationId) {
         SessionDO entityDO = findByConversationId(conversationId);
-        if (isExpired(entityDO)) {
-            expireSession(entityDO);
-            return null;
-        }
         return Objects.nonNull(entityDO) ? sessionBuilder.buildBOByDO(entityDO) : null;
     }
 
@@ -107,6 +83,19 @@ public class SessionServiceImpl implements SessionService {
             sessionManager.removeById(entityDO.getId());
             agenticChatMemory.clear(conversationId);
         }
+    }
+
+    @Override
+    public SessionBO update(String conversationId, SessionUpdateRequest request) {
+        SessionDO entityDO = findByConversationId(conversationId);
+        if (Objects.isNull(entityDO) || Objects.isNull(request)) {
+            return null;
+        }
+        if (StringUtils.isNotBlank(request.getTitle())) {
+            entityDO.setTitle(request.getTitle().trim());
+        }
+        sessionManager.updateById(entityDO);
+        return sessionBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -133,29 +122,10 @@ public class SessionServiceImpl implements SessionService {
         LambdaQueryWrapper<SessionDO> wrapper = Wrappers.<SessionDO>query().lambda();
         wrapper.eq(Objects.nonNull(query.getTenantId()), SessionDO::getTenantId, query.getTenantId());
         wrapper.eq(Objects.nonNull(query.getUserId()), SessionDO::getUserId, query.getUserId());
-        wrapper.eq(Objects.nonNull(query.getStatus()), SessionDO::getStatus, query.getStatus());
-        if (Objects.isNull(query.getStatus()) || Objects.equals(STATUS_ACTIVE, query.getStatus())) {
-            LocalDateTime now = LocalDateTime.now();
-            wrapper.and(nested -> nested.isNull(SessionDO::getExpireTime).or().ge(SessionDO::getExpireTime, now));
-        }
         wrapper.like(StringUtils.isNotEmpty(query.getConversationId()), SessionDO::getConversationId,
                 query.getConversationId());
+        wrapper.orderByDesc(SessionDO::getOperateTime);
         return wrapper;
-    }
-
-    private LocalDateTime nextExpireTime() {
-        return LocalDateTime.now().plusHours(agenticProperties.getSessionTtlHours());
-    }
-
-    private boolean isExpired(SessionDO session) {
-        return Objects.nonNull(session) && Objects.nonNull(session.getExpireTime())
-                && session.getExpireTime().isBefore(LocalDateTime.now());
-    }
-
-    private void expireSession(SessionDO session) {
-        session.setStatus(STATUS_EXPIRED);
-        sessionManager.updateById(session);
-        agenticChatMemory.clear(session.getConversationId());
     }
 
 }

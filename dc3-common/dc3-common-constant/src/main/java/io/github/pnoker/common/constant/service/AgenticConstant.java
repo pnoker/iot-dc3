@@ -45,6 +45,31 @@ public class AgenticConstant {
      */
     public static final String SESSION_URL_PREFIX = "/session";
 
+    /**
+     * URL prefix for the skill REST API.
+     */
+    public static final String SKILL_URL_PREFIX = "/skill";
+
+    /**
+     * URL prefix for the model REST API.
+     */
+    public static final String MODEL_URL_PREFIX = "/model";
+
+    /**
+     * URL prefix for the message REST API.
+     */
+    public static final String MESSAGE_URL_PREFIX = "/message";
+
+    /**
+     * URL prefix for the attachment REST API.
+     */
+    public static final String ATTACHMENT_URL_PREFIX = "/attachment";
+
+    /**
+     * URL prefix for the action confirmation REST API.
+     */
+    public static final String ACTION_URL_PREFIX = "/action";
+
     private AgenticConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
@@ -61,6 +86,12 @@ public class AgenticConstant {
         public static final String TENANT_ID = "dc3.agentic.tenantId";
 
         public static final String USER_ID = "dc3.agentic.userId";
+
+        public static final String CONVERSATION_ID = "dc3.agentic.conversationId";
+
+        public static final String CONFIRM_ACTIONS = "dc3.agentic.confirmActions";
+
+        public static final String TOOL_EVENTS = "dc3.agentic.toolEvents";
 
         private ToolContextKey() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);

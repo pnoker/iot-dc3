@@ -14,41 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.query;
+package io.github.pnoker.common.agentic.mapper;
 
-import io.github.pnoker.common.entity.common.Pages;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.github.pnoker.common.agentic.entity.model.ActionDO;
 
 /**
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.10
+ * @since 2026.5.10
  */
-@Getter
-@Setter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class SessionQuery implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    private Pages page;
-
-    private Long tenantId;
-
-    private Long userId;
-
-    private String conversationId;
+public interface ActionMapper extends BaseMapper<ActionDO> {
 
 }

@@ -14,41 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.query;
+package io.github.pnoker.common.agentic.service;
 
-import io.github.pnoker.common.entity.common.Pages;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import io.github.pnoker.common.agentic.entity.request.AttachmentUploadRequest;
+import io.github.pnoker.common.agentic.entity.vo.AttachmentVO;
+import io.github.pnoker.common.entity.common.RequestHeader;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.util.List;
 
-/**
- * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
- */
-@Getter
-@Setter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class SessionQuery implements Serializable {
+public interface AttachmentService {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    AttachmentVO upload(AttachmentUploadRequest request, RequestHeader.UserHeader header);
 
-    private Pages page;
+    List<AttachmentVO> list(String conversationId, RequestHeader.UserHeader header);
 
-    private Long tenantId;
-
-    private Long userId;
-
-    private String conversationId;
+    String summarize(List<Long> attachmentIds, RequestHeader.UserHeader header);
 
 }
