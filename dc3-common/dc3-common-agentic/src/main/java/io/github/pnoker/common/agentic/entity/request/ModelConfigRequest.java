@@ -36,9 +36,7 @@ public class ModelConfigRequest {
 
     private String label;
 
-    private String provider;
-
-    private String baseUrl;
+    private Long providerId;
 
     private Boolean stream;
 

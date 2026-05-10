@@ -20,6 +20,7 @@ import io.github.pnoker.common.agentic.entity.request.ModelConfigRequest;
 import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +42,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(AgenticConstant.MODEL_URL_PREFIX)
-public class ModelController {
+public class ModelController implements BaseController {
 
     private final ModelConfigService modelConfigService;
 
@@ -61,12 +62,14 @@ public class ModelController {
 
     @PostMapping("/config/add")
     public Mono<R<ModelConfigVO>> add(@RequestBody ModelConfigRequest request) {
-        return Mono.just(R.ok(modelConfigService.save(request)));
+        return getUserHeader().flatMap(header -> async(() ->
+                R.ok(modelConfigService.save(request, header))));
     }
 
     @PostMapping("/config/update")
     public Mono<R<ModelConfigVO>> update(@RequestBody ModelConfigRequest request) {
-        return Mono.just(R.ok(modelConfigService.update(request)));
+        return getUserHeader().flatMap(header -> async(() ->
+                R.ok(modelConfigService.update(request, header))));
     }
 
     @PostMapping("/config/delete/{id}")

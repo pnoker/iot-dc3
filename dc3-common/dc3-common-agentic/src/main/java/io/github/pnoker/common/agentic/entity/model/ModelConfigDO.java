@@ -54,11 +54,8 @@ public class ModelConfigDO implements Serializable {
     @TableField("label")
     private String label;
 
-    @TableField("provider")
-    private String provider;
-
-    @TableField("base_url")
-    private String baseUrl;
+    @TableField("provider_id")
+    private Long providerId;
 
     @TableField("stream")
     private Boolean stream;
