@@ -155,16 +155,16 @@ want Compose-only variables to appear in the local Java process environment.
 
 ### Agentic and OpenAI-Compatible API
 
-| Variable                      | Scope   | Meaning                                                                                            |
-|-------------------------------|---------|----------------------------------------------------------------------------------------------------|
-| `OPENAI_BASE_URL`             | Runtime | OpenAI-compatible API base URL used by Agentic Center.                                             |
-| `OPENAI_API_KEY`              | Runtime | API key for the OpenAI-compatible provider. Leave empty when Agentic Center is disabled or mocked. |
-| `OPENAI_MODEL`                | Runtime | Chat model name used by Agentic Center.                                                            |
-| `OPENAI_TEMPERATURE`          | Runtime | Sampling temperature for chat completions.                                                         |
-| `OPENAI_MAX_TOKENS`           | Runtime | Maximum output token budget for one model response.                                                |
-| `AGENTIC_MEMORY_SCHEMA_INIT`  | Runtime | Spring AI JDBC memory schema initialization mode, typically `always` for local dev.                |
-| `AGENTIC_MEMORY_MAX_MESSAGES` | Runtime | Maximum chat messages retained per conversation window.                                            |
-| `AGENTIC_SESSION_TTL_HOURS`   | Runtime | Agentic session time-to-live in hours.                                                             |
+| Variable                          | Scope   | Meaning                                                                                            |
+|-----------------------------------|---------|----------------------------------------------------------------------------------------------------|
+| `OPENAI_BASE_URL`                 | Runtime | OpenAI-compatible API base URL used by Agentic Center.                                             |
+| `OPENAI_API_KEY`                  | Runtime | API key for the OpenAI-compatible provider. Leave empty when Agentic Center is disabled or mocked. |
+| `OPENAI_MODEL`                    | Runtime | Chat model name used by Agentic Center.                                                            |
+| `OPENAI_TEMPERATURE`              | Runtime | Sampling temperature for chat completions.                                                         |
+| `OPENAI_MAX_TOKENS`               | Runtime | Maximum output token budget for one model response.                                                |
+| `AGENTIC_MEMORY_SCHEMA_INIT`      | Runtime | Spring AI JDBC memory schema initialization mode. Keep `never`; DC3 pre-creates `dc3_chat_memory`. |
+| `AGENTIC_MEMORY_MAX_MESSAGES`     | Runtime | Maximum chat messages retained per conversation window.                                            |
+| `AGENTIC_ATTACHMENT_STORAGE_PATH` | Runtime | Directory used by Agentic Center to store uploaded attachment files.                               |
 
 ### MQTT and Point Processing
 
