@@ -58,6 +58,18 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/menu/Menu.vue'),
         },
         {
+          name: 'settingsAgentic',
+          path: 'agentic',
+          meta: { title: 'Agentic' },
+          component: () => import('@/views/settings/agentic/AgenticSettings.vue'),
+        },
+        {
+          name: 'settingsAgenticProvider',
+          path: 'agentic/provider',
+          meta: { title: 'Agentic Providers' },
+          component: () => import('@/views/settings/agentic/ProviderSettings.vue'),
+        },
+        {
           name: 'settingsEvent',
           path: 'event',
           meta: { title: 'Events' },

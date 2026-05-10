@@ -25,5 +25,6 @@
  *     (SERVICE_NAME + URL_PREFIX fragments)
  */
 export const API_AUTH_BASE = 'api/v3/auth';
+export const API_AGENTIC_BASE = 'api/v3/agentic';
 export const API_DATA_BASE = 'api/v3/data';
 export const API_MANAGER_BASE = 'api/v3/manager';

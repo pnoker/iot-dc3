@@ -17,6 +17,24 @@
 export type { Login, Attribute, Dictionary, Order, PageQuery, PageResult } from './common';
 
 export type {
+  AgenticSkill,
+  AgenticModel,
+  AgenticModelConfig,
+  AgenticProvider,
+  AgenticSession,
+  AgenticMessage,
+  AgenticMessageContext,
+  AgenticMessageTokens,
+  AgenticMessageRole,
+  AgenticAttachment,
+  AgenticAction,
+  AgenticChatMessage,
+  AgenticChatCompletionRequest,
+  AgenticStreamCallbacks,
+  AgenticTraceEvent,
+} from './agentic';
+
+export type {
   UserForm,
   UserRecord,
   RoleForm,

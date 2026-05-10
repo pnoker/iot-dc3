@@ -1,0 +1,248 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { httpGet, httpPost } from '@/api/common';
+import request from '@/config/axios';
+import { API_AGENTIC_BASE } from '@/config/constant/api';
+import { AUTH_HEADERS } from '@/config/constant/common';
+import type {
+  AgenticChatCompletionRequest,
+  AgenticAction,
+  AgenticAttachment,
+  AgenticModel,
+  AgenticModelConfig,
+  AgenticMessage,
+  AgenticProvider,
+  AgenticSession,
+  AgenticSkill,
+  AgenticStreamCallbacks,
+  AgenticTraceEvent,
+  PageQuery,
+  PageResult,
+} from '@/config/types';
+import { getStorage } from '@/utils/storageUtil';
+import { isNull } from '@/utils/validationUtil';
+
+interface OpenAIChunk {
+  object?: string;
+  type?: AgenticTraceEvent['type'];
+  title?: string;
+  detail?: string;
+  name?: string;
+  created?: number;
+  choices?: Array<{
+    delta?: {
+      content?: string;
+    };
+    finish_reason?: string;
+  }>;
+}
+
+export const getAgenticSkills = () => httpGet<R<AgenticSkill[]>>(`${API_AGENTIC_BASE}/skill/list`);
+
+export const getAgenticModels = () => httpGet<R<AgenticModel[]>>(`${API_AGENTIC_BASE}/model/list`);
+
+export const getAgenticModelConfigs = () => httpGet<R<AgenticModelConfig[]>>(`${API_AGENTIC_BASE}/model/config/list`);
+
+export const addAgenticModelConfig = (data: AgenticModelConfig) =>
+  httpPost<R<AgenticModelConfig>>(`${API_AGENTIC_BASE}/model/config/add`, data);
+
+export const updateAgenticModelConfig = (data: AgenticModelConfig) =>
+  httpPost<R<AgenticModelConfig>>(`${API_AGENTIC_BASE}/model/config/update`, data);
+
+export const deleteAgenticModelConfig = (id: string) =>
+  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/model/config/delete/${id}`);
+
+export const getAgenticProviders = () => httpGet<R<AgenticProvider[]>>(`${API_AGENTIC_BASE}/provider/list`);
+
+export const addAgenticProvider = (data: AgenticProvider) =>
+  httpPost<R<AgenticProvider>>(`${API_AGENTIC_BASE}/provider/config/add`, data);
+
+export const updateAgenticProvider = (data: AgenticProvider) =>
+  httpPost<R<AgenticProvider>>(`${API_AGENTIC_BASE}/provider/config/update`, data);
+
+export const deleteAgenticProvider = (id: string) =>
+  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/provider/config/delete/${id}`);
+
+export const getAgenticSessions = (query?: PageQuery) =>
+  httpGet<R<PageResult<AgenticSession>>>(`${API_AGENTIC_BASE}/session`, { params: flattenSessionQuery(query) });
+
+export const deleteAgenticSession = (conversationId: string) =>
+  request<R<boolean>>({ url: `${API_AGENTIC_BASE}/session/${conversationId}`, method: 'delete' });
+
+export const updateAgenticSession = (conversationId: string, data: Pick<AgenticSession, 'title'>) =>
+  httpPost<R<AgenticSession>>(`${API_AGENTIC_BASE}/session/${conversationId}/update`, data);
+
+export const getAgenticMessages = (conversationId: string) =>
+  httpGet<R<AgenticMessage[]>>(`${API_AGENTIC_BASE}/message/${conversationId}`);
+
+export const uploadAgenticAttachment = (data: {
+  conversationId: string;
+  fileName: string;
+  contentType: string;
+  size: number;
+  data: string;
+}) => httpPost<R<AgenticAttachment>>(`${API_AGENTIC_BASE}/attachment/upload`, data);
+
+export const getAgenticAttachments = (conversationId: string) =>
+  httpGet<R<AgenticAttachment[]>>(`${API_AGENTIC_BASE}/attachment/${conversationId}`);
+
+export const getPendingAgenticActions = (conversationId: string) =>
+  httpGet<R<AgenticAction[]>>(`${API_AGENTIC_BASE}/action/pending/${conversationId}`);
+
+export const confirmAgenticAction = (actionId: string) =>
+  httpPost<R<AgenticAction>>(`${API_AGENTIC_BASE}/action/${actionId}/confirm`);
+
+export const rejectAgenticAction = (actionId: string) =>
+  httpPost<R<AgenticAction>>(`${API_AGENTIC_BASE}/action/${actionId}/reject`);
+
+export const streamAgenticChatCompletion = async (
+  data: AgenticChatCompletionRequest,
+  callbacks: AgenticStreamCallbacks = {}
+) => {
+  try {
+    const response = await fetch(`/${API_AGENTIC_BASE}/chat/completions`, {
+      method: 'post',
+      credentials: 'include',
+      signal: callbacks.signal,
+      headers: buildFetchHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      await handleStreamHttpError(response);
+    }
+    if (!response.body) {
+      throw new Error('Streaming response body is empty');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let done = false;
+
+    while (!done) {
+      const result = await reader.read();
+      done = result.done;
+      buffer += decoder.decode(result.value || new Uint8Array(), { stream: !done });
+      buffer = parseSseBuffer(buffer, callbacks);
+    }
+
+    parseSseBuffer(buffer, callbacks, true);
+    callbacks.onDone?.();
+  } catch (error) {
+    const normalized = error instanceof Error ? error : new Error(String(error));
+    callbacks.onError?.(normalized);
+    throw normalized;
+  }
+};
+
+const buildFetchHeaders = (): HeadersInit => {
+  const headers: Record<string, string> = {
+    Accept: 'text/event-stream',
+    'Content-Type': 'application/json',
+  };
+
+  const tenant = getStorage(AUTH_HEADERS.TENANT);
+  if (!isNull(tenant)) {
+    headers[AUTH_HEADERS.TENANT] = tenant;
+  }
+
+  const login = getStorage(AUTH_HEADERS.LOGIN);
+  if (!isNull(login)) {
+    headers[AUTH_HEADERS.LOGIN] = login;
+  }
+
+  const token = getStorage(AUTH_HEADERS.TOKEN);
+  if (!isNull(token)) {
+    headers[AUTH_HEADERS.TOKEN] = JSON.stringify(token);
+  }
+
+  return headers;
+};
+
+const flattenSessionQuery = (query?: PageQuery) => {
+  if (!query?.page) {
+    return query;
+  }
+
+  const { page, ...rest } = query;
+  return {
+    ...rest,
+    'page.current': page.current,
+    'page.size': page.size,
+  };
+};
+
+const handleStreamHttpError = async (response: Response): Promise<never> => {
+  if (response.status === 401) {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.hash = '#/login';
+  }
+
+  const message = await response.text();
+  throw new Error(message || `Agentic stream failed with status ${response.status}`);
+};
+
+const parseSseBuffer = (buffer: string, callbacks: AgenticStreamCallbacks, flush = false) => {
+  const blocks = buffer.split(/\r?\n\r?\n/);
+  const rest = flush ? '' : blocks.pop() || '';
+
+  for (const block of blocks) {
+    parseSseBlock(block, callbacks);
+  }
+
+  if (flush && rest) {
+    parseSseBlock(rest, callbacks);
+  }
+
+  return rest;
+};
+
+const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
+  const data = block
+    .split(/\r?\n/)
+    .filter((line) => line.startsWith('data:'))
+    .map((line) => line.replace(/^data:\s?/, ''))
+    .join('\n')
+    .trim();
+
+  if (!data || data === '[DONE]') {
+    return;
+  }
+
+  try {
+    const chunk = JSON.parse(data) as OpenAIChunk;
+    if (chunk.object === 'agentic.event' && chunk.type && chunk.title) {
+      callbacks.onEvent?.({
+        id: `${chunk.type}-${chunk.created || Date.now()}-${Math.random().toString(16).slice(2)}`,
+        type: chunk.type,
+        title: chunk.title,
+        detail: chunk.detail,
+        name: chunk.name,
+        created: chunk.created,
+      });
+      return;
+    }
+    const content = chunk.choices?.[0]?.delta?.content;
+    if (content) {
+      callbacks.onDelta?.(content);
+    }
+  } catch (error) {
+    callbacks.onError?.(error instanceof Error ? error : new Error(String(error)));
+  }
+};

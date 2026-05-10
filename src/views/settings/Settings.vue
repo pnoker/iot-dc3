@@ -85,6 +85,8 @@
     { name: 'settingsResource', title: t('nav.settingsResource'), icon: 'Key' },
     { name: 'settingsApi', title: t('nav.settingsApi'), icon: 'Link' },
     { name: 'settingsMenu', title: t('nav.settingsMenu'), icon: 'Menu' },
+    { name: 'settingsAgentic', title: t('nav.settingsAgentic'), icon: 'ChatDotRound' },
+    { name: 'settingsAgenticProvider', title: t('nav.settingsAgenticProvider'), icon: 'ChatLineSquare' },
     {
       name: 'settingsEvent',
       title: t('nav.settingsEvent'),
@@ -113,11 +115,22 @@
     const settings = menuStore.findByCode('settings');
     const children = settings?.children || [];
     if (!children.length) return fallback;
-    return children
+    const items = children
       .slice()
       .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
       .map(mapMenuNode);
+    if (!hasItem(items, 'settingsAgentic')) {
+      items.push({ name: 'settingsAgentic', title: t('nav.settingsAgentic'), icon: 'ChatDotRound' });
+    }
+    if (!hasItem(items, 'settingsAgenticProvider')) {
+      items.push({ name: 'settingsAgenticProvider', title: t('nav.settingsAgenticProvider'), icon: 'ChatLineSquare' });
+    }
+    return items;
   });
+
+  const hasItem = (items: SidebarItem[], name: string): boolean => {
+    return items.some((item) => item.name === name || hasItem(item.children || [], name));
+  };
 
   const activeMenu = computed(() => String(route.name || 'settingsUser'));
 

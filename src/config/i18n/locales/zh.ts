@@ -85,6 +85,8 @@ export default {
     settingsResource: '资源管理',
     settingsApi: 'API 接口',
     settingsMenu: '菜单管理',
+    settingsAgentic: '智能助手',
+    settingsAgenticProvider: '模型提供商',
     settingsEvent: '事件',
     settingsEventOverview: '概览',
     settingsDeviceEvent: '设备事件',

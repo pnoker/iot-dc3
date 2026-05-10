@@ -1,0 +1,573 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import {
+  confirmAgenticAction,
+  deleteAgenticSession,
+  getAgenticAttachments,
+  getAgenticMessages,
+  getAgenticModels,
+  getPendingAgenticActions,
+  rejectAgenticAction,
+  getAgenticSessions,
+  getAgenticSkills,
+  streamAgenticChatCompletion,
+  updateAgenticSession,
+  uploadAgenticAttachment,
+} from '@/api/agentic';
+import type {
+  AgenticAction,
+  AgenticAttachment,
+  AgenticMessage,
+  AgenticModel,
+  AgenticSession,
+  AgenticSkill,
+  AgenticTraceEvent,
+} from '@/config/types';
+import { failMessage, warnMessage } from '@/utils/notificationUtil';
+import { getStorage, setStorage } from '@/utils/storageUtil';
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
+
+const MESSAGE_STORAGE_KEY = 'dc3-agentic-messages';
+const INTERNAL_USER_CONTENT_MARKERS = [
+  '\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation.',
+  '\n\nAttached files available to the user:',
+  '\n\nBackend context:',
+];
+const DEFAULT_MODEL: AgenticModel = {
+  model: 'dc3-agentic',
+  label: 'DC3 Agentic',
+  stream: true,
+  toolCall: true,
+  vision: false,
+  reasoning: false,
+};
+
+export const useAgenticStore = defineStore('agentic', () => {
+  const visible = ref(false);
+  const bootstrapped = ref(false);
+  const loading = ref(false);
+  const streaming = ref(false);
+  const sessions = ref<AgenticSession[]>([]);
+  const models = ref<AgenticModel[]>([]);
+  const skills = ref<AgenticSkill[]>([]);
+  const selectedModel = ref('');
+  const reasoningEnabled = ref(false);
+  const requireConfirmation = ref(true);
+  const temperature = ref<number>();
+  const maxTokens = ref<number>();
+  const activeConversationId = ref('');
+  const currentAbortController = ref<AbortController>();
+  const messagesByConversation = ref<Record<string, AgenticMessage[]>>(readCachedMessages());
+  const attachmentsByConversation = ref<Record<string, AgenticAttachment[]>>({});
+  const pendingAttachmentIdsByConversation = ref<Record<string, number[]>>({});
+  const pendingActionsByConversation = ref<Record<string, AgenticAction[]>>({});
+  const traceEventsByConversation = ref<Record<string, AgenticTraceEvent[]>>({});
+
+  const activeModel = computed(() => {
+    return models.value.find((model) => model.model === selectedModel.value) || models.value[0] || DEFAULT_MODEL;
+  });
+
+  const currentMessages = computed(() => {
+    return activeConversationId.value ? messagesByConversation.value[activeConversationId.value] || [] : [];
+  });
+
+  const currentSession = computed(() => {
+    return sessions.value.find((session) => session.conversationId === activeConversationId.value);
+  });
+
+  const currentAttachments = computed(() => {
+    if (!activeConversationId.value) {
+      return [];
+    }
+    const pendingIds = new Set(pendingAttachmentIdsByConversation.value[activeConversationId.value] || []);
+    return (attachmentsByConversation.value[activeConversationId.value] || []).filter((attachment) =>
+      pendingIds.has(attachment.id)
+    );
+  });
+
+  const currentPendingActions = computed(() => {
+    return activeConversationId.value ? pendingActionsByConversation.value[activeConversationId.value] || [] : [];
+  });
+
+  const currentTraceEvents = computed(() => {
+    return activeConversationId.value ? traceEventsByConversation.value[activeConversationId.value] || [] : [];
+  });
+
+  const open = async () => {
+    visible.value = true;
+    await bootstrap();
+  };
+
+  const close = () => {
+    visible.value = false;
+  };
+
+  const toggle = async () => {
+    if (visible.value) {
+      close();
+      return;
+    }
+    await open();
+  };
+
+  const bootstrap = async () => {
+    if (bootstrapped.value) {
+      ensureActiveSession();
+      return;
+    }
+
+    loading.value = true;
+    try {
+      await Promise.all([loadModels(), loadSkills(), loadSessions()]);
+      bootstrapped.value = true;
+      const conversationId = ensureActiveSession();
+      await Promise.all([
+        loadMessages(conversationId),
+        loadAttachments(conversationId),
+        loadPendingActions(conversationId),
+      ]);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const loadModels = async () => {
+    try {
+      const response = await getAgenticModels();
+      models.value = response.data?.length ? response.data : [DEFAULT_MODEL];
+    } catch (error) {
+      models.value = [DEFAULT_MODEL];
+      warnMessage('Failed to load agentic models, fallback model is used.', 'Agentic', error);
+    }
+
+    const firstModel = models.value[0] || DEFAULT_MODEL;
+    selectedModel.value = selectedModel.value || firstModel.model;
+    temperature.value = temperature.value ?? firstModel.temperature;
+    maxTokens.value = maxTokens.value ?? firstModel.maxTokens;
+  };
+
+  const loadSkills = async () => {
+    try {
+      const response = await getAgenticSkills();
+      skills.value = response.data || [];
+    } catch (error) {
+      skills.value = [];
+      warnMessage('Failed to load agentic skills.', 'Agentic', error);
+    }
+  };
+
+  const loadSessions = async () => {
+    try {
+      const response = await getAgenticSessions({ page: { current: 1, size: 50 } });
+      sessions.value = response.data?.records || [];
+    } catch (error) {
+      sessions.value = [];
+      warnMessage('Failed to load agentic sessions.', 'Agentic', error);
+    }
+  };
+
+  const newSession = () => {
+    const conversationId = createConversationId();
+    activeConversationId.value = conversationId;
+    if (!messagesByConversation.value[conversationId]) {
+      messagesByConversation.value[conversationId] = [];
+    }
+    pendingAttachmentIdsByConversation.value[conversationId] = [];
+    traceEventsByConversation.value[conversationId] = [];
+    if (!sessions.value.some((session) => session.conversationId === conversationId)) {
+      sessions.value = [
+        {
+          conversationId,
+          title: 'New Conversation',
+        },
+        ...sessions.value,
+      ];
+    }
+    persistMessages();
+  };
+
+  const selectSession = async (conversationId?: string | number) => {
+    if (!conversationId) {
+      return;
+    }
+    activeConversationId.value = String(conversationId);
+    if (!messagesByConversation.value[activeConversationId.value]) {
+      messagesByConversation.value[activeConversationId.value] = [];
+      persistMessages();
+    }
+    await loadMessages(activeConversationId.value);
+    await Promise.all([loadAttachments(activeConversationId.value), loadPendingActions(activeConversationId.value)]);
+  };
+
+  const deleteSession = async (conversationId: string) => {
+    if (!conversationId) {
+      return;
+    }
+
+    try {
+      await deleteAgenticSession(conversationId);
+    } catch (error) {
+      warnMessage('Failed to delete server-side agentic session, local session is removed.', 'Agentic', error);
+    }
+
+    delete messagesByConversation.value[conversationId];
+    delete attachmentsByConversation.value[conversationId];
+    delete pendingAttachmentIdsByConversation.value[conversationId];
+    delete pendingActionsByConversation.value[conversationId];
+    delete traceEventsByConversation.value[conversationId];
+    sessions.value = sessions.value.filter((session) => session.conversationId !== conversationId);
+    if (activeConversationId.value === conversationId) {
+      const nextSession = sessions.value[0];
+      if (nextSession) {
+        activeConversationId.value = nextSession.conversationId;
+      } else {
+        newSession();
+      }
+    }
+    persistMessages();
+  };
+
+  const renameSession = async (conversationId: string, title: string) => {
+    const normalizedTitle = normalizeTitle(title);
+    sessions.value = sessions.value.map((session) =>
+      session.conversationId === conversationId ? { ...session, title: normalizedTitle } : session
+    );
+
+    try {
+      const response = await updateAgenticSession(conversationId, {
+        title: normalizedTitle,
+      });
+      sessions.value = sessions.value.map((session) =>
+        session.conversationId === conversationId ? { ...session, ...response.data } : session
+      );
+    } catch (error) {
+      warnMessage('Failed to update agentic session metadata.', 'Agentic', error);
+    }
+  };
+
+  const sendMessage = async (content: string) => {
+    const text = content.trim();
+    if (!text || streaming.value) {
+      return;
+    }
+
+    const conversationId = ensureActiveSession();
+    const userMessage: AgenticMessage = {
+      id: createMessageId('user'),
+      role: 'user',
+      content: text,
+    };
+    const assistantMessage: AgenticMessage = {
+      id: createMessageId('assistant'),
+      role: 'assistant',
+      content: '',
+      streaming: true,
+    };
+
+    setConversationMessages(conversationId, [...currentMessages.value, userMessage, assistantMessage]);
+    traceEventsByConversation.value[conversationId] = [];
+    const abortController = new AbortController();
+    currentAbortController.value = abortController;
+    streaming.value = true;
+
+    try {
+      await streamAgenticChatCompletion(
+        {
+          model: selectedModel.value || activeModel.value.model,
+          messages: [{ role: 'user', content: text }],
+          stream: true,
+          conversationId,
+          temperature: temperature.value,
+          maxTokens: maxTokens.value,
+          attachments: currentAttachments.value.map((attachment) => attachment.id),
+          reasoning: reasoningEnabled.value,
+          confirmActions: requireConfirmation.value,
+        },
+        {
+          signal: abortController.signal,
+          onEvent: (event) => appendTraceEvent(conversationId, event),
+          onDelta: (delta) => appendAssistantDelta(conversationId, assistantMessage.id, delta),
+        }
+      );
+      markAssistantComplete(conversationId, assistantMessage.id);
+      await syncSessionAfterMessage(conversationId, text);
+      await Promise.all([loadMessages(conversationId), loadPendingActions(conversationId)]);
+    } catch (error) {
+      if ((error as Error).name === 'AbortError') {
+        appendAssistantDelta(conversationId, assistantMessage.id, '\n\nCanceled.');
+      } else {
+        failMessage('Agentic chat failed.', 'Agentic', error);
+        appendAssistantDelta(conversationId, assistantMessage.id, '\n\nRequest failed.');
+      }
+      markAssistantComplete(conversationId, assistantMessage.id);
+    } finally {
+      pendingAttachmentIdsByConversation.value[conversationId] = [];
+      streaming.value = false;
+      currentAbortController.value = undefined;
+    }
+  };
+
+  const stopStreaming = () => {
+    currentAbortController.value?.abort();
+  };
+
+  const loadMessages = async (conversationId: string) => {
+    if (!conversationId) {
+      return;
+    }
+    try {
+      const response = await getAgenticMessages(conversationId);
+      if (response.data) {
+        messagesByConversation.value[conversationId] = response.data.map((message) => ({
+          id: String(message.id || createMessageId(message.role)),
+          role: message.role,
+          content: normalizeDisplayContent(message.role, message.content),
+          contentExt: message.contentExt,
+          skills: message.skills,
+          messageIndex: message.messageIndex,
+        }));
+        persistMessages();
+      }
+    } catch (error) {
+      warnMessage('Failed to load agentic messages, local cache is used.', 'Agentic', error);
+    }
+  };
+
+  const loadAttachments = async (conversationId: string) => {
+    if (!conversationId) {
+      return;
+    }
+    try {
+      const response = await getAgenticAttachments(conversationId);
+      attachmentsByConversation.value[conversationId] = response.data || [];
+    } catch (error) {
+      attachmentsByConversation.value[conversationId] = attachmentsByConversation.value[conversationId] || [];
+      warnMessage('Failed to load agentic attachments.', 'Agentic', error);
+    }
+  };
+
+  const uploadAttachment = async (file: File) => {
+    const conversationId = ensureActiveSession();
+    const data = await readFileAsDataUrl(file);
+    const response = await uploadAgenticAttachment({
+      conversationId,
+      fileName: file.name,
+      contentType: file.type || 'application/octet-stream',
+      size: file.size,
+      data,
+    });
+    attachmentsByConversation.value[conversationId] = [
+      response.data,
+      ...(attachmentsByConversation.value[conversationId] || []),
+    ];
+    pendingAttachmentIdsByConversation.value[conversationId] = [
+      response.data.id,
+      ...(pendingAttachmentIdsByConversation.value[conversationId] || []),
+    ];
+  };
+
+  const removeLocalAttachment = (attachmentId: number) => {
+    const conversationId = activeConversationId.value;
+    pendingAttachmentIdsByConversation.value[conversationId] = (
+      pendingAttachmentIdsByConversation.value[conversationId] || []
+    ).filter((id) => id !== attachmentId);
+  };
+
+  const loadPendingActions = async (conversationId: string) => {
+    if (!conversationId) {
+      return;
+    }
+    try {
+      const response = await getPendingAgenticActions(conversationId);
+      pendingActionsByConversation.value[conversationId] = response.data || [];
+    } catch (error) {
+      pendingActionsByConversation.value[conversationId] = [];
+      warnMessage('Failed to load pending agentic actions.', 'Agentic', error);
+    }
+  };
+
+  const confirmAction = async (actionId: string) => {
+    await confirmAgenticAction(actionId);
+    await loadPendingActions(activeConversationId.value);
+  };
+
+  const rejectAction = async (actionId: string) => {
+    await rejectAgenticAction(actionId);
+    await loadPendingActions(activeConversationId.value);
+  };
+
+  const ensureActiveSession = () => {
+    if (!activeConversationId.value) {
+      const existingSession = sessions.value[0];
+      if (existingSession) {
+        activeConversationId.value = existingSession.conversationId;
+      } else {
+        newSession();
+      }
+    }
+    return activeConversationId.value;
+  };
+
+  const syncSessionAfterMessage = async (conversationId: string, firstUserText: string) => {
+    const session = sessions.value.find((item) => item.conversationId === conversationId);
+    const title = normalizeTitle(
+      session?.title && session.title !== 'New Conversation' ? session.title : firstUserText
+    );
+    await renameSession(conversationId, title);
+    await loadSessions();
+    if (!sessions.value.some((item) => item.conversationId === conversationId)) {
+      sessions.value = [{ conversationId, title }, ...sessions.value];
+    }
+  };
+
+  const setConversationMessages = (conversationId: string, messages: AgenticMessage[]) => {
+    messagesByConversation.value[conversationId] = messages;
+    persistMessages();
+  };
+
+  const appendAssistantDelta = (conversationId: string, messageId: string, delta: string) => {
+    const messages = messagesByConversation.value[conversationId] || [];
+    setConversationMessages(
+      conversationId,
+      messages.map((message) => (message.id === messageId ? { ...message, content: message.content + delta } : message))
+    );
+  };
+
+  const markAssistantComplete = (conversationId: string, messageId: string) => {
+    const messages = messagesByConversation.value[conversationId] || [];
+    setConversationMessages(
+      conversationId,
+      messages.map((message) => (message.id === messageId ? { ...message, streaming: false } : message))
+    );
+  };
+
+  const appendTraceEvent = (conversationId: string, event: AgenticTraceEvent) => {
+    traceEventsByConversation.value[conversationId] = [
+      ...(traceEventsByConversation.value[conversationId] || []),
+      {
+        ...event,
+        id: event.id || createTraceEventId(event.type),
+      },
+    ];
+  };
+
+  const persistMessages = () => {
+    setStorage(MESSAGE_STORAGE_KEY, messagesByConversation.value);
+  };
+
+  return {
+    visible,
+    bootstrapped,
+    loading,
+    streaming,
+    sessions,
+    models,
+    skills,
+    selectedModel,
+    reasoningEnabled,
+    requireConfirmation,
+    temperature,
+    maxTokens,
+    activeConversationId,
+    messagesByConversation,
+    attachmentsByConversation,
+    pendingAttachmentIdsByConversation,
+    pendingActionsByConversation,
+    traceEventsByConversation,
+    activeModel,
+    currentMessages,
+    currentSession,
+    currentAttachments,
+    currentPendingActions,
+    currentTraceEvents,
+    open,
+    close,
+    toggle,
+    bootstrap,
+    loadSessions,
+    newSession,
+    selectSession,
+    deleteSession,
+    renameSession,
+    sendMessage,
+    stopStreaming,
+    loadMessages,
+    loadAttachments,
+    uploadAttachment,
+    removeLocalAttachment,
+    loadPendingActions,
+    confirmAction,
+    rejectAction,
+  };
+});
+
+const readCachedMessages = (): Record<string, AgenticMessage[]> => {
+  const cached = getStorage(MESSAGE_STORAGE_KEY);
+  if (!cached || typeof cached !== 'object') {
+    return {};
+  }
+  return Object.fromEntries(
+    Object.entries(cached as Record<string, AgenticMessage[]>).map(([conversationId, messages]) => [
+      conversationId,
+      Array.isArray(messages)
+        ? messages.map((message) => ({
+            ...message,
+            content: normalizeDisplayContent(message.role, message.content),
+          }))
+        : [],
+    ])
+  );
+};
+
+const createConversationId = () => {
+  return typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `conversation-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
+
+const createMessageId = (role: string) => {
+  return `${role}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
+
+const createTraceEventId = (type: string) => {
+  return `trace-${type}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
+
+const normalizeTitle = (title: string) => {
+  const trimmed = title.trim().replace(/\s+/g, ' ');
+  return trimmed.length > 32 ? `${trimmed.slice(0, 32)}...` : trimmed || 'New Conversation';
+};
+
+const normalizeDisplayContent = (role: string, content?: string) => {
+  if (role !== 'user') {
+    return content || '';
+  }
+  return INTERNAL_USER_CONTENT_MARKERS.reduce((displayContent, marker) => {
+    const markerIndex = displayContent.indexOf(marker);
+    return markerIndex >= 0 ? displayContent.slice(0, markerIndex).trimEnd() : displayContent;
+  }, content || '');
+};
+
+const readFileAsDataUrl = (file: File) => {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+};

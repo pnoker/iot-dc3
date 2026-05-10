@@ -84,7 +84,7 @@
       <el-scrollbar ref="scrollbarRef">
         <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item v-for="item in breadcrumbItems" :key="item.path" :to="item.path">
+            <el-breadcrumb-item v-for="(item, index) in breadcrumbItems" :key="`${item.path}-${index}`" :to="item.path">
               <span class="breadcrumb__item">
                 <el-icon v-if="item.icon" class="breadcrumb__icon">
                   <component :is="item.icon" />
@@ -98,10 +98,12 @@
       </el-scrollbar>
       <el-backtop :right="40" :bottom="40" target=".body .el-scrollbar__wrap" />
     </div>
+    <agentic-assistant />
   </div>
 </template>
 
 <script lang="ts" setup>
+  import AgenticAssistant from '@/components/agentic/AgenticAssistant.vue';
   import router from '@/config/router';
   import { HomeFilled, QuestionFilled, Setting, SwitchButton } from '@element-plus/icons-vue';
   import { computed, onMounted } from 'vue';
@@ -151,6 +153,7 @@
     settingsResource: 'nav.settingsResource',
     settingsApi: 'nav.settingsApi',
     settingsMenu: 'nav.settingsMenu',
+    settingsAgentic: 'nav.settingsAgentic',
     settingsEvent: 'nav.settingsEvent',
     settingsDeviceEvent: 'nav.settingsDeviceEvent',
     settingsDriverEvent: 'nav.settingsDriverEvent',
@@ -192,6 +195,7 @@
     settingsResource: 'Key',
     settingsApi: 'Link',
     settingsMenu: 'Menu',
+    settingsAgentic: 'ChatDotRound',
     settingsEvent: 'Bell',
     settingsEventOverview: 'DataLine',
     settingsDeviceEvent: 'Management',

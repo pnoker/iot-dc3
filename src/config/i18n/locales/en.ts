@@ -85,6 +85,8 @@ export default {
     settingsResource: 'Resource',
     settingsApi: 'Api',
     settingsMenu: 'Menu',
+    settingsAgentic: 'Agentic',
+    settingsAgenticProvider: 'Agentic Provider',
     settingsEvent: 'Event',
     settingsEventOverview: 'Overview',
     settingsDeviceEvent: 'Device Event',

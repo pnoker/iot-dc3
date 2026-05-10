@@ -1,0 +1,151 @@
+<!--
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
+<template>
+  <el-dialog
+    v-model="visible"
+    :append-to-body="true"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+    :show-close="false"
+    class="things-dialog"
+    draggable
+    :title="isEdit ? 'Edit Provider' : 'Add Provider'"
+    @closed="onClosed"
+  >
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
+      <el-form-item label="Name" prop="name">
+        <el-input v-model="form.name" clearable placeholder="My Provider" />
+      </el-form-item>
+      <el-form-item label="Type" prop="providerType">
+        <el-select v-model="form.providerType" placeholder="Select a provider type" style="width: 100%">
+          <el-option v-for="pt in providerTypes" :key="pt.value" :label="pt.label" :value="pt.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Base URL" prop="baseUrl">
+        <el-input v-model="form.baseUrl" clearable placeholder="https://api.openai.com" />
+      </el-form-item>
+      <el-form-item label="API Key" prop="apiKey">
+        <el-input v-model="form.apiKey" type="password" show-password clearable placeholder="sk-..." />
+      </el-form-item>
+      <el-form-item label="Default">
+        <el-switch
+          v-model="form.defaultFlag"
+          :active-value="1"
+          :inactive-value="0"
+          active-text="Yes"
+          inactive-text="No"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('common.enable')">
+        <el-switch
+          v-model="form.enableFlag"
+          :active-value="0"
+          :inactive-value="1"
+          :active-text="$t('common.enable')"
+          :inactive-text="$t('common.disable')"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('common.remark')">
+        <el-input v-model="form.remark" type="textarea" :rows="3" maxlength="300" show-word-limit />
+      </el-form-item>
+    </el-form>
+    <div class="things-dialog-footer">
+      <el-button @click="visible = false">{{ $t('common.cancel') }}</el-button>
+      <el-button plain type="success" @click="onReset">{{ $t('common.reset') }}</el-button>
+      <el-button type="primary" :loading="submitting" @click="onSubmit">
+        {{ $t('common.confirm') }}
+      </el-button>
+    </div>
+  </el-dialog>
+</template>
+
+<script lang="ts" setup>
+  import { reactive, ref } from 'vue';
+  import type { FormInstance, FormRules } from 'element-plus';
+  import type { AgenticProvider } from '@/config/types';
+
+  const providerTypes = [
+    { label: 'OpenAI Compatible', value: 'openai-compatible' },
+    { label: 'Anthropic', value: 'anthropic' },
+  ];
+
+  const emit = defineEmits<{
+    (e: 'save', form: AgenticProvider & { apiKey?: string }, done: () => void): void;
+  }>();
+
+  const visible = ref(false);
+  const isEdit = ref(false);
+  const submitting = ref(false);
+  const formRef = ref<FormInstance>();
+
+  const initialForm = (): AgenticProvider & { apiKey?: string } => ({
+    name: '',
+    providerType: 'openai-compatible',
+    baseUrl: '',
+    apiKey: '',
+    defaultFlag: 0,
+    enableFlag: 0,
+    remark: '',
+  });
+
+  const form = reactive(initialForm());
+
+  const rules: FormRules = {
+    name: [{ required: true, message: 'Name is required', trigger: 'blur' }],
+    baseUrl: [{ required: true, message: 'Base URL is required', trigger: 'blur' }],
+  };
+
+  const show = () => {
+    isEdit.value = false;
+    Object.assign(form, initialForm());
+    visible.value = true;
+  };
+
+  const showEdit = (row: AgenticProvider & { apiKey?: string }) => {
+    isEdit.value = true;
+    Object.assign(form, initialForm(), row);
+    visible.value = true;
+  };
+
+  const onClosed = () => {
+    formRef.value?.resetFields();
+  };
+
+  const onReset = () => {
+    if (isEdit.value) {
+      formRef.value?.clearValidate();
+    } else {
+      Object.assign(form, initialForm());
+      formRef.value?.resetFields();
+    }
+  };
+
+  const onSubmit = async () => {
+    await formRef.value?.validate();
+    submitting.value = true;
+    emit('save', { ...form }, () => {
+      submitting.value = false;
+      visible.value = false;
+    });
+  };
+
+  defineExpose({ show, showEdit });
+</script>
+
+<style lang="scss" scoped>
+  @use '@/styles/things-dialog.scss';
+</style>
