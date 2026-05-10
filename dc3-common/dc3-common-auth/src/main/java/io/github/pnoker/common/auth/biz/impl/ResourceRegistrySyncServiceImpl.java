@@ -89,20 +89,10 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
      * row; parent_resource_id mirrors the parent menu's resource.
      */
     private static final String MENU_RESOURCE_CODE_PREFIX = "menu:";
-
-    /**
-     * Counters for resource-tree repairs performed while keeping the public sync result
-     * focused on dc3_api row changes.
-     */
-    private record ResourceRepairResult(int inserted, int updated) {
-    }
-
     @Resource
     private ApiManager apiManager;
-
     @Resource
     private ResourceManager resourceManager;
-
     @Resource
     private ResourceRegistryLockMapper resourceRegistryLockMapper;
 
@@ -659,6 +649,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
                 .eq(ResourceDO::getEntityId, parentMenuId)
                 .last("LIMIT 1"));
         return Objects.isNull(parent) ? 0L : parent.getId();
+    }
+
+    /**
+     * Counters for resource-tree repairs performed while keeping the public sync result
+     * focused on dc3_api row changes.
+     */
+    private record ResourceRepairResult(int inserted, int updated) {
     }
 
 }
