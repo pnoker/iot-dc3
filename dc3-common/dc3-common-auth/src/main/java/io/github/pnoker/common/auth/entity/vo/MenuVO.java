@@ -27,6 +27,7 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,7 +53,7 @@ public class MenuVO extends BaseVO {
     /**
      * ID
      */
-    @NotBlank(message = "Menu parent id can't be empty", groups = {Add.class, Update.class})
+    @NotNull(message = "Menu parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentMenuId;
 
     /**
