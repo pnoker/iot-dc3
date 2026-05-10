@@ -19,9 +19,10 @@ import { defineComponent, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '@/config/router';
 
-import { getDeviceByDriverId, getDeviceStatusByDriverId } from '@/api/device';
+import { getDeviceStatusByDriverId } from '@/api/device';
 import { getProfileByIds } from '@/api/profile';
-import { getDriverById, getDriverByIds } from '@/api/driver';
+import { getDriverByIds } from '@/api/driver';
+import { getDeviceByPointId, getPointById } from '@/api/point';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';
@@ -43,7 +44,7 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
-      active: route.query.active as string,
+      active: (route.query.active as string) || 'detail',
       driverTable: {} as Record<string, any>,
       profileTable: {} as Record<string, any>,
       statusTable: {} as Record<string, any>,
@@ -51,8 +52,8 @@ export default defineComponent({
       listDeviceData: [] as any[],
     });
 
-    const driver = () => {
-      getDriverById(reactiveData.id)
+    const point = () => {
+      getPointById(reactiveData.id)
         .then((res) => {
           reactiveData.data = res.data;
         })
@@ -62,44 +63,57 @@ export default defineComponent({
     };
 
     const device = () => {
-      getDeviceByDriverId(reactiveData.id)
+      getDeviceByPointId(reactiveData.id)
         .then((res) => {
-          reactiveData.listDeviceData = res.data;
+          reactiveData.listDeviceData = res.data?.devices || [];
 
           // driver
-          const driverIds = Array.from(new Set(reactiveData.listDeviceData.map((device) => device.driverId)));
-          getDriverByIds(driverIds)
-            .then((res) => {
-              reactiveData.driverTable = res.data;
-            })
-            .catch(() => {
-              // nothing to do
-            });
+          const driverIds = Array.from(new Set(reactiveData.listDeviceData.map((device) => device.driverId))).filter(
+            Boolean
+          );
+          if (driverIds.length > 0) {
+            getDriverByIds(driverIds)
+              .then((res) => {
+                reactiveData.driverTable = res.data;
+              })
+              .catch(() => {
+                // nothing to do
+              });
+
+            Promise.all(driverIds.map((driverId) => getDeviceStatusByDriverId(driverId)))
+              .then((resList) => {
+                reactiveData.statusTable = resList.reduce<Record<string, any>>((pre, cur) => {
+                  return { ...pre, ...(cur.data || {}) };
+                }, {});
+              })
+              .catch(() => {
+                // nothing to do
+              });
+          } else {
+            reactiveData.driverTable = {};
+            reactiveData.statusTable = {};
+          }
 
           // profile
           const profileIds = Array.from(
             new Set(
               reactiveData.listDeviceData.reduce<string[]>((pre, cur) => {
-                pre.push(...cur.profileIds);
+                pre.push(...(cur.profileIds || []));
                 return pre;
               }, [])
             )
-          );
-          getProfileByIds(profileIds)
-            .then((res) => {
-              reactiveData.profileTable = res.data;
-            })
-            .catch(() => {
-              // nothing to do
-            });
-        })
-        .catch(() => {
-          // nothing to do
-        });
-
-      getDeviceStatusByDriverId(reactiveData.id)
-        .then((res) => {
-          reactiveData.statusTable = res.data;
+          ).filter(Boolean);
+          if (profileIds.length > 0) {
+            getProfileByIds(profileIds)
+              .then((res) => {
+                reactiveData.profileTable = res.data;
+              })
+              .catch(() => {
+                // nothing to do
+              });
+          } else {
+            reactiveData.profileTable = {};
+          }
         })
         .catch(() => {
           // nothing to do
@@ -107,7 +121,7 @@ export default defineComponent({
     };
 
     const deviceName = () => {
-      return reactiveData.listDeviceData.map((device) => device.pointName).join(', ');
+      return reactiveData.listDeviceData.map((device) => device.deviceName).join(', ');
     };
 
     const changeActive = (tab: any) => {
@@ -117,12 +131,12 @@ export default defineComponent({
       });
     };
 
-    driver();
+    point();
     device();
 
     return {
       reactiveData,
-      driver,
+      point,
       device,
       deviceName,
       changeActive,

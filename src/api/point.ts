@@ -17,7 +17,7 @@
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 import type { PageQuery, PageResult } from '@/config/types';
-import type { PointForm, PointRecord } from '@/config/types/manager';
+import type { DeviceRecord, PointForm, PointRecord } from '@/config/types/manager';
 
 export const addPoint = (point: PointForm) => httpPost<R<PointRecord>>(`${API_MANAGER_BASE}/point/add`, point);
 
@@ -38,6 +38,11 @@ export const getPointUnit = (pointIds: string[]) => httpPost(`${API_MANAGER_BASE
 export const getPointByProfileId = (profileId: string) => httpGet(`${API_MANAGER_BASE}/point/profile_id/${profileId}`);
 
 export const getPointByDeviceId = (deviceId: string) => httpGet(`${API_MANAGER_BASE}/point/device_id/${deviceId}`);
+
+export const getDeviceByPointId = (pointId: string) =>
+  httpGet<R<{ count: number; devices: DeviceRecord[] }>>(
+    `${API_MANAGER_BASE}/point/selectPointStatisticsWithDevice/${pointId}`
+  );
 
 export const getPointValueLatest = (pointValue: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/point_value/latest`, pointValue);
