@@ -259,12 +259,13 @@ public class PointServiceImpl implements PointService {
             }
         });
         DeviceByPointBO deviceByPointBO = new DeviceByPointBO();
-        if (Objects.nonNull(deviceIds)) {
+        if (CollectionUtils.isNotEmpty(deviceIds)) {
             List<DeviceDO> deviceDOList = deviceMapper
                     .selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
             deviceByPointBO.setDevices(deviceDOList);
             deviceByPointBO.setCount(deviceDOList.stream().count());
         } else {
+            deviceByPointBO.setDevices(Collections.emptyList());
             deviceByPointBO.setCount(0L);
         }
         return deviceByPointBO;
