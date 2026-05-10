@@ -61,14 +61,6 @@ public class MenuExt extends BaseExt {
         private Map<String, String> titles;
 
         /**
-         * Legacy i18n key (e.g. {@code nav.home}) kept only for backward compatibility
-         * with pre-multilingual menu records. New menus must populate {@link #titles}
-         * instead; the UI treats this as a final fallback when {@code titles} is empty.
-         */
-        @Deprecated
-        private String title;
-
-        /**
          * Icon.
          */
         private String icon;
