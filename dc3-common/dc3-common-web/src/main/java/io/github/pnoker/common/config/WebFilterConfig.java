@@ -39,13 +39,12 @@ import org.springframework.web.server.WebFilter;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Web Filter Configuration Class
  * <p>
- * Configuration class for custom web filters in reactive applications. Configures context
- * path filter and user header interceptor for request processing.
+ * Configuration class for custom web filters in reactive applications. Configures user
+ * header interception for request processing.
  * </p>
  *
  * @author pnoker
@@ -57,28 +56,7 @@ import java.util.Optional;
 public class WebFilterConfig {
 
     @Resource
-    private org.springframework.core.env.Environment environment;
-
-    @Resource
     private HmacAuthSigner hmacAuthSigner;
-
-    /**
-     * Custom context path filter
-     *
-     * @return WebFilter for handling context path
-     */
-    @Bean
-    public WebFilter contextPathWebFilter() {
-        String contextPath = Optional.ofNullable(environment.getProperty("server.reactive.context-path")).orElse("/");
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            if (request.getURI().getPath().startsWith(contextPath)) {
-                return chain
-                        .filter(exchange.mutate().request(request.mutate().contextPath(contextPath).build()).build());
-            }
-            return chain.filter(exchange);
-        };
-    }
 
     /**
      * Custom user header interceptor filter
