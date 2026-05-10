@@ -56,6 +56,11 @@ public class AgenticConstant {
     public static final String MODEL_URL_PREFIX = "/model";
 
     /**
+     * URL prefix for the provider REST API.
+     */
+    public static final String PROVIDER_URL_PREFIX = "/provider";
+
+    /**
      * URL prefix for the message REST API.
      */
     public static final String MESSAGE_URL_PREFIX = "/message";
