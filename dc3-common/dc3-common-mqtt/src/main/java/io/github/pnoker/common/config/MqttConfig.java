@@ -22,7 +22,7 @@ import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MqttUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageProducer;
@@ -49,7 +49,7 @@ import java.util.Objects;
  * @since 2022.1.0
  */
 @Slf4j
-@Configuration
+@AutoConfiguration
 public class MqttConfig {
 
     private final MqttProperties mqttProperties;

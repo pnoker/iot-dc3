@@ -28,7 +28,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 /**
  * RabbitMQ Configuration Class
@@ -43,7 +43,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022.1.0
  */
 @Slf4j
-@Configuration
+@AutoConfiguration
 public class RabbitConfig {
 
     private final ConnectionFactory connectionFactory;

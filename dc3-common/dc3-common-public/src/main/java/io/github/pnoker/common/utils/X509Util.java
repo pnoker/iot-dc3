@@ -112,32 +112,17 @@ public class X509Util {
     // TODO: 2023.10.16 There are issues here, currently in an unavailable state
     @SuppressWarnings("unchecked")
     private static <T> T loadCertificateWithPassword(String caCrtFile, String password) throws IOException {
-        PemReader reader = null;
-        try {
-            String classPath = "classpath:";
-            if (caCrtFile.startsWith(classPath)) {
-                InputStream inputStream = X509Util.class.getResourceAsStream(caCrtFile.replace(classPath, ""));
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                if (Objects.nonNull(password)) {
-                    reader = new PemReader(inputStreamReader);
-                } else {
-                    reader = new PemReader(inputStreamReader);
-                }
-            } else {
-                Path path = Paths.get(caCrtFile);
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(path));
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                if (Objects.nonNull(password)) {
-                    reader = new PemReader(inputStreamReader);
-                } else {
-                    reader = new PemReader(inputStreamReader);
-                }
-            }
+        String classPath = "classpath:";
+        InputStream inputStream;
+        if (caCrtFile.startsWith(classPath)) {
+            inputStream = X509Util.class.getResourceAsStream(caCrtFile.replace(classPath, ""));
+        } else {
+            inputStream = new ByteArrayInputStream(Files.readAllBytes(Paths.get(caCrtFile)));
+        }
+        try (InputStream is = inputStream;
+             InputStreamReader isr = new InputStreamReader(is);
+             PemReader reader = new PemReader(isr)) {
             return (T) reader.readPemObject();
-        } finally {
-            if (Objects.nonNull(reader)) {
-                reader.close();
-            }
         }
     }
 

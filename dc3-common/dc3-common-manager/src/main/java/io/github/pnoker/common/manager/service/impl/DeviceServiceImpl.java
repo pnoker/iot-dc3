@@ -507,10 +507,9 @@ public class DeviceServiceImpl implements DeviceService {
             Path resourcePath = Paths.get(resource.getURI());
             String fileName = MessageFormat.format("dc3_device_import_template_{0}.xlsx", System.currentTimeMillis());
             path = resourcePath.resolve(fileName);
-            FileOutputStream outputStream = new FileOutputStream(path.toUri().getPath());
-            workbook.write(outputStream);
-            workbook.close();
-            outputStream.close();
+            try (FileOutputStream outputStream = new FileOutputStream(path.toUri().getPath())) {
+                workbook.write(outputStream);
+            }
         } catch (IOException e) {
             throw new ServiceException("Generate template error: {}", e.getMessage());
         }

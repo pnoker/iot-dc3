@@ -23,7 +23,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 /**
  * RabbitMQ Exchange Configuration Class
@@ -40,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Getter
 @Setter
-@Configuration
+@AutoConfiguration
 public class ExchangeConfig {
 
     /**

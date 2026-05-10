@@ -18,51 +18,30 @@
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.utils.JsonUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.http.codec.json.JacksonJsonDecoder;
-import org.springframework.http.codec.json.JacksonJsonEncoder;
-import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
- * WebFlux Configuration Class
- * <p>
- * Configuration class for Spring WebFlux reactive web framework. Configures resource
- * handlers for static files and custom JSON message codecs using the project's JsonUtil
- * for consistent serialization.
- * </p>
+ * WebFlux auto-configuration for static resources and JSON codecs.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Slf4j
-@EnableWebFlux
-@Configuration
+@AutoConfiguration
 public class WebFluxConfig implements WebFluxConfigurer {
 
-    /**
-     * Configure static resource handlers
-     *
-     * @param registry ResourceHandlerRegistry for configuring static resources
-     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/");
     }
 
-    /**
-     * Configure HTTP message codecs for JSON serialization/deserialization
-     *
-     * @param configurer ServerCodecConfigurer for configuring message codecs
-     */
     @Override
     public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-        configurer.customCodecs().registerWithDefaultConfig(new JacksonJsonEncoder(JsonUtil.getJsonMapper()));
-        configurer.customCodecs().registerWithDefaultConfig(new JacksonJsonDecoder(JsonUtil.getJsonMapper()));
+        configurer.defaultCodecs().jacksonJsonEncoder(new org.springframework.http.codec.json.JacksonJsonEncoder(JsonUtil.getJsonMapper()));
+        configurer.defaultCodecs().jacksonJsonDecoder(new org.springframework.http.codec.json.JacksonJsonDecoder(JsonUtil.getJsonMapper()));
     }
 
 }
