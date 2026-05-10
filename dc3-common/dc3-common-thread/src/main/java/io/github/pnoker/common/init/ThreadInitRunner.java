@@ -22,7 +22,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 /**
  * Thread Initialization Runner for DC3 IoT Platform. This component handles thread
@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Configuration;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Configuration
+@AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.thread"})
 @EnableConfigurationProperties({ThreadProperties.class})
 public class ThreadInitRunner implements ApplicationRunner {

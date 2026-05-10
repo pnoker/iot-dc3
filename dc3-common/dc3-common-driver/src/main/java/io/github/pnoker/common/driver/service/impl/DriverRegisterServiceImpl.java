@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bo.RegisterBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
@@ -56,9 +57,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             // Register driver with the driver client
             driverClient.driverRegister(entityBO);
         } catch (Exception e) {
-            // Log error and exit if initialization fails
             log.error("Driver initialization failed: {}", e.getMessage(), e);
-            System.exit(1);
+            throw new ServiceException("Driver initialization failed: {}", e.getMessage());
         }
     }
 

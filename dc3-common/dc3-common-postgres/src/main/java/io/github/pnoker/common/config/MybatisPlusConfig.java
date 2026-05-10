@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Configuration
+@AutoConfiguration
 @EnableTransactionManagement
 public class MybatisPlusConfig {
 

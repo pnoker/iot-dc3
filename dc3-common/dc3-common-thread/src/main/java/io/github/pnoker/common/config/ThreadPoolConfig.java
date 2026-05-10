@@ -20,7 +20,7 @@ package io.github.pnoker.common.config;
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 2022.1.0
  */
 @Slf4j
-@Configuration
+@AutoConfiguration
 public class ThreadPoolConfig {
 
     private final AtomicInteger threadPoolAtomic = new AtomicInteger(1);

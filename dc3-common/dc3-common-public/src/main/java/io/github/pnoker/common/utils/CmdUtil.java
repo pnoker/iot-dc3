@@ -47,12 +47,10 @@ public class CmdUtil {
      * @param cmd     Exit command to send before destroying
      */
     public static void destroyProcessWithCmd(Process process, String cmd) {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-        try {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
             if (!cmd.equals(StringUtils.EMPTY)) {
                 writer.write(cmd);
                 writer.flush();
-                writer.close();
             }
             process.destroyForcibly();
         } catch (IOException e) {
