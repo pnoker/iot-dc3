@@ -25,6 +25,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Tree-shaped variant of {@link RoleBO} — adds a nested children collection so the role
@@ -67,7 +68,7 @@ public class RoleTreeBO extends RoleBO {
     }
 
     public void addChild(RoleTreeBO child) {
-        if (children == null) {
+        if (Objects.isNull(children)) {
             children = new ArrayList<>();
         }
         children.add(child);

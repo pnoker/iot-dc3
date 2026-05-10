@@ -91,7 +91,7 @@ public class DriverEventServiceImpl implements DriverEventService {
         // flips below, and the matching removal hook (see OfflineExpiryListener) lands
         // one
         // when the TTL elapses without a fresh heartbeat.
-        if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {
+        if (Objects.nonNull(prev) && !Objects.equals(prev, current) && isFlip(prev, current)) {
             String message = String.format("Driver status changed: %s -> %s", prev, current);
             persist(payload, DriverEventTypeEnum.ALARM, "driver-state-flip", message);
         }
@@ -105,7 +105,7 @@ public class DriverEventServiceImpl implements DriverEventService {
             log.warn("Drop driver alarm without driverId: {}", entityDTO.getContent());
             return;
         }
-        String msg = payload.getMessage() != null ? payload.getMessage() : entityDTO.getContent();
+        String msg = Objects.nonNull(payload.getMessage()) ? payload.getMessage() : entityDTO.getContent();
         persist(payload, DriverEventTypeEnum.ALARM, "driver-alarm", msg);
     }
 
@@ -117,7 +117,7 @@ public class DriverEventServiceImpl implements DriverEventService {
         entity.setEventExt(JsonExt.builder().type(extType).content(extContent).version(1).build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
+        entity.setTenantId(Objects.nonNull(payload.getTenantId()) ? payload.getTenantId() : 0L);
         driverEventManager.save(entity);
     }
 

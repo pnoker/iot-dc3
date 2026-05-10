@@ -59,6 +59,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Objects;
 
 /**
  * @author pnoker
@@ -92,11 +93,11 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private static String enableKey(Object raw) {
-        if (raw == null)
+        if (Objects.isNull(raw))
             return TopologyLimits.UNKNOWN_BUCKET;
         Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
         EnableFlagEnum e = EnableFlagEnum.ofIndex(b);
-        return e == null ? TopologyLimits.UNKNOWN_BUCKET : e.name();
+        return Objects.isNull(e) ? TopologyLimits.UNKNOWN_BUCKET : e.name();
     }
 
     // ================================================================
@@ -104,11 +105,11 @@ public class DashboardServiceImpl implements DashboardService {
     // ================================================================
 
     private static String driverTypeKey(Object raw) {
-        if (raw == null)
+        if (Objects.isNull(raw))
             return TopologyLimits.UNKNOWN_BUCKET;
         Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
         DriverTypeFlagEnum e = DriverTypeFlagEnum.ofIndex(b);
-        return e == null ? TopologyLimits.UNKNOWN_BUCKET : e.name();
+        return Objects.isNull(e) ? TopologyLimits.UNKNOWN_BUCKET : e.name();
     }
 
     /**
@@ -120,7 +121,7 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate anchor = today.minusDays(length - 1L);
         for (DailyGrowthRow row : rows) {
             LocalDate day = row.getDay();
-            if (day == null)
+            if (Objects.isNull(day))
                 continue;
             int idx = (int) (day.toEpochDay() - anchor.toEpochDay());
             if (idx >= 0 && idx < length) {
@@ -154,7 +155,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private static String normaliseRange(String rangeKey) {
-        if (rangeKey == null || rangeKey.isBlank())
+        if (Objects.isNull(rangeKey) || rangeKey.isBlank())
             return TopologyLimits.RANGE_DEFAULT;
         return switch (rangeKey) {
             case TopologyLimits.RANGE_TODAY, TopologyLimits.RANGE_24H, TopologyLimits.RANGE_7D,
@@ -183,7 +184,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private static long nullZero(Long v) {
-        return v == null ? 0L : v;
+        return Objects.isNull(v) ? 0L : v;
     }
 
     private static TopologyNodeVO node(String id, String name, int layer, String type,
@@ -214,7 +215,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<BucketVO> byType = buckets(dashboardMapper.countDriverByType(tenantId),
                 DashboardServiceImpl::driverTypeKey);
         List<BucketVO> byService = buckets(dashboardMapper.countDriverByService(tenantId),
-                v -> v == null ? SymbolConstant.HYPHEN : v.toString());
+                v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
 
         out.setByEnable(byEnable);
         out.setByType(byType);
@@ -231,9 +232,9 @@ public class DashboardServiceImpl implements DashboardService {
         List<BucketVO> byEnable = buckets(dashboardMapper.countDeviceByEnable(tenantId),
                 DashboardServiceImpl::enableKey);
         List<BucketVO> byDriver = buckets(dashboardMapper.countDeviceByDriver(tenantId, clampedTopN),
-                v -> v == null ? SymbolConstant.HYPHEN : v.toString());
+                v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
         List<BucketVO> byProfile = buckets(dashboardMapper.countDeviceByProfile(tenantId, clampedTopN),
-                v -> v == null ? SymbolConstant.HYPHEN : v.toString());
+                v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
 
         out.setByEnable(byEnable);
         out.setByDriver(byDriver);
@@ -264,7 +265,7 @@ public class DashboardServiceImpl implements DashboardService {
         String normRange = normaliseRange(rangeKey);
         String cacheKey = tenantId + ":" + normMode + ":" + normRange;
         TopologyVO hit = topologyCache.getIfPresent(cacheKey);
-        if (hit != null)
+        if (Objects.nonNull(hit))
             return hit;
 
         TopologyVO out = computeTopology(tenantId, normMode, normRange);
@@ -374,7 +375,7 @@ public class DashboardServiceImpl implements DashboardService {
                     long sum = 0;
                     for (Long did : devs) {
                         Map<Long, Long> vs = volumeByDevicePoint.get(did);
-                        if (vs != null)
+                        if (Objects.nonNull(vs))
                             sum += vs.getOrDefault(pid, 0L);
                     }
                     pointWeight.put(pid, sum);
@@ -387,7 +388,7 @@ public class DashboardServiceImpl implements DashboardService {
                     sum += v;
                 deviceWeight.put(did, sum);
                 Long drvId = deviceToDriver.get(did);
-                if (drvId != null)
+                if (Objects.nonNull(drvId))
                     driverWeight.merge(drvId, sum, Long::sum);
             }
         } else {
@@ -468,7 +469,7 @@ public class DashboardServiceImpl implements DashboardService {
         Set<Long> keptProfileIds = new LinkedHashSet<>();
         for (Long did : topDeviceIdSet) {
             Set<Long> pids = profilesByDevice.get(did);
-            if (pids != null)
+            if (Objects.nonNull(pids))
                 keptProfileIds.addAll(pids);
         }
         if (volumeMode) {
@@ -549,7 +550,7 @@ public class DashboardServiceImpl implements DashboardService {
                 long sum = 0;
                 Map<Long, Long> devVols = volumeByDevicePoint.get(deviceId);
                 List<TopologyPointRow> pts = pointsByProfile.getOrDefault(profileId, Collections.emptyList());
-                if (devVols != null) {
+                if (Objects.nonNull(devVols)) {
                     for (TopologyPointRow p : pts) {
                         sum += devVols.getOrDefault(p.getId(), 0L);
                     }

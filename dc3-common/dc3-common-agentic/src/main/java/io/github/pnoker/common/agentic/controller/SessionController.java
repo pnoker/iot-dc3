@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import java.util.Objects;
 
 /**
  * @author pnoker
@@ -57,7 +58,7 @@ public class SessionController implements BaseController {
     @GetMapping
     public Mono<R<Page<SessionVO>>> list(SessionQuery query) {
         return getUserHeader().flatMap(header -> async(() -> {
-            SessionQuery scopedQuery = query == null ? new SessionQuery() : query;
+            SessionQuery scopedQuery = Objects.isNull(query) ? new SessionQuery() : query;
             scopedQuery.setTenantId(header.getTenantId());
             scopedQuery.setUserId(header.getUserId());
             Page<SessionBO> page = sessionService.selectByPage(scopedQuery);
@@ -72,7 +73,7 @@ public class SessionController implements BaseController {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.getByConversationId(AgenticConversationIds.scope(header.getTenantId(),
                     header.getUserId(), conversationId));
-            if (session == null) {
+            if (Objects.isNull(session)) {
                 return R.fail("Session not found");
             }
             SessionVO vo = sessionBuilder.buildVOByBO(session);

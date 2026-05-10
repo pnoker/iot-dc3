@@ -149,7 +149,7 @@ public class MenuController implements BaseController {
         out.setOperatorId(flat.getOperatorId());
         out.setOperatorName(flat.getOperatorName());
         out.setOperateTime(flat.getOperateTime());
-        if (node.getChildren() != null) {
+        if (Objects.nonNull(node.getChildren())) {
             List<MenuTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
             for (MenuTreeBO child : node.getChildren()) {
                 childVOs.add(toTreeVO(child));

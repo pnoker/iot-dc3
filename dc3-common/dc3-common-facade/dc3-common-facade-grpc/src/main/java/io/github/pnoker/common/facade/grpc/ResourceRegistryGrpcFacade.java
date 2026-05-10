@@ -56,7 +56,7 @@ public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
                 .setServiceName(Objects.requireNonNullElse(command.getServiceName(), ""))
                 .setDeleteMissing(command.isDeleteMissing());
         List<FacadeScannedApiBO> apis = command.getApis();
-        if (apis != null) {
+        if (Objects.nonNull(apis)) {
             for (FacadeScannedApiBO api : apis) {
                 request.addApis(GrpcScannedApiDTO.newBuilder()
                         .setMethod(Objects.requireNonNullElse(api.getMethod(), ""))

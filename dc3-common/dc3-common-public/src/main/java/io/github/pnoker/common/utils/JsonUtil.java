@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * JSON serialization/deserialization utility based on Jackson.
@@ -413,7 +414,7 @@ public final class JsonUtil {
      * @return true if valid JSON, false otherwise
      */
     public static boolean isJson(String text) {
-        if (text == null || text.isEmpty()) {
+        if (Objects.isNull(text) || text.isEmpty()) {
             return false;
         }
         try {

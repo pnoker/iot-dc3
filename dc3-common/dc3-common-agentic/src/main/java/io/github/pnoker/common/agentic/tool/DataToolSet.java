@@ -27,6 +27,7 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Data-domain tools exposed to the LLM via Spring AI @Tool.
@@ -61,7 +62,7 @@ public class DataToolSet {
                 tenantId, deviceId, pointId);
         try {
             FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, pointId);
-            if (value == null) {
+            if (Objects.isNull(value)) {
                 return "No latest value found for device " + deviceId + " point " + pointId;
             }
             return String.format("Device %d / Point %d: value=%s, rawValue=%s, time=%d", value.getDeviceId(),
@@ -83,7 +84,7 @@ public class DataToolSet {
                 "getPointValueHistory", tenantId, deviceId, pointId, count);
         try {
             List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, count);
-            if (history == null || history.isEmpty()) {
+            if (Objects.isNull(history) || history.isEmpty()) {
                 return "No history data found for device " + deviceId + " point " + pointId;
             }
             return "History values (" + history.size() + " records): " + String.join(", ", history);
@@ -119,7 +120,7 @@ public class DataToolSet {
                                   ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, valueLength={}",
-                "writePointValue", tenantId, deviceId, pointId, value == null ? 0 : value.length());
+                "writePointValue", tenantId, deviceId, pointId, Objects.isNull(value) ? 0 : value.length());
         try {
             boolean success = pointValueCommandFacade.write(tenantId, deviceId, pointId, value);
             return success

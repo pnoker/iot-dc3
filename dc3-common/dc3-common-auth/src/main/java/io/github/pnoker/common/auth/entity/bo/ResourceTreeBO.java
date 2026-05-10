@@ -25,6 +25,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Tree-shaped variant of {@link ResourceBO} — adds a nested children collection so the
@@ -68,7 +69,7 @@ public class ResourceTreeBO extends ResourceBO {
     }
 
     public void addChild(ResourceTreeBO child) {
-        if (children == null) {
+        if (Objects.isNull(children)) {
             children = new ArrayList<>();
         }
         children.add(child);

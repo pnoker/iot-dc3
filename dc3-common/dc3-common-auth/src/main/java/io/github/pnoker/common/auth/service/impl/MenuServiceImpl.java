@@ -118,7 +118,7 @@ public class MenuServiceImpl implements MenuService {
         }
         // Re-read to pick up any DB-side mutations (trigger-updated operate_time, etc).
         MenuDO latest = menuManager.getById(entityBO.getId());
-        resourceRegistrySyncService.syncMenuResource(latest != null ? latest : entityDO);
+        resourceRegistrySyncService.syncMenuResource(Objects.nonNull(latest) ? latest : entityDO);
     }
 
     @Override
@@ -145,11 +145,11 @@ public class MenuServiceImpl implements MenuService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getMenuName()), MenuDO::getMenuName, entityQuery.getMenuName());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getMenuCode()), MenuDO::getMenuCode, entityQuery.getMenuCode());
         wrapper.eq(Objects.nonNull(entityQuery.getMenuTypeFlag()), MenuDO::getMenuTypeFlag,
-                entityQuery.getMenuTypeFlag() == null ? null : entityQuery.getMenuTypeFlag().getIndex());
+                Objects.isNull(entityQuery.getMenuTypeFlag()) ? null : entityQuery.getMenuTypeFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getParentMenuId()), MenuDO::getParentMenuId,
                 entityQuery.getParentMenuId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), MenuDO::getEnableFlag,
-                entityQuery.getEnableFlag() == null ? null : entityQuery.getEnableFlag().getIndex());
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         return wrapper;
     }
 
@@ -171,8 +171,8 @@ public class MenuServiceImpl implements MenuService {
         List<MenuTreeBO> roots = new ArrayList<>();
         for (MenuTreeBO node : byId.values()) {
             Long parentId = node.getParentMenuId();
-            MenuTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
-            if (parent == null) {
+            MenuTreeBO parent = Objects.isNull(parentId) || parentId == 0L ? null : byId.get(parentId);
+            if (Objects.isNull(parent)) {
                 roots.add(node);
             } else {
                 parent.addChild(node);

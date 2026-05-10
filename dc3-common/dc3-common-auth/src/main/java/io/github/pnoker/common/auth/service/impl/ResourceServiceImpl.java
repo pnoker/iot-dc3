@@ -181,8 +181,8 @@ public class ResourceServiceImpl implements ResourceService {
         List<ResourceTreeBO> roots = new ArrayList<>();
         for (ResourceTreeBO node : byId.values()) {
             Long parentId = node.getParentResourceId();
-            ResourceTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
-            if (parent == null) {
+            ResourceTreeBO parent = Objects.isNull(parentId) || parentId == 0L ? null : byId.get(parentId);
+            if (Objects.isNull(parent)) {
                 roots.add(node);
             } else {
                 parent.addChild(node);

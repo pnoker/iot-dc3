@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Objects;
 
 /**
  * Default agentic chat orchestration service.
@@ -140,8 +141,8 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         String scopedConversationId = AgenticConversationIds.scope(userHeader.getTenantId(), userHeader.getUserId(),
                 conversationId);
         SkillDefinition skill = resolveSkill(request.getSkill());
-        List<String> toolNames = skill == null ? List.of() : skillRegistry.getEnabledToolNames(skill.getName());
-        String skillSystemPrompt = skill == null ? null : buildSkillSystemPrompt(skill);
+        List<String> toolNames = Objects.isNull(skill) ? List.of() : skillRegistry.getEnabledToolNames(skill.getName());
+        String skillSystemPrompt = Objects.isNull(skill) ? null : buildSkillSystemPrompt(skill);
         String model = StringUtils.defaultIfBlank(request.getModel(), DEFAULT_MODEL);
         Map<String, Object> toolContext = Map.of(
                 AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId(),
@@ -150,7 +151,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         log.debug(
                 "Agentic chat request received, mode={}, model={}, messageCount={}, conversationIdPresent={}, skill={}, tenantId={}, userId={}",
                 mode, model, request.getMessages().size(), StringUtils.isNotBlank(request.getConversationId()),
-                skill == null ? null : skill.getName(), userHeader.getTenantId(), userHeader.getUserId());
+                Objects.isNull(skill) ? null : skill.getName(), userHeader.getTenantId(), userHeader.getUserId());
 
         touchSession(scopedConversationId, conversationId, request.getSkill(), userHeader);
 
@@ -159,16 +160,16 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     }
 
     private void validateRequest(ChatCompletionRequest request) {
-        if (request == null) {
+        if (Objects.isNull(request)) {
             throw new RequestException("Chat completion request is required");
         }
-        if (request.getMessages() == null || request.getMessages().isEmpty()) {
+        if (Objects.isNull(request.getMessages()) || request.getMessages().isEmpty()) {
             throw new RequestException("Chat messages are required");
         }
-        if (request.getTemperature() != null && (request.getTemperature() < 0.0 || request.getTemperature() > 2.0)) {
+        if (Objects.nonNull(request.getTemperature()) && (request.getTemperature() < 0.0 || request.getTemperature() > 2.0)) {
             throw new RequestException("Temperature must be between 0.0 and 2.0");
         }
-        if (request.getMaxTokens() != null && request.getMaxTokens() < 1) {
+        if (Objects.nonNull(request.getMaxTokens()) && request.getMaxTokens() < 1) {
             throw new RequestException("Max tokens must be greater than 0");
         }
     }
@@ -176,7 +177,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     private String extractLastUserMessage(ChatCompletionRequest request) {
         return request.getMessages()
                 .stream()
-                .filter(message -> message != null && "user".equals(message.getRole()))
+                .filter(message -> Objects.nonNull(message) && "user".equals(message.getRole()))
                 .map(ChatMessageDTO::getContent)
                 .filter(StringUtils::isNotBlank)
                 .reduce((first, second) -> second)
@@ -189,11 +190,11 @@ public class AgenticChatServiceImpl implements AgenticChatService {
 
     private SkillDefinition resolveSkill(String skillName) {
         String normalizedSkillName = StringUtils.trimToNull(skillName);
-        if (normalizedSkillName == null) {
+        if (Objects.isNull(normalizedSkillName)) {
             return null;
         }
         SkillDefinition skill = skillRegistry.get(normalizedSkillName);
-        if (skill == null) {
+        if (Objects.isNull(skill)) {
             log.warn("Agentic skill not found, skill={}", normalizedSkillName);
             throw new RequestException("Agentic skill does not exist: {}", normalizedSkillName);
         }
@@ -202,7 +203,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     }
 
     private List<String> normalizeToolNames(List<String> toolNames) {
-        if (toolNames == null || toolNames.isEmpty()) {
+        if (Objects.isNull(toolNames) || toolNames.isEmpty()) {
             return List.of();
         }
         return toolNames.stream().filter(StringUtils::isNotBlank).distinct().toList();
@@ -213,10 +214,10 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         if (StringUtils.isNotBlank(skill.getSystemPromptAddition())) {
             sections.add(skill.getSystemPromptAddition().trim());
         }
-        if (skill.getExamples() != null && !skill.getExamples().isEmpty()) {
+        if (Objects.nonNull(skill.getExamples()) && !skill.getExamples().isEmpty()) {
             StringBuilder examples = new StringBuilder("Examples:");
             for (SkillDefinition.SkillExample example : skill.getExamples()) {
-                if (example == null || StringUtils.isAnyBlank(example.getUser(), example.getAssistant())) {
+                if (Objects.isNull(example) || StringUtils.isAnyBlank(example.getUser(), example.getAssistant())) {
                     continue;
                 }
                 examples.append("\n- User: ").append(example.getUser().trim())
@@ -245,14 +246,14 @@ public class AgenticChatServiceImpl implements AgenticChatService {
 
     private ChatClient.ChatClientRequestSpec applyRequestOptions(ChatClient.ChatClientRequestSpec promptSpec,
                                                                  Double temperature, Integer maxTokens) {
-        if (temperature == null && maxTokens == null) {
+        if (Objects.isNull(temperature) && Objects.isNull(maxTokens)) {
             return promptSpec;
         }
         OpenAiChatOptions.Builder options = OpenAiChatOptions.builder();
-        if (temperature != null) {
+        if (Objects.nonNull(temperature)) {
             options.temperature(temperature);
         }
-        if (maxTokens != null) {
+        if (Objects.nonNull(maxTokens)) {
             options.maxTokens(maxTokens);
         }
         return promptSpec.options(options);

@@ -38,6 +38,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Global Exception Handler Configuration
@@ -99,7 +100,7 @@ public class ExceptionConfig {
         }
 
         String reason = exception.getReason();
-        return Mono.just(R.fail(reason != null ? reason : status.toString()));
+        return Mono.just(R.fail(Objects.nonNull(reason) ? reason : status.toString()));
     }
 
     /**
@@ -154,7 +155,7 @@ public class ExceptionConfig {
      * @return Mono containing error response with field validation details
      */
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
     public Mono<R<String>> methodArgumentNotValidException(MethodArgumentNotValidException exception,
                                                            ServerHttpRequest request) {
         HashMap<String, String> map = new HashMap<>(4);

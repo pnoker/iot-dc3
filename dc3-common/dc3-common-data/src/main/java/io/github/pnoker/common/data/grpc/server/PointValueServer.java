@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * gRPC server implementation for the PointValue service. Delegates to
@@ -76,7 +77,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .latest(query);
 
             GrpcRPointValueDTO.Builder response = GrpcRPointValueDTO.newBuilder();
-            if (page == null || page.getRecords().isEmpty()) {
+            if (Objects.isNull(page) || page.getRecords().isEmpty()) {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(false)
                         .setCode(ResponseEnum.NO_RESOURCE.getCode())
@@ -92,12 +93,12 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                 io.github.pnoker.common.entity.bo.PointValueBO bo = page.getRecords().getFirst();
                 response.setData(GrpcPointValueDTO.newBuilder()
                         .setId(0)
-                        .setDeviceId(bo.getDeviceId() != null ? bo.getDeviceId() : 0)
-                        .setPointId(bo.getPointId() != null ? bo.getPointId() : 0)
-                        .setValue(bo.getCalValue() != null ? bo.getCalValue() : "")
-                        .setRawValue(bo.getRawValue() != null ? bo.getRawValue() : "")
+                        .setDeviceId(Objects.nonNull(bo.getDeviceId()) ? bo.getDeviceId() : 0)
+                        .setPointId(Objects.nonNull(bo.getPointId()) ? bo.getPointId() : 0)
+                        .setValue(Objects.nonNull(bo.getCalValue()) ? bo.getCalValue() : "")
+                        .setRawValue(Objects.nonNull(bo.getRawValue()) ? bo.getRawValue() : "")
                         .setCreateTime(
-                                bo.getCreateTime() != null ? bo.getCreateTime().toEpochSecond(java.time.ZoneOffset.UTC) : 0)
+                                Objects.nonNull(bo.getCreateTime()) ? bo.getCreateTime().toEpochSecond(java.time.ZoneOffset.UTC) : 0)
                         .build());
             }
             responseObserver.onNext(response.build());
@@ -129,7 +130,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                             .setMessage(ResponseEnum.OK.getText())
                             .build());
 
-            if (history != null) {
+            if (Objects.nonNull(history)) {
                 response.addAllData(history);
             }
             responseObserver.onNext(response.build());

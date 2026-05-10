@@ -84,7 +84,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public String getDeviceOnlineByDriverId(Long tenantId, Long driverId) {
         List<String> list = getDeviceStatuses(tenantId, driverId);
-        if (list == null) {
+        if (Objects.isNull(list)) {
             return String.valueOf(0L);
         }
         long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
@@ -94,7 +94,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public String getDeviceOfflineByDriverId(Long tenantId, Long driverId) {
         List<String> list = getDeviceStatuses(tenantId, driverId);
-        if (list == null) {
+        if (Objects.isNull(list)) {
             return String.valueOf(0L);
         }
         long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.OFFLINE.getCode())).count();

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 
 /**
  * Thin Caffeine wrapper with a Redis-like surface (setKey/getKey with optional TTL, batch
@@ -82,7 +83,7 @@ public class LocalCacheService {
             // Only fire listeners for natural TTL expiries. Explicit
             // cache.invalidate() / size-based eviction aren't
             // "the key went offline" semantically.
-            if (cause != RemovalCause.EXPIRED || key == null || value == null)
+            if (cause != RemovalCause.EXPIRED || Objects.isNull(key) || Objects.isNull(value))
                 return;
             for (ExpireListener listener : expireListeners) {
                 try {
@@ -104,7 +105,7 @@ public class LocalCacheService {
     }
 
     public <T> void setKey(Map<String, T> valuesMap) {
-        if (valuesMap == null || valuesMap.isEmpty()) {
+        if (Objects.isNull(valuesMap) || valuesMap.isEmpty()) {
             return;
         }
         valuesMap.forEach(this::setKey);
@@ -113,11 +114,11 @@ public class LocalCacheService {
     @SuppressWarnings("unchecked")
     public <T> T getKey(String key) {
         Entry entry = cache.getIfPresent(key);
-        return entry == null ? null : (T) entry.value;
+        return Objects.isNull(entry) ? null : (T) entry.value;
     }
 
     public <T> List<T> getKey(List<String> keys) {
-        if (keys == null || keys.isEmpty()) {
+        if (Objects.isNull(keys) || keys.isEmpty()) {
             return List.of();
         }
         List<T> result = new ArrayList<>(keys.size());
@@ -133,7 +134,7 @@ public class LocalCacheService {
      * read / write); keep the handler short.
      */
     public void onExpire(ExpireListener listener) {
-        if (listener != null)
+        if (Objects.nonNull(listener))
             expireListeners.add(listener);
     }
 
