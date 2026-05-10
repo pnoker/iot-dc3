@@ -24,9 +24,9 @@ import io.github.pnoker.common.driver.service.DriverScheduleService;
 import jakarta.annotation.Resource;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 /**
  * Application startup runner that completes the standard driver bootstrap sequence:

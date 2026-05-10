@@ -22,9 +22,9 @@ import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 /**
  * Data Initialization Runner for DC3 IoT Platform. This class handles data initialization
