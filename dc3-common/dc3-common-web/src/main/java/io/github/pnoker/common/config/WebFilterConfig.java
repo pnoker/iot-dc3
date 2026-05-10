@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -54,7 +54,7 @@ import java.util.Optional;
  * @since 2022.1.0
  */
 @Slf4j
-@Configuration
+@AutoConfiguration
 public class WebFilterConfig {
 
     @Resource
@@ -70,7 +70,7 @@ public class WebFilterConfig {
      */
     @Bean
     public WebFilter contextPathWebFilter() {
-        String contextPath = Optional.ofNullable(serverProperties.getServlet().getContextPath()).orElse("/");
+        String contextPath = Optional.ofNullable(serverProperties.getReactive().getContextPath()).orElse("/");
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             if (request.getURI().getPath().startsWith(contextPath)) {

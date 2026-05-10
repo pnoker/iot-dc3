@@ -32,6 +32,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
@@ -52,6 +53,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@AutoConfiguration
 @Slf4j
 @RestControllerAdvice
 public class ExceptionConfig {

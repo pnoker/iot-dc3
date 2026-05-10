@@ -20,7 +20,7 @@ package io.github.pnoker.common.config;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 /**
  * Data access layer (DAL) auto-configuration.
@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022.1.0
  */
 @Slf4j
-@Configuration
+@AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.dal"})
 @MapperScan(basePackages = {"io.github.pnoker.common.dal.mapper"})
 public class DalConfig {
