@@ -95,11 +95,11 @@
   });
 
   const profileLength = computed(() => {
-    return profileViewRef.value?.reactiveData.page.total || 0;
+    return profileViewRef.value?.reactiveData?.page?.total || 0;
   });
 
   const pointLength = computed(() => {
-    return pointViewRef.value?.reactiveData.page.total || 0;
+    return pointViewRef.value?.reactiveData?.page?.total || 0;
   });
 
   const device = () => {

@@ -276,5 +276,10 @@
     emit('next-handle');
   };
 
+  defineExpose({
+    reactiveData,
+    refresh,
+  });
+
   list();
 </script>

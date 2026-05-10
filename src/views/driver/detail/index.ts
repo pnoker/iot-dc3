@@ -61,7 +61,7 @@ export default defineComponent({
     });
 
     const deviceLength = computed(() => {
-      return deviceViewRef.value?.reactiveData.page.total || 0;
+      return deviceViewRef.value?.reactiveData?.page?.total || 0;
     });
 
     // 加载驱动数据

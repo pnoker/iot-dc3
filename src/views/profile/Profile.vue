@@ -217,6 +217,11 @@
     list();
   };
 
+  defineExpose({
+    reactiveData,
+    refresh,
+  });
+
   list();
 </script>
 

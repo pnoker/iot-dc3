@@ -50,7 +50,7 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
-      active: route.query.active,
+      active: (route.query.active as string) || 'detail',
       deviceLoading: true,
       pointLoading: true,
       driverTable: {} as any,
@@ -62,11 +62,11 @@ export default defineComponent({
     });
 
     const pointLength = computed(() => {
-      return pointViewRef.value?.reactiveData.page.total || 0;
+      return pointViewRef.value?.reactiveData?.page?.total || 0;
     });
 
     const deviceLength = computed(() => {
-      return deviceViewRef.value?.reactiveData.page.total || 0;
+      return deviceViewRef.value?.reactiveData?.page?.total || 0;
     });
 
     const profile = () => {
