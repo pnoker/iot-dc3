@@ -173,7 +173,7 @@ public final class DeviceMetadata {
 
         return pointAttributeConfigMap.entrySet()
                 .stream()
-                .filter(entry -> MapUtils.isEmpty(entry.getValue())
+                .filter(entry -> MapUtils.isNotEmpty(entry.getValue())
                         && entry.getValue().keySet().containsAll(attributeMap.keySet()))
                 .collect(Collectors.toMap(Map.Entry::getKey,
                         entryMap -> attributeMap.entrySet()
