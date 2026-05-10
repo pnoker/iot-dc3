@@ -80,15 +80,37 @@ public class NettyServerHandler {
      * @param byteBuf The byte buffer containing the incoming message
      */
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
-        log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
-        String deviceName = byteBuf.toString(0, 22, StandardCharsets.UTF_8);
+        int readableBytes = byteBuf.readableBytes();
+        log.debug("Driver message received, protocol=netty, remoteAddress={}, bytes={}",
+                context.channel().remoteAddress(), readableBytes);
+        if (log.isTraceEnabled()) {
+            log.trace("Driver message payload received, protocol=netty, remoteAddress={}, payload={}",
+                    context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
+        }
+        if (readableBytes < 23) {
+            log.warn("Driver message skipped, protocol=netty, remoteAddress={}, reason=payloadTooShort, bytes={}",
+                    context.channel().remoteAddress(), readableBytes);
+            return;
+        }
+
+        String deviceName = byteBuf.toString(0, 22, StandardCharsets.UTF_8).trim();
         long deviceId = Long.parseLong(deviceName);
         DeviceBO device = deviceMetadata.getCache(deviceId);
+        if (Objects.isNull(device)) {
+            log.warn("Driver message skipped, protocol=netty, remoteAddress={}, deviceId={}, reason=deviceMissing",
+                    context.channel().remoteAddress(), deviceId);
+            return;
+        }
 
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
         Map<Long, Map<String, AttributeBO>> pointConfigMap = deviceMetadata.getPointConfig(deviceId);
+        if (Objects.isNull(pointConfigMap)) {
+            log.warn("Driver message skipped, protocol=netty, remoteAddress={}, deviceId={}, reason=pointConfigMissing",
+                    context.channel().remoteAddress(), deviceId);
+            return;
+        }
 
         List<PointValue> pointValues = new ArrayList<>(16);
         for (Map.Entry<Long, Map<String, AttributeBO>> entry : pointConfigMap.entrySet()) {
@@ -115,6 +137,8 @@ public class NettyServerHandler {
         }
 
         driverSenderService.pointValueSender(pointValues);
+        log.debug("Driver point values forwarded, protocol=netty, deviceId={}, key={}, count={}", deviceId, hexKey,
+                pointValues.size());
     }
 
 }

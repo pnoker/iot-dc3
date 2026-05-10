@@ -105,15 +105,19 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
+            log.info("Driver metadata event received, protocol=modbusTcp, metadataType={}, operateType={}, deviceId={}",
+                    metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                connectMap.remove(metadataEvent.getId());
+                ModbusMaster removed = connectMap.remove(metadataEvent.getId());
+                log.info("Driver connection invalidated, protocol=modbusTcp, deviceId={}, operateType={}, removed={}",
+                        metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
+            log.info("Driver metadata event received, protocol=modbusTcp, metadataType={}, operateType={}, pointId={}",
+                    metadataType, operateType, metadataEvent.getId());
         }
     }
 
@@ -140,19 +144,25 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws ConnectorException if connection initialization fails
      */
     private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverConfig));
         ModbusMaster modbusMaster = connectMap.get(deviceId);
         if (Objects.isNull(modbusMaster)) {
+            String host = driverConfig.get("host").getValue(String.class);
+            int port = driverConfig.get("port").getValue(Integer.class);
+            log.debug("Driver connection creating, protocol=modbusTcp, deviceId={}, host={}, port={}", deviceId, host,
+                    port);
             IpParameters params = new IpParameters();
-            params.setHost(driverConfig.get("host").getValue(String.class));
-            params.setPort(driverConfig.get("port").getValue(Integer.class));
+            params.setHost(host);
+            params.setPort(port);
             modbusMaster = modbusFactory.createTcpMaster(params, true);
             try {
                 modbusMaster.init();
                 connectMap.put(deviceId, modbusMaster);
+                log.info("Driver connection established, protocol=modbusTcp, deviceId={}, host={}, port={}", deviceId,
+                        host, port);
             } catch (ModbusInitException e) {
                 connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
-                log.error("Connect modbus master error: {}", e.getMessage(), e);
+                log.error("Driver connection failed, protocol=modbusTcp, deviceId={}, host={}, port={}", deviceId,
+                        host, port, e);
                 throw new ConnectorException(e.getMessage());
             }
         }
@@ -191,6 +201,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                 Number inputRegisterValue = getMasterValue(modbusMaster, inputRegister);
                 return String.valueOf(inputRegisterValue);
             default:
+                log.warn("Unsupported Modbus function code, slaveId={}, functionCode={}, offset={}", slaveId,
+                        functionCode, offset);
                 return "0";
         }
     }
@@ -208,7 +220,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         try {
             return modbusMaster.getValue(locator);
         } catch (ModbusTransportException | ErrorResponseException e) {
-            log.error("Read modbus master value error: {}", e.getMessage(), e);
+            log.error("Driver point read failed, protocol=modbusTcp", e);
             throw new ReadPointException(e.getMessage());
         }
     }
@@ -237,6 +249,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                 setMasterValue(modbusMaster, locator, wValue);
                 return true;
             default:
+                log.warn("Unsupported Modbus write function code, slaveId={}, functionCode={}, offset={}", slaveId,
+                        functionCode, offset);
                 return false;
         }
     }
@@ -279,7 +293,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, wValue.getValue(Boolean.class));
             return (WriteCoilResponse) modbusMaster.send(coilRequest);
         } catch (ModbusTransportException e) {
-            log.error("Write modbus master value error: {}", e.getMessage(), e);
+            log.error("Driver point write failed, protocol=modbusTcp, slaveId={}, offset={}", slaveId, offset, e);
             throw new WritePointException(e.getMessage());
         }
     }
@@ -297,7 +311,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         try {
             modbusMaster.setValue(locator, wValue.getValue(Float.class));
         } catch (ModbusTransportException | ErrorResponseException e) {
-            log.error("Write modbus master value error: {}", e.getMessage(), e);
+            log.error("Driver point write failed, protocol=modbusTcp", e);
             throw new WritePointException(e.getMessage());
         }
     }

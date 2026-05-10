@@ -20,6 +20,7 @@ import io.github.pnoker.driver.api.DaveArea;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.impl.nodave.Nodave;
 import io.github.pnoker.driver.api.impl.nodave.S7Connection;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Base connection implementation for the S7 PLC communication using the Libnodave
@@ -30,6 +31,7 @@ import io.github.pnoker.driver.api.impl.nodave.S7Connection;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 public abstract class S7BaseConnection implements S7Connector {
 
     /**
@@ -80,9 +82,14 @@ public abstract class S7BaseConnection implements S7Connector {
      * @param b the byte stream
      */
     protected static void dump(final byte[] b) {
-        for (final byte element : b) {
-            System.out.print(Integer.toHexString(element & 0xFF) + ",");
+        if (!log.isTraceEnabled()) {
+            return;
         }
+        StringBuilder hex = new StringBuilder();
+        for (final byte element : b) {
+            hex.append(Integer.toHexString(element & 0xFF)).append(',');
+        }
+        log.trace("S7 buffer dump, payload={}", hex);
     }
 
     /**

@@ -17,12 +17,14 @@
 package io.github.pnoker.driver.api.impl.nodave;
 
 import io.github.pnoker.driver.api.DaveArea;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Thomas Rudin
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 public final class PDU {
 
     /**
@@ -299,7 +301,7 @@ public final class PDU {
      */
     public void dump() {
         Nodave.dump("PDU header ", this.mem, this.header, this.hlen);
-        System.out.println("plen: " + this.plen + " dlen: " + this.dlen);
+        log.trace("S7 PDU dump, parameterLength={}, dataLength={}", this.plen, this.dlen);
         Nodave.dump("Parameter", this.mem, this.param, this.plen);
         if (this.dlen > 0) {
             Nodave.dump("Data     ", this.mem, this.data, this.dlen);
