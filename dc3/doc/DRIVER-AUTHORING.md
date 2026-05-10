@@ -44,8 +44,10 @@ cd dc3-driver/dc3-driver-bacnet
 ```
 
 Then rename the Java package and main class to match. The `dc3-driver-virtual` template has
-a single `service/impl/DriverCustomServiceImpl.java` and a `VirtualDriverApplication.java` —
-just rename them to your driver.
+a single `service/impl/VirtualDriverCustomServiceImpl.java` and a `VirtualDriverApplication.java`.
+Rename both to your driver, and keep the custom service implementation name protocol-specific
+(for example, `BacnetDriverCustomServiceImpl`) so static analysis tools can scan every driver
+module without filtering duplicate fully qualified class names.
 
 ## Step 2 — Wire into the parent POM
 
@@ -79,7 +81,7 @@ The parent already pulls in `dc3-common-driver` and the Spring Boot Maven plugin
 ## Step 3 — Application class
 
 Drop a single `@SpringBootApplication`-annotated entry point. Same package as your
-`DriverCustomServiceImpl` so default component scanning picks both up:
+protocol-specific `DriverCustomService` implementation so default component scanning picks both up:
 
 ```java
 @SpringBootApplication
@@ -167,7 +169,7 @@ Five methods. Drop your protocol logic in:
 ```java
 @Slf4j
 @Service
-public class DriverCustomServiceImpl implements DriverCustomService {
+public class BacnetDriverCustomServiceImpl implements DriverCustomService {
 
     @Resource private DriverMetadata driverMetadata;
     @Resource private DriverSenderService driverSenderService;
@@ -295,7 +297,7 @@ and bind **Points**.
 
 - **`dc3.driver.code` collides with another driver.** Manager rejects the registration. Pick a
   unique code; convention is PascalCase ending in `Driver`.
-- **`DriverCustomServiceImpl` not picked up.** The class needs `@Service` *and* must live in
+- **`DriverCustomService` implementation not picked up.** The class needs `@Service` *and* must live in
   a package scanned from your `@SpringBootApplication` class — i.e. same package or below.
 - **`read` returns null / throws.** The framework logs and skips the point for that cycle;
   it does *not* fail the whole driver. Don't catch and return null silently — let the

@@ -69,7 +69,7 @@ import java.util.concurrent.TimeoutException;
  */
 @Slf4j
 @Service
-public class DriverCustomServiceImpl implements DriverCustomService {
+public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
     DriverMetadata driverMetadata;
