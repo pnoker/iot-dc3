@@ -20,8 +20,8 @@ package io.github.pnoker.common.config;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
-import org.springframework.context.annotation.Bean;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

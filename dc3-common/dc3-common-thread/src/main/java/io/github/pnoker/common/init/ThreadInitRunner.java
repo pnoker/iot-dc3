@@ -20,9 +20,9 @@ package io.github.pnoker.common.init;
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 /**
  * Thread Initialization Runner for DC3 IoT Platform. This component handles thread

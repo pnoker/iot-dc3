@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.init;
 
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * Gateway Component Scan Configuration for DC3 IoT Platform. Enables component scanning

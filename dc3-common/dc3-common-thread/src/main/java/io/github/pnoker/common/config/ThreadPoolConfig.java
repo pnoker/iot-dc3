@@ -19,8 +19,8 @@ package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
