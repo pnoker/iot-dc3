@@ -58,12 +58,12 @@ export MQTT_BATCH_INTERVAL=5
 # Spring AI
 export OPENAI_BASE_URL=https://api.openai.com
 export OPENAI_API_KEY=
-export OPENAI_MODEL=gpt-4o
+export OPENAI_MODEL=deepseek-v4-pro
 export OPENAI_TEMPERATURE=0.7
 export OPENAI_MAX_TOKENS=2048
-export AGENTIC_MEMORY_SCHEMA_INIT=always
+export AGENTIC_MEMORY_SCHEMA_INIT=never
 export AGENTIC_MEMORY_MAX_MESSAGES=50
-export AGENTIC_SESSION_TTL_HOURS=72
+export AGENTIC_ATTACHMENT_STORAGE_PATH=dc3/data/agentic/attachments
 
 # Per-process overrides. Uncomment only for a single service process.
 # export TCP_PORT=6270

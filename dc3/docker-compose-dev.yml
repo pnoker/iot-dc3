@@ -175,7 +175,7 @@ services:
       - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
+      - OPENAI_MODEL=${OPENAI_MODEL:-deepseek-v4-pro}
       - OPENAI_TEMPERATURE=${OPENAI_TEMPERATURE:-0.7}
       - OPENAI_MAX_TOKENS=${OPENAI_MAX_TOKENS:-2048}
     container_name: dc3-center-agentic
