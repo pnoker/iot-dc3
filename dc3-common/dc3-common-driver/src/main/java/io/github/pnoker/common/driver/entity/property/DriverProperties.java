@@ -63,7 +63,7 @@ public class DriverProperties {
      * Driver display name.
      */
     @NotBlank(message = "Driver name can't be empty")
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid driver name format")
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5\\s_#@/.|\\-]{1,63}$", message = "Invalid driver name format")
     private String name;
 
     /**
