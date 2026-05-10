@@ -77,7 +77,13 @@ public class DriverReadServiceImpl implements DriverReadService {
 
         // Get driver and point configurations
         Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
+        if (driverConfig.isEmpty()) {
+            return;
+        }
         Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
+        if (pointConfig.isEmpty()) {
+            return;
+        }
 
         // Get point from metadata cache
         PointBO point = pointMetadata.getCache(pointId);
