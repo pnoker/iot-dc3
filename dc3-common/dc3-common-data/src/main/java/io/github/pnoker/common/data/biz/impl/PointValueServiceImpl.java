@@ -168,10 +168,10 @@ public class PointValueServiceImpl implements PointValueService {
             entityQuery.setPage(new Pages());
         }
         validateMetadataScope(entityQuery.getTenantId(), entityQuery.getDeviceId(), entityQuery.getPointId());
-        if (entityQuery.getCreateTimeFrom() == null) {
+        if (Objects.isNull(entityQuery.getCreateTimeFrom())) {
             java.time.LocalDateTime from = io.github.pnoker.common.utils.TimeRangeUtil
                     .resolveFrom(entityQuery.getRangeKey(), entityQuery.getRangeHours());
-            if (from != null) {
+            if (Objects.nonNull(from)) {
                 entityQuery.setCreateTimeFrom(from);
             }
         }

@@ -91,7 +91,7 @@ public class OfflineExpiryListener {
     }
 
     private void onExpire(String key, Object lastValue) {
-        if (key == null)
+        if (Objects.isNull(key))
             return;
         final String lastStatus = lastValue instanceof String s ? s : null;
         // Skip if the key was already offline — avoids a duplicate alarm on
@@ -113,11 +113,11 @@ public class OfflineExpiryListener {
         if (Objects.equals(lastStatus, DriverStatusEnum.OFFLINE.getCode()))
             return;
         Long id = parseIdSuffix(key, PrefixConstant.DRIVER_STATUS_KEY_PREFIX);
-        if (id == null)
+        if (Objects.isNull(id))
             return;
 
         FacadeDriverBO driver = driverFacade.selectById(id);
-        if (driver == null) {
+        if (Objects.isNull(driver)) {
             log.debug("Driver {} not found when handling offline expiry", id);
             return;
         }
@@ -132,7 +132,7 @@ public class OfflineExpiryListener {
                 .build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(driver.getTenantId() != null ? driver.getTenantId() : 0L);
+        entity.setTenantId(Objects.nonNull(driver.getTenantId()) ? driver.getTenantId() : 0L);
         driverEventManager.save(entity);
 
         // Deliberately do NOT re-seed the cache. The previous version wrote
@@ -149,11 +149,11 @@ public class OfflineExpiryListener {
         if (Objects.equals(lastStatus, DeviceStatusEnum.OFFLINE.getCode()))
             return;
         Long id = parseIdSuffix(key, PrefixConstant.DEVICE_STATUS_KEY_PREFIX);
-        if (id == null)
+        if (Objects.isNull(id))
             return;
 
         FacadeDeviceBO device = deviceFacade.selectById(id);
-        if (device == null) {
+        if (Objects.isNull(device)) {
             log.debug("Device {} not found when handling offline expiry", id);
             return;
         }
@@ -169,7 +169,7 @@ public class OfflineExpiryListener {
                 .build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(device.getTenantId() != null ? device.getTenantId() : 0L);
+        entity.setTenantId(Objects.nonNull(device.getTenantId()) ? device.getTenantId() : 0L);
         deviceEventManager.save(entity);
 
         // See handleDriverExpiry — don't re-seed: the previous OFFLINE

@@ -91,7 +91,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
 
         // Derive an ALARM row on state flips so operators see transitions in the alert
         // list.
-        if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {
+        if (Objects.nonNull(prev) && !Objects.equals(prev, current) && isFlip(prev, current)) {
             String message = String.format("Device status changed: %s -> %s", prev, current);
             persist(payload, DeviceEventTypeEnum.ALARM, "device-state-flip", message);
         }
@@ -105,7 +105,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
             log.warn("Drop device alarm without deviceId: {}", entityDTO.getContent());
             return;
         }
-        String msg = payload.getMessage() != null ? payload.getMessage() : entityDTO.getContent();
+        String msg = Objects.nonNull(payload.getMessage()) ? payload.getMessage() : entityDTO.getContent();
         persist(payload, DeviceEventTypeEnum.ALARM, "device-alarm", msg);
     }
 
@@ -118,7 +118,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         entity.setEventExt(JsonExt.builder().type(extType).content(extContent).version(1).build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
+        entity.setTenantId(Objects.nonNull(payload.getTenantId()) ? payload.getTenantId() : 0L);
         deviceEventManager.save(entity);
     }
 

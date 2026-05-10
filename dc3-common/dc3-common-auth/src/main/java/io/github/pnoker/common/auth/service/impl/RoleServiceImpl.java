@@ -149,8 +149,8 @@ public class RoleServiceImpl implements RoleService {
         List<RoleTreeBO> roots = new ArrayList<>();
         for (Map.Entry<Long, RoleTreeBO> e : byId.entrySet()) {
             Long parentId = parentByChild.get(e.getKey());
-            RoleTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
-            if (parent == null) {
+            RoleTreeBO parent = Objects.isNull(parentId) || parentId == 0L ? null : byId.get(parentId);
+            if (Objects.isNull(parent)) {
                 roots.add(e.getValue());
             } else {
                 parent.addChild(e.getValue());

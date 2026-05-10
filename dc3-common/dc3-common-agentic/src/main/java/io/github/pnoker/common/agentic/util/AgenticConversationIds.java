@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.util;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import java.util.Objects;
 
 /**
  * Utility methods for tenant/user scoped agentic conversation IDs.
@@ -56,7 +57,7 @@ public class AgenticConversationIds {
      */
     public static String stripScope(Long tenantId, Long userId, String conversationId) {
         String prefix = tenantId + SEPARATOR + userId + SEPARATOR;
-        return conversationId != null && conversationId.startsWith(prefix) ? conversationId.substring(prefix.length())
+        return Objects.nonNull(conversationId) && conversationId.startsWith(prefix) ? conversationId.substring(prefix.length())
                 : conversationId;
     }
 

@@ -25,6 +25,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Tree-shaped variant of {@link MenuBO} — nested children mirror parent_menu_id.
@@ -64,7 +65,7 @@ public class MenuTreeBO extends MenuBO {
     }
 
     public void addChild(MenuTreeBO child) {
-        if (children == null) {
+        if (Objects.isNull(children)) {
             children = new ArrayList<>();
         }
         children.add(child);

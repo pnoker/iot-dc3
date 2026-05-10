@@ -32,6 +32,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Objects;
 
 /**
  * Local host IP, hostname, and MAC address lookup.
@@ -167,12 +168,12 @@ public class HostUtil {
         for (InterfaceAddress interfaceAddress : interfaceAddressList) {
             InetAddress inetAddress = interfaceAddress.getAddress();
             NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
-            if (network == null) {
+            if (Objects.isNull(network)) {
                 continue;
             }
 
             byte[] mac = network.getHardwareAddress();
-            if (mac != null) {
+            if (Objects.nonNull(mac)) {
                 StringBuilder stringBuilder = new StringBuilder();
                 for (int i = 0; i < mac.length; i++) {
                     stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));

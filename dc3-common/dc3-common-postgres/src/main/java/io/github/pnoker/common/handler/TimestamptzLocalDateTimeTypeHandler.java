@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 /**
  * Bridges {@link LocalDateTime} entity fields and PostgreSQL {@code TIMESTAMPTZ} columns.
@@ -67,7 +68,7 @@ public class TimestamptzLocalDateTimeTypeHandler extends BaseTypeHandler<LocalDa
     }
 
     private LocalDateTime toLocalDateTime(OffsetDateTime odt) {
-        return odt == null ? null : odt.atZoneSameInstant(TimeConstant.DEFAULT_ZONEID).toLocalDateTime();
+        return Objects.isNull(odt) ? null : odt.atZoneSameInstant(TimeConstant.DEFAULT_ZONEID).toLocalDateTime();
     }
 
 }

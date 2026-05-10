@@ -65,7 +65,7 @@ public class SessionServiceImpl implements SessionService {
     public SessionBO touch(String conversationId, String skill, Long tenantId, Long userId) {
         LocalDateTime expireTime = nextExpireTime();
         SessionDO existing = findByConversationId(conversationId);
-        if (existing != null) {
+        if (Objects.nonNull(existing)) {
             if (StringUtils.isNotEmpty(skill)) {
                 existing.setSkill(skill);
             }
@@ -82,7 +82,7 @@ public class SessionServiceImpl implements SessionService {
         entityDO.setTenantId(tenantId);
         entityDO.setUserId(userId);
         entityDO.setTitle("New Conversation");
-        entityDO.setSkill(StringUtils.defaultString(skill, ""));
+        entityDO.setSkill(Objects.toString(skill, ""));
         entityDO.setStatus(STATUS_ACTIVE);
         entityDO.setExpireTime(expireTime);
         entityDO.setEnableFlag((byte) 0);
@@ -97,13 +97,13 @@ public class SessionServiceImpl implements SessionService {
             expireSession(entityDO);
             return null;
         }
-        return entityDO != null ? sessionBuilder.buildBOByDO(entityDO) : null;
+        return Objects.nonNull(entityDO) ? sessionBuilder.buildBOByDO(entityDO) : null;
     }
 
     @Override
     public void removeByConversationId(String conversationId) {
         SessionDO entityDO = findByConversationId(conversationId);
-        if (entityDO != null) {
+        if (Objects.nonNull(entityDO)) {
             sessionManager.removeById(entityDO.getId());
             agenticChatMemory.clear(conversationId);
         }
@@ -148,7 +148,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     private boolean isExpired(SessionDO session) {
-        return session != null && session.getExpireTime() != null
+        return Objects.nonNull(session) && Objects.nonNull(session.getExpireTime())
                 && session.getExpireTime().isBefore(LocalDateTime.now());
     }
 

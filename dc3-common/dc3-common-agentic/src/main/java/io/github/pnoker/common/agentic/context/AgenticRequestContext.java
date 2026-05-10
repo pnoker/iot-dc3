@@ -58,7 +58,7 @@ public class AgenticRequestContext {
 
     public static Long requireTenantId(ToolContext toolContext) {
         Long tenantId = getLongContextValue(toolContext, AgenticConstant.ToolContextKey.TENANT_ID);
-        return tenantId != null ? tenantId : requireTenantId();
+        return Objects.nonNull(tenantId) ? tenantId : requireTenantId();
     }
 
     public static Long requireTenantId() {
@@ -67,7 +67,7 @@ public class AgenticRequestContext {
 
     public static Long requireUserId(ToolContext toolContext) {
         Long userId = getLongContextValue(toolContext, AgenticConstant.ToolContextKey.USER_ID);
-        return userId != null ? userId : requireUserId();
+        return Objects.nonNull(userId) ? userId : requireUserId();
     }
 
     public static Long requireUserId() {

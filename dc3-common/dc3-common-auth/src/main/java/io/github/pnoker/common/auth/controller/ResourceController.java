@@ -149,7 +149,7 @@ public class ResourceController implements BaseController {
         out.setOperatorId(flat.getOperatorId());
         out.setOperatorName(flat.getOperatorName());
         out.setOperateTime(flat.getOperateTime());
-        if (node.getChildren() != null) {
+        if (Objects.nonNull(node.getChildren())) {
             List<ResourceTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
             for (ResourceTreeBO child : node.getChildren()) {
                 childVOs.add(toTreeVO(child));

@@ -25,6 +25,7 @@ import org.mapstruct.Mapping;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Objects;
 
 /**
  * Converts between the facade-api shapes and {@code dc3-common-data} internals.
@@ -47,7 +48,7 @@ public interface FacadePointValueBuilder {
      * Convert LocalDateTime to epoch seconds.
      */
     default long map(LocalDateTime value) {
-        if (value == null) {
+        if (Objects.isNull(value)) {
             return 0L;
         }
         return value.toEpochSecond(ZoneOffset.UTC);

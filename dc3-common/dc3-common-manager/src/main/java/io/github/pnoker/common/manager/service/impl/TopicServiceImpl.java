@@ -56,12 +56,12 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
         List<TopicVO> topicVOList = new ArrayList<>();
         String topic = topicQuery.getTopic();
         Long deviceIdL = null;
-        if (topic != null && topic.length() > 0) {
+        if (Objects.nonNull(topic) && topic.length() > 0) {
             String[] parts = topic.split("/");
             deviceIdL = Long.parseLong(parts[parts.length - 1]);
         }
         String dName = topicQuery.getDeviceName();
-        List<DeviceDO> deviceList = lambdaQuery().eq(deviceIdL != null, DeviceDO::getId, deviceIdL)
+        List<DeviceDO> deviceList = lambdaQuery().eq(Objects.nonNull(deviceIdL), DeviceDO::getId, deviceIdL)
                 .eq(Objects.nonNull(topicQuery.getTenantId()), DeviceDO::getTenantId, topicQuery.getTenantId())
                 .eq(Objects.nonNull(dName) && !dName.isEmpty(), DeviceDO::getDeviceName, dName)
                 // .eq(DeviceDO::getEnableFlag, 1)
@@ -74,7 +74,7 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
                     .eq(ProfileBindDO::getDeviceId, deviceId)
                     .eq(Objects.nonNull(topicQuery.getTenantId()), ProfileBindDO::getTenantId, topicQuery.getTenantId())
                     .one();
-            if (profileBind != null) {
+            if (Objects.nonNull(profileBind)) {
                 Long profileBindId = profileBind.getProfileId();
                 List<PointDO> points = Db.lambdaQuery(PointDO.class)
                         .eq(PointDO::getProfileId, profileBindId)

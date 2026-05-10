@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import java.util.Objects;
 
 /**
  * OpenAI-compatible chat completion endpoint.
@@ -55,7 +56,7 @@ public class ChatController implements BaseController {
     @PostMapping("/completions")
     public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequest request) {
         return getUserHeader().flatMap(header -> {
-            if (request != null && request.isStream()) {
+            if (Objects.nonNull(request) && request.isStream()) {
                 return Mono.just(ResponseEntity.ok()
                         .contentType(MediaType.TEXT_EVENT_STREAM)
                         .body(agenticChatService.streamChatCompletion(request, header)));
