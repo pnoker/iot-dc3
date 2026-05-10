@@ -30,12 +30,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
  * Walks the WebFlux handler mappings and turns every HTTP endpoint into a
  * {@link FacadeScannedApiBO}. One handler method with multiple HTTP methods or URL
- * patterns is fanned out to multiple entries.
+ * patterns is fanned out to multiple entries, then de-duplicated by
+ * {@code METHOD:path} so the auth-side sync receives a stable inventory.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -54,6 +56,13 @@ public class ApiEndpointScanner {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
+    /**
+     * Create a scanner bound to the WebFlux handler mapping built by the current
+     * application context.
+     *
+     * @param handlerMapping WebFlux request mapping registry
+     * @param properties registrar scan configuration
+     */
     public ApiEndpointScanner(RequestMappingHandlerMapping handlerMapping, ResourceRegistrarProperties properties) {
         this.handlerMapping = handlerMapping;
         this.properties = properties;
@@ -64,6 +73,12 @@ public class ApiEndpointScanner {
         return className + "." + handler.getMethod().getName();
     }
 
+    /**
+     * Scan all registered WebFlux request mappings and return the endpoint inventory
+     * visible to the permission resource registrar.
+     *
+     * @return deterministic list of scanned API endpoints
+     */
     public List<FacadeScannedApiBO> scan() {
         Map<RequestMappingInfo, HandlerMethod> mappings = handlerMapping.getHandlerMethods();
         // Preserve discovery order for deterministic diffs.
@@ -74,18 +89,19 @@ public class ApiEndpointScanner {
         return new ArrayList<>(deduped.values());
     }
 
+    /**
+     * Expand one WebFlux mapping into zero or more permission endpoints. Unsupported
+     * methods, ambiguous method-less mappings, excluded paths, and duplicate
+     * {@code METHOD:path} entries are ignored.
+     */
     private void expand(RequestMappingInfo info, HandlerMethod handler, Map<String, FacadeScannedApiBO> out) {
         Set<RequestMethod> methods = info.getMethodsCondition().getMethods();
         if (methods.isEmpty()) {
             // Controllers that don't declare a method expose GET by default at the HTTP
-            // level, but for permission-registration purposes these are ambiguous — skip.
+            // level, but for permission-registration purposes these are ambiguous - skip.
             return;
         }
-        Set<PathPattern> patterns;
-        if (info.getPatternsCondition() == null) {
-            return;
-        }
-        patterns = info.getPatternsCondition().getPatterns();
+        Set<PathPattern> patterns = info.getPatternsCondition().getPatterns();
         if (patterns.isEmpty()) {
             return;
         }
@@ -115,9 +131,12 @@ public class ApiEndpointScanner {
         }
     }
 
+    /**
+     * Apply built-in and user-configured Ant-style path excludes.
+     */
     private boolean isExcluded(String path) {
         List<String> allExcludes = new ArrayList<>(DEFAULT_EXCLUDES);
-        if (properties.getExcludePaths() != null) {
+        if (Objects.nonNull(properties.getExcludePaths())) {
             allExcludes.addAll(properties.getExcludePaths());
         }
         for (String pattern : allExcludes) {

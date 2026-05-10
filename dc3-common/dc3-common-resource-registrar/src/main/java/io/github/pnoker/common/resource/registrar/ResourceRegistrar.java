@@ -33,7 +33,9 @@ import java.util.List;
 
 /**
  * Drives a one-shot sync of the local HTTP endpoint inventory to the auth resource tables
- * as soon as the application finishes starting.
+ * as soon as the application finishes starting. The transport is selected by whichever
+ * {@link ResourceRegistryFacade} bean is active: local facade for single-JVM deployments
+ * or gRPC facade for distributed center services.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -50,6 +52,15 @@ public class ResourceRegistrar {
 
     private final Environment environment;
 
+    /**
+     * Create a registrar that scans the current service and submits the inventory through
+     * the active facade implementation.
+     *
+     * @param scanner endpoint scanner for the local WebFlux mappings
+     * @param facade transport-neutral resource registry facade
+     * @param properties registrar runtime options
+     * @param environment Spring environment used for service-name fallback
+     */
     public ResourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
                              ResourceRegistrarProperties properties, Environment environment) {
         this.scanner = scanner;
@@ -58,6 +69,12 @@ public class ResourceRegistrar {
         this.environment = environment;
     }
 
+    /**
+     * Register scanned endpoints after the application is ready and all WebFlux handler
+     * mappings have been built. Failures abort startup only when
+     * {@code dc3.resource-registrar.fail-fast=true}; otherwise the service keeps running
+     * and logs the registration error.
+     */
     @EventListener(ApplicationReadyEvent.class)
     public void register() {
         if (!properties.isEnabled()) {
@@ -94,6 +111,9 @@ public class ResourceRegistrar {
         }
     }
 
+    /**
+     * Resolve the stable service name used as the namespace for generated API codes.
+     */
     private String resolveServiceName() {
         String name = properties.getServiceName();
         return StringUtils.isBlank(name) ? environment.getProperty("spring.application.name") : name;

@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Tree structure builder from flat lists.
@@ -49,7 +50,7 @@ public class TreeUtil {
             }
             for (T it : treeNodes) {
                 if (it.getParentId() == treeNode.getId()) {
-                    if (treeNode.getChildren() == null) {
+                    if (Objects.isNull(treeNode.getChildren())) {
                         treeNode.setChildren(new ArrayList<>(16));
                     }
                     treeNode.add(it);
@@ -88,7 +89,7 @@ public class TreeUtil {
     public <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
         for (T it : treeNodes) {
             if (treeNode.getId() == it.getParentId()) {
-                if (treeNode.getChildren() == null) {
+                if (Objects.isNull(treeNode.getChildren())) {
                     treeNode.setChildren(new ArrayList<>(16));
                 }
                 treeNode.add(findChildren(it, treeNodes));
