@@ -27,6 +27,7 @@ import io.github.pnoker.driver.exception.S7Exception;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Array;
+import java.util.Objects;
 
 /**
  * The Class S7Serializer is responsible for serializing S7 TCP Connection
@@ -76,7 +77,7 @@ public final class S7SerializerImpl implements S7Serializer {
                 byteOffset);
 
         try {
-            final T obj = beanClass.newInstance();
+            final T obj = beanClass.getDeclaredConstructor().newInstance();
             final BeanParseResult result = BeanParser.parse(beanClass);
             for (final BeanEntry entry : result.entries) {
                 Object value = null;
@@ -129,12 +130,12 @@ public final class S7SerializerImpl implements S7Serializer {
             for (final BeanEntry entry : result.entries) {
                 final Object fieldValue = entry.field.get(bean);
 
-                if (fieldValue != null) {
+                if (Objects.nonNull(fieldValue)) {
                     if (entry.isArray) {
                         for (int i = 0; i < entry.arraySize; i++) {
                             final Object arrayItem = Array.get(fieldValue, i);
 
-                            if (arrayItem != null) {
+                            if (Objects.nonNull(arrayItem)) {
                                 entry.serializer.insert(arrayItem, buffer,
                                         entry.byteOffset + byteOffset + (i * entry.s7type.getByteSize()),
                                         entry.bitOffset + (i * entry.s7type.getBitSize()), entry.size);
@@ -198,7 +199,7 @@ public final class S7SerializerImpl implements S7Serializer {
             final BeanParseResult result = BeanParser.parse(bean);
 
             final byte[] buffer = new byte[result.blockSize];
-            log.trace("store-buffer-size: " + buffer.length);
+            log.trace("S7 store buffer prepared, size={}", buffer.length);
 
             insertBytes(bean, buffer, 0);
 

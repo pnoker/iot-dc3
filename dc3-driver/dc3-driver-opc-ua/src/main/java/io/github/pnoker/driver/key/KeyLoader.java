@@ -88,6 +88,7 @@ public class KeyLoader {
         Path serverKeyStore = baseDir.resolve("dc3-opc-ua-client.pfx");
 
         if (!Files.exists(serverKeyStore)) {
+            log.info("OPC UA client keystore generating, path={}", serverKeyStore);
             keyStore.load(null, PASSWORD);
             KeyPair keyPair = SelfSignedCertificateGenerator.generateRsaKeyPair(2048);
             SelfSignedCertificateBuilder builder = new SelfSignedCertificateBuilder(keyPair)
@@ -115,10 +116,12 @@ public class KeyLoader {
             try (OutputStream out = Files.newOutputStream(serverKeyStore)) {
                 keyStore.store(out, PASSWORD);
             }
+            log.info("OPC UA client keystore generated, path={}", serverKeyStore);
         } else {
             try (InputStream in = Files.newInputStream(serverKeyStore)) {
                 keyStore.load(in, PASSWORD);
             }
+            log.debug("OPC UA client keystore loaded, path={}", serverKeyStore);
         }
 
         Key serverPrivateKey = keyStore.getKey(CLIENT_ALIAS, PASSWORD);
@@ -126,6 +129,7 @@ public class KeyLoader {
             clientCertificate = (X509Certificate) keyStore.getCertificate(CLIENT_ALIAS);
             PublicKey serverPublicKey = clientCertificate.getPublicKey();
             clientKeyPair = new KeyPair(serverPublicKey, (PrivateKey) serverPrivateKey);
+            log.debug("OPC UA client certificate loaded, alias={}", CLIENT_ALIAS);
         }
 
         return this;

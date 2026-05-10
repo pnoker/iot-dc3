@@ -19,6 +19,7 @@ package io.github.pnoker.driver.mqtt.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.mqtt.entity.MessageHeader;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * MQTT message receive service implementation.
@@ -60,10 +62,13 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     @Override
     public void receiveValue(MqttMessage mqttMessage) {
         // do something to process your mqtt messages
-        log.info(JsonUtil.toJsonString(mqttMessage));
+        log.debug("MQTT message received, topic={}, qos={}, payloadLength={}", topicOf(mqttMessage), qosOf(mqttMessage),
+                payloadLengthOf(mqttMessage));
         PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
         pointValue.setCreateTime(LocalDateTimeUtil.now());
         driverSenderService.pointValueSender(pointValue);
+        log.debug("MQTT point value forwarded, topic={}, deviceId={}, pointId={}", topicOf(mqttMessage),
+                pointValue.getDeviceId(), pointValue.getPointId());
     }
 
     /**
@@ -78,13 +83,29 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     @Override
     public void receiveValues(List<MqttMessage> mqttMessageList) {
         // do something to process your mqtt messages
-        log.info(JsonUtil.toJsonString(mqttMessageList));
+        log.debug("MQTT message batch received, count={}", mqttMessageList.size());
         List<PointValue> pointValues = mqttMessageList.stream().map(mqttMessage -> {
             PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
             pointValue.setCreateTime(LocalDateTimeUtil.now());
             return pointValue;
         }).toList();
         driverSenderService.pointValueSender(pointValues);
+        log.debug("MQTT point value batch forwarded, count={}", pointValues.size());
+    }
+
+    private String topicOf(MqttMessage mqttMessage) {
+        MessageHeader header = mqttMessage.getHeader();
+        return Objects.isNull(header) ? null : header.getMqttReceivedTopic();
+    }
+
+    private Integer qosOf(MqttMessage mqttMessage) {
+        MessageHeader header = mqttMessage.getHeader();
+        return Objects.isNull(header) ? null : header.getMqttReceivedQos();
+    }
+
+    private int payloadLengthOf(MqttMessage mqttMessage) {
+        String payload = mqttMessage.getPayload();
+        return Objects.isNull(payload) ? 0 : payload.length();
     }
 
 }

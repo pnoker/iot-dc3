@@ -17,7 +17,9 @@
 package io.github.pnoker.driver.api.impl.nodave;
 
 import io.github.pnoker.driver.api.DaveArea;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -28,6 +30,7 @@ import java.util.concurrent.Semaphore;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 public abstract class S7Connection {
 
     static int tmo_normal = 150;
@@ -99,7 +102,6 @@ public abstract class S7Connection {
         final ResultSet rs = new ResultSet();
         if (p2.mem[p2.param + 0] == PDU.FUNC_READ) {
             int numResults = p2.mem[p2.param + 1];
-            // System.out.println("Results " + numResults);
             rs.results = new Result[numResults];
             int pos = p2.data;
             for (int i = 0; i < numResults; i++) {
@@ -110,14 +112,12 @@ public abstract class S7Connection {
                     final int type = Nodave.USByte(p2.mem, pos + 1);
                     int len = Nodave.USBEWord(p2.mem, pos + 2);
                     r.error = 0;
-                    // System.out.println("Raw length " + len);
                     if (type == 4) {
                         len /= 8;
                     } else if (type == 3) {
                         ; // length is ok
                     }
 
-                    // System.out.println("Byte length " + len);
                     // r.data = new byte[len];
 
                     // System.arraycopy(p2.mem, pos + 4, r.data, 0, len);
@@ -128,7 +128,7 @@ public abstract class S7Connection {
                         pos++;
                     }
                 } else {
-                    System.out.println("Error " + r.error);
+                    log.warn("S7 read result item failed, error={}", r.error);
                 }
                 pos += 4;
                 rs.results[i] = r;
@@ -191,7 +191,6 @@ public abstract class S7Connection {
      * @return value
      */
     public long getDWORD(final int pos) {
-        // System.out.println("getDWORD pos " + pos);
         return Nodave.USBELong(this.msgIn, this.udata + pos);
     }
 
@@ -216,7 +215,6 @@ public abstract class S7Connection {
      * @return value
      */
     public float getFloat(final int pos) {
-        // System.out.println("getFloat pos " + pos);
         return Nodave.BEFloat(this.msgIn, this.udata + pos);
     }
 
@@ -323,7 +321,9 @@ public abstract class S7Connection {
         try {
             this.semaphore.acquire();
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
+            log.warn("S7 read interrupted, area={}, dbNum={}, start={}, length={}", area, DBnum, start, len, e);
+            return Nodave.RESULT_TIMEOUT;
         }
         final PDU p1 = new PDU(this.msgOut, this.PDUstartOut);
         p1.initReadRequest();
@@ -353,7 +353,7 @@ public abstract class S7Connection {
         /*
          * copy to user buffer and setup internal buffer pointers:
          */
-        if (buffer != null) {
+        if (Objects.nonNull(buffer)) {
             System.arraycopy(p2.mem, p2.udata, buffer, 0, p2.udlen);
         }
 
@@ -372,7 +372,7 @@ public abstract class S7Connection {
     }
 
     public int useResult(final ResultSet rs, final int number) {
-        System.out.println("rs.getNumResults: " + rs.getNumResults() + " number: " + number);
+        log.trace("S7 result selected, resultCount={}, number={}", rs.getNumResults(), number);
         if (rs.getNumResults() > number) {
             this.dataPointer = rs.results[number].bufferStart;
             return 0;

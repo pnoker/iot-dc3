@@ -93,7 +93,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.debug(throwable.getMessage());
+        log.warn("Driver channel error, protocol=tcp, remoteAddress={}", context.channel().remoteAddress(), throwable);
         context.disconnect();
     }
 

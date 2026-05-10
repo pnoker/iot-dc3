@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.driver.api.impl.nodave;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Utility class for communication with Siemens S7 PLCs. This class provides methods for
  * data conversion, protocol constants, and error handling for S7 PLC communication. Based
@@ -25,6 +27,7 @@ package io.github.pnoker.driver.api.impl.nodave;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 public final class Nodave {
 
     public final static int MAX_RAW_LEN = 2048;
@@ -102,7 +105,6 @@ public final class Nodave {
 
     public static float BEFloat(final byte[] b, final int pos) {
         int i = 0;
-        // System.out.println("pos" + pos);
 
         i |= Nodave.USByte(b, pos);
         i <<= 8;
@@ -168,7 +170,10 @@ public final class Nodave {
      * @param len   Length
      */
     public static void dump(final String text, final byte[] mem, final int start, final int len) {
-        System.out.print(text + " ");
+        if (!log.isTraceEnabled()) {
+            return;
+        }
+        StringBuilder hex = new StringBuilder();
         for (int i = start; i < (start + len); i++) {
             int j = mem[i];
             if (j < 0) {
@@ -178,9 +183,9 @@ public final class Nodave {
             if (s.length() < 2) {
                 s = "0" + s;
             }
-            System.out.print(s + ",");
+            hex.append(s).append(',');
         }
-        System.out.println(" ");
+        log.trace("S7 buffer dump, label={}, payload={}", text, hex);
     }
 
     public static long SBELong(final byte[] b, final int pos) {
@@ -348,8 +353,6 @@ public final class Nodave {
         int j = b[pos + 1];
         int k = b[pos + 2];
         int l = b[pos + 3];
-        // System.out.println(
-        // pos + " 0:" + i + " 1:" + j + " 2:" + k + " 3:" + l);
         if (i < 0) {
             i += 256;
         }

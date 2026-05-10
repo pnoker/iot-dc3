@@ -22,6 +22,7 @@ import io.github.pnoker.driver.api.impl.nodave.Nodave;
 import io.github.pnoker.driver.api.impl.nodave.PLCinterface;
 import io.github.pnoker.driver.api.impl.nodave.TCPConnection;
 import io.github.pnoker.driver.exception.S7Exception;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -36,6 +37,7 @@ import java.net.Socket;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 public final class S7TCPConnection extends S7BaseConnection {
 
     /**
@@ -110,7 +112,7 @@ public final class S7TCPConnection extends S7BaseConnection {
         try {
             this.socket.close();
         } catch (final Exception e) {
-            e.printStackTrace();
+            log.warn("S7 socket close failed, host={}, port={}", this.host, this.port, e);
         }
     }
 

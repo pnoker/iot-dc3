@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -143,10 +144,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             // to do something for device event
-            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
+            log.info("Driver metadata event received, protocol=mqtt, metadataType={}, operateType={}, deviceId={}",
+                    metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             // to do something for point event
-            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
+            log.info("Driver metadata event received, protocol=mqtt, metadataType={}, operateType={}, pointId={}",
+                    metadataType, operateType, metadataEvent.getId());
         }
     }
 
@@ -211,10 +214,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          */
         String commandTopic = pointConfig.get("commandTopic").getValue(String.class);
         String value = values.getValue();
+        log.debug("Driver point write requested, protocol=mqtt, deviceId={}, pointId={}, topic={}, valueLength={}",
+                device.getId(), point.getId(), commandTopic, Objects.toString(value, "").length());
         try {
             int commandQos = pointConfig.get("commandQos").getValue(Integer.class);
             mqttSendService.sendToMqtt(commandTopic, commandQos, value);
         } catch (Exception e) {
+            log.warn("MQTT command QoS unavailable, fallback to default, deviceId={}, pointId={}, topic={}",
+                    device.getId(), point.getId(), commandTopic, e);
             mqttSendService.sendToMqtt(commandTopic, value);
         }
         return true;
