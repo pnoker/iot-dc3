@@ -56,9 +56,9 @@ public class ResourceRegistrar {
      * Create a registrar that scans the current service and submits the inventory through
      * the active facade implementation.
      *
-     * @param scanner endpoint scanner for the local WebFlux mappings
-     * @param facade transport-neutral resource registry facade
-     * @param properties registrar runtime options
+     * @param scanner     endpoint scanner for the local WebFlux mappings
+     * @param facade      transport-neutral resource registry facade
+     * @param properties  registrar runtime options
      * @param environment Spring environment used for service-name fallback
      */
     public ResourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
