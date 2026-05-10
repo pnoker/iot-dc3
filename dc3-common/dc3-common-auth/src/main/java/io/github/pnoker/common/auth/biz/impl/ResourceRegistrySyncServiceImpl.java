@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,11 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * Auth-side reconciler for endpoint resource registration. The registrar submits a full
+ * inventory for one service, and this service makes the API table plus permission
+ * resource tree converge on that inventory inside a transaction scoped to the service
+ * name.
+ *
  * @author pnoker
  * @version 2026.5.5
  * @since 2026.5.5
@@ -84,6 +90,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
      */
     private static final String MENU_RESOURCE_CODE_PREFIX = "menu:";
 
+    /**
+     * Counters for resource-tree repairs performed while keeping the public sync result
+     * focused on dc3_api row changes.
+     */
+    private record ResourceRepairResult(int inserted, int updated) {
+    }
+
     @Resource
     private ApiManager apiManager;
 
@@ -94,7 +107,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private ResourceRegistryLockMapper resourceRegistryLockMapper;
 
     private static String apiCodeOf(String serviceName, String method, String path) {
-        return serviceName + ":" + method.toUpperCase() + ":" + path;
+        return serviceName + ":" + methodToTypeFlag(method).name() + ":" + path;
     }
 
     private static ApiTypeFlagEnum methodToTypeFlag(String method) {
@@ -110,7 +123,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
 
     private static ResourceScopeFlagEnum methodToScopeFlag(Byte apiTypeFlag) {
         ApiTypeFlagEnum type = ApiTypeFlagEnum.ofIndex(apiTypeFlag);
-        if (type == null) {
+        if (Objects.isNull(type)) {
             return ResourceScopeFlagEnum.LIST;
         }
         return switch (type) {
@@ -136,8 +149,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         Map<String, ResourceRegistryScannedApi> scannedByCode = indexScanned(scanned, serviceName);
 
         // Ensure the service + apiGroup virtual grouping nodes exist before writing
-        // leaves,
-        // so the leaf rows can set parent_resource_id to the right ancestor.
+        // leaves, so the leaf rows can set parent_resource_id to the right ancestor.
         Set<String> targetGroups = new LinkedHashSet<>();
         for (ResourceRegistryScannedApi spec : scannedByCode.values()) {
             targetGroups.add(Objects.requireNonNullElse(spec.getApiGroup(), ""));
@@ -155,10 +167,9 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         int unchanged = 0;
 
         List<ApiDO> apisToInsert = new ArrayList<>();
-        List<ResourceDO> resourcesToInsert = new ArrayList<>();
         List<ApiDO> apisToUpdate = new ArrayList<>();
-        List<ResourceDO> resourcesToUpdate = new ArrayList<>();
         List<Long> apiIdsToDelete = new ArrayList<>();
+        Map<String, ApiDO> targetApisByCode = new LinkedHashMap<>(scannedByCode.size());
 
         for (Map.Entry<String, ResourceRegistryScannedApi> entry : scannedByCode.entrySet()) {
             String apiCode = entry.getKey();
@@ -175,41 +186,24 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             } else {
                 unchanged++;
             }
+            targetApisByCode.put(apiCode, existing);
         }
 
         if (!apisToInsert.isEmpty()) {
             apiManager.saveBatch(apisToInsert);
             for (ApiDO api : apisToInsert) {
-                Long groupNodeId = groupNodeIds.get(Objects.requireNonNullElse(api.getApiGroup(), ""));
-                resourcesToInsert.add(buildLeafResourceDO(api, groupNodeId));
+                targetApisByCode.put(api.getApiCode(), api);
             }
-            resourceManager.saveBatch(resourcesToInsert);
             inserted = apisToInsert.size();
         }
 
         if (!apisToUpdate.isEmpty()) {
             apiManager.updateBatchById(apisToUpdate);
-            Map<Long, ResourceDO> resourceByEntityId = loadResourcesByEntityIds(
-                    apisToUpdate.stream().map(ApiDO::getId).toList());
-            List<ResourceDO> resourcesToBackfill = new ArrayList<>();
-            for (ApiDO api : apisToUpdate) {
-                Long groupNodeId = groupNodeIds.get(Objects.requireNonNullElse(api.getApiGroup(), ""));
-                ResourceDO resourceDO = resourceByEntityId.get(api.getId());
-                if (Objects.isNull(resourceDO)) {
-                    resourcesToBackfill.add(buildLeafResourceDO(api, groupNodeId));
-                } else {
-                    applyLeafResourceUpdates(resourceDO, api, groupNodeId);
-                    resourcesToUpdate.add(resourceDO);
-                }
-            }
-            if (!resourcesToUpdate.isEmpty()) {
-                resourceManager.updateBatchById(resourcesToUpdate);
-            }
-            if (!resourcesToBackfill.isEmpty()) {
-                resourceManager.saveBatch(resourcesToBackfill);
-            }
             updated = apisToUpdate.size();
         }
+
+        ResourceRepairResult resourceRepair = reconcileLeafResources(new ArrayList<>(targetApisByCode.values()),
+                groupNodeIds);
 
         if (command.isDeleteMissing() && !existingByCode.isEmpty()) {
             for (ApiDO orphan : existingByCode.values()) {
@@ -233,8 +227,9 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         int removedGroupNodes = cleanupOrphanGroupingNodes(serviceName);
 
         log.info(
-                "Resource registry sync [{}]: inserted={}, updated={}, deleted={}, unchanged={}, prunedGroupingNodes={}",
-                serviceName, inserted, updated, deletedCount, unchanged, removedGroupNodes);
+                "Resource registry sync [{}]: inserted={}, updated={}, deleted={}, unchanged={}, resourceInserted={}, resourceUpdated={}, prunedGroupingNodes={}",
+                serviceName, inserted, updated, deletedCount, unchanged, resourceRepair.inserted(),
+                resourceRepair.updated(), removedGroupNodes);
 
         return ResourceRegistrySyncResult.builder()
                 .inserted(inserted)
@@ -271,12 +266,28 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
 
     private Map<String, ResourceRegistryScannedApi> indexScanned(List<ResourceRegistryScannedApi> scanned,
                                                                  String serviceName) {
-        Map<String, ResourceRegistryScannedApi> map = new HashMap<>(scanned.size());
+        Map<String, ResourceRegistryScannedApi> map = new LinkedHashMap<>(scanned.size());
         for (ResourceRegistryScannedApi spec : scanned) {
+            validateScannedApi(spec);
             String code = apiCodeOf(serviceName, spec.getMethod(), spec.getPath());
-            map.put(code, spec);
+            if (Objects.nonNull(map.putIfAbsent(code, spec))) {
+                log.warn("Duplicate scanned API ignored: serviceName={}, apiCode={}", serviceName, code);
+            }
         }
         return map;
+    }
+
+    private void validateScannedApi(ResourceRegistryScannedApi spec) {
+        if (Objects.isNull(spec)) {
+            throw new IllegalArgumentException("Scanned API must not be null");
+        }
+        if (StringUtils.isBlank(spec.getMethod())) {
+            throw new IllegalArgumentException("Scanned API method is required");
+        }
+        methodToTypeFlag(spec.getMethod());
+        if (StringUtils.isBlank(spec.getPath())) {
+            throw new IllegalArgumentException("Scanned API path is required");
+        }
     }
 
     private ApiDO buildApiDO(ResourceRegistryScannedApi spec, String apiCode, String serviceName) {
@@ -306,9 +317,43 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return resource;
     }
 
+    private ResourceRepairResult reconcileLeafResources(List<ApiDO> apis, Map<String, Long> groupNodeIds) {
+        if (apis.isEmpty()) {
+            return new ResourceRepairResult(0, 0);
+        }
+        for (ApiDO api : apis) {
+            if (Objects.isNull(api.getId())) {
+                throw new IllegalStateException("API id is required before creating resource leaf: " + api.getApiCode());
+            }
+        }
+        List<Long> entityIds = apis.stream().map(ApiDO::getId).toList();
+        Map<Long, ResourceDO> resourceByEntityId = loadResourcesByEntityIds(entityIds);
+        List<ResourceDO> resourcesToInsert = new ArrayList<>();
+        List<ResourceDO> resourcesToUpdate = new ArrayList<>();
+        for (ApiDO api : apis) {
+            Long groupNodeId = groupNodeIds.get(Objects.requireNonNullElse(api.getApiGroup(), ""));
+            ResourceDO resourceDO = resourceByEntityId.get(api.getId());
+            if (Objects.isNull(resourceDO)) {
+                resourcesToInsert.add(buildLeafResourceDO(api, groupNodeId));
+                continue;
+            }
+            if (needsLeafResourceUpdate(resourceDO, api, groupNodeId)) {
+                applyLeafResourceUpdates(resourceDO, api, groupNodeId);
+                resourcesToUpdate.add(resourceDO);
+            }
+        }
+        if (!resourcesToInsert.isEmpty()) {
+            resourceManager.saveBatch(resourcesToInsert);
+        }
+        if (!resourcesToUpdate.isEmpty()) {
+            resourceManager.updateBatchById(resourcesToUpdate);
+        }
+        return new ResourceRepairResult(resourcesToInsert.size(), resourcesToUpdate.size());
+    }
+
     private boolean needsUpdate(ApiDO existing, ResourceRegistryScannedApi spec, String apiCode, String serviceName) {
         byte expectedType = methodToTypeFlag(spec.getMethod()).getIndex();
-        if (existing.getApiTypeFlag() == null || existing.getApiTypeFlag() != expectedType) {
+        if (Objects.isNull(existing.getApiTypeFlag()) || existing.getApiTypeFlag() != expectedType) {
             return true;
         }
         if (!Objects.equals(existing.getApiName(), spec.getApiName())) {
@@ -348,15 +393,50 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
         resource.setResourceName(api.getApiName());
         resource.setResourceCode(RESOURCE_CODE_PREFIX + api.getApiCode());
+        resource.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
         resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
+        resource.setEntityId(api.getId());
+        if (Objects.isNull(resource.getResourceExt())) {
+            resource.setResourceExt(new JsonExt());
+        }
         resource.setRemark(Objects.requireNonNullElse(api.getRemark(), ""));
         resource.setOperateTime(null);
+    }
+
+    private boolean needsLeafResourceUpdate(ResourceDO resource, ApiDO api, Long groupNodeId) {
+        if (!Objects.equals(resource.getParentResourceId(), Objects.requireNonNullElse(groupNodeId, 0L))) {
+            return true;
+        }
+        if (!Objects.equals(resource.getResourceName(), api.getApiName())) {
+            return true;
+        }
+        if (!Objects.equals(resource.getResourceCode(), RESOURCE_CODE_PREFIX + api.getApiCode())) {
+            return true;
+        }
+        if (!Objects.equals(resource.getResourceTypeFlag(), ResourceTypeFlagEnum.API.getIndex())) {
+            return true;
+        }
+        if (!Objects.equals(resource.getResourceScopeFlag(), methodToScopeFlag(api.getApiTypeFlag()).getIndex())) {
+            return true;
+        }
+        if (!Objects.equals(resource.getEntityId(), api.getId())) {
+            return true;
+        }
+        if (Objects.isNull(resource.getResourceExt())) {
+            return true;
+        }
+        String expectedRemark = Objects.requireNonNullElse(api.getRemark(), "");
+        return !Objects.equals(Objects.requireNonNullElse(resource.getRemark(), ""), expectedRemark);
     }
 
     private Long ensureServiceNode(String serviceName) {
         String code = SERVICE_NODE_CODE_PREFIX + serviceName;
         ResourceDO existing = findByResourceCode(code);
-        if (existing != null) {
+        if (Objects.nonNull(existing)) {
+            if (needsGroupingNodeUpdate(existing, 0L, serviceName, code, "Service grouping node (auto-registered)")) {
+                applyGroupingNodeUpdates(existing, 0L, serviceName, code, "Service grouping node (auto-registered)");
+                resourceManager.updateById(existing);
+            }
             return existing.getId();
         }
         ResourceDO node = new ResourceDO();
@@ -378,7 +458,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         for (String group : targetGroups) {
             String code = GROUP_NODE_CODE_PREFIX + serviceName + ":" + group;
             ResourceDO existing = findByResourceCode(code);
-            if (existing == null) {
+            if (Objects.isNull(existing)) {
                 ResourceDO node = new ResourceDO();
                 node.setParentResourceId(serviceNodeId);
                 node.setResourceName(group.isEmpty() ? "(ungrouped)" : group);
@@ -392,15 +472,60 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
                 resourceManager.save(node);
                 result.put(group, node.getId());
             } else {
-                if (!Objects.equals(existing.getParentResourceId(), serviceNodeId)) {
-                    existing.setParentResourceId(serviceNodeId);
-                    existing.setOperateTime(null);
+                String name = group.isEmpty() ? "(ungrouped)" : group;
+                if (needsGroupingNodeUpdate(existing, serviceNodeId, name, code, "API grouping node (auto-registered)")) {
+                    applyGroupingNodeUpdates(existing, serviceNodeId, name, code, "API grouping node (auto-registered)");
                     resourceManager.updateById(existing);
                 }
                 result.put(group, existing.getId());
             }
         }
         return result;
+    }
+
+    private boolean needsGroupingNodeUpdate(ResourceDO node, Long parentResourceId, String name, String code,
+                                            String remark) {
+        if (!Objects.equals(node.getParentResourceId(), parentResourceId)) {
+            return true;
+        }
+        if (!Objects.equals(node.getResourceName(), name)) {
+            return true;
+        }
+        if (!Objects.equals(node.getResourceCode(), code)) {
+            return true;
+        }
+        if (!Objects.equals(node.getResourceTypeFlag(), ResourceTypeFlagEnum.API.getIndex())) {
+            return true;
+        }
+        if (!Objects.equals(node.getResourceScopeFlag(), ResourceScopeFlagEnum.LIST.getIndex())) {
+            return true;
+        }
+        if (!Objects.equals(node.getEntityId(), 0L)) {
+            return true;
+        }
+        if (Objects.isNull(node.getResourceExt())) {
+            return true;
+        }
+        if (!Objects.equals(node.getEnableFlag(), EnableFlagEnum.ENABLE.getIndex())) {
+            return true;
+        }
+        return !Objects.equals(Objects.requireNonNullElse(node.getRemark(), ""), remark);
+    }
+
+    private void applyGroupingNodeUpdates(ResourceDO node, Long parentResourceId, String name, String code,
+                                          String remark) {
+        node.setParentResourceId(parentResourceId);
+        node.setResourceName(name);
+        node.setResourceCode(code);
+        node.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
+        node.setResourceScopeFlag(ResourceScopeFlagEnum.LIST.getIndex());
+        node.setEntityId(0L);
+        if (Objects.isNull(node.getResourceExt())) {
+            node.setResourceExt(new JsonExt());
+        }
+        node.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
+        node.setRemark(remark);
+        node.setOperateTime(null);
     }
 
     private ResourceDO findByResourceCode(String code) {
@@ -431,7 +556,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             removed += idsToDrop.size();
         }
         ResourceDO serviceNode = findByResourceCode(SERVICE_NODE_CODE_PREFIX + serviceName);
-        if (serviceNode != null) {
+        if (Objects.nonNull(serviceNode)) {
             long children = resourceManager
                     .count(Wrappers.<ResourceDO>lambdaQuery().eq(ResourceDO::getParentResourceId, serviceNode.getId()));
             if (children == 0) {
@@ -465,8 +590,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     }
 
     private boolean equalsContent(ApiExt.Content a, ApiExt.Content b) {
-        if (a == null || b == null) {
-            return a == null && b == null;
+        if (Objects.isNull(a) || Objects.isNull(b)) {
+            return Objects.isNull(a) && Objects.isNull(b);
         }
         return Objects.equals(a.getTitle(), b.getTitle()) && Objects.equals(a.getUrl(), b.getUrl())
                 && Objects.equals(a.getRemark(), b.getRemark());
@@ -475,7 +600,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void syncMenuResource(MenuDO menu) {
-        if (menu == null || menu.getId() == null) {
+        if (Objects.isNull(menu) || Objects.isNull(menu.getId())) {
             return;
         }
         String code = MENU_RESOURCE_CODE_PREFIX + Objects.requireNonNullElse(menu.getMenuCode(), "");
@@ -486,7 +611,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
                 .last("LIMIT 1"));
         Long parentResourceId = resolveMenuParentResourceId(menu.getParentMenuId());
 
-        if (existing == null) {
+        if (Objects.isNull(existing)) {
             ResourceDO mirror = new ResourceDO();
             mirror.setParentResourceId(parentResourceId);
             mirror.setResourceName(Objects.requireNonNullElse(menu.getMenuName(), ""));
@@ -513,27 +638,27 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeMenuResource(Long menuId) {
-        if (menuId == null) {
+        if (Objects.isNull(menuId)) {
             return;
         }
         ResourceDO existing = resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
                 .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.MENU.getIndex())
                 .eq(ResourceDO::getEntityId, menuId)
                 .last("LIMIT 1"));
-        if (existing != null) {
+        if (Objects.nonNull(existing)) {
             resourceManager.removeById(existing.getId());
         }
     }
 
     private Long resolveMenuParentResourceId(Long parentMenuId) {
-        if (parentMenuId == null || parentMenuId == 0L) {
+        if (Objects.isNull(parentMenuId) || parentMenuId == 0L) {
             return 0L;
         }
         ResourceDO parent = resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
                 .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.MENU.getIndex())
                 .eq(ResourceDO::getEntityId, parentMenuId)
                 .last("LIMIT 1"));
-        return parent == null ? 0L : parent.getId();
+        return Objects.isNull(parent) ? 0L : parent.getId();
     }
 
 }
