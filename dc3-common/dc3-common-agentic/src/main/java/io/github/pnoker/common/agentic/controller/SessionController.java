@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
+import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.agentic.util.AgenticConversationIds;
@@ -31,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -89,6 +92,21 @@ public class SessionController implements BaseController {
             sessionService.removeByConversationId(AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
             return R.ok();
+        }));
+    }
+
+    @PostMapping("/{conversationId}/update")
+    public Mono<R<SessionVO>> update(@PathVariable String conversationId,
+                                     @RequestBody(required = false) SessionUpdateRequest request) {
+        return getUserHeader().flatMap(header -> async(() -> {
+            SessionBO session = sessionService.update(AgenticConversationIds.scope(header.getTenantId(),
+                    header.getUserId(), conversationId), request);
+            if (Objects.isNull(session)) {
+                return R.fail("Session not found");
+            }
+            SessionVO vo = sessionBuilder.buildVOByBO(session);
+            sanitizeSession(header, vo);
+            return R.ok(vo);
         }));
     }
 

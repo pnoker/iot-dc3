@@ -24,10 +24,15 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * Configures the Spring AI ChatClient with tool registration and chat memory.
@@ -46,7 +51,7 @@ public class ChatClientConfig {
             You can help users manage IoT devices, query real-time and historical data,
             and perform device operations. You have access to the following capabilities:
             
-            - **Auth tools**: Look up tenants, users, and login records.
+            - **Auth tools**: Read the current low-sensitivity tenant and user context.
             - **Manager tools**: Query devices, drivers, and data points (metrics).
             - **Data tools**: Read real-time point values, query historical data, and send read/write commands to devices.
             
@@ -58,8 +63,20 @@ public class ChatClientConfig {
             """;
 
     @Bean
-    @ConditionalOnMissingBean
-    public ChatMemory agenticChatMemory(ChatMemoryRepository chatMemoryRepository, AgenticProperties properties) {
+    @Primary
+    public ChatMemoryRepository agenticChatMemoryRepository(JdbcTemplate jdbcTemplate,
+                                                            PlatformTransactionManager transactionManager) {
+        return JdbcChatMemoryRepository.builder()
+                .jdbcTemplate(jdbcTemplate)
+                .transactionManager(transactionManager)
+                .dialect(new Dc3ChatMemoryRepositoryDialect())
+                .build();
+    }
+
+    @Bean
+    @Primary
+    public ChatMemory agenticChatMemory(@Qualifier("agenticChatMemoryRepository") ChatMemoryRepository chatMemoryRepository,
+                                        AgenticProperties properties) {
         return MessageWindowChatMemory.builder()
                 .chatMemoryRepository(chatMemoryRepository)
                 .maxMessages(properties.getMemoryMaxMessages())
@@ -69,11 +86,40 @@ public class ChatClientConfig {
     @Bean
     public ChatClient agenticChatClient(ChatClient.Builder builder, AuthToolSet authToolSet,
                                         ManagerToolSet managerToolSet, DataToolSet dataToolSet,
-                                        ChatMemory agenticChatMemory) {
-        return builder.defaultSystem(SYSTEM_PROMPT)
-                .defaultTools(authToolSet, managerToolSet, dataToolSet)
-                .defaultAdvisors(MessageChatMemoryAdvisor.builder(agenticChatMemory).build())
-                .build();
+                                        @Qualifier("agenticChatMemory") ChatMemory agenticChatMemory,
+                                        AgenticProperties properties) {
+        ChatClient.Builder clientBuilder = builder.defaultSystem(SYSTEM_PROMPT);
+        if (properties.isToolCallingEnabled()) {
+            clientBuilder.defaultTools(authToolSet, managerToolSet, dataToolSet);
+        }
+        if (properties.isMemoryEnabled()) {
+            clientBuilder.defaultAdvisors(MessageChatMemoryAdvisor.builder(agenticChatMemory).build());
+        }
+        return clientBuilder.build();
+    }
+
+    private static class Dc3ChatMemoryRepositoryDialect implements JdbcChatMemoryRepositoryDialect {
+
+        @Override
+        public String getSelectMessagesSql() {
+            return "SELECT content, type FROM dc3_chat_memory WHERE conversation_id = ? ORDER BY \"timestamp\"";
+        }
+
+        @Override
+        public String getInsertMessageSql() {
+            return "INSERT INTO dc3_chat_memory (conversation_id, content, type, \"timestamp\") VALUES (?, ?, ?, ?)";
+        }
+
+        @Override
+        public String getSelectConversationIdsSql() {
+            return "SELECT DISTINCT conversation_id FROM dc3_chat_memory";
+        }
+
+        @Override
+        public String getDeleteMessagesSql() {
+            return "DELETE FROM dc3_chat_memory WHERE conversation_id = ?";
+        }
+
     }
 
 }

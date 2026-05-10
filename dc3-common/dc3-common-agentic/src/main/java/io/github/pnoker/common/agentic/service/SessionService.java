@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
+import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 
 /**
  *
@@ -33,12 +34,11 @@ public interface SessionService {
      * session already exists, update its operate_time.
      *
      * @param conversationId conversation ID
-     * @param skill          active skill name (may be null)
      * @param tenantId       tenant scope
      * @param userId         user scope
      * @return the session BO
      */
-    SessionBO touch(String conversationId, String skill, Long tenantId, Long userId);
+    SessionBO touch(String conversationId, Long tenantId, Long userId);
 
     /**
      * Get session by conversation ID.
@@ -55,6 +55,15 @@ public interface SessionService {
      * @param conversationId conversation ID
      */
     void removeByConversationId(String conversationId);
+
+    /**
+     * Update mutable session metadata.
+     *
+     * @param conversationId conversation ID
+     * @param request        mutable fields
+     * @return updated session BO or null if the session does not exist
+     */
+    SessionBO update(String conversationId, SessionUpdateRequest request);
 
     /**
      * Query sessions with pagination.

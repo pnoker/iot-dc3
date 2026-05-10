@@ -17,6 +17,8 @@
 package io.github.pnoker.common.agentic.tool;
 
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
+import io.github.pnoker.common.agentic.service.ActionService;
+import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
@@ -48,9 +50,13 @@ public class DataToolSet {
 
     private final PointValueCommandFacade pointValueCommandFacade;
 
-    public DataToolSet(PointValueFacade pointValueFacade, PointValueCommandFacade pointValueCommandFacade) {
+    private final ActionService actionService;
+
+    public DataToolSet(PointValueFacade pointValueFacade, PointValueCommandFacade pointValueCommandFacade,
+                       ActionService actionService) {
         this.pointValueFacade = pointValueFacade;
         this.pointValueCommandFacade = pointValueCommandFacade;
+        this.actionService = actionService;
     }
 
     @Tool(description = "Get the latest point value for a specific device and point. Returns the current value.")
@@ -60,6 +66,7 @@ public class DataToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "getLatestPointValue",
                 tenantId, deviceId, pointId);
+        recordTool(toolContext, "getLatestPointValue", "Get latest point value");
         try {
             FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, pointId);
             if (Objects.isNull(value)) {
@@ -82,6 +89,7 @@ public class DataToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
                 "getPointValueHistory", tenantId, deviceId, pointId, count);
+        recordTool(toolContext, "getPointValueHistory", "Get point value history");
         try {
             List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, count);
             if (Objects.isNull(history) || history.isEmpty()) {
@@ -102,6 +110,7 @@ public class DataToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
                 deviceId, pointId);
+        recordTool(toolContext, "readPointValue", "Send point read command");
         try {
             boolean success = pointValueCommandFacade.read(tenantId, deviceId, pointId);
             return success ? "Read command sent successfully for device " + deviceId + " point " + pointId
@@ -121,7 +130,16 @@ public class DataToolSet {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, valueLength={}",
                 "writePointValue", tenantId, deviceId, pointId, Objects.isNull(value) ? 0 : value.length());
+        recordTool(toolContext, "writePointValue", "Prepare point write command");
         try {
+            if (AgenticRequestContext.confirmActions(toolContext)) {
+                RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader();
+                String conversationId = AgenticRequestContext.requireConversationId(toolContext);
+                String actionId = actionService.createWritePointValueAction(conversationId, deviceId, pointId, value,
+                        header);
+                return "Write command is pending user confirmation. actionId=" + actionId
+                        + ". Ask the user to confirm before executing it.";
+            }
             boolean success = pointValueCommandFacade.write(tenantId, deviceId, pointId, value);
             return success
                     ? "Write command sent successfully for device " + deviceId + " point " + pointId + " value=" + value
@@ -131,6 +149,10 @@ public class DataToolSet {
                     deviceId, pointId, e);
             return "Error sending write command: " + e.getMessage();
         }
+    }
+
+    private void recordTool(ToolContext toolContext, String toolName, String description) {
+        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "data", description);
     }
 
 }

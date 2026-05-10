@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -28,17 +29,20 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
+ * Pending or executed agentic action.
+ *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.10
+ * @since 2026.5.10
  */
 @Getter
 @Setter
 @ToString
-@TableName("dc3_session")
-public class SessionDO implements Serializable {
+@TableName(value = "dc3_action", autoResultMap = true)
+public class ActionDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -46,11 +50,29 @@ public class SessionDO implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
+    @TableField("action_id")
+    private String actionId;
+
     @TableField("conversation_id")
     private String conversationId;
 
+    @TableField("action_type")
+    private String actionType;
+
     @TableField("title")
     private String title;
+
+    @TableField("description")
+    private String description;
+
+    @TableField(value = "payload", typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> payload;
+
+    @TableField("status")
+    private Byte status;
+
+    @TableField("expire_time")
+    private LocalDateTime expireTime;
 
     @TableField("tenant_id")
     private Long tenantId;

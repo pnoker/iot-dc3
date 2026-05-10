@@ -75,6 +75,22 @@ public class ChatCompletionRequest {
      */
     private String skill;
 
+    /**
+     * Uploaded attachment database IDs associated with this request.
+     */
+    private List<Long> attachments;
+
+    /**
+     * Whether the client asked for model reasoning. Current OpenAI-compatible text
+     * endpoint treats this as advisory metadata.
+     */
+    private Boolean reasoning;
+
+    /**
+     * Whether risky tool calls must use the pending-action confirmation protocol.
+     */
+    private Boolean confirmActions;
+
     public boolean isStream() {
         return Boolean.TRUE.equals(stream);
     }

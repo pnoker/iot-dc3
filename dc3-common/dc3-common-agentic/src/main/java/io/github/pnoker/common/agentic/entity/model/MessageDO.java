@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -30,15 +31,17 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
+ * Agentic conversation message.
+ *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.10
+ * @since 2026.5.10
  */
 @Getter
 @Setter
 @ToString
-@TableName("dc3_session")
-public class SessionDO implements Serializable {
+@TableName(value = "dc3_message", autoResultMap = true)
+public class MessageDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -49,8 +52,20 @@ public class SessionDO implements Serializable {
     @TableField("conversation_id")
     private String conversationId;
 
-    @TableField("title")
-    private String title;
+    @TableField("role")
+    private String role;
+
+    @TableField(value = "content", typeHandler = JacksonTypeHandler.class)
+    private AgenticMessageContent content;
+
+    @TableField("model")
+    private String model;
+
+    @TableField("message_index")
+    private Long messageIndex;
+
+    @TableField("status")
+    private Byte status;
 
     @TableField("tenant_id")
     private Long tenantId;
