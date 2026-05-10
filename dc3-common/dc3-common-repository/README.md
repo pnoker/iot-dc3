@@ -28,11 +28,14 @@ application profile. Add a concrete storage implementation (e.g.,
 TimescaleDB, InfluxDB, MongoDB) by implementing `RepositoryService` and registering it as a Spring bean.
 
 ```java
+
 @Resource
 private RepositoryService repositoryService;
 
 // Persist ingested point value
-repositoryService.save(pointValueBO);
+repositoryService.
+
+save(pointValueBO);
 
 // Query latest value for a point
 PointValueBO latest = repositoryService.latest(queryBO);
