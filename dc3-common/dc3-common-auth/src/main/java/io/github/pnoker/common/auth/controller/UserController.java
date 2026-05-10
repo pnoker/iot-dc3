@@ -78,6 +78,15 @@ public class UserController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             userService.save(entityBO);
+            UserBO saved = userService.selectByUserName(entityBO.getUserName(), true);
+            TenantBindBO tenantBindBO = new TenantBindBO();
+            tenantBindBO.setTenantId(header.getTenantId());
+            tenantBindBO.setUserId(saved.getId());
+            tenantBindBO.setCreatorId(header.getUserId());
+            tenantBindBO.setCreatorName(header.getNickName());
+            tenantBindBO.setOperatorId(header.getUserId());
+            tenantBindBO.setOperatorName(header.getNickName());
+            tenantBindService.save(tenantBindBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -86,7 +95,11 @@ public class UserController implements BaseController {
     public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenantMember(tenantId, id);
+            TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, id);
             userService.remove(id);
+            if (Objects.nonNull(tenantBind)) {
+                tenantBindService.remove(tenantBind.getId());
+            }
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
