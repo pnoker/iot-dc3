@@ -26,9 +26,8 @@ import io.github.pnoker.common.utils.RequestUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.web.server.autoconfigure.ServerProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -58,7 +57,7 @@ import java.util.Optional;
 public class WebFilterConfig {
 
     @Resource
-    private ServerProperties serverProperties;
+    private org.springframework.core.env.Environment environment;
 
     @Resource
     private HmacAuthSigner hmacAuthSigner;
@@ -70,7 +69,7 @@ public class WebFilterConfig {
      */
     @Bean
     public WebFilter contextPathWebFilter() {
-        String contextPath = Optional.ofNullable(serverProperties.getReactive().getContextPath()).orElse("/");
+        String contextPath = Optional.ofNullable(environment.getProperty("server.reactive.context-path")).orElse("/");
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             if (request.getURI().getPath().startsWith(contextPath)) {
