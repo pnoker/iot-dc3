@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.driver.api.impl.nodave;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +27,7 @@ import java.io.OutputStream;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 public final class PLCinterface {
 
     InputStream in;
@@ -64,7 +67,9 @@ public final class PLCinterface {
                     }
                     retry++;
                 } catch (final InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                    log.warn("S7 interface read interrupted, interfaceName={}, retry={}", this.name, retry, e);
+                    return 0;
                 }
             }
             res = 0;
@@ -75,7 +80,7 @@ public final class PLCinterface {
             }
             return res;
         } catch (final IOException e) {
-            e.printStackTrace();
+            log.warn("S7 interface read failed, interfaceName={}, start={}, length={}", this.name, start, len, e);
             return 0;
         }
     }
@@ -84,7 +89,7 @@ public final class PLCinterface {
         try {
             this.out.write(b, start, len);
         } catch (final IOException e) {
-            System.err.println("Interface.write: " + e);
+            log.warn("S7 interface write failed, interfaceName={}, start={}, length={}", this.name, start, len, e);
         }
     }
 

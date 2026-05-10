@@ -89,11 +89,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         threadPoolExecutor.execute(() -> {
-            log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
+            log.info("Driver listener starting, protocol=tcp, port={}", tcpPort);
             nettyTcpServer.start(tcpPort);
         });
         threadPoolExecutor.execute(() -> {
-            log.debug("Virtual Listening Driver Starting(UDP::{}) incoming data listener", udpPort);
+            log.info("Driver listener starting, protocol=udp, port={}", udpPort);
             nettyUdpServer.start(udpPort);
         });
     }
@@ -125,9 +125,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
+            log.info("Driver metadata event received, protocol=listeningVirtual, metadataType={}, operateType={}, deviceId={}",
+                    metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
+            log.info("Driver metadata event received, protocol=listeningVirtual, metadataType={}, operateType={}, pointId={}",
+                    metadataType, operateType, metadataEvent.getId());
         }
     }
 
@@ -172,7 +174,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
         if (Objects.nonNull(channel)) {
+            log.debug("Driver point write requested, protocol=tcp, deviceId={}, pointId={}, valueLength={}", deviceId,
+                    point.getId(), Objects.toString(wValue.getValue(), "").length());
             channel.writeAndFlush(DecodeUtil.stringToByte(wValue.getValue()));
+        } else {
+            log.warn("Driver point write skipped, protocol=tcp, deviceId={}, pointId={}, reason=channelMissing",
+                    deviceId, point.getId());
         }
         return true;
     }

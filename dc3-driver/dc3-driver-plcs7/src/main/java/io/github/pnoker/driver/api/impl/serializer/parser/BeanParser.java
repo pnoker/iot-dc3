@@ -24,6 +24,7 @@ import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 /**
  * Bean Parser
@@ -86,18 +87,16 @@ public final class BeanParser {
      */
     public static BeanParseResult parse(final Class<?> jclass) throws Exception {
         final BeanParseResult res = new BeanParseResult();
-        log.trace("Parsing: " + jclass.getName());
+        log.trace("S7 bean parsing started, className={}", jclass.getName());
 
         for (final Field field : jclass.getFields()) {
             final S7Variable dataAnnotation = field.getAnnotation(S7Variable.class);
 
-            if (dataAnnotation != null) {
-                log.trace("Parsing field: " + field.getName());
-                log.trace("		type: " + dataAnnotation.type());
-                log.trace("		byteOffset: " + dataAnnotation.byteOffset());
-                log.trace("		bitOffset: " + dataAnnotation.bitOffset());
-                log.trace("		size: " + dataAnnotation.size());
-                log.trace("		arraySize: " + dataAnnotation.arraySize());
+            if (Objects.nonNull(dataAnnotation)) {
+                log.trace(
+                        "S7 bean field parsing, className={}, fieldName={}, type={}, byteOffset={}, bitOffset={}, size={}, arraySize={}",
+                        jclass.getName(), field.getName(), dataAnnotation.type(), dataAnnotation.byteOffset(),
+                        dataAnnotation.bitOffset(), dataAnnotation.size(), dataAnnotation.arraySize());
 
                 final int offset = dataAnnotation.byteOffset();
 
@@ -108,13 +107,13 @@ public final class BeanParser {
 
                 if (dataAnnotation.type() == S7Type.STRUCT) {
                     // recurse
-                    log.trace("Recursing...");
+                    log.trace("S7 nested bean parsing, className={}, fieldName={}", jclass.getName(), field.getName());
                     final BeanParseResult subResult = parse(field.getType());
                     res.blockSize += subResult.blockSize;
-                    log.trace("	New blocksize: " + res.blockSize);
+                    log.trace("S7 bean block size updated, className={}, blockSize={}", jclass.getName(), res.blockSize);
                 }
 
-                log.trace("	New blocksize (+offset): " + res.blockSize);
+                log.trace("S7 bean block size after offset, className={}, blockSize={}", jclass.getName(), res.blockSize);
 
                 // Add dynamic size
                 res.blockSize += dataAnnotation.size();
@@ -139,7 +138,7 @@ public final class BeanParser {
                 entry.serializer = s;
 
                 res.blockSize += (s.getSizeInBytes() * dataAnnotation.arraySize());
-                log.trace("	New blocksize (+array): " + res.blockSize);
+                log.trace("S7 bean block size after array, className={}, blockSize={}", jclass.getName(), res.blockSize);
 
                 if (s.getSizeInBits() > 0) {
                     boolean offsetOfBitAlreadyKnown = false;
@@ -157,7 +156,7 @@ public final class BeanParser {
             }
         }
 
-        log.trace("Parsing done, overall size: " + res.blockSize);
+        log.trace("S7 bean parsing completed, className={}, blockSize={}", jclass.getName(), res.blockSize);
 
         return res;
     }

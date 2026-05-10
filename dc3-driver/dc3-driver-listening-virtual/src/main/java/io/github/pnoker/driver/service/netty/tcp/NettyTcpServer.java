@@ -30,6 +30,7 @@ import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
@@ -47,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 @Component
 public class NettyTcpServer {
 
@@ -82,9 +84,11 @@ public class NettyTcpServer {
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();
+            log.info("Driver listener started, protocol=tcp, port={}", port);
             future.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully().sync();
+            log.info("Driver listener stopped, protocol=tcp, port={}", port);
         }
     }
 
