@@ -37,9 +37,9 @@ public class ModelConfigVO extends BaseVO {
 
     private String label;
 
-    private String provider;
+    private Long providerId;
 
-    private String baseUrl;
+    private String providerName;
 
     private Boolean stream;
 
