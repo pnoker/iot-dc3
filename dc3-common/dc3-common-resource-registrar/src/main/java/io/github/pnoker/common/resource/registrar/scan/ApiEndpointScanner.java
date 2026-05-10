@@ -61,7 +61,7 @@ public class ApiEndpointScanner {
      * application context.
      *
      * @param handlerMapping WebFlux request mapping registry
-     * @param properties registrar scan configuration
+     * @param properties     registrar scan configuration
      */
     public ApiEndpointScanner(RequestMappingHandlerMapping handlerMapping, ResourceRegistrarProperties properties) {
         this.handlerMapping = handlerMapping;
