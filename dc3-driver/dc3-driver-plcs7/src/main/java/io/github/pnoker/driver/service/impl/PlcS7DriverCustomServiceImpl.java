@@ -66,7 +66,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Service
-public class DriverCustomServiceImpl implements DriverCustomService {
+public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
     DriverMetadata driverMetadata;

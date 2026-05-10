@@ -44,7 +44,6 @@ import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
-import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,7 +66,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-public class DriverCustomServiceImpl implements DriverCustomService {
+public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
 
     /**
      * Modbus factory for creating ModbusMaster instances.

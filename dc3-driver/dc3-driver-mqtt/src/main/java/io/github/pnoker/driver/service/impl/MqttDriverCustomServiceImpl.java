@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-public class DriverCustomServiceImpl implements DriverCustomService {
+public class MqttDriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
     DriverMetadata driverMetadata;
