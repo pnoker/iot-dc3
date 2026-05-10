@@ -4,6 +4,7 @@
 spring:
   ai:
     openai:
+      # 待遗弃，需要调整记忆和session机制为默认的
       base-url: ${OPENAI_BASE_URL:https://api.openai.com}
       api-key: ${OPENAI_API_KEY:}
       chat:
