@@ -16,11 +16,6 @@
  */
 package io.github.pnoker.common.agentic.config;
 
-import io.github.pnoker.common.agentic.tool.AuthToolSet;
-import io.github.pnoker.common.agentic.tool.DataToolSet;
-import io.github.pnoker.common.agentic.tool.ManagerToolSet;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -35,10 +30,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Configures the Spring AI ChatClient with tool registration and chat memory.
+ * Configures Spring AI chat memory.
+ * The {@link org.springframework.ai.chat.client.ChatClient} instances are created dynamically
+ * per provider by {@link ChatClientFactory}.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.10
  * @since 2022.1.0
  */
 @Configuration
@@ -81,21 +78,6 @@ public class ChatClientConfig {
                 .chatMemoryRepository(chatMemoryRepository)
                 .maxMessages(properties.getMemoryMaxMessages())
                 .build();
-    }
-
-    @Bean
-    public ChatClient agenticChatClient(ChatClient.Builder builder, AuthToolSet authToolSet,
-                                        ManagerToolSet managerToolSet, DataToolSet dataToolSet,
-                                        @Qualifier("agenticChatMemory") ChatMemory agenticChatMemory,
-                                        AgenticProperties properties) {
-        ChatClient.Builder clientBuilder = builder.defaultSystem(SYSTEM_PROMPT);
-        if (properties.isToolCallingEnabled()) {
-            clientBuilder.defaultTools(authToolSet, managerToolSet, dataToolSet);
-        }
-        if (properties.isMemoryEnabled()) {
-            clientBuilder.defaultAdvisors(MessageChatMemoryAdvisor.builder(agenticChatMemory).build());
-        }
-        return clientBuilder.build();
     }
 
     private static class Dc3ChatMemoryRepositoryDialect implements JdbcChatMemoryRepositoryDialect {

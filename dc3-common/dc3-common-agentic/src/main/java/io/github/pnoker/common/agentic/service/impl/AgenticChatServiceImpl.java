@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service.impl;
 
 import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
+import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
@@ -83,7 +84,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
 
     private static final String DEFAULT_MODEL = "dc3-agentic";
 
-    private final ChatClient chatClient;
+    private final ChatClientFactory chatClientFactory;
 
     private final SkillRegistry skillRegistry;
 
@@ -103,11 +104,11 @@ public class AgenticChatServiceImpl implements AgenticChatService {
 
     private final ObjectMapper objectMapper;
 
-    public AgenticChatServiceImpl(ChatClient chatClient, SkillRegistry skillRegistry, SessionService sessionService,
+    public AgenticChatServiceImpl(ChatClientFactory chatClientFactory, SkillRegistry skillRegistry, SessionService sessionService,
                                   MessageService messageService, AttachmentService attachmentService,
                                   DeviceFacade deviceFacade, DriverFacade driverFacade, PointFacade pointFacade,
                                   AgenticProperties properties, ObjectMapper objectMapper) {
-        this.chatClient = chatClient;
+        this.chatClientFactory = chatClientFactory;
         this.skillRegistry = skillRegistry;
         this.sessionService = sessionService;
         this.messageService = messageService;
@@ -410,6 +411,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     }
 
     private ChatClient.ChatClientRequestSpec buildPrompt(PreparedChatRequest prepared) {
+        ChatClient chatClient = chatClientFactory.getOrCreate(prepared.model());
         ChatClient.ChatClientRequestSpec promptSpec = chatClient.prompt()
                 .user(prepared.userMessage())
                 .toolContext(prepared.toolContext())
