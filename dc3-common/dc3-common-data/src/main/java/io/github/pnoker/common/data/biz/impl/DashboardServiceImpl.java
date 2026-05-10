@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Objects;
 
 import static io.github.pnoker.common.data.constant.DashboardLimits.*;
 
@@ -87,7 +88,7 @@ public class DashboardServiceImpl implements DashboardService {
      * stringify for the VO.
      */
     private static String asString(Object v) {
-        return v == null ? null : v.toString();
+        return Objects.isNull(v) ? null : v.toString();
     }
 
     @Override
@@ -144,7 +145,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public Page<AlertItemVO> alertPage(Long tenantId, String source, Integer eventTypeFlag, Integer confirmFlag,
                                        LocalDateTime from, long current, long size) {
-        String src = source == null || source.isBlank() ? null : (ALERT_SOURCES.contains(source) ? source : null);
+        String src = Objects.isNull(source) || source.isBlank() ? null : (ALERT_SOURCES.contains(source) ? source : null);
         long clampedCurrent = Math.max(1L, current);
         long clampedSize = Math.clamp(size, 1L, MAX_PAGE_SIZE);
         long offset = (clampedCurrent - 1L) * clampedSize;
@@ -173,7 +174,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public boolean confirmAlert(Long tenantId, String source, Long id) {
-        if (source == null || !ALERT_SOURCES.contains(source) || id == null) {
+        if (Objects.isNull(source) || !ALERT_SOURCES.contains(source) || Objects.isNull(id)) {
             return false;
         }
         return alertMapper.confirmOne(tenantId, source, id) > 0;
@@ -181,7 +182,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public boolean unconfirmAlert(Long tenantId, String source, Long id) {
-        if (source == null || !ALERT_SOURCES.contains(source) || id == null) {
+        if (Objects.isNull(source) || !ALERT_SOURCES.contains(source) || Objects.isNull(id)) {
             return false;
         }
         return alertMapper.unconfirmOne(tenantId, source, id) > 0;
@@ -189,13 +190,13 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public int bulkConfirmAlert(Long tenantId, List<Map<String, Object>> items, boolean confirm) {
-        if (items == null || items.isEmpty())
+        if (Objects.isNull(items) || items.isEmpty())
             return 0;
         int changed = 0;
         for (Map<String, Object> item : items) {
             Object srcRaw = item.get("source");
             Object idRaw = item.get("id");
-            if (srcRaw == null || idRaw == null)
+            if (Objects.isNull(srcRaw) || Objects.isNull(idRaw))
                 continue;
             String source = srcRaw.toString();
             if (!ALERT_SOURCES.contains(source))
@@ -253,7 +254,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<TopEntityVO> top(Long tenantId, String dimension, int rangeHours, int limit) {
         String column = DIMENSION_COLUMN.get(dimension);
-        if (column == null) {
+        if (Objects.isNull(column)) {
             throw new IllegalArgumentException("Unsupported dimension: " + dimension);
         }
         int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
@@ -290,11 +291,11 @@ public class DashboardServiceImpl implements DashboardService {
             vo.setValueType(row.getValueType());
             vo.setCreateTime(row.getCreateTime());
             out.add(vo);
-            if (vo.getDeviceId() != null && vo.getDeviceId() > 0)
+            if (Objects.nonNull(vo.getDeviceId()) && vo.getDeviceId() > 0)
                 deviceIds.add(vo.getDeviceId());
-            if (vo.getPointId() != null && vo.getPointId() > 0)
+            if (Objects.nonNull(vo.getPointId()) && vo.getPointId() > 0)
                 pointIds.add(vo.getPointId());
-            if (vo.getDriverId() != null && vo.getDriverId() > 0)
+            if (Objects.nonNull(vo.getDriverId()) && vo.getDriverId() > 0)
                 driverIds.add(vo.getDriverId());
         }
 
@@ -311,11 +312,11 @@ public class DashboardServiceImpl implements DashboardService {
                 .collect(java.util.stream.Collectors.toMap(FacadeDriverBO::getId, FacadeDriverBO::getDriverName, (a, b) -> a));
 
         for (LatestPointValueVO vo : out) {
-            if (vo.getDeviceId() != null)
+            if (Objects.nonNull(vo.getDeviceId()))
                 vo.setDeviceName(deviceNames.get(vo.getDeviceId()));
-            if (vo.getPointId() != null)
+            if (Objects.nonNull(vo.getPointId()))
                 vo.setPointName(pointNames.get(vo.getPointId()));
-            if (vo.getDriverId() != null)
+            if (Objects.nonNull(vo.getDriverId()))
                 vo.setDriverName(driverNames.get(vo.getDriverId()));
         }
 
@@ -326,7 +327,7 @@ public class DashboardServiceImpl implements DashboardService {
     public AlertStatsVO alertStats(Long tenantId) {
         AlertStatsVO vo = new AlertStatsVO();
         var totals = alertMapper.countAll(tenantId);
-        if (totals != null) {
+        if (Objects.nonNull(totals)) {
             vo.setTotal(totals.getTotal());
             vo.setUnconfirmed(totals.getUnconfirmed());
         }
@@ -373,7 +374,7 @@ public class DashboardServiceImpl implements DashboardService {
         long[] series = new long[24];
         for (var row : alertMapper.hourlyCounts(tenantId, anchor)) {
             LocalDateTime bucket = row.getBucket();
-            if (bucket == null)
+            if (Objects.isNull(bucket))
                 continue;
             long diffHours = java.time.Duration.between(anchor, bucket).toHours();
             int idx = (int) diffHours;
@@ -476,7 +477,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<AlertTypeBucketVO> out = new ArrayList<>(rows.size());
         for (var row : rows) {
             AlertTypeBucketVO vo = new AlertTypeBucketVO();
-            vo.setType(row.getKey() == null ? null : row.getKey().toString());
+            vo.setType(Objects.isNull(row.getKey()) ? null : row.getKey().toString());
             vo.setCount(row.getCount());
             out.add(vo);
         }
@@ -594,7 +595,7 @@ public class DashboardServiceImpl implements DashboardService {
     public AgingBacklogVO alertAgingBacklog(Long tenantId) {
         var row = alertMapper.agingBuckets(tenantId);
         AgingBacklogVO vo = new AgingBacklogVO();
-        if (row != null) {
+        if (Objects.nonNull(row)) {
             vo.setUnder1h(row.getUnder1h());
             vo.setH1to6(row.getH1to6());
             vo.setH6to24(row.getH6to24());
@@ -671,7 +672,7 @@ public class DashboardServiceImpl implements DashboardService {
             vo.setPointId(r.getPointId());
             LocalDateTime last = r.getLastSeen();
             vo.setLastSeen(last);
-            if (last != null) {
+            if (Objects.nonNull(last)) {
                 vo.setSilentSeconds(java.time.Duration.between(last, now).getSeconds());
             }
             out.add(vo);

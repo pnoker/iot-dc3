@@ -153,7 +153,7 @@ public class RoleController implements BaseController {
         out.setOperatorId(flat.getOperatorId());
         out.setOperatorName(flat.getOperatorName());
         out.setOperateTime(flat.getOperateTime());
-        if (node.getChildren() != null) {
+        if (Objects.nonNull(node.getChildren())) {
             List<RoleTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
             for (RoleTreeBO child : node.getChildren()) {
                 childVOs.add(toTreeVO(child));

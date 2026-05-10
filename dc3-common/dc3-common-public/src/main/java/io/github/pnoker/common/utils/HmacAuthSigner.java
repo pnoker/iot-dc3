@@ -25,6 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.HexFormat;
+import java.util.Objects;
 
 /**
  * HMAC-SHA256 signer for the {@code X-Auth-User} header.
@@ -76,7 +77,7 @@ public class HmacAuthSigner {
      * or the payload is null.
      */
     public String sign(String payload) {
-        if (!enabled || payload == null) {
+        if (!enabled || Objects.isNull(payload)) {
             return null;
         }
         try {
@@ -96,11 +97,11 @@ public class HmacAuthSigner {
      * @return {@code true} iff the supplied hex signature matches the computed HMAC.
      */
     public boolean verify(String payload, String expectedHex) {
-        if (!enabled || payload == null || expectedHex == null) {
+        if (!enabled || Objects.isNull(payload) || Objects.isNull(expectedHex)) {
             return false;
         }
         String actual = sign(payload);
-        if (actual == null || actual.length() != expectedHex.length()) {
+        if (Objects.isNull(actual) || actual.length() != expectedHex.length()) {
             return false;
         }
         int diff = 0;

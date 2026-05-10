@@ -49,7 +49,7 @@ public class RequestUtil {
      * @return The first valid IP address found, or null if none is valid
      */
     public static String getMultistageReverseProxyIp(String ip) {
-        if (ip == null) {
+        if (Objects.isNull(ip)) {
             return null;
         }
         String[] ips = ip.split(",");
@@ -77,7 +77,7 @@ public class RequestUtil {
                 "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
         for (String header : headers) {
             ip = request.getHeaders().getFirst(header);
-            if (!(ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))) {
+            if (!(Objects.isNull(ip) || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))) {
                 return getMultistageReverseProxyIp(ip);
             }
         }

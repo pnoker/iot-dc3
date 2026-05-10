@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Resource Registry Api
@@ -90,7 +91,7 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
             log.error("Resource registry sync failed for service [{}]", request.getServiceName(), e);
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(e.getMessage() != null ? e.getMessage() : ResponseEnum.FAILURE.getText());
+            rBuilder.setMessage(Objects.nonNull(e.getMessage()) ? e.getMessage() : ResponseEnum.FAILURE.getText());
         }
         builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());

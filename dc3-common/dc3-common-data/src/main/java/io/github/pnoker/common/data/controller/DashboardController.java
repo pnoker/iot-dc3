@@ -33,6 +33,7 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Dashboard / home-page aggregate endpoints. All tenant-scoped via
@@ -153,11 +154,11 @@ public class DashboardController implements BaseController {
             @org.springframework.web.bind.annotation.RequestBody(
                     required = false) io.github.pnoker.common.data.entity.query.AlertPageQuery query) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            io.github.pnoker.common.data.entity.query.AlertPageQuery q = query == null
+            io.github.pnoker.common.data.entity.query.AlertPageQuery q = Objects.isNull(query)
                     ? new io.github.pnoker.common.data.entity.query.AlertPageQuery() : query;
             java.time.LocalDateTime from = TimeRangeUtil.resolveFrom(q.getRangeKey(), q.getRangeHours());
-            long current = q.getCurrent() == null ? 1L : q.getCurrent();
-            long size = q.getSize() == null ? 20L : q.getSize();
+            long current = Objects.isNull(q.getCurrent()) ? 1L : q.getCurrent();
+            long size = Objects.isNull(q.getSize()) ? 20L : q.getSize();
             return R.ok(dashboardService.alertPage(tenantId, q.getSource(), q.getEventTypeFlag(),
                     q.getConfirmFlag(), from, current, size));
         }));
@@ -186,7 +187,7 @@ public class DashboardController implements BaseController {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> items = (List<Map<String, Object>>) body.getOrDefault("items",
                     java.util.Collections.emptyList());
-            boolean confirm = body.get("confirm") == null || Boolean.parseBoolean(body.get("confirm").toString());
+            boolean confirm = Objects.isNull(body.get("confirm")) || Boolean.parseBoolean(body.get("confirm").toString());
             return R.ok(dashboardService.bulkConfirmAlert(tenantId, items, confirm));
         }));
     }
@@ -214,7 +215,7 @@ public class DashboardController implements BaseController {
      */
     private int resolveEffectiveHours(String rangeKey, int rangeHours) {
         Integer resolved = TimeRangeUtil.resolveHours(rangeKey, rangeHours);
-        return resolved != null ? resolved : rangeHours;
+        return Objects.nonNull(resolved) ? resolved : rangeHours;
     }
 
     /**
@@ -223,7 +224,7 @@ public class DashboardController implements BaseController {
      */
     private int resolveEffectiveDays(String rangeKey, int days) {
         Integer resolved = TimeRangeUtil.resolveDays(rangeKey, days);
-        return resolved != null ? resolved : days;
+        return Objects.nonNull(resolved) ? resolved : days;
     }
 
     @GetMapping("/alert/activity")

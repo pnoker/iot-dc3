@@ -127,7 +127,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             attribute.setDriverId(entityBO.getId());
             attribute.setTenantId(entityBO.getTenantId());
             DriverAttributeBO existing = oldDriverAttributeMap.get(entry.getKey());
-            if (existing != null) {
+            if (Objects.nonNull(existing)) {
                 attribute.setId(existing.getId());
                 toUpdate.add(attribute);
             } else {
@@ -171,7 +171,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             attribute.setDriverId(entityBO.getId());
             attribute.setTenantId(entityBO.getTenantId());
             PointAttributeBO existing = oldPointAttributeMap.get(entry.getKey());
-            if (existing != null) {
+            if (Objects.nonNull(existing)) {
                 attribute.setId(existing.getId());
                 pointToUpdate.add(attribute);
             } else {

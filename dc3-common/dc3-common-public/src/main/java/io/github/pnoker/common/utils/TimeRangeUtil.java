@@ -21,6 +21,7 @@ import io.github.pnoker.common.enums.TimeRangeKeyEnum;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Resolves UI time-range inputs ({@link TimeRangeKeyEnum} or legacy hours) into
@@ -54,7 +55,7 @@ public final class TimeRangeUtil {
      * not filter by {@code create_time}
      */
     public static LocalDateTime resolveFrom(TimeRangeKeyEnum rangeKey, Integer rangeHours) {
-        if (rangeKey != null) {
+        if (Objects.nonNull(rangeKey)) {
             return switch (rangeKey) {
                 case TODAY -> LocalDate.now().atStartOfDay();
                 case H24 -> LocalDateTime.now().minusHours(HOURS_24H);
@@ -62,7 +63,7 @@ public final class TimeRangeUtil {
                 case D30 -> LocalDateTime.now().minusHours(HOURS_30D);
             };
         }
-        if (rangeHours != null && rangeHours > 0) {
+        if (Objects.nonNull(rangeHours) && rangeHours > 0) {
             return LocalDateTime.now().minusHours(rangeHours);
         }
         return null;
@@ -85,7 +86,7 @@ public final class TimeRangeUtil {
      * @return effective hour span, or {@code null} when no bound applies
      */
     public static Integer resolveHours(TimeRangeKeyEnum rangeKey, Integer rangeHours) {
-        if (rangeKey != null) {
+        if (Objects.nonNull(rangeKey)) {
             return switch (rangeKey) {
                 case TODAY -> {
                     LocalDateTime midnight = LocalDate.now().atStartOfDay();
@@ -100,7 +101,7 @@ public final class TimeRangeUtil {
                 case D30 -> HOURS_30D;
             };
         }
-        if (rangeHours != null && rangeHours > 0) {
+        if (Objects.nonNull(rangeHours) && rangeHours > 0) {
             return rangeHours;
         }
         return null;
@@ -121,14 +122,14 @@ public final class TimeRangeUtil {
      * @return effective day count, or {@code null} when no bound applies
      */
     public static Integer resolveDays(TimeRangeKeyEnum rangeKey, Integer days) {
-        if (rangeKey != null) {
+        if (Objects.nonNull(rangeKey)) {
             return switch (rangeKey) {
                 case TODAY, H24 -> 1;
                 case D7 -> 7;
                 case D30 -> 30;
             };
         }
-        if (days != null && days > 0) {
+        if (Objects.nonNull(days) && days > 0) {
             return days;
         }
         return null;

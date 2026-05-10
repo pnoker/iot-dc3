@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Scans the classpath for skill definition YAML files ({@code classpath*:skills/*.yml})
@@ -85,7 +86,7 @@ public class SkillLoader implements ApplicationRunner {
         skill.setTools((List<String>) map.get("tools"));
 
         List<Map<String, String>> exampleMaps = (List<Map<String, String>>) map.get("examples");
-        if (exampleMaps != null) {
+        if (Objects.nonNull(exampleMaps)) {
             List<SkillDefinition.SkillExample> examples = new ArrayList<>();
             for (Map<String, String> ex : exampleMaps) {
                 examples.add(new SkillDefinition.SkillExample(ex.get("user"), ex.get("assistant")));
