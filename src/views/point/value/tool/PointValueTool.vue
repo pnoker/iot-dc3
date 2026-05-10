@@ -19,8 +19,8 @@
     :form-model="formData"
     :page="page"
     hide-sort
-    @search="$emit('search', $event)"
-    @reset="$emit('reset')"
+    @search="onSearch"
+    @reset="onReset"
     @refresh="$emit('refresh')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -105,6 +105,7 @@
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { Dictionary } from '@/config/types';
   import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary';
+  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
     embedded: {
@@ -117,13 +118,22 @@
     },
   });
 
-  defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change']);
+  const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change']);
 
   const formData = reactive<Record<string, any>>({ enableFlag: '', rangeKey: '' });
   const deviceDictionaries = ref<Dictionary[]>([]);
   const deviceLoading = ref(false);
   const pointDictionaries = ref<Dictionary[]>([]);
   const pointLoading = ref(false);
+
+  const onSearch = (data: Record<string, any>) => {
+    emit('search', cleanSearchParams(data));
+  };
+
+  const onReset = () => {
+    resetSearchForm(formData, { enableFlag: '', rangeKey: '' });
+    emit('reset');
+  };
 
   const deviceDictionary = (query?: string) => {
     deviceLoading.value = true;

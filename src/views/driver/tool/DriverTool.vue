@@ -19,8 +19,8 @@
     :form-model="formData"
     :rules="formRule"
     :page="page"
-    @search="$emit('search', $event)"
-    @reset="$emit('reset')"
+    @search="onSearch"
+    @reset="onReset"
     @refresh="$emit('refresh')"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
@@ -73,6 +73,7 @@
   import type { FormRules } from 'element-plus';
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
     page: {
@@ -85,10 +86,19 @@
     },
   });
 
-  defineEmits(['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change']);
+  const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change']);
 
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
   const formRule = reactive<FormRules>({
     port: [{ type: 'number', message: 'Port must be a number' }],
   });
+
+  const onSearch = (data: Record<string, any>) => {
+    emit('search', cleanSearchParams(data));
+  };
+
+  const onReset = () => {
+    resetSearchForm(formData, { enableFlag: '' });
+    emit('reset');
+  };
 </script>

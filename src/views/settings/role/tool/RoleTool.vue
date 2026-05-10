@@ -65,6 +65,7 @@
   import { reactive } from 'vue';
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
     page: {
@@ -78,14 +79,11 @@
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
 
   const onSearch = (data: Record<string, any>) => {
-    const params = { ...data };
-    if (!params.enableFlag) delete params.enableFlag;
-    emit('search', params);
+    emit('search', cleanSearchParams(data));
   };
 
   const onReset = () => {
-    Object.keys(formData).forEach((k) => delete formData[k]);
-    formData.enableFlag = '';
+    resetSearchForm(formData, { enableFlag: '' });
     emit('reset');
   };
 </script>

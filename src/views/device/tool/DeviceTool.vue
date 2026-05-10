@@ -18,8 +18,8 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="$emit('search', $event)"
-    @reset="$emit('reset')"
+    @search="onSearch"
+    @reset="onReset"
     @refresh="$emit('refresh')"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
@@ -83,6 +83,7 @@
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import type { Dictionary } from '@/config/types';
   import { getDriverDictionary } from '@/api/dictionary';
+  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
     embedded: {
@@ -95,11 +96,29 @@
     },
   });
 
-  defineEmits(['search', 'reset', 'show-add', 'show-import', 'refresh', 'sort', 'size-change', 'current-change']);
+  const emit = defineEmits([
+    'search',
+    'reset',
+    'show-add',
+    'show-import',
+    'refresh',
+    'sort',
+    'size-change',
+    'current-change',
+  ]);
 
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
   const driverDictionaries = ref<Dictionary[]>([]);
   const driverLoading = ref(false);
+
+  const onSearch = (data: Record<string, any>) => {
+    emit('search', cleanSearchParams(data));
+  };
+
+  const onReset = () => {
+    resetSearchForm(formData, { enableFlag: '' });
+    emit('reset');
+  };
 
   const driverDictionary = (query?: string) => {
     driverLoading.value = true;

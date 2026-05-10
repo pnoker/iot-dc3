@@ -92,6 +92,7 @@
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import { RESOURCE_SCOPE_OPTIONS, RESOURCE_TYPE_OPTIONS } from '@/config/constant/enums';
+  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
     page: {
@@ -105,20 +106,11 @@
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
 
   const onSearch = (data: Record<string, any>) => {
-    const params = { ...data };
-    if (!params.enableFlag) delete params.enableFlag;
-    if (Array.isArray(params.resourceTypeFlags) && params.resourceTypeFlags.length === 0) {
-      delete params.resourceTypeFlags;
-    }
-    if (Array.isArray(params.resourceScopeFlags) && params.resourceScopeFlags.length === 0) {
-      delete params.resourceScopeFlags;
-    }
-    emit('search', params);
+    emit('search', cleanSearchParams(data));
   };
 
   const onReset = () => {
-    Object.keys(formData).forEach((k) => delete formData[k]);
-    formData.enableFlag = '';
+    resetSearchForm(formData, { enableFlag: '' });
     emit('reset');
   };
 </script>

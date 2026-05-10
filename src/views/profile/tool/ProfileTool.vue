@@ -18,8 +18,8 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="$emit('search', $event)"
-    @reset="$emit('reset')"
+    @search="onSearch"
+    @reset="onReset"
     @refresh="$emit('refresh')"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
@@ -57,6 +57,7 @@
   import { reactive } from 'vue';
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
     embedded: {
@@ -69,7 +70,16 @@
     },
   });
 
-  defineEmits(['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change']);
+  const emit = defineEmits(['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change']);
 
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
+
+  const onSearch = (data: Record<string, any>) => {
+    emit('search', cleanSearchParams(data));
+  };
+
+  const onReset = () => {
+    resetSearchForm(formData, { enableFlag: '' });
+    emit('reset');
+  };
 </script>

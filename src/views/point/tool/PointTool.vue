@@ -19,8 +19,8 @@
     :form-model="formData"
     :rules="formRule"
     :page="page"
-    @search="$emit('search', $event)"
-    @reset="$emit('reset')"
+    @search="onSearch"
+    @reset="onReset"
     @refresh="$emit('refresh')"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
@@ -97,6 +97,7 @@
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import type { Dictionary } from '@/config/types';
   import { getProfileDictionary } from '@/api/dictionary';
+  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
     embedded: {
@@ -117,7 +118,7 @@
     },
   });
 
-  defineEmits([
+  const emit = defineEmits([
     'search',
     'reset',
     'show-add',
@@ -135,6 +136,15 @@
   const formRule = reactive<FormRules>({
     port: [{ type: 'number', message: t('common.name') }],
   });
+
+  const onSearch = (data: Record<string, any>) => {
+    emit('search', cleanSearchParams(data));
+  };
+
+  const onReset = () => {
+    resetSearchForm(formData, { enableFlag: '' });
+    emit('reset');
+  };
 
   const profileDictionaries = ref<Dictionary[]>([]);
   const profileLoading = ref(false);
