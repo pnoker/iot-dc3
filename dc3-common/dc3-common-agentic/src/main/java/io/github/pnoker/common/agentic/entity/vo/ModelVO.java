@@ -14,41 +14,40 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.query;
+package io.github.pnoker.common.agentic.entity.vo;
 
-import io.github.pnoker.common.entity.common.Pages;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
+ * Agentic model option exposed to the web client.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 @Getter
 @Setter
-@Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class SessionQuery implements Serializable {
+public class ModelVO {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    private String model;
 
-    private Pages page;
+    private String label;
 
-    private Long tenantId;
+    private boolean stream;
 
-    private Long userId;
+    private boolean toolCall;
 
-    private String conversationId;
+    private boolean vision;
+
+    private boolean reasoning;
+
+    private Double temperature;
+
+    private Integer maxTokens;
 
 }

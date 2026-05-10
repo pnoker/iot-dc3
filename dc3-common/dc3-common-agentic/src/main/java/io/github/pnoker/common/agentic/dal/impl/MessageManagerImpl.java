@@ -14,41 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.query;
+package io.github.pnoker.common.agentic.dal.impl;
 
-import io.github.pnoker.common.entity.common.Pages;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.pnoker.common.agentic.dal.MessageManager;
+import io.github.pnoker.common.agentic.entity.model.MessageDO;
+import io.github.pnoker.common.agentic.mapper.MessageMapper;
+import org.springframework.stereotype.Service;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-/**
- * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
- */
-@Getter
-@Setter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class SessionQuery implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    private Pages page;
-
-    private Long tenantId;
-
-    private Long userId;
-
-    private String conversationId;
-
+@Service
+public class MessageManagerImpl extends ServiceImpl<MessageMapper, MessageDO> implements MessageManager {
 }

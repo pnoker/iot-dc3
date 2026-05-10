@@ -30,15 +30,17 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
+ * Agentic uploaded attachment metadata and file location.
+ *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.10
+ * @since 2026.5.10
  */
 @Getter
 @Setter
 @ToString
-@TableName("dc3_session")
-public class SessionDO implements Serializable {
+@TableName("dc3_attachment")
+public class AttachmentDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -49,8 +51,17 @@ public class SessionDO implements Serializable {
     @TableField("conversation_id")
     private String conversationId;
 
-    @TableField("title")
-    private String title;
+    @TableField("file_name")
+    private String fileName;
+
+    @TableField("content_type")
+    private String contentType;
+
+    @TableField("size")
+    private Long size;
+
+    @TableField("file_path")
+    private String filePath;
 
     @TableField("tenant_id")
     private Long tenantId;

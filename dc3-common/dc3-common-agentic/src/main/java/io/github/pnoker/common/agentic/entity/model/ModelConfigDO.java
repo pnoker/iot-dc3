@@ -30,15 +30,17 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
+ * Agentic model option metadata.
+ *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.10
+ * @since 2026.5.10
  */
 @Getter
 @Setter
 @ToString
-@TableName("dc3_session")
-public class SessionDO implements Serializable {
+@TableName("dc3_model_config")
+public class ModelConfigDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -46,17 +48,41 @@ public class SessionDO implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
-    @TableField("conversation_id")
-    private String conversationId;
+    @TableField("model")
+    private String model;
 
-    @TableField("title")
-    private String title;
+    @TableField("label")
+    private String label;
 
-    @TableField("tenant_id")
-    private Long tenantId;
+    @TableField("provider")
+    private String provider;
 
-    @TableField("user_id")
-    private Long userId;
+    @TableField("base_url")
+    private String baseUrl;
+
+    @TableField("stream")
+    private Boolean stream;
+
+    @TableField("tool_call")
+    private Boolean toolCall;
+
+    @TableField("vision")
+    private Boolean vision;
+
+    @TableField("reasoning")
+    private Boolean reasoning;
+
+    @TableField("temperature")
+    private Double temperature;
+
+    @TableField("max_tokens")
+    private Integer maxTokens;
+
+    @TableField("default_flag")
+    private Byte defaultFlag;
+
+    @TableField("enable_flag")
+    private Byte enableFlag;
 
     @TableField("remark")
     private String remark;
