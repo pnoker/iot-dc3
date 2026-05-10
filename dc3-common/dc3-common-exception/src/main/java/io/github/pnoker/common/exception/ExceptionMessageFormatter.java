@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.exception;
 
+import java.util.Objects;
+
 /**
  * Lightweight exception message formatter that supports the placeholder style used
  * by project exception call sites.
@@ -31,7 +33,7 @@ final class ExceptionMessageFormatter {
     }
 
     static String format(String template, Object... params) {
-        if (template == null || params == null || params.length == 0) {
+        if (Objects.isNull(template) || Objects.isNull(params) || params.length == 0) {
             return template;
         }
 

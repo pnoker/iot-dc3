@@ -44,12 +44,21 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
 @ConditionalOnProperty(prefix = "dc3.resource-registrar", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class ResourceRegistrarAutoConfiguration {
 
+    /**
+     * Scanner bean backed by the application WebFlux mapping registry. It is shared by
+     * whichever registrar instance is created for the active facade mode.
+     */
     @Bean
     public ApiEndpointScanner apiEndpointScanner(RequestMappingHandlerMapping requestMappingHandlerMapping,
                                                  ResourceRegistrarProperties properties) {
         return new ApiEndpointScanner(requestMappingHandlerMapping, properties);
     }
 
+    /**
+     * Create the startup registrar only when a facade implementation is active. This keeps
+     * services that include the scanner but do not include a local or gRPC auth facade from
+     * failing auto-configuration.
+     */
     @Bean
     @ConditionalOnBean(ResourceRegistryFacade.class)
     public ResourceRegistrar resourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,

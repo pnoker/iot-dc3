@@ -22,6 +22,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Objects;
 
 /**
  * Time-range preset used by dashboard / alert / point-value list endpoints.
@@ -68,7 +69,7 @@ public enum TimeRangeKeyEnum {
      * is case-insensitive; {@code null} / blank input returns {@code null}.
      */
     public static TimeRangeKeyEnum ofCode(String code) {
-        if (code == null || code.isBlank()) {
+        if (Objects.isNull(code) || code.isBlank()) {
             return null;
         }
         String normalized = code.trim();
