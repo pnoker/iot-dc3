@@ -1,17 +1,18 @@
-# Agentic module defaults — imported as a Spring profile via AgenticAutoConfiguration.
+# Agentic module defaults loaded when the "agentic" Spring profile is active.
 # These can be overridden in the center service's own application.yml.
 
 spring:
   ai:
     openai:
-      # 待遗弃，需要调整记忆和session机制为默认的
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
-      api-key: ${OPENAI_API_KEY:}
+      # Used only by Spring AI's fallback ChatClient when no database model/provider matches.
+      # Normal Agentic provider credentials are loaded from dc3_model_provider.
+      base-url: ${AGENTIC_FALLBACK_OPENAI_BASE_URL:https://api.openai.com}
+      api-key: ${AGENTIC_FALLBACK_OPENAI_API_KEY:}
       chat:
         options:
-          model: ${OPENAI_MODEL:deepseek-v4-pro}
-          temperature: ${OPENAI_TEMPERATURE:0.7}
-          max-tokens: ${OPENAI_MAX_TOKENS:2048}
+          model: ${AGENTIC_FALLBACK_OPENAI_MODEL:gpt-4o}
+          temperature: ${AGENTIC_FALLBACK_OPENAI_TEMPERATURE:0.7}
+          max-tokens: ${AGENTIC_FALLBACK_OPENAI_MAX_TOKENS:2048}
         memory:
           repository:
             jdbc:
