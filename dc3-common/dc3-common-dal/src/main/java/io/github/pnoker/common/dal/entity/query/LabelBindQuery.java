@@ -18,6 +18,7 @@
 package io.github.pnoker.common.dal.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,6 +55,11 @@ public class LabelBindQuery implements Serializable {
     private Long tenantId;
 
     // Query fields
+
+    /**
+     * Entity type flag.
+     */
+    private EntityTypeFlagEnum entityTypeFlag;
 
     /**
      * Label ID.

@@ -15,11 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.dal.entity.bo;
+package io.github.pnoker.common.dal.entity.vo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.entity.common.TenantOwned;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.valid.Add;
+import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,38 +30,37 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Label binding business object (BO) representing the association between labels and
+ * Group binding view object representing the association between groups and
  * entities.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.11
+ * @since 2026.5.11
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class LabelBindBO extends BaseBO implements TenantOwned {
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public class GroupBindVO extends BaseVO {
 
     /**
      * Entity type flag.
      */
+    @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
-     * Label ID.
+     * Group ID.
      */
-    private Long labelId;
+    @NotNull(message = "Group ID can't be empty", groups = {Add.class, Update.class})
+    private Long groupId;
 
     /**
      * Entity ID.
      */
+    @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
-
-    /**
-     * Tenant ID.
-     */
-    private Long tenantId;
 
 }

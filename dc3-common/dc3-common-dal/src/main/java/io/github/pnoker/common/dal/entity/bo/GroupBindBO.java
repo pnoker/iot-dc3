@@ -27,19 +27,19 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Label binding business object (BO) representing the association between labels and
+ * Group binding business object representing the association between groups and
  * entities.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.11
+ * @since 2026.5.11
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class LabelBindBO extends BaseBO implements TenantOwned {
+public class GroupBindBO extends BaseBO implements TenantOwned {
 
     /**
      * Entity type flag.
@@ -47,9 +47,9 @@ public class LabelBindBO extends BaseBO implements TenantOwned {
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
-     * Label ID.
+     * Group ID.
      */
-    private Long labelId;
+    private Long groupId;
 
     /**
      * Entity ID.
