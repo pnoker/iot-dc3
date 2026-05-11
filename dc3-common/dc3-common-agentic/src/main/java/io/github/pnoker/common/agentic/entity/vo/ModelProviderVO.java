@@ -17,6 +17,9 @@
 package io.github.pnoker.common.agentic.entity.vo;
 
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import io.github.pnoker.common.enums.DefaultFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,12 +38,12 @@ public class ModelProviderVO extends BaseVO {
 
     private String name;
 
-    private String providerType;
+    private AgenticModelProviderTypeEnum providerType;
 
     private String baseUrl;
 
-    private Byte defaultFlag;
+    private DefaultFlagEnum defaultFlag;
 
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
 }

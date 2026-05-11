@@ -19,14 +19,18 @@ package io.github.pnoker.common.agentic.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.dal.ActionManager;
+import io.github.pnoker.common.agentic.entity.bo.ActionBO;
+import io.github.pnoker.common.agentic.entity.builder.ActionBuilder;
 import io.github.pnoker.common.agentic.entity.model.ActionDO;
-import io.github.pnoker.common.agentic.entity.vo.ActionVO;
 import io.github.pnoker.common.agentic.service.ActionService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.AgenticActionStatusEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,107 +41,97 @@ import java.util.UUID;
 @Service
 public class ActionServiceImpl implements ActionService {
 
-    public static final byte STATUS_PENDING = 0;
-
-    public static final byte STATUS_CONFIRMED = 1;
-
-    public static final byte STATUS_REJECTED = 2;
-
-    public static final byte STATUS_EXECUTED = 3;
-
-    public static final byte STATUS_FAILED = 4;
-
     private static final String ACTION_WRITE_POINT_VALUE = "writePointValue";
 
     private final ActionManager actionManager;
+    private final ActionBuilder actionBuilder;
 
     private final PointValueCommandFacade pointValueCommandFacade;
 
-    public ActionServiceImpl(ActionManager actionManager, PointValueCommandFacade pointValueCommandFacade) {
+    public ActionServiceImpl(ActionManager actionManager,
+                             ActionBuilder actionBuilder,
+                             PointValueCommandFacade pointValueCommandFacade) {
         this.actionManager = actionManager;
+        this.actionBuilder = actionBuilder;
         this.pointValueCommandFacade = pointValueCommandFacade;
     }
 
     @Override
     public String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,
                                               RequestHeader.UserHeader header) {
-        ActionDO entity = new ActionDO();
-        entity.setActionId(UUID.randomUUID().toString());
-        entity.setConversationId(conversationId);
-        entity.setActionType(ACTION_WRITE_POINT_VALUE);
-        entity.setTitle("Write point value");
-        entity.setDescription("Write value to device " + deviceId + ", point " + pointId);
-        entity.setPayload(Map.of("deviceId", deviceId, "pointId", pointId, "value", value));
-        entity.setStatus(STATUS_PENDING);
-        entity.setExpireTime(LocalDateTime.now().plusMinutes(10));
-        entity.setTenantId(header.getTenantId());
-        entity.setUserId(header.getUserId());
-        entity.setCreateTime(LocalDateTime.now());
-        entity.setOperateTime(entity.getCreateTime());
-        entity.setCreatorId(header.getUserId());
-        entity.setOperatorId(header.getUserId());
-        entity.setCreatorName(header.getUserName());
-        entity.setOperatorName(header.getUserName());
-        actionManager.save(entity);
-        return entity.getActionId();
+        ActionBO entityBO = new ActionBO();
+        entityBO.setActionId(UUID.randomUUID().toString());
+        entityBO.setConversationId(conversationId);
+        entityBO.setActionType(ACTION_WRITE_POINT_VALUE);
+        entityBO.setTitle("Write point value");
+        entityBO.setDescription("Write value to device " + deviceId + ", point " + pointId);
+        entityBO.setPayload(Map.of("deviceId", deviceId, "pointId", pointId, "value", value));
+        entityBO.setStatus(AgenticActionStatusEnum.PENDING);
+        entityBO.setExpireTime(LocalDateTime.now().plusMinutes(10));
+        entityBO.setTenantId(header.getTenantId());
+        entityBO.setUserId(header.getUserId());
+        fillCreateAudit(entityBO, header);
+        ActionDO entityDO = actionBuilder.buildDOByBO(entityBO);
+        actionManager.save(entityDO);
+        return entityDO.getActionId();
     }
 
     @Override
-    public List<ActionVO> listPending(String conversationId, RequestHeader.UserHeader header) {
+    public List<ActionBO> listPending(String conversationId, RequestHeader.UserHeader header) {
         LambdaQueryWrapper<ActionDO> wrapper = scopedWrapper(header)
                 .eq(ActionDO::getConversationId, conversationId)
-                .eq(ActionDO::getStatus, STATUS_PENDING)
+                .eq(ActionDO::getStatus, AgenticActionStatusEnum.PENDING)
                 .ge(ActionDO::getExpireTime, LocalDateTime.now())
                 .orderByDesc(ActionDO::getCreateTime);
-        return actionManager.list(wrapper).stream().map(this::toVO).toList();
+        return actionBuilder.buildBOListByDOList(actionManager.list(wrapper));
     }
 
     @Override
-    public ActionVO confirm(String actionId, RequestHeader.UserHeader header) {
+    @Transactional(rollbackFor = Exception.class)
+    public ActionBO confirm(String actionId, RequestHeader.UserHeader header) {
         ActionDO action = getPending(actionId, header);
-        action.setStatus(STATUS_CONFIRMED);
-        action.setOperateTime(LocalDateTime.now());
-        actionManager.updateById(action);
+        claimPending(action, header, AgenticActionStatusEnum.CONFIRMED, "Agentic action is no longer pending");
 
         try {
             if (ACTION_WRITE_POINT_VALUE.equals(action.getActionType())) {
                 Map<String, Object> payload = action.getPayload();
                 boolean success = pointValueCommandFacade.write(header.getTenantId(), longValue(payload.get("deviceId")),
                         longValue(payload.get("pointId")), Objects.toString(payload.get("value"), ""));
-                action.setStatus(success ? STATUS_EXECUTED : STATUS_FAILED);
+                action.setStatus(success ? AgenticActionStatusEnum.EXECUTED.getIndex()
+                        : AgenticActionStatusEnum.FAILED.getIndex());
                 action.setRemark(success ? "Executed" : "Facade returned false");
             } else {
-                action.setStatus(STATUS_FAILED);
+                action.setStatus(AgenticActionStatusEnum.FAILED.getIndex());
                 action.setRemark("Unsupported action type");
             }
         } catch (Exception e) {
-            action.setStatus(STATUS_FAILED);
+            action.setStatus(AgenticActionStatusEnum.FAILED.getIndex());
             action.setRemark(e.getMessage());
         }
 
         action.setOperateTime(LocalDateTime.now());
         actionManager.updateById(action);
-        return toVO(action);
+        return actionBuilder.buildBOByDO(action);
     }
 
     @Override
-    public ActionVO reject(String actionId, RequestHeader.UserHeader header) {
+    @Transactional(rollbackFor = Exception.class)
+    public ActionBO reject(String actionId, RequestHeader.UserHeader header) {
         ActionDO action = getPending(actionId, header);
-        action.setStatus(STATUS_REJECTED);
-        action.setOperateTime(LocalDateTime.now());
-        actionManager.updateById(action);
-        return toVO(action);
+        claimPending(action, header, AgenticActionStatusEnum.REJECTED,
+                "Agentic action is no longer pending");
+        return actionBuilder.buildBOByDO(action);
     }
 
     private ActionDO getPending(String actionId, RequestHeader.UserHeader header) {
         LambdaQueryWrapper<ActionDO> wrapper = scopedWrapper(header)
                 .eq(ActionDO::getActionId, actionId)
-                .last("LIMIT 1");
+                .last(QueryWrapperConstant.LIMIT_ONE);
         ActionDO action = actionManager.getOne(wrapper);
         if (Objects.isNull(action)) {
             throw new NotFoundException("Agentic action does not exist");
         }
-        if (!Objects.equals(action.getStatus(), STATUS_PENDING)) {
+        if (!Objects.equals(action.getStatus(), AgenticActionStatusEnum.PENDING.getIndex())) {
             throw new RequestException("Agentic action is no longer pending");
         }
         if (Objects.nonNull(action.getExpireTime()) && action.getExpireTime().isBefore(LocalDateTime.now())) {
@@ -146,28 +140,41 @@ public class ActionServiceImpl implements ActionService {
         return action;
     }
 
+    private void claimPending(ActionDO action, RequestHeader.UserHeader header, AgenticActionStatusEnum nextStatus,
+                              String failureMessage) {
+        LocalDateTime now = LocalDateTime.now();
+        boolean updated = actionManager.update(Wrappers.<ActionDO>lambdaUpdate()
+                .set(ActionDO::getStatus, nextStatus.getIndex())
+                .set(ActionDO::getOperateTime, now)
+                .eq(ActionDO::getId, action.getId())
+                .eq(ActionDO::getTenantId, header.getTenantId())
+                .eq(ActionDO::getUserId, header.getUserId())
+                .eq(ActionDO::getStatus, AgenticActionStatusEnum.PENDING.getIndex())
+                .and(wrapper -> wrapper.isNull(ActionDO::getExpireTime)
+                        .or()
+                        .ge(ActionDO::getExpireTime, now)));
+        if (!updated) {
+            throw new RequestException(failureMessage);
+        }
+        action.setStatus(nextStatus.getIndex());
+        action.setOperateTime(now);
+    }
+
+    private void fillCreateAudit(ActionBO entityBO, RequestHeader.UserHeader header) {
+        LocalDateTime now = LocalDateTime.now();
+        entityBO.setCreateTime(now);
+        entityBO.setOperateTime(now);
+        entityBO.setCreatorId(header.getUserId());
+        entityBO.setCreatorName(header.getUserName());
+        entityBO.setOperatorId(header.getUserId());
+        entityBO.setOperatorName(header.getUserName());
+    }
+
     private LambdaQueryWrapper<ActionDO> scopedWrapper(RequestHeader.UserHeader header) {
         return Wrappers.<ActionDO>query()
                 .lambda()
                 .eq(ActionDO::getTenantId, header.getTenantId())
                 .eq(ActionDO::getUserId, header.getUserId());
-    }
-
-    private ActionVO toVO(ActionDO entity) {
-        ActionVO vo = new ActionVO();
-        vo.setId(entity.getId());
-        vo.setActionId(entity.getActionId());
-        vo.setConversationId(entity.getConversationId());
-        vo.setActionType(entity.getActionType());
-        vo.setTitle(entity.getTitle());
-        vo.setDescription(entity.getDescription());
-        vo.setPayload(entity.getPayload());
-        vo.setStatus(entity.getStatus());
-        vo.setExpireTime(entity.getExpireTime());
-        vo.setRemark(entity.getRemark());
-        vo.setCreateTime(entity.getCreateTime());
-        vo.setOperateTime(entity.getOperateTime());
-        return vo;
     }
 
     private Long longValue(Object value) {

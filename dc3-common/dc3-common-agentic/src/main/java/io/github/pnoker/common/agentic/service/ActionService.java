@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service;
 
-import io.github.pnoker.common.agentic.entity.vo.ActionVO;
+import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 
 import java.util.List;
@@ -26,10 +26,10 @@ public interface ActionService {
     String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,
                                        RequestHeader.UserHeader header);
 
-    List<ActionVO> listPending(String conversationId, RequestHeader.UserHeader header);
+    List<ActionBO> listPending(String conversationId, RequestHeader.UserHeader header);
 
-    ActionVO confirm(String actionId, RequestHeader.UserHeader header);
+    ActionBO confirm(String actionId, RequestHeader.UserHeader header);
 
-    ActionVO reject(String actionId, RequestHeader.UserHeader header);
+    ActionBO reject(String actionId, RequestHeader.UserHeader header);
 
 }

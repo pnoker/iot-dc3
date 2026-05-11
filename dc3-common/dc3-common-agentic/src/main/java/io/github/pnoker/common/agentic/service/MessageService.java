@@ -16,17 +16,17 @@
  */
 package io.github.pnoker.common.agentic.service;
 
+import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.entity.vo.MessageVO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 
 import java.util.List;
 
 public interface MessageService {
 
-    MessageVO save(String conversationId, String role, AgenticMessageContent content, String model,
+    MessageBO save(String conversationId, String role, AgenticMessageContent content, String model,
                    RequestHeader.UserHeader header);
 
-    List<MessageVO> list(String conversationId, RequestHeader.UserHeader header);
+    List<MessageBO> list(String conversationId, RequestHeader.UserHeader header);
 
 }
