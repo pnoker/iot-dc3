@@ -48,6 +48,8 @@ public class ManagerConstant {
 
     public static final String GROUP_URL_PREFIX = "/group";
 
+    public static final String GROUP_BIND_URL_PREFIX = "/group_bind";
+
     public static final String DEVICE_URL_PREFIX = "/device";
 
     public static final String DASHBOARD_URL_PREFIX = "/dashboard";
@@ -59,6 +61,8 @@ public class ManagerConstant {
     public static final String DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX = "/driver_attribute_config";
 
     public static final String LABEL_URL_PREFIX = "/label";
+
+    public static final String LABEL_BIND_URL_PREFIX = "/label_bind";
 
     public static final String DICTIONARY_URL_PREFIX = "/dictionary";
 
