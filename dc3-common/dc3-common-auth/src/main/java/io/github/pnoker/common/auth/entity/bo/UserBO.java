@@ -20,6 +20,7 @@ package io.github.pnoker.common.auth.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.UserIdentityExt;
 import io.github.pnoker.common.entity.ext.UserSocialExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,8 +72,8 @@ public class UserBO extends BaseBO {
     private UserIdentityExt identityExt;
 
     /**
-     * Enable flag, 0:, 1:Disable
+     * Enable flag.
      */
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
 }

@@ -18,6 +18,7 @@
 package io.github.pnoker.common.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -75,8 +76,8 @@ public class UserQuery implements Serializable {
     private String email;
 
     /**
-     * Enable flag, 0 enabled, 1 disabled
+     * Enable flag.
      */
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
 }
