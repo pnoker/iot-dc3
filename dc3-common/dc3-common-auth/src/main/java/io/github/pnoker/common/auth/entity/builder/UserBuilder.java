@@ -24,6 +24,7 @@ import io.github.pnoker.common.auth.entity.vo.UserVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.UserIdentityExt;
 import io.github.pnoker.common.entity.ext.UserSocialExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -34,6 +35,7 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * User Builder
@@ -69,6 +71,7 @@ public interface UserBuilder {
      */
     @Mapping(target = "socialExt", ignore = true)
     @Mapping(target = "identityExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     UserDO buildDOByBO(UserBO entityBO);
 
@@ -97,6 +100,10 @@ public interface UserBuilder {
             identityExt.setContent(JsonUtil.toJsonString(entityIdentityExt.getContent()));
         }
         entityDO.setIdentityExt(identityExt);
+
+        // Enable Flag
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**
@@ -115,6 +122,7 @@ public interface UserBuilder {
      */
     @Mapping(target = "socialExt", ignore = true)
     @Mapping(target = "identityExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     UserBO buildBOByDO(UserDO entityDO);
 
     @AfterMapping
@@ -140,6 +148,10 @@ public interface UserBuilder {
             ext.setContent(JsonUtil.parseObject(entityIdentityExt.getContent(), UserIdentityExt.Content.class));
             entityBO.setIdentityExt(ext);
         }
+
+        // Enable Flag
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

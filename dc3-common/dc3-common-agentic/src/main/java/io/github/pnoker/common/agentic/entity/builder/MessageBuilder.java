@@ -21,6 +21,7 @@ import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.MessageDO;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Agentic message builder.
@@ -48,11 +50,25 @@ public interface MessageBuilder {
     List<MessageBO> buildBOListByVOList(List<MessageVO> entityVOList);
 
     @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "status", ignore = true)
     MessageDO buildDOByBO(MessageBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(MessageBO entityBO, @MappingTarget MessageDO entityDO) {
+        AgenticMessageStatusEnum status = entityBO.getStatus();
+        Optional.ofNullable(status).ifPresent(value -> entityDO.setStatus(value.getIndex()));
+    }
 
     List<MessageDO> buildDOListByBOList(List<MessageBO> entityBOList);
 
+    @Mapping(target = "status", ignore = true)
     MessageBO buildBOByDO(MessageDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(MessageDO entityDO, @MappingTarget MessageBO entityBO) {
+        Byte status = entityDO.getStatus();
+        entityBO.setStatus(AgenticMessageStatusEnum.ofIndex(status));
+    }
 
     List<MessageBO> buildBOListByDOList(List<MessageDO> entityDOList);
 

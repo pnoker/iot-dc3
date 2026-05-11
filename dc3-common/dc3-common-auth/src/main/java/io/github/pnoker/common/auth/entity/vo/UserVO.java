@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.UserIdentityExt;
 import io.github.pnoker.common.entity.ext.UserSocialExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
@@ -87,8 +88,8 @@ public class UserVO extends BaseVO {
     private UserIdentityExt identityExt;
 
     /**
-     * Enable flag, 0:, 1:Disable
+     * Enable flag.
      */
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
 }

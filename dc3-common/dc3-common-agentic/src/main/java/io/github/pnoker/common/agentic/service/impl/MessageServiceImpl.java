@@ -26,6 +26,7 @@ import io.github.pnoker.common.agentic.entity.model.MessageDO;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +36,6 @@ import java.util.Objects;
 
 @Service
 public class MessageServiceImpl implements MessageService {
-
-    private static final byte STATUS_OK = 0;
 
     private static final List<String> INTERNAL_TEXT_MARKERS = List.of(
             "\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation.",
@@ -60,7 +59,7 @@ public class MessageServiceImpl implements MessageService {
         entityBO.setContent(Objects.nonNull(content) ? content : AgenticMessageContent.ofText(""));
         entityBO.setModel(model);
         entityBO.setMessageIndex(nextMessageIndex(conversationId, header));
-        entityBO.setStatus(STATUS_OK);
+        entityBO.setStatus(AgenticMessageStatusEnum.OK);
         entityBO.setTenantId(header.getTenantId());
         entityBO.setUserId(header.getUserId());
         fillCreateAudit(entityBO, header);
