@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import io.github.pnoker.common.agentic.entity.bo.ActionBO;
+import io.github.pnoker.common.agentic.entity.builder.ActionBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ActionVO;
 import io.github.pnoker.common.agentic.service.ActionService;
 import io.github.pnoker.common.agentic.util.AgenticConversationIds;
@@ -23,6 +25,7 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,36 +39,42 @@ import java.util.List;
 @RequestMapping(AgenticConstant.ACTION_URL_PREFIX)
 public class ActionController implements BaseController {
 
+    private final ActionBuilder actionBuilder;
+
     private final ActionService actionService;
 
-    public ActionController(ActionService actionService) {
+    public ActionController(ActionBuilder actionBuilder, ActionService actionService) {
+        this.actionBuilder = actionBuilder;
         this.actionService = actionService;
     }
 
     @GetMapping("/pending/{conversationId}")
-    public Mono<R<List<ActionVO>>> pending(@PathVariable String conversationId) {
+    public Mono<R<List<ActionVO>>> pending(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
-            List<ActionVO> actions = actionService.listPending(scopedConversationId, header);
+            List<ActionVO> actions = actionBuilder.buildVOListByBOList(actionService.listPending(scopedConversationId,
+                    header));
             actions.forEach(action -> sanitize(header, action));
             return R.ok(actions);
         }));
     }
 
     @PostMapping("/{actionId}/confirm")
-    public Mono<R<ActionVO>> confirm(@PathVariable String actionId) {
+    public Mono<R<ActionVO>> confirm(@NotBlank @PathVariable(value = "actionId") String actionId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            ActionVO action = actionService.confirm(actionId, header);
+            ActionBO actionBO = actionService.confirm(actionId, header);
+            ActionVO action = actionBuilder.buildVOByBO(actionBO);
             sanitize(header, action);
             return R.ok(action);
         }));
     }
 
     @PostMapping("/{actionId}/reject")
-    public Mono<R<ActionVO>> reject(@PathVariable String actionId) {
+    public Mono<R<ActionVO>> reject(@NotBlank @PathVariable(value = "actionId") String actionId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            ActionVO action = actionService.reject(actionId, header);
+            ActionBO actionBO = actionService.reject(actionId, header);
+            ActionVO action = actionBuilder.buildVOByBO(actionBO);
             sanitize(header, action);
             return R.ok(action);
         }));

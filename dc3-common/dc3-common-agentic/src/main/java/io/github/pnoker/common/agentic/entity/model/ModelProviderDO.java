@@ -52,11 +52,12 @@ public class ModelProviderDO implements Serializable {
     private String name;
 
     @TableField("provider_type")
-    private String providerType;
+    private Byte providerType;
 
     @TableField("base_url")
     private String baseUrl;
 
+    @ToString.Exclude
     @TableField("api_key")
     private String apiKey;
 

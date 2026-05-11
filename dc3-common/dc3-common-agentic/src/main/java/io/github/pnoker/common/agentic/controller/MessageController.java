@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import io.github.pnoker.common.agentic.entity.builder.MessageBuilder;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.util.AgenticConversationIds;
@@ -23,6 +24,7 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,18 +37,22 @@ import java.util.List;
 @RequestMapping(AgenticConstant.MESSAGE_URL_PREFIX)
 public class MessageController implements BaseController {
 
+    private final MessageBuilder messageBuilder;
+
     private final MessageService messageService;
 
-    public MessageController(MessageService messageService) {
+    public MessageController(MessageBuilder messageBuilder, MessageService messageService) {
+        this.messageBuilder = messageBuilder;
         this.messageService = messageService;
     }
 
     @GetMapping("/{conversationId}")
-    public Mono<R<List<MessageVO>>> list(@PathVariable String conversationId) {
+    public Mono<R<List<MessageVO>>> list(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
-            List<MessageVO> messages = messageService.list(scopedConversationId, header);
+            List<MessageVO> messages = messageBuilder.buildVOListByBOList(messageService.list(scopedConversationId,
+                    header));
             messages.forEach(message -> sanitize(header, message));
             return R.ok(messages);
         }));

@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.common.agentic.entity.request;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,14 +32,18 @@ import lombok.Setter;
 @Setter
 public class AttachmentUploadRequest {
 
+    @NotBlank(message = "Conversation ID is required")
     private String conversationId;
 
+    @NotBlank(message = "File name is required")
     private String fileName;
 
     private String contentType;
 
+    @Min(value = 0, message = "Attachment size must be greater than or equal to 0")
     private Long size;
 
+    @NotBlank(message = "Attachment data is required")
     private String data;
 
 }

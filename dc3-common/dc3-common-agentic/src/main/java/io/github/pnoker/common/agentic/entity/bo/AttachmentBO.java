@@ -14,20 +14,41 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.service;
+package io.github.pnoker.common.agentic.entity.bo;
 
-import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
-import io.github.pnoker.common.agentic.entity.request.AttachmentUploadRequest;
-import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.entity.base.BaseBO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import java.util.List;
+/**
+ * Agentic attachment BO.
+ *
+ * @author pnoker
+ * @version 2026.5.11
+ * @since 2026.5.11
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(callSuper = true)
+public class AttachmentBO extends BaseBO {
 
-public interface AttachmentService {
+    private String conversationId;
 
-    AttachmentBO upload(AttachmentUploadRequest request, RequestHeader.UserHeader header);
+    private String fileName;
 
-    List<AttachmentBO> list(String conversationId, RequestHeader.UserHeader header);
+    private String contentType;
 
-    String summarize(List<Long> attachmentIds, RequestHeader.UserHeader header);
+    private Long size;
+
+    private String filePath;
+
+    private Long tenantId;
+
+    private Long userId;
 
 }

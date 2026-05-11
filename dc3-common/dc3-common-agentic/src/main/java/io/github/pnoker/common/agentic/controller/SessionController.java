@@ -28,6 +28,7 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,7 +74,7 @@ public class SessionController implements BaseController {
     }
 
     @GetMapping("/{conversationId}")
-    public Mono<R<SessionVO>> get(@PathVariable String conversationId) {
+    public Mono<R<SessionVO>> get(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.getByConversationId(AgenticConversationIds.scope(header.getTenantId(),
                     header.getUserId(), conversationId));
@@ -87,7 +88,7 @@ public class SessionController implements BaseController {
     }
 
     @DeleteMapping("/{conversationId}")
-    public Mono<R<Boolean>> delete(@PathVariable String conversationId) {
+    public Mono<R<Boolean>> delete(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             sessionService.removeByConversationId(AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
@@ -96,7 +97,7 @@ public class SessionController implements BaseController {
     }
 
     @PostMapping("/{conversationId}/update")
-    public Mono<R<SessionVO>> update(@PathVariable String conversationId,
+    public Mono<R<SessionVO>> update(@NotBlank @PathVariable(value = "conversationId") String conversationId,
                                      @RequestBody(required = false) SessionUpdateRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.update(AgenticConversationIds.scope(header.getTenantId(),

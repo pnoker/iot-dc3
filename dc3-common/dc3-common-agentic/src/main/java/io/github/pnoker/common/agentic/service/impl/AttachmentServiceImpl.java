@@ -20,9 +20,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.dal.AttachmentManager;
+import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
+import io.github.pnoker.common.agentic.entity.builder.AttachmentBuilder;
 import io.github.pnoker.common.agentic.entity.model.AttachmentDO;
 import io.github.pnoker.common.agentic.entity.request.AttachmentUploadRequest;
-import io.github.pnoker.common.agentic.entity.vo.AttachmentVO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
@@ -45,16 +46,20 @@ public class AttachmentServiceImpl implements AttachmentService {
     private static final long MAX_BYTES = 10 * 1024 * 1024;
 
     private final AttachmentManager attachmentManager;
+    private final AttachmentBuilder attachmentBuilder;
 
     private final AgenticProperties properties;
 
-    public AttachmentServiceImpl(AttachmentManager attachmentManager, AgenticProperties properties) {
+    public AttachmentServiceImpl(AttachmentManager attachmentManager,
+                                 AttachmentBuilder attachmentBuilder,
+                                 AgenticProperties properties) {
         this.attachmentManager = attachmentManager;
+        this.attachmentBuilder = attachmentBuilder;
         this.properties = properties;
     }
 
     @Override
-    public AttachmentVO upload(AttachmentUploadRequest request, RequestHeader.UserHeader header) {
+    public AttachmentBO upload(AttachmentUploadRequest request, RequestHeader.UserHeader header) {
         if (Objects.isNull(request) || StringUtils.isAnyBlank(request.getConversationId(), request.getFileName(),
                 request.getData())) {
             throw new RequestException("Attachment data is required");
@@ -66,33 +71,29 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         Path filePath = writeFile(request.getConversationId(), request.getFileName(), content);
 
-        AttachmentDO entity = new AttachmentDO();
-        entity.setConversationId(request.getConversationId());
-        entity.setFileName(request.getFileName());
-        entity.setContentType(StringUtils.defaultIfBlank(request.getContentType(), "application/octet-stream"));
-        entity.setSize(Objects.nonNull(request.getSize()) ? request.getSize() : (long) content.length);
-        entity.setFilePath(filePath.toString());
-        entity.setTenantId(header.getTenantId());
-        entity.setUserId(header.getUserId());
-        entity.setCreateTime(LocalDateTime.now());
-        entity.setOperateTime(entity.getCreateTime());
-        entity.setCreatorId(header.getUserId());
-        entity.setOperatorId(header.getUserId());
-        entity.setCreatorName(header.getUserName());
-        entity.setOperatorName(header.getUserName());
-        attachmentManager.save(entity);
-        return toVO(entity);
+        AttachmentBO entityBO = new AttachmentBO();
+        entityBO.setConversationId(request.getConversationId());
+        entityBO.setFileName(request.getFileName());
+        entityBO.setContentType(StringUtils.defaultIfBlank(request.getContentType(), "application/octet-stream"));
+        entityBO.setSize(Objects.nonNull(request.getSize()) ? request.getSize() : (long) content.length);
+        entityBO.setFilePath(filePath.toString());
+        entityBO.setTenantId(header.getTenantId());
+        entityBO.setUserId(header.getUserId());
+        fillCreateAudit(entityBO, header);
+        AttachmentDO entityDO = attachmentBuilder.buildDOByBO(entityBO);
+        attachmentManager.save(entityDO);
+        return attachmentBuilder.buildBOByDO(entityDO);
     }
 
     @Override
-    public List<AttachmentVO> list(String conversationId, RequestHeader.UserHeader header) {
+    public List<AttachmentBO> list(String conversationId, RequestHeader.UserHeader header) {
         LambdaQueryWrapper<AttachmentDO> wrapper = Wrappers.<AttachmentDO>query()
                 .lambda()
                 .eq(AttachmentDO::getConversationId, conversationId)
                 .eq(AttachmentDO::getTenantId, header.getTenantId())
                 .eq(AttachmentDO::getUserId, header.getUserId())
                 .orderByDesc(AttachmentDO::getCreateTime);
-        return attachmentManager.list(wrapper).stream().map(this::toVO).toList();
+        return attachmentBuilder.buildBOListByDOList(attachmentManager.list(wrapper));
     }
 
     @Override
@@ -109,7 +110,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         if (attachments.isEmpty()) {
             return "";
         }
-        String summary = attachments.stream()
+        String summary = attachmentBuilder.buildBOListByDOList(attachments).stream()
                 .map(item -> "- " + item.getFileName() + " (" + item.getContentType() + ", " + item.getSize()
                         + " bytes, path=" + item.getFilePath() + ")")
                 .reduce((left, right) -> left + "\n" + right)
@@ -144,17 +145,14 @@ public class AttachmentServiceImpl implements AttachmentService {
         return StringUtils.defaultIfBlank(sanitized, "attachment");
     }
 
-    private AttachmentVO toVO(AttachmentDO entity) {
-        AttachmentVO vo = new AttachmentVO();
-        vo.setId(entity.getId());
-        vo.setConversationId(entity.getConversationId());
-        vo.setFileName(entity.getFileName());
-        vo.setContentType(entity.getContentType());
-        vo.setSize(entity.getSize());
-        vo.setFilePath(entity.getFilePath());
-        vo.setCreateTime(entity.getCreateTime());
-        vo.setOperateTime(entity.getOperateTime());
-        return vo;
+    private void fillCreateAudit(AttachmentBO entityBO, RequestHeader.UserHeader header) {
+        LocalDateTime now = LocalDateTime.now();
+        entityBO.setCreateTime(now);
+        entityBO.setOperateTime(now);
+        entityBO.setCreatorId(header.getUserId());
+        entityBO.setCreatorName(header.getUserName());
+        entityBO.setOperatorId(header.getUserId());
+        entityBO.setOperatorName(header.getUserName());
     }
 
 }
