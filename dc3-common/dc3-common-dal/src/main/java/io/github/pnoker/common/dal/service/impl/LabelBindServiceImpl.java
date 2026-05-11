@@ -92,7 +92,7 @@ public class LabelBindServiceImpl implements LabelBindService {
 
     @Override
     public LabelBindBO selectById(Long id) {
-        LabelBindDO entityDO = getDOById(id, false);
+        LabelBindDO entityDO = getDOById(id, true);
         return labelBindBuilder.buildBOByDO(entityDO);
     }
 
@@ -114,10 +114,13 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), LabelBindDO::getEntityTypeFlag,
+                entityQuery.getEntityTypeFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getLabelId()), LabelBindDO::getLabelId,
                 entityQuery.getLabelId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), LabelBindDO::getEntityId,
                 entityQuery.getEntityId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), LabelBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

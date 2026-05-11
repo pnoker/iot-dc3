@@ -15,31 +15,44 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.dal.entity.bo;
+package io.github.pnoker.common.dal.entity.query;
 
-import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.entity.common.TenantOwned;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
- * Label binding business object (BO) representing the association between labels and
- * entities.
+ * GroupBind Query
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.11
+ * @since 2026.5.11
  */
 @Getter
 @Setter
+@Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
-public class LabelBindBO extends BaseBO implements TenantOwned {
+public class GroupBindQuery implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private Pages page;
+
+    /**
+     * Tenant ID.
+     */
+    private Long tenantId;
 
     /**
      * Entity type flag.
@@ -47,18 +60,13 @@ public class LabelBindBO extends BaseBO implements TenantOwned {
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
-     * Label ID.
+     * Group ID.
      */
-    private Long labelId;
+    private Long groupId;
 
     /**
      * Entity ID.
      */
     private Long entityId;
-
-    /**
-     * Tenant ID.
-     */
-    private Long tenantId;
 
 }

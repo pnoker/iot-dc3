@@ -18,9 +18,9 @@
 package io.github.pnoker.common.dal.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.dal.entity.bo.LabelBindBO;
-import io.github.pnoker.common.dal.entity.model.LabelBindDO;
-import io.github.pnoker.common.dal.entity.vo.LabelBindVO;
+import io.github.pnoker.common.dal.entity.bo.GroupBindBO;
+import io.github.pnoker.common.dal.entity.model.GroupBindDO;
+import io.github.pnoker.common.dal.entity.vo.GroupBindVO;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -33,14 +33,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * LabelBind Builder
+ * GroupBind Builder
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.11
+ * @since 2026.5.11
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
-public interface LabelBindBuilder {
+public interface GroupBindBuilder {
 
     /**
      * VO to BO
@@ -49,7 +49,7 @@ public interface LabelBindBuilder {
      * @return EntityBO
      */
     @Mapping(target = "tenantId", ignore = true)
-    LabelBindBO buildBOByVO(LabelBindVO entityVO);
+    GroupBindBO buildBOByVO(GroupBindVO entityVO);
 
     /**
      * VOList to BOList
@@ -57,7 +57,7 @@ public interface LabelBindBuilder {
      * @param entityVOList EntityVO collection
      * @return EntityBO collection
      */
-    List<LabelBindBO> buildBOListByVOList(List<LabelBindVO> entityVOList);
+    List<GroupBindBO> buildBOListByVOList(List<GroupBindVO> entityVOList);
 
     /**
      * BO to VO
@@ -65,7 +65,7 @@ public interface LabelBindBuilder {
      * @param entityBO EntityBO
      * @return EntityVO
      */
-    LabelBindVO buildVOByBO(LabelBindBO entityBO);
+    GroupBindVO buildVOByBO(GroupBindBO entityBO);
 
     /**
      * BOList to VOList
@@ -73,7 +73,7 @@ public interface LabelBindBuilder {
      * @param entityBOList EntityBO collection
      * @return EntityVO collection
      */
-    List<LabelBindVO> buildVOListByBOList(List<LabelBindBO> entityBOList);
+    List<GroupBindVO> buildVOListByBOList(List<GroupBindBO> entityBOList);
 
     /**
      * DO to BO
@@ -82,11 +82,10 @@ public interface LabelBindBuilder {
      * @return EntityBO
      */
     @Mapping(target = "entityTypeFlag", ignore = true)
-    LabelBindBO buildBOByDO(LabelBindDO entityDO);
+    GroupBindBO buildBOByDO(GroupBindDO entityDO);
 
     @AfterMapping
-    default void afterProcess(LabelBindDO entityDO, @MappingTarget LabelBindBO entityBO) {
-        // EntityType Flag
+    default void afterProcess(GroupBindDO entityDO, @MappingTarget GroupBindBO entityBO) {
         Byte entityTypeFlag = entityDO.getEntityTypeFlag();
         entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(entityTypeFlag));
     }
@@ -97,7 +96,7 @@ public interface LabelBindBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<LabelBindBO> buildBOListByDOList(List<LabelBindDO> entityDOList);
+    List<GroupBindBO> buildBOListByDOList(List<GroupBindDO> entityDOList);
 
     /**
      * BO to DO
@@ -107,11 +106,10 @@ public interface LabelBindBuilder {
      */
     @Mapping(target = "entityTypeFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    LabelBindDO buildDOByBO(LabelBindBO entityBO);
+    GroupBindDO buildDOByBO(GroupBindBO entityBO);
 
     @AfterMapping
-    default void afterProcess(LabelBindBO entityBO, @MappingTarget LabelBindDO entityDO) {
-        // EntityType Flag
+    default void afterProcess(GroupBindBO entityBO, @MappingTarget GroupBindDO entityDO) {
         EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
         Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
     }
@@ -122,7 +120,7 @@ public interface LabelBindBuilder {
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
      */
-    List<LabelBindDO> buildDOListByBOList(List<LabelBindBO> entityBOList);
+    List<GroupBindDO> buildDOListByBOList(List<GroupBindBO> entityBOList);
 
     /**
      * BOPage to VOPage
@@ -130,7 +128,7 @@ public interface LabelBindBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    default Page<LabelBindVO> buildVOPageByBOPage(Page<LabelBindBO> entityPageBO) {
+    default Page<GroupBindVO> buildVOPageByBOPage(Page<GroupBindBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }
 
@@ -140,7 +138,7 @@ public interface LabelBindBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    default Page<LabelBindBO> buildBOPageByDOPage(Page<LabelBindDO> entityPageDO) {
+    default Page<GroupBindBO> buildBOPageByDOPage(Page<GroupBindDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
