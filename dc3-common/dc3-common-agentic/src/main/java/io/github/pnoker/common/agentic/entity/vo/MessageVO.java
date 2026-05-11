@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.entity.vo;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -50,6 +51,6 @@ public class MessageVO extends BaseVO {
 
     private Long messageIndex;
 
-    private Byte status;
+    private AgenticMessageStatusEnum status;
 
 }

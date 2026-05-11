@@ -82,7 +82,7 @@ public class ResourceQuery implements Serializable {
      * </ul>
      *
      */
-    private Byte resourceScopeFlag;
+    private ResourceScopeFlagEnum resourceScopeFlag;
 
     /**
      * Scope multi-select — takes precedence over {@link #resourceScopeFlag} when

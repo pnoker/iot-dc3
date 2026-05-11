@@ -151,7 +151,7 @@ public class ResourceServiceImpl implements ResourceService {
                 wrapper.in(ResourceDO::getResourceScopeFlag, scopeIndexes);
             }
         } else if (Objects.nonNull(entityQuery.getResourceScopeFlag())) {
-            wrapper.eq(ResourceDO::getResourceScopeFlag, entityQuery.getResourceScopeFlag());
+            wrapper.eq(ResourceDO::getResourceScopeFlag, entityQuery.getResourceScopeFlag().getIndex());
         }
         wrapper.eq(Objects.nonNull(entityQuery.getParentResourceId()), ResourceDO::getParentResourceId,
                 entityQuery.getParentResourceId());
