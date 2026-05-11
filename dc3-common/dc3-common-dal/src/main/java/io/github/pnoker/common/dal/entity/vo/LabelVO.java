@@ -24,6 +24,7 @@ import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -67,6 +68,7 @@ public class LabelVO extends BaseVO {
     /**
      * Entity type flag.
      */
+    @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
