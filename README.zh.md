@@ -89,8 +89,9 @@ cp .env.example .env
 ```
 
 根目录 `.env` 用于 `dc3/` 下 Compose 文件的变量插值；镜像仓库可通过 `DC3_IMAGE_REGISTRY` 切换，应用运行时环境变量仍然位于
-`dc3/env/dev.env` 或 `dc3/env/dev.env.sh`。如果启用 Agentic Center，请在 `.env` 或当前 shell 中配置 `OPENAI_BASE_URL`、
-`OPENAI_API_KEY`、`OPENAI_MODEL` 等 OpenAI 兼容参数。
+`dc3/env/dev.env` 或 `dc3/env/dev.env.sh`。Agentic provider 通常存储在数据库中；只有需要兜底配置时，才在 `.env`
+或当前 shell 中配置 `AGENTIC_FALLBACK_OPENAI_BASE_URL`、`AGENTIC_FALLBACK_OPENAI_API_KEY`、
+`AGENTIC_FALLBACK_OPENAI_MODEL` 等 OpenAI 兼容参数。
 
 Compose 只会注入 Compose 文件显式引用的变量，例如镜像仓库、镜像版本、发布端口、日志选项和可选观测栈参数。本地源码方式启动
 Java

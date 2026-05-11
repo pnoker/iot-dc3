@@ -101,8 +101,9 @@ Tệp `.env` ở thư mục gốc được dùng cho nội suy biến trong các
 vẫn nằm trong `dc3/env/dev.env` hoặc `dc3/env/dev.env.sh`.
 
 Compose chỉ truyền các biến được tham chiếu rõ ràng trong file Compose vào container, chẳng hạn registry image, tag
-image, cổng publish, tùy chọn log và cấu hình observability tùy chọn. Nếu bật Agentic Center, hãy cấu hình
-`OPENAI_BASE_URL`, `OPENAI_API_KEY` và `OPENAI_MODEL` trong môi trường của process hoặc container đó.
+image, cổng publish, tùy chọn log và cấu hình observability tùy chọn. Provider của Agentic thường được lưu trong cơ sở dữ liệu; chỉ cấu hình
+`AGENTIC_FALLBACK_OPENAI_BASE_URL`, `AGENTIC_FALLBACK_OPENAI_API_KEY` và `AGENTIC_FALLBACK_OPENAI_MODEL` khi cần giá trị dự phòng
+cho process hoặc container đó.
 
 Xem [`dc3/doc/ENVIRONMENT.md`](dc3/doc/ENVIRONMENT.md) để biết sự khác nhau giữa `.env` ở thư mục gốc và
 `dc3/env/dev.env(.sh)`.
