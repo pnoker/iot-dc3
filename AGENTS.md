@@ -140,6 +140,28 @@ stub configuration instead of ad hoc channel construction.
 - Use grouped validation annotations consistently.
 - Keep validation and exception messages in English.
 
+### Domain Modeling
+
+Keep persistence, business, and web representations deliberately separated.
+
+- Persistence objects (`*DO`) model the database shape. Database-coded flags and type columns may stay as `Byte` on
+  `*DO` classes, but they must not leak into business or response models when a domain enum exists or should exist.
+- Business objects (`*BO`) carry business semantics. Use enums such as `EnableFlagEnum`, `DefaultFlagEnum`, or
+  domain-specific enums instead of naked `Byte`, `Integer`, or `String` flags.
+- View objects (`*VO`) carry API response/request semantics. Prefer the same domain enums used by the corresponding
+  `*BO`, unless a public API compatibility requirement explicitly requires a primitive or string.
+- Use MapStruct `*Builder` classes for `VO <-> BO <-> DO` conversion. Put enum/index conversion in the builder
+  (`EnumValue.getIndex()` for `BO -> DO`, `Enum.ofIndex(...)` for `DO -> BO`) instead of scattering it through services.
+- Controllers should translate web input/output (`VO`, request DTOs, path variables) to and from `BO`; services should
+  expose and accept `BO` rather than `VO` for persistent business entities.
+- MyBatis-Plus query conditions may use enum values directly when the enum field has `@EnumValue`, for example
+  `.eq(EntityDO::getEnableFlag, EnableFlagEnum.ENABLE)`. Plain Java comparisons against `Byte` fields must compare
+  with the enum index, preferably centralized in a builder or helper.
+- Do not introduce magic flag constants such as `private static final Byte DEFAULT = 1`. Add or reuse a domain enum
+  instead, with `@EnumValue`, `ofIndex(...)`, and clear names.
+- Do not expose secrets in `VO` classes, and exclude secret-bearing fields such as `apiKey`, `password`, `secret`,
+  `token`, and credentials from Lombok `@ToString`.
+
 ### Configuration
 
 - Custom `@ConfigurationProperties` prefixes must use `dc3.*`.
