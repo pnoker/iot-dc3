@@ -41,6 +41,7 @@ public class UserPasswordBO extends BaseBO {
     /**
      *
      */
+    @ToString.Exclude
     private String loginPassword;
 
 }
