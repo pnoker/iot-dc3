@@ -100,8 +100,9 @@ For the difference between root `.env` and `dc3/env/dev.env(.sh)`, see
 
 The root `.env` is used by Compose only for variables referenced by Compose files, such as image registry, image tag,
 published ports, logging options, and optional observability settings. Local source-run Java processes should use
-`dc3/env/dev.env` or `dc3/env/dev.env.sh`. If Agentic Center is enabled, configure `OPENAI_BASE_URL`,
-`OPENAI_API_KEY`, and `OPENAI_MODEL` in the environment used by that process or container.
+`dc3/env/dev.env` or `dc3/env/dev.env.sh`. Agentic providers are normally stored in the database; configure
+`AGENTIC_FALLBACK_OPENAI_BASE_URL`, `AGENTIC_FALLBACK_OPENAI_API_KEY`, and `AGENTIC_FALLBACK_OPENAI_MODEL` only as
+fallback values for the process or container.
 
 ## 3.2 Preparation
 

@@ -94,8 +94,8 @@ cp .env.example .env
 で管理されます。
 
 Compose は、Compose ファイルで明示的に参照された変数のみをコンテナへ渡します。たとえばイメージレジストリ、イメージタグ、公開ポート、
-ログ設定、任意の監視スタック設定です。Agentic Center を有効にする場合は、そのプロセスまたはコンテナの環境に
-`OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` を設定してください。
+ログ設定、任意の監視スタック設定です。Agentic provider は通常データベースに保存されます。フォールバックが必要な場合のみ
+`AGENTIC_FALLBACK_OPENAI_BASE_URL`、`AGENTIC_FALLBACK_OPENAI_API_KEY`、`AGENTIC_FALLBACK_OPENAI_MODEL` を設定してください。
 
 リポジトリ直下の `.env` と `dc3/env/dev.env(.sh)` の違いは [`dc3/doc/ENVIRONMENT.md`](dc3/doc/ENVIRONMENT.md) を参照してください。
 
