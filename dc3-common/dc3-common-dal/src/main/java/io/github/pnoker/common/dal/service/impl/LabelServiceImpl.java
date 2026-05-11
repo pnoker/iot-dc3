@@ -35,7 +35,9 @@ import io.github.pnoker.common.exception.AssociatedException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +68,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public void save(LabelBO entityBO) {
+        validateEntityType(entityBO.getEntityTypeFlag());
         checkDuplicate(entityBO, false, true);
 
         LabelDO entityDO = labelBuilder.buildDOByBO(entityBO);
@@ -95,6 +98,7 @@ public class LabelServiceImpl implements LabelService {
     public void update(LabelBO entityBO) {
         getDOById(entityBO.getId(), true);
 
+        validateEntityType(entityBO.getEntityTypeFlag());
         checkDuplicate(entityBO, true, true);
 
         LabelDO entityDO = labelBuilder.buildDOByBO(entityBO);
@@ -159,6 +163,19 @@ public class LabelServiceImpl implements LabelService {
             throw new DuplicateException("Label has been duplicated");
         }
         return duplicate;
+    }
+
+    private void validateEntityType(EntityTypeFlagEnum entityTypeFlag) {
+        if (!isSupportedEntityType(entityTypeFlag)) {
+            throw new RequestException("Label entity type is not supported");
+        }
+    }
+
+    private boolean isSupportedEntityType(EntityTypeFlagEnum entityTypeFlag) {
+        return EntityTypeFlagEnum.DRIVER == entityTypeFlag
+                || EntityTypeFlagEnum.PROFILE == entityTypeFlag
+                || EntityTypeFlagEnum.POINT == entityTypeFlag
+                || EntityTypeFlagEnum.DEVICE == entityTypeFlag;
     }
 
     /**

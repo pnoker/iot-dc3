@@ -22,9 +22,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.dal.dal.GroupBindManager;
 import io.github.pnoker.common.dal.dal.GroupManager;
 import io.github.pnoker.common.dal.entity.bo.GroupBO;
 import io.github.pnoker.common.dal.entity.builder.GroupBuilder;
+import io.github.pnoker.common.dal.entity.model.GroupBindDO;
 import io.github.pnoker.common.dal.entity.model.GroupDO;
 import io.github.pnoker.common.dal.entity.query.GroupQuery;
 import io.github.pnoker.common.dal.service.GroupService;
@@ -34,14 +36,19 @@ import io.github.pnoker.common.exception.AssociatedException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * <p>
@@ -62,8 +69,13 @@ public class GroupServiceImpl implements GroupService {
     @Resource
     private GroupManager groupManager;
 
+    @Resource
+    private GroupBindManager groupBindManager;
+
     @Override
     public void save(GroupBO entityBO) {
+        validateGroupType(entityBO.getGroupTypeFlag());
+        validateParent(entityBO);
         checkDuplicate(entityBO, false, true);
 
         GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
@@ -83,6 +95,13 @@ public class GroupServiceImpl implements GroupService {
             throw new AssociatedException("Failed to remove group: there are subgroups under the group");
         }
 
+        LambdaQueryWrapper<GroupBindDO> bindWrapper = Wrappers.<GroupBindDO>query().lambda();
+        bindWrapper.eq(GroupBindDO::getGroupId, id);
+        count = groupBindManager.count(bindWrapper);
+        if (count > 0) {
+            throw new AssociatedException("Failed to remove group: the group has been bound by another entity");
+        }
+
         if (!groupManager.removeById(id)) {
             throw new DeleteException("Failed to remove group");
         }
@@ -92,6 +111,8 @@ public class GroupServiceImpl implements GroupService {
     public void update(GroupBO entityBO) {
         getDOById(entityBO.getId(), true);
 
+        validateGroupType(entityBO.getGroupTypeFlag());
+        validateParent(entityBO);
         checkDuplicate(entityBO, true, true);
 
         GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
@@ -126,6 +147,11 @@ public class GroupServiceImpl implements GroupService {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getGroupName()), GroupDO::getGroupName,
                 entityQuery.getGroupName());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getParentGroupId()), GroupDO::getParentGroupId,
+                entityQuery.getParentGroupId());
+        wrapper.eq(Objects.nonNull(entityQuery.getGroupTypeFlag()), GroupDO::getGroupTypeFlag,
+                entityQuery.getGroupTypeFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), GroupDO::getEnableFlag, entityQuery.getEnableFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), GroupDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -154,6 +180,53 @@ public class GroupServiceImpl implements GroupService {
             throw new DuplicateException("Group has been duplicated");
         }
         return duplicate;
+    }
+
+    private void validateGroupType(EntityTypeFlagEnum entityTypeFlag) {
+        if (!isGroupable(entityTypeFlag)) {
+            throw new RequestException("Group type is not supported");
+        }
+    }
+
+    private boolean isGroupable(EntityTypeFlagEnum entityTypeFlag) {
+        return EntityTypeFlagEnum.DRIVER == entityTypeFlag
+                || EntityTypeFlagEnum.PROFILE == entityTypeFlag
+                || EntityTypeFlagEnum.POINT == entityTypeFlag
+                || EntityTypeFlagEnum.DEVICE == entityTypeFlag;
+    }
+
+    private void validateParent(GroupBO entityBO) {
+        Long parentGroupId = entityBO.getParentGroupId();
+        if (!FieldUtil.isValidIdField(parentGroupId)) {
+            entityBO.setParentGroupId(null);
+            entityBO.setGroupLevel((byte) 0);
+            return;
+        }
+
+        if (Objects.equals(entityBO.getId(), parentGroupId)) {
+            throw new RequestException("Group parent can't be itself");
+        }
+
+        GroupDO parent = getDOById(parentGroupId, true);
+        if (!Objects.equals(entityBO.getTenantId(), parent.getTenantId())
+                || !Objects.equals(entityBO.getGroupTypeFlag().getIndex(), parent.getGroupTypeFlag())) {
+            throw new NotFoundException("Resource does not exist");
+        }
+
+        if (FieldUtil.isValidIdField(entityBO.getId())) {
+            Set<Long> visited = new HashSet<>();
+            Long currentParentId = parentGroupId;
+            while (FieldUtil.isValidIdField(currentParentId) && visited.add(currentParentId)) {
+                if (Objects.equals(entityBO.getId(), currentParentId)) {
+                    throw new RequestException("Group parent can't be a descendant group");
+                }
+                GroupDO current = getDOById(currentParentId, true);
+                currentParentId = current.getParentGroupId();
+            }
+        }
+
+        Byte parentLevel = Objects.isNull(parent.getGroupLevel()) ? 0 : parent.getGroupLevel();
+        entityBO.setGroupLevel((byte) (parentLevel + 1));
     }
 
     /**

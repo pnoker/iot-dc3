@@ -20,10 +20,11 @@ package io.github.pnoker.common.dal.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.GroupTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,12 +50,13 @@ public class GroupVO extends BaseVO {
     /**
      * Parent group ID.
      */
-    private String parentGroupId;
+    private Long parentGroupId;
 
     /**
      * Group type flag.
      */
-    private GroupTypeFlagEnum groupTypeFlag;
+    @NotNull(message = "Group type flag can't be empty", groups = {Add.class, Update.class})
+    private EntityTypeFlagEnum groupTypeFlag;
 
     /**
      * Group name.
