@@ -45,6 +45,7 @@ public class AuthHeader implements Serializable {
 
     private String salt;
 
+    @ToString.Exclude
     private String token;
 
 }

@@ -64,7 +64,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
         entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
         if (!userPasswordManager.save(entityDO)) {
-            throw new AddException("Failed to create user password: {}", entityBO.toString());
+            throw new AddException("Failed to create user password");
         }
     }
 

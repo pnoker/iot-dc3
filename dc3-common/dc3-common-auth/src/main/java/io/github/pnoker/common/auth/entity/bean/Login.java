@@ -57,9 +57,11 @@ public class Login implements Serializable {
     private String salt;
 
     @NotBlank(message = "Password can't be empty", groups = {Auth.class})
+    @ToString.Exclude
     private String password;
 
     @NotBlank(message = "Token can't be empty", groups = {Check.class})
+    @ToString.Exclude
     private String token;
 
 }

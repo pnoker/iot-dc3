@@ -58,6 +58,7 @@ public class UserPasswordDO implements Serializable {
      *
      */
     @TableField("login_password")
+    @ToString.Exclude
     private String loginPassword;
 
     /**
