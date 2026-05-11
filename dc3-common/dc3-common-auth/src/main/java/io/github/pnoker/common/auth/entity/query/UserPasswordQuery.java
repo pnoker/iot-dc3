@@ -53,6 +53,7 @@ public class UserPasswordQuery implements Serializable {
     /**
      *
      */
+    @ToString.Exclude
     private String loginPassword;
 
 }
