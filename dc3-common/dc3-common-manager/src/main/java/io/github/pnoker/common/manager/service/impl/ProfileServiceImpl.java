@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.AssociatedException;
@@ -44,6 +45,7 @@ import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.mapper.ProfileMapper;
 import io.github.pnoker.common.manager.service.ProfileService;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -200,6 +202,20 @@ public class ProfileServiceImpl implements ProfileService {
                 entityQuery.getProfileShareFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dp.tenant_id", entityQuery.getTenantId());
+        wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
+                "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
+                        + "and dgb.tenant_id = dp.tenant_id "
+                        + "and dgb.entity_type_flag = {0} "
+                        + "and dgb.entity_id = dp.id "
+                        + "and dgb.group_id = {1}",
+                EntityTypeFlagEnum.PROFILE.getIndex(), entityQuery.getGroupId());
+        wrapper.exists(FieldUtil.isValidIdField(entityQuery.getLabelId()),
+                "select 1 from dc3_label_bind dlb where dlb.deleted = 0 "
+                        + "and dlb.tenant_id = dp.tenant_id "
+                        + "and dlb.entity_type_flag = {0} "
+                        + "and dlb.entity_id = dp.id "
+                        + "and dlb.label_id = {1}",
+                EntityTypeFlagEnum.PROFILE.getIndex(), entityQuery.getLabelId());
         return wrapper.lambda();
     }
 

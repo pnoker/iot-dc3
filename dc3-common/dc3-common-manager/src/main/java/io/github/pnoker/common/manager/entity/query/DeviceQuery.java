@@ -77,6 +77,16 @@ public class DeviceQuery implements Serializable {
     private EnableFlagEnum enableFlag;
 
     /**
+     * Group ID
+     */
+    private Long groupId;
+
+    /**
+     * Label ID
+     */
+    private Long labelId;
+
+    /**
      *
      */
     private Integer version;

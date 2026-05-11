@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.AddException;
@@ -582,6 +583,20 @@ public class DeviceServiceImpl implements DeviceService {
             wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
             wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
             wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dd.tenant_id", entityQuery.getTenantId());
+            wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
+                    "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
+                            + "and dgb.tenant_id = dd.tenant_id "
+                            + "and dgb.entity_type_flag = {0} "
+                            + "and dgb.entity_id = dd.id "
+                            + "and dgb.group_id = {1}",
+                    EntityTypeFlagEnum.DEVICE.getIndex(), entityQuery.getGroupId());
+            wrapper.exists(FieldUtil.isValidIdField(entityQuery.getLabelId()),
+                    "select 1 from dc3_label_bind dlb where dlb.deleted = 0 "
+                            + "and dlb.tenant_id = dd.tenant_id "
+                            + "and dlb.entity_type_flag = {0} "
+                            + "and dlb.entity_id = dd.id "
+                            + "and dlb.label_id = {1}",
+                    EntityTypeFlagEnum.DEVICE.getIndex(), entityQuery.getLabelId());
         }
         return wrapper.lambda();
     }
