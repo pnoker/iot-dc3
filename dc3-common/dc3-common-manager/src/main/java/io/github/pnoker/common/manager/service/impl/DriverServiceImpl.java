@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -39,6 +40,7 @@ import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.ProfileBindService;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -194,6 +196,20 @@ public class DriverServiceImpl implements DriverService {
                 entityQuery.getDriverTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverDO::getEnableFlag, entityQuery.getEnableFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverDO::getTenantId, entityQuery.getTenantId());
+        wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
+                "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
+                        + "and dgb.tenant_id = dc3_driver.tenant_id "
+                        + "and dgb.entity_type_flag = {0} "
+                        + "and dgb.entity_id = dc3_driver.id "
+                        + "and dgb.group_id = {1}",
+                EntityTypeFlagEnum.DRIVER.getIndex(), entityQuery.getGroupId());
+        wrapper.exists(FieldUtil.isValidIdField(entityQuery.getLabelId()),
+                "select 1 from dc3_label_bind dlb where dlb.deleted = 0 "
+                        + "and dlb.tenant_id = dc3_driver.tenant_id "
+                        + "and dlb.entity_type_flag = {0} "
+                        + "and dlb.entity_id = dc3_driver.id "
+                        + "and dlb.label_id = {1}",
+                EntityTypeFlagEnum.DRIVER.getIndex(), entityQuery.getLabelId());
         return wrapper;
     }
 
