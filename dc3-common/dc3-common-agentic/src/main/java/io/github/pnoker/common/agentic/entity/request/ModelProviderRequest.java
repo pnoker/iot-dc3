@@ -16,6 +16,12 @@
  */
 package io.github.pnoker.common.agentic.entity.request;
 
+import io.github.pnoker.common.valid.Add;
+import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,18 +36,25 @@ import lombok.Setter;
 @Setter
 public class ModelProviderRequest {
 
+    @NotNull(message = "Provider ID is required", groups = {Update.class})
     private Long id;
 
+    @NotBlank(message = "Provider name is required", groups = {Add.class, Update.class})
     private String name;
 
     private String providerType;
 
+    @NotBlank(message = "Provider base URL is required", groups = {Add.class, Update.class})
     private String baseUrl;
 
     private String apiKey;
 
+    @Min(value = 0, message = "Default flag must be 0 or 1", groups = {Add.class, Update.class})
+    @Max(value = 1, message = "Default flag must be 0 or 1", groups = {Add.class, Update.class})
     private Byte defaultFlag;
 
+    @Min(value = 0, message = "Enable flag must be 0 or 1", groups = {Add.class, Update.class})
+    @Max(value = 1, message = "Enable flag must be 0 or 1", groups = {Add.class, Update.class})
     private Byte enableFlag;
 
     private String remark;

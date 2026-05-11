@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.vo;
+package io.github.pnoker.common.agentic.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -26,16 +28,18 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * Agentic action confirmation response.
+ * Agentic action BO.
  *
  * @author pnoker
- * @version 2026.5.10
- * @since 2026.5.10
+ * @version 2026.5.11
+ * @since 2026.5.11
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString(callSuper = true)
-public class ActionVO extends BaseVO {
+public class ActionBO extends BaseBO {
 
     private String actionId;
 
@@ -52,5 +56,9 @@ public class ActionVO extends BaseVO {
     private AgenticActionStatusEnum status;
 
     private LocalDateTime expireTime;
+
+    private Long tenantId;
+
+    private Long userId;
 
 }

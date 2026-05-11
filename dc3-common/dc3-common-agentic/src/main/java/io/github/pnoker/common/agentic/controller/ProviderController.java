@@ -16,12 +16,18 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
+import io.github.pnoker.common.agentic.entity.builder.ModelProviderBuilder;
 import io.github.pnoker.common.agentic.entity.request.ModelProviderRequest;
 import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
 import io.github.pnoker.common.agentic.service.ModelProviderService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.valid.Add;
+import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,33 +49,42 @@ import java.util.List;
 @RequestMapping(AgenticConstant.PROVIDER_URL_PREFIX)
 public class ProviderController implements BaseController {
 
+    private final ModelProviderBuilder modelProviderBuilder;
+
     private final ModelProviderService modelProviderService;
 
-    public ProviderController(ModelProviderService modelProviderService) {
+    public ProviderController(ModelProviderBuilder modelProviderBuilder, ModelProviderService modelProviderService) {
+        this.modelProviderBuilder = modelProviderBuilder;
         this.modelProviderService = modelProviderService;
     }
 
     @GetMapping("/list")
     public Mono<R<List<ModelProviderVO>>> list() {
-        return Mono.just(R.ok(modelProviderService.list()));
+        return async(() -> R.ok(modelProviderBuilder.buildVOListByBOList(modelProviderService.list())));
     }
 
     @PostMapping("/config/add")
-    public Mono<R<ModelProviderVO>> add(@RequestBody ModelProviderRequest request) {
-        return getUserHeader().flatMap(header -> async(() ->
-                R.ok(modelProviderService.save(request, header))));
+    public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderRequest request) {
+        return getUserHeader().flatMap(header -> async(() -> {
+            ModelProviderBO entityBO = modelProviderBuilder.buildBOByRequest(request);
+            return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.save(entityBO, header)));
+        }));
     }
 
     @PostMapping("/config/update")
-    public Mono<R<ModelProviderVO>> update(@RequestBody ModelProviderRequest request) {
-        return getUserHeader().flatMap(header -> async(() ->
-                R.ok(modelProviderService.update(request, header))));
+    public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderRequest request) {
+        return getUserHeader().flatMap(header -> async(() -> {
+            ModelProviderBO entityBO = modelProviderBuilder.buildBOByRequest(request);
+            return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.update(entityBO, header)));
+        }));
     }
 
     @PostMapping("/config/delete/{id}")
-    public Mono<R<Boolean>> delete(@PathVariable Long id) {
-        modelProviderService.remove(id);
-        return Mono.just(R.ok(true));
+    public Mono<R<Boolean>> delete(@NotNull @PathVariable(value = "id") Long id) {
+        return async(() -> {
+            modelProviderService.remove(id);
+            return R.ok(true);
+        });
     }
 
 }

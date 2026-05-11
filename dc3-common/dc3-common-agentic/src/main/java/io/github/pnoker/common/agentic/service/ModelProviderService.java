@@ -16,19 +16,18 @@
  */
 package io.github.pnoker.common.agentic.service;
 
-import io.github.pnoker.common.agentic.entity.request.ModelProviderRequest;
-import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
+import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 
 import java.util.List;
 
 public interface ModelProviderService {
 
-    List<ModelProviderVO> list();
+    List<ModelProviderBO> list();
 
-    ModelProviderVO save(ModelProviderRequest request, RequestHeader.UserHeader header);
+    ModelProviderBO save(ModelProviderBO entityBO, RequestHeader.UserHeader header);
 
-    ModelProviderVO update(ModelProviderRequest request, RequestHeader.UserHeader header);
+    ModelProviderBO update(ModelProviderBO entityBO, RequestHeader.UserHeader header);
 
     void remove(Long id);
 

@@ -397,7 +397,8 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         }
         try {
             List<String> messages = messageService.list(scopedConversationId, userHeader).stream()
-                    .map(message -> StringUtils.defaultString(message.getContent()))
+                    .map(message -> Objects.nonNull(message.getContent()) ? message.getContent().getText() : null)
+                    .map(StringUtils::defaultString)
                     .filter(StringUtils::isNotBlank)
                     .toList();
             int start = Math.max(0, messages.size() - properties.getMemoryMaxMessages());

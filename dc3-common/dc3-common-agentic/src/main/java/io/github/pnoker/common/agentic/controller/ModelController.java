@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
+import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
 import io.github.pnoker.common.agentic.entity.request.ModelConfigRequest;
 import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
@@ -23,6 +25,10 @@ import io.github.pnoker.common.agentic.service.ModelConfigService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.valid.Add;
+import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,38 +50,47 @@ import java.util.List;
 @RequestMapping(AgenticConstant.MODEL_URL_PREFIX)
 public class ModelController implements BaseController {
 
+    private final ModelConfigBuilder modelConfigBuilder;
+
     private final ModelConfigService modelConfigService;
 
-    public ModelController(ModelConfigService modelConfigService) {
+    public ModelController(ModelConfigBuilder modelConfigBuilder, ModelConfigService modelConfigService) {
+        this.modelConfigBuilder = modelConfigBuilder;
         this.modelConfigService = modelConfigService;
     }
 
     @GetMapping("/list")
     public Mono<R<List<ModelVO>>> list() {
-        return Mono.just(R.ok(modelConfigService.listOptions()));
+        return async(() -> R.ok(modelConfigService.listOptions()));
     }
 
     @GetMapping("/config/list")
     public Mono<R<List<ModelConfigVO>>> listConfigs() {
-        return Mono.just(R.ok(modelConfigService.listConfigs()));
+        return async(() -> R.ok(modelConfigBuilder.buildVOListByBOList(modelConfigService.listConfigs())));
     }
 
     @PostMapping("/config/add")
-    public Mono<R<ModelConfigVO>> add(@RequestBody ModelConfigRequest request) {
-        return getUserHeader().flatMap(header -> async(() ->
-                R.ok(modelConfigService.save(request, header))));
+    public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigRequest request) {
+        return getUserHeader().flatMap(header -> async(() -> {
+            ModelConfigBO entityBO = modelConfigBuilder.buildBOByRequest(request);
+            return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.save(entityBO, header)));
+        }));
     }
 
     @PostMapping("/config/update")
-    public Mono<R<ModelConfigVO>> update(@RequestBody ModelConfigRequest request) {
-        return getUserHeader().flatMap(header -> async(() ->
-                R.ok(modelConfigService.update(request, header))));
+    public Mono<R<ModelConfigVO>> update(@Validated(Update.class) @RequestBody ModelConfigRequest request) {
+        return getUserHeader().flatMap(header -> async(() -> {
+            ModelConfigBO entityBO = modelConfigBuilder.buildBOByRequest(request);
+            return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.update(entityBO, header)));
+        }));
     }
 
     @PostMapping("/config/delete/{id}")
-    public Mono<R<Boolean>> delete(@PathVariable Long id) {
-        modelConfigService.remove(id);
-        return Mono.just(R.ok(true));
+    public Mono<R<Boolean>> delete(@NotNull @PathVariable(value = "id") Long id) {
+        return async(() -> {
+            modelConfigService.remove(id);
+            return R.ok(true);
+        });
     }
 
 }

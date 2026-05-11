@@ -23,8 +23,14 @@ import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import io.github.pnoker.common.agentic.dal.ModelConfigManager;
 import io.github.pnoker.common.agentic.dal.ModelProviderManager;
+import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
+import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
+import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
+import io.github.pnoker.common.agentic.entity.builder.ModelProviderBuilder;
 import io.github.pnoker.common.agentic.entity.model.ModelConfigDO;
-import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.chat.client.ChatClient;
@@ -33,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,24 +54,27 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class ChatClientFactory {
 
-    private static final byte ENABLED = 0;
-    private static final String PROVIDER_TYPE_ANTHROPIC = "anthropic";
-
     private final Map<Long, ChatClient> cache = new ConcurrentHashMap<>();
     private final ModelProviderManager modelProviderManager;
     private final ModelConfigManager modelConfigManager;
+    private final ModelProviderBuilder modelProviderBuilder;
+    private final ModelConfigBuilder modelConfigBuilder;
     private final ChatClient.Builder fallbackBuilder;
 
     public ChatClientFactory(ModelProviderManager modelProviderManager,
                              ModelConfigManager modelConfigManager,
+                             ModelProviderBuilder modelProviderBuilder,
+                             ModelConfigBuilder modelConfigBuilder,
                              ChatClient.Builder fallbackBuilder) {
         this.modelProviderManager = modelProviderManager;
         this.modelConfigManager = modelConfigManager;
+        this.modelProviderBuilder = modelProviderBuilder;
+        this.modelConfigBuilder = modelConfigBuilder;
         this.fallbackBuilder = fallbackBuilder;
     }
 
     public ChatClient getOrCreate(String model) {
-        ModelConfigDO config = resolveConfig(model);
+        ModelConfigBO config = resolveConfig(model);
         if (Objects.isNull(config)) {
             log.debug("Agentic model config not found, using fallback ChatClient, model={}", model);
             return fallbackBuilder.build();
@@ -79,23 +89,24 @@ public class ChatClientFactory {
         }
     }
 
-    private ModelConfigDO resolveConfig(String model) {
-        return modelConfigManager.getOne(Wrappers.<ModelConfigDO>query()
+    private ModelConfigBO resolveConfig(String model) {
+        ModelConfigDO entityDO = modelConfigManager.getOne(Wrappers.<ModelConfigDO>query()
                 .lambda()
                 .eq(ModelConfigDO::getModel, model)
-                .eq(ModelConfigDO::getEnableFlag, ENABLED)
-                .last("LIMIT 1"));
+                .eq(ModelConfigDO::getEnableFlag, EnableFlagEnum.ENABLE)
+                .last(QueryWrapperConstant.LIMIT_ONE));
+        return Objects.nonNull(entityDO) ? modelConfigBuilder.buildBOByDO(entityDO) : null;
     }
 
     private ChatClient getOrCreateByProvider(Long providerId) {
         return cache.computeIfAbsent(providerId, id -> {
-            ModelProviderDO provider = modelProviderManager.getById(id);
-            if (Objects.isNull(provider) || !Objects.equals(provider.getEnableFlag(), ENABLED)) {
+            ModelProviderBO provider = resolveProvider(id);
+            if (Objects.isNull(provider) || !isEnabled(provider.getEnableFlag())) {
                 log.warn("Agentic provider not found or disabled, providerId={}", id);
                 return fallbackBuilder.build();
             }
             ChatClient chatClient;
-            if (PROVIDER_TYPE_ANTHROPIC.equals(provider.getProviderType())) {
+            if (AgenticModelProviderTypeEnum.ANTHROPIC.equals(provider.getProviderType())) {
                 chatClient = buildAnthropicClient(provider);
             } else {
                 chatClient = buildOpenAiClient(provider);
@@ -106,7 +117,13 @@ public class ChatClientFactory {
         });
     }
 
-    private ChatClient buildOpenAiClient(ModelProviderDO provider) {
+    private ModelProviderBO resolveProvider(Long providerId) {
+        return Optional.ofNullable(modelProviderManager.getById(providerId))
+                .map(modelProviderBuilder::buildBOByDO)
+                .orElse(null);
+    }
+
+    private ChatClient buildOpenAiClient(ModelProviderBO provider) {
         OpenAIClient openAiClient = OpenAIOkHttpClient.builder()
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
@@ -117,7 +134,7 @@ public class ChatClientFactory {
         return ChatClient.builder(chatModel).build();
     }
 
-    private ChatClient buildAnthropicClient(ModelProviderDO provider) {
+    private ChatClient buildAnthropicClient(ModelProviderBO provider) {
         AnthropicClient anthropicClient = AnthropicOkHttpClient.builder()
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
@@ -126,6 +143,10 @@ public class ChatClientFactory {
                 .anthropicClient(anthropicClient)
                 .build();
         return ChatClient.builder(chatModel).build();
+    }
+
+    private boolean isEnabled(EnableFlagEnum enableFlag) {
+        return EnableFlagEnum.ENABLE.equals(enableFlag);
     }
 
 }

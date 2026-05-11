@@ -19,10 +19,12 @@ package io.github.pnoker.common.agentic.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.dal.MessageManager;
+import io.github.pnoker.common.agentic.entity.bo.MessageBO;
+import io.github.pnoker.common.agentic.entity.builder.MessageBuilder;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.MessageDO;
-import io.github.pnoker.common.agentic.entity.vo.MessageVO;
 import io.github.pnoker.common.agentic.service.MessageService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -42,35 +44,33 @@ public class MessageServiceImpl implements MessageService {
             "\n\nBackend context:");
 
     private final MessageManager messageManager;
+    private final MessageBuilder messageBuilder;
 
-    public MessageServiceImpl(MessageManager messageManager) {
+    public MessageServiceImpl(MessageManager messageManager, MessageBuilder messageBuilder) {
         this.messageManager = messageManager;
+        this.messageBuilder = messageBuilder;
     }
 
     @Override
-    public MessageVO save(String conversationId, String role, AgenticMessageContent content, String model,
+    public MessageBO save(String conversationId, String role, AgenticMessageContent content, String model,
                           RequestHeader.UserHeader header) {
-        MessageDO entity = new MessageDO();
-        entity.setConversationId(conversationId);
-        entity.setRole(role);
-        entity.setContent(Objects.nonNull(content) ? content : AgenticMessageContent.ofText(""));
-        entity.setModel(model);
-        entity.setMessageIndex(nextMessageIndex(conversationId, header));
-        entity.setStatus(STATUS_OK);
-        entity.setTenantId(header.getTenantId());
-        entity.setUserId(header.getUserId());
-        entity.setCreateTime(LocalDateTime.now());
-        entity.setOperateTime(entity.getCreateTime());
-        entity.setCreatorId(header.getUserId());
-        entity.setOperatorId(header.getUserId());
-        entity.setCreatorName(header.getUserName());
-        entity.setOperatorName(header.getUserName());
-        messageManager.save(entity);
-        return toVO(entity);
+        MessageBO entityBO = new MessageBO();
+        entityBO.setConversationId(conversationId);
+        entityBO.setRole(role);
+        entityBO.setContent(Objects.nonNull(content) ? content : AgenticMessageContent.ofText(""));
+        entityBO.setModel(model);
+        entityBO.setMessageIndex(nextMessageIndex(conversationId, header));
+        entityBO.setStatus(STATUS_OK);
+        entityBO.setTenantId(header.getTenantId());
+        entityBO.setUserId(header.getUserId());
+        fillCreateAudit(entityBO, header);
+        MessageDO entityDO = messageBuilder.buildDOByBO(entityBO);
+        messageManager.save(entityDO);
+        return messageBuilder.buildBOByDO(entityDO);
     }
 
     @Override
-    public List<MessageVO> list(String conversationId, RequestHeader.UserHeader header) {
+    public List<MessageBO> list(String conversationId, RequestHeader.UserHeader header) {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query()
                 .lambda()
                 .eq(MessageDO::getConversationId, conversationId)
@@ -78,7 +78,9 @@ public class MessageServiceImpl implements MessageService {
                 .eq(MessageDO::getUserId, header.getUserId())
                 .orderByAsc(MessageDO::getMessageIndex)
                 .orderByAsc(MessageDO::getCreateTime);
-        return messageManager.list(wrapper).stream().map(this::toVO).toList();
+        return messageBuilder.buildBOListByDOList(messageManager.list(wrapper)).stream()
+                .map(this::normalize)
+                .toList();
     }
 
     private long nextMessageIndex(String conversationId, RequestHeader.UserHeader header) {
@@ -88,28 +90,27 @@ public class MessageServiceImpl implements MessageService {
                 .eq(MessageDO::getTenantId, header.getTenantId())
                 .eq(MessageDO::getUserId, header.getUserId())
                 .orderByDesc(MessageDO::getMessageIndex)
-                .last("LIMIT 1");
+                .last(QueryWrapperConstant.LIMIT_ONE);
         MessageDO latest = messageManager.getOne(wrapper);
         return Objects.isNull(latest) || Objects.isNull(latest.getMessageIndex()) ? 1 : latest.getMessageIndex() + 1;
     }
 
-    private MessageVO toVO(MessageDO entity) {
-        AgenticMessageContent content = Objects.nonNull(entity.getContent()) ? entity.getContent()
+    private MessageBO normalize(MessageBO entityBO) {
+        AgenticMessageContent content = Objects.nonNull(entityBO.getContent()) ? entityBO.getContent()
                 : AgenticMessageContent.ofText("");
-        normalizeContentText(entity.getRole(), content);
-        MessageVO vo = new MessageVO();
-        vo.setId(entity.getId());
-        vo.setConversationId(entity.getConversationId());
-        vo.setRole(entity.getRole());
-        vo.setContent(StringUtils.defaultString(content.getText()));
-        vo.setContentExt(content);
-        vo.setModel(entity.getModel());
-        vo.setSkills(content.getSkills());
-        vo.setMessageIndex(entity.getMessageIndex());
-        vo.setStatus(entity.getStatus());
-        vo.setCreateTime(entity.getCreateTime());
-        vo.setOperateTime(entity.getOperateTime());
-        return vo;
+        normalizeContentText(entityBO.getRole(), content);
+        entityBO.setContent(content);
+        return entityBO;
+    }
+
+    private void fillCreateAudit(MessageBO entityBO, RequestHeader.UserHeader header) {
+        LocalDateTime now = LocalDateTime.now();
+        entityBO.setCreateTime(now);
+        entityBO.setOperateTime(now);
+        entityBO.setCreatorId(header.getUserId());
+        entityBO.setCreatorName(header.getUserName());
+        entityBO.setOperatorId(header.getUserId());
+        entityBO.setOperatorName(header.getUserName());
     }
 
     private void normalizeContentText(String role, AgenticMessageContent content) {

@@ -26,6 +26,7 @@ import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.SessionService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -114,7 +115,7 @@ public class SessionServiceImpl implements SessionService {
         LambdaQueryWrapper<SessionDO> wrapper = Wrappers.<SessionDO>query()
                 .lambda()
                 .eq(SessionDO::getConversationId, conversationId)
-                .last("LIMIT 1");
+                .last(QueryWrapperConstant.LIMIT_ONE);
         return sessionManager.getOne(wrapper);
     }
 

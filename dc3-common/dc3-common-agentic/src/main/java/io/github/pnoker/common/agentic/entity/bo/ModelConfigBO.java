@@ -14,43 +14,53 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.vo;
+package io.github.pnoker.common.agentic.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseVO;
-import io.github.pnoker.common.enums.AgenticActionStatusEnum;
+import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.enums.DefaultFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-
 /**
- * Agentic action confirmation response.
+ * Agentic model configuration BO.
  *
  * @author pnoker
- * @version 2026.5.10
- * @since 2026.5.10
+ * @version 2026.5.11
+ * @since 2026.5.11
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString(callSuper = true)
-public class ActionVO extends BaseVO {
+public class ModelConfigBO extends BaseBO {
 
-    private String actionId;
+    private String model;
 
-    private String conversationId;
+    private String label;
 
-    private String actionType;
+    private Long providerId;
 
-    private String title;
+    private String providerName;
 
-    private String description;
+    private Boolean stream;
 
-    private Map<String, Object> payload;
+    private Boolean toolCall;
 
-    private AgenticActionStatusEnum status;
+    private Boolean vision;
 
-    private LocalDateTime expireTime;
+    private Boolean reasoning;
+
+    private Double temperature;
+
+    private Integer maxTokens;
+
+    private DefaultFlagEnum defaultFlag;
+
+    private EnableFlagEnum enableFlag;
 
 }

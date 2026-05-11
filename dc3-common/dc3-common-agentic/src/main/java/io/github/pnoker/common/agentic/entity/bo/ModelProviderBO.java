@@ -14,43 +14,43 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.vo;
+package io.github.pnoker.common.agentic.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseVO;
-import io.github.pnoker.common.enums.AgenticActionStatusEnum;
+import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import io.github.pnoker.common.enums.DefaultFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-
 /**
- * Agentic action confirmation response.
+ * Agentic model provider BO.
  *
  * @author pnoker
- * @version 2026.5.10
- * @since 2026.5.10
+ * @version 2026.5.11
+ * @since 2026.5.11
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString(callSuper = true)
-public class ActionVO extends BaseVO {
+public class ModelProviderBO extends BaseBO {
 
-    private String actionId;
+    private String name;
 
-    private String conversationId;
+    private AgenticModelProviderTypeEnum providerType;
 
-    private String actionType;
+    private String baseUrl;
 
-    private String title;
+    @ToString.Exclude
+    private String apiKey;
 
-    private String description;
+    private DefaultFlagEnum defaultFlag;
 
-    private Map<String, Object> payload;
-
-    private AgenticActionStatusEnum status;
-
-    private LocalDateTime expireTime;
+    private EnableFlagEnum enableFlag;
 
 }
