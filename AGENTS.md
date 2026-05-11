@@ -193,6 +193,35 @@ generator so rerunning `make changelog` after committing `CHANGE.md` remains sta
 
 ## Commit Rules
 
+### AI Commit Confirmation
+
+AI coding agents must not create commits without explicit user confirmation.
+
+Before each commit, show:
+
+- the proposed commit message;
+- the files included in that commit;
+- the reason this group of files belongs together;
+- the verification already run for the change.
+
+Wait for the user to approve that specific commit before running `git commit`.
+
+Do not batch unrelated changes into one commit. Split commits by intent, for example:
+
+- feature or behavior changes;
+- bug fixes;
+- configuration changes;
+- documentation changes;
+- generated release notes.
+
+`dc3/doc/CHANGE.md` must be committed separately with exactly:
+
+```text
+docs(release): update generated changelog
+```
+
+If the user asks to commit multiple changes, first present the proposed commit sequence and wait for approval.
+
 Use Conventional Commit subjects:
 
 ```text
