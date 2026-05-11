@@ -55,13 +55,15 @@ export POINT_BATCH_INTERVAL=5
 export MQTT_BATCH_SPEED=100
 export MQTT_BATCH_INTERVAL=5
 
-# Spring AI
-export OPENAI_BASE_URL=https://api.openai.com
-export OPENAI_API_KEY=
-export OPENAI_MODEL=deepseek-v4-pro
-export OPENAI_TEMPERATURE=0.7
-export OPENAI_MAX_TOKENS=2048
+# Agentic fallback OpenAI-compatible provider. Normal providers are stored in dc3_model_provider.
+export AGENTIC_FALLBACK_OPENAI_BASE_URL=https://api.openai.com
+export AGENTIC_FALLBACK_OPENAI_API_KEY=
+export AGENTIC_FALLBACK_OPENAI_MODEL=gpt-4o
+export AGENTIC_FALLBACK_OPENAI_TEMPERATURE=0.7
+export AGENTIC_FALLBACK_OPENAI_MAX_TOKENS=2048
 export AGENTIC_MEMORY_SCHEMA_INIT=never
+export AGENTIC_MEMORY_ENABLED=false
+export AGENTIC_TOOL_CALLING_ENABLED=false
 export AGENTIC_MEMORY_MAX_MESSAGES=50
 export AGENTIC_ATTACHMENT_STORAGE_PATH=dc3/data/agentic/attachments
 
