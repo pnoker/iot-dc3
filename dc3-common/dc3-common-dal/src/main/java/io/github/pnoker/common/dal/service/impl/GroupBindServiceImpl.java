@@ -115,7 +115,7 @@ public class GroupBindServiceImpl implements GroupBindService {
     private LambdaQueryWrapper<GroupBindDO> fuzzyQuery(GroupBindQuery entityQuery) {
         LambdaQueryWrapper<GroupBindDO> wrapper = Wrappers.<GroupBindDO>query().lambda();
         wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), GroupBindDO::getEntityTypeFlag,
-                entityQuery.getEntityTypeFlag());
+                Objects.isNull(entityQuery.getEntityTypeFlag()) ? null : entityQuery.getEntityTypeFlag().getIndex());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getGroupId()), GroupBindDO::getGroupId,
                 entityQuery.getGroupId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), GroupBindDO::getEntityId,
@@ -134,7 +134,8 @@ public class GroupBindServiceImpl implements GroupBindService {
      */
     private boolean checkDuplicate(GroupBindBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<GroupBindDO> wrapper = Wrappers.<GroupBindDO>query().lambda();
-        wrapper.eq(GroupBindDO::getEntityTypeFlag, entityBO.getEntityTypeFlag());
+        wrapper.eq(GroupBindDO::getEntityTypeFlag,
+                Objects.isNull(entityBO.getEntityTypeFlag()) ? null : entityBO.getEntityTypeFlag().getIndex());
         wrapper.eq(GroupBindDO::getEntityId, entityBO.getEntityId());
         wrapper.eq(GroupBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);

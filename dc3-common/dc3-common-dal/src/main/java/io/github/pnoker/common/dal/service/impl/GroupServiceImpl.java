@@ -150,8 +150,9 @@ public class GroupServiceImpl implements GroupService {
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getParentGroupId()), GroupDO::getParentGroupId,
                 entityQuery.getParentGroupId());
         wrapper.eq(Objects.nonNull(entityQuery.getGroupTypeFlag()), GroupDO::getGroupTypeFlag,
-                entityQuery.getGroupTypeFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), GroupDO::getEnableFlag, entityQuery.getEnableFlag());
+                Objects.isNull(entityQuery.getGroupTypeFlag()) ? null : entityQuery.getGroupTypeFlag().getIndex());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), GroupDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), GroupDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -167,7 +168,8 @@ public class GroupServiceImpl implements GroupService {
     private boolean checkDuplicate(GroupBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
         wrapper.eq(GroupDO::getGroupName, entityBO.getGroupName());
-        wrapper.eq(GroupDO::getGroupTypeFlag, entityBO.getGroupTypeFlag());
+        wrapper.eq(GroupDO::getGroupTypeFlag,
+                Objects.isNull(entityBO.getGroupTypeFlag()) ? null : entityBO.getGroupTypeFlag().getIndex());
         wrapper.eq(GroupDO::getParentGroupId, entityBO.getParentGroupId());
         wrapper.eq(GroupDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
@@ -198,7 +200,7 @@ public class GroupServiceImpl implements GroupService {
     private void validateParent(GroupBO entityBO) {
         Long parentGroupId = entityBO.getParentGroupId();
         if (!FieldUtil.isValidIdField(parentGroupId)) {
-            entityBO.setParentGroupId(null);
+            entityBO.setParentGroupId(0L);
             entityBO.setGroupLevel((byte) 0);
             return;
         }

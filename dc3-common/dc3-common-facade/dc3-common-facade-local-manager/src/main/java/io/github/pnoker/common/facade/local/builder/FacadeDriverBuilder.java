@@ -23,6 +23,7 @@ import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * FacadeDriver ↔ manager DriverBO/Query mapper. Field sets are aligned.

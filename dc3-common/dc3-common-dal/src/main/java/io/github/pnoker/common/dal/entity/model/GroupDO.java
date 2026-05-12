@@ -63,7 +63,7 @@ public class GroupDO implements Serializable {
     /**
      * Group type flag.
      */
-    @TableField("group_type_flag")
+    @TableField("entity_type_flag")
     private Byte groupTypeFlag;
 
     /**
