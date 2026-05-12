@@ -155,18 +155,18 @@ want Compose-only variables to appear in the local Java process environment.
 
 ### Agentic and OpenAI-Compatible API
 
-| Variable                              | Scope   | Meaning                                                                                                                     |
-|---------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------|
-| `AGENTIC_FALLBACK_OPENAI_BASE_URL`    | Runtime | Fallback OpenAI-compatible API base URL used only when no database model/provider matches.                                  |
-| `AGENTIC_FALLBACK_OPENAI_API_KEY`     | Runtime | Fallback API key. Normal Agentic provider credentials are stored in `dc3_model_provider`.                                   |
-| `AGENTIC_FALLBACK_OPENAI_MODEL`       | Runtime | Fallback chat model name exposed only when no enabled `dc3_model_config` exists.                                            |
-| `AGENTIC_FALLBACK_OPENAI_TEMPERATURE` | Runtime | Fallback sampling temperature for chat completions.                                                                          |
-| `AGENTIC_FALLBACK_OPENAI_MAX_TOKENS`  | Runtime | Fallback maximum output token budget for one model response.                                                                |
-| `AGENTIC_MEMORY_SCHEMA_INIT`          | Runtime | Spring AI JDBC memory schema initialization mode. Keep `never`; DC3 pre-creates `dc3_chat_memory`.                          |
-| `AGENTIC_MEMORY_ENABLED`              | Runtime | Whether Agentic Center should include persisted conversation memory when preparing chat requests.                            |
-| `AGENTIC_TOOL_CALLING_ENABLED`        | Runtime | Whether Agentic Center should expose provider-native tool calling when the implementation path supports it.                  |
-| `AGENTIC_MEMORY_MAX_MESSAGES`         | Runtime | Maximum chat messages retained per conversation window.                                                                     |
-| `AGENTIC_ATTACHMENT_STORAGE_PATH`     | Runtime | Directory used by Agentic Center to store uploaded attachment files.                                                        |
+| Variable                              | Scope   | Meaning                                                                                                     |
+|---------------------------------------|---------|-------------------------------------------------------------------------------------------------------------|
+| `AGENTIC_FALLBACK_OPENAI_BASE_URL`    | Runtime | Fallback OpenAI-compatible API base URL used only when no database model/provider matches.                  |
+| `AGENTIC_FALLBACK_OPENAI_API_KEY`     | Runtime | Fallback API key. Normal Agentic provider credentials are stored in `dc3_model_provider`.                   |
+| `AGENTIC_FALLBACK_OPENAI_MODEL`       | Runtime | Fallback chat model name exposed only when no enabled `dc3_model_config` exists.                            |
+| `AGENTIC_FALLBACK_OPENAI_TEMPERATURE` | Runtime | Fallback sampling temperature for chat completions.                                                         |
+| `AGENTIC_FALLBACK_OPENAI_MAX_TOKENS`  | Runtime | Fallback maximum output token budget for one model response.                                                |
+| `AGENTIC_MEMORY_SCHEMA_INIT`          | Runtime | Spring AI JDBC memory schema initialization mode. Keep `never`; DC3 pre-creates `dc3_chat_memory`.          |
+| `AGENTIC_MEMORY_ENABLED`              | Runtime | Whether Agentic Center should include persisted conversation memory when preparing chat requests.           |
+| `AGENTIC_TOOL_CALLING_ENABLED`        | Runtime | Whether Agentic Center should expose provider-native tool calling when the implementation path supports it. |
+| `AGENTIC_MEMORY_MAX_MESSAGES`         | Runtime | Maximum chat messages retained per conversation window.                                                     |
+| `AGENTIC_ATTACHMENT_STORAGE_PATH`     | Runtime | Directory used by Agentic Center to store uploaded attachment files.                                        |
 
 ### MQTT and Point Processing
 
