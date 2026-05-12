@@ -16,11 +16,13 @@
  */
 package io.github.pnoker.common.agentic.config;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -78,6 +80,12 @@ public class ChatClientConfig {
                 .chatMemoryRepository(chatMemoryRepository)
                 .maxMessages(properties.getMemoryMaxMessages())
                 .build();
+    }
+
+    @Bean
+    @Primary
+    public ChatClient.Builder agenticChatClientBuilder(@Qualifier("openAiChatModel") ChatModel chatModel) {
+        return ChatClient.builder(chatModel);
     }
 
     private static class Dc3ChatMemoryRepositoryDialect implements JdbcChatMemoryRepositoryDialect {

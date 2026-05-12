@@ -49,22 +49,13 @@ public interface ModelConfigBuilder {
     List<ModelConfigBO> buildBOListByVOList(List<ModelConfigVO> entityVOList);
 
     @Mapping(target = "providerName", ignore = true)
-    @Mapping(target = "defaultFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     ModelConfigBO buildBOByRequest(ModelConfigRequest entityRequest);
-
-    @AfterMapping
-    default void afterProcess(ModelConfigRequest entityRequest, @MappingTarget ModelConfigBO entityBO) {
-        if (Objects.isNull(entityRequest)) {
-            return;
-        }
-        Optional.ofNullable(entityRequest.getDefaultFlag())
-                .map(DefaultFlagEnum::ofIndex)
-                .ifPresent(entityBO::setDefaultFlag);
-        Optional.ofNullable(entityRequest.getEnableFlag())
-                .map(EnableFlagEnum::ofIndex)
-                .ifPresent(entityBO::setEnableFlag);
-    }
 
     @Mapping(target = "defaultFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
