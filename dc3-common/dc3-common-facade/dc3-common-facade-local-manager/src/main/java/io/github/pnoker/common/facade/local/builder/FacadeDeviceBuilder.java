@@ -23,6 +23,7 @@ import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Converts between the facade-api shapes and {@code dc3-common-manager} internals. Field

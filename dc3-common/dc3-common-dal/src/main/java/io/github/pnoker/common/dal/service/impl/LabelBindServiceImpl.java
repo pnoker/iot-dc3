@@ -115,7 +115,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
         wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), LabelBindDO::getEntityTypeFlag,
-                entityQuery.getEntityTypeFlag());
+                Objects.isNull(entityQuery.getEntityTypeFlag()) ? null : entityQuery.getEntityTypeFlag().getIndex());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getLabelId()), LabelBindDO::getLabelId,
                 entityQuery.getLabelId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), LabelBindDO::getEntityId,
@@ -134,7 +134,8 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private boolean checkDuplicate(LabelBindBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
-        wrapper.eq(LabelBindDO::getEntityTypeFlag, entityBO.getEntityTypeFlag());
+        wrapper.eq(LabelBindDO::getEntityTypeFlag,
+                Objects.isNull(entityBO.getEntityTypeFlag()) ? null : entityBO.getEntityTypeFlag().getIndex());
         wrapper.eq(LabelBindDO::getLabelId, entityBO.getLabelId());
         wrapper.eq(LabelBindDO::getEntityId, entityBO.getEntityId());
         wrapper.eq(LabelBindDO::getTenantId, entityBO.getTenantId());
