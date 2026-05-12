@@ -54,6 +54,7 @@ public interface GrpcDeviceBuilder {
      */
     @Mapping(target = "page", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "labelId", ignore = true)
     DeviceQuery buildQueryByGrpcQuery(GrpcPageDeviceQuery entityQuery);
 
     @AfterMapping
@@ -77,6 +78,8 @@ public interface GrpcDeviceBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "profileId", ignore = true)
+    @Mapping(target = "groupId", ignore = true)
+    @Mapping(target = "labelId", ignore = true)
     DeviceQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityQuery);
 
     @AfterMapping

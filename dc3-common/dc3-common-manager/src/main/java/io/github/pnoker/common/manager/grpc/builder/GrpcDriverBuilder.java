@@ -57,6 +57,8 @@ public interface GrpcDriverBuilder {
     @Mapping(target = "page", ignore = true)
     @Mapping(target = "driverTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "groupId", ignore = true)
+    @Mapping(target = "labelId", ignore = true)
     DriverQuery buildQueryByGrpcQuery(GrpcPageDriverQuery entityQuery);
 
     @AfterMapping

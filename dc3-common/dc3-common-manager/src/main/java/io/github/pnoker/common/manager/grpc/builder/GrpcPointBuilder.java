@@ -57,6 +57,7 @@ public interface GrpcPointBuilder {
     @Mapping(target = "pointTypeFlag", ignore = true)
     @Mapping(target = "rwFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "labelId", ignore = true)
     PointQuery buildQueryByGrpcQuery(GrpcPagePointQuery entityQuery);
 
     @AfterMapping
@@ -78,6 +79,8 @@ public interface GrpcPointBuilder {
     @Mapping(target = "pointTypeFlag", ignore = true)
     @Mapping(target = "rwFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "groupId", ignore = true)
+    @Mapping(target = "labelId", ignore = true)
     PointQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPagePointQuery entityQuery);
 
     @AfterMapping

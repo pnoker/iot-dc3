@@ -34,6 +34,8 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadePointBuilder {
 
+    @Mapping(target = "groupId", ignore = true)
+    @Mapping(target = "labelId", ignore = true)
     PointQuery toManagerQuery(FacadePointQuery facadeQuery);
 
     FacadePointBO toFacadeBO(PointBO managerBO);
