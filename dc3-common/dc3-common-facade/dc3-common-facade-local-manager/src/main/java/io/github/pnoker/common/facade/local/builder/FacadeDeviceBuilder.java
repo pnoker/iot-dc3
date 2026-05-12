@@ -35,6 +35,8 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeDeviceBuilder {
 
+    @Mapping(target = "groupId", ignore = true)
+    @Mapping(target = "labelId", ignore = true)
     DeviceQuery toManagerQuery(FacadeDeviceQuery facadeQuery);
 
     FacadeDeviceBO toFacadeBO(DeviceBO managerBO);

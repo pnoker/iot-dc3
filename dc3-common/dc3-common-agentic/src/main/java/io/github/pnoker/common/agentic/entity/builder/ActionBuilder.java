@@ -41,6 +41,8 @@ import java.util.Optional;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface ActionBuilder {
 
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     ActionBO buildBOByVO(ActionVO entityVO);
 
     List<ActionBO> buildBOListByVOList(List<ActionVO> entityVOList);
