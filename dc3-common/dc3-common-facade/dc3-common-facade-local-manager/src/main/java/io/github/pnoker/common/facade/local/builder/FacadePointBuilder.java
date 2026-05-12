@@ -23,6 +23,7 @@ import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * FacadePoint ↔ manager PointBO/Query mapper.

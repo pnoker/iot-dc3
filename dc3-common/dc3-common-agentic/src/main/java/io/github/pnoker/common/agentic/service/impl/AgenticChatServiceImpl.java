@@ -453,9 +453,6 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         if (Objects.nonNull(maxTokens)) {
             options.maxTokens(maxTokens);
         }
-        if (!reasoning) {
-            options.extraBody(Map.of("enable_thinking", false));
-        }
         return promptSpec.options(options);
     }
 
