@@ -30,8 +30,10 @@ import io.github.pnoker.common.agentic.entity.builder.ModelProviderBuilder;
 import io.github.pnoker.common.agentic.entity.model.ModelConfigDO;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -73,8 +75,25 @@ public class ChatClientFactory {
         this.fallbackBuilder = fallbackBuilder;
     }
 
+    public String resolveModel(String requestedModel) {
+        if (StringUtils.isNotBlank(requestedModel)) {
+            return requestedModel.trim();
+        }
+        ModelConfigBO defaultConfig = resolveDefaultConfig();
+        if (Objects.nonNull(defaultConfig) && StringUtils.isNotBlank(defaultConfig.getModel())) {
+            return defaultConfig.getModel();
+        }
+        return null;
+    }
+
     public ChatClient getOrCreate(String model) {
-        ModelConfigBO config = resolveConfig(model);
+        ModelConfigBO config = null;
+        if (StringUtils.isNotBlank(model)) {
+            config = resolveConfig(model);
+        }
+        if (Objects.isNull(config)) {
+            config = resolveDefaultConfig();
+        }
         if (Objects.isNull(config)) {
             log.debug("Agentic model config not found, using fallback ChatClient, model={}", model);
             return fallbackBuilder.build();
@@ -93,6 +112,15 @@ public class ChatClientFactory {
         ModelConfigDO entityDO = modelConfigManager.getOne(Wrappers.<ModelConfigDO>query()
                 .lambda()
                 .eq(ModelConfigDO::getModel, model)
+                .eq(ModelConfigDO::getEnableFlag, EnableFlagEnum.ENABLE)
+                .last(QueryWrapperConstant.LIMIT_ONE));
+        return Objects.nonNull(entityDO) ? modelConfigBuilder.buildBOByDO(entityDO) : null;
+    }
+
+    private ModelConfigBO resolveDefaultConfig() {
+        ModelConfigDO entityDO = modelConfigManager.getOne(Wrappers.<ModelConfigDO>query()
+                .lambda()
+                .eq(ModelConfigDO::getDefaultFlag, DefaultFlagEnum.DEFAULT)
                 .eq(ModelConfigDO::getEnableFlag, EnableFlagEnum.ENABLE)
                 .last(QueryWrapperConstant.LIMIT_ONE));
         return Objects.nonNull(entityDO) ? modelConfigBuilder.buildBOByDO(entityDO) : null;

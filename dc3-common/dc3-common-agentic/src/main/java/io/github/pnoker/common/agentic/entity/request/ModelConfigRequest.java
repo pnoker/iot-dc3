@@ -16,11 +16,12 @@
  */
 package io.github.pnoker.common.agentic.entity.request;
 
+import io.github.pnoker.common.enums.DefaultFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -66,13 +67,9 @@ public class ModelConfigRequest {
     @Min(value = 1, message = "Max tokens must be greater than 0", groups = {Add.class, Update.class})
     private Integer maxTokens;
 
-    @Min(value = 0, message = "Default flag must be 0 or 1", groups = {Add.class, Update.class})
-    @Max(value = 1, message = "Default flag must be 0 or 1", groups = {Add.class, Update.class})
-    private Byte defaultFlag;
+    private DefaultFlagEnum defaultFlag;
 
-    @Min(value = 0, message = "Enable flag must be 0 or 1", groups = {Add.class, Update.class})
-    @Max(value = 1, message = "Enable flag must be 0 or 1", groups = {Add.class, Update.class})
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
     private String remark;
 

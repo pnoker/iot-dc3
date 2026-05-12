@@ -51,9 +51,13 @@ public interface ModelProviderBuilder {
 
     List<ModelProviderBO> buildBOListByVOList(List<ModelProviderVO> entityVOList);
 
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "defaultFlag", ignore = true)
     @Mapping(target = "providerType", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     ModelProviderBO buildBOByRequest(ModelProviderRequest entityRequest);
 
     @AfterMapping
@@ -61,12 +65,6 @@ public interface ModelProviderBuilder {
         if (Objects.isNull(entityRequest)) {
             return;
         }
-        Optional.ofNullable(entityRequest.getDefaultFlag())
-                .map(DefaultFlagEnum::ofIndex)
-                .ifPresent(entityBO::setDefaultFlag);
-        Optional.ofNullable(entityRequest.getEnableFlag())
-                .map(EnableFlagEnum::ofIndex)
-                .ifPresent(entityBO::setEnableFlag);
         entityBO.setProviderType(providerType(entityRequest.getProviderType()));
     }
 

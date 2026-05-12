@@ -82,8 +82,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Service
 public class AgenticChatServiceImpl implements AgenticChatService {
 
-    private static final String DEFAULT_MODEL = "dc3-agentic";
-
     private final ChatClientFactory chatClientFactory;
 
     private final SkillRegistry skillRegistry;
@@ -200,7 +198,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         String effectiveSkillName = Objects.isNull(skill) ? null : skill.getName();
         List<String> toolNames = Objects.isNull(skill) ? List.of() : skillRegistry.getEnabledToolNames(skill.getName());
         String skillSystemPrompt = Objects.isNull(skill) ? null : buildSkillSystemPrompt(skill);
-        String model = StringUtils.defaultIfBlank(request.getModel(), DEFAULT_MODEL);
+        String model = chatClientFactory.resolveModel(request.getModel());
         Queue<AgenticRequestContext.ToolEvent> toolEvents = new ConcurrentLinkedQueue<>();
         Map<String, Object> toolContext = new HashMap<>();
         toolContext.put(AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId());
