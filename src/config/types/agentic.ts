@@ -35,8 +35,8 @@ export interface AgenticProvider {
   name: string;
   providerType: string;
   baseUrl: string;
-  defaultFlag?: number;
-  enableFlag?: number;
+  defaultFlag?: string;
+  enableFlag?: string;
   remark?: string;
 }
 
@@ -44,8 +44,8 @@ export interface AgenticModelConfig extends AgenticModel {
   id?: string;
   providerId?: string;
   providerName?: string;
-  defaultFlag?: number;
-  enableFlag?: number;
+  defaultFlag?: string;
+  enableFlag?: string;
   remark?: string;
   createTime?: string;
   operateTime?: string;

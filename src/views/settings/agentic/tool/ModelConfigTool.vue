@@ -39,8 +39,8 @@
           v-model="formData.enableFlag"
           :options="[
             { label: $t('common.all'), value: '' },
-            { label: $t('common.enable'), value: 0 },
-            { label: $t('common.disable'), value: 1 },
+            { label: $t('common.enable'), value: 'ENABLE' },
+            { label: $t('common.disable'), value: 'DISABLE' },
           ]"
         />
       </el-form-item>

@@ -45,15 +45,15 @@
         </el-table-column>
         <el-table-column label="Default" width="100">
           <template #default="{ row }">
-            <el-tag :type="Number(row.defaultFlag) === 1 ? 'success' : 'info'" size="small">
-              {{ Number(row.defaultFlag) === 1 ? $t('common.yes') : $t('common.no') }}
+            <el-tag :type="row.defaultFlag === 'DEFAULT' ? 'success' : 'info'" size="small">
+              {{ row.defaultFlag === 'DEFAULT' ? $t('common.yes') : $t('common.no') }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.enable')" width="100">
           <template #default="{ row }">
-            <el-tag :type="Number(row.enableFlag) === 0 ? 'success' : 'info'" size="small">
-              {{ Number(row.enableFlag) === 0 ? $t('common.enable') : $t('common.disable') }}
+            <el-tag :type="row.enableFlag === 'ENABLE' ? 'success' : 'info'" size="small">
+              {{ row.enableFlag === 'ENABLE' ? $t('common.enable') : $t('common.disable') }}
             </el-tag>
           </template>
         </el-table-column>
@@ -143,8 +143,8 @@
     if (q.providerId) {
       filtered = filtered.filter((r) => String(r.providerId) === String(q.providerId));
     }
-    if (q.enableFlag !== '' && q.enableFlag !== undefined) {
-      filtered = filtered.filter((r) => Number(r.enableFlag) === Number(q.enableFlag));
+    if (q.enableFlag) {
+      filtered = filtered.filter((r) => r.enableFlag === q.enableFlag);
     }
     reactiveData.page.total = filtered.length;
     const start = (reactiveData.page.current - 1) * reactiveData.page.size;

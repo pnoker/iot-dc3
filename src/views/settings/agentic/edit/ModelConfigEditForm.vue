@@ -55,8 +55,8 @@
       <el-form-item label="Default">
         <el-switch
           v-model="form.defaultFlag"
-          :active-value="1"
-          :inactive-value="0"
+          active-value="DEFAULT"
+          inactive-value="NOT_DEFAULT"
           active-text="Yes"
           inactive-text="No"
         />
@@ -64,8 +64,8 @@
       <el-form-item :label="$t('common.enable')">
         <el-switch
           v-model="form.enableFlag"
-          :active-value="0"
-          :inactive-value="1"
+          active-value="ENABLE"
+          inactive-value="DISABLE"
           :active-text="$t('common.enable')"
           :inactive-text="$t('common.disable')"
         />
@@ -112,8 +112,8 @@
     reasoning: false,
     temperature: 0.7,
     maxTokens: 2048,
-    defaultFlag: 0,
-    enableFlag: 0,
+    defaultFlag: 'NOT_DEFAULT',
+    enableFlag: 'ENABLE',
     remark: '',
   });
 

@@ -39,8 +39,8 @@
           v-model="formData.enableFlag"
           :options="[
             { label: $t('common.all'), value: '' },
-            { label: $t('common.enable'), value: 0 },
-            { label: $t('common.disable'), value: 1 },
+            { label: $t('common.enable'), value: 'ENABLE' },
+            { label: $t('common.disable'), value: 'DISABLE' },
           ]"
         />
       </el-form-item>
@@ -60,8 +60,8 @@
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   const providerTypes = [
-    { label: 'OpenAI Compatible', value: 'openai-compatible' },
-    { label: 'Anthropic', value: 'anthropic' },
+    { label: 'OpenAI Compatible', value: 'OPENAI_COMPATIBLE' },
+    { label: 'Anthropic', value: 'ANTHROPIC' },
   ];
 
   defineProps<{
