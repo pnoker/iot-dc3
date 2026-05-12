@@ -45,6 +45,8 @@ import java.util.Optional;
 public interface MessageBuilder {
 
     @Mapping(target = "content", source = "contentExt")
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     MessageBO buildBOByVO(MessageVO entityVO);
 
     List<MessageBO> buildBOListByVOList(List<MessageVO> entityVOList);

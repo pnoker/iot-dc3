@@ -37,6 +37,8 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface AttachmentBuilder {
 
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     AttachmentBO buildBOByVO(AttachmentVO entityVO);
 
     List<AttachmentBO> buildBOListByVOList(List<AttachmentVO> entityVOList);
