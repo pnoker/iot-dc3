@@ -79,14 +79,27 @@
 
   // Static fallback shown when the menu API is unreachable or still loading.
   // `icon` holds the globally-registered element-plus icon component name.
+  const modelGroup = (children?: SidebarItem[]): SidebarItem => ({
+    name: 'settingsModel',
+    title: t('nav.settingsModel'),
+    icon: 'Cpu',
+    children: children?.length
+      ? children
+      : [
+          { name: 'settingsAgentic', title: t('nav.settingsAgentic'), icon: 'ChatDotRound' },
+          { name: 'settingsAgenticProvider', title: t('nav.settingsAgenticProvider'), icon: 'ChatLineSquare' },
+        ],
+  });
+
   const fallback: SidebarItem[] = [
     { name: 'settingsUser', title: t('nav.settingsUser'), icon: 'User' },
     { name: 'settingsRole', title: t('nav.settingsRole'), icon: 'UserFilled' },
     { name: 'settingsResource', title: t('nav.settingsResource'), icon: 'Key' },
     { name: 'settingsApi', title: t('nav.settingsApi'), icon: 'Link' },
     { name: 'settingsMenu', title: t('nav.settingsMenu'), icon: 'Menu' },
-    { name: 'settingsAgentic', title: t('nav.settingsAgentic'), icon: 'ChatDotRound' },
-    { name: 'settingsAgenticProvider', title: t('nav.settingsAgenticProvider'), icon: 'ChatLineSquare' },
+    { name: 'settingsGroup', title: t('nav.settingsGroup'), icon: 'Grid' },
+    { name: 'settingsLabel', title: t('nav.settingsLabel'), icon: 'CollectionTag' },
+    modelGroup(),
     {
       name: 'settingsEvent',
       title: t('nav.settingsEvent'),
@@ -119,17 +132,74 @@
       .slice()
       .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
       .map(mapMenuNode);
-    if (!hasItem(items, 'settingsAgentic')) {
-      items.push({ name: 'settingsAgentic', title: t('nav.settingsAgentic'), icon: 'ChatDotRound' });
-    }
-    if (!hasItem(items, 'settingsAgenticProvider')) {
-      items.push({ name: 'settingsAgenticProvider', title: t('nav.settingsAgenticProvider'), icon: 'ChatLineSquare' });
-    }
+    ensureDirectItem(items, { name: 'settingsGroup', title: t('nav.settingsGroup'), icon: 'Grid' }, [
+      'settingsLabel',
+      'settingsModel',
+      'settingsEvent',
+      'settingsAbout',
+    ]);
+    ensureDirectItem(items, { name: 'settingsLabel', title: t('nav.settingsLabel'), icon: 'CollectionTag' }, [
+      'settingsModel',
+      'settingsEvent',
+      'settingsAbout',
+    ]);
+    ensureModelGroup(items);
     return items;
   });
 
   const hasItem = (items: SidebarItem[], name: string): boolean => {
     return items.some((item) => item.name === name || hasItem(item.children || [], name));
+  };
+
+  const insertBefore = (items: SidebarItem[], item: SidebarItem, beforeNames: string[]) => {
+    const index = items.findIndex((candidate) => beforeNames.includes(candidate.name));
+    if (index >= 0) {
+      items.splice(index, 0, item);
+    } else {
+      items.push(item);
+    }
+  };
+
+  const ensureDirectItem = (items: SidebarItem[], item: SidebarItem, beforeNames: string[]) => {
+    if (hasItem(items, item.name)) return;
+    insertBefore(items, item, beforeNames);
+  };
+
+  const ensureModelGroup = (items: SidebarItem[]) => {
+    const extracted: SidebarItem[] = [];
+    for (const name of ['settingsAgentic', 'settingsAgenticProvider']) {
+      const index = items.findIndex((item) => item.name === name);
+      if (index >= 0) {
+        const removed = items.splice(index, 1)[0];
+        if (removed) extracted.push(removed);
+      }
+    }
+
+    const model = items.find((item) => item.name === 'settingsModel');
+    if (model) {
+      model.children = model.children || [];
+      if (!hasItem(model.children, 'settingsAgentic')) {
+        model.children.push(
+          extracted.find((item) => item.name === 'settingsAgentic') || {
+            name: 'settingsAgentic',
+            title: t('nav.settingsAgentic'),
+            icon: 'ChatDotRound',
+          }
+        );
+      }
+      if (!hasItem(model.children, 'settingsAgenticProvider')) {
+        model.children.push(
+          extracted.find((item) => item.name === 'settingsAgenticProvider') || {
+            name: 'settingsAgenticProvider',
+            title: t('nav.settingsAgenticProvider'),
+            icon: 'ChatLineSquare',
+          }
+        );
+      }
+      return;
+    }
+
+    insertBefore(items, modelGroup(extracted), ['settingsEvent', 'settingsAbout']);
   };
 
   const activeMenu = computed(() => String(route.name || 'settingsUser'));

@@ -107,3 +107,42 @@ export interface PointInfoForm {
   configValue?: string;
   [key: string]: unknown;
 }
+
+// ─── Group / Label ──────────────────────────────────────────────────
+
+export interface GroupForm {
+  id?: string;
+  parentGroupId?: number | string | null;
+  groupTypeFlag?: string;
+  groupName?: string;
+  groupCode?: string;
+  groupLevel?: number;
+  groupIndex?: number;
+  enableFlag?: string;
+  remark?: string;
+  [key: string]: unknown;
+}
+
+export interface GroupRecord extends GroupForm {
+  id: string;
+  createTime?: string;
+  operateTime?: string;
+  children?: GroupRecord[];
+}
+
+export interface LabelForm {
+  id?: string;
+  labelName?: string;
+  labelCode?: string;
+  labelColor?: string;
+  entityTypeFlag?: string;
+  enableFlag?: string;
+  remark?: string;
+  [key: string]: unknown;
+}
+
+export interface LabelRecord extends LabelForm {
+  id: string;
+  createTime?: string;
+  operateTime?: string;
+}

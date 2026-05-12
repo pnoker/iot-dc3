@@ -50,8 +50,29 @@ export default (configEnv: ConfigEnv) => {
         if (id.includes('vue-router')) {
           return 'router-vendor';
         }
-        if (id.includes('@antv')) {
+        if (id.includes('@antv+g2@') || id.includes('/node_modules/@antv/g2/')) {
           return 'g2-vendor';
+        }
+        if (id.includes('@antv+g6@') || id.includes('/node_modules/@antv/g6/')) {
+          return 'g6-vendor';
+        }
+        if (id.includes('@antv+g@') || id.includes('/node_modules/@antv/g/')) {
+          return 'antv-g';
+        }
+        if (id.includes('@antv+component@') || id.includes('/node_modules/@antv/component/')) {
+          return 'antv-component';
+        }
+        if (id.includes('@antv+g-canvas@') || id.includes('/node_modules/@antv/g-canvas/')) {
+          return 'antv-g-canvas';
+        }
+        if (id.includes('@antv+vendor@') || id.includes('/node_modules/@antv/vendor/')) {
+          return 'antv-vendor-core';
+        }
+        if (id.includes('@antv+layout@') || id.includes('/node_modules/@antv/layout/')) {
+          return 'antv-layout';
+        }
+        if (id.includes('@antv')) {
+          return 'antv-vendor';
         }
         return 'vendor';
       }

@@ -21,7 +21,7 @@
         <img class="img" src="/images/logo/logo-white.png" />
       </div>
     </div>
-    <particles />
+    <Particles />
     <div class="login-wrapper-right animated bounce-in-down">
       <div class="login-right">
         <div class="login-main">

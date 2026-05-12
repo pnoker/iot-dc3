@@ -53,6 +53,13 @@ export const ENABLE_FLAG_OPTIONS: EnumOption[] = [
   { label: 'DISABLE', value: 'DISABLE' },
 ];
 
+export const ENTITY_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'DRIVER', value: 'DRIVER' },
+  { label: 'PROFILE', value: 'PROFILE' },
+  { label: 'POINT', value: 'POINT' },
+  { label: 'DEVICE', value: 'DEVICE' },
+];
+
 export const MENU_TYPE_OPTIONS: EnumOption[] = [
   { label: 'TITLE', value: 'TITLE' },
   { label: 'COMMON', value: 'COMMON' },

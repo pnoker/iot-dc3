@@ -151,7 +151,7 @@
 
 <script lang="ts" setup>
   import type { Component } from 'vue';
-  import { computed, onMounted, reactive, ref } from 'vue';
+  import { computed, defineAsyncComponent, onMounted, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
   import { Bell, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
@@ -165,15 +165,16 @@
   import AlertActivityHeatmap from './components/AlertActivityHeatmap.vue';
   import AlertTypePie from './components/AlertTypePie.vue';
   import AlertStormSources from './components/AlertStormSources.vue';
-  import FlappingSources from './components/FlappingSources.vue';
-  import PeerDeviation from './components/PeerDeviation.vue';
-  import AlertCorrelation from './components/AlertCorrelation.vue';
-  import SilentSources from './components/SilentSources.vue';
-  import PointCoverageGap from './components/PointCoverageGap.vue';
-  import ProtocolHealth from './components/ProtocolHealth.vue';
-  import AgingBacklog from './components/AgingBacklog.vue';
-  import MttaMttr from './components/MttaMttr.vue';
-  import ChangeImpact from './components/ChangeImpact.vue';
+
+  const FlappingSources = defineAsyncComponent(() => import('./components/FlappingSources.vue'));
+  const PeerDeviation = defineAsyncComponent(() => import('./components/PeerDeviation.vue'));
+  const AlertCorrelation = defineAsyncComponent(() => import('./components/AlertCorrelation.vue'));
+  const SilentSources = defineAsyncComponent(() => import('./components/SilentSources.vue'));
+  const PointCoverageGap = defineAsyncComponent(() => import('./components/PointCoverageGap.vue'));
+  const ProtocolHealth = defineAsyncComponent(() => import('./components/ProtocolHealth.vue'));
+  const AgingBacklog = defineAsyncComponent(() => import('./components/AgingBacklog.vue'));
+  const MttaMttr = defineAsyncComponent(() => import('./components/MttaMttr.vue'));
+  const ChangeImpact = defineAsyncComponent(() => import('./components/ChangeImpact.vue'));
 
   type Tone = 'blue' | 'purple' | 'orange' | 'red';
 
