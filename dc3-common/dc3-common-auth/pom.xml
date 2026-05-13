@@ -76,6 +76,25 @@
             <artifactId>dc3-common-web</artifactId>
         </dependency>
 
+        <!-- Reactive test utilities for controller verification -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- gRPC in-process channel for service-impl smoke tests -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-inprocess</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
