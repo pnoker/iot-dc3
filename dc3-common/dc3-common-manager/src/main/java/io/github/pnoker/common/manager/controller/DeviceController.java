@@ -22,6 +22,7 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
@@ -40,18 +41,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -67,6 +70,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(ManagerConstant.DEVICE_URL_PREFIX)
 public class DeviceController implements BaseController {
+
+    private static final long MAX_IMPORT_BYTES = 20 * 1024 * 1024;
 
     private final DeviceBuilder deviceBuilder;
 
@@ -100,8 +105,8 @@ public class DeviceController implements BaseController {
      * @param id ID
      * @return R of String
      */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.selectById(id));
             deviceService.remove(id);
@@ -130,8 +135,8 @@ public class DeviceController implements BaseController {
      * @param id ID
      * @return DeviceVO {@link DeviceVO}
      */
-    @GetMapping("/id/{id}")
-    public Mono<R<DeviceVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<DeviceVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceBO entityBO = requireTenant(tenantId, deviceService.selectById(id));
             DeviceVO entityVO = deviceBuilder.buildVOByBO(entityBO);
@@ -145,13 +150,28 @@ public class DeviceController implements BaseController {
      * @param deviceIds Device ID
      * @return Map(ID, DeviceVO)
      */
-    @PostMapping("/ids")
+    @PostMapping("/select_by_ids")
     public Mono<R<Map<Long, DeviceVO>>> selectByIds(@RequestBody List<Long> deviceIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.selectByIds(deviceIds));
             Map<Long, DeviceVO> deviceMap = entityBOList.stream()
                     .collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
+        }));
+    }
+
+    /**
+     * Profile ID Device
+     *
+     * @param profileId Profile ID
+     * @return Device array
+     */
+    @GetMapping("/select_by_profile_id")
+    public Mono<R<List<DeviceVO>>> selectByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.selectByProfileId(profileId));
+            List<DeviceVO> entityVOList = deviceBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         }));
     }
 
@@ -185,12 +205,20 @@ public class DeviceController implements BaseController {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             return filePart.flatMap(part -> {
-                String filePath = FileUtil.getTempPath() + FileUtil.getRandomXlsxName();
-                File file = new File(filePath);
+                assertXlsxFile(part);
+                assertImportContentLength(part);
+                Path filePath = FileUtil.getTempUploadFilePath(FileUtil.getRandomXlsxName(), "manager", "device",
+                        "import");
+                File file = filePath.toFile();
                 return part.transferTo(file).then(Mono.defer(() -> async(() -> {
-                    deviceService.importDevice(entityBO, file);
-                    return R.ok();
-                })));
+                    try {
+                        assertImportFileSize(filePath);
+                        deviceService.importDevice(entityBO, file);
+                        return R.<String>ok();
+                    } finally {
+                        deleteTempFile(filePath);
+                    }
+                }))).doOnError(error -> deleteTempFile(filePath));
             });
         });
     }
@@ -213,13 +241,45 @@ public class DeviceController implements BaseController {
      * @param driverId
      * @return
      */
-    @GetMapping("/getDeviceByDriverId/{driverId}")
-    public Mono<R<String>> getDeviceByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    @GetMapping("/select_by_driver_id")
+    public Mono<R<String>> getDeviceByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.selectById(driverId));
             List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.selectByDriverId(driverId));
             return R.ok(String.valueOf(deviceBOList.size()));
         }));
+    }
+
+    private void assertXlsxFile(FilePart part) {
+        String fileName = part.filename();
+        if (Objects.isNull(fileName) || !fileName.toLowerCase(Locale.ROOT).endsWith(".xlsx")) {
+            throw new RequestException("Only XLSX files can be imported");
+        }
+    }
+
+    private void assertImportContentLength(FilePart part) {
+        long contentLength = part.headers().getContentLength();
+        if (contentLength > MAX_IMPORT_BYTES) {
+            throw new RequestException("Import file size exceeds 20 MB");
+        }
+    }
+
+    private void assertImportFileSize(Path filePath) {
+        try {
+            if (Files.size(filePath) > MAX_IMPORT_BYTES) {
+                throw new RequestException("Import file size exceeds 20 MB");
+            }
+        } catch (java.io.IOException e) {
+            throw new RequestException("Import file read failed");
+        }
+    }
+
+    private void deleteTempFile(Path filePath) {
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (java.io.IOException e) {
+            log.warn("Failed to delete temporary import file: {}", filePath, e);
+        }
     }
 
 }

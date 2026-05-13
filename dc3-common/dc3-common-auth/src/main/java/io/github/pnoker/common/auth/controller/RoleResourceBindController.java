@@ -42,10 +42,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -98,8 +98,8 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleResourceBindBO entityBO = roleResourceBindService.selectById(id);
             requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
@@ -118,8 +118,8 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
-    @GetMapping("/list-resource-by-role/{roleId}")
-    public Mono<R<List<ResourceVO>>> listResourceByRole(@NotNull @PathVariable(value = "roleId") Long roleId) {
+    @GetMapping("/list_resource_by_role")
+    public Mono<R<List<ResourceVO>>> listResourceByRole(@NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, roleService.selectById(roleId));
             List<ResourceBO> entityBOList = roleResourceBindService.listResourceByRoleId(roleId);
@@ -128,8 +128,8 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
-    @GetMapping("/list-resource-by-user/{userId}")
-    public Mono<R<List<ResourceVO>>> listResourceByUser(@NotNull @PathVariable(value = "userId") Long userId) {
+    @GetMapping("/list_resource_by_user")
+    public Mono<R<List<ResourceVO>>> listResourceByUser(@NotNull @RequestParam(value = "user_id") Long userId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenantMember(tenantId, userId);
             List<ResourceBO> entityBOList = roleResourceBindService.listResourceByUserId(userId, tenantId);
@@ -138,8 +138,8 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
-    @GetMapping("/list-role-by-resource/{resourceId}")
-    public Mono<R<List<RoleVO>>> listRoleByResource(@NotNull @PathVariable(value = "resourceId") Long resourceId) {
+    @GetMapping("/list_role_by_resource")
+    public Mono<R<List<RoleVO>>> listRoleByResource(@NotNull @RequestParam(value = "resource_id") Long resourceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<RoleBO> entityBOList = roleResourceBindService.listRoleByResourceId(resourceId, tenantId);
             List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);

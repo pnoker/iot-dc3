@@ -47,8 +47,17 @@ public class FileUtil {
      * @return Temporary upload file directory path
      */
     public static String getTempPath() {
-        String path = FolderConstant.TEMP_FILE_PATH;
-        Path dir = Paths.get(path);
+        return getTempPath(new String[0]);
+    }
+
+    /**
+     * Get module-scoped temporary upload directory.
+     *
+     * @param segments module or business path segments
+     * @return Temporary upload directory path
+     */
+    public static String getTempPath(String... segments) {
+        Path dir = Paths.get(FolderConstant.TEMP_FILE_PATH, safePathSegments(segments));
         if (Files.notExists(dir) || !Files.isDirectory(dir)) {
             try {
                 Files.createDirectories(dir);
@@ -56,7 +65,18 @@ public class FileUtil {
                 log.error(e.getMessage(), e);
             }
         }
-        return path;
+        return dir.toString() + "/";
+    }
+
+    /**
+     * Create a module-scoped temporary upload file path.
+     *
+     * @param fileName target file name
+     * @param segments module or business path segments
+     * @return Temporary upload file path
+     */
+    public static Path getTempUploadFilePath(String fileName, String... segments) {
+        return Paths.get(getTempPath(segments), safePathPart(fileName)).toAbsolutePath().normalize();
     }
 
     /**
@@ -66,6 +86,25 @@ public class FileUtil {
      */
     public static String getRandomXlsxName() {
         return UUID.randomUUID().toString() + ".xlsx";
+    }
+
+    private static String[] safePathSegments(String... segments) {
+        if (segments == null) {
+            return new String[0];
+        }
+        String[] safeSegments = new String[segments.length];
+        for (int i = 0; i < segments.length; i++) {
+            safeSegments[i] = safePathPart(segments[i]);
+        }
+        return safeSegments;
+    }
+
+    private static String safePathPart(String value) {
+        if (value == null || value.isBlank()) {
+            return "upload";
+        }
+        String sanitized = value.replaceAll("[^a-zA-Z0-9._-]", "_");
+        return sanitized.isBlank() ? "upload" : sanitized;
     }
 
 }

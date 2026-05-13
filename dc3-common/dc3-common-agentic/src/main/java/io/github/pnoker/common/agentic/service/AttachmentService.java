@@ -17,14 +17,15 @@
 package io.github.pnoker.common.agentic.service;
 
 import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
-import io.github.pnoker.common.agentic.entity.request.AttachmentUploadRequest;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import org.springframework.http.codec.multipart.FilePart;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface AttachmentService {
 
-    AttachmentBO upload(AttachmentUploadRequest request, RequestHeader.UserHeader header);
+    Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.UserHeader header);
 
     List<AttachmentBO> list(String conversationId, RequestHeader.UserHeader header);
 

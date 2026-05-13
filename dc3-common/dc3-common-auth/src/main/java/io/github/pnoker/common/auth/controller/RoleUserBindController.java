@@ -42,7 +42,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -99,8 +98,8 @@ public class RoleUserBindController implements BaseController {
         }));
     }
 
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleUserBindBO entityBO = roleUserBindService.selectById(id);
             requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
@@ -120,9 +119,9 @@ public class RoleUserBindController implements BaseController {
         }));
     }
 
-    @GetMapping("/list-role-by-user/{userId}")
-    public Mono<R<List<RoleVO>>> listRoleByUser(@NotNull @PathVariable(value = "userId") Long userId,
-                                                @RequestParam(value = "tenantId", required = false) Long ignoredTenantId) {
+    @GetMapping("/list_role_by_user")
+    public Mono<R<List<RoleVO>>> listRoleByUser(@NotNull @RequestParam(value = "user_id") Long userId,
+                                                @RequestParam(value = "tenant_id", required = false) Long ignoredTenantId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenantMember(tenantId, userId);
             List<RoleBO> entityBOList = roleUserBindService.listRoleByTenantIdAndUserId(tenantId, userId);
@@ -131,8 +130,8 @@ public class RoleUserBindController implements BaseController {
         }));
     }
 
-    @GetMapping("/list-user-by-role/{roleId}")
-    public Mono<R<List<UserVO>>> listUserByRole(@NotNull @PathVariable(value = "roleId") Long roleId) {
+    @GetMapping("/list_user_by_role")
+    public Mono<R<List<UserVO>>> listUserByRole(@NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, roleService.selectById(roleId));
             List<UserBO> entityBOList = roleUserBindService.listUserByRoleId(roleId)

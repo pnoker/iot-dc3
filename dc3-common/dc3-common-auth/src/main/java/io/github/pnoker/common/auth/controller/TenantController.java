@@ -33,10 +33,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -84,8 +84,8 @@ public class TenantController implements BaseController {
      * @param id ID
      * @return R of String
      */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             tenantService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -117,8 +117,8 @@ public class TenantController implements BaseController {
      * @param id ID
      * @return TenantVO {@link TenantVO}
      */
-    @GetMapping("/id/{id}")
-    public Mono<R<TenantVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<TenantVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             TenantBO entityBO = tenantService.selectById(id);
             TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
@@ -132,8 +132,8 @@ public class TenantController implements BaseController {
      * @param code TenantCode
      * @return {@link TenantBO}
      */
-    @GetMapping("/code/{code}")
-    public Mono<R<TenantBO>> selectByCode(@NotNull @PathVariable(value = "code") String code) {
+    @GetMapping("/select_by_code")
+    public Mono<R<TenantBO>> selectByCode(@NotNull @RequestParam(value = "code") String code) {
         return async(() -> {
             TenantBO select = tenantService.selectByCode(code);
             if (Objects.nonNull(select)) {

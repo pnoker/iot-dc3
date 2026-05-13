@@ -38,10 +38,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -100,8 +100,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @param id ID
      * @return R of String
      */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverAttributeConfigService.selectById(id));
             driverAttributeConfigService.remove(id);
@@ -132,8 +132,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @param id ID
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
-    @GetMapping("/id/{id}")
-    public Mono<R<DriverAttributeConfigVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<DriverAttributeConfigVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeConfigBO entityBO = requireTenant(tenantId, driverAttributeConfigService.selectById(id));
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -148,10 +148,10 @@ public class DriverAttributeConfigController implements BaseController {
      * @param deviceId    Device ID
      * @return DriverConfig
      */
-    @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
+    @GetMapping("/select_by_device_id_and_attribute_id")
     public Mono<R<DriverAttributeConfigVO>> selectByDeviceIdAndAttributeId(
-            @NotNull @PathVariable(value = "deviceId") Long deviceId,
-            @NotNull @PathVariable(value = "attributeId") Long attributeId) {
+            @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @NotNull @RequestParam(value = "attribute_id") Long attributeId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireDriverConfigRelations(tenantId, deviceId, attributeId);
             DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(deviceId,
@@ -168,9 +168,9 @@ public class DriverAttributeConfigController implements BaseController {
      * @param deviceId Device ID
      * @return DriverConfig
      */
-    @GetMapping("/device_id/{deviceId}")
+    @GetMapping("/select_by_device_id")
     public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(
-            @NotNull @PathVariable(value = "deviceId") Long deviceId) {
+            @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.selectById(deviceId));
             List<DriverAttributeConfigBO> entityBOList = filterTenant(tenantId, driverAttributeConfigService.selectByDeviceId(deviceId));

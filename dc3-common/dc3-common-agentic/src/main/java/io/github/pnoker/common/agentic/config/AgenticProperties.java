@@ -60,8 +60,9 @@ public class AgenticProperties {
     private boolean toolCallingEnabled = false;
 
     /**
-     * Directory used to persist uploaded agentic attachment files.
+     * Root directory used to persist uploaded agentic attachment files. Runtime files
+     * are stored under tenant/user/conversation subfolders.
      */
-    private String attachmentStoragePath = "dc3/data/agentic/attachments";
+    private String attachmentStoragePath = "dc3/data/upload/agentic/attachment";
 
 }

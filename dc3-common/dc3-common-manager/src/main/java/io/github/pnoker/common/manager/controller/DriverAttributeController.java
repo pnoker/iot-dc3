@@ -35,10 +35,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -93,8 +93,8 @@ public class DriverAttributeController implements BaseController {
      * @param id ID
      * @return R of String
      */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverAttributeService.selectById(id));
             driverAttributeService.remove(id);
@@ -125,8 +125,8 @@ public class DriverAttributeController implements BaseController {
      * @param id ID
      * @return DriverAttributeVO {@link DriverAttributeVO}
      */
-    @GetMapping("/id/{id}")
-    public Mono<R<DriverAttributeVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<DriverAttributeVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeBO entityBO = requireTenant(tenantId, driverAttributeService.selectById(id));
             DriverAttributeVO entityVO = driverAttributeBuilder.buildVOByBO(entityBO);
@@ -140,12 +140,12 @@ public class DriverAttributeController implements BaseController {
      * @param id ID
      * @return DriverAttribute
      */
-    @GetMapping("/driver_id/{id}")
-    public Mono<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_driver_id")
+    public Mono<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
-                requireTenant(tenantId, driverService.selectById(id));
-                List<DriverAttributeBO> entityBOList = filterTenant(tenantId, driverAttributeService.selectByDriverId(id));
+                requireTenant(tenantId, driverService.selectById(driverId));
+                List<DriverAttributeBO> entityBOList = filterTenant(tenantId, driverAttributeService.selectByDriverId(driverId));
                 List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
             } catch (NotFoundException ne) {

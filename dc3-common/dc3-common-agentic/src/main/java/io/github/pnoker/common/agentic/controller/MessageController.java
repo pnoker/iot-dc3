@@ -26,8 +26,8 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -46,8 +46,8 @@ public class MessageController implements BaseController {
         this.messageService = messageService;
     }
 
-    @GetMapping("/{conversationId}")
-    public Mono<R<List<MessageVO>>> list(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
+    @GetMapping("/list")
+    public Mono<R<List<MessageVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
