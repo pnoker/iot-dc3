@@ -1,0 +1,176 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.github.pnoker.driver.service.impl;
+
+import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.entity.dto.MetadataEventDTO;
+import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.driver.service.MqttSendService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class MqttDriverCustomServiceImplTest {
+
+    @Mock
+    private DriverMetadata driverMetadata;
+
+    @Mock
+    private DriverSenderService driverSenderService;
+
+    @Mock
+    private MqttSendService mqttSendService;
+
+    private MqttDriverCustomServiceImpl service;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        service = new MqttDriverCustomServiceImpl();
+        injectField("driverMetadata", driverMetadata);
+        injectField("driverSenderService", driverSenderService);
+        injectField("mqttSendService", mqttSendService);
+    }
+
+    @Test
+    void initialIsNoOp() {
+        assertThatNoException().isThrownBy(() -> service.initial());
+        verifyNoInteractions(mqttSendService, driverSenderService, driverMetadata);
+    }
+
+    @Test
+    void scheduleSendsOnlineForEveryAttachedDevice() {
+        when(driverMetadata.getDeviceIds()).thenReturn(Set.of(1L, 2L));
+        service.schedule();
+        verify(driverSenderService).deviceStatusSender(eq(1L), eq(DeviceStatusEnum.ONLINE), eq(25),
+                eq(TimeUnit.SECONDS));
+        verify(driverSenderService).deviceStatusSender(eq(2L), eq(DeviceStatusEnum.ONLINE), eq(25),
+                eq(TimeUnit.SECONDS));
+    }
+
+    @Test
+    void deviceAndPointEventsAreLoggedOnly() {
+        assertThatNoException().isThrownBy(
+                () -> service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 1L)));
+        assertThatNoException().isThrownBy(
+                () -> service.event(metadataEvent(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.UPDATE, 2L)));
+        verifyNoInteractions(mqttSendService, driverSenderService, driverMetadata);
+    }
+
+    @Test
+    void readReturnsNullBecauseMqttIsPassive() {
+        assertThat(service.read(null, null, device(1L), point(1L))).isNull();
+    }
+
+    @Test
+    void writePublishesWithConfiguredQosWhenAvailable() {
+        Map<String, AttributeBO> pointConfig = new HashMap<>();
+        pointConfig.put("commandTopic",
+                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeFlagEnum.STRING).build());
+        pointConfig.put("commandQos", AttributeBO.builder().value("1").type(AttributeTypeFlagEnum.INT).build());
+
+        Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
+                WValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+
+        assertThat(ok).isTrue();
+        verify(mqttSendService).sendToMqtt("dc3/cmd/temp", 1, "23.5");
+        verify(mqttSendService, never()).sendToMqtt(eq("dc3/cmd/temp"), eq("23.5"));
+    }
+
+    @Test
+    void writeFallsBackToDefaultQosWhenLookupFails() {
+        Map<String, AttributeBO> pointConfig = new HashMap<>();
+        pointConfig.put("commandTopic",
+                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeFlagEnum.STRING).build());
+        // commandQos missing entirely → service catches NPE and falls back
+
+        Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
+                WValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+
+        assertThat(ok).isTrue();
+        verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");
+    }
+
+    @Test
+    void writeFallsBackToDefaultQosWhenQosTypeIsWrong() {
+        Map<String, AttributeBO> pointConfig = new HashMap<>();
+        pointConfig.put("commandTopic",
+                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeFlagEnum.STRING).build());
+        // commandQos present but as STRING -> AttributeBO.getValue(Integer.class) throws
+        // TypeException, service catches and falls back to default-QoS overload.
+        pointConfig.put("commandQos",
+                AttributeBO.builder().value("not-a-number").type(AttributeTypeFlagEnum.STRING).build());
+
+        Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
+                WValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+
+        assertThat(ok).isTrue();
+        verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");
+    }
+
+    private void injectField(String name, Object value) throws Exception {
+        Field field = MqttDriverCustomServiceImpl.class.getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(service, value);
+    }
+
+    private static DeviceBO device(Long id) {
+        DeviceBO device = new DeviceBO();
+        device.setId(id);
+        return device;
+    }
+
+    private static PointBO point(Long id) {
+        PointBO point = new PointBO();
+        point.setId(id);
+        return point;
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
+}
