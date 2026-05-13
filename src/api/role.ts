@@ -21,11 +21,11 @@ import type { RoleForm, RoleRecord } from '@/config/types/auth';
 
 export const addRole = (role: RoleForm) => httpPost(`${API_AUTH_BASE}/role/add`, role);
 
-export const deleteRole = (id: string) => httpPost(`${API_AUTH_BASE}/role/delete/${id}`);
+export const deleteRole = (id: string) => httpPost(`${API_AUTH_BASE}/role/delete`, undefined, { params: { id } });
 
 export const updateRole = (role: RoleForm) => httpPost(`${API_AUTH_BASE}/role/update`, role);
 
-export const getRoleById = (id: string) => httpGet(`${API_AUTH_BASE}/role/id/${id}`);
+export const getRoleById = (id: string) => httpGet(`${API_AUTH_BASE}/role/select_by_id`, { params: { id } });
 
 export const getRoleList = <T = R<PageResult<RoleRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/role/list`, query);

@@ -21,11 +21,12 @@ import type { ResourceForm, ResourceRecord } from '@/config/types/auth';
 
 export const addResource = (resource: ResourceForm) => httpPost(`${API_AUTH_BASE}/resource/add`, resource);
 
-export const deleteResource = (id: string) => httpPost(`${API_AUTH_BASE}/resource/delete/${id}`);
+export const deleteResource = (id: string) =>
+  httpPost(`${API_AUTH_BASE}/resource/delete`, undefined, { params: { id } });
 
 export const updateResource = (resource: ResourceForm) => httpPost(`${API_AUTH_BASE}/resource/update`, resource);
 
-export const getResourceById = (id: string) => httpGet(`${API_AUTH_BASE}/resource/id/${id}`);
+export const getResourceById = (id: string) => httpGet(`${API_AUTH_BASE}/resource/select_by_id`, { params: { id } });
 
 export const getResourceList = <T = R<PageResult<ResourceRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/resource/list`, query);

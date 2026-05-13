@@ -21,11 +21,12 @@ import type { GroupForm, GroupRecord } from '@/config/types/manager';
 
 export const addGroup = (group: GroupForm) => httpPost(`${API_MANAGER_BASE}/group/add`, group);
 
-export const deleteGroup = (id: string) => httpPost(`${API_MANAGER_BASE}/group/delete/${id}`);
+export const deleteGroup = (id: string) => httpPost(`${API_MANAGER_BASE}/group/delete`, undefined, { params: { id } });
 
 export const updateGroup = (group: GroupForm) => httpPost(`${API_MANAGER_BASE}/group/update`, group);
 
-export const getGroupById = (id: string) => httpGet<R<GroupRecord>>(`${API_MANAGER_BASE}/group/id/${id}`);
+export const getGroupById = (id: string) =>
+  httpGet<R<GroupRecord>>(`${API_MANAGER_BASE}/group/select_by_id`, { params: { id } });
 
 export const getGroupList = <T = R<PageResult<GroupRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/group/list`, query);

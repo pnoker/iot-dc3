@@ -28,7 +28,7 @@ export const protocolHealth = () => httpGet(`${API_DATA_BASE}/dashboard/protocol
 
 export const silentSources = (baselineDays = 7, silentMinutes = 15, limit = 50) =>
   httpGet(`${API_DATA_BASE}/dashboard/silent/sources`, {
-    params: { baselineDays, silentMinutes, limit },
+    params: { baseline_days: baselineDays, silent_minutes: silentMinutes, limit },
   });
 
 export const coverageGap = (limit = 100) => httpGet(`${API_DATA_BASE}/dashboard/coverage/gap`, { params: { limit } });

@@ -19,15 +19,18 @@ import { API_AUTH_BASE } from '@/config/constant/api';
 import type { PageQuery, PageResult } from '@/config/types';
 import type { UserForm, UserRecord } from '@/config/types/auth';
 
-export const addUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user-profile/add`, user);
+export const addUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/add`, user);
 
-export const deleteUser = (id: string) => httpPost(`${API_AUTH_BASE}/user-profile/delete/${id}`);
+export const deleteUser = (id: string) =>
+  httpPost(`${API_AUTH_BASE}/user_profile/delete`, undefined, { params: { id } });
 
-export const updateUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user-profile/update`, user);
+export const updateUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/update`, user);
 
-export const getUserById = (id: string) => httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user-profile/id/${id}`);
+export const getUserById = (id: string) =>
+  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/select_by_id`, { params: { id } });
 
-export const getUserByName = (name: string) => httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user-profile/name/${name}`);
+export const getUserByName = (name: string) =>
+  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/select_by_name`, { params: { name } });
 
 export const getUserList = <T = R<PageResult<UserRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_AUTH_BASE}/user-profile/list`, query);
+  httpPost<T>(`${API_AUTH_BASE}/user_profile/list`, query);

@@ -64,7 +64,7 @@ export const updateAgenticModelConfig = (data: AgenticModelConfig) =>
   httpPost<R<AgenticModelConfig>>(`${API_AGENTIC_BASE}/model/config/update`, data);
 
 export const deleteAgenticModelConfig = (id: string) =>
-  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/model/config/delete/${id}`);
+  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/model/config/delete`, undefined, { params: { id } });
 
 export const getAgenticProviders = () => httpGet<R<AgenticProvider[]>>(`${API_AGENTIC_BASE}/provider/list`);
 
@@ -75,39 +75,49 @@ export const updateAgenticProvider = (data: AgenticProvider) =>
   httpPost<R<AgenticProvider>>(`${API_AGENTIC_BASE}/provider/config/update`, data);
 
 export const deleteAgenticProvider = (id: string) =>
-  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/provider/config/delete/${id}`);
+  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/provider/config/delete`, undefined, { params: { id } });
 
 export const getAgenticSessions = (query?: PageQuery) =>
-  httpGet<R<PageResult<AgenticSession>>>(`${API_AGENTIC_BASE}/session`, { params: flattenSessionQuery(query) });
+  httpGet<R<PageResult<AgenticSession>>>(`${API_AGENTIC_BASE}/session/list`, { params: flattenSessionQuery(query) });
 
 export const deleteAgenticSession = (conversationId: string) =>
-  request<R<boolean>>({ url: `${API_AGENTIC_BASE}/session/${conversationId}`, method: 'delete' });
+  request<R<boolean>>({
+    url: `${API_AGENTIC_BASE}/session/delete`,
+    method: 'delete',
+    params: { conversation_id: conversationId },
+  });
 
 export const updateAgenticSession = (conversationId: string, data: Pick<AgenticSession, 'title'>) =>
-  httpPost<R<AgenticSession>>(`${API_AGENTIC_BASE}/session/${conversationId}/update`, data);
+  httpPost<R<AgenticSession>>(`${API_AGENTIC_BASE}/session/update`, data, {
+    params: { conversation_id: conversationId },
+  });
 
 export const getAgenticMessages = (conversationId: string) =>
-  httpGet<R<AgenticMessage[]>>(`${API_AGENTIC_BASE}/message/${conversationId}`);
+  httpGet<R<AgenticMessage[]>>(`${API_AGENTIC_BASE}/message/list`, { params: { conversation_id: conversationId } });
 
-export const uploadAgenticAttachment = (data: {
-  conversationId: string;
-  fileName: string;
-  contentType: string;
-  size: number;
-  data: string;
-}) => httpPost<R<AgenticAttachment>>(`${API_AGENTIC_BASE}/attachment/upload`, data);
+export const uploadAgenticAttachment = (conversationId: string, file: File) => {
+  const data = new FormData();
+  data.append('file', file);
+  return httpPost<R<AgenticAttachment>>(`${API_AGENTIC_BASE}/attachment/upload`, data, {
+    params: { conversation_id: conversationId },
+    timeout: 0,
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
 
 export const getAgenticAttachments = (conversationId: string) =>
-  httpGet<R<AgenticAttachment[]>>(`${API_AGENTIC_BASE}/attachment/${conversationId}`);
+  httpGet<R<AgenticAttachment[]>>(`${API_AGENTIC_BASE}/attachment/list`, {
+    params: { conversation_id: conversationId },
+  });
 
 export const getPendingAgenticActions = (conversationId: string) =>
-  httpGet<R<AgenticAction[]>>(`${API_AGENTIC_BASE}/action/pending/${conversationId}`);
+  httpGet<R<AgenticAction[]>>(`${API_AGENTIC_BASE}/action/pending`, { params: { conversation_id: conversationId } });
 
 export const confirmAgenticAction = (actionId: string) =>
-  httpPost<R<AgenticAction>>(`${API_AGENTIC_BASE}/action/${actionId}/confirm`);
+  httpPost<R<AgenticAction>>(`${API_AGENTIC_BASE}/action/confirm`, undefined, { params: { action_id: actionId } });
 
 export const rejectAgenticAction = (actionId: string) =>
-  httpPost<R<AgenticAction>>(`${API_AGENTIC_BASE}/action/${actionId}/reject`);
+  httpPost<R<AgenticAction>>(`${API_AGENTIC_BASE}/action/reject`, undefined, { params: { action_id: actionId } });
 
 export const streamAgenticChatCompletion = async (
   data: AgenticChatCompletionRequest,

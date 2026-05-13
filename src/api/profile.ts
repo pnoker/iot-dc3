@@ -22,17 +22,20 @@ import type { ProfileForm, ProfileRecord } from '@/config/types/manager';
 export const addProfile = (profile: ProfileForm) =>
   httpPost<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/add`, profile);
 
-export const deleteProfile = (id: string) => httpPost(`${API_MANAGER_BASE}/profile/delete/${id}`);
+export const deleteProfile = (id: string) =>
+  httpPost(`${API_MANAGER_BASE}/profile/delete`, undefined, { params: { id } });
 
 export const updateProfile = (profile: ProfileForm) =>
   httpPost<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/update`, profile);
 
-export const getProfileById = (id: string) => httpGet<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/id/${id}`);
+export const getProfileById = (id: string) =>
+  httpGet<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/select_by_id`, { params: { id } });
 
 export const getProfileByIds = (profileIds: string[]) =>
-  httpPost<R<Record<string, ProfileRecord>>>(`${API_MANAGER_BASE}/profile/ids`, profileIds);
+  httpPost<R<Record<string, ProfileRecord>>>(`${API_MANAGER_BASE}/profile/select_by_ids`, profileIds);
 
-export const getProfileByDeviceId = (deviceId: string) => httpGet(`${API_MANAGER_BASE}/profile/device_id/${deviceId}`);
+export const getProfileByDeviceId = (deviceId: string) =>
+  httpGet(`${API_MANAGER_BASE}/profile/select_by_device_id`, { params: { device_id: deviceId } });
 
 export const getProfileList = <T = R<PageResult<ProfileRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/profile/list`, query);

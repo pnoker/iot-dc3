@@ -363,14 +363,7 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const uploadAttachment = async (file: File) => {
     const conversationId = ensureActiveSession();
-    const data = await readFileAsDataUrl(file);
-    const response = await uploadAgenticAttachment({
-      conversationId,
-      fileName: file.name,
-      contentType: file.type || 'application/octet-stream',
-      size: file.size,
-      data,
-    });
+    const response = await uploadAgenticAttachment(conversationId, file);
     attachmentsByConversation.value[conversationId] = [
       response.data,
       ...(attachmentsByConversation.value[conversationId] || []),
@@ -561,13 +554,4 @@ const normalizeDisplayContent = (role: string, content?: string) => {
     const markerIndex = displayContent.indexOf(marker);
     return markerIndex >= 0 ? displayContent.slice(0, markerIndex).trimEnd() : displayContent;
   }, content || '');
-};
-
-const readFileAsDataUrl = (file: File) => {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result || ''));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
 };

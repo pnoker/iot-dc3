@@ -21,32 +21,35 @@ import type { DeviceForm, DeviceRecord } from '@/config/types/manager';
 
 export const addDevice = (device: DeviceForm) => httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/add`, device);
 
-export const deleteDevice = (id: string) => httpPost(`${API_MANAGER_BASE}/device/delete/${id}`);
+export const deleteDevice = (id: string) =>
+  httpPost(`${API_MANAGER_BASE}/device/delete`, undefined, { params: { id } });
 
 export const updateDevice = (device: DeviceForm) =>
   httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/update`, device);
 
-export const getDeviceById = (id: string) => httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/id/${id}`);
+export const getDeviceById = (id: string) =>
+  httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/select_by_id`, { params: { id } });
 
 export const getDeviceByIds = (deviceIds: string[]) =>
-  httpPost<R<Record<string, DeviceRecord>>>(`${API_MANAGER_BASE}/device/ids`, deviceIds);
+  httpPost<R<Record<string, DeviceRecord>>>(`${API_MANAGER_BASE}/device/select_by_ids`, deviceIds);
 
-export const getDeviceByDriverId = (driverId: string) => httpGet(`${API_MANAGER_BASE}/device/driver_id/${driverId}`);
+export const getDeviceByDriverId = (driverId: string) =>
+  httpGet(`${API_MANAGER_BASE}/device/select_by_driver_id`, { params: { driver_id: driverId } });
 
 export const getDeviceByProfileId = (profileId: string) =>
-  httpGet(`${API_MANAGER_BASE}/device/profile_id/${profileId}`);
+  httpGet(`${API_MANAGER_BASE}/device/select_by_profile_id`, { params: { profile_id: profileId } });
 
 export const getDeviceList = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
 
 export const getDeviceStatus = (query: Record<string, unknown>) =>
-  httpPost(`${API_DATA_BASE}/device/status/device`, query);
+  httpPost(`${API_DATA_BASE}/device/status/list`, query);
 
 export const getDeviceStatusByDriverId = (driverId: string) =>
-  httpGet(`${API_DATA_BASE}/device/status/device/driver_id/${driverId}`);
+  httpGet(`${API_DATA_BASE}/device/status/select_by_driver_id`, { params: { driver_id: driverId } });
 
 export const getDeviceStatusByProfileId = (profileId: string) =>
-  httpGet(`${API_DATA_BASE}/device/status/device/profile_id/${profileId}`);
+  httpGet(`${API_DATA_BASE}/device/status/select_by_profile_id`, { params: { profile_id: profileId } });
 
 export const importDeviceTemplate = (device: Record<string, unknown>) =>
   httpPost(`${API_MANAGER_BASE}/device/export/import_template`, device, { responseType: 'blob' });
