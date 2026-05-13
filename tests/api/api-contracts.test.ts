@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { readdirSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
+
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import * as agenticApi from '@/api/agentic';
@@ -85,6 +88,32 @@ const modules: Record<string, ApiModule> = {
   user: userApi,
 };
 
+const coveredApiSourceFiles = new Set([
+  'agentic',
+  'api',
+  'attribute',
+  'dashboard/alert',
+  'dashboard/stats',
+  'dashboard/system',
+  'dashboard/topology',
+  'device',
+  'dictionary',
+  'driver',
+  'group',
+  'info',
+  'label',
+  'menu',
+  'point',
+  'profile',
+  'resource',
+  'role',
+  'roleResourceBind',
+  'roleUserBind',
+  'token',
+  'user',
+]);
+
+const apiSourceFileExclusions = new Set(['common', 'dashboard/index']);
 const excludedExports = new Set(['streamAgenticChatCompletion']);
 
 const pageQuery = {
@@ -122,6 +151,17 @@ function sampleArgs(name: string): unknown[] {
   if (/^(add|update|import|upload|read|write)/.test(name) || /Status$/.test(name)) return [payload];
   if (/^(delete|get|confirm|reject)/.test(name)) return ['id-1'];
   return [];
+}
+
+function walkApiSourceFiles(dir: string): string[] {
+  return readdirSync(dir).flatMap((entry) => {
+    const path = join(dir, entry);
+    const stat = statSync(path);
+    if (stat.isDirectory()) return walkApiSourceFiles(path);
+    if (!entry.endsWith('.ts')) return [];
+
+    return [relative(join(process.cwd(), 'src/api'), path).replace(/\.ts$/, '').replaceAll('\\', '/')];
+  });
 }
 
 function resetTransportSpies() {
@@ -182,6 +222,14 @@ function expectStandardParams(call: TransportCall) {
 describe('API wrapper contracts', () => {
   afterEach(() => {
     resetTransportSpies();
+  });
+
+  it('includes every public API wrapper source file in the contract matrix', () => {
+    const sourceFiles = walkApiSourceFiles(join(process.cwd(), 'src/api'))
+      .filter((file) => !apiSourceFileExclusions.has(file))
+      .sort();
+
+    expect(sourceFiles).toEqual([...coveredApiSourceFiles].sort());
   });
 
   for (const [moduleName, moduleApi] of Object.entries(modules)) {

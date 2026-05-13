@@ -39,7 +39,11 @@ DOCKER_COMPOSE ?= docker compose
 	test-unit \
 	test-api \
 	test-component \
+	test-guard \
+	test-impact \
+	test-ci \
 	test-e2e \
+	test-e2e-sweep \
 	clean \
 	ci \
 	docker-build \
@@ -64,9 +68,13 @@ help:
 		'make test-unit    - run Vitest unit tests' \
 		'make test-api     - run API contract tests' \
 		'make test-component - run component tests' \
+		'make test-guard   - run AI coding guardrail tests' \
+		'make test-impact  - print recommended checks for changed files' \
+		'make test-ci      - run Vitest with coverage thresholds' \
 		'make test-e2e     - run Playwright e2e tests' \
+		'make test-e2e-sweep - run browser sweep against a full environment' \
 		'make clean        - remove dist output' \
-		'make ci           - run lint-check, check, test, build' \
+		'make ci           - run lint-check, check, guardrails, test, build' \
 		'make docker-build - build dc3 docker services' \
 		'make docker-up    - start dc3 docker services' \
 		'make docker-down  - stop dc3 docker services'
@@ -119,13 +127,25 @@ test-api:
 test-component:
 	$(PNPM) run test:component
 
+test-guard:
+	$(PNPM) run test:guard
+
+test-impact:
+	$(PNPM) run test:impact
+
+test-ci:
+	$(PNPM) run test:ci
+
 test-e2e:
 	$(PNPM) run test:e2e
+
+test-e2e-sweep:
+	$(PNPM) run test:e2e:sweep
 
 clean:
 	$(PNPM) run clean
 
-ci: lint-check check test build
+ci: lint-check check test-guard test-ci build
 
 docker-build:
 	cd $(DC3_DIR) && $(DOCKER_COMPOSE) build

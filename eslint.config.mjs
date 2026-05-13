@@ -49,6 +49,21 @@ export default [
   ...defineConfigWithVueTs(vueTsConfigs.recommended),
   configPrettier,
   {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      sourceType: 'module',
+      ecmaVersion: 'latest',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2021,
+      },
+    },
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
     files: ['**/*.{ts,tsx,vue}'],
     languageOptions: {
       parser: vueParser,

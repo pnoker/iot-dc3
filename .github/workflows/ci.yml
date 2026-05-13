@@ -48,8 +48,11 @@ jobs:
       - name: Type Check
         run: pnpm run type-check
 
-      - name: Test
-        run: pnpm test
+      - name: Guardrails
+        run: pnpm run test:guard
+
+      - name: Test With Coverage
+        run: pnpm run test:ci
 
       - name: Build
         run: pnpm build
