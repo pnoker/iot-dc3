@@ -1,0 +1,53 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Shared application profile for unit, slice and integration tests.
+# Imported by other modules via spring.profiles.active=test.
+
+spring:
+  main:
+    banner-mode: off
+    allow-bean-definition-overriding: true
+  rabbitmq:
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+  cache:
+    type: simple
+  task:
+    scheduling:
+      pool:
+        size: 1
+
+management:
+  endpoints:
+    enabled-by-default: false
+  health:
+    defaults:
+      enabled: false
+
+logging:
+  level:
+    root: WARN
+    io.github.pnoker: INFO
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN
+    org.springframework: WARN
+    org.springframework.test: INFO
+    org.hibernate.validator: WARN
+    com.zaxxer.hikari: WARN
