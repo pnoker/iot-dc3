@@ -34,27 +34,20 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.manager.dal.PointAttributeConfigManager;
-import io.github.pnoker.common.manager.dal.PointDataVolumeRunManager;
 import io.github.pnoker.common.manager.dal.PointManager;
 import io.github.pnoker.common.manager.dal.ProfileBindManager;
 import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
-import io.github.pnoker.common.manager.entity.bo.DeviceDataVolumeRunBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
-import io.github.pnoker.common.manager.entity.bo.PointDataStatisticsByDriverIdBO;
-import io.github.pnoker.common.manager.entity.bo.PointDataVolumeRunBO;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.builder.PointBuilder;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
-import io.github.pnoker.common.manager.entity.model.DriverDO;
 import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
-import io.github.pnoker.common.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
-import io.github.pnoker.common.manager.mapper.DriverMapper;
 import io.github.pnoker.common.manager.mapper.PointMapper;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.manager.service.ProfileBindService;
@@ -68,9 +61,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -106,9 +96,6 @@ public class PointServiceImpl implements PointService {
     private MetadataEventPublisher metadataEventPublisher;
 
     @Resource
-    private PointDataVolumeRunManager pointDataVolumeRunManager;
-
-    @Resource
     private ProfileBindService profileBindService;
 
     @Resource
@@ -119,9 +106,6 @@ public class PointServiceImpl implements PointService {
 
     @Resource
     private DeviceMapper deviceMapper;
-
-    @Resource
-    private DriverMapper driverMapper;
 
     @Override
     public void save(PointBO entityBO) {
@@ -273,52 +257,16 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds) {
-        List<PointDataVolumeRunBO> list = new ArrayList<>();
-        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTimeUtil.now().toLocalDate(), LocalTime.MIN)
-                .minusDays(7);
-        if (Objects.isNull(deviceIds)) {
-            return list;
-        }
-        List<DeviceDO> deviceDOList = deviceMapper
-                .selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
-        deviceDOList.forEach(deviceDO -> {
-            ArrayList<Long> zeroList = new ArrayList<>(Collections.nCopies(7, 0L));
-            LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
-            wrapper.eq(PointDataVolumeRunDO::getPointId, pointId)
-                    .eq(PointDataVolumeRunDO::getDeviceId, deviceDO.getId())
-                    .ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
-            PointDataVolumeRunBO pointDataVolumeRunBO = new PointDataVolumeRunBO();
-            pointDataVolumeRunBO.setDeviceName(deviceDO.getDeviceName());
-            List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper);
-            if (CollectionUtils.isNotEmpty(pointDataVolumeRunDOList)) {
-                for (int i = 0; i < Math.min(7, pointDataVolumeRunDOList.size()); i++) {
-                    zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
-                }
-            }
-            pointDataVolumeRunBO.setTotal(zeroList);
-            list.add(pointDataVolumeRunBO);
-        });
-        return list;
-    }
-
-    @Override
-    public PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId) {
-        QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
-        wrapper.select("sum(total) as total");
-        wrapper.lambda().eq(PointDataVolumeRunDO::getPointId, pointId);
-        return pointDataVolumeRunManager.getOne(wrapper);
-    }
-
-    @Override
     public Long selectPointByDeviceId(Long deviceId) {
-        ProfileBindDO bindDO = profileBindManager
-                .getOne(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
-        Long count = 0L;
-        if (Objects.nonNull(bindDO)) {
-            List<PointDO> list = pointManager
-                    .list(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, bindDO.getProfileId()));
-            count = list.stream().count();
+        List<ProfileBindDO> bindDOList = profileBindManager
+                .list(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
+        if (CollectionUtils.isEmpty(bindDOList)) {
+            return 0L;
+        }
+        long count = 0L;
+        for (ProfileBindDO bindDO : bindDOList) {
+            count += pointManager
+                    .count(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, bindDO.getProfileId()));
         }
         return count;
     }
@@ -326,122 +274,43 @@ public class PointServiceImpl implements PointService {
     @Override
     public PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId) {
         PointConfigByDeviceBO pointConfigByDeviceBO = new PointConfigByDeviceBO();
-        ProfileBindDO bindDO = profileBindManager
-                .getOne(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
-        List<Long> configCount = new ArrayList<>();
-        List<Long> unConfigCount = new ArrayList<>();
-        if (Objects.nonNull(bindDO)) {
-            List<PointDO> list = pointManager
-                    .list(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, bindDO.getProfileId()));
-            if (Objects.nonNull(list)) {
-                List<Long> profileList = list.stream().map(PointDO::getId).toList();
-                List<PointAttributeConfigDO> list2 = pointAttributeConfigManager
-                        .list(new LambdaQueryWrapper<PointAttributeConfigDO>().eq(PointAttributeConfigDO::getDeviceId,
-                                deviceId));
-                if (Objects.nonNull(list2)) {
-                    List<Long> attrList = new ArrayList<>(
-                            list2.stream().map(PointAttributeConfigDO::getPointId).toList());
-                    //
-                    attrList.retainAll(profileList);
-                    configCount.addAll(attrList);
-                    unConfigCount.addAll(profileList);
-                } else {
-                    unConfigCount.addAll(profileList);
-                }
-            }
-        }
+        List<ProfileBindDO> bindDOList = profileBindManager
+                .list(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
         pointConfigByDeviceBO.setConfigCount(0L);
-        if (Objects.nonNull(configCount) && Objects.nonNull(unConfigCount)) {
-            List<PointDO> list = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, configCount));
-            pointConfigByDeviceBO.setPoints(list);
-            pointConfigByDeviceBO.setConfigCount(list.stream().count());
+        if (CollectionUtils.isEmpty(bindDOList)) {
+            pointConfigByDeviceBO.setUnConfigCount(0L);
+            return pointConfigByDeviceBO;
         }
-        pointConfigByDeviceBO.setUnConfigCount(unConfigCount.stream().count() - pointConfigByDeviceBO.getConfigCount());
-        return pointConfigByDeviceBO;
-    }
-
-    @Override
-    public List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds) {
-        List<DeviceDataVolumeRunBO> list = new ArrayList<>();
-        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTimeUtil.now().toLocalDate(), LocalTime.MIN)
-                .minusDays(7);
-        if (Objects.isNull(pointIds)) {
-            return list;
+        List<Long> profileIds = bindDOList.stream().map(ProfileBindDO::getProfileId).distinct().toList();
+        List<PointDO> allPoints = pointManager
+                .list(new LambdaQueryWrapper<PointDO>().in(PointDO::getProfileId, profileIds));
+        if (CollectionUtils.isEmpty(allPoints)) {
+            pointConfigByDeviceBO.setUnConfigCount(0L);
+            return pointConfigByDeviceBO;
         }
-        List<PointDO> pointDOList = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, pointIds));
-        pointDOList.forEach(pointDO -> {
-            ArrayList<Long> zeroList = new ArrayList<>(Collections.nCopies(7, 0L));
-            LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
-            wrapper.eq(PointDataVolumeRunDO::getPointId, pointDO.getId())
-                    .eq(PointDataVolumeRunDO::getDeviceId, deviceId)
-                    .ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
-            DeviceDataVolumeRunBO deviceDataVolumeRunBO = new DeviceDataVolumeRunBO();
-            deviceDataVolumeRunBO.setPointName(pointDO.getPointName());
-            List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper);
-            if (CollectionUtils.isNotEmpty(pointDataVolumeRunDOList)) {
-                for (int i = 0; i < Math.min(7, pointDataVolumeRunDOList.size()); i++) {
-                    zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
-                }
-            }
-            deviceDataVolumeRunBO.setTotal(zeroList);
-            list.add(deviceDataVolumeRunBO);
-        });
-        return list;
-    }
-
-    @Override
-    public PointDataVolumeRunDO selectPointDataByDriverId(Long driverId) {
-        QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
-        wrapper.select("sum(total) as total");
-        wrapper.lambda().eq(PointDataVolumeRunDO::getDriverId, driverId);
-        PointDataVolumeRunDO one = pointDataVolumeRunManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return new PointDataVolumeRunDO();
-        }
-        return one;
-    }
-
-    @Override
-    public Long selectPointByDriverId(Long driverId) {
-        LambdaQueryWrapper<PointDataVolumeRunDO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(PointDataVolumeRunDO::getPointId);
-        queryWrapper.eq(PointDataVolumeRunDO::getDriverId, driverId).groupBy(PointDataVolumeRunDO::getPointId);
-        List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(queryWrapper);
-        if (Objects.nonNull(pointDataVolumeRunDOList)) {
-            return pointDataVolumeRunDOList.stream().count();
+        List<Long> pointIdList = allPoints.stream().map(PointDO::getId).toList();
+        List<PointAttributeConfigDO> configList = pointAttributeConfigManager
+                .list(new LambdaQueryWrapper<PointAttributeConfigDO>()
+                        .eq(PointAttributeConfigDO::getDeviceId, deviceId));
+        Set<Long> configuredPointIds;
+        if (CollectionUtils.isNotEmpty(configList)) {
+            configuredPointIds = configList.stream()
+                    .map(PointAttributeConfigDO::getPointId)
+                    .filter(pointIdList::contains)
+                    .collect(Collectors.toSet());
         } else {
-            return 0L;
+            configuredPointIds = new HashSet<>();
         }
-    }
-
-    @Override
-    public PointDataStatisticsByDriverIdBO selectPointDataStatisticsByDriverId(Long driverId) {
-        PointDataStatisticsByDriverIdBO result = new PointDataStatisticsByDriverIdBO();
-        DriverDO driverDO = driverMapper.selectById(driverId);
-        if (Objects.isNull(driverDO)) {
-            throw new NotFoundException("Driver does not exist");
+        long configCount = configuredPointIds.size();
+        pointConfigByDeviceBO.setConfigCount(configCount);
+        pointConfigByDeviceBO.setUnConfigCount(pointIdList.size() - configCount);
+        if (!configuredPointIds.isEmpty()) {
+            List<PointDO> configuredPoints = allPoints.stream()
+                    .filter(p -> configuredPointIds.contains(p.getId()))
+                    .toList();
+            pointConfigByDeviceBO.setPoints(configuredPoints);
         }
-        result.setDriverName(driverDO.getDriverName());
-        List<Long> zero = Collections.nCopies(7, 0L);
-        ArrayList<Long> zeroList = new ArrayList<>(zero);
-        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTimeUtil.now().toLocalDate(), LocalTime.MIN)
-                .minusDays(6);
-        QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
-        wrapper.select("sum(total) as total");
-        List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper.lambda()
-                .eq(PointDataVolumeRunDO::getDriverId, driverId)
-                .ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo)
-                .groupBy(PointDataVolumeRunDO::getCreateTime)
-                .orderByDesc(PointDataVolumeRunDO::getCreateTime));
-        if (Objects.isNull(pointDataVolumeRunDOList)) {
-            result.setTotal(zeroList);
-            return result;
-        }
-        for (int i = 0; i < Math.min(7, pointDataVolumeRunDOList.size()); i++) {
-            zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
-        }
-        result.setTotal(zeroList);
-        return result;
+        return pointConfigByDeviceBO;
     }
 
     /**
