@@ -95,6 +95,7 @@
         <module>dc3-common-rabbitmq</module>
         <module>dc3-common-repository</module>
         <module>dc3-common-resource-registrar</module>
+        <module>dc3-common-test</module>
         <module>dc3-common-thread</module>
         <module>dc3-common-web</module>
     </modules>
@@ -299,6 +300,11 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-repository</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-test</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
