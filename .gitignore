@@ -13,3 +13,15 @@ dc3/data/
 .env
 .claude/settings.local.json
 .claude/TODO.md
+
+# Test artifacts
+test-results/
+**/target/test-classes/
+**/target/surefire-reports/
+**/target/failsafe-reports/
+**/target/site/jacoco*/
+**/target/jacoco*.exec
+
+# Testcontainers state
+.testcontainers/
+**/.testcontainers.properties.bak
