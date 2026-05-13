@@ -35,6 +35,11 @@ DOCKER_COMPOSE ?= docker compose
 	lint-check \
 	format \
 	format-check \
+	test \
+	test-unit \
+	test-api \
+	test-component \
+	test-e2e \
 	clean \
 	ci \
 	docker-build \
@@ -55,8 +60,13 @@ help:
 		'make lint-check   - run eslint/prettier checks only' \
 		'make format       - run prettier --write' \
 		'make format-check - run prettier --check' \
+		'make test         - run Vitest unit/api/component tests' \
+		'make test-unit    - run Vitest unit tests' \
+		'make test-api     - run API contract tests' \
+		'make test-component - run component tests' \
+		'make test-e2e     - run Playwright e2e tests' \
 		'make clean        - remove dist output' \
-		'make ci           - run lint-check, check, build' \
+		'make ci           - run lint-check, check, test, build' \
 		'make docker-build - build dc3 docker services' \
 		'make docker-up    - start dc3 docker services' \
 		'make docker-down  - stop dc3 docker services'
@@ -97,10 +107,25 @@ format:
 format-check:
 	$(PNPM) run format:check
 
+test:
+	$(PNPM) test
+
+test-unit:
+	$(PNPM) run test:unit
+
+test-api:
+	$(PNPM) run test:api
+
+test-component:
+	$(PNPM) run test:component
+
+test-e2e:
+	$(PNPM) run test:e2e
+
 clean:
 	$(PNPM) run clean
 
-ci: lint-check check build
+ci: lint-check check test build
 
 docker-build:
 	cd $(DC3_DIR) && $(DOCKER_COMPOSE) build

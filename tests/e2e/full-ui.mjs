@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-/* global process, setTimeout, console, localStorage, atob, fetch */
+/* global process, setTimeout, console, localStorage, atob, fetch, URL, window */
 
 import { chromium } from 'playwright';
 
 const BASE = process.env.E2E_BASE_URL || 'http://localhost:8080';
-const CHROME = process.env.E2E_CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const CHROME = process.env.E2E_CHROME_PATH || '';
+const HEADLESS = process.env.E2E_HEADLESS !== 'false';
 
-const routeIds = {
-  driverId: '90001',
-  profileId: '2049809585272340481',
-  deviceId: '2049476237861646337',
-  pointId: '2049475924299673602',
-  pointProfileId: '2049475811418370050',
-  apiId: '2049813224913190914',
-  resourceId: '20001',
-  menuId: '10003',
-  userId: '1',
-  roleId: '1011',
-};
+const routeIds = {};
 
-const protectedRoutes = [
+const baseProtectedRoutes = [
   '/home',
+  '/home/application',
   '/driver',
   '/profile',
   '/device',
@@ -45,25 +36,53 @@ const protectedRoutes = [
   '/settings/resource',
   '/settings/api',
   '/settings/menu',
+  '/settings/group',
+  '/settings/label',
+  '/settings/agentic',
+  '/settings/agentic/provider',
   '/settings/event',
   '/settings/event/device',
   '/settings/event/driver',
   '/settings/about',
-  `/driver/detail?id=${routeIds.driverId}`,
-  `/device/detail?id=${routeIds.deviceId}`,
-  `/device/edit?id=${routeIds.deviceId}`,
-  `/profile/detail?id=${routeIds.profileId}`,
-  `/profile/edit?id=${routeIds.profileId}`,
-  `/point/detail?id=${routeIds.pointId}`,
-  `/point/edit?id=${routeIds.pointId}&profileId=${routeIds.pointProfileId}`,
-  `/settings/api/detail?id=${routeIds.apiId}`,
-  `/settings/resource/detail?id=${routeIds.resourceId}`,
-  `/settings/menu/detail?id=${routeIds.menuId}`,
-  `/settings/user/detail?id=${routeIds.userId}`,
-  `/settings/role/detail?id=${routeIds.roleId}`,
 ];
 
-const openRoutes = ['/login', '/403', '/404', '/500', ...protectedRoutes];
+const protectedRouteProbes = [
+  '/driver/detail?id=e2e-auth-probe',
+  '/device/detail?id=e2e-auth-probe',
+  '/device/edit?id=e2e-auth-probe',
+  '/profile/detail?id=e2e-auth-probe',
+  '/profile/edit?id=e2e-auth-probe',
+  '/point/detail?id=e2e-auth-probe',
+  '/point/edit?id=e2e-auth-probe&profileId=e2e-auth-probe',
+  '/settings/api/detail?id=e2e-auth-probe',
+  '/settings/resource/detail?id=e2e-auth-probe',
+  '/settings/menu/detail?id=e2e-auth-probe',
+  '/settings/user/detail?id=e2e-auth-probe',
+  '/settings/role/detail?id=e2e-auth-probe',
+];
+
+function entityRoutes() {
+  const routes = [];
+  if (routeIds.driverId) routes.push(`/driver/detail?id=${routeIds.driverId}`);
+  if (routeIds.deviceId) {
+    routes.push(`/device/detail?id=${routeIds.deviceId}`);
+    routes.push(`/device/edit?id=${routeIds.deviceId}`);
+  }
+  if (routeIds.profileId) {
+    routes.push(`/profile/detail?id=${routeIds.profileId}`);
+    routes.push(`/profile/edit?id=${routeIds.profileId}`);
+  }
+  if (routeIds.pointId) routes.push(`/point/detail?id=${routeIds.pointId}`);
+  if (routeIds.pointId && routeIds.pointProfileId) {
+    routes.push(`/point/edit?id=${routeIds.pointId}&profileId=${routeIds.pointProfileId}`);
+  }
+  if (routeIds.apiId) routes.push(`/settings/api/detail?id=${routeIds.apiId}`);
+  if (routeIds.resourceId) routes.push(`/settings/resource/detail?id=${routeIds.resourceId}`);
+  if (routeIds.menuId) routes.push(`/settings/menu/detail?id=${routeIds.menuId}`);
+  if (routeIds.userId) routes.push(`/settings/user/detail?id=${routeIds.userId}`);
+  if (routeIds.roleId) routes.push(`/settings/role/detail?id=${routeIds.roleId}`);
+  return routes;
+}
 
 const interactionPages = [
   { name: 'Driver', route: '/driver', placeholder: 'Enter driver name', value: 'Virtual', detail: true },
@@ -148,6 +167,42 @@ const interactionPages = [
     detail: true,
     paginate: true,
   },
+  {
+    name: 'Settings Group',
+    route: '/settings/group',
+    placeholder: 'Enter group name',
+    value: 'Group',
+    add: true,
+    edit: true,
+    deleteClick: true,
+  },
+  {
+    name: 'Settings Label',
+    route: '/settings/label',
+    placeholder: 'Enter label name',
+    value: 'Label',
+    add: true,
+    edit: true,
+    deleteClick: true,
+  },
+  {
+    name: 'Agentic Model Config',
+    route: '/settings/agentic',
+    placeholder: 'gpt-4o-mini',
+    value: 'gpt',
+    add: true,
+    edit: true,
+    deleteClick: true,
+  },
+  {
+    name: 'Agentic Provider',
+    route: '/settings/agentic/provider',
+    placeholder: 'Provider name',
+    value: 'openai',
+    add: true,
+    edit: true,
+    deleteClick: true,
+  },
   { name: 'Device Event', route: '/settings/event/device', paginate: true },
   { name: 'Driver Event', route: '/settings/event/driver', paginate: true },
 ];
@@ -182,8 +237,8 @@ const destructiveDeleteCases = [
     name: 'User delete',
     route: '/settings/user',
     placeholder: 'Enter user name',
-    listUrl: '/api/v3/auth/user-profile/list',
-    addUrl: '/api/v3/auth/user-profile/add',
+    listUrl: '/api/v3/auth/user_profile/list',
+    addUrl: '/api/v3/auth/user_profile/add',
     nameField: 'userName',
     seed: (name, suffix) => ({
       userName: name,
@@ -241,6 +296,36 @@ const destructiveDeleteCases = [
       resourceTypeFlag: 'API',
       resourceScopeFlag: 'LIST',
       entityId: routeIds.apiId,
+      enableFlag: 'ENABLE',
+      remark: 'codex e2e delete',
+    }),
+  },
+  {
+    name: 'Group delete',
+    route: '/settings/group',
+    placeholder: 'Enter group name',
+    listUrl: '/api/v3/manager/group/list',
+    addUrl: '/api/v3/manager/group/add',
+    nameField: 'groupName',
+    seed: (name) => ({
+      parentGroupId: 0,
+      groupName: name,
+      groupCode: name,
+      groupTypeFlag: 'DEVICE',
+      enableFlag: 'ENABLE',
+      remark: 'codex e2e delete',
+    }),
+  },
+  {
+    name: 'Label delete',
+    route: '/settings/label',
+    placeholder: 'Enter label name',
+    listUrl: '/api/v3/manager/label/list',
+    addUrl: '/api/v3/manager/label/add',
+    nameField: 'labelName',
+    seed: (name) => ({
+      labelName: name,
+      labelCode: name,
       enableFlag: 'ENABLE',
       remark: 'codex e2e delete',
     }),
@@ -343,7 +428,9 @@ function hasEmptySearchEnum(requests) {
   return requests
     .filter((item) => item.method === 'POST')
     .filter((item) =>
-      /\/(driver|profile|device|point|point_value|api|resource|menu|role|user|event)\/list/.test(item.url)
+      /\/(driver|profile|device|point|point_value|api|resource|menu|role|user|group|label|event|model\/config|provider)\/list/.test(
+        item.url
+      )
     )
     .filter((item) => item.body && typeof item.body === 'object')
     .filter(
@@ -391,14 +478,20 @@ async function clickButtonIfPresent(page, name, options = {}) {
   return true;
 }
 
-async function apiPost(page, url, body = {}) {
+async function apiPost(page, url, body = {}, params = {}) {
   return page.evaluate(
-    async ({ requestUrl, requestBody }) => {
+    async ({ requestUrl, requestBody, requestParams }) => {
       const decodeStorage = (key) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
         return JSON.parse(atob(raw)).content;
       };
+      const target = new URL(requestUrl, window.location.origin);
+      Object.entries(requestParams).forEach(([key, value]) => {
+        if (value !== undefined) target.searchParams.set(key, String(value));
+      });
+      const targetUrl =
+        target.origin === window.location.origin ? `${target.pathname}${target.search}` : target.toString();
       const headers = {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -406,7 +499,7 @@ async function apiPost(page, url, body = {}) {
         'X-Auth-Login': decodeStorage('X-Auth-Login'),
         'X-Auth-Token': JSON.stringify(decodeStorage('X-Auth-Token')),
       };
-      const res = await fetch(requestUrl, {
+      const res = await fetch(targetUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(requestBody),
@@ -420,7 +513,7 @@ async function apiPost(page, url, body = {}) {
       }
       return { status: res.status, data, text };
     },
-    { requestUrl: url, requestBody: body }
+    { requestUrl: url, requestBody: body, requestParams: params }
   );
 }
 
@@ -430,6 +523,259 @@ async function listCount(page, url, nameField, name) {
     throw new Error(`List failed for ${name}: ${JSON.stringify(res.data)}`);
   }
   return Number(res.data?.data?.total ?? 0);
+}
+
+function idOf(record) {
+  if (!record || typeof record !== 'object' || record.id == null) return undefined;
+  return String(record.id);
+}
+
+async function firstRecord(page, url) {
+  const res = await apiPost(page, url, { page: { size: 1, current: 1 } });
+  if (!res.data?.ok) return undefined;
+  return res.data?.data?.records?.[0];
+}
+
+async function listByName(page, url, nameField, name) {
+  const res = await apiPost(page, url, { page: { size: 1, current: 1 }, [nameField]: name });
+  if (!res.data?.ok) return undefined;
+  return res.data?.data?.records?.[0];
+}
+
+function uniqueName(prefix) {
+  return `e2e_${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+async function createEntity(page, cleanupStack, seed) {
+  const name = String(seed.body[seed.nameField]);
+  const existingId = idOf(await listByName(page, seed.listUrl, seed.nameField, name));
+  if (existingId) return existingId;
+
+  const add = await apiPost(page, seed.addUrl, seed.body);
+  if (!add.data?.ok) {
+    throw new Error(`Failed to seed ${seed.addUrl}: ${JSON.stringify(add.data)}`);
+  }
+
+  const id = idOf(add.data?.data) || idOf(await listByName(page, seed.listUrl, seed.nameField, name));
+  if (!id) {
+    throw new Error(`Seeded ${seed.addUrl} but could not resolve created id for ${name}`);
+  }
+
+  cleanupStack.push(async () => {
+    await apiPost(page, seed.deleteUrl, {}, { id }).catch(() => {});
+  });
+  return id;
+}
+
+async function discoverRouteIds(page) {
+  const [driver, profile, device, point, api, resource, menu, user, role] = await Promise.all([
+    firstRecord(page, '/api/v3/manager/driver/list'),
+    firstRecord(page, '/api/v3/manager/profile/list'),
+    firstRecord(page, '/api/v3/manager/device/list'),
+    firstRecord(page, '/api/v3/manager/point/list'),
+    firstRecord(page, '/api/v3/auth/api/list'),
+    firstRecord(page, '/api/v3/auth/resource/list'),
+    firstRecord(page, '/api/v3/auth/menu/list'),
+    firstRecord(page, '/api/v3/auth/user_profile/list'),
+    firstRecord(page, '/api/v3/auth/role/list'),
+  ]);
+
+  return {
+    driverId: idOf(driver),
+    profileId: idOf(profile),
+    deviceId: idOf(device),
+    pointId: idOf(point),
+    pointProfileId: point?.profileId ? String(point.profileId) : undefined,
+    apiId: idOf(api),
+    resourceId: idOf(resource),
+    menuId: idOf(menu),
+    userId: idOf(user),
+    roleId: idOf(role),
+  };
+}
+
+async function ensureE2eData(page) {
+  const cleanupStack = [];
+  const discovered = await discoverRouteIds(page);
+  const suffix = uniqueName('route');
+
+  const driverId =
+    discovered.driverId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/manager/driver/list',
+      addUrl: '/api/v3/manager/driver/add',
+      deleteUrl: '/api/v3/manager/driver/delete',
+      nameField: 'driverName',
+      body: {
+        driverName: suffix,
+        driverCode: suffix,
+        serviceName: `dc3-e2e-${suffix}`,
+        serviceHost: '127.0.0.1',
+        driverTypeFlag: 'CUSTOM',
+        enableFlag: 'ENABLE',
+        remark: 'created by e2e route fixture',
+      },
+    }));
+
+  const profileId =
+    discovered.profileId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/manager/profile/list',
+      addUrl: '/api/v3/manager/profile/add',
+      deleteUrl: '/api/v3/manager/profile/delete',
+      nameField: 'profileName',
+      body: {
+        profileName: suffix,
+        profileCode: suffix,
+        enableFlag: 'ENABLE',
+        remark: 'created by e2e route fixture',
+      },
+    }));
+
+  const deviceId =
+    discovered.deviceId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/manager/device/list',
+      addUrl: '/api/v3/manager/device/add',
+      deleteUrl: '/api/v3/manager/device/delete',
+      nameField: 'deviceName',
+      body: {
+        deviceName: suffix,
+        deviceCode: suffix,
+        driverId,
+        profileIds: [profileId],
+        enableFlag: 'ENABLE',
+        remark: 'created by e2e route fixture',
+      },
+    }));
+
+  const pointId =
+    discovered.pointId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/manager/point/list',
+      addUrl: '/api/v3/manager/point/add',
+      deleteUrl: '/api/v3/manager/point/delete',
+      nameField: 'pointName',
+      body: {
+        pointName: suffix,
+        pointCode: suffix,
+        pointTypeFlag: 'STRING',
+        rwFlag: 'RW',
+        profileId,
+        unit: '',
+        enableFlag: 'ENABLE',
+        remark: 'created by e2e route fixture',
+      },
+    }));
+
+  const apiId =
+    discovered.apiId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/auth/api/list',
+      addUrl: '/api/v3/auth/api/add',
+      deleteUrl: '/api/v3/auth/api/delete',
+      nameField: 'apiName',
+      body: {
+        apiName: suffix,
+        apiCode: `E2E_${suffix}`.toUpperCase(),
+        serviceName: 'dc3-e2e',
+        apiTypeFlag: 'POST',
+        apiGroup: 'e2e',
+        enableFlag: 'ENABLE',
+        remark: 'created by e2e route fixture',
+        apiExt: { content: { url: '/e2e/fixture', title: suffix, remark: 'created by e2e route fixture' } },
+      },
+    }));
+
+  const resourceId =
+    discovered.resourceId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/auth/resource/list',
+      addUrl: '/api/v3/auth/resource/add',
+      deleteUrl: '/api/v3/auth/resource/delete',
+      nameField: 'resourceName',
+      body: {
+        parentResourceId: 0,
+        resourceName: suffix,
+        resourceCode: suffix,
+        resourceTypeFlag: 'API',
+        resourceScopeFlag: 'LIST',
+        entityId: apiId,
+        enableFlag: 'ENABLE',
+        remark: 'created by e2e route fixture',
+      },
+    }));
+
+  const menuId =
+    discovered.menuId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/auth/menu/list',
+      addUrl: '/api/v3/auth/menu/add',
+      deleteUrl: '/api/v3/auth/menu/delete',
+      nameField: 'menuName',
+      body: {
+        parentMenuId: 0,
+        menuName: suffix,
+        menuCode: suffix,
+        menuTypeFlag: 'COMMON',
+        menuLevel: 'C1',
+        menuIndex: 999,
+        enableFlag: 'ENABLE',
+        remark: 'created by e2e route fixture',
+        menuExt: { content: { titles: { zh: suffix, en: suffix }, icon: 'Menu', url: '/e2e-fixture' } },
+      },
+    }));
+
+  const userId =
+    discovered.userId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/auth/user_profile/list',
+      addUrl: '/api/v3/auth/user_profile/add',
+      deleteUrl: '/api/v3/auth/user_profile/delete',
+      nameField: 'userName',
+      body: {
+        userName: suffix,
+        nickName: suffix,
+        phone: `139${String(Date.now()).slice(-8)}`,
+        email: `${suffix}@example.com`,
+        enableFlag: 0,
+      },
+    }));
+
+  const roleId =
+    discovered.roleId ||
+    (await createEntity(page, cleanupStack, {
+      listUrl: '/api/v3/auth/role/list',
+      addUrl: '/api/v3/auth/role/add',
+      deleteUrl: '/api/v3/auth/role/delete',
+      nameField: 'roleName',
+      body: {
+        parentRoleId: 0,
+        roleName: suffix,
+        roleCode: `E2E_${suffix}`.toUpperCase(),
+        enableFlag: 'ENABLE',
+        remark: 'created by e2e route fixture',
+      },
+    }));
+
+  Object.assign(routeIds, {
+    driverId,
+    profileId,
+    deviceId,
+    pointId,
+    pointProfileId: discovered.pointProfileId || profileId,
+    apiId,
+    resourceId,
+    menuId,
+    userId,
+    roleId,
+  });
+
+  return async () => {
+    for (const clean of cleanupStack.reverse()) {
+      await clean();
+    }
+  };
 }
 
 async function testSearch(page, watch, pageDef, result) {
@@ -742,7 +1088,7 @@ async function securityTest(browser) {
     if (isBusinessApi(req.url())) businessApiRequests.push(req.url());
   });
 
-  for (const route of protectedRoutes) {
+  for (const route of [...baseProtectedRoutes, ...protectedRouteProbes]) {
     await page.goto(`${BASE}/#${route}`, { waitUntil: 'domcontentloaded' });
     await waitPage(page);
     results.push({ route, ok: page.url().includes('/login'), url: page.url() });
@@ -759,6 +1105,7 @@ async function securityTest(browser) {
 
 async function routeOpenTest(page, watch) {
   const results = [];
+  const openRoutes = ['/login', '/403', '/404', '/500', ...baseProtectedRoutes, ...entityRoutes()];
   for (const route of openRoutes) {
     const mark = markWatch(watch);
     await page.goto(`${BASE}/#${route}`, { waitUntil: 'domcontentloaded' });
@@ -828,10 +1175,15 @@ async function interactionTest(page, watch) {
   };
 }
 
-const browser = await chromium.launch({
-  executablePath: CHROME,
-  headless: true,
-});
+const launchOptions = {
+  headless: HEADLESS,
+};
+
+if (CHROME) {
+  launchOptions.executablePath = CHROME;
+}
+
+const browser = await chromium.launch(launchOptions);
 
 const security = await securityTest(browser);
 
@@ -840,11 +1192,18 @@ const page = await context.newPage();
 const watch = createWatch(page);
 await login(page);
 
-const routeOpen = await routeOpenTest(page, watch);
-const interactions = await interactionTest(page, watch);
+const cleanupE2eData = await ensureE2eData(page);
+let routeOpen;
+let interactions;
 
-await context.close();
-await browser.close();
+try {
+  routeOpen = await routeOpenTest(page, watch);
+  interactions = await interactionTest(page, watch);
+} finally {
+  await cleanupE2eData();
+  await context.close();
+  await browser.close();
+}
 
 const output = {
   security,
