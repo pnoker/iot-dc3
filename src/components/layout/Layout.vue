@@ -146,7 +146,6 @@
     profileEdit: 'nav.profileEdit',
     pointDetail: 'nav.pointDetail',
     pointEdit: 'nav.pointEdit',
-    application: 'nav.application',
     settings: 'nav.settings',
     settingsUser: 'nav.settingsUser',
     settingsRole: 'nav.settingsRole',

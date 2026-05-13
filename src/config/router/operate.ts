@@ -27,21 +27,6 @@ const Layout = () => import('@/components/layout/Layout.vue');
  */
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/home',
-    component: Layout,
-    children: [
-      {
-        name: 'application',
-        path: '/home/application',
-        meta: {
-          icon: 'el-icon-s-home',
-          title: 'Application',
-        },
-        component: () => import('@/views/application/Application.vue'),
-      },
-    ],
-  },
-  {
     path: '/driver',
     component: Layout,
     children: [

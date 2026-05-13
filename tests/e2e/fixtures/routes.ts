@@ -29,7 +29,6 @@ export interface RouteIds {
 
 export const protectedRoutes = [
   '/home',
-  '/home/application',
   '/driver',
   '/profile',
   '/device',
