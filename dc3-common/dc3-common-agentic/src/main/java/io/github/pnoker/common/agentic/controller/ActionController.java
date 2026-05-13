@@ -27,9 +27,9 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -48,8 +48,8 @@ public class ActionController implements BaseController {
         this.actionService = actionService;
     }
 
-    @GetMapping("/pending/{conversationId}")
-    public Mono<R<List<ActionVO>>> pending(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
+    @GetMapping("/pending")
+    public Mono<R<List<ActionVO>>> pending(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
@@ -60,8 +60,8 @@ public class ActionController implements BaseController {
         }));
     }
 
-    @PostMapping("/{actionId}/confirm")
-    public Mono<R<ActionVO>> confirm(@NotBlank @PathVariable(value = "actionId") String actionId) {
+    @PostMapping("/confirm")
+    public Mono<R<ActionVO>> confirm(@NotBlank @RequestParam(value = "action_id") String actionId) {
         return getUserHeader().flatMap(header -> async(() -> {
             ActionBO actionBO = actionService.confirm(actionId, header);
             ActionVO action = actionBuilder.buildVOByBO(actionBO);
@@ -70,8 +70,8 @@ public class ActionController implements BaseController {
         }));
     }
 
-    @PostMapping("/{actionId}/reject")
-    public Mono<R<ActionVO>> reject(@NotBlank @PathVariable(value = "actionId") String actionId) {
+    @PostMapping("/reject")
+    public Mono<R<ActionVO>> reject(@NotBlank @RequestParam(value = "action_id") String actionId) {
         return getUserHeader().flatMap(header -> async(() -> {
             ActionBO actionBO = actionService.reject(actionId, header);
             ActionVO action = actionBuilder.buildVOByBO(actionBO);

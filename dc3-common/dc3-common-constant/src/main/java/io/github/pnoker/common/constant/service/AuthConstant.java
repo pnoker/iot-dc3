@@ -36,7 +36,7 @@ public class AuthConstant {
 
     public static final String USER_URL_PREFIX = "/user";
 
-    public static final String USER_PROFILE_URL_PREFIX = "/user-profile";
+    public static final String USER_PROFILE_URL_PREFIX = "/user_profile";
 
     public static final String TENANT_URL_PREFIX = "/tenant";
 
@@ -48,9 +48,9 @@ public class AuthConstant {
 
     public static final String RESOURCE_URL_PREFIX = "/resource";
 
-    public static final String ROLE_USER_URL_PREFIX = "/role-user";
+    public static final String ROLE_USER_URL_PREFIX = "/role_user";
 
-    public static final String ROLE_RESOURCE_URL_PREFIX = "/role-resource";
+    public static final String ROLE_RESOURCE_URL_PREFIX = "/role_resource";
 
     public static final String API_URL_PREFIX = "/api";
 

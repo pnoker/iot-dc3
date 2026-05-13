@@ -62,7 +62,7 @@ public class DashboardController implements BaseController {
     }
 
     @GetMapping("/device/stats")
-    public Mono<R<DeviceStatsVO>> deviceStats(@RequestParam(value = "topN", defaultValue = "10") int topN) {
+    public Mono<R<DeviceStatsVO>> deviceStats(@RequestParam(value = "top_n", defaultValue = "10") int topN) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.deviceStats(tenantId, topN))));
     }
 
@@ -90,7 +90,7 @@ public class DashboardController implements BaseController {
      */
     @GetMapping("/topology")
     public Mono<R<TopologyVO>> topology(@RequestParam(value = "mode", defaultValue = "cardinality") String mode,
-                                        @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+                                        @RequestParam(value = "range_key", required = false) String rangeKey) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.topology(tenantId, mode, rangeKey))));
     }
 

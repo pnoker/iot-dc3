@@ -29,7 +29,6 @@ import io.github.pnoker.common.entity.query.PointValueQuery;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -104,9 +103,9 @@ public class PointValueController implements BaseController {
      * @param pointId  Point ID
      * @return List of String, where each String is the historical value for the point
      */
-    @GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
-    public Mono<R<List<String>>> history(@NotNull @PathVariable(name = "deviceId") Long deviceId,
-                                         @NotNull @PathVariable(name = "pointId") Long pointId,
+    @GetMapping("/select_history_by_device_id_and_point_id")
+    public Mono<R<List<String>>> history(@NotNull @RequestParam(name = "device_id") Long deviceId,
+                                         @NotNull @RequestParam(name = "point_id") Long pointId,
                                          @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);
