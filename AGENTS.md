@@ -298,10 +298,19 @@ Run checks proportional to the change:
 
 - Java/shared behavior: `mvn -s .mvn/settings.xml -q -DskipTests compile`
 - Full package: `mvn -s .mvn/settings.xml clean package`
+- Behaviour change in tested code: `make test`
+- DAL or SQL change: `make test-it` (requires Docker, runs Testcontainers)
+- gRPC proto change: regenerate stubs and run the matching contract tests
+- Aggregate coverage check: `make coverage` and inspect
+  `dc3-coverage/target/site/jacoco-aggregate/index.html`. Coverage
+  regressions greater than 1% block the change.
 - Changelog script: `python3 -m py_compile dc3/bin/changelog.py`
 - Compose files: `docker compose -f dc3/<file>.yml config --quiet`
 - YAML syntax: parse changed YAML after normalizing Maven placeholders such as `@project.artifactId@`
 - Agent or docs changes: check links, command examples, stale filenames, and current workflow names
+
+See `dc3/doc/TESTING.md` for the full test pyramid, naming conventions,
+Testcontainers strategy and CI workflow expectations.
 
 Before committing code that changes public behavior, mention what was verified and what was not verified.
 
@@ -340,4 +349,5 @@ their own identity.
 - Runtime and environment changes should update `dc3/doc/ENVIRONMENT.md`.
 - Driver authoring changes should update `dc3/doc/DRIVER-AUTHORING.md`.
 - Container changes should update compose examples and `.env.example` if variables change.
+- Test strategy, harness or coverage gate changes should update `dc3/doc/TESTING.md`.
 - Release workflow changes should update `CONTRIBUTING.md` and this file.
