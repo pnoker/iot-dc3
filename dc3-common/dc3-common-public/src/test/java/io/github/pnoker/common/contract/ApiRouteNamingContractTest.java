@@ -45,48 +45,6 @@ class ApiRouteNamingContractTest {
     private static final Pattern REQUEST_PARAM = Pattern.compile("@RequestParam\\s*\\((.*?)\\)", Pattern.DOTALL);
     private static final Pattern NAMED_REQUEST_PARAM = Pattern.compile("(?:value|name)\\s*=\\s*\"([^\"]+)\"");
 
-    @Test
-    void controllerRoutesUseLowerSnakeCaseAndQueryParams() throws IOException {
-        List<String> violations = new ArrayList<>();
-
-        for (Path source : javaSources()) {
-            String text = Files.readString(source);
-            if (text.contains("PathVariable")) {
-                violations.add("%s imports or uses PathVariable".formatted(source));
-            }
-            if (text.contains("AttachmentUploadRequest")) {
-                violations.add("%s uses JSON/Base64 attachment upload request instead of multipart file upload".formatted(source));
-            }
-            if (text.contains("MultipartFile")) {
-                violations.add("%s uses MultipartFile; reactive controllers should use FilePart".formatted(source));
-            }
-            if (text.contains("FileUtil.getTempPath() +")) {
-                violations.add("%s concatenates upload temp paths instead of using module-scoped FileUtil helpers".formatted(source));
-            }
-
-            Matcher mappings = MAPPING.matcher(text);
-            while (mappings.find()) {
-                Matcher literals = STRING_LITERAL.matcher(mappings.group(1));
-                while (literals.find()) {
-                    assertRoute(source, literals.group(1), violations);
-                }
-            }
-
-            Matcher requestParams = REQUEST_PARAM.matcher(text);
-            while (requestParams.find()) {
-                assertRequestParam(source, requestParams.group(1), violations);
-            }
-
-            Matcher methodMappings = METHOD_MAPPING.matcher(text);
-            while (methodMappings.find()) {
-                assertMethodRoute(source, methodMappings.group(1), methodMappings.group(2), methodMappings.group(3),
-                        violations);
-            }
-        }
-
-        assertThat(violations).isEmpty();
-    }
-
     private static List<Path> javaSources() throws IOException {
         Path commonRoot = Path.of("..").toAbsolutePath().normalize();
         try (var stream = Files.walk(commonRoot)) {
@@ -154,6 +112,48 @@ class ApiRouteNamingContractTest {
         if (name.matches(".*[A-Z-].*")) {
             violations.add("%s uses non-snake-case request param %s".formatted(source, name));
         }
+    }
+
+    @Test
+    void controllerRoutesUseLowerSnakeCaseAndQueryParams() throws IOException {
+        List<String> violations = new ArrayList<>();
+
+        for (Path source : javaSources()) {
+            String text = Files.readString(source);
+            if (text.contains("PathVariable")) {
+                violations.add("%s imports or uses PathVariable".formatted(source));
+            }
+            if (text.contains("AttachmentUploadRequest")) {
+                violations.add("%s uses JSON/Base64 attachment upload request instead of multipart file upload".formatted(source));
+            }
+            if (text.contains("MultipartFile")) {
+                violations.add("%s uses MultipartFile; reactive controllers should use FilePart".formatted(source));
+            }
+            if (text.contains("FileUtil.getTempPath() +")) {
+                violations.add("%s concatenates upload temp paths instead of using module-scoped FileUtil helpers".formatted(source));
+            }
+
+            Matcher mappings = MAPPING.matcher(text);
+            while (mappings.find()) {
+                Matcher literals = STRING_LITERAL.matcher(mappings.group(1));
+                while (literals.find()) {
+                    assertRoute(source, literals.group(1), violations);
+                }
+            }
+
+            Matcher requestParams = REQUEST_PARAM.matcher(text);
+            while (requestParams.find()) {
+                assertRequestParam(source, requestParams.group(1), violations);
+            }
+
+            Matcher methodMappings = METHOD_MAPPING.matcher(text);
+            while (methodMappings.find()) {
+                assertMethodRoute(source, methodMappings.group(1), methodMappings.group(2), methodMappings.group(3),
+                        violations);
+            }
+        }
+
+        assertThat(violations).isEmpty();
     }
 
 }

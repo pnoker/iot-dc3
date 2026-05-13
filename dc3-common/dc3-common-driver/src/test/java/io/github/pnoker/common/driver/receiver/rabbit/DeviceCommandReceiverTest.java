@@ -33,10 +33,7 @@ import org.springframework.amqp.core.MessageProperties;
 import java.lang.reflect.Field;
 
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceCommandReceiverTest {
@@ -52,6 +49,12 @@ class DeviceCommandReceiverTest {
 
     private DeviceCommandReceiver receiver;
     private Message message;
+
+    private static void injectField(Object target, String name, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -108,11 +111,5 @@ class DeviceCommandReceiverTest {
         doThrow(new RuntimeException("driver offline")).when(driverReadService).read(dto);
         receiver.deviceCommandReceive(channel, message, dto);
         verify(channel).basicNack(eq(7L), eq(false), eq(true));
-    }
-
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
     }
 }

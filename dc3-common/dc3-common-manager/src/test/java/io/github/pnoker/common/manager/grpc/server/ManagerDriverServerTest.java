@@ -62,6 +62,12 @@ class ManagerDriverServerTest {
     private ManagedChannel channel;
     private DriverApiGrpc.DriverApiBlockingStub stub;
 
+    private static void injectField(Object target, String name, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         ManagerDriverServer driverServer = new ManagerDriverServer();
@@ -160,11 +166,5 @@ class ManagerDriverServerTest {
         assertThat(response.getData().getPage().getCurrent()).isEqualTo(2L);
         assertThat(response.getData().getPage().getSize()).isEqualTo(10L);
         assertThat(response.getData().getPage().getTotal()).isEqualTo(25L);
-    }
-
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
     }
 }

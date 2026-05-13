@@ -40,9 +40,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MetadataReceiverTest {
@@ -62,6 +60,24 @@ class MetadataReceiverTest {
     private DriverMetadata driverMetadata;
     private MetadataReceiver receiver;
     private Message message;
+
+    private static MetadataEventDTO event(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO dto = new MetadataEventDTO();
+        dto.setMetadataType(type);
+        dto.setOperateType(op);
+        dto.setId(id);
+        return dto;
+    }
+
+    private static void injectField(Object target, String name, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
+    private static <T> T any() {
+        return org.mockito.ArgumentMatchers.any();
+    }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -147,23 +163,5 @@ class MetadataReceiverTest {
                 .when(metadataEventPublisher).publishEvent(any());
         receiver.metadataReceive(channel, message, dto);
         verify(channel).basicNack(eq(7L), eq(false), eq(true));
-    }
-
-    private static MetadataEventDTO event(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO dto = new MetadataEventDTO();
-        dto.setMetadataType(type);
-        dto.setOperateType(op);
-        dto.setId(id);
-        return dto;
-    }
-
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
-
-    private static <T> T any() {
-        return org.mockito.ArgumentMatchers.any();
     }
 }

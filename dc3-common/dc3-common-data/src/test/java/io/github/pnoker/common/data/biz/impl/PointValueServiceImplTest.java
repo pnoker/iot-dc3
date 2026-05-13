@@ -32,21 +32,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PointValueServiceImplTest {
@@ -67,6 +62,24 @@ class PointValueServiceImplTest {
     private PointValueServiceImpl service;
 
     private PointValueBO pv;
+
+    private static Long eqLong(long value) {
+        return org.mockito.ArgumentMatchers.eq(value);
+    }
+
+    private static FacadeDeviceBO stubDevice(Long tenantId, Long profileId) {
+        FacadeDeviceBO device = new FacadeDeviceBO();
+        device.setTenantId(tenantId);
+        device.setProfileIds(List.of(profileId));
+        return device;
+    }
+
+    private static FacadePointBO stubPoint(Long tenantId, Long profileId) {
+        FacadePointBO point = new FacadePointBO();
+        point.setTenantId(tenantId);
+        point.setProfileId(profileId);
+        return point;
+    }
 
     @BeforeEach
     void setUp() {
@@ -245,23 +258,5 @@ class PointValueServiceImplTest {
             service.page(query);
             verify(repositoryService).selectPagePointValue(query);
         }
-    }
-
-    private static Long eqLong(long value) {
-        return org.mockito.ArgumentMatchers.eq(value);
-    }
-
-    private static FacadeDeviceBO stubDevice(Long tenantId, Long profileId) {
-        FacadeDeviceBO device = new FacadeDeviceBO();
-        device.setTenantId(tenantId);
-        device.setProfileIds(List.of(profileId));
-        return device;
-    }
-
-    private static FacadePointBO stubPoint(Long tenantId, Long profileId) {
-        FacadePointBO point = new FacadePointBO();
-        point.setTenantId(tenantId);
-        point.setProfileId(profileId);
-        return point;
     }
 }

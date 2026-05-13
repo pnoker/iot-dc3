@@ -38,9 +38,7 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PointValueJobTest {
@@ -54,6 +52,12 @@ class PointValueJobTest {
     private PointValueJob job;
     private ExecutorService executor;
     private PointBatchProperties properties;
+
+    private static void injectField(Object target, String name, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -120,11 +124,5 @@ class PointValueJobTest {
     void hourlyJobForDataExecutesWithoutThrowing() {
         HourlyJobForData hourly = new HourlyJobForData();
         assertThatNoException().isThrownBy(() -> hourly.executeInternal(jobExecutionContext));
-    }
-
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
     }
 }

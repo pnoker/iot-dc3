@@ -82,6 +82,34 @@ class IndexedEnumContractTest {
             ResponseEnum.class,
             RwFlagEnum.class);
 
+    private static Method method(Class<?> type, String name, Class<?>... parameterTypes) {
+        try {
+            return type.getMethod(name, parameterTypes);
+        } catch (NoSuchMethodException e) {
+            throw new AssertionError(
+                    "Enum %s does not expose %s(%s)".formatted(
+                            type.getName(), name, String.join(",",
+                                    Stream.of(parameterTypes).map(Class::getSimpleName).toList())),
+                    e);
+        }
+    }
+
+    private static Byte unusedIndex(Enum<?>[] constants, Method getIndex) throws Exception {
+        Set<Byte> taken = new HashSet<>();
+        for (Enum<?> constant : constants) {
+            taken.add((Byte) getIndex.invoke(constant));
+        }
+        // Search in the full Byte range so wide-coded enums like ResponseEnum
+        // (codes around 200, 500, 20301) still find a free slot.
+        for (int candidate = -128; candidate <= 127; candidate++) {
+            Byte byteCandidate = (byte) candidate;
+            if (!taken.contains(byteCandidate)) {
+                return byteCandidate;
+            }
+        }
+        throw new IllegalStateException("No unused byte index available");
+    }
+
     @TestFactory
     Stream<DynamicTest> indexedEnumsHonourTheStandardContract() {
         return INDEXED_ENUMS.stream().flatMap(this::contractFor);
@@ -121,33 +149,5 @@ class IndexedEnumContractTest {
                         }));
 
         return Stream.concat(perConstant, rejection);
-    }
-
-    private static Method method(Class<?> type, String name, Class<?>... parameterTypes) {
-        try {
-            return type.getMethod(name, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            throw new AssertionError(
-                    "Enum %s does not expose %s(%s)".formatted(
-                            type.getName(), name, String.join(",",
-                                    Stream.of(parameterTypes).map(Class::getSimpleName).toList())),
-                    e);
-        }
-    }
-
-    private static Byte unusedIndex(Enum<?>[] constants, Method getIndex) throws Exception {
-        Set<Byte> taken = new HashSet<>();
-        for (Enum<?> constant : constants) {
-            taken.add((Byte) getIndex.invoke(constant));
-        }
-        // Search in the full Byte range so wide-coded enums like ResponseEnum
-        // (codes around 200, 500, 20301) still find a free slot.
-        for (int candidate = -128; candidate <= 127; candidate++) {
-            Byte byteCandidate = (byte) candidate;
-            if (!taken.contains(byteCandidate)) {
-                return byteCandidate;
-            }
-        }
-        throw new IllegalStateException("No unused byte index available");
     }
 }

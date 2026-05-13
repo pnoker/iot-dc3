@@ -42,33 +42,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticGatewayFilterTest {
 
     @Mock
     private FilterService filterService;
-
-    private AuthenticGatewayFilter filter(boolean signingEnabled) {
-        return new AuthenticGatewayFilter(filterService,
-                new HmacAuthSigner(signingEnabled ? "test-secret" : null));
-    }
-
     private RequestHeader.UserHeader user;
     private FacadeUserLoginBO userLogin;
     private FacadeTenantBO tenant;
-
-    @BeforeEach
-    void setUp() {
-        user = new RequestHeader.UserHeader(7L, "Alice", "alice", 1L);
-        userLogin = new FacadeUserLoginBO();
-        userLogin.setLoginName("alice");
-        tenant = new FacadeTenantBO();
-        tenant.setTenantName("Acme");
-    }
 
     private static MockServerWebExchange exchange() {
         return MockServerWebExchange.from(MockServerHttpRequest.get("/api/manager/devices").build());
@@ -79,6 +62,20 @@ class AuthenticGatewayFilterTest {
             capture.set(ex);
             return Mono.empty();
         };
+    }
+
+    private AuthenticGatewayFilter filter(boolean signingEnabled) {
+        return new AuthenticGatewayFilter(filterService,
+                new HmacAuthSigner(signingEnabled ? "test-secret" : null));
+    }
+
+    @BeforeEach
+    void setUp() {
+        user = new RequestHeader.UserHeader(7L, "Alice", "alice", 1L);
+        userLogin = new FacadeUserLoginBO();
+        userLogin.setLoginName("alice");
+        tenant = new FacadeTenantBO();
+        tenant.setTenantName("Acme");
     }
 
     @Test

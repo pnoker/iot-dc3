@@ -29,19 +29,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FieldUtilTest {
 
-    static class Sample implements Serializable {
-        private String name;
-        private Long id;
-
-        public String getName() {
-            return name;
-        }
-
-        public Long getId() {
-            return id;
-        }
-    }
-
     @Test
     void getFieldExtractsLambdaPropertyName() {
         SFunction<Sample, ?> nameAccessor = Sample::getName;
@@ -85,5 +72,18 @@ class FieldUtilTest {
         assertThatThrownBy(constructor::newInstance)
                 .isInstanceOf(InvocationTargetException.class)
                 .hasCauseInstanceOf(IllegalStateException.class);
+    }
+
+    static class Sample implements Serializable {
+        private String name;
+        private Long id;
+
+        public String getName() {
+            return name;
+        }
+
+        public Long getId() {
+            return id;
+        }
     }
 }

@@ -34,6 +34,15 @@ class PointValueLocalCacheServiceTest {
     private LocalCacheService localCache;
     private PointValueLocalCacheService service;
 
+    private static PointValueBO pv(Long tenantId, Long deviceId, Long pointId, String raw) {
+        return PointValueBO.builder()
+                .tenantId(tenantId)
+                .deviceId(deviceId)
+                .pointId(pointId)
+                .rawValue(raw)
+                .build();
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         localCache = new LocalCacheService();
@@ -42,15 +51,6 @@ class PointValueLocalCacheServiceTest {
         Field field = PointValueLocalCacheService.class.getDeclaredField("localCacheService");
         field.setAccessible(true);
         field.set(service, localCache);
-    }
-
-    private static PointValueBO pv(Long tenantId, Long deviceId, Long pointId, String raw) {
-        return PointValueBO.builder()
-                .tenantId(tenantId)
-                .deviceId(deviceId)
-                .pointId(pointId)
-                .rawValue(raw)
-                .build();
     }
 
     @Test

@@ -73,6 +73,24 @@ class TokenServiceImplTest {
     private UserPasswordBO password;
     private TenantBindBO bind;
 
+    private static void setField(Object target, String name, Object value) throws Exception {
+        Field field = findField(target.getClass(), name);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
+    private static Field findField(Class<?> type, String name) throws NoSuchFieldException {
+        Class<?> current = type;
+        while (current != null) {
+            try {
+                return current.getDeclaredField(name);
+            } catch (NoSuchFieldException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        throw new NoSuchFieldException(name);
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         tenant = new TenantBO();
@@ -224,23 +242,5 @@ class TokenServiceImplTest {
         when(tenantBindService.selectByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(bind);
         TokenValid result = tokenService.checkValid(LOGIN, SALT, "garbage-token", TENANT_CODE);
         assertThat(result.isValid()).isFalse();
-    }
-
-    private static void setField(Object target, String name, Object value) throws Exception {
-        Field field = findField(target.getClass(), name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
-
-    private static Field findField(Class<?> type, String name) throws NoSuchFieldException {
-        Class<?> current = type;
-        while (current != null) {
-            try {
-                return current.getDeclaredField(name);
-            } catch (NoSuchFieldException ignored) {
-                current = current.getSuperclass();
-            }
-        }
-        throw new NoSuchFieldException(name);
     }
 }
