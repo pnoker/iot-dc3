@@ -99,6 +99,23 @@
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-web</artifactId>
         </dependency>
+
+        <!-- Reactive + gRPC test utilities -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-inprocess</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
