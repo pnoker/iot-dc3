@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.pnoker</groupId>
+        <artifactId>dc3-common</artifactId>
+        <version>2026.5.5</version>
+    </parent>
+
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-common-test</artifactId>
+    <version>2026.5.5</version>
+    <packaging>jar</packaging>
+
+    <inceptionYear>2016</inceptionYear>
+    <url>https://github.com/pnoker/iot-dc3</url>
+    <description>
+        Shared test fixtures, container helpers and contract base classes used across
+        the IoT DC3 platform test suites. Consumed by other modules with test scope.
+    </description>
+
+    <developers>
+        <developer>
+            <id>pnoker</id>
+            <name>pnoker</name>
+            <email>pnokers@icloud.com</email>
+            <roles>
+                <role>PMC</role>
+            </roles>
+            <organization>pnoker.github.io</organization>
+            <url>https://github.com/pnoker/iot-dc3</url>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>GNU Affero General Public License v3.0</name>
+            <url>https://www.gnu.org/licenses/agpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/pnoker/iot-dc3</url>
+        <connection>scm:git:https://github.com/pnoker/iot-dc3.git</connection>
+        <developerConnection>scm:git:https://github.com/pnoker/iot-dc3.git</developerConnection>
+    </scm>
+
+    <dependencies>
+        <!--
+          The compile-scope dependencies below are needed because dc3-common-test
+          ships its support code under src/main; consumer modules then depend on
+          this artifact with test scope.
+        -->
+
+        <!-- Spring Boot test starter (JUnit 5, Mockito, AssertJ, JsonAssert) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Reactor test utilities (StepVerifier) -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Spring AMQP test harness -->
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit-test</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- gRPC in-process channel -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-testing</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-inprocess</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Testcontainers core + database/messaging modules -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>rabbitmq</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>hivemq</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Postgres JDBC driver (used by Testcontainers JDBC URL) -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Awaitility for async assertions -->
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Instancio for fixture object generation -->
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- WireMock for HTTP stubbing -->
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- DC3 model dependencies for fixtures (BO/VO/DO references) -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-public</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-constant</artifactId>
+        </dependency>
+
+        <!-- Logging facade only; binding pulled in by spring-boot-starter-test -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
