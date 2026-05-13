@@ -1,0 +1,51 @@
+name: E2E
+
+on:
+  push:
+    branches: [ develop, release, main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: End-to-end suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: 21
+          cache: maven
+          cache-dependency-path: "**/pom.xml"
+
+      - name: Verify docker availability
+        run: |
+          docker version
+          docker info
+
+      - name: Run end-to-end suite
+        env:
+          TESTCONTAINERS_REUSE_ENABLE: "true"
+        run: |
+          set -euo pipefail
+          make test-e2e
+
+      - name: Upload failsafe reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-failsafe-reports
+          path: dc3-e2e/target/failsafe-reports/
+          if-no-files-found: ignore
+          retention-days: 14

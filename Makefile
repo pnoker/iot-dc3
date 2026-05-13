@@ -64,9 +64,13 @@ endif
 
 help:
 	echo 'You can use make to execute the following commands:' \
-	&& echo 'Usage: make [help | clean | package | changelog | app | app-all | dev-db | dev-optional | dev | dev-all | build | deploy | tag]' \
+	&& echo 'Usage: make [help | clean | package | test | test-it | test-e2e | coverage | changelog | app | app-all | dev-db | dev-optional | dev | dev-all | build | deploy | tag]' \
 	&& echo ' - make clean: clean Maven build artifacts' \
 	&& echo ' - make package: package all modules with Maven' \
+	&& echo ' - make test: run unit tests across the reactor (mvn test)' \
+	&& echo ' - make test-it: run integration tests across the reactor (mvn verify, skip unit phase)' \
+	&& echo ' - make test-e2e: run dockerised end-to-end suites (mvn verify -pl dc3-e2e -Pe2e)' \
+	&& echo ' - make coverage: produce the aggregated jacoco report (mvn verify -pl dc3-coverage -am)' \
 	&& echo ' - make changelog [FROM=<ref>] [TO=HEAD] [VERSION=<version>]: update dc3/doc/CHANGE.md from git commits' \
 	&& echo ' - make install-hooks: install repository Git hooks' \
 	&& echo ' - make tag: git tag' \
@@ -104,6 +108,18 @@ clean:
 
 package:
 	$(MVN) clean package
+
+test:
+	$(MVN) -B test
+
+test-it:
+	$(MVN) -B verify -Dskip.unit.tests=true
+
+test-e2e:
+	$(MVN) -B verify -pl dc3-e2e -am -Pe2e
+
+coverage:
+	$(MVN) -B verify -pl dc3-coverage -am
 
 tag:
 	dc3/bin/tag.sh
