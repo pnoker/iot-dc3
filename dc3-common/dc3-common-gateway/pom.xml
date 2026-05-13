@@ -102,6 +102,13 @@
             <artifactId>dc3-common-web</artifactId>
         </dependency>
 
+        <!-- Reactive test utilities for filter verification -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
