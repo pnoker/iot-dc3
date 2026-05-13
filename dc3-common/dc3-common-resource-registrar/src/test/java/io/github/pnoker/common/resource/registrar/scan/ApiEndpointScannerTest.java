@@ -139,23 +139,33 @@ class ApiEndpointScannerTest {
     @RequestMapping("/api/sample")
     static class SampleController {
         @GetMapping("/{id}")
-        public String get(String id) { return id; }
+        public String get(String id) {
+            return id;
+        }
 
         @PostMapping
-        public String create() { return "ok"; }
+        public String create() {
+            return "ok";
+        }
 
         @PutMapping("/{id}")
-        public String update(String id) { return id; }
+        public String update(String id) {
+            return id;
+        }
 
         @DeleteMapping("/{id}")
-        public String delete(String id) { return id; }
+        public String delete(String id) {
+            return id;
+        }
     }
 
     @RestController
     @RequestMapping("/api/duplicate")
     static class DuplicateController {
         @GetMapping("/api/sample/{id}")
-        public String collide(String id) { return id; }
+        public String collide(String id) {
+            return id;
+        }
     }
 
     @RestController
@@ -163,26 +173,34 @@ class ApiEndpointScannerTest {
     static class MultiMethodController {
         @RequestMapping(method = {org.springframework.web.bind.annotation.RequestMethod.GET,
                 org.springframework.web.bind.annotation.RequestMethod.POST})
-        public String both() { return "ok"; }
+        public String both() {
+            return "ok";
+        }
     }
 
     @RestController
     @RequestMapping("/api/patch")
     static class PatchOnlyController {
         @PatchMapping
-        public String patch() { return "ok"; }
+        public String patch() {
+            return "ok";
+        }
     }
 
     @RestController
     static class ActuatorController {
         @GetMapping("/actuator/health")
-        public String health() { return "UP"; }
+        public String health() {
+            return "UP";
+        }
     }
 
     @RestController
     @RequestMapping("/api/methodless")
     static class MethodLessController {
         @RequestMapping
-        public String anything() { return "ok"; }
+        public String anything() {
+            return "ok";
+        }
     }
 }

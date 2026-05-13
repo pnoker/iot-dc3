@@ -172,8 +172,10 @@ public class UserLoginController implements BaseController {
     public Mono<R<UserLoginVO>> selectByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.selectByLoginName(name, false);
+            // Both "not found" and "wrong tenant" return the same 404 so the
+            // response shape does not reveal whether a login name exists.
             if (Objects.isNull(entityBO)) {
-                return R.fail(ResponseEnum.NO_RESOURCE.getText());
+                throw new NotFoundException("Resource does not exist");
             }
             requireTenantMember(tenantId, entityBO.getUserId());
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
@@ -199,14 +201,19 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * Name
+     * Check whether a login name is available (not yet taken) within the
+     * caller's tenant. Requires authentication so the name cannot be used to
+     * probe for accounts in other tenants.
      *
-     * @param name Name
-     * @return
+     * @param name login name to check
+     * @return {@code true} when the name is free to use
      */
     @GetMapping("/check")
     public Mono<R<Boolean>> checkLoginNameValid(@NotNull @RequestParam(value = "name") String name) {
-        return async(() -> Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? R.ok() : R.fail());
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            boolean available = userLoginService.checkLoginNameAvailable(name, tenantId);
+            return R.ok(available);
+        }));
     }
 
     private void requireTenantMember(Long tenantId, Long userId) {

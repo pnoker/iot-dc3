@@ -46,6 +46,10 @@ class DriverRegisterServiceImplTest {
     private DriverProperties properties;
     private DriverRegisterServiceImpl service;
 
+    private static <T> T any() {
+        return org.mockito.ArgumentMatchers.any();
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         properties = new DriverProperties();
@@ -90,9 +94,5 @@ class DriverRegisterServiceImplTest {
         assertThatThrownBy(() -> service.initial())
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("Driver initialization failed");
-    }
-
-    private static <T> T any() {
-        return org.mockito.ArgumentMatchers.any();
     }
 }

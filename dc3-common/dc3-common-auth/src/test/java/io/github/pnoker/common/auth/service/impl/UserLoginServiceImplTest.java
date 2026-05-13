@@ -38,13 +38,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserLoginServiceImplTest {
@@ -63,6 +59,24 @@ class UserLoginServiceImplTest {
 
     private UserLoginBO bo;
     private UserLoginDO doRow;
+
+    private static void setField(Object target, String name, Object value) throws Exception {
+        Field field = findField(target.getClass(), name);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
+    private static Field findField(Class<?> type, String name) throws NoSuchFieldException {
+        Class<?> current = type;
+        while (current != null) {
+            try {
+                return current.getDeclaredField(name);
+            } catch (NoSuchFieldException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        throw new NoSuchFieldException(name);
+    }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -161,21 +175,23 @@ class UserLoginServiceImplTest {
         assertThat(service.checkLoginNameValid("alice")).isFalse();
     }
 
-    private static void setField(Object target, String name, Object value) throws Exception {
-        Field field = findField(target.getClass(), name);
-        field.setAccessible(true);
-        field.set(target, value);
+    @Test
+    void checkLoginNameAvailableReturnsTrueWhenTenantHasNoMembers() {
+        when(tenantBindService.listUserIdsByTenantId(1L)).thenReturn(java.util.List.of());
+        assertThat(service.checkLoginNameAvailable("alice", 1L)).isTrue();
     }
 
-    private static Field findField(Class<?> type, String name) throws NoSuchFieldException {
-        Class<?> current = type;
-        while (current != null) {
-            try {
-                return current.getDeclaredField(name);
-            } catch (NoSuchFieldException ignored) {
-                current = current.getSuperclass();
-            }
-        }
-        throw new NoSuchFieldException(name);
+    @Test
+    void checkLoginNameAvailableReturnsTrueWhenNameNotInTenant() {
+        when(tenantBindService.listUserIdsByTenantId(1L)).thenReturn(java.util.List.of(1L, 2L));
+        when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        assertThat(service.checkLoginNameAvailable("newuser", 1L)).isTrue();
+    }
+
+    @Test
+    void checkLoginNameAvailableReturnsFalseWhenNameExistsInTenant() {
+        when(tenantBindService.listUserIdsByTenantId(1L)).thenReturn(java.util.List.of(1L, 2L));
+        when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
+        assertThat(service.checkLoginNameAvailable("alice", 1L)).isFalse();
     }
 }

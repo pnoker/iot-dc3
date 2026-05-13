@@ -51,7 +51,8 @@ class EnableOptionalTest {
     @Test
     void ifPresentOrElseFiresFallbackForUnknownIndex() {
         AtomicBoolean fallback = new AtomicBoolean(false);
-        EnableOptional.ofNullable((byte) 99).ifPresentOrElse(value -> {}, () -> fallback.set(true));
+        EnableOptional.ofNullable((byte) 99).ifPresentOrElse(value -> {
+        }, () -> fallback.set(true));
         assertThat(fallback).isTrue();
     }
 

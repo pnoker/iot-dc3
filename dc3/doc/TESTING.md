@@ -6,12 +6,12 @@ repository. It complements `AGENTS.md` (engineering rules), `LOGGING.md`
 
 ## 1. Test Pyramid
 
-| Layer | Goal | Mechanics | Target share |
-|---|---|---|---|
-| Unit | Fast, isolated business logic checks | JUnit 5 + Mockito + AssertJ | ~70% |
-| Slice | Spring slice tests for controllers, JSON, persistence | `@WebFluxTest`, `@JsonTest`, `@MybatisPlusTest` | ~25% |
+| Layer       | Goal                                                    | Mechanics                                        | Target share                        |
+|-------------|---------------------------------------------------------|--------------------------------------------------|-------------------------------------|
+| Unit        | Fast, isolated business logic checks                    | JUnit 5 + Mockito + AssertJ                      | ~70%                                |
+| Slice       | Spring slice tests for controllers, JSON, persistence   | `@WebFluxTest`, `@JsonTest`, `@MybatisPlusTest`  | ~25%                                |
 | Integration | Real infrastructure via Testcontainers, gRPC in-process | PG18+TimescaleDB, RabbitMQ, MQTT, gRPC InProcess | included in slice/integration share |
-| End-to-end | Full reactor against a docker-compose stack | `dc3-e2e` with rest-assured | ~5% |
+| End-to-end  | Full reactor against a docker-compose stack             | `dc3-e2e` with rest-assured                      | ~5%                                 |
 
 Aggregate coverage gates (read from `dc3-coverage`):
 
@@ -56,14 +56,14 @@ Naming rules:
 
 ## 3. When Tests Are Required
 
-| Change type | Required action |
-|---|---|
-| Bug fix | Add a regression test that fails before the fix |
-| New feature / behaviour change | Add unit + slice/integration coverage |
-| Refactor | Preserve coverage; add a contract test if behaviour was previously implicit |
-| DAL / SQL change | Run `make test-it`; add a Testcontainers slice test |
-| gRPC proto change | Update server + stub tests in the same PR |
-| Pure docs / formatting | No test required |
+| Change type                    | Required action                                                             |
+|--------------------------------|-----------------------------------------------------------------------------|
+| Bug fix                        | Add a regression test that fails before the fix                             |
+| New feature / behaviour change | Add unit + slice/integration coverage                                       |
+| Refactor                       | Preserve coverage; add a contract test if behaviour was previously implicit |
+| DAL / SQL change               | Run `make test-it`; add a Testcontainers slice test                         |
+| gRPC proto change              | Update server + stub tests in the same PR                                   |
+| Pure docs / formatting         | No test required                                                            |
 
 The `Validation Checklist` in `AGENTS.md` enumerates the full matrix.
 
@@ -88,11 +88,11 @@ Containers expose a single shared instance per JVM, started lazily on
 class-load and reused across modules via `withReuse(true)`. Pin images
 to the production-aligned tag:
 
-| Container | Image | Notes |
-|---|---|---|
+| Container              | Image                           | Notes                                                                          |
+|------------------------|---------------------------------|--------------------------------------------------------------------------------|
 | Postgres + TimescaleDB | `timescale/timescaledb-ha:pg18` | Mirrors the production Dockerfile under `dc3-docker/dc3/dependencies/postgres` |
-| RabbitMQ | `rabbitmq:3.13-management` | Publisher confirms + mandatory delivery enabled, mirroring `RabbitConfig` |
-| MQTT | `eclipse-mosquitto:2.0` | Anonymous access on port 1883 for driver tests |
+| RabbitMQ               | `rabbitmq:3.13-management`      | Publisher confirms + mandatory delivery enabled, mirroring `RabbitConfig`      |
+| MQTT                   | `eclipse-mosquitto:2.0`         | Anonymous access on port 1883 for driver tests                                 |
 
 The shared wrappers live in
 `dc3-common/dc3-common-test/src/main/java/io/github/pnoker/test/containers/`
@@ -152,11 +152,11 @@ temporarily.
 
 ## 9. CI
 
-| Workflow | Triggers | Jobs |
-|---|---|---|
-| `ci.yml` | push + PR to develop/release/main | `compile` (fast-fail) |
-| `test.yml` | push + PR to develop/release/main | `unit`, `integration`, `coverage` |
-| `e2e.yml` | push to develop/release/main + workflow_dispatch | `e2e` |
+| Workflow   | Triggers                                         | Jobs                              |
+|------------|--------------------------------------------------|-----------------------------------|
+| `ci.yml`   | push + PR to develop/release/main                | `compile` (fast-fail)             |
+| `test.yml` | push + PR to develop/release/main                | `unit`, `integration`, `coverage` |
+| `e2e.yml`  | push to develop/release/main + workflow_dispatch | `e2e`                             |
 
 PR review expectations:
 

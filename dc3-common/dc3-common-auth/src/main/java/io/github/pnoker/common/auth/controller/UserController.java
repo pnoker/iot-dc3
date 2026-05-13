@@ -130,8 +130,10 @@ public class UserController implements BaseController {
     public Mono<R<UserVO>> selectByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO entityBO = userService.selectByUserName(name, false);
+            // Both "not found" and "wrong tenant" return the same 404 so the
+            // response shape does not reveal whether a user name exists.
             if (Objects.isNull(entityBO)) {
-                return R.fail(ResponseEnum.NO_RESOURCE.getText());
+                throw new NotFoundException("Resource does not exist");
             }
             requireTenantMember(tenantId, entityBO.getId());
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);

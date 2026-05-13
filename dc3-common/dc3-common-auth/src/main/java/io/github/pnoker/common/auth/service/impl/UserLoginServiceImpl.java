@@ -145,6 +145,19 @@ public class UserLoginServiceImpl implements UserLoginService {
         return false;
     }
 
+    @Override
+    public boolean checkLoginNameAvailable(String loginName, Long tenantId) {
+        List<Long> userIds = tenantBindService.listUserIdsByTenantId(tenantId);
+        if (CollectionUtils.isEmpty(userIds)) {
+            return true;
+        }
+        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
+        wrapper.eq(UserLoginDO::getLoginName, loginName);
+        wrapper.in(UserLoginDO::getUserId, userIds);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        return Objects.isNull(userLoginManager.getOne(wrapper));
+    }
+
     /**
      * @param entityQuery {@link UserLoginQuery}
      * @return {@link LambdaQueryWrapper}

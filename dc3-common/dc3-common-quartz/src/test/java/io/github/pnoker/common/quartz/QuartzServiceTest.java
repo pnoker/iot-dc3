@@ -25,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.CronTrigger;
 import org.quartz.DateBuilder;
-import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -39,9 +38,7 @@ import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class QuartzServiceTest {
@@ -57,13 +54,6 @@ class QuartzServiceTest {
         Field field = QuartzService.class.getDeclaredField("scheduler");
         field.setAccessible(true);
         field.set(service, scheduler);
-    }
-
-    public static class SampleJob extends QuartzJobBean {
-        @Override
-        protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-            // no-op for testing
-        }
     }
 
     @Test
@@ -139,5 +129,12 @@ class QuartzServiceTest {
         when(scheduler.isShutdown()).thenReturn(false);
         org.mockito.Mockito.doThrow(new SchedulerException("boom")).when(scheduler).start();
         assertThatThrownBy(() -> service.startScheduler()).isInstanceOf(SchedulerException.class);
+    }
+
+    public static class SampleJob extends QuartzJobBean {
+        @Override
+        protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+            // no-op for testing
+        }
     }
 }

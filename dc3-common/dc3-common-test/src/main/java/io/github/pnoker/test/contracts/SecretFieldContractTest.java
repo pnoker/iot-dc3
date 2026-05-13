@@ -41,30 +41,6 @@ public abstract class SecretFieldContractTest {
     private static final Set<String> DEFAULT_SENSITIVE = Set.of(
             "apikey", "password", "secret", "token", "loginpassword", "saltpassword");
 
-    protected abstract List<Class<?>> voClasses();
-
-    protected Set<String> sensitiveFields() {
-        return DEFAULT_SENSITIVE;
-    }
-
-    @Test
-    void sensitiveFieldsMustBeAbsentFromToString() throws Exception {
-        Set<String> blocklist = new LinkedHashSet<>();
-        sensitiveFields().forEach(field -> blocklist.add(field.toLowerCase()));
-
-        for (Class<?> voClass : voClasses()) {
-            Object instance = newInstance(voClass);
-            populateStringFields(instance, blocklist);
-            String rendered = String.valueOf(instance).toLowerCase();
-            for (String forbidden : blocklist) {
-                assertThat(rendered)
-                        .as("toString() of %s must not contain field name %s",
-                                voClass.getSimpleName(), forbidden)
-                        .doesNotContain(forbidden + "=");
-            }
-        }
-    }
-
     private static Object newInstance(Class<?> type) throws ReflectiveOperationException {
         return type.getDeclaredConstructor().newInstance();
     }
@@ -90,6 +66,31 @@ public abstract class SecretFieldContractTest {
             }
             current = current.getSuperclass();
         }
-        Arrays.stream(instance.getClass().getDeclaredFields()).forEach(field -> {});
+        Arrays.stream(instance.getClass().getDeclaredFields()).forEach(field -> {
+        });
+    }
+
+    protected abstract List<Class<?>> voClasses();
+
+    protected Set<String> sensitiveFields() {
+        return DEFAULT_SENSITIVE;
+    }
+
+    @Test
+    void sensitiveFieldsMustBeAbsentFromToString() throws Exception {
+        Set<String> blocklist = new LinkedHashSet<>();
+        sensitiveFields().forEach(field -> blocklist.add(field.toLowerCase()));
+
+        for (Class<?> voClass : voClasses()) {
+            Object instance = newInstance(voClass);
+            populateStringFields(instance, blocklist);
+            String rendered = String.valueOf(instance).toLowerCase();
+            for (String forbidden : blocklist) {
+                assertThat(rendered)
+                        .as("toString() of %s must not contain field name %s",
+                                voClass.getSimpleName(), forbidden)
+                        .doesNotContain(forbidden + "=");
+            }
+        }
     }
 }

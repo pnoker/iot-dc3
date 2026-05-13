@@ -33,14 +33,9 @@ import org.springframework.core.env.Environment;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ResourceRegistrarTest {
@@ -56,6 +51,26 @@ class ResourceRegistrarTest {
 
     private ResourceRegistrarProperties properties;
     private ResourceRegistrar registrar;
+
+    private static FacadeScannedApiBO api(String method, String path) {
+        return FacadeScannedApiBO.builder()
+                .method(method)
+                .path(path)
+                .apiName("Sample." + method.toLowerCase())
+                .title(method.toLowerCase())
+                .remark("")
+                .apiGroup("Sample")
+                .build();
+    }
+
+    private static FacadeResourceRegistrySyncResultBO result(int inserted, int updated, int deleted, int unchanged) {
+        return FacadeResourceRegistrySyncResultBO.builder()
+                .inserted(inserted)
+                .updated(updated)
+                .deleted(deleted)
+                .unchanged(unchanged)
+                .build();
+    }
 
     @BeforeEach
     void setUp() {
@@ -185,25 +200,5 @@ class ResourceRegistrarTest {
         assertThatThrownBy(() -> registrar.register())
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("downstream offline");
-    }
-
-    private static FacadeScannedApiBO api(String method, String path) {
-        return FacadeScannedApiBO.builder()
-                .method(method)
-                .path(path)
-                .apiName("Sample." + method.toLowerCase())
-                .title(method.toLowerCase())
-                .remark("")
-                .apiGroup("Sample")
-                .build();
-    }
-
-    private static FacadeResourceRegistrySyncResultBO result(int inserted, int updated, int deleted, int unchanged) {
-        return FacadeResourceRegistrySyncResultBO.builder()
-                .inserted(inserted)
-                .updated(updated)
-                .deleted(deleted)
-                .unchanged(unchanged)
-                .build();
     }
 }

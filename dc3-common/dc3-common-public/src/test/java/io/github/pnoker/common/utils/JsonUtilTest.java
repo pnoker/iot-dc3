@@ -33,9 +33,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JsonUtilTest {
 
-    record Sample(String name, int age) {
-    }
-
     @Test
     void parseObjectFromString() {
         Sample sample = JsonUtil.parseObject("{\"name\":\"a\",\"age\":1}", Sample.class);
@@ -134,5 +131,8 @@ class JsonUtilTest {
         assertThatThrownBy(constructor::newInstance)
                 .isInstanceOf(InvocationTargetException.class)
                 .hasCauseInstanceOf(IllegalStateException.class);
+    }
+
+    record Sample(String name, int age) {
     }
 }
