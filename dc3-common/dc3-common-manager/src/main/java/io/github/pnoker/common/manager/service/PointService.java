@@ -19,12 +19,8 @@ package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
-import io.github.pnoker.common.manager.entity.bo.DeviceDataVolumeRunBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
-import io.github.pnoker.common.manager.entity.bo.PointDataStatisticsByDriverIdBO;
-import io.github.pnoker.common.manager.entity.bo.PointDataVolumeRunBO;
-import io.github.pnoker.common.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 
 import java.util.List;
@@ -85,25 +81,6 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     DeviceByPointBO selectPointStatisticsWithDevice(Long pointId);
 
     /**
-     *
-     * id
-     *
-     * @param pointId   id
-     * @param deviceIds id
-     * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
-     */
-    List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
-
-    /**
-     *
-     * id
-     *
-     * @param pointId id
-     * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
-     */
-    PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId);
-
-    /**
      * @param deviceId
      * @return
      */
@@ -114,32 +91,5 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @return
      */
     PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId);
-
-    /**
-     * @param deviceId
-     * @param pointIds
-     * @return
-     */
-    List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds);
-
-    /**
-     * @param driverId
-     * @return
-     */
-    PointDataVolumeRunDO selectPointDataByDriverId(Long driverId);
-
-    /**
-     * @param driverId
-     * @return
-     */
-    Long selectPointByDriverId(Long driverId);
-
-    /**
-     * 7 days
-     *
-     * @param driverId
-     * @return
-     */
-    PointDataStatisticsByDriverIdBO selectPointDataStatisticsByDriverId(Long driverId);
 
 }

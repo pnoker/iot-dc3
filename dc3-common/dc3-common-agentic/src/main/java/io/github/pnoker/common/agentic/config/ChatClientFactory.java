@@ -17,10 +17,14 @@
 package io.github.pnoker.common.agentic.config;
 
 import com.anthropic.client.AnthropicClient;
+import com.anthropic.client.AnthropicClientAsync;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.openai.client.OpenAIClient;
+import com.openai.client.OpenAIClientAsync;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.client.okhttp.OpenAIOkHttpClientAsync;
 import io.github.pnoker.common.agentic.dal.ModelConfigManager;
 import io.github.pnoker.common.agentic.dal.ModelProviderManager;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
@@ -156,8 +160,13 @@ public class ChatClientFactory {
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
                 .build();
+        OpenAIClientAsync openAiClientAsync = OpenAIOkHttpClientAsync.builder()
+                .baseUrl(provider.getBaseUrl())
+                .apiKey(provider.getApiKey())
+                .build();
         OpenAiChatModel chatModel = OpenAiChatModel.builder()
                 .openAiClient(openAiClient)
+                .openAiClientAsync(openAiClientAsync)
                 .build();
         return ChatClient.builder(chatModel).build();
     }
@@ -167,8 +176,13 @@ public class ChatClientFactory {
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
                 .build();
+        AnthropicClientAsync anthropicClientAsync = AnthropicOkHttpClientAsync.builder()
+                .baseUrl(provider.getBaseUrl())
+                .apiKey(provider.getApiKey())
+                .build();
         AnthropicChatModel chatModel = AnthropicChatModel.builder()
                 .anthropicClient(anthropicClient)
+                .anthropicClientAsync(anthropicClientAsync)
                 .build();
         return ChatClient.builder(chatModel).build();
     }

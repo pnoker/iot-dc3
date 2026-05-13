@@ -22,25 +22,16 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
-import io.github.pnoker.common.manager.entity.bo.DeviceDataVolumeRunBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
-import io.github.pnoker.common.manager.entity.bo.PointDataStatisticsByDriverIdBO;
-import io.github.pnoker.common.manager.entity.bo.PointDataVolumeRunBO;
 import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.manager.entity.builder.PointBuilder;
-import io.github.pnoker.common.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.entity.vo.DeviceByPointVO;
-import io.github.pnoker.common.manager.entity.vo.DeviceDataVolumeRunVO;
 import io.github.pnoker.common.manager.entity.vo.PointConfigByDeviceVO;
-import io.github.pnoker.common.manager.entity.vo.PointDataStatisticsByDriverIdVO;
-import io.github.pnoker.common.manager.entity.vo.PointDataVolumeRunVO;
 import io.github.pnoker.common.manager.entity.vo.PointVO;
 import io.github.pnoker.common.manager.service.DeviceService;
-import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.valid.Add;
@@ -82,17 +73,14 @@ public class PointController implements BaseController {
 
     private final DeviceService deviceService;
 
-    private final DriverService driverService;
-
     private final ProfileService profileService;
 
     public PointController(PointBuilder pointBuilder, PointService pointService, DeviceBuilder deviceBuilder,
-                           DeviceService deviceService, DriverService driverService, ProfileService profileService) {
+                           DeviceService deviceService, ProfileService profileService) {
         this.pointBuilder = pointBuilder;
         this.pointService = pointService;
         this.deviceBuilder = deviceBuilder;
         this.deviceService = deviceService;
-        this.driverService = driverService;
         this.profileService = profileService;
     }
 
@@ -261,45 +249,6 @@ public class PointController implements BaseController {
     }
 
     /**
-     *
-     * id
-     *
-     * @param pointId   id
-     * @param deviceIds id
-     * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
-     */
-    @PostMapping("/selectPointStatisticsByDeviceId/{pointId}")
-    public Mono<R<List<PointDataVolumeRunVO>>> selectPointStatisticsByDeviceId(
-            @NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, pointService.selectById(pointId));
-            Set<Long> scopedDeviceIds = filterTenant(tenantId, deviceService.selectByIds(deviceIds.stream().toList()))
-                    .stream()
-                    .map(DeviceBO::getId)
-                    .collect(Collectors.toSet());
-            List<PointDataVolumeRunBO> list = pointService.selectPointStatisticsByDeviceId(pointId, scopedDeviceIds);
-            List<PointDataVolumeRunVO> pointDataVolumeRunVO = pointBuilder.buildVOPointDataByBO(list);
-            return R.ok(pointDataVolumeRunVO);
-        }));
-    }
-
-    /**
-     *
-     * id
-     *
-     * @param pointId id
-     * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
-     */
-    @GetMapping("/selectPointStatisticsByPointId/{pointId}")
-    public Mono<R<Long>> selectPointStatisticsByPointId(@NotNull @PathVariable(value = "pointId") Long pointId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, pointService.selectById(pointId));
-            PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointStatisticsByPointId(pointId);
-            return R.ok(Objects.isNull(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
-        }));
-    }
-
-    /**
      * @param deviceId
      * @return
      */
@@ -324,64 +273,6 @@ public class PointController implements BaseController {
             PointConfigByDeviceBO pointConfigByDeviceBO = pointService.selectPointConfigByDeviceId(deviceId);
             PointConfigByDeviceVO pointConfigByDeviceVO = pointBuilder.buildVODeviceByBO(pointConfigByDeviceBO);
             return R.ok(pointConfigByDeviceVO);
-        }));
-    }
-
-    /**
-     * @param deviceId
-     * @param pointIds
-     * @return
-     */
-    @PostMapping("/selectDeviceStatisticsByPointId/{deviceId}")
-    public Mono<R<List<DeviceDataVolumeRunVO>>> selectDeviceStatisticsByPointId(
-            @NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.selectById(deviceId));
-            Set<Long> scopedPointIds = filterTenant(tenantId, pointService.selectByIds(pointIds)).stream()
-                    .map(PointBO::getId)
-                    .collect(Collectors.toSet());
-            List<DeviceDataVolumeRunBO> list = pointService.selectDeviceStatisticsByPointId(deviceId, scopedPointIds);
-            List<DeviceDataVolumeRunVO> deviceDataVolumeRunVOList = pointBuilder.buildVODeviceDataByBO(list);
-            return R.ok(deviceDataVolumeRunVOList);
-        }));
-    }
-
-    /**
-     * @param driverId
-     * @return
-     */
-    @GetMapping("/selectPointDataByDriverId/{driverId}")
-    public Mono<R<Long>> selectPointDataByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, driverService.selectById(driverId));
-            PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointDataByDriverId(driverId);
-            return R.ok(Objects.isNull(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
-        }));
-    }
-
-    /**
-     * @param driverId
-     * @return
-     */
-    @GetMapping("/selectPointByDriverId/{driverId}")
-    public Mono<R<Long>> selectPointByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, driverService.selectById(driverId));
-            Long result = pointService.selectPointByDriverId(driverId);
-            return R.ok(result);
-        }));
-    }
-
-    @GetMapping("/selectPointDataStatisticsByDriverId/{driverId}")
-    public Mono<R<PointDataStatisticsByDriverIdVO>> selectPointDataStatisticsByDriverId(
-            @NotNull @PathVariable(value = "driverId") Long driverId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, driverService.selectById(driverId));
-            PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOList = pointService
-                    .selectPointDataStatisticsByDriverId(driverId);
-            PointDataStatisticsByDriverIdVO pointDataStatisticsByDriverIdVOList = pointBuilder
-                    .buildVOPointDataDriverByBO(pointDataStatisticsByDriverIdBOList);
-            return R.ok(pointDataStatisticsByDriverIdVOList);
         }));
     }
 

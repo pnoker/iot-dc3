@@ -23,16 +23,10 @@ import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.RwFlagEnum;
-import io.github.pnoker.common.manager.entity.bo.DeviceDataVolumeRunBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
-import io.github.pnoker.common.manager.entity.bo.PointDataStatisticsByDriverIdBO;
-import io.github.pnoker.common.manager.entity.bo.PointDataVolumeRunBO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
-import io.github.pnoker.common.manager.entity.vo.DeviceDataVolumeRunVO;
 import io.github.pnoker.common.manager.entity.vo.PointConfigByDeviceVO;
-import io.github.pnoker.common.manager.entity.vo.PointDataStatisticsByDriverIdVO;
-import io.github.pnoker.common.manager.entity.vo.PointDataVolumeRunVO;
 import io.github.pnoker.common.manager.entity.vo.PointVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -209,13 +203,6 @@ public interface PointBuilder {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }
 
-    List<PointDataVolumeRunVO> buildVOPointDataByBO(List<PointDataVolumeRunBO> list);
-
     PointConfigByDeviceVO buildVODeviceByBO(PointConfigByDeviceBO pointConfigByDeviceBO);
-
-    List<DeviceDataVolumeRunVO> buildVODeviceDataByBO(List<DeviceDataVolumeRunBO> list);
-
-    PointDataStatisticsByDriverIdVO buildVOPointDataDriverByBO(
-            PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOList);
 
 }

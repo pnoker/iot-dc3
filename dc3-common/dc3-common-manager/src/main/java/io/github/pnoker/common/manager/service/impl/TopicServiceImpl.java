@@ -70,11 +70,11 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
         for (DeviceDO device : deviceList) {
             String deviceName = device.getDeviceName();
             Long deviceId = device.getId();
-            ProfileBindDO profileBind = Db.lambdaQuery(ProfileBindDO.class)
+            List<ProfileBindDO> profileBinds = Db.lambdaQuery(ProfileBindDO.class)
                     .eq(ProfileBindDO::getDeviceId, deviceId)
                     .eq(Objects.nonNull(topicQuery.getTenantId()), ProfileBindDO::getTenantId, topicQuery.getTenantId())
-                    .one();
-            if (Objects.nonNull(profileBind)) {
+                    .list();
+            for (ProfileBindDO profileBind : profileBinds) {
                 Long profileBindId = profileBind.getProfileId();
                 List<PointDO> points = Db.lambdaQuery(PointDO.class)
                         .eq(PointDO::getProfileId, profileBindId)
