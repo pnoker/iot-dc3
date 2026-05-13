@@ -23,19 +23,20 @@ import io.github.pnoker.common.agentic.dal.AttachmentManager;
 import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
 import io.github.pnoker.common.agentic.entity.builder.AttachmentBuilder;
 import io.github.pnoker.common.agentic.entity.model.AttachmentDO;
-import io.github.pnoker.common.agentic.entity.request.AttachmentUploadRequest;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -59,23 +60,36 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public AttachmentBO upload(AttachmentUploadRequest request, RequestHeader.UserHeader header) {
-        if (Objects.isNull(request) || StringUtils.isAnyBlank(request.getConversationId(), request.getFileName(),
-                request.getData())) {
+    public Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.UserHeader header) {
+        if (StringUtils.isBlank(conversationId) || Objects.isNull(filePart)
+                || StringUtils.isBlank(filePart.filename())) {
             throw new RequestException("Attachment data is required");
         }
-        byte[] content = decode(request.getData());
-        if (content.length > MAX_BYTES) {
+        assertContentLength(filePart);
+
+        Path filePath = resolveFilePath(conversationId, header, filePart.filename());
+        return filePart.transferTo(filePath.toFile())
+                .then(Mono.fromCallable(() -> saveAttachment(conversationId, filePart, filePath, header))
+                        .subscribeOn(Schedulers.boundedElastic()))
+                .doOnError(error -> deleteFile(filePath))
+                .onErrorMap(Exception.class, error -> error instanceof RequestException ? error
+                        : new RequestException("Attachment file save failed"));
+    }
+
+    private AttachmentBO saveAttachment(String conversationId, FilePart filePart, Path filePath,
+                                        RequestHeader.UserHeader header) throws Exception {
+        long size = Files.size(filePath);
+        if (size > MAX_BYTES) {
+            Files.deleteIfExists(filePath);
             throw new RequestException("Attachment size exceeds 10 MB");
         }
 
-        Path filePath = writeFile(request.getConversationId(), request.getFileName(), content);
-
         AttachmentBO entityBO = new AttachmentBO();
-        entityBO.setConversationId(request.getConversationId());
-        entityBO.setFileName(request.getFileName());
-        entityBO.setContentType(StringUtils.defaultIfBlank(request.getContentType(), "application/octet-stream"));
-        entityBO.setSize(Objects.nonNull(request.getSize()) ? request.getSize() : (long) content.length);
+        entityBO.setConversationId(conversationId);
+        entityBO.setFileName(filePart.filename());
+        MediaType contentType = filePart.headers().getContentType();
+        entityBO.setContentType(Objects.nonNull(contentType) ? contentType.toString() : "application/octet-stream");
+        entityBO.setSize(size);
         entityBO.setFilePath(filePath.toString());
         entityBO.setTenantId(header.getTenantId());
         entityBO.setUserId(header.getUserId());
@@ -118,24 +132,39 @@ public class AttachmentServiceImpl implements AttachmentService {
         return "Attachment metadata:\n" + summary;
     }
 
-    private byte[] decode(String data) {
-        String normalized = data;
-        int comma = normalized.indexOf(',');
-        if (comma >= 0) {
-            normalized = normalized.substring(comma + 1);
+    private Path resolveFilePath(String conversationId, RequestHeader.UserHeader header, String fileName) {
+        Path storageRoot = Paths.get(properties.getAttachmentStoragePath()).toAbsolutePath().normalize();
+        Path directory = storageRoot
+                .resolve("tenant_" + safePathPart(String.valueOf(header.getTenantId())))
+                .resolve("user_" + safePathPart(String.valueOf(header.getUserId())))
+                .resolve(safePathPart(conversationId))
+                .toAbsolutePath()
+                .normalize();
+        try {
+            Files.createDirectories(directory);
+        } catch (Exception e) {
+            throw new RequestException("Attachment directory create failed");
         }
-        return Base64.getDecoder().decode(normalized);
+
+        Path filePath = directory.resolve(UUID.randomUUID() + "-" + safePathPart(fileName)).normalize();
+        if (!filePath.startsWith(storageRoot)) {
+            throw new RequestException("Attachment file path is invalid");
+        }
+        return filePath;
     }
 
-    private Path writeFile(String conversationId, String fileName, byte[] content) {
+    private void assertContentLength(FilePart filePart) {
+        long contentLength = filePart.headers().getContentLength();
+        if (contentLength > MAX_BYTES) {
+            throw new RequestException("Attachment size exceeds 10 MB");
+        }
+    }
+
+    private void deleteFile(Path filePath) {
         try {
-            Path directory = Paths.get(properties.getAttachmentStoragePath(), safePathPart(conversationId));
-            Files.createDirectories(directory);
-            Path filePath = directory.resolve(UUID.randomUUID() + "-" + safePathPart(fileName));
-            Files.write(filePath, content);
-            return filePath.toAbsolutePath().normalize();
-        } catch (IOException e) {
-            throw new RequestException("Attachment file save failed");
+            Files.deleteIfExists(filePath);
+        } catch (Exception ignored) {
+            // best effort cleanup for failed uploads
         }
     }
 

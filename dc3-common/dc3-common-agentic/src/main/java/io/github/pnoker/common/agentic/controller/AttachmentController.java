@@ -16,9 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
-import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
 import io.github.pnoker.common.agentic.entity.builder.AttachmentBuilder;
-import io.github.pnoker.common.agentic.entity.request.AttachmentUploadRequest;
 import io.github.pnoker.common.agentic.entity.vo.AttachmentVO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.agentic.util.AgenticConversationIds;
@@ -27,12 +25,12 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -52,19 +50,21 @@ public class AttachmentController implements BaseController {
     }
 
     @PostMapping("/upload")
-    public Mono<R<AttachmentVO>> upload(@Validated @RequestBody AttachmentUploadRequest request) {
-        return getUserHeader().flatMap(header -> async(() -> {
-            request.setConversationId(AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
-                    request.getConversationId()));
-            AttachmentBO attachmentBO = attachmentService.upload(request, header);
-            AttachmentVO attachment = attachmentBuilder.buildVOByBO(attachmentBO);
-            sanitize(header, attachment);
-            return R.ok(attachment);
+    public Mono<R<AttachmentVO>> upload(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
+                                        @RequestPart("file") Mono<FilePart> filePart) {
+        return getUserHeader().flatMap(header -> filePart.flatMap(part -> {
+            String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
+                    conversationId);
+            return attachmentService.upload(scopedConversationId, part, header).map(attachmentBO -> {
+                AttachmentVO attachment = attachmentBuilder.buildVOByBO(attachmentBO);
+                sanitize(header, attachment);
+                return R.ok(attachment);
+            });
         }));
     }
 
-    @GetMapping("/{conversationId}")
-    public Mono<R<List<AttachmentVO>>> list(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
+    @GetMapping("/list")
+    public Mono<R<List<AttachmentVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId);

@@ -32,10 +32,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -60,7 +60,7 @@ public class SessionController implements BaseController {
         this.sessionBuilder = sessionBuilder;
     }
 
-    @GetMapping
+    @GetMapping("/list")
     public Mono<R<Page<SessionVO>>> list(SessionQuery query) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionQuery scopedQuery = Objects.isNull(query) ? new SessionQuery() : query;
@@ -73,8 +73,8 @@ public class SessionController implements BaseController {
         }));
     }
 
-    @GetMapping("/{conversationId}")
-    public Mono<R<SessionVO>> get(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
+    @GetMapping("/select_by_conversation_id")
+    public Mono<R<SessionVO>> get(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.getByConversationId(AgenticConversationIds.scope(header.getTenantId(),
                     header.getUserId(), conversationId));
@@ -87,8 +87,8 @@ public class SessionController implements BaseController {
         }));
     }
 
-    @DeleteMapping("/{conversationId}")
-    public Mono<R<Boolean>> delete(@NotBlank @PathVariable(value = "conversationId") String conversationId) {
+    @DeleteMapping("/delete")
+    public Mono<R<Boolean>> delete(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             sessionService.removeByConversationId(AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
@@ -96,8 +96,8 @@ public class SessionController implements BaseController {
         }));
     }
 
-    @PostMapping("/{conversationId}/update")
-    public Mono<R<SessionVO>> update(@NotBlank @PathVariable(value = "conversationId") String conversationId,
+    @PostMapping("/update")
+    public Mono<R<SessionVO>> update(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionUpdateRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.update(AgenticConversationIds.scope(header.getTenantId(),

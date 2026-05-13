@@ -40,10 +40,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -106,8 +106,8 @@ public class PointController implements BaseController {
      * @param id ID
      * @return R of String
      */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointService.selectById(id));
             pointService.remove(id);
@@ -138,8 +138,8 @@ public class PointController implements BaseController {
      * @param id ID
      * @return PointVO {@link PointVO}
      */
-    @GetMapping("/id/{id}")
-    public Mono<R<PointVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<PointVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointBO entityBO = requireTenant(tenantId, pointService.selectById(id));
             PointVO entityVO = pointBuilder.buildVOByBO(entityBO);
@@ -153,7 +153,7 @@ public class PointController implements BaseController {
      * @param pointIds Point ID
      * @return Map(ID, PointVO)
      */
-    @PostMapping("/ids")
+    @PostMapping("/select_by_ids")
     public Mono<R<Map<Long, PointVO>>> selectByIds(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<PointBO> entityBOList = filterTenant(tenantId, pointService.selectByIds(pointIds));
@@ -169,8 +169,8 @@ public class PointController implements BaseController {
      * @param profileId Point ID
      * @return Point
      */
-    @GetMapping("/profile_id/{profileId}")
-    public Mono<R<List<PointVO>>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
+    @GetMapping("/select_by_profile_id")
+    public Mono<R<List<PointVO>>> selectByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.selectById(profileId));
             List<PointBO> entityBOList = filterTenant(tenantId, pointService.selectByProfileId(profileId));
@@ -185,8 +185,8 @@ public class PointController implements BaseController {
      * @param deviceId Device ID
      * @return Point Array
      */
-    @GetMapping("/device_id/{deviceId}")
-    public Mono<R<List<PointVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    @GetMapping("/select_by_device_id")
+    public Mono<R<List<PointVO>>> selectByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.selectById(deviceId));
             List<PointBO> entityBOList = filterTenant(tenantId, pointService.selectByDeviceId(deviceId));
@@ -237,9 +237,9 @@ public class PointController implements BaseController {
      * @param pointId id
      * @return {@link R}<{@link Set}<{@link Long}>>
      */
-    @GetMapping("/selectPointStatisticsWithDevice/{pointId}")
+    @GetMapping("/select_device_statistics_by_point_id")
     public Mono<R<DeviceByPointVO>> selectPointStatisticsWithDevice(
-            @NotNull @PathVariable(value = "pointId") Long pointId) {
+            @NotNull @RequestParam(value = "point_id") Long pointId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointService.selectById(pointId));
             DeviceByPointBO deviceByPointBO = pointService.selectPointStatisticsWithDevice(pointId);
@@ -252,8 +252,8 @@ public class PointController implements BaseController {
      * @param deviceId
      * @return
      */
-    @GetMapping("/selectPointByDeviceId/{deviceId}")
-    public Mono<R<Long>> selectPointByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    @GetMapping("/select_count_by_device_id")
+    public Mono<R<Long>> selectPointByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.selectById(deviceId));
             Long count = pointService.selectPointByDeviceId(deviceId);
@@ -265,9 +265,9 @@ public class PointController implements BaseController {
      * @param deviceId
      * @return
      */
-    @GetMapping("/selectPointConfigByDeviceId/{deviceId}")
+    @GetMapping("/select_config_by_device_id")
     public Mono<R<PointConfigByDeviceVO>> selectPointConfigByDeviceId(
-            @NotNull @PathVariable(value = "deviceId") Long deviceId) {
+            @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.selectById(deviceId));
             PointConfigByDeviceBO pointConfigByDeviceBO = pointService.selectPointConfigByDeviceId(deviceId);

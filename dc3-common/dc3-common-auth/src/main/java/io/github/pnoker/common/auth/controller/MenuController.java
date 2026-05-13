@@ -35,10 +35,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -80,8 +80,8 @@ public class MenuController implements BaseController {
         }));
     }
 
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             menuService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -99,8 +99,8 @@ public class MenuController implements BaseController {
         }));
     }
 
-    @GetMapping("/id/{id}")
-    public Mono<R<MenuVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<MenuVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             MenuBO entityBO = menuService.selectById(id);
             MenuVO entityVO = menuBuilder.buildVOByBO(entityBO);

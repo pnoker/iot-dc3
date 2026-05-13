@@ -25,10 +25,10 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -59,7 +59,7 @@ public class DriverStatusController implements BaseController {
      * @param entityQuery Driver and pagination parameters
      * @return Map String:String
      */
-    @PostMapping("/driver")
+    @PostMapping("/list")
     public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
@@ -75,8 +75,8 @@ public class DriverStatusController implements BaseController {
      * @param driverId Driver ID
      * @return Number of devices currently online
      */
-    @GetMapping("/getDeviceOnlineByDriverId/{driverId}")
-    public Mono<R<String>> getDeviceOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    @GetMapping("/select_device_online_by_driver_id")
+    public Mono<R<String>> getDeviceOnlineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             String result = driverStatusService.getDeviceOnlineByDriverId(tenantId, driverId);
             return R.ok(result);
@@ -89,8 +89,8 @@ public class DriverStatusController implements BaseController {
      * @param driverId Driver ID
      * @return Number of devices currently offline
      */
-    @GetMapping("/getDeviceOfflineByDriverId/{driverId}")
-    public Mono<R<String>> getDeviceOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    @GetMapping("/select_device_offline_by_driver_id")
+    public Mono<R<String>> getDeviceOfflineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             String result = driverStatusService.getDeviceOfflineByDriverId(tenantId, driverId);
             return R.ok(result);

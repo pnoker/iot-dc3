@@ -41,10 +41,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -107,8 +107,8 @@ public class GroupBindController implements BaseController {
      * @param id ID
      * @return R of String
      */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupBindService.selectById(id));
             groupBindService.remove(id);
@@ -136,8 +136,8 @@ public class GroupBindController implements BaseController {
      * @param id ID
      * @return GroupBindVO {@link GroupBindVO}
      */
-    @GetMapping("/id/{id}")
-    public Mono<R<GroupBindVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<GroupBindVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBindBO entityBO = requireTenant(tenantId, groupBindService.selectById(id));
             GroupBindVO entityVO = groupBindBuilder.buildVOByBO(entityBO);

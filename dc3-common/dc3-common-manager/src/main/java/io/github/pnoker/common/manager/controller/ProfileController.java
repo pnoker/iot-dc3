@@ -34,10 +34,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -93,8 +93,8 @@ public class ProfileController implements BaseController {
      * @param id ID
      * @return R of String
      */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.selectById(id));
             profileService.remove(id);
@@ -125,8 +125,8 @@ public class ProfileController implements BaseController {
      * @param id ID
      * @return ProfileVO {@link ProfileVO}
      */
-    @GetMapping("/id/{id}")
-    public Mono<R<ProfileVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<ProfileVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ProfileBO entityBO = requireTenant(tenantId, profileService.selectById(id));
             ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
@@ -140,7 +140,7 @@ public class ProfileController implements BaseController {
      * @param profileIds ID
      * @return Map(ID, ProfileVO)
      */
-    @PostMapping("/ids")
+    @PostMapping("/select_by_ids")
     public Mono<R<Map<Long, ProfileVO>>> selectByIds(@RequestBody Set<Long> profileIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.selectByIds(profileIds));
@@ -156,8 +156,8 @@ public class ProfileController implements BaseController {
      * @param deviceId Device ID
      * @return Profile
      */
-    @GetMapping("/device_id/{deviceId}")
-    public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    @GetMapping("/select_by_device_id")
+    public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.selectById(deviceId));
             List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.selectByDeviceId(deviceId));

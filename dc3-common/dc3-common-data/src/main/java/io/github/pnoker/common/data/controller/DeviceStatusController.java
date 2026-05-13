@@ -25,10 +25,10 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -59,7 +59,7 @@ public class DeviceStatusController implements BaseController {
      * @param deviceQuery Device Dto
      * @return Map String:String
      */
-    @PostMapping("/device")
+    @PostMapping("/list")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery query = Objects.isNull(deviceQuery) ? new DeviceQuery() : deviceQuery;
@@ -75,8 +75,8 @@ public class DeviceStatusController implements BaseController {
      * @param driverId Driver ID
      * @return Map String:String
      */
-    @GetMapping("/device/driver_id/{driverId}")
-    public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    @GetMapping("/select_by_driver_id")
+    public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
@@ -92,9 +92,9 @@ public class DeviceStatusController implements BaseController {
      * @param profileId Profile ID
      * @return Map String:String
      */
-    @GetMapping("/device/profile_id/{profileId}")
+    @GetMapping("/select_by_profile_id")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
-            @NotNull @PathVariable(value = "profileId") Long profileId) {
+            @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setProfileId(profileId);

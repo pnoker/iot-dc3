@@ -37,10 +37,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -94,8 +94,8 @@ public class UserLoginController implements BaseController {
      * @param id ID
      * @return R of String
      */
-    @PostMapping("/delete/{id}")
-    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.selectById(id);
             requireTenantMember(tenantId, entityBO.getUserId());
@@ -132,8 +132,8 @@ public class UserLoginController implements BaseController {
      * @param id ID
      * @return
      */
-    @PostMapping("/reset/{id}")
-    public Mono<R<Boolean>> restPassword(@NotNull @PathVariable(value = "id") Long id) {
+    @PostMapping("/reset")
+    public Mono<R<Boolean>> restPassword(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginQuery query = new UserLoginQuery();
             query.setUserPasswordId(id);
@@ -152,8 +152,8 @@ public class UserLoginController implements BaseController {
      * @param id ID
      * @return UserLoginVO {@link UserLoginVO}
      */
-    @GetMapping("/id/{id}")
-    public Mono<R<UserLoginVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    @GetMapping("/select_by_id")
+    public Mono<R<UserLoginVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.selectById(id);
             requireTenantMember(tenantId, entityBO.getUserId());
@@ -168,8 +168,8 @@ public class UserLoginController implements BaseController {
      * @param name Name
      * @return {@link UserLoginBO}
      */
-    @GetMapping("/name/{name}")
-    public Mono<R<UserLoginVO>> selectByName(@NotNull @PathVariable(value = "name") String name) {
+    @GetMapping("/select_by_name")
+    public Mono<R<UserLoginVO>> selectByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.selectByLoginName(name, false);
             if (Objects.isNull(entityBO)) {
@@ -204,8 +204,8 @@ public class UserLoginController implements BaseController {
      * @param name Name
      * @return
      */
-    @GetMapping("/check/{name}")
-    public Mono<R<Boolean>> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name) {
+    @GetMapping("/check")
+    public Mono<R<Boolean>> checkLoginNameValid(@NotNull @RequestParam(value = "name") String name) {
         return async(() -> Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? R.ok() : R.fail());
     }
 
