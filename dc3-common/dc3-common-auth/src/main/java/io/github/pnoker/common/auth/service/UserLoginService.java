@@ -47,4 +47,14 @@ public interface UserLoginService extends BaseService<UserLoginBO, UserLoginQuer
      */
     boolean checkLoginNameValid(String loginName);
 
+    /**
+     * Check whether the login name is available (not yet taken) within
+     * the given tenant. Returns {@code true} when the name is free to use.
+     *
+     * @param loginName login name to check
+     * @param tenantId  tenant scope
+     * @return {@code true} if the name is not yet used in this tenant
+     */
+    boolean checkLoginNameAvailable(String loginName, Long tenantId);
+
 }

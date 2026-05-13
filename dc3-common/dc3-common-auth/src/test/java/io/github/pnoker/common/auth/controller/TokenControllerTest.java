@@ -48,11 +48,6 @@ class TokenControllerTest {
 
     private TokenController controller;
 
-    @BeforeEach
-    void setUp() {
-        controller = new TokenController(tokenService);
-    }
-
     private static TokenQuery query() {
         TokenQuery query = new TokenQuery();
         query.setTenant("tenant-A");
@@ -61,6 +56,11 @@ class TokenControllerTest {
         query.setPassword("hash");
         query.setToken("token");
         return query;
+    }
+
+    @BeforeEach
+    void setUp() {
+        controller = new TokenController(tokenService);
     }
 
     @Test

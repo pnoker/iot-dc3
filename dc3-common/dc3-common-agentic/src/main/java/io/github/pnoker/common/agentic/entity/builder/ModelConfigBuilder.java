@@ -31,7 +31,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**

@@ -34,7 +34,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.UUID;
@@ -51,6 +50,12 @@ class TokenServerTest {
     private Server server;
     private ManagedChannel channel;
     private TokenApiGrpc.TokenApiBlockingStub stub;
+
+    private static void injectService(TokenServer target, TokenService service) throws Exception {
+        Field field = TokenServer.class.getDeclaredField("tokenService");
+        field.setAccessible(true);
+        field.set(target, service);
+    }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -120,11 +125,5 @@ class TokenServerTest {
 
         assertThat(response.getResult().getOk()).isFalse();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
-    }
-
-    private static void injectService(TokenServer target, TokenService service) throws Exception {
-        Field field = TokenServer.class.getDeclaredField("tokenService");
-        field.setAccessible(true);
-        field.set(target, service);
     }
 }

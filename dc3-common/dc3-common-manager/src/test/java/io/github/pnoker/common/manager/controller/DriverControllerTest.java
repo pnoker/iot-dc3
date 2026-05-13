@@ -43,9 +43,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Reactive controller test that exercises DriverController through StepVerifier
@@ -67,11 +65,6 @@ class DriverControllerTest {
 
     private DriverController controller;
 
-    @BeforeEach
-    void setUp() {
-        controller = new DriverController(driverBuilder, driverService);
-    }
-
     private static <T> Mono<T> withTenantContext(Mono<T> mono) {
         RequestHeader.UserHeader user = new RequestHeader.UserHeader(7L, "Alice", "alice", TENANT_ID);
         return mono.contextWrite(Context.of(RequestConstant.Key.USER_HEADER, user));
@@ -79,6 +72,11 @@ class DriverControllerTest {
 
     private static <T> Mono<T> withMissingHeader(Mono<T> mono) {
         return mono.contextWrite(Context.empty());
+    }
+
+    @BeforeEach
+    void setUp() {
+        controller = new DriverController(driverBuilder, driverService);
     }
 
     @Test

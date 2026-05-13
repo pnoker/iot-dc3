@@ -30,13 +30,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BaseControllerTest {
 
-    private record TenantEntity(Long tenantId) implements TenantOwned {
-        @Override
-        public Long getTenantId() {
-            return tenantId;
-        }
-    }
-
     private final BaseController controller = new BaseController() {
     };
 
@@ -103,5 +96,12 @@ class BaseControllerTest {
                 .expectErrorMatches(throwable -> throwable instanceof IllegalStateException
                         && "supplier failed".equals(throwable.getMessage()))
                 .verify();
+    }
+
+    private record TenantEntity(Long tenantId) implements TenantOwned {
+        @Override
+        public Long getTenantId() {
+            return tenantId;
+        }
     }
 }

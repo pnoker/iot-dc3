@@ -51,7 +51,8 @@ class JsonOptionalTest {
     @Test
     void ifPresentOrElseFiresFallbackForInvalidJson() {
         AtomicBoolean fallback = new AtomicBoolean(false);
-        JsonOptional.ofNullable("garbage").ifPresentOrElse(value -> {}, () -> fallback.set(true));
+        JsonOptional.ofNullable("garbage").ifPresentOrElse(value -> {
+        }, () -> fallback.set(true));
         assertThat(fallback).isTrue();
     }
 

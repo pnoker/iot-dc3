@@ -18,4 +18,5 @@
 -- tests see identical extensions and search_path behavior. Per-table DDL is
 -- contributed by individual modules under their own src/test/resources/db/.
 
-CREATE EXTENSION IF NOT EXISTS timescaledb;
+CREATE
+EXTENSION IF NOT EXISTS timescaledb;

@@ -46,7 +46,8 @@ class CollectionOptionalTest {
     @Test
     void ifPresentOrElseFiresFallbackForEmpty() {
         AtomicBoolean fallback = new AtomicBoolean(false);
-        CollectionOptional.<Integer>ofNullable(List.of()).ifPresentOrElse(values -> {}, () -> fallback.set(true));
+        CollectionOptional.<Integer>ofNullable(List.of()).ifPresentOrElse(values -> {
+        }, () -> fallback.set(true));
         assertThat(fallback).isTrue();
     }
 
