@@ -104,6 +104,13 @@
             <artifactId>dc3-common-public</artifactId>
         </dependency>
 
+        <!-- Reactive test utilities for global handler verification -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
