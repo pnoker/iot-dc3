@@ -318,6 +318,11 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-test</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-thread</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
