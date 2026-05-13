@@ -46,8 +46,10 @@
     "test:ci": "vitest run --coverage",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:headed": "E2E_HEADLESS=false playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:sweep": "node tests/e2e/browser-sweep.mjs",
+    "test:e2e:sweep:headed": "E2E_HEADLESS=false node tests/e2e/browser-sweep.mjs",
     "test:all": "pnpm run test && pnpm run test:e2e",
     "tauri": "tauri",
     "clean": "rimraf dist"

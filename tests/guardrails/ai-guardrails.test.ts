@@ -83,7 +83,9 @@ describe('AI coding guardrails', () => {
         'test:impact': expect.any(String),
         'test:ci': expect.any(String),
         'test:e2e': expect.any(String),
+        'test:e2e:headed': expect.any(String),
         'test:e2e:sweep': expect.any(String),
+        'test:e2e:sweep:headed': expect.any(String),
         build: expect.any(String),
       })
     );

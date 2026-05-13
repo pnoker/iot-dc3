@@ -14,7 +14,9 @@ level of the application.
 - `pnpm run test:ci`: run Vitest with coverage thresholds.
 - `pnpm run test:coverage`: run Vitest with coverage.
 - `pnpm run test:e2e`: run Playwright Test specs.
+- `pnpm run test:e2e:headed`: run Playwright Test specs in a visible browser.
 - `pnpm run test:e2e:sweep`: run the deep browser sweep.
+- `pnpm run test:e2e:sweep:headed`: run the deep browser sweep in a visible browser.
 
 ## Layers
 
@@ -49,6 +51,11 @@ The mandatory policy lives in `docs/frontend-testing-guardrails.md`. In short:
 Playwright defaults to `http://localhost:8080` and starts `pnpm dev` unless
 `E2E_START_SERVER=0` is set. Use `E2E_BASE_URL` to point at an already running
 environment.
+
+Use the headed scripts when you want to watch the browser operate:
+
+- `pnpm run test:e2e:headed`
+- `pnpm run test:e2e:sweep:headed`
 
 The `tests/e2e/browser-sweep.mjs` script is kept for deeper
 manual/full-environment sweeps. It performs destructive delete checks against

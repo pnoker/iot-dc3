@@ -43,7 +43,9 @@ DOCKER_COMPOSE ?= docker compose
 	test-impact \
 	test-ci \
 	test-e2e \
+	test-e2e-headed \
 	test-e2e-sweep \
+	test-e2e-sweep-headed \
 	clean \
 	ci \
 	docker-build \
@@ -72,7 +74,9 @@ help:
 		'make test-impact  - print recommended checks for changed files' \
 		'make test-ci      - run Vitest with coverage thresholds' \
 		'make test-e2e     - run Playwright e2e tests' \
+		'make test-e2e-headed - run Playwright e2e tests in a visible browser' \
 		'make test-e2e-sweep - run browser sweep against a full environment' \
+		'make test-e2e-sweep-headed - run browser sweep in a visible browser' \
 		'make clean        - remove dist output' \
 		'make ci           - run lint-check, check, guardrails, test, build' \
 		'make docker-build - build dc3 docker services' \
@@ -139,8 +143,14 @@ test-ci:
 test-e2e:
 	$(PNPM) run test:e2e
 
+test-e2e-headed:
+	$(PNPM) run test:e2e:headed
+
 test-e2e-sweep:
 	$(PNPM) run test:e2e:sweep
+
+test-e2e-sweep-headed:
+	$(PNPM) run test:e2e:sweep:headed
 
 clean:
 	$(PNPM) run clean
