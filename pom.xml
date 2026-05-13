@@ -109,6 +109,8 @@
         <module>dc3-center</module>
         <module>dc3-driver</module>
         <module>dc3-gateway</module>
+        <module>dc3-coverage</module>
+        <module>dc3-e2e</module>
     </modules>
 
     <dependencyManagement>
