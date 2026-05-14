@@ -55,9 +55,7 @@ public class MybatisGenerator {
                                 path + "/resources/mapping")))
                 .templateEngine(new FreemarkerTemplateEngine())
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
-                .strategyConfig(builder -> builder.addInclude("dc3_point_value_bool", "dc3_point_value_double",
-                        "dc3_point_value_float", "dc3_point_value_int", "dc3_point_value_long", "dc3_point_value_json",
-                        "dc3_point_value"))
+                .strategyConfig(builder -> builder.addInclude("dc3_point_value"))
                 .execute();
     }
 

@@ -206,7 +206,7 @@
         SELECT device_id AS device_id,
                point_id  AS point_id,
                COUNT(*)  AS cnt
-        FROM dc3_history.v_dc3_point_value_all
+        FROM dc3_history.dc3_point_value
         WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
         GROUP BY device_id, point_id
