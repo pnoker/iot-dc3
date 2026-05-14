@@ -74,8 +74,8 @@ public class PointValueDO implements Serializable {
      * queries (AVG/MIN/MAX/SUM/timeseries). NULL for non-numeric payloads
      * (booleans, JSON, free-form text).
      */
-    @TableField("numeric_value")
-    private Double numericValue;
+    @TableField("num_value")
+    private Double numValue;
 
     /**
      * Driver ID
