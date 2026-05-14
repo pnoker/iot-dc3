@@ -89,7 +89,12 @@ export const deleteAgenticSession = (conversationId: string) =>
     params: { conversation_id: conversationId },
   });
 
-export const updateAgenticSession = (conversationId: string, data: Partial<Pick<AgenticSession, 'title' | 'model'>>) =>
+export const updateAgenticSession = (
+  conversationId: string,
+  data: Partial<
+    Pick<AgenticSession, 'title' | 'model' | 'reasoningEnabled' | 'temperature' | 'maxTokens' | 'requireConfirmation'>
+  >
+) =>
   httpPost<R<AgenticSession>>(`${API_AGENTIC_BASE}/session/update`, data, {
     params: { conversation_id: conversationId },
   });

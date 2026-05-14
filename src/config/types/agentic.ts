@@ -55,6 +55,10 @@ export interface AgenticSession {
   conversationId: string;
   title?: string;
   model?: string;
+  reasoningEnabled?: boolean;
+  temperature?: number;
+  maxTokens?: number;
+  requireConfirmation?: boolean;
   createTime?: string;
   operateTime?: string;
 }
