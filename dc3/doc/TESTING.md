@@ -11,7 +11,7 @@ repository. It complements `AGENTS.md` (engineering rules), `LOGGING.md`
 | Unit        | Fast, isolated business logic checks                    | JUnit 5 + Mockito + AssertJ                      | ~70%                                |
 | Slice       | Spring slice tests for controllers, JSON, persistence   | `@WebFluxTest`, `@JsonTest`, `@MybatisPlusTest`  | ~25%                                |
 | Integration | Real infrastructure via Testcontainers, gRPC in-process | PG18+TimescaleDB, RabbitMQ, MQTT, gRPC InProcess | included in slice/integration share |
-| End-to-end  | Full reactor against a docker-compose stack             | `dc3-e2e` with rest-assured                      | ~5%                                 |
+| End-to-end  | Infrastructure-backed harness now; full user flows next | `dc3-e2e` with Testcontainers + rest-assured     | ~5%                                 |
 
 Aggregate coverage gates (read from `dc3-coverage`):
 
@@ -85,8 +85,8 @@ The `Validation Checklist` in `AGENTS.md` enumerates the full matrix.
 ## 5. Testcontainers Conventions
 
 Containers expose a single shared instance per JVM, started lazily on
-class-load and reused across modules via `withReuse(true)`. Pin images
-to the production-aligned tag:
+class-load. Cross-run reuse is opt-in and only enabled when the local
+Testcontainers environment supports it. Pin images to the production-aligned tag:
 
 | Container              | Image                           | Notes                                                                          |
 |------------------------|---------------------------------|--------------------------------------------------------------------------------|
@@ -99,13 +99,11 @@ The shared wrappers live in
 and inject themselves into Spring environments via
 `@DynamicPropertySource` callbacks.
 
-For local reuse, contributors can opt-in by exporting:
+For local reuse, contributors can opt in by creating `~/.testcontainers.properties`:
 
 ```bash
-export TESTCONTAINERS_REUSE_ENABLE=true
+testcontainers.reuse.enable=true
 ```
-
-CI sets this automatically inside the integration job.
 
 ## 6. Test Data Strategy
 
@@ -142,7 +140,7 @@ dependencies.
 make test                 # Unit phase
 make test-it              # Integration phase (requires Docker)
 make coverage             # Aggregate jacoco report (target/site/jacoco-aggregate)
-make test-e2e             # Full docker-compose end-to-end suite
+make test-e2e             # E2E harness; exports DC3_E2E=true and requires Docker
 mvn -B -pl <module> test  # Targeted unit run for a single module
 ```
 

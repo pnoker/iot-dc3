@@ -21,6 +21,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.TestcontainersConfiguration;
 
 /**
  * Shared Eclipse Mosquitto MQTT broker container for driver and common-mqtt tests.
@@ -32,6 +33,8 @@ import org.testcontainers.utility.DockerImageName;
 public final class MqttContainer {
 
     private static final DockerImageName IMAGE = DockerImageName.parse("eclipse-mosquitto:2.0");
+
+    private static final boolean REUSE_ENABLED = TestcontainersConfiguration.getInstance().environmentSupportsReuse();
 
     private static final String CONFIG = """
             listener 1883
@@ -45,7 +48,7 @@ public final class MqttContainer {
                     org.testcontainers.images.builder.Transferable.of(CONFIG),
                     "/mosquitto/config/mosquitto.conf")
             .waitingFor(Wait.forLogMessage(".*mosquitto version.*\\n", 1))
-            .withReuse(true);
+            .withReuse(REUSE_ENABLED);
 
     static {
         INSTANCE.start();

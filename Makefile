@@ -116,7 +116,7 @@ test-it:
 	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify
 
 test-e2e:
-	$(MVN) -B -Dmaven.test.skip=false -pl dc3-e2e -am -Pe2e verify
+	DC3_E2E=true $(MVN) -B -Dmaven.test.skip=false -pl dc3-e2e -am -Pe2e verify
 
 coverage:
 	$(MVN) -B -Dmaven.test.skip=false -pl dc3-coverage -am verify

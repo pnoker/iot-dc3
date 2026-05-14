@@ -20,6 +20,7 @@ package io.github.pnoker.test.containers;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.TestcontainersConfiguration;
 
 /**
  * Shared PostgreSQL + TimescaleDB container that mirrors the production image
@@ -35,12 +36,14 @@ public final class PgTimescaleContainer {
             .parse("timescale/timescaledb-ha:pg18")
             .asCompatibleSubstituteFor("postgres");
 
+    private static final boolean REUSE_ENABLED = TestcontainersConfiguration.getInstance().environmentSupportsReuse();
+
     @SuppressWarnings("resource")
     private static final PostgreSQLContainer<?> INSTANCE = new PostgreSQLContainer<>(IMAGE)
             .withDatabaseName("dc3")
             .withUsername("dc3")
             .withPassword("dc3")
-            .withReuse(true);
+            .withReuse(REUSE_ENABLED);
 
     static {
         INSTANCE.start();

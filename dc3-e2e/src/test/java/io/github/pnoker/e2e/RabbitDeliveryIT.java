@@ -22,17 +22,20 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.GetResponse;
 import io.github.pnoker.e2e.harness.BaseE2eIT;
 import io.github.pnoker.e2e.harness.E2eStack;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static org.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -97,46 +100,64 @@ class RabbitDeliveryIT extends BaseE2eIT {
             channel.basicPublish(exchange, "k", null, "first".getBytes(StandardCharsets.UTF_8));
             channel.basicPublish(exchange, "k", null, "second".getBytes(StandardCharsets.UTF_8));
 
-            // Wait until both messages are persisted (queueDeclarePassive count==2).
-            for (int i = 0; i < 20 && channel.messageCount(queue) < 2; i++) {
-                Thread.sleep(50);
+            await().atMost(Duration.ofSeconds(2))
+                    .pollInterval(Duration.ofMillis(50))
+                    .untilAsserted(() -> assertThat(channel.messageCount(queue)).isEqualTo(2));
+
+            try (Channel delivery = conn.createChannel()) {
+                GetResponse first = delivery.basicGet(queue, false);
+                assertThat(first).isNotNull();
+                assertThat(new String(first.getBody(), StandardCharsets.UTF_8)).isEqualTo("first");
+
+                GetResponse second = delivery.basicGet(queue, false);
+                assertThat(second).isNotNull();
+                assertThat(new String(second.getBody(), StandardCharsets.UTF_8)).isEqualTo("second");
+                delivery.basicAck(second.getEnvelope().getDeliveryTag(), false);
             }
 
-            channel.basicGet(queue, false); // first delivery, no ack -> requeued on close-channel
-            channel.basicAck(channel.basicGet(queue, false).getEnvelope().getDeliveryTag(), false);
+            await().atMost(Duration.ofSeconds(2))
+                    .pollInterval(Duration.ofMillis(50))
+                    .untilAsserted(() -> assertThat(channel.messageCount(queue)).isEqualTo(1));
 
-            // Drain remaining: requeued first + nothing else.
-            for (int i = 0; i < 20 && channel.messageCount(queue) == 0; i++) {
-                Thread.sleep(50);
-            }
-            assertThat(channel.messageCount(queue)).isEqualTo(1);
+            GetResponse requeued = channel.basicGet(queue, false);
+            assertThat(requeued).isNotNull();
+            assertThat(new String(requeued.getBody(), StandardCharsets.UTF_8)).isEqualTo("first");
+            channel.basicAck(requeued.getEnvelope().getDeliveryTag(), false);
+
+            assertThat(channel.messageCount(queue)).isZero();
         }
     }
 
     @Test
-    void waitForConfirmsTimesOutWhenBrokerNeverAcks() throws Exception {
+    void waitForConfirmsWithoutPendingPublishesCompletesImmediately() throws Exception {
         try (Connection conn = newConnection();
                 Channel channel = conn.createChannel()) {
             channel.confirmSelect();
-            // A fresh channel without any publish has no outstanding confirms; the
-            // expected behavior is that waitForConfirms returns true immediately. To pin
-            // the timeout-throwing branch, drive a publish that never gets confirmed by
-            // closing the channel mid-flight on a separate connection. The simpler
-            // contract worth pinning here: no-publish wait completes synchronously.
             assertThat(channel.waitForConfirms(50L)).isTrue();
         }
     }
 
     @Test
-    void exclusiveQueueRejectsSecondConsumerOnSameConnection() throws Exception {
-        try (Connection conn = newConnection();
-                Channel first = conn.createChannel();
-                Channel second = conn.createChannel()) {
+    void exclusiveQueueRejectsConsumerOnDifferentConnection() throws Exception {
+        try (Connection owner = newConnection();
+                Connection other = newConnection();
+                Channel first = owner.createChannel()) {
             String queue = "dc3.e2e.exclusive." + UUID.randomUUID();
             first.queueDeclare(queue, false, true, false, null);
             first.basicConsume(queue, true, "c1", (tag, delivery) -> {}, tag -> {});
-            assertThatThrownBy(() -> second.basicConsume(queue, true, "c2", (tag, delivery) -> {}, tag -> {}))
-                    .isInstanceOf(java.io.IOException.class);
+
+            Channel second = other.createChannel();
+            try {
+                assertThatThrownBy(() -> second.basicConsume(queue, true, "c2", (tag, delivery) -> {}, tag -> {}))
+                        .isInstanceOf(java.io.IOException.class)
+                        .hasRootCauseInstanceOf(com.rabbitmq.client.ShutdownSignalException.class)
+                        .hasStackTraceContaining("RESOURCE_LOCKED");
+                assertThat(second.isOpen()).isFalse();
+            } finally {
+                if (second.isOpen()) {
+                    second.close();
+                }
+            }
         }
     }
 
