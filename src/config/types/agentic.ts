@@ -54,6 +54,7 @@ export interface AgenticModelConfig extends AgenticModel {
 export interface AgenticSession {
   conversationId: string;
   title?: string;
+  model?: string;
   createTime?: string;
   operateTime?: string;
 }
@@ -80,6 +81,7 @@ export interface AgenticMessageContent {
   attachments?: number[];
   skills?: string[];
   tools?: string[];
+  traces?: AgenticTraceEvent[];
   contexts?: AgenticMessageContext[];
   tokens?: AgenticMessageTokens;
   reasoning?: boolean;
@@ -145,6 +147,30 @@ export interface AgenticChatCompletionRequest {
   attachments?: number[];
   reasoning?: boolean;
   confirmActions?: boolean;
+}
+
+export interface AgenticChatCompletionResponse {
+  id?: string;
+  object?: string;
+  created?: number;
+  model?: string;
+  choices?: Array<{
+    index?: number;
+    message?: {
+      role?: AgenticMessageRole;
+      content?: string;
+    };
+    finishReason?: string;
+    finish_reason?: string;
+  }>;
+  usage?: {
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
 }
 
 export interface AgenticStreamCallbacks {

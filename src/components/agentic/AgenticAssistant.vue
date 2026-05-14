@@ -120,7 +120,11 @@
               <div v-if="message.role === 'assistant'" class="agentic-markdown" v-html="renderMarkdown(message)" />
               <div v-else class="agentic-text">{{ message.content }}</div>
               <span v-if="message.streaming && !message.content" class="agentic-cursor">Thinking...</span>
-              <details v-if="message.role === 'assistant' && hasAssistantDetails(message)" class="agentic-details">
+              <details
+                v-if="message.role === 'assistant' && hasAssistantDetails(message)"
+                class="agentic-details"
+                :open="message.streaming"
+              >
                 <summary>
                   <el-icon>
                     <Cpu />
@@ -129,26 +133,79 @@
                 </summary>
 
                 <div class="agentic-details__body">
-                  <div v-if="assistantSkills(message).length" class="agentic-details__row">
-                    <span class="agentic-details__label">Skills</span>
-                    <div class="agentic-details__tags">
-                      <el-tag v-for="skill in assistantSkills(message)" :key="skill" size="small">{{ skill }}</el-tag>
+                  <div class="agentic-run-overview">
+                    <div v-for="item in assistantRunOverview(message)" :key="item.label" class="agentic-run-stat">
+                      <span>{{ item.label }}</span>
+                      <strong>{{ item.value }}</strong>
                     </div>
                   </div>
 
-                  <div v-if="assistantReasoning(message)" class="agentic-details__row">
-                    <span class="agentic-details__label">Reasoning</span>
-                    <el-tag size="small" type="warning">enabled</el-tag>
-                  </div>
-
-                  <div v-if="assistantTools(message).length" class="agentic-details__row">
-                    <span class="agentic-details__label">Tools</span>
-                    <div class="agentic-details__tags">
-                      <el-tag v-for="tool in assistantTools(message)" :key="tool" size="small" type="success">
-                        {{ tool }}
-                      </el-tag>
+                  <section v-if="assistantThinkingItems(message).length" class="agentic-trace-section">
+                    <div class="agentic-trace-section__header">
+                      <span>Thinking</span>
                     </div>
-                  </div>
+                    <div class="agentic-thinking-list">
+                      <div v-for="item in assistantThinkingItems(message)" :key="item.label" class="agentic-thinking">
+                        <span>{{ item.label }}</span>
+                        <small>{{ item.detail }}</small>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section v-if="assistantSkillSteps(message).length" class="agentic-trace-section">
+                    <div class="agentic-trace-section__header">
+                      <span>Skill Chain</span>
+                    </div>
+                    <ol class="agentic-chain">
+                      <li v-for="step in assistantSkillSteps(message)" :key="step.id">
+                        <span class="agentic-chain__index">{{ step.index }}</span>
+                        <div class="agentic-chain__content">
+                          <strong>{{ step.label }}</strong>
+                          <small v-if="step.detail">{{ step.detail }}</small>
+                        </div>
+                      </li>
+                    </ol>
+                  </section>
+
+                  <section
+                    v-if="assistantToolSteps(message).length || assistantAvailableTools(message).length"
+                    class="agentic-trace-section"
+                  >
+                    <div class="agentic-trace-section__header">
+                      <span>Tool Chain</span>
+                    </div>
+                    <div v-if="assistantAvailableTools(message).length" class="agentic-tool-scope">
+                      <span>Scope</span>
+                      <div class="agentic-details__tags">
+                        <el-tag v-for="tool in assistantAvailableTools(message)" :key="tool" size="small" type="info">
+                          {{ tool }}
+                        </el-tag>
+                      </div>
+                    </div>
+                    <ol v-if="assistantToolSteps(message).length" class="agentic-chain">
+                      <li v-for="step in assistantToolSteps(message)" :key="step.id">
+                        <span class="agentic-chain__index">{{ step.index }}</span>
+                        <div class="agentic-chain__content">
+                          <strong>{{ step.label }}</strong>
+                          <small v-if="step.detail">{{ step.detail }}</small>
+                          <em v-if="step.meta">{{ step.meta }}</em>
+                        </div>
+                      </li>
+                    </ol>
+                  </section>
+
+                  <section v-if="assistantTokenItems(message).length" class="agentic-trace-section">
+                    <div class="agentic-trace-section__header">
+                      <span>Token Usage</span>
+                      <strong>{{ assistantTokenTotalLabel(message) }}</strong>
+                    </div>
+                    <div class="agentic-token-grid">
+                      <div v-for="item in assistantTokenItems(message)" :key="item.label" class="agentic-token-item">
+                        <span>{{ item.label }}</span>
+                        <strong>{{ item.value }}</strong>
+                      </div>
+                    </div>
+                  </section>
 
                   <div
                     v-if="assistantContexts(message).length"
@@ -164,15 +221,6 @@
                         <el-tag size="small" type="info">{{ context.type }}</el-tag>
                         <pre>{{ context.content }}</pre>
                       </div>
-                    </div>
-                  </div>
-
-                  <div v-if="assistantTokens(message)" class="agentic-details__row">
-                    <span class="agentic-details__label">Tokens</span>
-                    <div class="agentic-token-list">
-                      <span v-for="item in assistantTokenItems(message)" :key="item.label">
-                        {{ item.label }} {{ item.value }}
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -246,7 +294,13 @@
                 </el-button>
               </el-tooltip>
 
-              <el-select v-model="selectedModel" class="agentic-model" size="small" filterable>
+              <el-select
+                :model-value="selectedModel"
+                class="agentic-model"
+                size="small"
+                filterable
+                @update:model-value="handleModelChange"
+              >
                 <el-option
                   v-for="model in models"
                   :key="model.model"
@@ -352,13 +406,36 @@
   import { marked } from 'marked';
   import { storeToRefs } from 'pinia';
   import { computed, ref } from 'vue';
-  import type { AgenticMessage, AgenticMessageContext, AgenticMessageTokens } from '@/config/types';
+  import type { AgenticMessage, AgenticMessageContext, AgenticMessageTokens, AgenticTraceEvent } from '@/config/types';
   import { useAgenticStore } from '@/store';
 
   interface AssistantPromptItem {
     key: string | number;
     label?: string;
     description?: string;
+  }
+
+  interface AssistantRunStat {
+    label: string;
+    value: string;
+  }
+
+  interface AssistantThinkingItem {
+    label: string;
+    detail: string;
+  }
+
+  interface AssistantChainStep {
+    id: string;
+    index: number;
+    label: string;
+    detail?: string;
+    meta?: string;
+  }
+
+  interface AssistantTokenItem {
+    label: string;
+    value: string;
   }
 
   const agenticStore = useAgenticStore();
@@ -454,6 +531,10 @@
     draft.value = `${item.label || ''}${description}`.trim();
   };
 
+  const handleModelChange = (model: string | number) => {
+    void agenticStore.setSelectedModel(model);
+  };
+
   const handleSubmit = async () => {
     const content = draft.value.trim() || (currentAttachments.value.length ? 'Please analyze the attached files.' : '');
     if (!content) {
@@ -501,36 +582,95 @@
 
   const hasAssistantDetails = (message: AgenticMessage) => {
     return (
-      assistantSkills(message).length > 0 ||
+      assistantRunOverview(message).length > 0 ||
+      assistantThinkingItems(message).length > 0 ||
+      assistantSkillSteps(message).length > 0 ||
+      assistantToolSteps(message).length > 0 ||
+      assistantAvailableTools(message).length > 0 ||
       assistantReasoning(message) ||
-      assistantTools(message).length > 0 ||
       assistantContexts(message).length > 0 ||
-      Boolean(assistantTokens(message)) ||
-      Boolean(message.streaming)
+      assistantTokenItems(message).length > 0
     );
   };
 
   const assistantDetailSummary = (message: AgenticMessage) => {
     const parts: string[] = [];
-    const skills = assistantSkills(message);
-    const tools = assistantTools(message);
+    const skills = assistantSkillSteps(message);
+    const tools = assistantToolSteps(message);
     const contexts = assistantContexts(message);
+    const tokenTotal = assistantTokenTotal(message);
     if (message.streaming && !currentTraceEvents.value.length) {
       parts.push('Thinking');
-    }
-    if (skills.length) {
-      parts.push(`${skills.length} skill${skills.length > 1 ? 's' : ''}`);
-    }
-    if (tools.length) {
-      parts.push(`${tools.length} tool${tools.length > 1 ? 's' : ''}`);
-    }
-    if (contexts.length) {
-      parts.push(`${contexts.length} context${contexts.length > 1 ? 's' : ''}`);
     }
     if (assistantReasoning(message)) {
       parts.push('reasoning');
     }
+    if (skills.length) {
+      parts.push(`${skills.length} skill step${skills.length > 1 ? 's' : ''}`);
+    }
+    if (tools.length) {
+      parts.push(`${tools.length} tool step${tools.length > 1 ? 's' : ''}`);
+    }
+    if (contexts.length) {
+      parts.push(`${contexts.length} context${contexts.length > 1 ? 's' : ''}`);
+    }
+    if (typeof tokenTotal === 'number') {
+      parts.push(`${formatCount(tokenTotal)} tokens`);
+    }
     return parts.length ? parts.join(' · ') : 'Thinking';
+  };
+
+  const assistantRunOverview = (message: AgenticMessage): AssistantRunStat[] => {
+    const stats: AssistantRunStat[] = [];
+    const skills = assistantSkillSteps(message).length;
+    const tools = assistantToolSteps(message).length;
+    const tokenTotal = assistantTokenTotal(message);
+    stats.push({ label: 'Status', value: message.streaming ? (message.content ? 'Streaming' : 'Thinking') : 'Done' });
+    if (assistantReasoning(message)) {
+      stats.push({ label: 'Reasoning', value: 'Enabled' });
+    }
+    if (skills > 0) {
+      stats.push({ label: 'Skills', value: String(skills) });
+    }
+    if (tools > 0) {
+      stats.push({ label: 'Tools', value: String(tools) });
+    }
+    if (typeof tokenTotal === 'number') {
+      stats.push({ label: 'Tokens', value: formatCount(tokenTotal) });
+    }
+    return stats;
+  };
+
+  const assistantThinkingItems = (message: AgenticMessage): AssistantThinkingItem[] => {
+    const items: AssistantThinkingItem[] = [];
+    const traces = assistantTraceEvents(message);
+    const tools = assistantToolSteps(message).length;
+    const skillSteps = assistantSkillSteps(message);
+    if (message.streaming) {
+      items.push({
+        label: message.content ? 'Generating answer' : 'Preparing response',
+        detail: traces.length ? 'Runtime trace is being collected.' : 'Waiting for the first model response chunk.',
+      });
+    }
+    if (assistantReasoning(message)) {
+      items.push({
+        label: 'Reasoning mode',
+        detail: 'The selected model was asked to use reasoning for this turn.',
+      });
+    }
+    if (skillSteps.length) {
+      items.push({
+        label: 'Skill routing',
+        detail: `Selected ${skillSteps[0]?.label || 'general'} for this request.`,
+      });
+    }
+    if (tools > 0) {
+      items.push({
+        label: 'Tool execution',
+        detail: `${tools} tool step${tools > 1 ? 's' : ''} recorded for this answer.`,
+      });
+    }
+    return uniqueThinkingItems(items);
   };
 
   const assistantSkills = (message: AgenticMessage) => {
@@ -544,7 +684,7 @@
 
   const assistantReasoning = (message: AgenticMessage) => {
     return Boolean(
-      message.contentExt?.reasoning || messageTraceEvents(message).some((event) => event.type === 'reasoning')
+      message.contentExt?.reasoning || assistantTraceEvents(message).some((event) => event.type === 'reasoning')
     );
   };
 
@@ -555,6 +695,63 @@
       .map((event) => event.name || event.title)
       .filter(Boolean);
     return uniqueStrings([...persisted, ...streaming]);
+  };
+
+  const assistantTraceEvents = (message: AgenticMessage): AgenticTraceEvent[] => {
+    return uniqueTraceEvents([...(message.contentExt?.traces || []), ...messageTraceEvents(message)]);
+  };
+
+  const assistantSkillSteps = (message: AgenticMessage): AssistantChainStep[] => {
+    const traceSteps = assistantTraceEvents(message)
+      .filter((event) => event.type === 'skill')
+      .map((event) => ({
+        id: traceKey(event),
+        index: 0,
+        label: event.name || event.title || 'general',
+        detail: event.detail || event.title,
+      }));
+    const fallbackSteps = assistantSkills(message).map((skill) => ({
+      id: `skill-${skill}`,
+      index: 0,
+      label: skill,
+      detail: 'Persisted assistant skill.',
+    }));
+    return indexChainSteps(uniqueChainSteps([...traceSteps, ...fallbackSteps]));
+  };
+
+  const assistantAvailableTools = (message: AgenticMessage) => {
+    return uniqueStrings(
+      assistantTraceEvents(message)
+        .filter((event) => event.type === 'tools')
+        .flatMap((event) => (event.detail || '').split(','))
+        .map((tool) => tool.trim())
+        .filter(Boolean)
+    );
+  };
+
+  const assistantToolSteps = (message: AgenticMessage): AssistantChainStep[] => {
+    const traceSteps = assistantTraceEvents(message)
+      .filter((event) => event.type === 'tool')
+      .map((event) => {
+        const backendContext = event.title === 'Backend context loaded';
+        const label = backendContext ? 'Backend context' : event.name || event.title || 'tool';
+        const detail = backendContext ? event.detail : event.title;
+        const meta = backendContext ? event.name : event.detail;
+        return {
+          id: traceKey(event),
+          index: 0,
+          label,
+          detail,
+          meta: meta && meta !== detail ? meta : undefined,
+        };
+      });
+    const fallbackSteps = assistantTools(message).map((tool) => ({
+      id: `tool-${tool}`,
+      index: 0,
+      label: tool,
+      detail: 'Persisted tool invocation.',
+    }));
+    return indexChainSteps(uniqueChainSteps([...traceSteps, ...fallbackSteps]));
   };
 
   const assistantContexts = (message: AgenticMessage): AgenticMessageContext[] => {
@@ -572,14 +769,37 @@
     return message.contentExt?.tokens;
   };
 
-  const assistantTokenItems = (message: AgenticMessage) => {
+  const assistantTokenTotal = (message: AgenticMessage) => {
+    const tokens = assistantTokens(message);
+    if (!tokens) {
+      return undefined;
+    }
+    const input = typeof tokens.input === 'number' ? tokens.input : 0;
+    const output = typeof tokens.output === 'number' ? tokens.output : 0;
+    return input + output > 0 ? input + output : undefined;
+  };
+
+  const assistantTokenTotalLabel = (message: AgenticMessage) => {
+    const total = assistantTokenTotal(message);
+    return typeof total === 'number' ? `${formatCount(total)} total` : 'Pending';
+  };
+
+  const assistantTokenItems = (message: AgenticMessage): AssistantTokenItem[] => {
     const tokens = assistantTokens(message);
     if (!tokens) {
       return [];
     }
-    return Object.entries(tokens)
-      .filter(([, value]) => typeof value === 'number')
-      .map(([label, value]) => ({ label, value }));
+    const tokenOrder: Array<[keyof AgenticMessageTokens, string]> = [
+      ['input', 'Input'],
+      ['output', 'Output'],
+      ['text', 'Text'],
+      ['context', 'Context'],
+      ['system', 'System'],
+      ['memory', 'Memory'],
+    ];
+    return tokenOrder
+      .filter(([key]) => typeof tokens[key] === 'number')
+      .map(([key, label]) => ({ label, value: formatCount(tokens[key] || 0) }));
   };
 
   const messageTraceEvents = (message: AgenticMessage) => {
@@ -588,6 +808,58 @@
 
   const uniqueStrings = (values: string[]) => {
     return Array.from(new Set(values.filter(Boolean)));
+  };
+
+  const uniqueTraceEvents = (events: AgenticTraceEvent[]) => {
+    const seen = new Set<string>();
+    return events.filter((event) => {
+      const key = traceKey(event);
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+  };
+
+  const traceKey = (event: AgenticTraceEvent) => {
+    return [event.type, event.name || '', event.title || '', event.detail || ''].join('|');
+  };
+
+  const uniqueChainSteps = (steps: AssistantChainStep[]) => {
+    const seen = new Set<string>();
+    return steps.filter((step) => {
+      const key = [step.label, step.detail || '', step.meta || ''].join('|');
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+  };
+
+  const indexChainSteps = (steps: AssistantChainStep[]) => {
+    return steps.map((step, index) => ({
+      ...step,
+      id: `${step.id}-${index}`,
+      index: index + 1,
+    }));
+  };
+
+  const uniqueThinkingItems = (items: AssistantThinkingItem[]) => {
+    const seen = new Set<string>();
+    return items.filter((item) => {
+      const key = `${item.label}|${item.detail}`;
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+  };
+
+  const formatCount = (value: number) => {
+    return new Intl.NumberFormat('en-US').format(value);
   };
 
   const sanitizeHtml = (html: string) => {
@@ -808,8 +1080,204 @@
   .agentic-details__body {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     padding-top: 4px;
+  }
+
+  .agentic-run-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 6px;
+  }
+
+  .agentic-run-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding: 6px 8px;
+    border: 1px solid #dfe7f1;
+    border-radius: 6px;
+    background: #f8fafc;
+
+    span {
+      overflow: hidden;
+      color: #64748b;
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    strong {
+      overflow: hidden;
+      color: #1f2937;
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .agentic-trace-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #ffffff;
+  }
+
+  .agentic-trace-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+
+    span {
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    strong {
+      color: #2563eb;
+      font-size: 12px;
+      font-weight: 700;
+    }
+  }
+
+  .agentic-thinking-list,
+  .agentic-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .agentic-thinking {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding-left: 10px;
+    border-left: 2px solid #93c5fd;
+
+    span {
+      color: #1f2937;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    small {
+      color: #64748b;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+  }
+
+  .agentic-chain {
+    list-style: none;
+
+    li {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 8px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+  }
+
+  .agentic-chain__index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 700;
+    background: #dbeafe;
+  }
+
+  .agentic-chain__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    strong,
+    small,
+    em {
+      overflow-wrap: anywhere;
+    }
+
+    strong {
+      color: #1f2937;
+      font-size: 12px;
+    }
+
+    small {
+      color: #475569;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    em {
+      color: #64748b;
+      font-size: 11px;
+      font-style: normal;
+    }
+  }
+
+  .agentic-tool-scope {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+
+    > span {
+      flex: 0 0 auto;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 22px;
+    }
+  }
+
+  .agentic-token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
+    gap: 6px;
+  }
+
+  .agentic-token-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    padding: 5px 7px;
+    border-radius: 5px;
+    background: #f1f5f9;
+
+    span {
+      overflow: hidden;
+      color: #64748b;
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    strong {
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+    }
   }
 
   .agentic-details__row {
