@@ -83,15 +83,23 @@ public class PointValue implements Serializable {
     private String calValue;
 
     /**
+     * Numeric projection of {@link #calValue} for aggregation queries. Set by the
+     * driver when the point type is numeric or boolean (1.0/0.0); {@code null} for
+     * string payloads.
+     */
+    private Double numValue;
+
+    /**
      * Time when the point value message was created.
      */
     private LocalDateTime createTime;
 
-    public PointValue(RValue calValue) {
-        this.deviceId = calValue.getDevice().getId();
-        this.pointId = calValue.getPoint().getId();
-        this.rawValue = calValue.getValue();
-        this.calValue = calValue.getFinalValue();
+    public PointValue(RValue rValue) {
+        this.deviceId = rValue.getDevice().getId();
+        this.pointId = rValue.getPoint().getId();
+        this.rawValue = rValue.getValue();
+        this.calValue = rValue.getFinalValue();
+        this.numValue = rValue.getNumericValue();
         this.createTime = LocalDateTimeUtil.now();
     }
 

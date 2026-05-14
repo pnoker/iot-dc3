@@ -33,7 +33,6 @@ import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +62,6 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     @Override
     public void savePointValue(PointValueBO entityBO) {
         PointValueDO entityDO = pointValueBuilder.buildDOByBO(entityBO);
-        applyNumericProjection(entityDO);
         if (!pointValueManager.save(entityDO)) {
             throw new AddException("Failed to create point value");
         }
@@ -72,34 +70,8 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     @Override
     public void savePointValues(List<PointValueBO> entityBOList) {
         List<PointValueDO> entityDOList = pointValueBuilder.buildDOListByBOList(entityBOList);
-        entityDOList.forEach(this::applyNumericProjection);
         if (!pointValueManager.saveBatch(entityDOList)) {
             throw new AddException("Failed to create point value list");
-        }
-    }
-
-    /**
-     * Best-effort projection of {@code cal_value} into the {@code num_value}
-     * column so dashboard aggregates can run on a typed double without parsing
-     * text at query time. Quietly leaves the column NULL when the calculated
-     * value is blank, non-finite, or not a valid double — those samples are
-     * still preserved in {@code raw_value}/{@code cal_value}.
-     */
-    private void applyNumericProjection(PointValueDO entityDO) {
-        if (Objects.isNull(entityDO) || Objects.nonNull(entityDO.getNumValue())) {
-            return;
-        }
-        String calValue = entityDO.getCalValue();
-        if (StringUtils.isBlank(calValue)) {
-            return;
-        }
-        try {
-            double parsed = Double.parseDouble(calValue.trim());
-            if (Double.isFinite(parsed)) {
-                entityDO.setNumValue(parsed);
-            }
-        } catch (NumberFormatException ignored) {
-            // Non-numeric payload (boolean, JSON, free-form text); leave num_value NULL.
         }
     }
 
