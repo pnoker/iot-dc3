@@ -20,6 +20,7 @@ package io.github.pnoker.common.agentic.controller;
 import io.github.pnoker.common.agentic.skill.SkillDefinition;
 import io.github.pnoker.common.agentic.skill.SkillRegistry;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 import reactor.test.StepVerifier;
 
 class SkillControllerTest {
