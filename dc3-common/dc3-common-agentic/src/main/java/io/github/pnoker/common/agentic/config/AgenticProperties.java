@@ -67,7 +67,7 @@ public class AgenticProperties {
     /**
      * Whether Spring AI should execute provider-native tool calls.
      */
-    private boolean toolCallingEnabled = false;
+    private boolean toolCallingEnabled = true;
 
     /**
      * Root directory used to persist uploaded agentic attachment files. Runtime files

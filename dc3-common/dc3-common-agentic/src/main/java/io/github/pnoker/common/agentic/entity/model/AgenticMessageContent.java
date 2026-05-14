@@ -51,6 +51,8 @@ public class AgenticMessageContent implements Serializable {
 
     private List<String> tools;
 
+    private List<Trace> traces;
+
     private List<Context> contexts;
 
     private Tokens tokens;
@@ -63,6 +65,37 @@ public class AgenticMessageContent implements Serializable {
         AgenticMessageContent content = new AgenticMessageContent();
         content.setText(text);
         return content;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Trace implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private String type;
+
+        private String title;
+
+        private String detail;
+
+        private String name;
+
+        private Long created;
+
+        public static Trace of(String type, String title, String detail, String name, Long created) {
+            Trace trace = new Trace();
+            trace.setType(type);
+            trace.setTitle(title);
+            trace.setDetail(detail);
+            trace.setName(name);
+            trace.setCreated(created);
+            return trace;
+        }
+
     }
 
     @Getter

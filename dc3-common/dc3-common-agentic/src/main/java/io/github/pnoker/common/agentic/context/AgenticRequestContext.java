@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.context;
 
+import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -23,7 +24,11 @@ import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.springframework.ai.chat.model.ToolContext;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 
 /**
@@ -36,6 +41,7 @@ import java.util.Queue;
 public class AgenticRequestContext {
 
     private static final ThreadLocal<RequestHeader.UserHeader> USER_HEADER = new InheritableThreadLocal<>();
+    private static final ThreadLocal<Map<String, List<MessageBO>>> MEMORY_HISTORY = new InheritableThreadLocal<>();
 
     private AgenticRequestContext() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
@@ -47,6 +53,30 @@ public class AgenticRequestContext {
 
     public static void clear() {
         USER_HEADER.remove();
+        MEMORY_HISTORY.remove();
+    }
+
+    public static void setMemoryHistory(String conversationId, List<MessageBO> history) {
+        if (Objects.isNull(conversationId) || conversationId.isBlank()) {
+            return;
+        }
+        Map<String, List<MessageBO>> histories = MEMORY_HISTORY.get();
+        if (Objects.isNull(histories)) {
+            histories = new HashMap<>();
+            MEMORY_HISTORY.set(histories);
+        }
+        histories.put(conversationId, Objects.isNull(history) ? List.of() : List.copyOf(history));
+    }
+
+    public static Optional<List<MessageBO>> getMemoryHistory(String conversationId) {
+        if (Objects.isNull(conversationId) || conversationId.isBlank()) {
+            return Optional.empty();
+        }
+        Map<String, List<MessageBO>> histories = MEMORY_HISTORY.get();
+        if (Objects.isNull(histories) || !histories.containsKey(conversationId)) {
+            return Optional.empty();
+        }
+        return Optional.of(histories.get(conversationId));
     }
 
     public static RequestHeader.UserHeader requireUserHeader() {

@@ -23,9 +23,11 @@ import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
 import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
+import io.github.pnoker.api.center.data.StatusHealthApiGrpc;
 import io.github.pnoker.api.center.manager.DeviceApiGrpc;
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
+import io.github.pnoker.api.center.manager.ProfileApiGrpc;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -83,8 +85,18 @@ public class GrpcStubConfig {
     }
 
     @Bean
+    public ProfileApiGrpc.ProfileApiBlockingStub managerProfileApiBlockingStub(GrpcChannelFactory channels) {
+        return ProfileApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    }
+
+    @Bean
     public PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub(GrpcChannelFactory channels) {
         return PointValueApiGrpc.newBlockingStub(channels.createChannel(DataConstant.SERVICE_NAME));
+    }
+
+    @Bean
+    public StatusHealthApiGrpc.StatusHealthApiBlockingStub statusHealthApiBlockingStub(GrpcChannelFactory channels) {
+        return StatusHealthApiGrpc.newBlockingStub(channels.createChannel(DataConstant.SERVICE_NAME));
     }
 
 }

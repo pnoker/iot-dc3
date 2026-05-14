@@ -14,24 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.request;
 
-import lombok.Getter;
-import lombok.Setter;
+package io.github.pnoker.common.facade.local.builder;
+
+import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
+import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
+import io.github.pnoker.common.manager.entity.bo.ProfileBO;
+import io.github.pnoker.common.manager.entity.query.ProfileQuery;
+import io.github.pnoker.common.utils.MapStructUtil;
+import org.mapstruct.Mapper;
 
 /**
- * Mutable session fields controlled by the web client.
+ * FacadeProfile ↔ manager ProfileBO/Query mapper.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.14
+ * @since 2026.5.5
  */
-@Getter
-@Setter
-public class SessionUpdateRequest {
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+public interface FacadeProfileBuilder {
 
-    private String title;
+    ProfileQuery toManagerQuery(FacadeProfileQuery facadeQuery);
 
-    private String model;
+    FacadeProfileBO toFacadeBO(ProfileBO managerBO);
 
 }

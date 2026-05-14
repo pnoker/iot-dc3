@@ -41,6 +41,8 @@ public class SessionVO extends BaseVO {
 
     private String title;
 
+    private String model;
+
     private Long tenantId;
 
     private Long userId;

@@ -27,18 +27,26 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AgenticConversationIdsTest {
 
+    private static final String SEPARATOR = Character.toString(31);
+
     @Test
     void scopePrefixesTenantAndUserBeforeConversationId() {
-        assertThat(AgenticConversationIds.scope(1L, 2L, "abc")).isEqualTo("1:2:abc");
+        assertThat(AgenticConversationIds.scope(1L, 2L, "abc")).isEqualTo("1" + SEPARATOR + "2" + SEPARATOR + "abc");
     }
 
     @Test
     void scopeAcceptsBlankConversationId() {
-        assertThat(AgenticConversationIds.scope(1L, 2L, "")).isEqualTo("1:2:");
+        assertThat(AgenticConversationIds.scope(1L, 2L, "")).isEqualTo("1" + SEPARATOR + "2" + SEPARATOR);
     }
 
     @Test
     void stripScopeRemovesMatchingPrefix() {
+        assertThat(AgenticConversationIds.stripScope(1L, 2L, "1" + SEPARATOR + "2" + SEPARATOR + "abc"))
+                .isEqualTo("abc");
+    }
+
+    @Test
+    void stripScopeRemovesLegacyColonPrefix() {
         assertThat(AgenticConversationIds.stripScope(1L, 2L, "1:2:abc")).isEqualTo("abc");
     }
 
@@ -54,7 +62,7 @@ class AgenticConversationIdsTest {
 
     @Test
     void stripScopeReturnsEmptyWhenInputIsExactlyThePrefix() {
-        assertThat(AgenticConversationIds.stripScope(1L, 2L, "1:2:")).isEmpty();
+        assertThat(AgenticConversationIds.stripScope(1L, 2L, "1" + SEPARATOR + "2" + SEPARATOR)).isEmpty();
     }
 
     @Test

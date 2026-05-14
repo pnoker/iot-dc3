@@ -18,10 +18,17 @@ package io.github.pnoker.common.agentic.tool;
 
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.service.ActionService;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.facade.api.DeviceFacade;
+import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
@@ -50,12 +57,18 @@ public class DataToolSet {
 
     private final PointValueCommandFacade pointValueCommandFacade;
 
+    private final DeviceFacade deviceFacade;
+
+    private final PointFacade pointFacade;
+
     private final ActionService actionService;
 
     public DataToolSet(PointValueFacade pointValueFacade, PointValueCommandFacade pointValueCommandFacade,
-                       ActionService actionService) {
+                       DeviceFacade deviceFacade, PointFacade pointFacade, ActionService actionService) {
         this.pointValueFacade = pointValueFacade;
         this.pointValueCommandFacade = pointValueCommandFacade;
+        this.deviceFacade = deviceFacade;
+        this.pointFacade = pointFacade;
         this.actionService = actionService;
     }
 
@@ -100,6 +113,57 @@ public class DataToolSet {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
                     "getPointValueHistory", tenantId, deviceId, pointId, count, e);
             return "Error retrieving history: " + e.getMessage();
+        }
+    }
+
+    @Tool(description = "Get a latest-value snapshot for points bound to a device. Returns point metadata and latest values for up to the requested limit.")
+    public String getDeviceLatestPointValues(@ToolParam(description = "The device ID") Long deviceId,
+                                             @ToolParam(description = "Maximum number of points to include") int limit,
+                                             ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        int size = Math.max(1, Math.min(limit, 50));
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, limit={}",
+                "getDeviceLatestPointValues", tenantId, deviceId, size);
+        recordTool(toolContext, "getDeviceLatestPointValues", "Get device latest point values");
+        try {
+            FacadeDeviceBO device = deviceFacade.selectById(tenantId, deviceId);
+            if (Objects.isNull(device)) {
+                return "Device not found for ID: " + deviceId;
+            }
+
+            FacadePointQuery query = new FacadePointQuery();
+            query.setTenantId(tenantId);
+            query.setDeviceId(deviceId);
+            Pages page = new Pages();
+            page.setCurrent(1);
+            page.setSize(size);
+            query.setPage(page);
+            FacadePage<FacadePointBO> points = pointFacade.selectByPage(query);
+            if (Objects.isNull(points) || points.getRecords().isEmpty()) {
+                return "No points found for device " + deviceId;
+            }
+
+            StringBuilder builder = new StringBuilder();
+            builder.append("Latest values for device ").append(deviceId).append(" (")
+                    .append(device.getDeviceName()).append("):\n");
+            builder.append("| Point ID | Point Name | Code | Value | Raw Value | Unit | Time |\n");
+            builder.append("| --- | --- | --- | --- | --- | --- | --- |\n");
+            for (FacadePointBO point : points.getRecords()) {
+                FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, point.getId());
+                builder.append("| ")
+                        .append(point.getId()).append(" | ")
+                        .append(escape(point.getPointName())).append(" | ")
+                        .append(escape(point.getPointCode())).append(" | ")
+                        .append(Objects.isNull(value) ? "" : escape(value.getValue())).append(" | ")
+                        .append(Objects.isNull(value) ? "" : escape(value.getRawValue())).append(" | ")
+                        .append(escape(point.getUnit())).append(" | ")
+                        .append(Objects.isNull(value) ? "" : value.getCreateTime()).append(" |\n");
+            }
+            return builder.toString();
+        } catch (Exception e) {
+            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, limit={}",
+                    "getDeviceLatestPointValues", tenantId, deviceId, size, e);
+            return "Error retrieving device latest values: " + e.getMessage();
         }
     }
 
@@ -153,6 +217,10 @@ public class DataToolSet {
 
     private void recordTool(ToolContext toolContext, String toolName, String description) {
         AgenticRequestContext.recordToolInvocation(toolContext, toolName, "data", description);
+    }
+
+    private String escape(String value) {
+        return Objects.toString(value, "").replace("|", "\\|").replace("\n", " ");
     }
 
 }

@@ -53,6 +53,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -101,12 +103,16 @@ public class AgenticChatServiceImpl implements AgenticChatService {
 
     private final AgenticProperties properties;
 
+    private final ToolCallbackProvider toolCallbackProvider;
+
     private final ObjectMapper objectMapper;
 
     public AgenticChatServiceImpl(ChatClientFactory chatClientFactory, SkillRegistry skillRegistry, SessionService sessionService,
                                   MessageService messageService, AttachmentService attachmentService,
                                   DeviceFacade deviceFacade, DriverFacade driverFacade, PointFacade pointFacade,
-                                  AgenticProperties properties, ObjectMapper objectMapper) {
+                                  AgenticProperties properties,
+                                  @Qualifier("agenticToolCallbackProvider") ToolCallbackProvider toolCallbackProvider,
+                                  ObjectMapper objectMapper) {
         this.chatClientFactory = chatClientFactory;
         this.skillRegistry = skillRegistry;
         this.sessionService = sessionService;
@@ -116,6 +122,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         this.driverFacade = driverFacade;
         this.pointFacade = pointFacade;
         this.properties = properties;
+        this.toolCallbackProvider = toolCallbackProvider;
         this.objectMapper = objectMapper;
     }
 
@@ -154,37 +161,37 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                             .data(formatFinalChunk(chatId, created, prepared.model()))
                             .build()))
                     .concatWith(Mono.just(ServerSentEvent.<String>builder().data("[DONE]").build()));
-        }).subscribeOn(Schedulers.boundedElastic());
+        }).doFinally(signalType -> AgenticRequestContext.clear()).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     public Mono<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request, RequestHeader.UserHeader userHeader) {
         return Mono.fromCallable(() -> {
-            PreparedChatRequest prepared = prepare(request, userHeader, "blocking");
-            ChatClient.ChatClientRequestSpec promptSpec = buildPrompt(prepared);
-            persistUserMessage(prepared, userHeader);
-
-            String content;
-            AgenticRequestContext.set(userHeader);
             try {
+                PreparedChatRequest prepared = prepare(request, userHeader, "blocking");
+                ChatClient.ChatClientRequestSpec promptSpec = buildPrompt(prepared);
+                persistUserMessage(prepared, userHeader);
+
+                AgenticRequestContext.set(userHeader);
+                String content;
                 content = promptSpec.call().content();
+                persistAssistantMessage(prepared, content, userHeader);
+
+                return ChatCompletionResponse.builder()
+                        .id(newChatId())
+                        .object("chat.completion")
+                        .created(Instant.now().getEpochSecond())
+                        .model(prepared.model())
+                        .choices(List.of(ChatCompletionResponse.Choice.builder()
+                                .index(0)
+                                .message(new ChatCompletionResponse.Message("assistant", content))
+                                .finishReason("stop")
+                                .build()))
+                        .usage(new ChatCompletionResponse.Usage(0, 0, 0))
+                        .build();
             } finally {
                 AgenticRequestContext.clear();
             }
-            persistAssistantMessage(prepared, content, userHeader);
-
-            return ChatCompletionResponse.builder()
-                    .id(newChatId())
-                    .object("chat.completion")
-                    .created(Instant.now().getEpochSecond())
-                    .model(prepared.model())
-                    .choices(List.of(ChatCompletionResponse.Choice.builder()
-                            .index(0)
-                            .message(new ChatCompletionResponse.Message("assistant", content))
-                            .finishReason("stop")
-                            .build()))
-                    .usage(new ChatCompletionResponse.Usage(0, 0, 0))
-                    .build();
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -202,31 +209,35 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         List<String> toolNames = Objects.isNull(skill) ? List.of() : skillRegistry.getEnabledToolNames(skill.getName());
         String skillSystemPrompt = Objects.isNull(skill) ? null : buildSkillSystemPrompt(skill);
         String model = chatClientFactory.resolveModel(request.getModel());
+        boolean toolCallingEnabled = properties.isToolCallingEnabled() && chatClientFactory.supportsToolCall(model);
         Queue<AgenticRequestContext.ToolEvent> toolEvents = new ConcurrentLinkedQueue<>();
         Map<String, Object> toolContext = new HashMap<>();
         toolContext.put(AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId());
         toolContext.put(AgenticConstant.ToolContextKey.USER_ID, userHeader.getUserId());
         toolContext.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, scopedConversationId);
-        toolContext.put(AgenticConstant.ToolContextKey.CONFIRM_ACTIONS, Boolean.TRUE.equals(request.getConfirmActions()));
+        toolContext.put(AgenticConstant.ToolContextKey.CONFIRM_ACTIONS,
+                !Boolean.FALSE.equals(request.getConfirmActions()));
         toolContext.put(AgenticConstant.ToolContextKey.TOOL_EVENTS, toolEvents);
         String directContext = buildDirectContext(effectiveSkillName, userHeader, toolEvents);
         List<AgenticMessageContent.Context> contexts = buildContexts(attachmentContext, directContext);
         String requestSystemContext = buildRequestSystemContext(contexts);
+        List<MessageBO> memoryHistory = loadMemoryHistory(scopedConversationId);
+        AgenticRequestContext.setMemoryHistory(scopedConversationId, memoryHistory);
         AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, skillSystemPrompt,
-                requestSystemContext, contexts, scopedConversationId);
+                requestSystemContext, contexts, memoryHistory);
 
         log.debug(
                 "Agentic chat request received, mode={}, model={}, messageCount={}, conversationIdPresent={}, skill={}, tenantId={}, userId={}",
                 mode, model, request.getMessages().size(), StringUtils.isNotBlank(request.getConversationId()),
                 Objects.isNull(skill) ? null : skill.getName(), userHeader.getTenantId(), userHeader.getUserId());
 
-        touchSession(scopedConversationId, conversationId, userHeader);
+        touchSession(scopedConversationId, conversationId, userHeader, model);
 
         return new PreparedChatRequest(rawUserMessage, scopedConversationId, skillSystemPrompt,
                 requestSystemContext, normalizeToolNames(toolNames), model, effectiveSkillName, toolContext,
                 request.getTemperature(), request.getMaxTokens(), skill, toolEvents,
-                Boolean.TRUE.equals(request.getReasoning()), StringUtils.isNotBlank(directContext), attachments,
-                contexts, inputTokens, new ArrayList<>());
+                toolCallingEnabled, Boolean.TRUE.equals(request.getReasoning()), StringUtils.isNotBlank(directContext),
+                attachments, contexts, inputTokens, new ArrayList<>());
     }
 
     private void validateRequest(ChatCompletionRequest request) {
@@ -369,7 +380,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     private AgenticMessageContent.Tokens buildInputTokens(String userMessage, String skillSystemPrompt,
                                                           String requestSystemContext,
                                                           List<AgenticMessageContent.Context> contexts,
-                                                          String scopedConversationId) {
+                                                          List<MessageBO> memoryHistory) {
         int textTokens = AgenticTokenEstimator.estimate(userMessage);
         int contextTokens = contexts.stream()
                 .map(AgenticMessageContent.Context::getContent)
@@ -378,7 +389,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         int systemTokens = AgenticTokenEstimator.estimate(ChatClientConfig.SYSTEM_PROMPT)
                 + AgenticTokenEstimator.estimate(skillSystemPrompt)
                 + AgenticTokenEstimator.estimate(systemInstructions(requestSystemContext, contexts));
-        int memoryTokens = estimateMemoryTokens(scopedConversationId);
+        int memoryTokens = estimateMemoryTokens(memoryHistory);
         return AgenticMessageContent.Tokens.of(textTokens + contextTokens + systemTokens + memoryTokens, 0,
                 textTokens, contextTokens, systemTokens, memoryTokens);
     }
@@ -397,22 +408,28 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         return String.join("\n", instructions);
     }
 
-    private int estimateMemoryTokens(String scopedConversationId) {
+    private List<MessageBO> loadMemoryHistory(String scopedConversationId) {
         if (!properties.isMemoryEnabled()) {
-            return 0;
+            return List.of();
         }
         try {
-            List<MessageBO> history = messageService.loadHistory(scopedConversationId, properties.getHistoryWindowSize());
-            return history.stream()
-                    .map(message -> Objects.nonNull(message.getContent()) ? message.getContent().getText() : null)
-                    .map(StringUtils::defaultString)
-                    .filter(StringUtils::isNotBlank)
-                    .mapToInt(AgenticTokenEstimator::estimate)
-                    .sum();
+            return messageService.loadHistory(scopedConversationId, properties.getHistoryWindowSize());
         } catch (Exception e) {
-            log.debug("Agentic memory token estimation failed, conversationId={}", scopedConversationId, e);
+            log.debug("Agentic memory history load failed, conversationId={}", scopedConversationId, e);
+            return List.of();
+        }
+    }
+
+    private int estimateMemoryTokens(List<MessageBO> history) {
+        if (!properties.isMemoryEnabled() || Objects.isNull(history) || history.isEmpty()) {
             return 0;
         }
+        return history.stream()
+                .map(message -> Objects.nonNull(message.getContent()) ? message.getContent().getText() : null)
+                .map(StringUtils::defaultString)
+                .filter(StringUtils::isNotBlank)
+                .mapToInt(AgenticTokenEstimator::estimate)
+                .sum();
     }
 
     private ChatClient.ChatClientRequestSpec buildPrompt(PreparedChatRequest prepared) {
@@ -426,7 +443,20 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         if (StringUtils.isNotBlank(systemPrompt)) {
             promptSpec = promptSpec.system(systemPrompt);
         }
+        promptSpec = applyToolCallbacks(promptSpec, prepared);
         promptSpec = applyRequestOptions(promptSpec, prepared.model(), prepared.temperature(), prepared.maxTokens());
+        return promptSpec;
+    }
+
+    private ChatClient.ChatClientRequestSpec applyToolCallbacks(ChatClient.ChatClientRequestSpec promptSpec,
+                                                                PreparedChatRequest prepared) {
+        if (!prepared.toolCallingEnabled()) {
+            return promptSpec;
+        }
+        promptSpec = promptSpec.toolCallbacks(toolCallbackProvider);
+        if (!prepared.toolNames().isEmpty()) {
+            promptSpec = promptSpec.toolNames(prepared.toolNames().toArray(String[]::new));
+        }
         return promptSpec;
     }
 
@@ -486,7 +516,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         events.add(ServerSentEvent.<String>builder()
                 .data(formatEvent("skill", "Auto skill", skillDescription, skillName))
                 .build());
-        if (!prepared.toolNames().isEmpty()) {
+        if (prepared.toolCallingEnabled() && !prepared.toolNames().isEmpty()) {
             events.add(ServerSentEvent.<String>builder()
                     .data(formatEvent("tools", "Available tools", String.join(", ", prepared.toolNames()), skillName))
                     .build());
@@ -639,9 +669,10 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         return StringUtils.defaultString(value).replace("|", "\\|").replace("\n", " ");
     }
 
-    private void touchSession(String scopedConversationId, String conversationId, RequestHeader.UserHeader userHeader) {
+    private void touchSession(String scopedConversationId, String conversationId, RequestHeader.UserHeader userHeader,
+                              String model) {
         try {
-            sessionService.touch(scopedConversationId, userHeader.getTenantId(), userHeader.getUserId());
+            sessionService.touch(scopedConversationId, userHeader.getTenantId(), userHeader.getUserId(), model);
         } catch (Exception e) {
             log.warn(
                     "Agentic session touch failed, tenantId={}, userId={}, conversationId={}",
@@ -683,11 +714,39 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         content.setFormat("markdown");
         content.setSkills(skillNames(prepared));
         content.setTools(tools);
+        content.setTraces(buildTraceEvents(prepared, toolEvents));
         content.setReasoning(prepared.reasoning());
         content.setDirectContextProvided(prepared.directContextProvided());
         content.setContexts(prepared.contexts());
         content.setTokens(outputTokens(prepared.inputTokens(), text));
         return content;
+    }
+
+    private List<AgenticMessageContent.Trace> buildTraceEvents(PreparedChatRequest prepared,
+                                                               List<AgenticRequestContext.ToolEvent> toolEvents) {
+        List<AgenticMessageContent.Trace> traces = new ArrayList<>();
+        long created = Instant.now().getEpochSecond();
+        String skillName = Objects.nonNull(prepared.skillDefinition()) ? prepared.skillDefinition().getName() : "general";
+        String skillDescription = Objects.nonNull(prepared.skillDefinition()) ? prepared.skillDefinition().getDescription()
+                : "General assistant mode";
+        traces.add(AgenticMessageContent.Trace.of("skill", "Auto skill", skillDescription, skillName, created));
+        if (prepared.toolCallingEnabled() && !prepared.toolNames().isEmpty()) {
+            traces.add(AgenticMessageContent.Trace.of("tools", "Available tools", String.join(", ", prepared.toolNames()),
+                    skillName, created));
+        }
+        if (prepared.directContextProvided()) {
+            traces.add(AgenticMessageContent.Trace.of("tool", "Backend context loaded",
+                    "Queried DC3 backend before model response", skillName, created));
+        }
+        if (prepared.reasoning()) {
+            traces.add(AgenticMessageContent.Trace.of("reasoning", "Thinking",
+                    "Reasoning mode requested for this model.", skillName, created));
+        }
+        for (AgenticRequestContext.ToolEvent event : toolEvents) {
+            traces.add(AgenticMessageContent.Trace.of("tool", event.description(), event.domain(), event.toolName(),
+                    event.timestamp() / 1000));
+        }
+        return traces;
     }
 
     private List<AgenticRequestContext.ToolEvent> drainToolEvents(PreparedChatRequest prepared) {
@@ -726,8 +785,8 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                                        String requestSystemContext, List<String> toolNames, String model, String skill,
                                        Map<String, Object> toolContext, Double temperature, Integer maxTokens,
                                        SkillDefinition skillDefinition,
-                                       Queue<AgenticRequestContext.ToolEvent> toolEvents, boolean reasoning,
-                                       boolean directContextProvided, List<Long> attachments,
+                                       Queue<AgenticRequestContext.ToolEvent> toolEvents, boolean toolCallingEnabled,
+                                       boolean reasoning, boolean directContextProvided, List<Long> attachments,
                                        List<AgenticMessageContent.Context> contexts,
                                        AgenticMessageContent.Tokens inputTokens,
                                        List<AgenticRequestContext.ToolEvent> toolTraceEvents) {

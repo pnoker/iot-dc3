@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.config;
 
+import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.service.MessageService;
@@ -83,7 +84,8 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
         }
         List<MessageBO> history;
         try {
-            history = messageService.loadHistory(conversationId, properties.getHistoryWindowSize());
+            history = AgenticRequestContext.getMemoryHistory(conversationId)
+                    .orElseGet(() -> messageService.loadHistory(conversationId, properties.getHistoryWindowSize()));
         } catch (Exception e) {
             log.warn("Agentic chat memory load failed, conversationId={}", conversationId, e);
             return Collections.emptyList();
