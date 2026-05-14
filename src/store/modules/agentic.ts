@@ -267,6 +267,10 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
 
     const conversationId = ensureActiveSession();
+    if (!conversationId) {
+      failMessage('Missing conversation context.', 'Agentic');
+      return;
+    }
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
       role: 'user',

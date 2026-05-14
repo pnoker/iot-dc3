@@ -123,6 +123,9 @@ export const streamAgenticChatCompletion = async (
   data: AgenticChatCompletionRequest,
   callbacks: AgenticStreamCallbacks = {}
 ) => {
+  if (!data.conversationId) {
+    throw new Error('conversationId is required — generate a stable UUID per conversation before calling.');
+  }
   try {
     const response = await fetch(`/${API_AGENTIC_BASE}/chat/completions`, {
       method: 'post',

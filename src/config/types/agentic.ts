@@ -134,7 +134,13 @@ export interface AgenticChatCompletionRequest {
   temperature?: number;
   maxTokens?: number;
   stream: boolean;
-  conversationId?: string;
+  /**
+   * Stable client-generated conversation ID. The backend uses this to replay chat
+   * memory across turns, so callers MUST reuse the same value for follow-up
+   * messages and only generate a fresh UUID when starting a new conversation.
+   * Leaving this empty is rejected by the backend with HTTP 400.
+   */
+  conversationId: string;
   skill?: string;
   attachments?: number[];
   reasoning?: boolean;
