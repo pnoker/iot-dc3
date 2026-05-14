@@ -70,6 +70,14 @@ public class PointValueDO implements Serializable {
     private String calValue;
 
     /**
+     * Best-effort numeric projection of {@link #calValue} for aggregation
+     * queries (AVG/MIN/MAX/SUM/timeseries). NULL for non-numeric payloads
+     * (booleans, JSON, free-form text).
+     */
+    @TableField("numeric_value")
+    private Double numericValue;
+
+    /**
      * Driver ID
      */
     @TableField("driver_id")

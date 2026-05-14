@@ -108,7 +108,7 @@ public interface DashboardMapper {
     /**
      * Volume rollup for the topology's "volume" mode — counts point_value rows per
      * {@code (device_id, point_id)} over the selected time window, queried against
-     * {@code dc3_history.v_dc3_point_value_all} (cross-schema).
+     * {@code dc3_history.dc3_point_value} (cross-schema).
      */
     List<PointVolumeRow> topologyPointVolumes(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from);
 
