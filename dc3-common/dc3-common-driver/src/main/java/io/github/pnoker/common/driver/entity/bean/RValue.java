@@ -75,8 +75,17 @@ public class RValue implements Serializable {
     private String value;
 
     /**
+     * Numeric projection for aggregation queries. Set by {@link #getFinalValue()} on
+     * first access: numeric types carry the converted number, booleans are 1.0/0.0,
+     * strings remain {@code null}.
+     */
+    private transient Double numericValue;
+
+    /**
      * Returns the final point value after applying scaling and type conversion rules
-     * defined by the point metadata.
+     * defined by the point metadata. As a side effect this also populates
+     * {@link #numericValue} so callers can retrieve the typed double without
+     * re-parsing.
      *
      * @return final point value as a string
      */
@@ -91,16 +100,65 @@ public class RValue implements Serializable {
         byte decimal = Optional.ofNullable(point.getValueDecimal()).orElse((byte) 6);
 
         return switch (valueType) {
-            case STRING -> value;
-            case BYTE -> String.valueOf(getByteValue(value, base, multiple));
-            case SHORT -> String.valueOf(getShortValue(value, base, multiple));
-            case INT -> String.valueOf(getIntegerValue(value, base, multiple));
-            case LONG -> String.valueOf(getLongValue(value, base, multiple));
-            case FLOAT -> String.valueOf(getFloatValue(value, base, multiple, decimal));
-            case DOUBLE -> String.valueOf(getDoubleValue(value, base, multiple, decimal));
-            case BOOLEAN -> String.valueOf(getBooleanValue(value));
+            case STRING -> {
+                numericValue = null;
+                yield value;
+            }
+            case BYTE -> {
+                byte v = getByteValue(value, base, multiple);
+                numericValue = (double) v;
+                yield String.valueOf(v);
+            }
+            case SHORT -> {
+                short v = getShortValue(value, base, multiple);
+                numericValue = (double) v;
+                yield String.valueOf(v);
+            }
+            case INT -> {
+                int v = getIntegerValue(value, base, multiple);
+                numericValue = (double) v;
+                yield String.valueOf(v);
+            }
+            case LONG -> {
+                long v = getLongValue(value, base, multiple);
+                numericValue = (double) v;
+                yield String.valueOf(v);
+            }
+            case FLOAT -> {
+                float v = getFloatValue(value, base, multiple, decimal);
+                numericValue = (double) v;
+                yield String.valueOf(v);
+            }
+            case DOUBLE -> {
+                double v = getDoubleValue(value, base, multiple, decimal);
+                numericValue = v;
+                yield String.valueOf(v);
+            }
+            case BOOLEAN -> {
+                boolean v = getBooleanValue(value);
+                numericValue = v ? 1.0 : 0.0;
+                yield String.valueOf(v);
+            }
         };
     }
+
+    /**
+     * Returns the numeric projection computed by the last {@link #getFinalValue()} call.
+     *
+     * @return numeric value or {@code null} for non-numeric point types
+     */
+    public Double getNumericValue() {
+        return numericValue;
+    }
+    /**
+     * Convenience constructor for test fixtures.
+     */
+    public RValue(DeviceBO device, PointBO point, String value) {
+        this.device = device;
+        this.point = point;
+        this.value = value;
+    }
+
 
     /**
      * Applies a linear transformation using the formula {@code y = ax + b}.
