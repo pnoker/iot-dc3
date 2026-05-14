@@ -19,7 +19,6 @@ package io.github.pnoker.e2e.harness;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
  * Base class for end-to-end integration tests. Subclasses inherit the lifecycle that
@@ -27,12 +26,14 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
  * so non-E2E builds (which do not carry Docker) can exclude these tests via
  * {@code -Dgroups='!e2e'} or surefire excludedGroups configuration.
  *
- * <p>The {@link EnabledIfEnvironmentVariable} guard keeps these tests dormant unless a
- * developer or CI workflow opts in by setting {@code DC3_E2E=true}. This is the same
- * gate the {@code e2e.yml} workflow toggles before running the suite.
+ * <p>Each concrete subclass MUST add
+ * {@code @EnabledIfEnvironmentVariable(named = "DC3_E2E", matches = "(?i)true|1|yes|on")}
+ * directly on the class. JUnit 5 evaluates the condition on the declared class, so
+ * keeping it on the abstract base would silently leave subclasses enabled when
+ * {@code DC3_E2E} is unset. The {@code e2e.yml} workflow exports the env var before
+ * running this suite.
  */
 @Tag("e2e")
-@EnabledIfEnvironmentVariable(named = "DC3_E2E", matches = "(?i)true|1|yes|on")
 public abstract class BaseE2eIT {
 
     @BeforeAll

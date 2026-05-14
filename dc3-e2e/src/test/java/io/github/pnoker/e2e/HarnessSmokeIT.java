@@ -22,6 +22,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import io.github.pnoker.e2e.harness.BaseE2eIT;
 import io.github.pnoker.e2e.harness.E2eStack;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -35,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * <p>Disabled by default. Run with {@code DC3_E2E=true mvn -pl dc3-e2e -am verify}.
  */
+@EnabledIfEnvironmentVariable(named = "DC3_E2E", matches = "(?i)true|1|yes|on")
 class HarnessSmokeIT extends BaseE2eIT {
 
     @Test
