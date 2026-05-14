@@ -21,7 +21,7 @@
 
     <select id="countInRange" resultType="long">
         SELECT COUNT(*)
-        FROM v_dc3_point_value_all
+        FROM dc3_point_value
         WHERE create_time &gt;= #{from}
           AND create_time &lt; #{to}
           AND tenant_id = #{tenantId}
@@ -29,7 +29,7 @@
 
     <select id="countTotal" resultType="long">
         SELECT COUNT(*)
-        FROM v_dc3_point_value_all
+        FROM dc3_point_value
         WHERE tenant_id = #{tenantId}
     </select>
 
@@ -50,7 +50,7 @@
     <select id="timeseries" resultType="io.github.pnoker.common.data.entity.bo.dashboard.TimeBucketRow">
         SELECT public.time_bucket(INTERVAL '${bucket}', create_time) AS bucket,
                COUNT(*)                                              AS count
-        FROM v_dc3_point_value_all
+        FROM dc3_point_value
         WHERE create_time &gt;= #{from}
           AND create_time &lt; #{to}
           AND tenant_id = #{tenantId}
@@ -66,7 +66,7 @@
     <select id="top" resultType="io.github.pnoker.common.data.entity.bo.dashboard.EntityCountRow">
         SELECT ${dimension} AS entity_id,
                COUNT(*)     AS count
-        FROM v_dc3_point_value_all
+        FROM dc3_point_value
         WHERE create_time &gt;= #{from}
           AND create_time &lt; #{to}
           AND tenant_id = #{tenantId}
@@ -76,88 +76,22 @@
     </select>
 
     <!--
-        Each branch has its own ORDER BY / LIMIT, so the subqueries must be
-        wrapped in parentheses to participate in UNION ALL (Postgres rule).
-        Inner LIMITs cap per-type reads so we never scan a full hypertable.
+        Latest stream: a single hypertable now holds every sample regardless
+        of declared point type, so the value_type column is derived from the
+        numeric_value projection — NUMERIC when cal_value parsed cleanly as a
+        double, STRING otherwise (booleans, JSON, free-form text).
     -->
     <select id="latestStream" resultType="io.github.pnoker.common.data.entity.bo.dashboard.LatestPointValueRow">
-        SELECT *
-        FROM ((SELECT tenant_id,
-                      device_id,
-                      point_id,
-                      driver_id,
-                      create_time,
-                      raw_value::text AS raw_value, cal_value::text AS cal_value, 'STRING' AS value_type
-               FROM dc3_point_value
-               WHERE tenant_id = #{tenantId}
-               ORDER BY create_time DESC
-               LIMIT #{limit})
-              UNION ALL
-              (SELECT tenant_id,
-                      device_id,
-                      point_id,
-                      driver_id,
-                      create_time,
-                      raw_value::text, cal_value::text, 'INT'
-               FROM dc3_point_value_int
-               WHERE tenant_id = #{tenantId}
-               ORDER BY create_time DESC
-               LIMIT #{limit})
-              UNION ALL
-              (SELECT tenant_id,
-                      device_id,
-                      point_id,
-                      driver_id,
-                      create_time,
-                      raw_value::text, cal_value::text, 'LONG'
-               FROM dc3_point_value_long
-               WHERE tenant_id = #{tenantId}
-               ORDER BY create_time DESC
-               LIMIT #{limit})
-              UNION ALL
-              (SELECT tenant_id,
-                      device_id,
-                      point_id,
-                      driver_id,
-                      create_time,
-                      raw_value::text, cal_value::text, 'BOOL'
-               FROM dc3_point_value_bool
-               WHERE tenant_id = #{tenantId}
-               ORDER BY create_time DESC
-               LIMIT #{limit})
-              UNION ALL
-              (SELECT tenant_id,
-                      device_id,
-                      point_id,
-                      driver_id,
-                      create_time,
-                      raw_value::text, cal_value::text, 'FLOAT'
-               FROM dc3_point_value_float
-               WHERE tenant_id = #{tenantId}
-               ORDER BY create_time DESC
-               LIMIT #{limit})
-              UNION ALL
-              (SELECT tenant_id,
-                      device_id,
-                      point_id,
-                      driver_id,
-                      create_time,
-                      raw_value::text, cal_value::text, 'DOUBLE'
-               FROM dc3_point_value_double
-               WHERE tenant_id = #{tenantId}
-               ORDER BY create_time DESC
-               LIMIT #{limit})
-              UNION ALL
-              (SELECT tenant_id,
-                      device_id,
-                      point_id,
-                      driver_id,
-                      create_time,
-                      raw_value::text, cal_value::text, 'JSON'
-               FROM dc3_point_value_json
-               WHERE tenant_id = #{tenantId}
-               ORDER BY create_time DESC
-               LIMIT #{limit})) unioned
+        SELECT tenant_id,
+               device_id,
+               point_id,
+               driver_id,
+               create_time,
+               raw_value,
+               cal_value,
+               CASE WHEN numeric_value IS NOT NULL THEN 'NUMERIC' ELSE 'STRING' END AS value_type
+        FROM dc3_point_value
+        WHERE tenant_id = #{tenantId}
         ORDER BY create_time DESC
         LIMIT #{limit}
     </select>
@@ -179,7 +113,7 @@
                          ELSE 5
                          END AS bin
               FROM (SELECT EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000 AS diff_ms
-                    FROM v_dc3_point_value_all
+                    FROM dc3_point_value
                     WHERE create_time &gt;= #{from}
                       AND create_time &lt; #{to}
                       AND tenant_id = #{tenantId}) deltas) bucketed
@@ -194,7 +128,7 @@
     -->
     <select id="hourlyActivity" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow">
         SELECT EXTRACT(DOW FROM create_time)::int AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
-        FROM v_dc3_point_value_all
+        FROM dc3_point_value
         WHERE create_time &gt;= #{from}
           AND create_time &lt; #{to}
           AND tenant_id = #{tenantId}
@@ -216,7 +150,7 @@
     -->
     <select id="silentSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SilentSourceRow">
         SELECT device_id, point_id, MAX(create_time) AS last_seen
-        FROM v_dc3_point_value_all
+        FROM dc3_point_value
         WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
         GROUP BY device_id, point_id
@@ -237,7 +171,7 @@
         WHERE p.deleted = 0
           AND p.tenant_id = #{tenantId}
           AND NOT EXISTS (SELECT 1
-                          FROM v_dc3_point_value_all pv
+                          FROM dc3_point_value pv
                           WHERE pv.point_id = p.id
                             AND pv.tenant_id = p.tenant_id)
         ORDER BY p.id DESC

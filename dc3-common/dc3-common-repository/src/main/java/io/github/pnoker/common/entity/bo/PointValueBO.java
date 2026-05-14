@@ -72,6 +72,14 @@ public class PointValueBO implements Serializable {
     private String calValue;
 
     /**
+     * Best-effort numeric projection of {@link #calValue} populated when the
+     * value parses cleanly as a double. NULL for booleans, JSON, and free-form
+     * text. Aggregate queries on the history table use this column with a
+     * partial index to skip the cast / parse step at query time.
+     */
+    private Double numericValue;
+
+    /**
      * Driver ID that collected the data
      */
     private Long driverId;
