@@ -41,9 +41,10 @@ import type {
 import { failMessage, warnMessage } from '@/utils/notificationUtil';
 import { getStorage, setStorage } from '@/utils/storageUtil';
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const MESSAGE_STORAGE_KEY = 'dc3-agentic-messages';
+const PREFS_STORAGE_KEY = 'dc3-agentic-prefs';
 const INTERNAL_USER_CONTENT_MARKERS = [
   '\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation.',
   '\n\nAttached files available to the user:',
@@ -66,11 +67,20 @@ export const useAgenticStore = defineStore('agentic', () => {
   const sessions = ref<AgenticSession[]>([]);
   const models = ref<AgenticModel[]>([]);
   const skills = ref<AgenticSkill[]>([]);
-  const selectedModel = ref('');
-  const reasoningEnabled = ref(false);
-  const requireConfirmation = ref(true);
-  const temperature = ref<number>();
-  const maxTokens = ref<number>();
+  const savedPrefs = readCachedPrefs();
+  const selectedModel = ref(String(savedPrefs.selectedModel || ''));
+  const reasoningEnabled = ref(Boolean(savedPrefs.reasoningEnabled ?? false));
+  const requireConfirmation = ref(Boolean(savedPrefs.requireConfirmation ?? true));
+  const temperature = ref<number | undefined>(
+    typeof savedPrefs.temperature === 'number' ? savedPrefs.temperature : undefined
+  );
+  const maxTokens = ref<number | undefined>(
+    typeof savedPrefs.maxTokens === 'number' ? savedPrefs.maxTokens : undefined
+  );
+  watch([selectedModel, reasoningEnabled, requireConfirmation, temperature, maxTokens], () => persistPrefs(), {
+    deep: true,
+  });
+
   const activeConversationId = ref('');
   const currentAbortController = ref<AbortController>();
   const messagesByConversation = ref<Record<string, AgenticMessage[]>>(readCachedMessages());
@@ -545,6 +555,16 @@ export const useAgenticStore = defineStore('agentic', () => {
     setStorage(MESSAGE_STORAGE_KEY, messagesByConversation.value);
   };
 
+  const persistPrefs = () => {
+    setStorage(PREFS_STORAGE_KEY, {
+      selectedModel: selectedModel.value,
+      reasoningEnabled: reasoningEnabled.value,
+      requireConfirmation: requireConfirmation.value,
+      temperature: temperature.value,
+      maxTokens: maxTokens.value,
+    });
+  };
+
   return {
     visible,
     bootstrapped,
@@ -591,6 +611,12 @@ export const useAgenticStore = defineStore('agentic', () => {
     rejectAction,
   };
 });
+
+const readCachedPrefs = () => {
+  const cached = getStorage(PREFS_STORAGE_KEY);
+  if (!cached || typeof cached !== 'object') return {};
+  return cached as Record<string, unknown>;
+};
 
 const readCachedMessages = (): Record<string, AgenticMessage[]> => {
   const cached = getStorage(MESSAGE_STORAGE_KEY);
