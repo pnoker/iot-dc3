@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -58,12 +59,15 @@ class ChatClientFactoryTest {
     @Mock
     private ChatClient.Builder fallbackBuilder;
 
+    @Mock
+    private Advisor memoryAdvisor;
+
     private ChatClientFactory factory;
 
     @BeforeEach
     void setUp() {
         factory = new ChatClientFactory(modelProviderManager, modelConfigManager, modelProviderBuilder,
-                modelConfigBuilder, fallbackBuilder);
+                modelConfigBuilder, fallbackBuilder, memoryAdvisor);
     }
 
     @Test
