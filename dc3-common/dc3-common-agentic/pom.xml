@@ -94,6 +94,13 @@
             <version>${dc3.version}</version>
         </dependency>
 
+        <!-- Reactive test utilities for controller verification -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
