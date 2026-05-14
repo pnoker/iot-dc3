@@ -17,6 +17,10 @@
 package io.github.pnoker.common.agentic.config;
 
 import io.github.pnoker.common.agentic.service.MessageService;
+import io.github.pnoker.common.agentic.tool.AuthToolSet;
+import io.github.pnoker.common.agentic.tool.DataToolSet;
+import io.github.pnoker.common.agentic.tool.ManagerToolSet;
+import io.github.pnoker.common.agentic.tool.PlatformToolSet;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -24,6 +28,8 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -81,6 +87,15 @@ public class ChatClientConfig {
     @Bean
     public Advisor agenticChatMemoryAdvisor(@Qualifier("agenticChatMemory") ChatMemory chatMemory) {
         return MessageChatMemoryAdvisor.builder(chatMemory).build();
+    }
+
+    @Bean
+    public ToolCallbackProvider agenticToolCallbackProvider(AuthToolSet authToolSet, ManagerToolSet managerToolSet,
+                                                            DataToolSet dataToolSet,
+                                                            PlatformToolSet platformToolSet) {
+        return MethodToolCallbackProvider.builder()
+                .toolObjects(authToolSet, managerToolSet, dataToolSet, platformToolSet)
+                .build();
     }
 
     @Bean

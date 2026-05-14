@@ -135,6 +135,14 @@ public class ChatClientFactory {
         return Objects.nonNull(provider) ? provider.getProviderType() : null;
     }
 
+    public boolean supportsToolCall(String model) {
+        ModelConfigBO config = StringUtils.isNotBlank(model) ? resolveConfig(model) : null;
+        if (Objects.isNull(config)) {
+            config = resolveDefaultConfig();
+        }
+        return Objects.isNull(config) || Boolean.TRUE.equals(config.getToolCall());
+    }
+
     public void evict(Long providerId) {
         ChatClient removed = cache.remove(providerId);
         if (Objects.nonNull(removed)) {

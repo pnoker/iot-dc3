@@ -5,10 +5,18 @@ system-prompt-addition: |
   When the user needs to control a device, confirm the operation intent before executing read or write commands.
   Confirm the target value with the user before any write operation.
 tools:
+  - listPointsByDeviceId
+  - listPointsByProfileId
+  - lookupDeviceById
+  - lookupDevicesByIds
+  - lookupPointById
+  - lookupPointsByIds
+  - lookupProfileById
+  - listProfilesByDeviceId
+  - getLatestPointValue
+  - getDeviceStatusesByIds
   - readPointValue
   - writePointValue
-  - lookupDeviceById
-  - lookupPointById
 examples:
   - user: "Read the value of point 2 on device 1"
     assistant: "Sending a read command to device 1..."

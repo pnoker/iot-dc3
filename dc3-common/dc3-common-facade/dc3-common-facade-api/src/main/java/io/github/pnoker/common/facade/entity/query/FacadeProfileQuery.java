@@ -14,35 +14,61 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
+package io.github.pnoker.common.facade.entity.query;
+
+import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.ProfileShareFlagEnum;
+import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
+ * Facade-level profile/template query.
+ *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.14
+ * @since 2026.5.5
  */
 @Getter
 @Setter
+@Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
-public class SessionBO extends BaseBO {
+public class FacadeProfileQuery implements Serializable {
 
-    private String conversationId;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    private String title;
-
-    private String model;
+    private Pages page;
 
     private Long tenantId;
 
-    private Long userId;
+    private String profileName;
+
+    private String profileCode;
+
+    private ProfileShareFlagEnum profileShareFlag;
+
+    private ProfileTypeFlagEnum profileTypeFlag;
+
+    private EnableFlagEnum enableFlag;
+
+    private Long groupId;
+
+    private Long labelId;
+
+    private Integer version;
+
+    private Long deviceId;
 
 }

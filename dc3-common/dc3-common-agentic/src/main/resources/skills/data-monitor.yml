@@ -5,8 +5,18 @@ system-prompt-addition: |
   When the user needs device data, use getLatestPointValue for real-time values and getPointValueHistory for historical trends.
   Include timestamps and unit information when presenting data.
 tools:
+  - listPointsByDeviceId
+  - listPointsByProfileId
+  - lookupDevicesByIds
+  - lookupPointsByIds
   - getLatestPointValue
+  - getDeviceLatestPointValues
   - getPointValueHistory
+  - getDeviceStatusesByIds
+  - getDeviceStatusesByProfileId
+  - getDriverStatusesByIds
+  - getDriverDeviceStatusSummary
+  - getSystemHealth
 examples:
   - user: "Show the latest data for device 1"
     assistant: "Fetching real-time data for device 1..."

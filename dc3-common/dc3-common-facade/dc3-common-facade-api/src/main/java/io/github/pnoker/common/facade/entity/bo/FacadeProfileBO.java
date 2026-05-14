@@ -14,9 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.bo;
+
+package io.github.pnoker.common.facade.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.ext.ProfileExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.ProfileShareFlagEnum;
+import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,25 +29,35 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * Facade-level profile/template BO.
+ *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.14
+ * @since 2026.5.5
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class SessionBO extends BaseBO {
+public class FacadeProfileBO extends BaseBO {
 
-    private String conversationId;
+    private String profileName;
 
-    private String title;
+    private String profileCode;
 
-    private String model;
+    private ProfileShareFlagEnum profileShareFlag;
+
+    private ProfileTypeFlagEnum profileTypeFlag;
+
+    private ProfileExt profileExt;
+
+    private EnableFlagEnum enableFlag;
 
     private Long tenantId;
 
-    private Long userId;
+    private String signature;
+
+    private Integer version;
 
 }

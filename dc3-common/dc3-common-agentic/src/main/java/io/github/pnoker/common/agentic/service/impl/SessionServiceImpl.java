@@ -59,11 +59,12 @@ public class SessionServiceImpl implements SessionService {
     private MessageService messageService;
 
     @Override
-    public SessionBO touch(String conversationId, Long tenantId, Long userId) {
+    public SessionBO touch(String conversationId, Long tenantId, Long userId, String model) {
         SessionDO existing = findByConversationId(conversationId);
         if (Objects.nonNull(existing)) {
             existing.setTenantId(tenantId);
             existing.setUserId(userId);
+            applyModel(existing, model);
             sessionManager.updateById(existing);
             return sessionBuilder.buildBOByDO(existing);
         }
@@ -73,6 +74,7 @@ public class SessionServiceImpl implements SessionService {
         entityDO.setTenantId(tenantId);
         entityDO.setUserId(userId);
         entityDO.setTitle("New Conversation");
+        applyModel(entityDO, model);
         sessionManager.save(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
     }
@@ -104,8 +106,15 @@ public class SessionServiceImpl implements SessionService {
         if (StringUtils.isNotBlank(request.getTitle())) {
             entityDO.setTitle(request.getTitle().trim());
         }
+        applyModel(entityDO, request.getModel());
         sessionManager.updateById(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
+    }
+
+    private void applyModel(SessionDO entityDO, String model) {
+        if (StringUtils.isNotBlank(model)) {
+            entityDO.setModel(model.trim());
+        }
     }
 
     @Override

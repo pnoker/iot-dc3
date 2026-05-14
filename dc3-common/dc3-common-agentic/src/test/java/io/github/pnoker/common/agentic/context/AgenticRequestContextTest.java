@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.agentic.context;
 
+import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -68,8 +70,17 @@ class AgenticRequestContextTest {
     @Test
     void clearRemovesThreadLocalHeader() {
         AgenticRequestContext.set(userHeader(1L, 5L));
+        AgenticRequestContext.setMemoryHistory("conv", List.of(new MessageBO()));
         AgenticRequestContext.clear();
         assertThatThrownBy(AgenticRequestContext::requireUserHeader).isInstanceOf(UnAuthorizedException.class);
+        assertThat(AgenticRequestContext.getMemoryHistory("conv")).isEmpty();
+    }
+
+    @Test
+    void memoryHistoryCanCacheEmptyResultForConversation() {
+        AgenticRequestContext.setMemoryHistory("conv", List.of());
+        assertThat(AgenticRequestContext.getMemoryHistory("conv")).hasValue(List.of());
+        assertThat(AgenticRequestContext.getMemoryHistory("other")).isEmpty();
     }
 
     @Test

@@ -79,6 +79,23 @@ public class ManagerToolSet {
         return formatDevice(bo);
     }
 
+    @Tool(description = "Batch look up devices by numeric IDs. Returns up to 50 tenant-scoped devices.")
+    public String lookupDevicesByIds(@ToolParam(description = "The numeric device IDs") List<Long> deviceIds,
+                                     ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        List<Long> ids = normalizeIds(deviceIds);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceIds={}", "lookupDevicesByIds", tenantId, ids);
+        recordTool(toolContext, "lookupDevicesByIds", "Batch query devices by IDs");
+        if (ids.isEmpty()) {
+            return "No valid device IDs provided.";
+        }
+        List<FacadeDeviceBO> devices = deviceFacade.selectByIds(tenantId, ids);
+        if (devices.isEmpty()) {
+            return "No devices found for IDs: " + ids;
+        }
+        return devices.stream().map(this::formatDevice).collect(Collectors.joining("\n"));
+    }
+
     @Tool(description = "Search for devices with optional filters. Supports filtering by device name, code, or driver ID. Returns a paginated list of devices.")
     public String searchDevices(
             @ToolParam(description = "Device name filter (partial match), or null to skip") String deviceName,
@@ -152,6 +169,23 @@ public class ManagerToolSet {
         return formatDriver(bo);
     }
 
+    @Tool(description = "Batch look up drivers by numeric IDs. Returns up to 50 tenant-scoped drivers.")
+    public String lookupDriversByIds(@ToolParam(description = "The numeric driver IDs") List<Long> driverIds,
+                                     ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        List<Long> ids = normalizeIds(driverIds);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, driverIds={}", "lookupDriversByIds", tenantId, ids);
+        recordTool(toolContext, "lookupDriversByIds", "Batch query drivers by IDs");
+        if (ids.isEmpty()) {
+            return "No valid driver IDs provided.";
+        }
+        List<FacadeDriverBO> drivers = driverFacade.selectByIds(tenantId, ids);
+        if (drivers.isEmpty()) {
+            return "No drivers found for IDs: " + ids;
+        }
+        return drivers.stream().map(this::formatDriver).collect(Collectors.joining("\n"));
+    }
+
     @Tool(description = "Resolve the driver that owns a given device. Returns the driver details.")
     public String lookupDriverByDeviceId(@ToolParam(description = "The device ID") Long deviceId,
                                          ToolContext toolContext) {
@@ -204,6 +238,23 @@ public class ManagerToolSet {
         return formatPoint(bo);
     }
 
+    @Tool(description = "Batch look up points by numeric IDs. Returns up to 50 tenant-scoped points.")
+    public String lookupPointsByIds(@ToolParam(description = "The numeric point IDs") List<Long> pointIds,
+                                    ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        List<Long> ids = normalizeIds(pointIds);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, pointIds={}", "lookupPointsByIds", tenantId, ids);
+        recordTool(toolContext, "lookupPointsByIds", "Batch query points by IDs");
+        if (ids.isEmpty()) {
+            return "No valid point IDs provided.";
+        }
+        List<FacadePointBO> points = pointFacade.selectByIds(tenantId, ids);
+        if (points.isEmpty()) {
+            return "No points found for IDs: " + ids;
+        }
+        return points.stream().map(this::formatPoint).collect(Collectors.joining("\n"));
+    }
+
     @Tool(description = "Search for points with optional filters. Returns a paginated list.")
     public String searchPoints(
             @ToolParam(description = "Point name filter (partial match), or null to skip") String pointName,
@@ -218,6 +269,50 @@ public class ManagerToolSet {
 
         FacadePointQuery query = new FacadePointQuery();
         query.setPointName(pointName);
+        query.setProfileId(profileId);
+        query.setTenantId(tenantId);
+        Pages p = new Pages();
+        p.setCurrent(page);
+        p.setSize(size);
+        query.setPage(p);
+
+        FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
+        return formatPointPage(result);
+    }
+
+    @Tool(description = "List points bound to a specific device ID. Use this before reading or writing values when the user knows the device but not the point ID.")
+    public String listPointsByDeviceId(@ToolParam(description = "The device ID") Long deviceId,
+                                       @ToolParam(description = "Page number (1-based)") int page,
+                                       @ToolParam(description = "Page size") int size,
+                                       ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, page={}, size={}", "listPointsByDeviceId",
+                tenantId, deviceId, page, size);
+        recordTool(toolContext, "listPointsByDeviceId", "List points by device");
+
+        FacadePointQuery query = new FacadePointQuery();
+        query.setDeviceId(deviceId);
+        query.setTenantId(tenantId);
+        Pages p = new Pages();
+        p.setCurrent(page);
+        p.setSize(size);
+        query.setPage(p);
+
+        FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
+        return formatPointPage(result);
+    }
+
+    @Tool(description = "List points under a specific profile/template ID. Use this when the user wants all metrics defined by a template.")
+    public String listPointsByProfileId(@ToolParam(description = "The profile/template ID") Long profileId,
+                                        @ToolParam(description = "Page number (1-based)") int page,
+                                        @ToolParam(description = "Page size") int size,
+                                        ToolContext toolContext) {
+        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}, page={}, size={}",
+                "listPointsByProfileId", tenantId, profileId, page, size);
+        recordTool(toolContext, "listPointsByProfileId", "List points by profile");
+
+        FacadePointQuery query = new FacadePointQuery();
         query.setProfileId(profileId);
         query.setTenantId(tenantId);
         Pages p = new Pages();
@@ -275,6 +370,13 @@ public class ManagerToolSet {
 
     private void recordTool(ToolContext toolContext, String toolName, String description) {
         AgenticRequestContext.recordToolInvocation(toolContext, toolName, "manager", description);
+    }
+
+    private List<Long> normalizeIds(List<Long> ids) {
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return List.of();
+        }
+        return ids.stream().filter(Objects::nonNull).distinct().limit(50).toList();
     }
 
 }

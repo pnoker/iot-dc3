@@ -14,35 +14,58 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
+package io.github.pnoker.common.facade.entity.bo;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Map;
+
 /**
+ * Transport-neutral system health snapshot.
+ *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.14
+ * @since 2026.5.5
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
-public class SessionBO extends BaseBO {
+@ToString
+public class FacadeSystemHealthBO implements Serializable {
 
-    private String conversationId;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    private String title;
+    private Map<String, String> center;
 
-    private String model;
+    private Map<String, String> infra;
 
-    private Long tenantId;
+    private FleetSummary drivers;
 
-    private Long userId;
+    private FleetSummary devices;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ToString
+    public static class FleetSummary implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private int total;
+
+        private int online;
+
+    }
 
 }

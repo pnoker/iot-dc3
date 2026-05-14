@@ -1,0 +1,129 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package api.common.data;
+
+import "api/common/r.proto";
+
+option java_package = "io.github.pnoker.api.center.data";
+option java_outer_classname = "StatusHealthProto";
+option objc_class_prefix = "Data";
+option java_multiple_files = true;
+
+// Service interface defining RPC calls related to fleet status and health.
+service StatusHealthApi {
+  // Query device statuses by device IDs
+  rpc DeviceStatusesByIds (GrpcIdsStatusQuery) returns (GrpcRStatusMap);
+
+  // Query device statuses by profile/template ID
+  rpc DeviceStatusesByProfileId (GrpcProfileStatusQuery) returns (GrpcRStatusMap);
+
+  // Query driver statuses by driver IDs
+  rpc DriverStatusesByIds (GrpcIdsStatusQuery) returns (GrpcRStatusMap);
+
+  // Query device online/offline summary under a driver
+  rpc DriverDeviceStatusSummary (GrpcDriverStatusQuery) returns (GrpcRStringMap);
+
+  // Query system health snapshot
+  rpc SystemHealth (GrpcTenantHealthQuery) returns (GrpcRSystemHealthDTO);
+}
+
+// Tenant-scoped IDs query.
+message GrpcIdsStatusQuery {
+  // Tenant ID
+  int64 tenant_id = 1;
+
+  // Entity IDs
+  repeated int64 ids = 2;
+}
+
+// Tenant-scoped profile query.
+message GrpcProfileStatusQuery {
+  // Tenant ID
+  int64 tenant_id = 1;
+
+  // Profile/template ID
+  int64 profile_id = 2;
+}
+
+// Tenant-scoped driver query.
+message GrpcDriverStatusQuery {
+  // Tenant ID
+  int64 tenant_id = 1;
+
+  // Driver ID
+  int64 driver_id = 2;
+}
+
+// Tenant-scoped health query.
+message GrpcTenantHealthQuery {
+  // Tenant ID
+  int64 tenant_id = 1;
+}
+
+// Response wrapper for status maps keyed by ID.
+message GrpcRStatusMap {
+  // Common result wrapper
+  GrpcR result = 1;
+
+  // Status map keyed by entity ID
+  map<int64, string> data = 2;
+}
+
+// Response wrapper for string maps.
+message GrpcRStringMap {
+  // Common result wrapper
+  GrpcR result = 1;
+
+  // String map data
+  map<string, string> data = 2;
+}
+
+// Response wrapper for system health.
+message GrpcRSystemHealthDTO {
+  // Common result wrapper
+  GrpcR result = 1;
+
+  // System health data
+  GrpcSystemHealthDTO data = 2;
+}
+
+// System health DTO.
+message GrpcSystemHealthDTO {
+  // Center service reachability
+  map<string, string> center = 1;
+
+  // Infrastructure reachability
+  map<string, string> infra = 2;
+
+  // Driver fleet summary
+  GrpcFleetSummaryDTO drivers = 3;
+
+  // Device fleet summary
+  GrpcFleetSummaryDTO devices = 4;
+}
+
+// Fleet summary DTO.
+message GrpcFleetSummaryDTO {
+  // Total entity count
+  int32 total = 1;
+
+  // Online entity count
+  int32 online = 2;
+}
