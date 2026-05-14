@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,7 +59,7 @@ public class MessageServiceImpl implements MessageService {
         entityBO.setRole(role);
         entityBO.setContent(Objects.nonNull(content) ? content : AgenticMessageContent.ofText(""));
         entityBO.setModel(model);
-        entityBO.setMessageIndex(nextMessageIndex(conversationId, header));
+        entityBO.setMessageIndex(nextMessageIndex(conversationId));
         entityBO.setStatus(AgenticMessageStatusEnum.OK);
         entityBO.setTenantId(header.getTenantId());
         entityBO.setUserId(header.getUserId());
@@ -82,12 +83,47 @@ public class MessageServiceImpl implements MessageService {
                 .toList();
     }
 
-    private long nextMessageIndex(String conversationId, RequestHeader.UserHeader header) {
+    @Override
+    public List<MessageBO> loadHistory(String scopedConversationId, int limit) {
+        if (StringUtils.isBlank(scopedConversationId) || limit <= 0) {
+            return List.of();
+        }
+        LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query()
+                .lambda()
+                .eq(MessageDO::getConversationId, scopedConversationId)
+                .orderByDesc(MessageDO::getMessageIndex)
+                .orderByDesc(MessageDO::getCreateTime)
+                .last("LIMIT " + limit);
+        List<MessageDO> latest = messageManager.list(wrapper);
+        if (latest.isEmpty()) {
+            return List.of();
+        }
+        Collections.reverse(latest);
+        return messageBuilder.buildBOListByDOList(latest).stream()
+                .map(this::normalize)
+                .toList();
+    }
+
+    @Override
+    public int removeByConversationId(String scopedConversationId) {
+        if (StringUtils.isBlank(scopedConversationId)) {
+            return 0;
+        }
+        LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query()
+                .lambda()
+                .eq(MessageDO::getConversationId, scopedConversationId);
+        long pending = messageManager.count(wrapper);
+        if (pending <= 0) {
+            return 0;
+        }
+        messageManager.remove(wrapper);
+        return (int) pending;
+    }
+
+    private long nextMessageIndex(String conversationId) {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query()
                 .lambda()
                 .eq(MessageDO::getConversationId, conversationId)
-                .eq(MessageDO::getTenantId, header.getTenantId())
-                .eq(MessageDO::getUserId, header.getUserId())
                 .orderByDesc(MessageDO::getMessageIndex)
                 .last(QueryWrapperConstant.LIMIT_ONE);
         MessageDO latest = messageManager.getOne(wrapper);

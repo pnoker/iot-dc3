@@ -29,4 +29,26 @@ public interface MessageService {
 
     List<MessageBO> list(String conversationId, RequestHeader.UserHeader header);
 
+    /**
+     * Load conversation history for chat memory replay. Returns the most recent
+     * {@code limit} messages for the scoped conversation, ordered chronologically.
+     * Unlike {@link #list(String, RequestHeader.UserHeader)} this does not depend on
+     * the request user header — chat memory is keyed solely by the already
+     * tenant/user-scoped conversation ID, and a non-existent conversation simply
+     * returns an empty list.
+     *
+     * @param scopedConversationId tenant/user scoped conversation ID
+     * @param limit                maximum number of messages to return
+     * @return chronologically ordered (oldest first) message BO list
+     */
+    List<MessageBO> loadHistory(String scopedConversationId, int limit);
+
+    /**
+     * Logically delete every message that belongs to the given scoped conversation.
+     *
+     * @param scopedConversationId tenant/user scoped conversation ID
+     * @return number of rows soft-deleted
+     */
+    int removeByConversationId(String scopedConversationId);
+
 }
