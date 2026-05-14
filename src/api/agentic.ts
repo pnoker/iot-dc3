@@ -20,6 +20,7 @@ import { API_AGENTIC_BASE } from '@/config/constant/api';
 import { AUTH_HEADERS } from '@/config/constant/common';
 import type {
   AgenticChatCompletionRequest,
+  AgenticChatCompletionResponse,
   AgenticAction,
   AgenticAttachment,
   AgenticModel,
@@ -87,7 +88,7 @@ export const deleteAgenticSession = (conversationId: string) =>
     params: { conversation_id: conversationId },
   });
 
-export const updateAgenticSession = (conversationId: string, data: Pick<AgenticSession, 'title'>) =>
+export const updateAgenticSession = (conversationId: string, data: Partial<Pick<AgenticSession, 'title' | 'model'>>) =>
   httpPost<R<AgenticSession>>(`${API_AGENTIC_BASE}/session/update`, data, {
     params: { conversation_id: conversationId },
   });
@@ -123,6 +124,9 @@ export const streamAgenticChatCompletion = async (
   data: AgenticChatCompletionRequest,
   callbacks: AgenticStreamCallbacks = {}
 ) => {
+  if (!data.conversationId) {
+    throw new Error('conversationId is required — generate a stable UUID per conversation before calling.');
+  }
   try {
     const response = await fetch(`/${API_AGENTIC_BASE}/chat/completions`, {
       method: 'post',
@@ -158,6 +162,29 @@ export const streamAgenticChatCompletion = async (
     callbacks.onError?.(normalized);
     throw normalized;
   }
+};
+
+export const completeAgenticChatCompletion = async (
+  data: AgenticChatCompletionRequest,
+  signal?: AbortSignal
+): Promise<AgenticChatCompletionResponse> => {
+  if (!data.conversationId) {
+    throw new Error('conversationId is required — generate a stable UUID per conversation before calling.');
+  }
+
+  const response = await fetch(`/${API_AGENTIC_BASE}/chat/completions`, {
+    method: 'post',
+    credentials: 'include',
+    signal,
+    headers: buildFetchHeaders(),
+    body: JSON.stringify({ ...data, stream: false }),
+  });
+
+  if (!response.ok) {
+    await handleStreamHttpError(response);
+  }
+
+  return (await response.json()) as AgenticChatCompletionResponse;
 };
 
 const buildFetchHeaders = (): HeadersInit => {

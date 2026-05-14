@@ -289,11 +289,18 @@ describe('agentic streaming contract', () => {
     const onEvent = vi.fn();
     const onDone = vi.fn();
 
-    await agenticApi.streamAgenticChatCompletion({ messages: [{ role: 'user', content: 'hello' }] } as never, {
-      onDelta,
-      onEvent,
-      onDone,
-    });
+    await agenticApi.streamAgenticChatCompletion(
+      {
+        messages: [{ role: 'user', content: 'hello' }],
+        conversationId: 'conversation-test',
+        stream: true,
+      } as never,
+      {
+        onDelta,
+        onEvent,
+        onDone,
+      }
+    );
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/v3/agentic/chat/completions',
@@ -322,9 +329,12 @@ describe('agentic streaming contract', () => {
 
     const onError = vi.fn();
 
-    await expect(agenticApi.streamAgenticChatCompletion({ messages: [] } as never, { onError })).rejects.toThrow(
-      'expired'
-    );
+    await expect(
+      agenticApi.streamAgenticChatCompletion(
+        { messages: [], conversationId: 'conversation-test', stream: true } as never,
+        { onError }
+      )
+    ).rejects.toThrow('expired');
 
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
     expect(window.location.hash).toBe('#/login');

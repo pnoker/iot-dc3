@@ -43,4 +43,4 @@ COPY --from=builder /build/dc3/dependencies/conf.crt/ /etc/letsencrypt/live/
 EXPOSE 80 443
 VOLUME /var/log/nginx
 
-CMD envsubst < /etc/nginx/location/default.env > /etc/nginx/location/default.conf ; nginx -g "daemon off;"
+CMD envsubst '${APP_API_HOST} ${APP_API_PORT}' < /etc/nginx/location/default.env > /etc/nginx/location/default.conf ; nginx -g "daemon off;"

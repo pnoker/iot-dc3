@@ -30,6 +30,7 @@ export type {
   AgenticAction,
   AgenticChatMessage,
   AgenticChatCompletionRequest,
+  AgenticChatCompletionResponse,
   AgenticStreamCallbacks,
   AgenticTraceEvent,
 } from './agentic';

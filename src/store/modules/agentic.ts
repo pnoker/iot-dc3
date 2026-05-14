@@ -15,6 +15,7 @@
  */
 
 import {
+  completeAgenticChatCompletion,
   confirmAgenticAction,
   deleteAgenticSession,
   getAgenticAttachments,
@@ -156,7 +157,8 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
 
     const firstModel = models.value[0] || DEFAULT_MODEL;
-    selectedModel.value = selectedModel.value || firstModel.model;
+    selectedModel.value = resolveModelName(selectedModel.value || currentSession.value?.model || firstModel.model);
+    applyModelCapabilities();
     temperature.value = temperature.value ?? firstModel.temperature;
     maxTokens.value = maxTokens.value ?? firstModel.maxTokens;
   };
@@ -183,6 +185,9 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const newSession = () => {
     const conversationId = createConversationId();
+    const model = resolveModelName(selectedModel.value);
+    selectedModel.value = model;
+    applyModelCapabilities();
     activeConversationId.value = conversationId;
     if (!messagesByConversation.value[conversationId]) {
       messagesByConversation.value[conversationId] = [];
@@ -194,6 +199,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         {
           conversationId,
           title: 'New Conversation',
+          model,
         },
         ...sessions.value,
       ];
@@ -206,6 +212,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       return;
     }
     activeConversationId.value = String(conversationId);
+    restoreSessionModel(sessions.value.find((session) => session.conversationId === activeConversationId.value));
     if (!messagesByConversation.value[activeConversationId.value]) {
       messagesByConversation.value[activeConversationId.value] = [];
       persistMessages();
@@ -267,6 +274,14 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
 
     const conversationId = ensureActiveSession();
+    if (!conversationId) {
+      failMessage('Missing conversation context.', 'Agentic');
+      return;
+    }
+    const model = resolveModelName(selectedModel.value || currentSession.value?.model);
+    selectedModel.value = model;
+    applyModelCapabilities();
+    updateSessionModelLocally(conversationId, model);
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
       role: 'user',
@@ -286,24 +301,27 @@ export const useAgenticStore = defineStore('agentic', () => {
     streaming.value = true;
 
     try {
-      await streamAgenticChatCompletion(
-        {
-          model: selectedModel.value || activeModel.value.model,
-          messages: [{ role: 'user', content: text }],
-          stream: true,
-          conversationId,
-          temperature: temperature.value,
-          maxTokens: maxTokens.value,
-          attachments: currentAttachments.value.map((attachment) => attachment.id),
-          reasoning: reasoningEnabled.value,
-          confirmActions: requireConfirmation.value,
-        },
-        {
+      const request = {
+        model,
+        messages: [{ role: 'user' as const, content: text }],
+        stream: activeModel.value.stream,
+        conversationId,
+        temperature: temperature.value,
+        maxTokens: maxTokens.value,
+        attachments: currentAttachments.value.map((attachment) => attachment.id),
+        reasoning: activeModel.value.reasoning && reasoningEnabled.value,
+        confirmActions: requireConfirmation.value,
+      };
+      if (activeModel.value.stream) {
+        await streamAgenticChatCompletion(request, {
           signal: abortController.signal,
           onEvent: (event) => appendTraceEvent(conversationId, event),
           onDelta: (delta) => appendAssistantDelta(conversationId, assistantMessage.id, delta),
-        }
-      );
+        });
+      } else {
+        const response = await completeAgenticChatCompletion(request, abortController.signal);
+        appendAssistantDelta(conversationId, assistantMessage.id, response.choices?.[0]?.message?.content || '');
+      }
       markAssistantComplete(conversationId, assistantMessage.id);
       await syncSessionAfterMessage(conversationId, text);
       await Promise.all([loadMessages(conversationId), loadPendingActions(conversationId)]);
@@ -409,6 +427,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       const existingSession = sessions.value[0];
       if (existingSession) {
         activeConversationId.value = existingSession.conversationId;
+        restoreSessionModel(existingSession);
       } else {
         newSession();
       }
@@ -424,7 +443,56 @@ export const useAgenticStore = defineStore('agentic', () => {
     await renameSession(conversationId, title);
     await loadSessions();
     if (!sessions.value.some((item) => item.conversationId === conversationId)) {
-      sessions.value = [{ conversationId, title }, ...sessions.value];
+      sessions.value = [{ conversationId, title, model: resolveModelName(selectedModel.value) }, ...sessions.value];
+    }
+  };
+
+  const setSelectedModel = async (model: string | number) => {
+    const nextModel = resolveModelName(String(model || ''));
+    selectedModel.value = nextModel;
+    applyModelCapabilities();
+
+    const conversationId = activeConversationId.value;
+    if (!conversationId) {
+      return;
+    }
+    updateSessionModelLocally(conversationId, nextModel);
+    const session = sessions.value.find((item) => item.conversationId === conversationId);
+    if (!session?.createTime && !session?.operateTime) {
+      return;
+    }
+    try {
+      const response = await updateAgenticSession(conversationId, { model: nextModel });
+      sessions.value = sessions.value.map((session) =>
+        session.conversationId === conversationId ? { ...session, ...response.data } : session
+      );
+    } catch (error) {
+      warnMessage('Failed to update agentic session model.', 'Agentic', error);
+    }
+  };
+
+  const restoreSessionModel = (session?: AgenticSession) => {
+    selectedModel.value = resolveModelName(session?.model || selectedModel.value);
+    applyModelCapabilities();
+  };
+
+  const updateSessionModelLocally = (conversationId: string, model: string) => {
+    sessions.value = sessions.value.map((session) =>
+      session.conversationId === conversationId ? { ...session, model } : session
+    );
+  };
+
+  const resolveModelName = (model?: string) => {
+    const candidate = model?.trim();
+    if (candidate && models.value.some((item) => item.model === candidate)) {
+      return candidate;
+    }
+    return models.value[0]?.model || DEFAULT_MODEL.model;
+  };
+
+  const applyModelCapabilities = () => {
+    if (!activeModel.value.reasoning) {
+      reasoningEnabled.value = false;
     }
   };
 
@@ -497,6 +565,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     selectSession,
     deleteSession,
     renameSession,
+    setSelectedModel,
     sendMessage,
     stopStreaming,
     loadMessages,

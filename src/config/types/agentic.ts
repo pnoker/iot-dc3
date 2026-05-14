@@ -54,6 +54,7 @@ export interface AgenticModelConfig extends AgenticModel {
 export interface AgenticSession {
   conversationId: string;
   title?: string;
+  model?: string;
   createTime?: string;
   operateTime?: string;
 }
@@ -80,6 +81,7 @@ export interface AgenticMessageContent {
   attachments?: number[];
   skills?: string[];
   tools?: string[];
+  traces?: AgenticTraceEvent[];
   contexts?: AgenticMessageContext[];
   tokens?: AgenticMessageTokens;
   reasoning?: boolean;
@@ -134,11 +136,41 @@ export interface AgenticChatCompletionRequest {
   temperature?: number;
   maxTokens?: number;
   stream: boolean;
-  conversationId?: string;
+  /**
+   * Stable client-generated conversation ID. The backend uses this to replay chat
+   * memory across turns, so callers MUST reuse the same value for follow-up
+   * messages and only generate a fresh UUID when starting a new conversation.
+   * Leaving this empty is rejected by the backend with HTTP 400.
+   */
+  conversationId: string;
   skill?: string;
   attachments?: number[];
   reasoning?: boolean;
   confirmActions?: boolean;
+}
+
+export interface AgenticChatCompletionResponse {
+  id?: string;
+  object?: string;
+  created?: number;
+  model?: string;
+  choices?: Array<{
+    index?: number;
+    message?: {
+      role?: AgenticMessageRole;
+      content?: string;
+    };
+    finishReason?: string;
+    finish_reason?: string;
+  }>;
+  usage?: {
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
 }
 
 export interface AgenticStreamCallbacks {
