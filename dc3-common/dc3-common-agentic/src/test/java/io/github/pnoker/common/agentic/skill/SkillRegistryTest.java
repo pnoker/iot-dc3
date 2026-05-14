@@ -26,6 +26,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SkillRegistryTest {
 
+    private static SkillDefinition skill(String name, List<String> tools) {
+        SkillDefinition skill = new SkillDefinition();
+        skill.setName(name);
+        skill.setEnabled(true);
+        skill.setDescription("d");
+        skill.setSystemPromptAddition("");
+        skill.setTools(tools);
+        return skill;
+    }
+
     @Test
     void registerAndLookupBySkillName() {
         SkillRegistry registry = new SkillRegistry();
@@ -91,15 +101,5 @@ class SkillRegistryTest {
         SkillDefinition skill = skill("free-form", null);
         registry.register(skill);
         assertThat(registry.getEnabledToolNames("free-form")).isNull();
-    }
-
-    private static SkillDefinition skill(String name, List<String> tools) {
-        SkillDefinition skill = new SkillDefinition();
-        skill.setName(name);
-        skill.setEnabled(true);
-        skill.setDescription("d");
-        skill.setSystemPromptAddition("");
-        skill.setTools(tools);
-        return skill;
     }
 }

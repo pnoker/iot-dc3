@@ -82,6 +82,56 @@ class ModbusTcpDriverCustomServiceImplTest {
 
     private ModbusFactory previousFactory;
 
+    private static ModbusFactory swapStaticFactory(ModbusFactory replacement) throws Exception {
+        Field field = ModbusTcpDriverCustomServiceImpl.class.getDeclaredField("modbusFactory");
+        field.setAccessible(true);
+        ModbusFactory previous = (ModbusFactory) field.get(null);
+        field.set(null, replacement);
+        return previous;
+    }
+
+    private static Map<String, AttributeBO> driverConfig(String host, int port) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
+        return m;
+    }
+
+    private static Map<String, AttributeBO> pointConfig(int slaveId, int functionCode, int offset) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("slaveId",
+                AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("functionCode",
+                AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeFlagEnum.INT).build());
+        return m;
+    }
+
+    private static DeviceBO device(Long id) {
+        DeviceBO device = new DeviceBO();
+        device.setId(id);
+        return device;
+    }
+
+    private static PointBO point(PointTypeFlagEnum type) {
+        PointBO point = new PointBO();
+        point.setId(1L);
+        point.setPointTypeFlag(type);
+        return point;
+    }
+
+    private static WValue wValue(String value, PointTypeFlagEnum type) {
+        return WValue.builder().value(value).type(type).build();
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         service = new ModbusTcpDriverCustomServiceImpl();
@@ -152,7 +202,7 @@ class ModbusTcpDriverCustomServiceImplTest {
 
         assertThatThrownBy(() -> service.read(driverConfig("host", 1502), pointConfig(1, 1, 0), device(7L),
                 point(PointTypeFlagEnum.INT))).isInstanceOf(ConnectorException.class)
-                        .hasMessageContaining("offline");
+                .hasMessageContaining("offline");
     }
 
     @Test
@@ -163,11 +213,11 @@ class ModbusTcpDriverCustomServiceImplTest {
         assertThat(
                 service.read(driverConfig("h", 1), pointConfig(1, 1, 0), device(2L), point(PointTypeFlagEnum.BOOLEAN))
                         .getValue())
-                                .isEqualTo("true");
+                .isEqualTo("true");
         assertThat(
                 service.read(driverConfig("h", 1), pointConfig(1, 2, 0), device(2L), point(PointTypeFlagEnum.BOOLEAN))
                         .getValue())
-                                .isEqualTo("false");
+                .isEqualTo("false");
         assertThat(service.read(driverConfig("h", 1), pointConfig(1, 3, 0), device(2L), point(PointTypeFlagEnum.INT))
                 .getValue()).isEqualTo("42");
         assertThat(service.read(driverConfig("h", 1), pointConfig(1, 4, 0), device(2L), point(PointTypeFlagEnum.INT))
@@ -190,7 +240,7 @@ class ModbusTcpDriverCustomServiceImplTest {
 
         assertThatThrownBy(() -> service.read(driverConfig("h", 1), pointConfig(1, 3, 0), device(3L),
                 point(PointTypeFlagEnum.INT))).isInstanceOf(ReadPointException.class)
-                        .hasMessageContaining("rs485 down");
+                .hasMessageContaining("rs485 down");
     }
 
     @Test
@@ -203,7 +253,7 @@ class ModbusTcpDriverCustomServiceImplTest {
 
         assertThatThrownBy(() -> service.read(driverConfig("h", 1), pointConfig(1, 4, 0), device(3L),
                 point(PointTypeFlagEnum.INT))).isInstanceOf(ReadPointException.class)
-                        .hasMessageContaining("illegal data address");
+                .hasMessageContaining("illegal data address");
     }
 
     @Test
@@ -238,8 +288,8 @@ class ModbusTcpDriverCustomServiceImplTest {
 
         assertThatThrownBy(() -> service.write(driverConfig("h", 1), pointConfig(1, 1, 0), device(7L),
                 point(PointTypeFlagEnum.BOOLEAN), wValue("true", PointTypeFlagEnum.BOOLEAN)))
-                        .isInstanceOf(WritePointException.class)
-                        .hasMessageContaining("transport reset");
+                .isInstanceOf(WritePointException.class)
+                .hasMessageContaining("transport reset");
     }
 
     @Test
@@ -259,8 +309,8 @@ class ModbusTcpDriverCustomServiceImplTest {
 
         assertThatThrownBy(() -> service.write(driverConfig("h", 1), pointConfig(1, 3, 0), device(8L),
                 point(PointTypeFlagEnum.FLOAT), wValue("1.0", PointTypeFlagEnum.FLOAT)))
-                        .isInstanceOf(WritePointException.class)
-                        .hasMessageContaining("offline");
+                .isInstanceOf(WritePointException.class)
+                .hasMessageContaining("offline");
     }
 
     @Test
@@ -277,55 +327,5 @@ class ModbusTcpDriverCustomServiceImplTest {
         Field field = ModbusTcpDriverCustomServiceImpl.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(service, value);
-    }
-
-    private static ModbusFactory swapStaticFactory(ModbusFactory replacement) throws Exception {
-        Field field = ModbusTcpDriverCustomServiceImpl.class.getDeclaredField("modbusFactory");
-        field.setAccessible(true);
-        ModbusFactory previous = (ModbusFactory) field.get(null);
-        field.set(null, replacement);
-        return previous;
-    }
-
-    private static Map<String, AttributeBO> driverConfig(String host, int port) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
-        return m;
-    }
-
-    private static Map<String, AttributeBO> pointConfig(int slaveId, int functionCode, int offset) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("slaveId",
-                AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("functionCode",
-                AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeFlagEnum.INT).build());
-        return m;
-    }
-
-    private static DeviceBO device(Long id) {
-        DeviceBO device = new DeviceBO();
-        device.setId(id);
-        return device;
-    }
-
-    private static PointBO point(PointTypeFlagEnum type) {
-        PointBO point = new PointBO();
-        point.setId(1L);
-        point.setPointTypeFlag(type);
-        return point;
-    }
-
-    private static WValue wValue(String value, PointTypeFlagEnum type) {
-        return WValue.builder().value(value).type(type).build();
-    }
-
-    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO event = new MetadataEventDTO();
-        event.setMetadataType(type);
-        event.setOperateType(op);
-        event.setId(id);
-        return event;
     }
 }

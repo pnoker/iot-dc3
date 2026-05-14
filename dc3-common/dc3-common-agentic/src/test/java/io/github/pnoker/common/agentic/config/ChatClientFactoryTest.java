@@ -64,6 +64,12 @@ class ChatClientFactoryTest {
 
     private ChatClientFactory factory;
 
+    private static Field cacheField() throws NoSuchFieldException {
+        Field field = ChatClientFactory.class.getDeclaredField("cache");
+        field.setAccessible(true);
+        return field;
+    }
+
     @BeforeEach
     void setUp() {
         factory = new ChatClientFactory(modelProviderManager, modelConfigManager, modelProviderBuilder,
@@ -108,11 +114,5 @@ class ChatClientFactoryTest {
         factory.evict(1L);
         factory.evict(2L);
         assertThat(cache).isEmpty();
-    }
-
-    private static Field cacheField() throws NoSuchFieldException {
-        Field field = ChatClientFactory.class.getDeclaredField("cache");
-        field.setAccessible(true);
-        return field;
     }
 }

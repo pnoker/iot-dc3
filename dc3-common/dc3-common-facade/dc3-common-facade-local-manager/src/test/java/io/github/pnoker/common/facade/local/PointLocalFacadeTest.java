@@ -51,6 +51,14 @@ class PointLocalFacadeTest {
 
     private PointLocalFacade facade;
 
+    private static <T> T any() {
+        return org.mockito.ArgumentMatchers.any();
+    }
+
+    private static <T> T any(Class<T> clazz) {
+        return org.mockito.ArgumentMatchers.any(clazz);
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         facade = new PointLocalFacade();
@@ -119,13 +127,5 @@ class PointLocalFacadeTest {
         Field field = PointLocalFacade.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(facade, value);
-    }
-
-    private static <T> T any() {
-        return org.mockito.ArgumentMatchers.any();
-    }
-
-    private static <T> T any(Class<T> clazz) {
-        return org.mockito.ArgumentMatchers.any(clazz);
     }
 }

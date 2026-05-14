@@ -17,6 +17,8 @@
 
 package io.github.pnoker.e2e;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import io.github.pnoker.e2e.harness.BaseE2eIT;
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
@@ -30,9 +32,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -40,17 +39,17 @@ import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Pins the rest-assured wiring shape that the platform-driven E2E flows will use:
- *  - JSON request and response shaping
- *  - status code + body matchers
- *  - {@link io.restassured.config.RestAssuredConfig} default content type override so
- *    non-JSON content types do not silently parse as form
- *
+ * - JSON request and response shaping
+ * - status code + body matchers
+ * - {@link io.restassured.config.RestAssuredConfig} default content type override so
+ * non-JSON content types do not silently parse as form
+ * <p>
  * The platform-image-driven user-flow scenarios (login, driver registration, write
  * point value, gateway 401, cross-tenant isolation, OFFLINE auto-status, command
  * round-trip, DLX requeue, agentic via WireMock, CSV import, token rotation) will
  * extend this harness once dc3-center-* and dc3-driver-* publish immutable image
  * tags suitable for CI. Until then the dependency on rest-assured is locked here.
- *
+ * <p>
  * Disabled by default; opt in with {@code DC3_E2E=true}.
  */
 @EnabledIfEnvironmentVariable(named = "DC3_E2E", matches = "(?i)true|1|yes|on")

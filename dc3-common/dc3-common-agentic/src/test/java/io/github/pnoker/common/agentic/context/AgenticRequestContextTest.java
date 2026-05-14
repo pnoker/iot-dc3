@@ -36,6 +36,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AgenticRequestContextTest {
 
+    private static RequestHeader.UserHeader userHeader(Long tenantId, Long userId) {
+        RequestHeader.UserHeader h = new RequestHeader.UserHeader();
+        h.setTenantId(tenantId);
+        h.setUserId(userId);
+        return h;
+    }
+
+    private static ToolContext toolContext(Map<String, Object> values) {
+        return new ToolContext(new HashMap<>(values));
+    }
+
     @AfterEach
     void cleanThreadLocal() {
         AgenticRequestContext.clear();
@@ -158,16 +169,5 @@ class AgenticRequestContextTest {
         // Just assert it doesn't throw.
         AgenticRequestContext.recordToolInvocation(ctx, "tool", "domain", "desc");
         AgenticRequestContext.recordToolInvocation(null, "tool", "domain", "desc");
-    }
-
-    private static RequestHeader.UserHeader userHeader(Long tenantId, Long userId) {
-        RequestHeader.UserHeader h = new RequestHeader.UserHeader();
-        h.setTenantId(tenantId);
-        h.setUserId(userId);
-        return h;
-    }
-
-    private static ToolContext toolContext(Map<String, Object> values) {
-        return new ToolContext(new HashMap<>(values));
     }
 }

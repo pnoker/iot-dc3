@@ -22,9 +22,15 @@ import io.github.pnoker.common.agentic.skill.SkillRegistry;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class SkillControllerTest {
+
+    private static SkillDefinition skill(String name, String description) {
+        SkillDefinition skill = new SkillDefinition();
+        skill.setName(name);
+        skill.setDescription(description);
+        skill.setEnabled(true);
+        return skill;
+    }
 
     @Test
     void listExposesEverySkillAsVO() {
@@ -54,13 +60,5 @@ class SkillControllerTest {
                     assertThat(response.getData()).isEmpty();
                 })
                 .verifyComplete();
-    }
-
-    private static SkillDefinition skill(String name, String description) {
-        SkillDefinition skill = new SkillDefinition();
-        skill.setName(name);
-        skill.setDescription(description);
-        skill.setEnabled(true);
-        return skill;
     }
 }

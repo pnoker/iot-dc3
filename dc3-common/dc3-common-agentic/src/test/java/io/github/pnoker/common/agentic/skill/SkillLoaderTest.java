@@ -28,6 +28,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SkillLoaderTest {
 
+    private static SkillDefinition invokeMapToSkill(SkillLoader loader, Map<String, Object> map) throws Exception {
+        Method method = SkillLoader.class.getDeclaredMethod("mapToSkill", Map.class);
+        method.setAccessible(true);
+        return (SkillDefinition) method.invoke(loader, map);
+    }
+
     @Test
     void loaderRegistersAllEnabledProductionSkills() throws Exception {
         SkillRegistry registry = new SkillRegistry();
@@ -80,11 +86,5 @@ class SkillLoaderTest {
         map.put("enabled", true);
         SkillDefinition skill = invokeMapToSkill(loader, map);
         assertThat(skill.getExamples()).isNull();
-    }
-
-    private static SkillDefinition invokeMapToSkill(SkillLoader loader, Map<String, Object> map) throws Exception {
-        Method method = SkillLoader.class.getDeclaredMethod("mapToSkill", Map.class);
-        method.setAccessible(true);
-        return (SkillDefinition) method.invoke(loader, map);
     }
 }

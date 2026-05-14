@@ -43,8 +43,8 @@ class HarnessSmokeIT extends BaseE2eIT {
     void postgresIsReachableAndAcceptsSimpleQueries() throws Exception {
         try (java.sql.Connection conn = DriverManager.getConnection(
                 E2eStack.postgresJdbcUrl(), E2eStack.postgresUsername(), E2eStack.postgresPassword());
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT 1")) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT 1")) {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getInt(1)).isEqualTo(1);
         }
