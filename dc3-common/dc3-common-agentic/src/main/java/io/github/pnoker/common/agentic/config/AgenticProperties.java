@@ -44,15 +44,25 @@ public class AgenticProperties {
     private boolean enabled = true;
 
     /**
-     * Maximum number of messages retained per conversation for chat memory.
+     * Maximum number of messages retained per conversation by the in-memory window
+     * before older turns are evicted.
      */
     @Min(value = 1, message = "Memory max messages must be greater than 0")
     private int memoryMaxMessages = 50;
 
     /**
-     * Whether Spring AI chat memory is sent back to the model provider.
+     * Whether to replay persisted conversation history back to the model provider on
+     * each request. When false the assistant remains fully stateless across turns.
      */
-    private boolean memoryEnabled = false;
+    private boolean memoryEnabled = true;
+
+    /**
+     * Maximum number of historical messages (user + assistant turns combined) loaded
+     * from {@code dc3_message} and replayed to the model per request. Independent of
+     * {@link #memoryMaxMessages}, which controls the in-memory advisor window.
+     */
+    @Min(value = 1, message = "History window size must be greater than 0")
+    private int historyWindowSize = 30;
 
     /**
      * Whether Spring AI should execute provider-native tool calls.

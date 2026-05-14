@@ -25,10 +25,12 @@ import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
+import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 @Service
 public class SessionServiceImpl implements SessionService {
 
@@ -51,6 +54,9 @@ public class SessionServiceImpl implements SessionService {
 
     @Resource
     private ChatMemory agenticChatMemory;
+
+    @Resource
+    private MessageService messageService;
 
     @Override
     public SessionBO touch(String conversationId, Long tenantId, Long userId) {
@@ -80,10 +86,13 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void removeByConversationId(String conversationId) {
         SessionDO entityDO = findByConversationId(conversationId);
-        if (Objects.nonNull(entityDO)) {
-            sessionManager.removeById(entityDO.getId());
-            agenticChatMemory.clear(conversationId);
+        if (Objects.isNull(entityDO)) {
+            return;
         }
+        sessionManager.removeById(entityDO.getId());
+        int removedMessages = messageService.removeByConversationId(conversationId);
+        agenticChatMemory.clear(conversationId);
+        log.info("Agentic session removed, conversationId={}, messagesRemoved={}", conversationId, removedMessages);
     }
 
     @Override
