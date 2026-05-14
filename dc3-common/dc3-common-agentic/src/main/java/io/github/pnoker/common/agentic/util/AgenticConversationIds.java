@@ -23,13 +23,28 @@ import java.util.Objects;
 /**
  * Utility methods for tenant/user scoped agentic conversation IDs.
  *
+ * <p>The scope is encoded as {@code tenantId<US>userId<US>conversationId} where
+ * {@code <US>} is the ASCII Unit Separator (0x1F). Using a non-printable separator
+ * prevents collisions with client-supplied conversation IDs that may contain
+ * common punctuation such as colons or slashes.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public class AgenticConversationIds {
 
-    private static final String SEPARATOR = ":";
+    /**
+     * ASCII Unit Separator (0x1F). Not allowed in printable client conversation IDs.
+     */
+    private static final String SEPARATOR = "";
+
+    /**
+     * Legacy separator that may appear in already-persisted scoped IDs from older
+     * deployments. Strip support is preserved for backward compatibility, but new
+     * scopes are always written with {@link #SEPARATOR}.
+     */
+    private static final String LEGACY_SEPARATOR = ":";
 
     private AgenticConversationIds() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
@@ -50,6 +65,7 @@ public class AgenticConversationIds {
 
     /**
      * Strip the tenant/user scope before returning a conversation ID to API clients.
+     * Recognises both the current {@link #SEPARATOR} and the legacy colon separator.
      *
      * @param tenantId       tenant ID
      * @param userId         user ID
@@ -57,9 +73,18 @@ public class AgenticConversationIds {
      * @return original client conversation ID when the expected scope is present
      */
     public static String stripScope(Long tenantId, Long userId, String conversationId) {
-        String prefix = tenantId + SEPARATOR + userId + SEPARATOR;
-        return Objects.nonNull(conversationId) && conversationId.startsWith(prefix) ? conversationId.substring(prefix.length())
-                : conversationId;
+        if (Objects.isNull(conversationId)) {
+            return null;
+        }
+        String currentPrefix = tenantId + SEPARATOR + userId + SEPARATOR;
+        if (conversationId.startsWith(currentPrefix)) {
+            return conversationId.substring(currentPrefix.length());
+        }
+        String legacyPrefix = tenantId + LEGACY_SEPARATOR + userId + LEGACY_SEPARATOR;
+        if (conversationId.startsWith(legacyPrefix)) {
+            return conversationId.substring(legacyPrefix.length());
+        }
+        return conversationId;
     }
 
 }

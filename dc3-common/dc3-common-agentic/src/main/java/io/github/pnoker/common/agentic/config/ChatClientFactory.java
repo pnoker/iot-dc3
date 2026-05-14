@@ -39,8 +39,13 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.anthropic.AnthropicChatModel;
+import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -51,6 +56,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Creates and caches {@link ChatClient} instances per provider.
  * Falls back to the Spring AI auto-configured {@link ChatClient.Builder} when no DB provider matches.
+ * Every {@link ChatClient} produced here is wired with the agentic
+ * {@link Advisor memory advisor} so that conversation history persisted in
+ * {@code dc3_message} is replayed back to the model on each call.
  *
  * @author pnoker
  * @version 2026.5.11
@@ -66,17 +74,20 @@ public class ChatClientFactory {
     private final ModelProviderBuilder modelProviderBuilder;
     private final ModelConfigBuilder modelConfigBuilder;
     private final ChatClient.Builder fallbackBuilder;
+    private final Advisor memoryAdvisor;
 
     public ChatClientFactory(ModelProviderManager modelProviderManager,
                              ModelConfigManager modelConfigManager,
                              ModelProviderBuilder modelProviderBuilder,
                              ModelConfigBuilder modelConfigBuilder,
-                             ChatClient.Builder fallbackBuilder) {
+                             ChatClient.Builder fallbackBuilder,
+                             @Qualifier("agenticChatMemoryAdvisor") Advisor memoryAdvisor) {
         this.modelProviderManager = modelProviderManager;
         this.modelConfigManager = modelConfigManager;
         this.modelProviderBuilder = modelProviderBuilder;
         this.modelConfigBuilder = modelConfigBuilder;
         this.fallbackBuilder = fallbackBuilder;
+        this.memoryAdvisor = memoryAdvisor;
     }
 
     public String resolveModel(String requestedModel) {
@@ -105,11 +116,72 @@ public class ChatClientFactory {
         return getOrCreateByProvider(config.getProviderId());
     }
 
+    /**
+     * Resolve the provider type for a given model identifier so callers can build
+     * provider-aware {@link ChatOptions}.
+     *
+     * @param model model identifier (may be null/blank to use the default config)
+     * @return resolved provider type, or {@code null} when no provider record is found
+     */
+    public AgenticModelProviderTypeEnum resolveProviderType(String model) {
+        ModelConfigBO config = StringUtils.isNotBlank(model) ? resolveConfig(model) : null;
+        if (Objects.isNull(config)) {
+            config = resolveDefaultConfig();
+        }
+        if (Objects.isNull(config)) {
+            return null;
+        }
+        ModelProviderBO provider = resolveProvider(config.getProviderId());
+        return Objects.nonNull(provider) ? provider.getProviderType() : null;
+    }
+
     public void evict(Long providerId) {
         ChatClient removed = cache.remove(providerId);
         if (Objects.nonNull(removed)) {
             log.info("Agentic ChatClient cache evicted, providerId={}", providerId);
         }
+    }
+
+    /**
+     * Build a {@link ChatOptions.Builder} instance appropriate for the resolved
+     * provider. Returns {@code null} when no override fields are supplied so callers
+     * can skip options entirely and let the provider defaults apply.
+     *
+     * <p>Spring AI 2.0 M5 expects a builder rather than a fully built options
+     * instance on {@code ChatClient.ChatClientRequestSpec.options(...)}; the
+     * framework calls {@code build()} once it has merged the per-request and
+     * default options.
+     *
+     * @param model       model name override
+     * @param temperature sampling temperature override (0.0..2.0)
+     * @param maxTokens   max output tokens override
+     * @return options builder, or {@code null} when nothing needs overriding
+     */
+    public ChatOptions.Builder<?> buildChatOptionsBuilder(String model, Double temperature, Integer maxTokens) {
+        if (StringUtils.isBlank(model) && Objects.isNull(temperature) && Objects.isNull(maxTokens)) {
+            return null;
+        }
+        AgenticModelProviderTypeEnum providerType = resolveProviderType(model);
+        if (AgenticModelProviderTypeEnum.ANTHROPIC.equals(providerType)) {
+            return applyCommonOptions(AnthropicChatOptions.builder(), model, temperature, maxTokens);
+        }
+        // Default to OpenAI options for OpenAI itself and OpenAI-compatible providers
+        // such as DeepSeek, Moonshot, Qwen — they all share the OpenAI request shape.
+        return applyCommonOptions(OpenAiChatOptions.builder(), model, temperature, maxTokens);
+    }
+
+    private <B extends ChatOptions.Builder<B>> B applyCommonOptions(B builder, String model, Double temperature,
+                                                                    Integer maxTokens) {
+        if (StringUtils.isNotBlank(model)) {
+            builder.model(model);
+        }
+        if (Objects.nonNull(temperature)) {
+            builder.temperature(temperature);
+        }
+        if (Objects.nonNull(maxTokens)) {
+            builder.maxTokens(maxTokens);
+        }
+        return builder;
     }
 
     private ModelConfigBO resolveConfig(String model) {
@@ -168,7 +240,7 @@ public class ChatClientFactory {
                 .openAiClient(openAiClient)
                 .openAiClientAsync(openAiClientAsync)
                 .build();
-        return ChatClient.builder(chatModel).build();
+        return ChatClient.builder(chatModel).defaultAdvisors(memoryAdvisor).build();
     }
 
     private ChatClient buildAnthropicClient(ModelProviderBO provider) {
@@ -184,7 +256,7 @@ public class ChatClientFactory {
                 .anthropicClient(anthropicClient)
                 .anthropicClientAsync(anthropicClientAsync)
                 .build();
-        return ChatClient.builder(chatModel).build();
+        return ChatClient.builder(chatModel).defaultAdvisors(memoryAdvisor).build();
     }
 
     private boolean isEnabled(EnableFlagEnum enableFlag) {
