@@ -36,7 +36,7 @@
     </description>
 
     <properties>
-        <spring-ai.version>2.0.0-M5</spring-ai.version>
+        <spring-ai.version>2.0.0-M6</spring-ai.version>
     </properties>
 
     <dependencyManagement>
