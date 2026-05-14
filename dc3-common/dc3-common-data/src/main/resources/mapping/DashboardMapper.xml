@@ -78,7 +78,7 @@
     <!--
         Latest stream: a single hypertable now holds every sample regardless
         of declared point type, so the value_type column is derived from the
-        numeric_value projection — NUMERIC when cal_value parsed cleanly as a
+        num_value projection — NUMERIC when cal_value parsed cleanly as a
         double, STRING otherwise (booleans, JSON, free-form text).
     -->
     <select id="latestStream" resultType="io.github.pnoker.common.data.entity.bo.dashboard.LatestPointValueRow">
@@ -89,7 +89,7 @@
                create_time,
                raw_value,
                cal_value,
-               CASE WHEN numeric_value IS NOT NULL THEN 'NUMERIC' ELSE 'STRING' END AS value_type
+               CASE WHEN num_value IS NOT NULL THEN 'NUMERIC' ELSE 'STRING' END AS value_type
         FROM dc3_point_value
         WHERE tenant_id = #{tenantId}
         ORDER BY create_time DESC
