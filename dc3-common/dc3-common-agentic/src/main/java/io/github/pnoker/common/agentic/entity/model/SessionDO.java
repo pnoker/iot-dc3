@@ -52,6 +52,9 @@ public class SessionDO implements Serializable {
     @TableField("title")
     private String title;
 
+    @TableField("model")
+    private String model;
+
     @TableField("tenant_id")
     private Long tenantId;
 

@@ -6,14 +6,28 @@ system-prompt-addition: |
   Present key fields such as ID, name, code, and status in a table.
 tools:
   - lookupDeviceById
+  - lookupDevicesByIds
   - searchDevices
   - listDevicesByDriverId
   - listDevicesByProfileId
   - lookupDriverById
+  - lookupDriversByIds
   - lookupDriverByDeviceId
   - searchDrivers
   - lookupPointById
+  - lookupPointsByIds
   - searchPoints
+  - listPointsByDeviceId
+  - listPointsByProfileId
+  - lookupProfileById
+  - lookupProfilesByIds
+  - searchProfiles
+  - listProfilesByDeviceId
+  - getDeviceStatusesByIds
+  - getDeviceStatusesByProfileId
+  - getDriverStatusesByIds
+  - getDriverDeviceStatusSummary
+  - getSystemHealth
 examples:
   - user: "Show devices under driver 1"
     assistant: "Querying the device list under driver 1..."

@@ -23,6 +23,7 @@ import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
+import io.github.pnoker.common.agentic.service.MessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,6 +53,9 @@ class SessionServiceImplTest {
     @Mock
     private ChatMemory agenticChatMemory;
 
+    @Mock
+    private MessageService messageService;
+
     @InjectMocks
     private SessionServiceImpl service;
 
@@ -60,7 +64,7 @@ class SessionServiceImplTest {
         // SessionServiceImpl uses @Resource which @InjectMocks resolves by field name; the
         // names match so injection should succeed but we re-set defensively in case the
         // resolution misses.
-        for (String name : new String[] {"sessionBuilder", "sessionManager", "agenticChatMemory"}) {
+        for (String name : new String[] {"sessionBuilder", "sessionManager", "agenticChatMemory", "messageService"}) {
             Field f = SessionServiceImpl.class.getDeclaredField(name);
             f.setAccessible(true);
             if (f.get(service) == null) {
@@ -68,8 +72,10 @@ class SessionServiceImplTest {
                     f.set(service, sessionBuilder);
                 } else if ("sessionManager".equals(name)) {
                     f.set(service, sessionManager);
-                } else {
+                } else if ("agenticChatMemory".equals(name)) {
                     f.set(service, agenticChatMemory);
+                } else {
+                    f.set(service, messageService);
                 }
             }
         }
@@ -81,7 +87,7 @@ class SessionServiceImplTest {
         SessionBO bo = new SessionBO();
         when(sessionBuilder.buildBOByDO(any(SessionDO.class))).thenReturn(bo);
 
-        SessionBO result = service.touch("conv-1", 1L, 2L);
+        SessionBO result = service.touch("conv-1", 1L, 2L, "deepseek-chat");
 
         ArgumentCaptor<SessionDO> captor = ArgumentCaptor.forClass(SessionDO.class);
         verify(sessionManager).save(captor.capture());
@@ -90,6 +96,7 @@ class SessionServiceImplTest {
         assertThat(saved.getTenantId()).isEqualTo(1L);
         assertThat(saved.getUserId()).isEqualTo(2L);
         assertThat(saved.getTitle()).isEqualTo("New Conversation");
+        assertThat(saved.getModel()).isEqualTo("deepseek-chat");
         assertThat(result).isSameAs(bo);
     }
 
@@ -104,8 +111,9 @@ class SessionServiceImplTest {
         when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
-        service.touch("conv-1", 1L, 2L);
+        service.touch("conv-1", 1L, 2L, "qwen-plus");
 
+        assertThat(existing.getModel()).isEqualTo("qwen-plus");
         verify(sessionManager).updateById(existing);
         verify(sessionManager, never()).save(any(SessionDO.class));
     }
@@ -160,9 +168,11 @@ class SessionServiceImplTest {
 
         SessionUpdateRequest request = new SessionUpdateRequest();
         request.setTitle("  New title  ");
+        request.setModel("  glm-4  ");
         service.update("conv-1", request);
 
         assertThat(existing.getTitle()).isEqualTo("New title");
+        assertThat(existing.getModel()).isEqualTo("glm-4");
         verify(sessionManager).updateById(existing);
     }
 

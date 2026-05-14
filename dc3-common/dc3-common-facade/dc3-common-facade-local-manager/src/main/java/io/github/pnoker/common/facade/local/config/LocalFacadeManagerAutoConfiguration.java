@@ -21,6 +21,7 @@ import io.github.pnoker.common.facade.local.DeviceLocalFacade;
 import io.github.pnoker.common.facade.local.builder.FacadeDeviceBuilder;
 import io.github.pnoker.common.facade.local.builder.FacadeDriverBuilder;
 import io.github.pnoker.common.facade.local.builder.FacadePointBuilder;
+import io.github.pnoker.common.facade.local.builder.FacadeProfileBuilder;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
@@ -44,8 +45,9 @@ import org.springframework.context.annotation.FilterType;
         includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
                 classes = {io.github.pnoker.common.facade.local.DeviceLocalFacade.class,
                         io.github.pnoker.common.facade.local.DriverLocalFacade.class,
-                        io.github.pnoker.common.facade.local.PointLocalFacade.class, FacadeDeviceBuilder.class,
-                        FacadeDriverBuilder.class, FacadePointBuilder.class,}))
+                        io.github.pnoker.common.facade.local.PointLocalFacade.class,
+                        io.github.pnoker.common.facade.local.ProfileLocalFacade.class, FacadeDeviceBuilder.class,
+                        FacadeDriverBuilder.class, FacadePointBuilder.class, FacadeProfileBuilder.class,}))
 public class LocalFacadeManagerAutoConfiguration {
 
     /**

@@ -14,24 +14,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.request;
 
-import lombok.Getter;
-import lombok.Setter;
+package io.github.pnoker.common.facade.api;
+
+import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
- * Mutable session fields controlled by the web client.
+ * Protocol-neutral status and health facade.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.14
+ * @since 2026.5.5
  */
-@Getter
-@Setter
-public class SessionUpdateRequest {
+public interface StatusHealthFacade {
 
-    private String title;
+    Map<Long, String> selectDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds);
 
-    private String model;
+    Map<Long, String> selectDeviceStatusesByProfileId(Long tenantId, Long profileId);
+
+    Map<Long, String> selectDriverStatusesByIds(Long tenantId, Collection<Long> driverIds);
+
+    Map<String, String> getDriverDeviceStatusSummary(Long tenantId, Long driverId);
+
+    FacadeSystemHealthBO systemHealth(Long tenantId);
 
 }

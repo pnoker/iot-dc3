@@ -31,14 +31,15 @@ public interface SessionService {
 
     /**
      * Create a new session if one does not exist for the given conversation ID. If a
-     * session already exists, update its operate_time.
+     * session already exists, update its operate_time and latest model.
      *
      * @param conversationId conversation ID
      * @param tenantId       tenant scope
      * @param userId         user scope
+     * @param model          latest selected model
      * @return the session BO
      */
-    SessionBO touch(String conversationId, Long tenantId, Long userId);
+    SessionBO touch(String conversationId, Long tenantId, Long userId, String model);
 
     /**
      * Get session by conversation ID.

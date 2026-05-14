@@ -43,6 +43,12 @@ message GrpcProfileQuery {
   int64 profile_id = 1;
 }
 
+// Profile ids query structure for batch profile lookup
+message GrpcProfileIdsQuery {
+  // Identifies profile template instances
+  repeated int64 profile_ids = 1;
+}
+
 // Point query structure for querying point information by point ID
 message GrpcPointQuery {
   // Point ID that identifies specific point
@@ -66,5 +72,4 @@ message GrpcDeviceIdsQuery {
   // Identifies device instances
   repeated int64 device_ids = 1;
 }
-
 

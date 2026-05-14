@@ -28,8 +28,8 @@ class AgenticPropertiesTest {
         AgenticProperties properties = new AgenticProperties();
         assertThat(properties.isEnabled()).isTrue();
         assertThat(properties.getMemoryMaxMessages()).isEqualTo(50);
-        assertThat(properties.isMemoryEnabled()).isFalse();
-        assertThat(properties.isToolCallingEnabled()).isFalse();
+        assertThat(properties.isMemoryEnabled()).isTrue();
+        assertThat(properties.isToolCallingEnabled()).isTrue();
         assertThat(properties.getAttachmentStoragePath()).isEqualTo("dc3/data/upload/agentic/attachment");
     }
 

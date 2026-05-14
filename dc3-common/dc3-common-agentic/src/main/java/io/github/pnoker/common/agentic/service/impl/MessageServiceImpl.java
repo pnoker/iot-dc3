@@ -76,8 +76,8 @@ public class MessageServiceImpl implements MessageService {
                 .eq(MessageDO::getConversationId, conversationId)
                 .eq(MessageDO::getTenantId, header.getTenantId())
                 .eq(MessageDO::getUserId, header.getUserId())
-                .orderByAsc(MessageDO::getMessageIndex)
-                .orderByAsc(MessageDO::getCreateTime);
+                .orderByAsc(MessageDO::getCreateTime)
+                .orderByAsc(MessageDO::getId);
         return messageBuilder.buildBOListByDOList(messageManager.list(wrapper)).stream()
                 .map(this::normalize)
                 .toList();
@@ -91,8 +91,8 @@ public class MessageServiceImpl implements MessageService {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query()
                 .lambda()
                 .eq(MessageDO::getConversationId, scopedConversationId)
-                .orderByDesc(MessageDO::getMessageIndex)
                 .orderByDesc(MessageDO::getCreateTime)
+                .orderByDesc(MessageDO::getId)
                 .last("LIMIT " + limit);
         List<MessageDO> latest = messageManager.list(wrapper);
         if (latest.isEmpty()) {
@@ -124,7 +124,8 @@ public class MessageServiceImpl implements MessageService {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query()
                 .lambda()
                 .eq(MessageDO::getConversationId, conversationId)
-                .orderByDesc(MessageDO::getMessageIndex)
+                .orderByDesc(MessageDO::getCreateTime)
+                .orderByDesc(MessageDO::getId)
                 .last(QueryWrapperConstant.LIMIT_ONE);
         MessageDO latest = messageManager.getOne(wrapper);
         return Objects.isNull(latest) || Objects.isNull(latest.getMessageIndex()) ? 1 : latest.getMessageIndex() + 1;

@@ -127,3 +127,33 @@ message GrpcPageDeviceQuery {
   // Profile template ID for querying devices under specific template
   int64 profile_id = 9;
 }
+
+// Profile pagination query structure, used for paginated query of profile/template information
+message GrpcPageProfileQuery {
+  // Pagination information including page number, page size, and total count
+  GrpcPage page = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
+
+  // Profile/template name for fuzzy query
+  string profile_name = 3;
+
+  // Profile/template code, unique identifier
+  string profile_code = 4;
+
+  // Profile share flag
+  int32 profile_share_flag = 5;
+
+  // Profile type flag
+  int32 profile_type_flag = 6;
+
+  // Enable flag: 0 for enabled, 1 for disabled, -1 for unset
+  int32 enable_flag = 7;
+
+  // Version number for version management
+  int32 version = 8;
+
+  // Device ID for querying templates bound to a specific device
+  int64 device_id = 9;
+}

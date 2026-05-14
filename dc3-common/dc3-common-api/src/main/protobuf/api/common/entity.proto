@@ -98,6 +98,40 @@ message GrpcDeviceDTO {
   int64 tenant_id = 10;
 }
 
+// Profile
+message GrpcProfileDTO {
+  // Base
+  // Common base fields (e.g., ID, creation time, etc.)
+  GrpcBase base = 1;
+
+  // Profile name
+  string profile_name = 2;
+
+  // Profile code
+  string profile_code = 3;
+
+  // Profile share flag
+  int32 profile_share_flag = 4;
+
+  // Profile type flag
+  int32 profile_type_flag = 5;
+
+  // Profile extension info
+  string profile_ext = 6;
+
+  // Enable flag
+  int32 enable_flag = 7;
+
+  // Signature
+  string signature = 8;
+
+  // Version
+  int32 version = 9;
+
+  // Tenant ID
+  int64 tenant_id = 10;
+}
+
 // Point
 message GrpcPointDTO {
   // Base
@@ -279,6 +313,5 @@ message GrpcPointAttributeConfigDTO {
   // Tenant ID
   int64 tenant_id = 9;
 }
-
 
 
