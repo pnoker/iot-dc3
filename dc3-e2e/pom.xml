@@ -29,18 +29,41 @@
     <packaging>jar</packaging>
 
     <description>
-        End-to-end test harness that boots the iot-dc3 platform via Docker
-        Compose (driven by Testcontainers) and exercises the public REST and
-        gRPC surfaces with rest-assured. Lives outside the production reactor
-        so its dependencies do not leak into deployable artifacts.
+        Infrastructure-backed end-to-end test harness for iot-dc3. It currently
+        boots production-aligned PostgreSQL/TimescaleDB and RabbitMQ containers
+        and pins the HTTP assertion tooling that future platform user-flow tests
+        will use. Lives outside the production reactor so its dependencies do
+        not leak into deployable artifacts.
     </description>
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <rest-assured.groovy.version>4.0.22</rest-assured.groovy.version>
         <!-- E2E is only invoked by an explicit profile or workflow. -->
         <skip.unit.tests>true</skip.unit.tests>
         <skip.integration.tests>true</skip.integration.tests>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Rest Assured 5.5.0 imports Groovy [4.0,5.0); override Spring Boot's Groovy 5 management. -->
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${rest-assured.groovy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-json</artifactId>
+                <version>${rest-assured.groovy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-xml</artifactId>
+                <version>${rest-assured.groovy.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -85,6 +108,11 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

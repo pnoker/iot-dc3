@@ -20,6 +20,7 @@ package io.github.pnoker.test.containers;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.TestcontainersConfiguration;
 
 /**
  * Shared RabbitMQ container with management plugin enabled, matching the
@@ -29,9 +30,11 @@ public final class RabbitContainer {
 
     private static final DockerImageName IMAGE = DockerImageName.parse("rabbitmq:3.13-management");
 
+    private static final boolean REUSE_ENABLED = TestcontainersConfiguration.getInstance().environmentSupportsReuse();
+
     @SuppressWarnings("resource")
     private static final RabbitMQContainer INSTANCE = new RabbitMQContainer(IMAGE)
-            .withReuse(true);
+            .withReuse(REUSE_ENABLED);
 
     static {
         INSTANCE.start();

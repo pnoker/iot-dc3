@@ -36,7 +36,7 @@ jobs:
 
       - name: Run end-to-end suite
         env:
-          TESTCONTAINERS_REUSE_ENABLE: "true"
+          DC3_E2E: "true"
         run: |
           set -euo pipefail
           make test-e2e

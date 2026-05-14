@@ -76,7 +76,7 @@
         <!-- Test toolchain (mirrored from iot-dc3 root pom; needed because
              dc3-common inherits from the external dc3-parent and therefore
              cannot read the root reactor's dependencyManagement). -->
-        <testcontainers.version>1.20.4</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
         <junit.bom.version>5.11.3</junit.bom.version>
         <assertj.version>3.26.3</assertj.version>
         <awaitility.version>4.2.2</awaitility.version>
