@@ -30,8 +30,8 @@ import org.junit.jupiter.api.Tag;
  * {@code @EnabledIfEnvironmentVariable(named = "DC3_E2E", matches = "(?i)true|1|yes|on")}
  * directly on the class. JUnit 5 evaluates the condition on the declared class, so
  * keeping it on the abstract base would silently leave subclasses enabled when
- * {@code DC3_E2E} is unset. The {@code e2e.yml} workflow exports the env var before
- * running this suite.
+ * {@code DC3_E2E} is unset. The {@code make test-e2e} target and {@code e2e.yml}
+ * workflow export the env var before running this suite.
  */
 @Tag("e2e")
 public abstract class BaseE2eIT {

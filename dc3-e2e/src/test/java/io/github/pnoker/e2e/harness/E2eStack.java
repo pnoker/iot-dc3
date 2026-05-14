@@ -23,6 +23,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.Duration;
 
@@ -59,14 +60,14 @@ public final class E2eStack {
             .withDatabaseName("dc3")
             .withUsername("dc3")
             .withPassword("dc3")
-            .withReuse(true)
+            .withReuse(reuseEnabled())
             .withStartupTimeout(Duration.ofMinutes(2));
 
     @SuppressWarnings("resource")
     private static final RabbitMQContainer RABBIT = new RabbitMQContainer(RABBIT_IMAGE)
             .withNetwork(NETWORK)
             .withNetworkAliases("dc3-rabbitmq")
-            .withReuse(true)
+            .withReuse(reuseEnabled())
             .waitingFor(Wait.forLogMessage(".*Server startup complete.*", 1))
             .withStartupTimeout(Duration.ofMinutes(2));
 
@@ -77,8 +78,8 @@ public final class E2eStack {
 
     /**
      * Idempotent boot. The first invocation starts the containers; subsequent calls
-     * are no-ops that return the already-running stack. Container reuse is enabled
-     * via {@code .testcontainers.properties} to keep cross-run startup fast.
+     * are no-ops that return the already-running stack. Cross-run container reuse
+     * is enabled only when the local Testcontainers environment supports it.
      */
     public static synchronized void start() {
         if (started) {
@@ -140,5 +141,9 @@ public final class E2eStack {
                     "E2eStack has not been started. Call E2eStack.start() from a "
                             + "@BeforeAll hook or extend BaseE2eIT.");
         }
+    }
+
+    private static boolean reuseEnabled() {
+        return TestcontainersConfiguration.getInstance().environmentSupportsReuse();
     }
 }

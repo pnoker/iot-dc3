@@ -77,7 +77,7 @@
         <spring-ai.version>2.0.0-M5</spring-ai.version>
 
         <!-- Test toolchain -->
-        <testcontainers.version>1.20.4</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
         <junit.bom.version>5.11.3</junit.bom.version>
         <assertj.version>3.26.3</assertj.version>
         <awaitility.version>4.2.2</awaitility.version>
