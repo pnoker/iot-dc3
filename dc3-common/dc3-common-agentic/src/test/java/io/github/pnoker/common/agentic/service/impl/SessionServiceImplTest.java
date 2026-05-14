@@ -64,7 +64,7 @@ class SessionServiceImplTest {
         // SessionServiceImpl uses @Resource which @InjectMocks resolves by field name; the
         // names match so injection should succeed but we re-set defensively in case the
         // resolution misses.
-        for (String name : new String[] {"sessionBuilder", "sessionManager", "agenticChatMemory", "messageService"}) {
+        for (String name : new String[]{"sessionBuilder", "sessionManager", "agenticChatMemory", "messageService"}) {
             Field f = SessionServiceImpl.class.getDeclaredField(name);
             f.setAccessible(true);
             if (f.get(service) == null) {

@@ -67,6 +67,11 @@ public class PointValueVO implements Serializable {
     private String calValue;
 
     /**
+     * Numeric projection of calValue for aggregation queries.
+     */
+    private Double numValue;
+
+    /**
      * Driver ID
      */
     private Long driverId;

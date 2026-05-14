@@ -72,6 +72,26 @@ class ListeningVirtualDriverCustomServiceImplTest {
 
     private ListeningVirtualDriverCustomServiceImpl service;
 
+    private static DeviceBO device(Long id) {
+        DeviceBO device = new DeviceBO();
+        device.setId(id);
+        return device;
+    }
+
+    private static PointBO point(Long id) {
+        PointBO point = new PointBO();
+        point.setId(id);
+        return point;
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         service = new ListeningVirtualDriverCustomServiceImpl();
@@ -166,25 +186,5 @@ class ListeningVirtualDriverCustomServiceImplTest {
         Field field = ListeningVirtualDriverCustomServiceImpl.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(service, value);
-    }
-
-    private static DeviceBO device(Long id) {
-        DeviceBO device = new DeviceBO();
-        device.setId(id);
-        return device;
-    }
-
-    private static PointBO point(Long id) {
-        PointBO point = new PointBO();
-        point.setId(id);
-        return point;
-    }
-
-    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO event = new MetadataEventDTO();
-        event.setMetadataType(type);
-        event.setOperateType(op);
-        event.setId(id);
-        return event;
     }
 }

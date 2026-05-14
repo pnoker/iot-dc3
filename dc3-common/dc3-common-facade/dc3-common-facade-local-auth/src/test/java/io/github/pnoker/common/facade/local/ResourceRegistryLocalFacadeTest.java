@@ -45,6 +45,21 @@ class ResourceRegistryLocalFacadeTest {
 
     private ResourceRegistryLocalFacade facade;
 
+    private static FacadeScannedApiBO api(String method, String path, String name, String group) {
+        return FacadeScannedApiBO.builder()
+                .method(method)
+                .path(path)
+                .apiName(name)
+                .title(method.toLowerCase())
+                .remark("")
+                .apiGroup(group)
+                .build();
+    }
+
+    private static <T> T any(Class<T> clazz) {
+        return org.mockito.ArgumentMatchers.any(clazz);
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         facade = new ResourceRegistryLocalFacade();
@@ -125,20 +140,5 @@ class ResourceRegistryLocalFacadeTest {
                 ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
         org.mockito.Mockito.verify(resourceRegistrySyncService).sync(captor.capture());
         assertThat(captor.getValue().getApis()).isEmpty();
-    }
-
-    private static FacadeScannedApiBO api(String method, String path, String name, String group) {
-        return FacadeScannedApiBO.builder()
-                .method(method)
-                .path(path)
-                .apiName(name)
-                .title(method.toLowerCase())
-                .remark("")
-                .apiGroup(group)
-                .build();
-    }
-
-    private static <T> T any(Class<T> clazz) {
-        return org.mockito.ArgumentMatchers.any(clazz);
     }
 }

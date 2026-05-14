@@ -46,6 +46,10 @@ class UserLoginLocalFacadeTest {
 
     private UserLoginLocalFacade facade;
 
+    private static UserLoginBO any() {
+        return org.mockito.ArgumentMatchers.any();
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         facade = new UserLoginLocalFacade();
@@ -77,9 +81,5 @@ class UserLoginLocalFacadeTest {
         Field field = UserLoginLocalFacade.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(facade, value);
-    }
-
-    private static UserLoginBO any() {
-        return org.mockito.ArgumentMatchers.any();
     }
 }

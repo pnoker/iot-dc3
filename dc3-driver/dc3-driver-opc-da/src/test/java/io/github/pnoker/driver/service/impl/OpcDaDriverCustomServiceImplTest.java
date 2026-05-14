@@ -63,6 +63,21 @@ class OpcDaDriverCustomServiceImplTest {
 
     private OpcDaDriverCustomServiceImpl service;
 
+    private static Map<String, AttributeBO> pointConfig(String group, String tag) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("group", AttributeBO.builder().value(group).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeFlagEnum.STRING).build());
+        return m;
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         service = new OpcDaDriverCustomServiceImpl();
@@ -270,20 +285,5 @@ class OpcDaDriverCustomServiceImplTest {
         Field field = OpcDaDriverCustomServiceImpl.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(service, value);
-    }
-
-    private static Map<String, AttributeBO> pointConfig(String group, String tag) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("group", AttributeBO.builder().value(group).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeFlagEnum.STRING).build());
-        return m;
-    }
-
-    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO event = new MetadataEventDTO();
-        event.setMetadataType(type);
-        event.setOperateType(op);
-        event.setId(id);
-        return event;
     }
 }
