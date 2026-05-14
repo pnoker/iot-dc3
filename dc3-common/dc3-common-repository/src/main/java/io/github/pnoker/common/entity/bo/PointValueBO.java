@@ -77,7 +77,7 @@ public class PointValueBO implements Serializable {
      * text. Aggregate queries on the history table use this column with a
      * partial index to skip the cast / parse step at query time.
      */
-    private Double numericValue;
+    private Double numValue;
 
     /**
      * Driver ID that collected the data

@@ -79,14 +79,14 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     /**
-     * Best-effort projection of {@code cal_value} into the {@code numeric_value}
+     * Best-effort projection of {@code cal_value} into the {@code num_value}
      * column so dashboard aggregates can run on a typed double without parsing
      * text at query time. Quietly leaves the column NULL when the calculated
      * value is blank, non-finite, or not a valid double — those samples are
      * still preserved in {@code raw_value}/{@code cal_value}.
      */
     private void applyNumericProjection(PointValueDO entityDO) {
-        if (Objects.isNull(entityDO) || Objects.nonNull(entityDO.getNumericValue())) {
+        if (Objects.isNull(entityDO) || Objects.nonNull(entityDO.getNumValue())) {
             return;
         }
         String calValue = entityDO.getCalValue();
@@ -96,10 +96,10 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
         try {
             double parsed = Double.parseDouble(calValue.trim());
             if (Double.isFinite(parsed)) {
-                entityDO.setNumericValue(parsed);
+                entityDO.setNumValue(parsed);
             }
         } catch (NumberFormatException ignored) {
-            // Non-numeric payload (boolean, JSON, free-form text); leave numeric_value NULL.
+            // Non-numeric payload (boolean, JSON, free-form text); leave num_value NULL.
         }
     }
 
