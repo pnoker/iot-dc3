@@ -176,6 +176,7 @@ export interface AgenticChatCompletionResponse {
 export interface AgenticStreamCallbacks {
   signal?: AbortSignal;
   onDelta?: (content: string) => void;
+  onReasoning?: (content: string) => void;
   onEvent?: (event: AgenticTraceEvent) => void;
   onDone?: () => void;
   onError?: (error: Error) => void;

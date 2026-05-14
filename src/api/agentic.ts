@@ -47,6 +47,7 @@ interface OpenAIChunk {
   choices?: Array<{
     delta?: {
       content?: string;
+      reasoning_content?: string;
     };
     finish_reason?: string;
   }>;
@@ -278,6 +279,10 @@ const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
     const content = chunk.choices?.[0]?.delta?.content;
     if (content) {
       callbacks.onDelta?.(content);
+    }
+    const reasoningContent = chunk.choices?.[0]?.delta?.reasoning_content;
+    if (reasoningContent) {
+      callbacks.onReasoning?.(reasoningContent);
     }
   } catch (error) {
     callbacks.onError?.(error instanceof Error ? error : new Error(String(error)));

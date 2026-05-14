@@ -317,6 +317,7 @@ export const useAgenticStore = defineStore('agentic', () => {
           signal: abortController.signal,
           onEvent: (event) => appendTraceEvent(conversationId, event),
           onDelta: (delta) => appendAssistantDelta(conversationId, assistantMessage.id, delta),
+          onReasoning: (reasoning) => appendAssistantReasoning(conversationId, assistantMessage.id, reasoning),
         });
       } else {
         const response = await completeAgenticChatCompletion(request, abortController.signal);
@@ -358,6 +359,7 @@ export const useAgenticStore = defineStore('agentic', () => {
           contentExt: message.contentExt,
           skills: message.skills,
           messageIndex: message.messageIndex,
+          reasoning: message.reasoning,
         }));
         persistMessages();
       }
@@ -502,11 +504,23 @@ export const useAgenticStore = defineStore('agentic', () => {
   };
 
   const appendAssistantDelta = (conversationId: string, messageId: string, delta: string) => {
-    const messages = messagesByConversation.value[conversationId] || [];
-    setConversationMessages(
-      conversationId,
-      messages.map((message) => (message.id === messageId ? { ...message, content: message.content + delta } : message))
-    );
+    const messages = messagesByConversation.value[conversationId];
+    if (!messages) return;
+    const index = messages.findIndex((message) => message.id === messageId);
+    if (index < 0) return;
+    const target = messages[index]!;
+    messages[index] = { ...target, content: target.content + delta };
+    messagesByConversation.value[conversationId] = [...messages];
+  };
+
+  const appendAssistantReasoning = (conversationId: string, messageId: string, reasoning: string) => {
+    const messages = messagesByConversation.value[conversationId];
+    if (!messages) return;
+    const index = messages.findIndex((message) => message.id === messageId);
+    if (index < 0) return;
+    const target = messages[index]!;
+    messages[index] = { ...target, reasoning: (target.reasoning || '') + reasoning };
+    messagesByConversation.value[conversationId] = [...messages];
   };
 
   const markAssistantComplete = (conversationId: string, messageId: string) => {

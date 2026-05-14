@@ -15,7 +15,7 @@
   -->
 
 <template>
-  <el-tooltip v-if="!visible" content="AI Assistant" placement="left">
+  <el-tooltip v-if="!visible" :content="t('agentic.tooltip')" placement="left">
     <el-button class="agentic-launcher" type="primary" circle @click="agenticStore.toggle">
       <el-icon>
         <ChatDotRound />
@@ -36,8 +36,8 @@
         <div class="agentic-title">
           <div class="agentic-mark">AI</div>
           <div>
-            <strong>DC3 Assistant</strong>
-            <span>{{ currentSession?.title || 'New Conversation' }}</span>
+            <strong>{{ t('agentic.title') }}</strong>
+            <span>{{ currentSession?.title || t('agentic.newConversation') }}</span>
           </div>
         </div>
 
@@ -67,25 +67,27 @@
                 >
                   <span class="agentic-history-item">{{ session.title }}</span>
                 </el-dropdown-item>
-                <el-dropdown-item v-if="conversationItems.length === 0" disabled>No history</el-dropdown-item>
+                <el-dropdown-item v-if="conversationItems.length === 0" disabled>{{
+                  t('agentic.headerNoHistory')
+                }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <el-tooltip content="Rename">
+          <el-tooltip :content="t('agentic.headerRename')">
             <el-button size="small" circle :disabled="!activeConversationId" @click="handleRenameCurrent">
               <el-icon>
                 <EditPen />
               </el-icon>
             </el-button>
           </el-tooltip>
-          <el-tooltip content="Delete">
+          <el-tooltip :content="t('agentic.headerDelete')">
             <el-button size="small" circle :disabled="!activeConversationId" @click="handleDeleteCurrent">
               <el-icon>
                 <Delete />
               </el-icon>
             </el-button>
           </el-tooltip>
-          <el-tooltip content="Close">
+          <el-tooltip :content="t('agentic.headerClose')">
             <el-button size="small" circle @click="agenticStore.close">
               <el-icon>
                 <Close />
@@ -99,8 +101,8 @@
         <div v-if="currentMessages.length === 0" class="agentic-empty">
           <Welcome
             icon="/images/logo/logo.png"
-            title="DC3 Assistant"
-            description="Ask about devices, drivers, points, events, and platform operations."
+            :title="t('agentic.title')"
+            :description="t('agentic.welcomeDescription')"
             variant="borderless"
           />
           <Prompts :items="promptItems" :wrap="true" @item-click="handlePromptClick" />
@@ -119,7 +121,12 @@
             <div class="agentic-message__content">
               <div v-if="message.role === 'assistant'" class="agentic-markdown" v-html="renderMarkdown(message)" />
               <div v-else class="agentic-text">{{ message.content }}</div>
-              <span v-if="message.streaming && !message.content" class="agentic-cursor">Thinking...</span>
+              <span v-if="message.streaming && !message.content" class="agentic-cursor">{{
+                t('agentic.thinking')
+              }}</span>
+              <div v-if="message.reasoning" class="agentic-reasoning">
+                <div class="agentic-reasoning__content" v-html="renderReasoning(message.reasoning)" />
+              </div>
               <details
                 v-if="message.role === 'assistant' && hasAssistantDetails(message)"
                 class="agentic-details"
@@ -142,7 +149,7 @@
 
                   <section v-if="assistantThinkingItems(message).length" class="agentic-trace-section">
                     <div class="agentic-trace-section__header">
-                      <span>Thinking</span>
+                      <span>{{ t('agentic.detailThinking') }}</span>
                     </div>
                     <div class="agentic-thinking-list">
                       <div v-for="item in assistantThinkingItems(message)" :key="item.label" class="agentic-thinking">
@@ -154,7 +161,7 @@
 
                   <section v-if="assistantSkillSteps(message).length" class="agentic-trace-section">
                     <div class="agentic-trace-section__header">
-                      <span>Skill Chain</span>
+                      <span>{{ t('agentic.detailSkillChain') }}</span>
                     </div>
                     <ol class="agentic-chain">
                       <li v-for="step in assistantSkillSteps(message)" :key="step.id">
@@ -172,10 +179,10 @@
                     class="agentic-trace-section"
                   >
                     <div class="agentic-trace-section__header">
-                      <span>Tool Chain</span>
+                      <span>{{ t('agentic.detailToolChain') }}</span>
                     </div>
                     <div v-if="assistantAvailableTools(message).length" class="agentic-tool-scope">
-                      <span>Scope</span>
+                      <span>{{ t('agentic.detailScope') }}</span>
                       <div class="agentic-details__tags">
                         <el-tag v-for="tool in assistantAvailableTools(message)" :key="tool" size="small" type="info">
                           {{ tool }}
@@ -196,7 +203,7 @@
 
                   <section v-if="assistantTokenItems(message).length" class="agentic-trace-section">
                     <div class="agentic-trace-section__header">
-                      <span>Token Usage</span>
+                      <span>{{ t('agentic.detailTokenUsage') }}</span>
                       <strong>{{ assistantTokenTotalLabel(message) }}</strong>
                     </div>
                     <div class="agentic-token-grid">
@@ -211,7 +218,7 @@
                     v-if="assistantContexts(message).length"
                     class="agentic-details__row agentic-details__row--stack"
                   >
-                    <span class="agentic-details__label">Contexts</span>
+                    <span class="agentic-details__label">{{ t('agentic.detailContexts') }}</span>
                     <div class="agentic-contexts">
                       <div
                         v-for="(context, index) in assistantContexts(message)"
@@ -237,7 +244,7 @@
               <strong>{{ action.title }}</strong>
               <span>{{ action.description }}</span>
             </div>
-            <el-tag type="warning" size="small">Pending</el-tag>
+            <el-tag type="warning" size="small">{{ t('agentic.pending') }}</el-tag>
             <div class="agentic-action__buttons">
               <el-button size="small" type="primary" @click="handleConfirmAction(action.actionId)">
                 <el-icon>
@@ -278,7 +285,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 6 }"
             resize="none"
-            placeholder="Message DC3 Assistant..."
+            :placeholder="t('agentic.composerPlaceholder')"
             :disabled="streaming"
             @keydown.enter.exact.prevent="handleSubmit"
           />
@@ -286,7 +293,7 @@
           <div class="agentic-composer__bar">
             <div class="agentic-composer__left">
               <input ref="fileInputRef" class="agentic-file" type="file" multiple @change="handleFileChange" />
-              <el-tooltip content="Attach file">
+              <el-tooltip :content="t('agentic.attachFile')">
                 <el-button circle size="small" :disabled="streaming" @click="handlePickFile">
                   <el-icon>
                     <Paperclip />
@@ -309,14 +316,14 @@
                 />
               </el-select>
 
-              <el-tooltip content="Reasoning">
+              <el-tooltip :content="t('agentic.reasoning')">
                 <el-switch
                   v-model="reasoningEnabled"
                   :disabled="!activeModel.reasoning"
                   size="small"
                   inline-prompt
-                  active-text="Think"
-                  inactive-text="Fast"
+                  :active-text="t('agentic.think')"
+                  :inactive-text="t('agentic.fast')"
                 />
               </el-tooltip>
 
@@ -330,11 +337,11 @@
                 </template>
                 <div class="agentic-settings">
                   <div class="agentic-setting">
-                    <span>Temperature</span>
+                    <span>{{ t('agentic.temperature') }}</span>
                     <el-slider v-model="temperatureProxy" :min="0" :max="2" :step="0.1" size="small" />
                   </div>
                   <div class="agentic-setting">
-                    <span>Max Tokens</span>
+                    <span>{{ t('agentic.maxTokens') }}</span>
                     <el-input-number
                       v-model="maxTokensProxy"
                       :min="1"
@@ -344,14 +351,22 @@
                     />
                   </div>
                   <div class="agentic-setting agentic-setting--row">
-                    <span>Confirm Actions</span>
+                    <span>{{ t('agentic.confirmActions') }}</span>
                     <el-switch v-model="requireConfirmation" size="small" />
                   </div>
                   <div class="agentic-capabilities">
-                    <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small">Stream</el-tag>
-                    <el-tag :type="activeModel.toolCall ? 'success' : 'info'" size="small">Tools</el-tag>
-                    <el-tag :type="activeModel.vision ? 'success' : 'info'" size="small">Vision</el-tag>
-                    <el-tag :type="activeModel.reasoning ? 'success' : 'info'" size="small">Reasoning</el-tag>
+                    <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small">{{
+                      t('agentic.capStream')
+                    }}</el-tag>
+                    <el-tag :type="activeModel.toolCall ? 'success' : 'info'" size="small">{{
+                      t('agentic.capTools')
+                    }}</el-tag>
+                    <el-tag :type="activeModel.vision ? 'success' : 'info'" size="small">{{
+                      t('agentic.capVision')
+                    }}</el-tag>
+                    <el-tag :type="activeModel.reasoning ? 'success' : 'info'" size="small">{{
+                      t('agentic.capReasoning')
+                    }}</el-tag>
                   </div>
                 </div>
               </el-popover>
@@ -405,6 +420,7 @@
   import { ElMessage, ElMessageBox } from 'element-plus';
   import { marked } from 'marked';
   import { storeToRefs } from 'pinia';
+  import { useI18n } from 'vue-i18n';
   import { computed, ref } from 'vue';
   import type { AgenticMessage, AgenticMessageContext, AgenticMessageTokens, AgenticTraceEvent } from '@/config/types';
   import { useAgenticStore } from '@/store';
@@ -439,6 +455,8 @@
   }
 
   const agenticStore = useAgenticStore();
+
+  const { t } = useI18n();
   const {
     visible,
     loading,
@@ -462,17 +480,21 @@
   const draft = ref('');
   const fileInputRef = ref<HTMLInputElement>();
 
-  const promptItems: AssistantPromptItem[] = [
-    { key: 'device-status', label: 'Device Status', description: 'Show abnormal devices and recent events.' },
-    { key: 'point-trend', label: 'Point Trend', description: 'Analyze recent point value changes.' },
-    { key: 'driver-health', label: 'Driver Health', description: 'Check driver connectivity and errors.' },
-    { key: 'operation-plan', label: 'Operation Plan', description: 'Draft a safe maintenance workflow.' },
-  ];
+  const promptItems = computed<AssistantPromptItem[]>(() => [
+    { key: 'device-status', label: t('agentic.promptDeviceStatus'), description: t('agentic.promptDeviceStatusDesc') },
+    { key: 'point-trend', label: t('agentic.promptPointTrend'), description: t('agentic.promptPointTrendDesc') },
+    { key: 'driver-health', label: t('agentic.promptDriverHealth'), description: t('agentic.promptDriverHealthDesc') },
+    {
+      key: 'operation-plan',
+      label: t('agentic.promptOperationPlan'),
+      description: t('agentic.promptOperationPlanDesc'),
+    },
+  ]);
 
   const conversationItems = computed(() => {
     return sessions.value.map((session) => ({
       ...session,
-      title: session.title || 'New Conversation',
+      title: session.title || t('agentic.newConversation'),
     }));
   });
 
@@ -505,10 +527,10 @@
     if (!conversationId) {
       return;
     }
-    const result = await ElMessageBox.prompt('Conversation title', 'Rename', {
-      inputValue: currentSession.value?.title || 'New Conversation',
-      confirmButtonText: 'Save',
-      cancelButtonText: 'Cancel',
+    const result = await ElMessageBox.prompt(t('agentic.dialogConversationTitle'), t('agentic.dialogRename'), {
+      inputValue: currentSession.value?.title || t('agentic.newConversation'),
+      confirmButtonText: t('agentic.dialogSave'),
+      cancelButtonText: t('agentic.dialogCancel'),
     });
     await agenticStore.renameSession(conversationId, result.value);
   };
@@ -518,10 +540,10 @@
     if (!conversationId) {
       return;
     }
-    await ElMessageBox.confirm('Delete this conversation?', 'Delete', {
+    await ElMessageBox.confirm(t('agentic.dialogDeleteConfirm'), t('agentic.dialogDeleteTitle'), {
       type: 'warning',
-      confirmButtonText: 'Delete',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: t('agentic.dialogDeleteTitle'),
+      cancelButtonText: t('agentic.dialogCancel'),
     });
     await agenticStore.deleteSession(conversationId);
   };
@@ -536,7 +558,7 @@
   };
 
   const handleSubmit = async () => {
-    const content = draft.value.trim() || (currentAttachments.value.length ? 'Please analyze the attached files.' : '');
+    const content = draft.value.trim() || (currentAttachments.value.length ? t('agentic.attachAnalyze') : '');
     if (!content) {
       return;
     }
@@ -562,10 +584,10 @@
   };
 
   const handleConfirmAction = async (actionId: string) => {
-    await ElMessageBox.confirm('Confirm this operation?', 'Confirm Action', {
+    await ElMessageBox.confirm(t('agentic.confirm'), t('agentic.confirmActions'), {
       type: 'warning',
-      confirmButtonText: 'Confirm',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: t('agentic.confirm'),
+      cancelButtonText: t('agentic.dialogCancel'),
     });
     await agenticStore.confirmAction(actionId);
     ElMessage.success('Action confirmed');
@@ -577,7 +599,12 @@
   };
 
   const renderMarkdown = (message: AgenticMessage) => {
-    return sanitizeHtml(String(marked.parse(message.content || (message.streaming ? 'Thinking...' : ''))));
+    return sanitizeHtml(String(marked.parse(message.content || (message.streaming ? t('agentic.thinking') : ''))));
+  };
+
+  const renderReasoning = (reasoning: string) => {
+    if (!reasoning) return '';
+    return sanitizeHtml(String(marked.parse(reasoning)));
   };
 
   const hasAssistantDetails = (message: AgenticMessage) => {
@@ -600,24 +627,24 @@
     const contexts = assistantContexts(message);
     const tokenTotal = assistantTokenTotal(message);
     if (message.streaming && !currentTraceEvents.value.length) {
-      parts.push('Thinking');
+      parts.push(t('agentic.detailSummaryThinking'));
     }
     if (assistantReasoning(message)) {
-      parts.push('reasoning');
+      parts.push(t('agentic.thinkingReasoningMode').toLowerCase());
     }
     if (skills.length) {
-      parts.push(`${skills.length} skill step${skills.length > 1 ? 's' : ''}`);
+      parts.push(t('agentic.detailSummarySkills', { n: skills.length }));
     }
     if (tools.length) {
-      parts.push(`${tools.length} tool step${tools.length > 1 ? 's' : ''}`);
+      parts.push(t('agentic.detailSummaryTools', { n: tools.length }));
     }
     if (contexts.length) {
-      parts.push(`${contexts.length} context${contexts.length > 1 ? 's' : ''}`);
+      parts.push(t('agentic.detailContexts'));
     }
     if (typeof tokenTotal === 'number') {
-      parts.push(`${formatCount(tokenTotal)} tokens`);
+      parts.push(t('agentic.detailSummaryTokens', { n: formatCount(tokenTotal) }));
     }
-    return parts.length ? parts.join(' · ') : 'Thinking';
+    return parts.length ? parts.join(' · ') : t('agentic.detailSummaryThinking');
   };
 
   const assistantRunOverview = (message: AgenticMessage): AssistantRunStat[] => {
@@ -625,18 +652,25 @@
     const skills = assistantSkillSteps(message).length;
     const tools = assistantToolSteps(message).length;
     const tokenTotal = assistantTokenTotal(message);
-    stats.push({ label: 'Status', value: message.streaming ? (message.content ? 'Streaming' : 'Thinking') : 'Done' });
+    stats.push({
+      label: t('agentic.statusLabel'),
+      value: message.streaming
+        ? message.content
+          ? t('agentic.statusStreaming')
+          : t('agentic.statusThinking')
+        : t('agentic.statusDone'),
+    });
     if (assistantReasoning(message)) {
-      stats.push({ label: 'Reasoning', value: 'Enabled' });
+      stats.push({ label: t('agentic.thinkingReasoningMode'), value: t('agentic.statusEnabled') });
     }
     if (skills > 0) {
-      stats.push({ label: 'Skills', value: String(skills) });
+      stats.push({ label: t('agentic.detailSkillChain'), value: String(skills) });
     }
     if (tools > 0) {
-      stats.push({ label: 'Tools', value: String(tools) });
+      stats.push({ label: t('agentic.detailToolChain'), value: String(tools) });
     }
     if (typeof tokenTotal === 'number') {
-      stats.push({ label: 'Tokens', value: formatCount(tokenTotal) });
+      stats.push({ label: t('agentic.detailTokenUsage'), value: formatCount(tokenTotal) });
     }
     return stats;
   };
@@ -648,26 +682,26 @@
     const skillSteps = assistantSkillSteps(message);
     if (message.streaming) {
       items.push({
-        label: message.content ? 'Generating answer' : 'Preparing response',
-        detail: traces.length ? 'Runtime trace is being collected.' : 'Waiting for the first model response chunk.',
+        label: message.content ? t('agentic.thinkingGenerating') : t('agentic.thinkingPreparing'),
+        detail: traces.length ? t('agentic.thinkingTraceCollecting') : t('agentic.thinkingWaitingChunk'),
       });
     }
     if (assistantReasoning(message)) {
       items.push({
-        label: 'Reasoning mode',
-        detail: 'The selected model was asked to use reasoning for this turn.',
+        label: t('agentic.thinkingReasoningMode'),
+        detail: t('agentic.thinkingReasoningDetail'),
       });
     }
     if (skillSteps.length) {
       items.push({
-        label: 'Skill routing',
-        detail: `Selected ${skillSteps[0]?.label || 'general'} for this request.`,
+        label: t('agentic.thinkingSkillRouting'),
+        detail: t('agentic.thinkingSkillDetail', { skill: skillSteps[0]?.label || 'general' }),
       });
     }
     if (tools > 0) {
       items.push({
-        label: 'Tool execution',
-        detail: `${tools} tool step${tools > 1 ? 's' : ''} recorded for this answer.`,
+        label: t('agentic.thinkingToolExec'),
+        detail: t('agentic.thinkingToolDetail', { n: tools }),
       });
     }
     return uniqueThinkingItems(items);
@@ -714,7 +748,7 @@
       id: `skill-${skill}`,
       index: 0,
       label: skill,
-      detail: 'Persisted assistant skill.',
+      detail: '',
     }));
     return indexChainSteps(uniqueChainSteps([...traceSteps, ...fallbackSteps]));
   };
@@ -749,7 +783,7 @@
       id: `tool-${tool}`,
       index: 0,
       label: tool,
-      detail: 'Persisted tool invocation.',
+      detail: '',
     }));
     return indexChainSteps(uniqueChainSteps([...traceSteps, ...fallbackSteps]));
   };
@@ -781,7 +815,7 @@
 
   const assistantTokenTotalLabel = (message: AgenticMessage) => {
     const total = assistantTokenTotal(message);
-    return typeof total === 'number' ? `${formatCount(total)} total` : 'Pending';
+    return typeof total === 'number' ? t('agentic.detailTotal', { n: formatCount(total) }) : t('agentic.detailPending');
   };
 
   const assistantTokenItems = (message: AgenticMessage): AssistantTokenItem[] => {
@@ -790,12 +824,12 @@
       return [];
     }
     const tokenOrder: Array<[keyof AgenticMessageTokens, string]> = [
-      ['input', 'Input'],
-      ['output', 'Output'],
-      ['text', 'Text'],
-      ['context', 'Context'],
-      ['system', 'System'],
-      ['memory', 'Memory'],
+      ['input', t('agentic.tokenInput')],
+      ['output', t('agentic.tokenOutput')],
+      ['text', t('agentic.tokenText')],
+      ['context', t('agentic.tokenContext')],
+      ['system', t('agentic.tokenSystem')],
+      ['memory', t('agentic.tokenMemory')],
     ];
     return tokenOrder
       .filter(([key]) => typeof tokens[key] === 'number')
@@ -1040,6 +1074,26 @@
   .agentic-cursor {
     color: #64748b;
     font-size: 12px;
+  }
+
+  .agentic-reasoning {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-left: 3px solid #93c5fd;
+    border-radius: 4px;
+    color: #475569;
+    font-size: 13px;
+    background: #f0f7ff;
+  }
+
+  .agentic-reasoning__content {
+    :deep(p) {
+      margin: 0 0 6px;
+    }
+
+    :deep(p:last-child) {
+      margin-bottom: 0;
+    }
   }
 
   .agentic-details {
