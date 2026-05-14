@@ -74,7 +74,7 @@
         <dc3.version>2026.5.5</dc3.version>
 
         <!-- Spring AI -->
-        <spring-ai.version>2.0.0-M5</spring-ai.version>
+        <spring-ai.version>2.0.0-M6</spring-ai.version>
 
         <!-- Test toolchain -->
         <testcontainers.version>1.21.4</testcontainers.version>
