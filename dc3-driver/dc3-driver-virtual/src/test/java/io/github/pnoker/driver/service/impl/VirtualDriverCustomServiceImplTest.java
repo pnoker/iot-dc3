@@ -58,6 +58,22 @@ class VirtualDriverCustomServiceImplTest {
     @InjectMocks
     private VirtualDriverCustomServiceImpl service;
 
+    private static PointBO pointOfType(PointTypeFlagEnum type) {
+        PointBO point = new PointBO();
+        point.setId(1L);
+        point.setPointName("p");
+        point.setPointTypeFlag(type);
+        return point;
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         // @InjectMocks resolves @Resource via reflection in the same class — re-assert
@@ -123,7 +139,7 @@ class VirtualDriverCustomServiceImplTest {
 
     @Test
     void readProducesNumericValueInRangeForOtherPointTypes() {
-        for (PointTypeFlagEnum type : new PointTypeFlagEnum[] {
+        for (PointTypeFlagEnum type : new PointTypeFlagEnum[]{
                 PointTypeFlagEnum.INT, PointTypeFlagEnum.LONG, PointTypeFlagEnum.FLOAT, PointTypeFlagEnum.DOUBLE,
                 PointTypeFlagEnum.BYTE, PointTypeFlagEnum.SHORT
         }) {
@@ -140,21 +156,5 @@ class VirtualDriverCustomServiceImplTest {
                 WValue.builder().value("anything").type(PointTypeFlagEnum.STRING).build());
         assertThat(result).isFalse();
         verify(driverSenderService, never()).pointValueSender(org.mockito.ArgumentMatchers.anyList());
-    }
-
-    private static PointBO pointOfType(PointTypeFlagEnum type) {
-        PointBO point = new PointBO();
-        point.setId(1L);
-        point.setPointName("p");
-        point.setPointTypeFlag(type);
-        return point;
-    }
-
-    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO event = new MetadataEventDTO();
-        event.setMetadataType(type);
-        event.setOperateType(op);
-        event.setId(id);
-        return event;
     }
 }

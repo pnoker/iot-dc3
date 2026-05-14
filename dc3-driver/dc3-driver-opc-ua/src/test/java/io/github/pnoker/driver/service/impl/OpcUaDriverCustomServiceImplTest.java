@@ -35,9 +35,9 @@ import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
@@ -70,6 +70,54 @@ class OpcUaDriverCustomServiceImplTest {
     private DriverSenderService driverSenderService;
 
     private OpcUaDriverCustomServiceImpl service;
+
+    private static Map<String, AttributeBO> driverConfig(String host, int port, String path) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("path", AttributeBO.builder().value(path).type(AttributeTypeFlagEnum.STRING).build());
+        return m;
+    }
+
+    private static Map<String, AttributeBO> pointConfig(int namespace, String tag) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("namespace",
+                AttributeBO.builder().value(String.valueOf(namespace)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeFlagEnum.STRING).build());
+        return m;
+    }
+
+    private static DeviceBO device(Long id) {
+        DeviceBO device = new DeviceBO();
+        device.setId(id);
+        return device;
+    }
+
+    private static PointBO point(PointTypeFlagEnum type) {
+        PointBO point = new PointBO();
+        point.setId(1L);
+        point.setPointTypeFlag(type);
+        return point;
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
+
+    // Reference unused to keep imports stable for future expansion.
+    @SuppressWarnings("unused")
+    private static List<EndpointDescription> sampleEndpoints() {
+        return List.of();
+    }
+
+    @SuppressWarnings("unused")
+    private static Optional<EndpointDescription> sampleSelector() {
+        return Optional.empty();
+    }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -144,7 +192,7 @@ class OpcUaDriverCustomServiceImplTest {
 
             assertThatThrownBy(() -> service.read(driverConfig("h", 4840, "/"), pointConfig(2, "tag.x"),
                     device(1L), point(PointTypeFlagEnum.STRING))).isInstanceOf(ConnectorException.class)
-                            .hasMessageContaining("endpoint refused");
+                    .hasMessageContaining("endpoint refused");
             assertThat(connectionMap()).doesNotContainKey(1L);
         }
     }
@@ -187,53 +235,5 @@ class OpcUaDriverCustomServiceImplTest {
         Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(service, value);
-    }
-
-    private static Map<String, AttributeBO> driverConfig(String host, int port, String path) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("path", AttributeBO.builder().value(path).type(AttributeTypeFlagEnum.STRING).build());
-        return m;
-    }
-
-    private static Map<String, AttributeBO> pointConfig(int namespace, String tag) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("namespace",
-                AttributeBO.builder().value(String.valueOf(namespace)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeFlagEnum.STRING).build());
-        return m;
-    }
-
-    private static DeviceBO device(Long id) {
-        DeviceBO device = new DeviceBO();
-        device.setId(id);
-        return device;
-    }
-
-    private static PointBO point(PointTypeFlagEnum type) {
-        PointBO point = new PointBO();
-        point.setId(1L);
-        point.setPointTypeFlag(type);
-        return point;
-    }
-
-    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO event = new MetadataEventDTO();
-        event.setMetadataType(type);
-        event.setOperateType(op);
-        event.setId(id);
-        return event;
-    }
-
-    // Reference unused to keep imports stable for future expansion.
-    @SuppressWarnings("unused")
-    private static List<EndpointDescription> sampleEndpoints() {
-        return List.of();
-    }
-
-    @SuppressWarnings("unused")
-    private static Optional<EndpointDescription> sampleSelector() {
-        return Optional.empty();
     }
 }

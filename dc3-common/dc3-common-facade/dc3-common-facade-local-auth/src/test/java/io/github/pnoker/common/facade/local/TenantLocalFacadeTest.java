@@ -45,6 +45,10 @@ class TenantLocalFacadeTest {
 
     private TenantLocalFacade facade;
 
+    private static TenantBO any() {
+        return org.mockito.ArgumentMatchers.any();
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         facade = new TenantLocalFacade();
@@ -73,9 +77,5 @@ class TenantLocalFacadeTest {
         Field field = TenantLocalFacade.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(facade, value);
-    }
-
-    private static TenantBO any() {
-        return org.mockito.ArgumentMatchers.any();
     }
 }

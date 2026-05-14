@@ -42,6 +42,16 @@ class MqttReceiveServiceImplTest {
 
     private MqttReceiveServiceImpl service;
 
+    private static MqttMessage mqttMessage(String topic, int qos, String payload) {
+        MessageHeader header = new MessageHeader(null);
+        header.setMqttReceivedTopic(topic);
+        header.setMqttReceivedQos(qos);
+        MqttMessage msg = new MqttMessage();
+        msg.setHeader(header);
+        msg.setPayload(payload);
+        return msg;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         service = new MqttReceiveServiceImpl();
@@ -94,15 +104,5 @@ class MqttReceiveServiceImplTest {
         service.receiveValue(msg);
 
         verify(driverSenderService).pointValueSender(org.mockito.ArgumentMatchers.any(PointValue.class));
-    }
-
-    private static MqttMessage mqttMessage(String topic, int qos, String payload) {
-        MessageHeader header = new MessageHeader(null);
-        header.setMqttReceivedTopic(topic);
-        header.setMqttReceivedQos(qos);
-        MqttMessage msg = new MqttMessage();
-        msg.setHeader(header);
-        msg.setPayload(payload);
-        return msg;
     }
 }

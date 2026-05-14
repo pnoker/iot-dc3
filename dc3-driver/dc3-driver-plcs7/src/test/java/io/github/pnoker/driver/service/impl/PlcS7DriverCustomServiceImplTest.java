@@ -37,9 +37,9 @@ import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
@@ -74,6 +74,51 @@ class PlcS7DriverCustomServiceImplTest {
     private S7Connector connector;
 
     private PlcS7DriverCustomServiceImpl service;
+
+    private static Map<String, AttributeBO> driverConfig(String host, int port) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
+        return m;
+    }
+
+    private static Map<String, AttributeBO> pointConfig(int dbNum, int byteOffset, int bitOffset, int blockSize) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("dbNum", AttributeBO.builder().value(String.valueOf(dbNum)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("byteOffset",
+                AttributeBO.builder().value(String.valueOf(byteOffset)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("bitOffset",
+                AttributeBO.builder().value(String.valueOf(bitOffset)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("blockSize",
+                AttributeBO.builder().value(String.valueOf(blockSize)).type(AttributeTypeFlagEnum.INT).build());
+        return m;
+    }
+
+    private static DeviceBO device(Long id) {
+        DeviceBO device = new DeviceBO();
+        device.setId(id);
+        return device;
+    }
+
+    private static PointBO point(PointTypeFlagEnum type, String pointName) {
+        PointBO point = new PointBO();
+        point.setId(1L);
+        point.setPointTypeFlag(type);
+        point.setPointName(pointName);
+        return point;
+    }
+
+    private static WValue wValue(String value, PointTypeFlagEnum type) {
+        return WValue.builder().value(value).type(type).build();
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -234,50 +279,5 @@ class PlcS7DriverCustomServiceImplTest {
         Field field = PlcS7DriverCustomServiceImpl.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(service, value);
-    }
-
-    private static Map<String, AttributeBO> driverConfig(String host, int port) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
-        return m;
-    }
-
-    private static Map<String, AttributeBO> pointConfig(int dbNum, int byteOffset, int bitOffset, int blockSize) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("dbNum", AttributeBO.builder().value(String.valueOf(dbNum)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("byteOffset",
-                AttributeBO.builder().value(String.valueOf(byteOffset)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("bitOffset",
-                AttributeBO.builder().value(String.valueOf(bitOffset)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("blockSize",
-                AttributeBO.builder().value(String.valueOf(blockSize)).type(AttributeTypeFlagEnum.INT).build());
-        return m;
-    }
-
-    private static DeviceBO device(Long id) {
-        DeviceBO device = new DeviceBO();
-        device.setId(id);
-        return device;
-    }
-
-    private static PointBO point(PointTypeFlagEnum type, String pointName) {
-        PointBO point = new PointBO();
-        point.setId(1L);
-        point.setPointTypeFlag(type);
-        point.setPointName(pointName);
-        return point;
-    }
-
-    private static WValue wValue(String value, PointTypeFlagEnum type) {
-        return WValue.builder().value(value).type(type).build();
-    }
-
-    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO event = new MetadataEventDTO();
-        event.setMetadataType(type);
-        event.setOperateType(op);
-        event.setId(id);
-        return event;
     }
 }

@@ -35,25 +35,34 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 
 /**
  * Locks the RabbitMQ delivery contract DC3 relies on:
- *  - publisher-confirm-mode=correlated guarantees the broker acks every routed message
- *  - mandatory=true with a return listener fires on unroutable messages
- *  - manual consumer ack drains a queue exactly once
- *
+ * - publisher-confirm-mode=correlated guarantees the broker acks every routed message
+ * - mandatory=true with a return listener fires on unroutable messages
+ * - manual consumer ack drains a queue exactly once
+ * <p>
  * Disabled by default; opt in with {@code DC3_E2E=true}.
  */
 @EnabledIfEnvironmentVariable(named = "DC3_E2E", matches = "(?i)true|1|yes|on")
 class RabbitDeliveryIT extends BaseE2eIT {
 
+    private static Connection newConnection() throws Exception {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(E2eStack.rabbitHost());
+        factory.setPort(E2eStack.rabbitAmqpPort());
+        factory.setUsername(E2eStack.rabbitUsername());
+        factory.setPassword(E2eStack.rabbitPassword());
+        return factory.newConnection();
+    }
+
     @Test
     void confirmedPublishRoutesMessageToBoundQueue() throws Exception {
         try (Connection conn = newConnection();
-                Channel channel = conn.createChannel()) {
+             Channel channel = conn.createChannel()) {
             channel.confirmSelect();
             String exchange = "dc3.e2e.exchange." + UUID.randomUUID();
             String queue = "dc3.e2e.queue." + UUID.randomUUID();
@@ -72,7 +81,7 @@ class RabbitDeliveryIT extends BaseE2eIT {
     @Test
     void mandatoryReturnsUnroutableMessageThroughReturnListener() throws Exception {
         try (Connection conn = newConnection();
-                Channel channel = conn.createChannel()) {
+             Channel channel = conn.createChannel()) {
             CompletableFuture<String> returned = new CompletableFuture<>();
             channel.addReturnListener(ret -> returned.complete(new String(ret.getBody(), StandardCharsets.UTF_8)));
 
@@ -90,7 +99,7 @@ class RabbitDeliveryIT extends BaseE2eIT {
     @Test
     void manualAckDrainsQueueExactlyOnce() throws Exception {
         try (Connection conn = newConnection();
-                Channel channel = conn.createChannel()) {
+             Channel channel = conn.createChannel()) {
             String exchange = "dc3.e2e.exchange." + UUID.randomUUID();
             String queue = "dc3.e2e.queue." + UUID.randomUUID();
             channel.exchangeDeclare(exchange, BuiltinExchangeType.DIRECT, false, true, null);
@@ -131,7 +140,7 @@ class RabbitDeliveryIT extends BaseE2eIT {
     @Test
     void waitForConfirmsWithoutPendingPublishesCompletesImmediately() throws Exception {
         try (Connection conn = newConnection();
-                Channel channel = conn.createChannel()) {
+             Channel channel = conn.createChannel()) {
             channel.confirmSelect();
             assertThat(channel.waitForConfirms(50L)).isTrue();
         }
@@ -140,15 +149,19 @@ class RabbitDeliveryIT extends BaseE2eIT {
     @Test
     void exclusiveQueueRejectsConsumerOnDifferentConnection() throws Exception {
         try (Connection owner = newConnection();
-                Connection other = newConnection();
-                Channel first = owner.createChannel()) {
+             Connection other = newConnection();
+             Channel first = owner.createChannel()) {
             String queue = "dc3.e2e.exclusive." + UUID.randomUUID();
             first.queueDeclare(queue, false, true, false, null);
-            first.basicConsume(queue, true, "c1", (tag, delivery) -> {}, tag -> {});
+            first.basicConsume(queue, true, "c1", (tag, delivery) -> {
+            }, tag -> {
+            });
 
             Channel second = other.createChannel();
             try {
-                assertThatThrownBy(() -> second.basicConsume(queue, true, "c2", (tag, delivery) -> {}, tag -> {}))
+                assertThatThrownBy(() -> second.basicConsume(queue, true, "c2", (tag, delivery) -> {
+                }, tag -> {
+                }))
                         .isInstanceOf(java.io.IOException.class)
                         .hasRootCauseInstanceOf(com.rabbitmq.client.ShutdownSignalException.class)
                         .hasStackTraceContaining("RESOURCE_LOCKED");
@@ -171,14 +184,5 @@ class RabbitDeliveryIT extends BaseE2eIT {
         factory.setConnectionTimeout(1_500);
         assertThatThrownBy(factory::newConnection)
                 .isInstanceOfAny(java.io.IOException.class, TimeoutException.class);
-    }
-
-    private static Connection newConnection() throws Exception {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(E2eStack.rabbitHost());
-        factory.setPort(E2eStack.rabbitAmqpPort());
-        factory.setUsername(E2eStack.rabbitUsername());
-        factory.setPassword(E2eStack.rabbitPassword());
-        return factory.newConnection();
     }
 }

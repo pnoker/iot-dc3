@@ -51,6 +51,14 @@ class DeviceLocalFacadeTest {
 
     private DeviceLocalFacade facade;
 
+    private static <T> T any() {
+        return org.mockito.ArgumentMatchers.any();
+    }
+
+    private static <T> T any(Class<T> clazz) {
+        return org.mockito.ArgumentMatchers.any(clazz);
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         facade = new DeviceLocalFacade();
@@ -171,13 +179,5 @@ class DeviceLocalFacadeTest {
         Field field = DeviceLocalFacade.class.getDeclaredField(name);
         field.setAccessible(true);
         field.set(facade, value);
-    }
-
-    private static <T> T any() {
-        return org.mockito.ArgumentMatchers.any();
-    }
-
-    private static <T> T any(Class<T> clazz) {
-        return org.mockito.ArgumentMatchers.any(clazz);
     }
 }
