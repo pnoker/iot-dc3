@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.PointValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -25,10 +27,10 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
+import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -61,38 +63,47 @@ public class DriverWriteServiceImpl implements DriverWriteService {
     @Resource
     private DriverCustomService driverCustomService;
 
+    @Resource
+    private DriverSenderService driverSenderService;
+
     @Override
     public void write(Long deviceId, Long pointId, String value) {
-        try {
-            // Get device from metadata cache
-            DeviceBO device = deviceMetadata.getCache(deviceId);
-            if (Objects.isNull(device)) {
-                throw new ReadPointException("Failed to write point value, device[{}] is null", deviceId);
-            }
-
-            // Check if device contains the specified point
-            if (!device.getPointIds().contains(pointId)) {
-                throw new ReadPointException("Failed to write point value, device[{}] not contained point[{}]",
-                        deviceId, pointId);
-            }
-
-            // Get driver and point configurations
-            Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
-            Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
-
-            // Get point from metadata cache
-            PointBO point = pointMetadata.getCache(pointId);
-            if (Objects.isNull(point)) {
-                throw new ReadPointException("Failed to write point value, point is null, deviceId={}, pointId={}",
-                        deviceId, pointId);
-            }
-
-            // Write value to device through custom driver service
-            driverCustomService.write(driverConfig, pointConfig, device, point,
-                    new WritePointValue(value, point.getPointTypeFlag()));
-        } catch (Exception e) {
-            throw new ServiceException(e.getMessage());
+        // Get device from metadata cache
+        DeviceBO device = deviceMetadata.getCache(deviceId);
+        if (Objects.isNull(device)) {
+            throw new ReadPointException("Failed to write point value, device[{}] is null", deviceId);
         }
+
+        // Check if device contains the specified point
+        if (!device.getPointIds().contains(pointId)) {
+            throw new ReadPointException("Failed to write point value, device[{}] not contained point[{}]",
+                    deviceId, pointId);
+        }
+
+        // Get driver and point configurations
+        Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
+        Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
+
+        // Get point from metadata cache
+        PointBO point = pointMetadata.getCache(pointId);
+        if (Objects.isNull(point)) {
+            throw new ReadPointException("Failed to write point value, point is null, deviceId={}, pointId={}",
+                    deviceId, pointId);
+        }
+
+        // Write value to device through custom driver service. Any exception thrown by
+        // the custom driver implementation propagates to DeviceCommandReceiver where
+        // ack/nack policy is decided — wrapping it here would erase the cause and make
+        // a transient I/O failure look identical to a programming bug.
+        driverCustomService.write(driverConfig, pointConfig, device, point,
+                new WritePointValue(value, point.getPointTypeFlag()));
+
+        // Echo the just-written value back to the platform as a synthetic point sample
+        // so dashboards see the new state without waiting for the next read scan. The
+        // value is the one the device acknowledged (echoed by the SDK from the request),
+        // not a re-read — drivers that need read-after-write semantics should layer that
+        // inside their own DriverProtocol.write implementation.
+        driverSenderService.pointValueSender(new PointValue(new ReadPointValue(device, point, value)));
     }
 
     @Override
