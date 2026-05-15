@@ -92,6 +92,26 @@ public class EnvironmentConstant {
     public static final String DRIVER_SERVICE = "dc3.driver.service";
 
     /**
+     * Driver profile auto-activation configuration key: "dc3.driver.auto-profile"
+     */
+    public static final String DRIVER_AUTO_PROFILE = "dc3.driver.auto-profile";
+
+    /**
+     * Spring profile name for driver applications: "driver"
+     */
+    public static final String DRIVER_PROFILE = "driver";
+
+    /**
+     * RabbitMQ profile auto-activation configuration key: "dc3.rabbitmq.auto-profile"
+     */
+    public static final String RABBITMQ_AUTO_PROFILE = "dc3.rabbitmq.auto-profile";
+
+    /**
+     * Spring profile name for RabbitMQ-enabled applications: "rabbitmq"
+     */
+    public static final String RABBITMQ_PROFILE = "rabbitmq";
+
+    /**
      * Driver host configuration key: "dc3.driver.host"
      */
     public static final String DRIVER_HOST = "dc3.driver.host";

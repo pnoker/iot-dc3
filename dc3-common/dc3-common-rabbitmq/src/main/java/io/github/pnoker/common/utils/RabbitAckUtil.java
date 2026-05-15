@@ -26,6 +26,12 @@ import java.io.IOException;
 /**
  * RabbitMQ manual acknowledgement helpers.
  *
+ * <p>All three methods log and swallow {@link IOException} from the underlying
+ * channel: callers are RabbitMQ listener handlers that have already finished
+ * processing the message, and a closed/broken channel cannot accept either an
+ * ack or a nack — letting the IOException propagate would only surface as
+ * another opaque listener failure with the same root cause.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2026.5.9
@@ -37,15 +43,19 @@ public class RabbitAckUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
-    public static void ack(Channel channel, long deliveryTag) throws IOException {
-        channel.basicAck(deliveryTag, false);
+    public static void ack(Channel channel, long deliveryTag) {
+        try {
+            channel.basicAck(deliveryTag, false);
+        } catch (IOException e) {
+            log.error("RabbitMQ ack failed, deliveryTag={}", deliveryTag, e);
+        }
     }
 
     public static void reject(Channel channel, long deliveryTag) {
         try {
             channel.basicReject(deliveryTag, false);
         } catch (IOException e) {
-            log.error("RabbitMQ reject failed, deliveryTag: {}", deliveryTag, e);
+            log.error("RabbitMQ reject failed, deliveryTag={}", deliveryTag, e);
         }
     }
 
@@ -53,7 +63,7 @@ public class RabbitAckUtil {
         try {
             channel.basicNack(deliveryTag, false, requeue);
         } catch (IOException e) {
-            log.error("RabbitMQ nack failed, deliveryTag: {}, requeue: {}", deliveryTag, requeue, e);
+            log.error("RabbitMQ nack failed, deliveryTag={}, requeue={}", deliveryTag, requeue, e);
         }
     }
 

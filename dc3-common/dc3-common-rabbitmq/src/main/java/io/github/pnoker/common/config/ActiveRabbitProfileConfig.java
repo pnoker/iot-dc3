@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -27,10 +28,11 @@ import org.springframework.core.env.ConfigurableEnvironment;
 /**
  * Active RabbitMQ Profile Configuration
  * <p>
- * Environment post processor that automatically activates the "rabbitmq" profile. This
- * configuration runs with highest precedence to ensure the rabbitmq profile is available
- * during application startup for RabbitMQ-related configurations.
- * </p>
+ * Environment post processor that activates the {@code rabbitmq} profile so the
+ * shared {@code application-rabbitmq.yml} defaults take effect alongside the
+ * application's own configuration. Profile activation can be turned off by
+ * setting {@code dc3.rabbitmq.auto-profile=false} in any property source — useful
+ * when an application embeds the SDK but wants its own profile model intact.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,14 +43,19 @@ import org.springframework.core.env.ConfigurableEnvironment;
 public class ActiveRabbitProfileConfig implements EnvironmentPostProcessor {
 
     /**
-     * Post-process environment to add the "rabbitmq" active profile
+     * Post-process environment to add the "rabbitmq" active profile.
      *
      * @param environment ConfigurableEnvironment to modify
      * @param application SpringApplication instance
      */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("rabbitmq");
+        if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.RABBITMQ_AUTO_PROFILE, Boolean.class,
+                Boolean.TRUE))) {
+            log.debug("Skipping rabbitmq profile activation, {}=false", EnvironmentConstant.RABBITMQ_AUTO_PROFILE);
+            return;
+        }
+        environment.addActiveProfile(EnvironmentConstant.RABBITMQ_PROFILE);
     }
 
 }
