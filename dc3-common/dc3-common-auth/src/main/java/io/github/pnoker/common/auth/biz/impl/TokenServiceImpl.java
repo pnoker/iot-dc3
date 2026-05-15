@@ -18,6 +18,7 @@
 package io.github.pnoker.common.auth.biz.impl;
 
 import io.github.pnoker.common.auth.biz.TokenService;
+import io.github.pnoker.common.auth.cache.TokenDenylistCache;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
@@ -37,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -60,6 +62,9 @@ public class TokenServiceImpl implements TokenService {
 
     @Resource
     private TenantBindService tenantBindService;
+
+    @Resource
+    private TokenDenylistCache tokenDenylistCache;
 
     @Override
     public String generateSalt(String loginName, String tenantCode) {
@@ -100,6 +105,22 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
+    public boolean cancelToken(String loginName, String tenantCode) {
+        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
+        if (Objects.isNull(tenantBO)) {
+            return false;
+        }
+        UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
+        if (Objects.isNull(userLogin)) {
+            return false;
+        }
+        long logoutEpochMs = System.currentTimeMillis();
+        tokenDenylistCache.markLogout(loginName, tenantCode, logoutEpochMs);
+        log.info("User logout, loginName={}, tenantCode={}, logoutEpochMs={}", loginName, tenantCode, logoutEpochMs);
+        return true;
+    }
+
+    @Override
     public TokenValid checkValid(String loginName, String salt, String token, String tenantCode) {
         TenantBO tenantBO = tenantService.selectByCode(tenantCode);
         if (Objects.isNull(tenantBO)) {
@@ -119,6 +140,12 @@ public class TokenServiceImpl implements TokenService {
 
         try {
             Claims claims = KeyUtil.parserToken(loginName, salt, token, tenantBO.getId());
+            Date issuedAt = claims.getIssuedAt();
+            long issuedAtEpochMs = Objects.nonNull(issuedAt) ? issuedAt.getTime() : 0L;
+            if (tokenDenylistCache.isRevoked(loginName, tenantCode, issuedAtEpochMs)) {
+                tokenValid.setExpireTime(claims.getExpiration());
+                return tokenValid;
+            }
             tokenValid.setValid(true);
             tokenValid.setExpireTime(claims.getExpiration());
             return tokenValid;

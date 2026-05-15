@@ -38,6 +38,12 @@
 
     <dependencies>
 
+        <!-- Local cache for token denylist (replaces Redis) -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- gRPC Related -->
         <dependency>
             <groupId>org.springframework.grpc</groupId>

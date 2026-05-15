@@ -60,8 +60,8 @@ public class SessionController implements BaseController {
         this.sessionBuilder = sessionBuilder;
     }
 
-    @GetMapping("/list")
-    public Mono<R<Page<SessionVO>>> list(SessionQuery query) {
+    @PostMapping("/list")
+    public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionQuery scopedQuery = Objects.isNull(query) ? new SessionQuery() : query;
             scopedQuery.setTenantId(header.getTenantId());
