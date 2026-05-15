@@ -17,22 +17,27 @@
 
 package io.github.pnoker.common.driver.service;
 
+import io.github.pnoker.common.entity.dto.MetadataEventDTO;
+
 /**
- * Aggregate driver SPI that combines the lifecycle, metadata, and protocol
- * contracts a fully-featured driver typically implements. The SDK injects this
- * type wherever it needs the union of all driver hooks (boot, schedule,
- * metadata events, read/write).
- *
- * <p>This interface intentionally adds no methods of its own — it exists so
- * existing drivers that {@code implements DriverCustomService} keep compiling
- * unchanged, while new drivers can pick the smaller capability interfaces
- * ({@link DriverLifecycle}, {@link DriverMetadataListener},
- * {@link DriverProtocol}) when they only need a subset.
+ * Driver-side reaction to driver, device, and point metadata events forwarded
+ * from the manager center. Implement this when the driver needs to refresh
+ * caches, recompute derived state, or open/close protocol connections in
+ * response to an add / update / delete on the metadata stream — the
+ * specific subject is carried in {@link MetadataEventDTO}.
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2025.9.0
  */
-public interface DriverCustomService extends DriverLifecycle, DriverMetadataListener, DriverProtocol {
+public interface DriverMetadataListener {
+
+    /**
+     * Receive a metadata change event for driver, device, or point.
+     *
+     * @param metadataEvent metadata event payload describing the affected
+     *                      entity, change type, and identifiers
+     */
+    void event(MetadataEventDTO metadataEvent);
 
 }
