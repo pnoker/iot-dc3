@@ -62,6 +62,7 @@ public class DeviceCommandReceiver {
     @RabbitListener(queues = "#{deviceCommandQueue.name}")
     public void deviceCommandReceive(Channel channel, Message message, DeviceCommandDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
         try {
             log.info("Receive device command: {}", JsonUtil.toJsonString(entityDTO));
 
@@ -90,8 +91,20 @@ public class DeviceCommandReceiver {
             }
             RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            // Bounded retry instead of unconditional requeue: a first-time failure may be
+            // a transient device hiccup, so let RabbitMQ redeliver once. If we fail
+            // again on redelivery we treat the message as poison and reject it without
+            // requeue — without a DLQ in place this drops the command, but it stops a
+            // single bad payload from pinning the consumer in an infinite loop.
+            if (redelivered) {
+                log.error("Device command failed on redelivery, dropping. type={}, deliveryTag={}",
+                        Objects.nonNull(entityDTO) ? entityDTO.getType() : null, deliveryTag, e);
+                RabbitAckUtil.reject(channel, deliveryTag);
+            } else {
+                log.warn("Device command failed, requeueing for one retry. type={}, deliveryTag={}, error={}",
+                        Objects.nonNull(entityDTO) ? entityDTO.getType() : null, deliveryTag, e.getMessage(), e);
+                RabbitAckUtil.nack(channel, deliveryTag, true);
+            }
         }
     }
 
