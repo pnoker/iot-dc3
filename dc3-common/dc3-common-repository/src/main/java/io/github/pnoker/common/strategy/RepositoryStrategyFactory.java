@@ -20,10 +20,12 @@ package io.github.pnoker.common.strategy;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
 import io.github.pnoker.common.repository.RepositoryService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RepositoryStrategyFactory {
 
     // Map to store repository services with name as key
-    private static final Map<String, RepositoryService> savingStrategyServiceMap = new ConcurrentHashMap<>();
+    private static final Map<String, RepositoryService> repositoryServiceMap = new ConcurrentHashMap<>();
 
     // Private constructor to prevent instantiation
     private RepositoryStrategyFactory() {
@@ -49,7 +51,7 @@ public class RepositoryStrategyFactory {
      * @return List of all repository services
      */
     public static List<RepositoryService> get() {
-        return new ArrayList<>(savingStrategyServiceMap.values());
+        return new ArrayList<>(repositoryServiceMap.values());
     }
 
     /**
@@ -59,7 +61,21 @@ public class RepositoryStrategyFactory {
      * @return RepositoryService instance for the given name
      */
     public static RepositoryService get(String name) {
-        return savingStrategyServiceMap.get(StrategyConstant.Storage.REPOSITORY_PREFIX + name);
+        String key = repositoryKey(name);
+        if (Objects.isNull(key)) {
+            return null;
+        }
+        return repositoryServiceMap.get(key);
+    }
+
+    /**
+     * Register a repository service with its declared repository name.
+     *
+     * @param service RepositoryService instance to register
+     */
+    public static void put(RepositoryService service) {
+        Objects.requireNonNull(service, "Repository service must not be null");
+        put(service.getRepositoryName(), service);
     }
 
     /**
@@ -69,7 +85,37 @@ public class RepositoryStrategyFactory {
      * @param service RepositoryService instance to register
      */
     public static void put(String name, RepositoryService service) {
-        savingStrategyServiceMap.put(StrategyConstant.Storage.REPOSITORY_PREFIX + name, service);
+        Objects.requireNonNull(service, "Repository service must not be null");
+        String key = repositoryKey(name);
+        if (Objects.isNull(key)) {
+            throw new IllegalArgumentException("Repository strategy name must not be blank");
+        }
+        repositoryServiceMap.put(key, service);
+    }
+
+    /**
+     * Remove repository service by name.
+     *
+     * @param name Name of the repository service
+     */
+    public static void remove(String name) {
+        String key = repositoryKey(name);
+        if (Objects.isNull(key)) {
+            return;
+        }
+        repositoryServiceMap.remove(key);
+    }
+
+    /**
+     * Clear all registered repository services.
+     */
+    public static void clear() {
+        repositoryServiceMap.clear();
+    }
+
+    private static String repositoryKey(String name) {
+        String repositoryName = StringUtils.trimToNull(name);
+        return Objects.isNull(repositoryName) ? null : StrategyConstant.Storage.REPOSITORY_PREFIX + repositoryName;
     }
 
 }

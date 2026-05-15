@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# # The following content will be overwritten by application-[dev|test|pre|pro].yml,
+# The following content will be overwritten by application-[dev|test|pre|pro].yml,
 # that is: if the following properties are configured in application-[dev|test|pre|pro].yml,
 # the property values configured in application.yml will be the main ones.
 spring:

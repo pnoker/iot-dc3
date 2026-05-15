@@ -97,6 +97,56 @@ public class EnvironmentConstant {
     public static final String AUTH_HMAC_SECRET_ENV = "AUTH_HMAC_SECRET";
 
     /**
+     * PostgreSQL profile auto-activation configuration key: "dc3.postgres.auto-profile"
+     */
+    public static final String POSTGRES_AUTO_PROFILE = "dc3.postgres.auto-profile";
+
+    /**
+     * Spring profile name for PostgreSQL-enabled applications: "postgres"
+     */
+    public static final String POSTGRES_PROFILE = "postgres";
+
+    /**
+     * PostgreSQL host environment variable: "POSTGRES_HOST"
+     */
+    public static final String POSTGRES_HOST_ENV = "POSTGRES_HOST";
+
+    /**
+     * PostgreSQL port environment variable: "POSTGRES_PORT"
+     */
+    public static final String POSTGRES_PORT_ENV = "POSTGRES_PORT";
+
+    /**
+     * PostgreSQL database environment variable: "POSTGRES_DB"
+     */
+    public static final String POSTGRES_DB_ENV = "POSTGRES_DB";
+
+    /**
+     * PostgreSQL schema environment variable: "POSTGRES_SCHEMA"
+     */
+    public static final String POSTGRES_SCHEMA_ENV = "POSTGRES_SCHEMA";
+
+    /**
+     * PostgreSQL username environment variable: "POSTGRES_USERNAME"
+     */
+    public static final String POSTGRES_USERNAME_ENV = "POSTGRES_USERNAME";
+
+    /**
+     * PostgreSQL password environment variable: "POSTGRES_PASSWORD"
+     */
+    public static final String POSTGRES_PASSWORD_ENV = "POSTGRES_PASSWORD";
+
+    /**
+     * Repository profile auto-activation configuration key: "dc3.repository.auto-profile"
+     */
+    public static final String REPOSITORY_AUTO_PROFILE = "dc3.repository.auto-profile";
+
+    /**
+     * Spring profile name for repository-enabled applications: "repository"
+     */
+    public static final String REPOSITORY_PROFILE = "repository";
+
+    /**
      * Driver tenant name configuration key: "dc3.driver.tenant"
      */
     public static final String DRIVER_TENANT = "dc3.driver.tenant";

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -40,14 +41,20 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActivePostgresProfileConfig implements EnvironmentPostProcessor {
 
-    @Override
     /**
-     * Post-process the Spring environment to activate PostgreSQL profile
+     * Post-process the Spring environment to activate PostgreSQL profile.
+     *
      * @param environment ConfigurableEnvironment to modify
      * @param application SpringApplication instance
      */
+    @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("postgres");
+        if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.POSTGRES_AUTO_PROFILE, Boolean.class,
+                Boolean.TRUE))) {
+            log.debug("Skipping postgres profile activation, {}=false", EnvironmentConstant.POSTGRES_AUTO_PROFILE);
+            return;
+        }
+        environment.addActiveProfile(EnvironmentConstant.POSTGRES_PROFILE);
     }
 
 }

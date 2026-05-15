@@ -18,7 +18,7 @@ utility support for all services that use PostgreSQL as their primary storage.
 |-------------------------------|----------------------------------------------------------------------------------------------|
 | `MybatisPlusConfig`           | Configures `MybatisPlusInterceptor` with pagination plugin; sets default enum type handler   |
 | `MybatisUtil`                 | Utility methods for building MyBatis-Plus `LambdaQueryWrapper` conditions from query objects |
-| `ActivePostgresProfileConfig` | Profile-conditional config activation                                                        |
+| `ActivePostgresProfileConfig` | Activates the `postgres` profile unless `dc3.postgres.auto-profile=false` is set             |
 
 ## Configuration Properties
 
@@ -34,6 +34,10 @@ spring:
           username: ${POSTGRES_USERNAME:dc3}
           password: ${POSTGRES_PASSWORD:dc3dc3dc3}
 ```
+
+Set `dc3.postgres.auto-profile=false` to opt out of automatic `postgres` profile activation.
+Applications can override the shared MyBatis-Plus pagination interceptor by declaring their own
+`MybatisPlusInterceptor` bean.
 
 ## Schema Isolation
 
@@ -61,4 +65,3 @@ mvn -s ../../.mvn/settings.xml clean package
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-
