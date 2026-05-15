@@ -155,7 +155,8 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
                 connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
                 log.error("Driver connection failed, protocol=opcDa, deviceId={}, host={}, clsId={}", deviceId, host,
                         clsId, e);
-                throw new ConnectorException(e.getMessage());
+                throw new ConnectorException("Driver connection failed, protocol=opcDa, deviceId={}, host={}, clsId={}, message={}",
+                        deviceId, host, clsId, e.getMessage(), e);
             }
         }
         return server;
@@ -196,7 +197,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
                  | UnknownHostException e) {
             server.dispose();
             log.error("Driver point read failed, protocol=opcDa", e);
-            throw new ReadPointException(e.getMessage());
+            throw new ReadPointException("Driver point read failed, protocol=opcDa, message={}", e.getMessage(), e);
         }
     }
 
@@ -255,7 +256,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
                  | JIException e) {
             server.dispose();
             log.error("Driver point write failed, protocol=opcDa", e);
-            throw new WritePointException(e.getMessage());
+            throw new WritePointException("Driver point write failed, protocol=opcDa, message={}", e.getMessage(), e);
         }
     }
 
