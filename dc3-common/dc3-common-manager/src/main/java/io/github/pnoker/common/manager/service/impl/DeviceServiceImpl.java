@@ -315,7 +315,7 @@ public class DeviceServiceImpl implements DeviceService {
         try {
             workbook = new XSSFWorkbook(file);
         } catch (Exception e) {
-            throw new ImportException("The import template file incorrectly: {}", e.getMessage());
+            throw new ImportException("The import template file incorrectly: {}", e.getMessage(), e);
         }
 
         if (!configIsEqual(workbook, driverAttributeBOList, pointAttributeBOList, pointBOList)) {
@@ -344,7 +344,7 @@ public class DeviceServiceImpl implements DeviceService {
         try {
             FileUtils.delete(file);
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            log.error("Failed to delete imported device file: {}", file, e);
         }
     }
 
@@ -512,7 +512,7 @@ public class DeviceServiceImpl implements DeviceService {
                 workbook.write(outputStream);
             }
         } catch (IOException e) {
-            throw new ServiceException("Generate template error: {}", e.getMessage());
+            throw new ServiceException("Generate template error: {}", e.getMessage(), e);
         }
         return path;
     }
@@ -529,8 +529,9 @@ public class DeviceServiceImpl implements DeviceService {
                 entityBO.setDeviceId(entityDO.getId());
                 entityBO.setTenantId(entityDO.getTenantId());
                 profileBindService.save(entityBO);
-            } catch (Exception ignored) {
-                // nothing to do
+            } catch (Exception e) {
+                log.warn("Skip profile bind during device save, deviceId={}, profileId={}, error={}",
+                        entityDO.getId(), profileId, e.getMessage(), e);
             }
         });
 

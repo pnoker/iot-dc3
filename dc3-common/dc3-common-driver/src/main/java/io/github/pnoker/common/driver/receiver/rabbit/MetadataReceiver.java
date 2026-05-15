@@ -122,7 +122,11 @@ public class MetadataReceiver {
             }
             RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Driver metadata consume failed, metadataType={}, operateType={}, id={}, deliveryTag={}, routingKey={}",
+                    Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
+                    Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null,
+                    Objects.nonNull(entityDTO) ? entityDTO.getId() : null,
+                    deliveryTag, message.getMessageProperties().getReceivedRoutingKey(), e);
             RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }

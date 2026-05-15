@@ -32,6 +32,12 @@ class ExceptionMessageFormatterTest {
         return (String) method.invoke(null, template, params);
     }
 
+    private Throwable invokeCause(Object... params) throws Exception {
+        Method method = ExceptionMessageFormatter.class.getDeclaredMethod("cause", Object[].class);
+        method.setAccessible(true);
+        return (Throwable) method.invoke(null, new Object[]{params});
+    }
+
     @Test
     void returnsTemplateWhenNoPlaceholders() throws Exception {
         assertThat(invokeFormat("static text", "ignored")).isEqualTo("static text");
@@ -75,5 +81,13 @@ class ExceptionMessageFormatterTest {
     void preservesSurroundingText() throws Exception {
         assertThat(invokeFormat("[before:{}:after]", "x"))
                 .isEqualTo("[before:x:after]");
+    }
+
+    @Test
+    void trailingThrowableIsCauseNotFormatParam() throws Exception {
+        IllegalStateException cause = new IllegalStateException("root");
+        assertThat(invokeFormat("operation {} failed", "sync", cause))
+                .isEqualTo("operation sync failed");
+        assertThat(invokeCause("sync", cause)).isSameAs(cause);
     }
 }

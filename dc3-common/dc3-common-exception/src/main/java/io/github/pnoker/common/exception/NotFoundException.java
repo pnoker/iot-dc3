@@ -35,7 +35,7 @@ public class NotFoundException extends RuntimeException {
     }
 
     public NotFoundException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
 }

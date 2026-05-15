@@ -180,7 +180,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             drivers = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             future.cancel(true);
-            log.warn("Driver summary failed: {}", e.getMessage(), e);
+            log.warn("Driver summary failed, tenantId={}", tenantId, e);
             return summary;
         }
         int online = 0;
@@ -209,7 +209,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             devices = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             future.cancel(true);
-            log.warn("Device summary failed: {}", e.getMessage(), e);
+            log.warn("Device summary failed, tenantId={}", tenantId, e);
             return summary;
         }
         int online = 0;

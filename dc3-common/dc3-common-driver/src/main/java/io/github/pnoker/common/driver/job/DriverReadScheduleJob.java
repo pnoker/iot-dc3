@@ -81,7 +81,7 @@ public class DriverReadScheduleJob extends QuartzJobBean {
                     try {
                         driverReadService.read(deviceId, pointId);
                     } catch (Exception e) {
-                        log.error("Read device[{}], point[{}] error: {}", deviceId, pointId, e.getMessage(), e);
+                        log.error("Driver point read schedule failed, deviceId={}, pointId={}", deviceId, pointId, e);
                     }
                 }
             }

@@ -35,7 +35,7 @@ public class CronException extends RuntimeException {
     }
 
     public CronException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
 }

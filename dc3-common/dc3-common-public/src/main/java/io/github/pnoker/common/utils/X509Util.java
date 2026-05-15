@@ -98,7 +98,7 @@ public class X509Util {
 
             return context.getSocketFactory();
         } catch (Exception e) {
-            throw new ConnectorException(e.getMessage());
+            throw new ConnectorException("Failed to create X509 SSL socket factory: {}", e.getMessage(), e);
         }
     }
 

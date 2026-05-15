@@ -35,7 +35,7 @@ public class TypeException extends RuntimeException {
     }
 
     public TypeException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
 }
