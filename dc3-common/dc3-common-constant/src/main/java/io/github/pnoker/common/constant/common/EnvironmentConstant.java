@@ -112,6 +112,16 @@ public class EnvironmentConstant {
     public static final String RABBITMQ_PROFILE = "rabbitmq";
 
     /**
+     * Quartz profile auto-activation configuration key: "dc3.quartz.auto-profile"
+     */
+    public static final String QUARTZ_AUTO_PROFILE = "dc3.quartz.auto-profile";
+
+    /**
+     * Spring profile name for Quartz-enabled applications: "quartz"
+     */
+    public static final String QUARTZ_PROFILE = "quartz";
+
+    /**
      * Driver host configuration key: "dc3.driver.host"
      */
     public static final String DRIVER_HOST = "dc3.driver.host";

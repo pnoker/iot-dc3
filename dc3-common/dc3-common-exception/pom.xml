@@ -66,4 +66,14 @@
         <developerConnection>scm:git:https://github.com/pnoker/iot-dc3.git</developerConnection>
     </scm>
 
+    <dependencies>
+
+        <!-- DC3 Common Related -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-constant</artifactId>
+        </dependency>
+
+    </dependencies>
+
 </project>

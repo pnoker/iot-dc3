@@ -28,13 +28,12 @@ import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
-import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,11 +50,8 @@ class QuartzServiceTest {
     private QuartzService service;
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new QuartzService();
-        Field field = QuartzService.class.getDeclaredField("scheduler");
-        field.setAccessible(true);
-        field.set(service, scheduler);
+    void setUp() {
+        service = new QuartzService(scheduler);
     }
 
     @Test
@@ -79,6 +75,36 @@ class QuartzServiceTest {
     }
 
     @Test
+    void createJobWithIntervalHonorsIntervalUnit() throws SchedulerException {
+        service.createJobWithInterval("group-1", "job-1", 2, DateBuilder.IntervalUnit.MINUTE, SampleJob.class);
+
+        ArgumentCaptor<Trigger> triggerCaptor = ArgumentCaptor.forClass(Trigger.class);
+        verify(scheduler).scheduleJob(org.mockito.ArgumentMatchers.any(JobDetail.class), triggerCaptor.capture());
+
+        SimpleTrigger simple = (SimpleTrigger) triggerCaptor.getValue();
+        assertThat(simple.getRepeatInterval()).isEqualTo(120_000L);
+    }
+
+    @Test
+    void createJobWithIntervalRejectsInvalidInputs() {
+        assertThatThrownBy(() -> service.createJobWithInterval("g", "n", 0, DateBuilder.IntervalUnit.SECOND,
+                SampleJob.class)).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Interval");
+        assertThatThrownBy(() -> service.createJobWithInterval("g", "n", 1, DateBuilder.IntervalUnit.MONTH,
+                SampleJob.class)).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("variable length");
+    }
+
+    @Test
+    void createJobDeletesExistingJobBeforeScheduling() throws SchedulerException {
+        when(scheduler.checkExists(JobKey.jobKey("job-1", "group-1"))).thenReturn(true);
+
+        service.createJobWithInterval("group-1", "job-1", 5, DateBuilder.IntervalUnit.SECOND, SampleJob.class);
+
+        verify(scheduler).deleteJob(JobKey.jobKey("job-1", "group-1"));
+    }
+
+    @Test
     void createJobWithCronRegistersDetailAndCronTrigger() throws SchedulerException {
         service.createJobWithCron("group-2", "job-2", "0 0/5 * * * ?", SampleJob.class);
 
@@ -95,7 +121,8 @@ class QuartzServiceTest {
     @Test
     void createJobWithCronRejectsInvalidExpression() {
         assertThatThrownBy(() -> service.createJobWithCron("g", "n", "garbage", SampleJob.class))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Cron expression is invalid");
     }
 
     @Test
@@ -108,8 +135,17 @@ class QuartzServiceTest {
     @Test
     void startSchedulerStartsWhenLive() throws SchedulerException {
         when(scheduler.isShutdown()).thenReturn(false);
+        when(scheduler.isStarted()).thenReturn(false);
         service.startScheduler();
         verify(scheduler).start();
+    }
+
+    @Test
+    void startSchedulerNoOpsWhenAlreadyStarted() throws SchedulerException {
+        when(scheduler.isShutdown()).thenReturn(false);
+        when(scheduler.isStarted()).thenReturn(true);
+        service.startScheduler();
+        verify(scheduler, never()).start();
     }
 
     @Test
@@ -127,8 +163,16 @@ class QuartzServiceTest {
     }
 
     @Test
+    void stopSchedulerCanWaitForJobsToComplete() throws SchedulerException {
+        when(scheduler.isShutdown()).thenReturn(false);
+        service.stopScheduler(true);
+        verify(scheduler).shutdown(true);
+    }
+
+    @Test
     void startSchedulerPropagatesFailure() throws SchedulerException {
         when(scheduler.isShutdown()).thenReturn(false);
+        when(scheduler.isStarted()).thenReturn(false);
         org.mockito.Mockito.doThrow(new SchedulerException("boom")).when(scheduler).start();
         assertThatThrownBy(() -> service.startScheduler()).isInstanceOf(SchedulerException.class);
     }
