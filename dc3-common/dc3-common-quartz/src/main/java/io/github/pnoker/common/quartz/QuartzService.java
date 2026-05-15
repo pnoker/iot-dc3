@@ -17,19 +17,21 @@
 
 package io.github.pnoker.common.quartz;
 
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronScheduleBuilder;
+import org.quartz.CronExpression;
 import org.quartz.DateBuilder;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
+
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Quartz Scheduler Service Utility
@@ -44,12 +46,13 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Slf4j
-@AutoConfiguration
 public class QuartzService {
 
-    @Resource
-    private Scheduler scheduler;
+    private final Scheduler scheduler;
+
+    public QuartzService(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
 
     /**
      * Create scheduled job with interval trigger
@@ -63,13 +66,20 @@ public class QuartzService {
      */
     public void createJobWithInterval(String group, String name, Integer interval,
                                       DateBuilder.IntervalUnit intervalUnit, Class<? extends Job> jobClass) throws SchedulerException {
+        validateIdentity(group, name, jobClass);
+        if (Objects.isNull(interval) || interval <= 0) {
+            throw new IllegalArgumentException("Interval must be greater than 0");
+        }
+        long intervalMillis = toMillis(interval, intervalUnit);
+
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(name, group)
-                .startAt(DateBuilder.futureDate(1, intervalUnit))
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(interval).repeatForever())
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(intervalMillis)
+                        .repeatForever())
                 .startNow()
                 .build();
+        deleteExistingJob(group, name);
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
@@ -84,13 +94,21 @@ public class QuartzService {
      */
     public void createJobWithCron(String group, String name, String cron, Class<? extends Job> jobClass)
             throws SchedulerException {
+        validateIdentity(group, name, jobClass);
+        if (Objects.isNull(cron) || cron.isBlank()) {
+            throw new IllegalArgumentException("Cron expression must not be blank");
+        }
+        if (!CronExpression.isValidExpression(cron)) {
+            throw new IllegalArgumentException("Cron expression is invalid: " + cron);
+        }
+
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(name, group)
-                .startAt(DateBuilder.futureDate(1, DateBuilder.IntervalUnit.SECOND))
                 .withSchedule(CronScheduleBuilder.cronSchedule(cron))
                 .startNow()
                 .build();
+        deleteExistingJob(group, name);
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
@@ -100,7 +118,7 @@ public class QuartzService {
      * @throws SchedulerException SchedulerException
      */
     public void startScheduler() throws SchedulerException {
-        if (!scheduler.isShutdown()) {
+        if (!scheduler.isShutdown() && !scheduler.isStarted()) {
             scheduler.start();
         }
     }
@@ -116,6 +134,53 @@ public class QuartzService {
         if (!scheduler.isShutdown()) {
             scheduler.shutdown();
         }
+    }
+
+    /**
+     * Stop the scheduler service.
+     *
+     * @param waitForJobsToComplete whether to wait for currently executing jobs to finish
+     * @throws SchedulerException SchedulerException
+     */
+    public void stopScheduler(boolean waitForJobsToComplete) throws SchedulerException {
+        if (!scheduler.isShutdown()) {
+            scheduler.shutdown(waitForJobsToComplete);
+        }
+    }
+
+    private void deleteExistingJob(String group, String name) throws SchedulerException {
+        JobKey jobKey = JobKey.jobKey(name, group);
+        if (scheduler.checkExists(jobKey)) {
+            scheduler.deleteJob(jobKey);
+        }
+    }
+
+    private static void validateIdentity(String group, String name, Class<? extends Job> jobClass) {
+        if (Objects.isNull(group) || group.isBlank()) {
+            throw new IllegalArgumentException("Job group must not be blank");
+        }
+        if (Objects.isNull(name) || name.isBlank()) {
+            throw new IllegalArgumentException("Job name must not be blank");
+        }
+        if (Objects.isNull(jobClass)) {
+            throw new IllegalArgumentException("Job class must not be null");
+        }
+    }
+
+    private static long toMillis(int interval, DateBuilder.IntervalUnit intervalUnit) {
+        if (Objects.isNull(intervalUnit)) {
+            throw new IllegalArgumentException("Interval unit must not be null");
+        }
+        return switch (intervalUnit) {
+            case MILLISECOND -> interval;
+            case SECOND -> TimeUnit.SECONDS.toMillis(interval);
+            case MINUTE -> TimeUnit.MINUTES.toMillis(interval);
+            case HOUR -> TimeUnit.HOURS.toMillis(interval);
+            case DAY -> TimeUnit.DAYS.toMillis(interval);
+            case WEEK -> TimeUnit.DAYS.toMillis(interval * 7L);
+            case MONTH, YEAR -> throw new IllegalArgumentException(
+                    "Interval unit " + intervalUnit + " has variable length and is not supported");
+        };
     }
 
 }

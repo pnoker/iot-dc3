@@ -17,6 +17,11 @@
 
 package io.github.pnoker.common.auth.biz.impl;
 
+import static io.github.pnoker.common.constant.service.AuthConstant.API_GROUP_NODE_CODE_PREFIX;
+import static io.github.pnoker.common.constant.service.AuthConstant.API_RESOURCE_CODE_PREFIX;
+import static io.github.pnoker.common.constant.service.AuthConstant.API_SERVICE_NODE_CODE_PREFIX;
+import static io.github.pnoker.common.constant.service.AuthConstant.MENU_RESOURCE_CODE_PREFIX;
+
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.auth.biz.ResourceRegistrySyncService;
 import io.github.pnoker.common.auth.dal.ApiManager;
@@ -64,31 +69,6 @@ import java.util.Set;
 @Service
 public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncService {
 
-    /**
-     * dc3_resource.resource_code prefix for API leaf rows (one per dc3_api row). Other
-     * resource types should use their own prefixes (e.g. {@code menu:}).
-     */
-    private static final String RESOURCE_CODE_PREFIX = "api:";
-
-    /**
-     * Resource code prefix for the virtual service-grouping node — one per serviceName,
-     * parent = 0, entity_id = 0. Exists only to give the Resource tree a root per
-     * service.
-     */
-    private static final String SERVICE_NODE_CODE_PREFIX = "api:service:";
-
-    /**
-     * Resource code prefix for the virtual apiGroup-grouping node — one per (serviceName,
-     * apiGroup) pair, parent = the corresponding service node, entity_id = 0. Clusters
-     * sibling endpoints under their owning controller.
-     */
-    private static final String GROUP_NODE_CODE_PREFIX = "api:group:";
-
-    /**
-     * Resource code prefix for MENU-type leaves. Each dc3_menu row owns one dc3_resource
-     * row; parent_resource_id mirrors the parent menu's resource.
-     */
-    private static final String MENU_RESOURCE_CODE_PREFIX = "menu:";
     @Resource
     private ApiManager apiManager;
     @Resource
@@ -297,7 +277,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         ResourceDO resource = new ResourceDO();
         resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
         resource.setResourceName(api.getApiName());
-        resource.setResourceCode(RESOURCE_CODE_PREFIX + api.getApiCode());
+        resource.setResourceCode(API_RESOURCE_CODE_PREFIX + api.getApiCode());
         resource.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
         resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
         resource.setEntityId(api.getId());
@@ -382,7 +362,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private void applyLeafResourceUpdates(ResourceDO resource, ApiDO api, Long groupNodeId) {
         resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
         resource.setResourceName(api.getApiName());
-        resource.setResourceCode(RESOURCE_CODE_PREFIX + api.getApiCode());
+        resource.setResourceCode(API_RESOURCE_CODE_PREFIX + api.getApiCode());
         resource.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
         resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
         resource.setEntityId(api.getId());
@@ -400,7 +380,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!Objects.equals(resource.getResourceName(), api.getApiName())) {
             return true;
         }
-        if (!Objects.equals(resource.getResourceCode(), RESOURCE_CODE_PREFIX + api.getApiCode())) {
+        if (!Objects.equals(resource.getResourceCode(), API_RESOURCE_CODE_PREFIX + api.getApiCode())) {
             return true;
         }
         if (!Objects.equals(resource.getResourceTypeFlag(), ResourceTypeFlagEnum.API.getIndex())) {
@@ -420,7 +400,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     }
 
     private Long ensureServiceNode(String serviceName) {
-        String code = SERVICE_NODE_CODE_PREFIX + serviceName;
+        String code = API_SERVICE_NODE_CODE_PREFIX + serviceName;
         ResourceDO existing = findByResourceCode(code);
         if (Objects.nonNull(existing)) {
             if (needsGroupingNodeUpdate(existing, 0L, serviceName, code, "Service grouping node (auto-registered)")) {
@@ -446,7 +426,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private Map<String, Long> ensureGroupNodes(String serviceName, Long serviceNodeId, Set<String> targetGroups) {
         Map<String, Long> result = new HashMap<>(targetGroups.size());
         for (String group : targetGroups) {
-            String code = GROUP_NODE_CODE_PREFIX + serviceName + ":" + group;
+            String code = API_GROUP_NODE_CODE_PREFIX + serviceName + ":" + group;
             ResourceDO existing = findByResourceCode(code);
             if (Objects.isNull(existing)) {
                 ResourceDO node = new ResourceDO();
@@ -531,7 +511,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private int cleanupOrphanGroupingNodes(String serviceName) {
         int removed = 0;
         List<ResourceDO> groupNodes = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
-                .likeRight(ResourceDO::getResourceCode, GROUP_NODE_CODE_PREFIX + serviceName + ":")
+                .likeRight(ResourceDO::getResourceCode, API_GROUP_NODE_CODE_PREFIX + serviceName + ":")
                 .eq(ResourceDO::getEntityId, 0L));
         List<Long> idsToDrop = new ArrayList<>();
         for (ResourceDO node : groupNodes) {
@@ -545,7 +525,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             resourceManager.removeByIds(idsToDrop);
             removed += idsToDrop.size();
         }
-        ResourceDO serviceNode = findByResourceCode(SERVICE_NODE_CODE_PREFIX + serviceName);
+        ResourceDO serviceNode = findByResourceCode(API_SERVICE_NODE_CODE_PREFIX + serviceName);
         if (Objects.nonNull(serviceNode)) {
             long children = resourceManager
                     .count(Wrappers.<ResourceDO>lambdaQuery().eq(ResourceDO::getParentResourceId, serviceNode.getId()));

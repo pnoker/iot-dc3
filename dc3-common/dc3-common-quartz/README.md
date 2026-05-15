@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-quartz` is the shared Quartz scheduler module of the IoT DC3 platform. It provides a reusable
-`QuartzService` for programmatically creating, updating, pausing, and
-triggering scheduled jobs across services, primarily used in the Manager Center for platform-level periodic tasks.
+`QuartzService` for programmatically registering scheduled jobs across services, primarily used by Data, Manager,
+MQTT, and Driver modules for periodic tasks.
 
 ## Module Information
 
@@ -16,17 +16,20 @@ triggering scheduled jobs across services, primarily used in the Manager Center 
 
 | Component                   | Purpose                                                                           |
 |-----------------------------|-----------------------------------------------------------------------------------|
-| `QuartzService`             | Lifecycle management for Quartz jobs: add, update, delete, pause, resume, trigger |
-| `ActiveQuartzProfileConfig` | Conditionally activates Quartz config based on active profile                     |
+| `QuartzConfig`              | Auto-configures the shared `QuartzService` bean |
+| `QuartzService`             | Registers cron / fixed-interval Quartz jobs and controls scheduler lifecycle |
+| `ActiveQuartzProfileConfig` | Activates the `quartz` profile unless `dc3.quartz.auto-profile=false` is set |
 
 ## Usage
 
 ```java
-// Schedule a job
-quartzService.createJob(MyJob.class, "jobName", "groupName", "0 0 * * * ?");
+// Register a cron job. Re-registering the same group/name replaces the existing job.
+quartzService.createJobWithCron("groupName", "jobName", "0 0 * * * ?", MyJob.class);
 
-// Update cron expression
-quartzService.updateJob("jobName", "groupName", "0 0/30 * * * ?");
+// Register a fixed-interval job.
+quartzService.createJobWithInterval("groupName", "jobName", 5, DateBuilder.IntervalUnit.SECOND, MyJob.class);
+
+quartzService.startScheduler();
 ```
 
 ## Build Instructions
@@ -44,4 +47,3 @@ mvn -s ../../.mvn/settings.xml clean package
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-
