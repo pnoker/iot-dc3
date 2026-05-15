@@ -48,7 +48,7 @@ public class CmdUtil {
      */
     public static void destroyProcessWithCmd(Process process, String cmd) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
-            if (!cmd.equals(StringUtils.EMPTY)) {
+            if (StringUtils.isNotEmpty(cmd)) {
                 writer.write(cmd);
                 writer.flush();
             }

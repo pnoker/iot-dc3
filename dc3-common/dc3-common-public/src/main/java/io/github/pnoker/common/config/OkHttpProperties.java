@@ -22,8 +22,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 /**
- * Shared HMAC signing properties.
+ * Shared OkHttp client properties.
  *
  * @author pnoker
  * @version 2026.5.10
@@ -31,12 +33,42 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = EnvironmentConstant.AUTH_HMAC_PREFIX)
-public class HmacAuthProperties {
+@ConfigurationProperties(prefix = EnvironmentConstant.HTTP_CLIENT_PREFIX)
+public class OkHttpProperties {
 
     /**
-     * Shared HMAC secret. Blank disables request-header signing.
+     * Whether OkHttp should retry recoverable connection failures.
      */
-    private String secret = "";
+    private boolean retryOnConnectionFailure = true;
+
+    /**
+     * Maximum idle connections retained by the shared connection pool.
+     */
+    private int maxIdleConnections = 16;
+
+    /**
+     * How long idle connections stay in the pool.
+     */
+    private Duration keepAliveDuration = Duration.ofSeconds(5);
+
+    /**
+     * End-to-end call timeout.
+     */
+    private Duration callTimeout = Duration.ofSeconds(15);
+
+    /**
+     * TCP connection timeout.
+     */
+    private Duration connectTimeout = Duration.ofSeconds(15);
+
+    /**
+     * Socket read timeout.
+     */
+    private Duration readTimeout = Duration.ofSeconds(15);
+
+    /**
+     * Socket write timeout.
+     */
+    private Duration writeTimeout = Duration.ofSeconds(15);
 
 }

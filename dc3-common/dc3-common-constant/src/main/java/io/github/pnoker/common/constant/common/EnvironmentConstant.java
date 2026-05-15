@@ -77,6 +77,26 @@ public class EnvironmentConstant {
     public static final String SPRING_APPLICATION_NAME = "spring.application.name";
 
     /**
+     * Shared HTTP client configuration prefix: "dc3.http.client"
+     */
+    public static final String HTTP_CLIENT_PREFIX = "dc3.http.client";
+
+    /**
+     * Shared HMAC configuration prefix: "dc3.auth.hmac"
+     */
+    public static final String AUTH_HMAC_PREFIX = "dc3.auth.hmac";
+
+    /**
+     * Shared HMAC secret configuration key: "dc3.auth.hmac.secret"
+     */
+    public static final String AUTH_HMAC_SECRET_PROPERTY = "dc3.auth.hmac.secret";
+
+    /**
+     * Shared HMAC secret environment variable: "AUTH_HMAC_SECRET"
+     */
+    public static final String AUTH_HMAC_SECRET_ENV = "AUTH_HMAC_SECRET";
+
+    /**
      * Driver tenant name configuration key: "dc3.driver.tenant"
      */
     public static final String DRIVER_TENANT = "dc3.driver.tenant";
