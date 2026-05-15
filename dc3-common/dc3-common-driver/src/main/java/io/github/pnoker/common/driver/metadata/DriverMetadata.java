@@ -53,41 +53,49 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class DriverMetadata {
 
     /**
+     * Identifiers of devices owned by the driver.
+     */
+    private final Set<Long> deviceIds = ConcurrentHashMap.newKeySet();
+    /**
+     * Driver attributes keyed by attribute identifier.
+     */
+    private final Map<Long, DriverAttributeDTO> driverAttributeIdMap = new ConcurrentHashMap<>();
+    /**
+     * Driver attributes keyed by attribute code.
+     */
+    private final Map<String, DriverAttributeDTO> driverAttributeNameMap = new ConcurrentHashMap<>();
+    /**
+     * Point attributes keyed by attribute identifier.
+     */
+    private final Map<Long, PointAttributeDTO> pointAttributeIdMap = new ConcurrentHashMap<>();
+    /**
+     * Point attributes keyed by attribute code.
+     */
+    private final Map<String, PointAttributeDTO> pointAttributeNameMap = new ConcurrentHashMap<>();
+    /**
      * Current driver status.
      */
     @Setter
     private DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
-
     /**
      * Registered driver definition.
      */
     @Setter
     private DriverBO driver;
 
-    /**
-     * Identifiers of devices owned by the driver.
-     */
-    private final Set<Long> deviceIds = ConcurrentHashMap.newKeySet();
+    private static <E> void replaceContents(Set<E> target, Set<E> source) {
+        target.clear();
+        if (Objects.nonNull(source)) {
+            target.addAll(source);
+        }
+    }
 
-    /**
-     * Driver attributes keyed by attribute identifier.
-     */
-    private final Map<Long, DriverAttributeDTO> driverAttributeIdMap = new ConcurrentHashMap<>();
-
-    /**
-     * Driver attributes keyed by attribute code.
-     */
-    private final Map<String, DriverAttributeDTO> driverAttributeNameMap = new ConcurrentHashMap<>();
-
-    /**
-     * Point attributes keyed by attribute identifier.
-     */
-    private final Map<Long, PointAttributeDTO> pointAttributeIdMap = new ConcurrentHashMap<>();
-
-    /**
-     * Point attributes keyed by attribute code.
-     */
-    private final Map<String, PointAttributeDTO> pointAttributeNameMap = new ConcurrentHashMap<>();
+    private static <K, V> void replaceContents(Map<K, V> target, Map<K, V> source) {
+        target.clear();
+        if (Objects.nonNull(source)) {
+            target.putAll(source);
+        }
+    }
 
     public void setDeviceIds(Set<Long> deviceIds) {
         replaceContents(this.deviceIds, deviceIds);
@@ -107,20 +115,6 @@ public final class DriverMetadata {
 
     public void setPointAttributeNameMap(Map<String, PointAttributeDTO> pointAttributeNameMap) {
         replaceContents(this.pointAttributeNameMap, pointAttributeNameMap);
-    }
-
-    private static <E> void replaceContents(Set<E> target, Set<E> source) {
-        target.clear();
-        if (Objects.nonNull(source)) {
-            target.addAll(source);
-        }
-    }
-
-    private static <K, V> void replaceContents(Map<K, V> target, Map<K, V> source) {
-        target.clear();
-        if (Objects.nonNull(source)) {
-            target.putAll(source);
-        }
     }
 
 }

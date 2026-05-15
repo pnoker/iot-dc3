@@ -170,7 +170,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
      */
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                       PointBO point) {
+                               PointBO point) {
         /*
          * Hint: The logic here is for reference only; please modify it according to the
          * actual application scenario.

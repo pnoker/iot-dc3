@@ -72,17 +72,6 @@
 
         <!-- DC3 Version -->
         <dc3.version>2026.5.5</dc3.version>
-
-        <!-- Test toolchain (mirrored from iot-dc3 root pom; needed because
-             dc3-common inherits from the external dc3-parent and therefore
-             cannot read the root reactor's dependencyManagement). -->
-        <testcontainers.version>1.21.4</testcontainers.version>
-        <junit.bom.version>5.11.3</junit.bom.version>
-        <assertj.version>3.26.3</assertj.version>
-        <awaitility.version>4.2.2</awaitility.version>
-        <instancio.version>5.3.0</instancio.version>
-        <rest-assured.version>5.5.0</rest-assured.version>
-        <wiremock.version>3.10.0</wiremock.version>
     </properties>
 
     <modules>
@@ -173,50 +162,6 @@
 
     <dependencyManagement>
         <dependencies>
-
-            <!-- Test BOMs imported here so dc3-common-* modules can omit
-                 explicit versions on JUnit 5 / Testcontainers dependencies. -->
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>${junit.bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainers.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!-- Test toolchain pinned versions -->
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitility.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.instancio</groupId>
-                <artifactId>instancio-junit</artifactId>
-                <version>${instancio.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>rest-assured</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wiremock</groupId>
-                <artifactId>wiremock-standalone</artifactId>
-                <version>${wiremock.version}</version>
-            </dependency>
 
             <!-- DC3 Api Related -->
             <dependency>

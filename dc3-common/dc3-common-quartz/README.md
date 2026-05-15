@@ -14,9 +14,9 @@ MQTT, and Driver modules for periodic tasks.
 
 ## Key Components
 
-| Component                   | Purpose                                                                           |
-|-----------------------------|-----------------------------------------------------------------------------------|
-| `QuartzConfig`              | Auto-configures the shared `QuartzService` bean |
+| Component                   | Purpose                                                                      |
+|-----------------------------|------------------------------------------------------------------------------|
+| `QuartzConfig`              | Auto-configures the shared `QuartzService` bean                              |
 | `QuartzService`             | Registers cron / fixed-interval Quartz jobs and controls scheduler lifecycle |
 | `ActiveQuartzProfileConfig` | Activates the `quartz` profile unless `dc3.quartz.auto-profile=false` is set |
 

@@ -122,7 +122,7 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                       PointBO point) {
+                               PointBO point) {
         return new ReadPointValue(device, point,
                 readValue(getConnector(device.getId(), driverConfig), pointConfig, point.getPointTypeFlag().getCode()));
     }
@@ -231,9 +231,9 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      * <p>
      * Function codes: 1=write coil, 3=write holding register. Others return false.
      *
-     * @param modbusMaster active Modbus connection
-     * @param pointConfig  point configuration (slaveId, functionCode, offset)
-     * @param writePointValue       value to write
+     * @param modbusMaster    active Modbus connection
+     * @param pointConfig     point configuration (slaveId, functionCode, offset)
+     * @param writePointValue value to write
      * @return true if write succeeded, false if failed or unsupported function code
      */
     private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
@@ -282,10 +282,10 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Write a boolean value to a Modbus coil.
      *
-     * @param modbusMaster active Modbus connection
-     * @param slaveId      target slave address
-     * @param offset       coil offset
-     * @param writePointValue       value containing the boolean to write
+     * @param modbusMaster    active Modbus connection
+     * @param slaveId         target slave address
+     * @param offset          coil offset
+     * @param writePointValue value containing the boolean to write
      * @return the coil write response
      * @throws WritePointException if a transport error occurs
      */
@@ -303,10 +303,10 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Write a numeric value to a Modbus holding register via the given locator.
      *
-     * @param modbusMaster active Modbus connection
-     * @param locator      identifies the target register
-     * @param writePointValue       value to write (read as Float)
-     * @param <T>          value type determined by the locator
+     * @param modbusMaster    active Modbus connection
+     * @param locator         identifies the target register
+     * @param writePointValue value to write (read as Float)
+     * @param <T>             value type determined by the locator
      * @throws WritePointException if a transport or error response occurs
      */
     private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WritePointValue writePointValue) {

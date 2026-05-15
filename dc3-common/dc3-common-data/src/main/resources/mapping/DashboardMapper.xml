@@ -23,8 +23,8 @@
         SELECT COUNT(*)
         FROM dc3_point_value
         WHERE create_time &gt;= #{from}
-          AND create_time &lt; #{to}
-          AND tenant_id = #{tenantId}
+        AND create_time &lt; #{to}
+        AND tenant_id = #{tenantId}
     </select>
 
     <select id="countTotal" resultType="long">
@@ -49,11 +49,11 @@
     -->
     <select id="timeseries" resultType="io.github.pnoker.common.data.entity.bo.dashboard.TimeBucketRow">
         SELECT public.time_bucket(INTERVAL '${bucket}', create_time) AS bucket,
-               COUNT(*)                                              AS count
+        COUNT(*) AS count
         FROM dc3_point_value
         WHERE create_time &gt;= #{from}
-          AND create_time &lt; #{to}
-          AND tenant_id = #{tenantId}
+        AND create_time &lt; #{to}
+        AND tenant_id = #{tenantId}
         GROUP BY bucket
         ORDER BY bucket ASC
     </select>
@@ -65,11 +65,11 @@
     -->
     <select id="top" resultType="io.github.pnoker.common.data.entity.bo.dashboard.EntityCountRow">
         SELECT ${dimension} AS entity_id,
-               COUNT(*)     AS count
+        COUNT(*) AS count
         FROM dc3_point_value
         WHERE create_time &gt;= #{from}
-          AND create_time &lt; #{to}
-          AND tenant_id = #{tenantId}
+        AND create_time &lt; #{to}
+        AND tenant_id = #{tenantId}
         GROUP BY ${dimension}
         ORDER BY count DESC
         LIMIT #{limit}
@@ -83,13 +83,13 @@
     -->
     <select id="latestStream" resultType="io.github.pnoker.common.data.entity.bo.dashboard.LatestPointValueRow">
         SELECT tenant_id,
-               device_id,
-               point_id,
-               driver_id,
-               create_time,
-               raw_value,
-               cal_value,
-               CASE WHEN num_value IS NOT NULL THEN 'NUMERIC' ELSE 'STRING' END AS value_type
+        device_id,
+        point_id,
+        driver_id,
+        create_time,
+        raw_value,
+        cal_value,
+        CASE WHEN num_value IS NOT NULL THEN 'NUMERIC' ELSE 'STRING' END AS value_type
         FROM dc3_point_value
         WHERE tenant_id = #{tenantId}
         ORDER BY create_time DESC
@@ -105,18 +105,18 @@
     <select id="latencyHistogram" resultType="io.github.pnoker.common.data.entity.bo.dashboard.LatencyBinRow">
         SELECT bin, COUNT(*) AS count
         FROM (SELECT CASE
-                         WHEN diff_ms &lt; 100 THEN 0
-                         WHEN diff_ms &lt; 500 THEN 1
-                         WHEN diff_ms &lt; 1000 THEN 2
-                         WHEN diff_ms &lt; 5000 THEN 3
-                         WHEN diff_ms &lt; 30000 THEN 4
-                         ELSE 5
-                         END AS bin
-              FROM (SELECT EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000 AS diff_ms
-                    FROM dc3_point_value
-                    WHERE create_time &gt;= #{from}
-                      AND create_time &lt; #{to}
-                      AND tenant_id = #{tenantId}) deltas) bucketed
+        WHEN diff_ms &lt; 100 THEN 0
+        WHEN diff_ms &lt; 500 THEN 1
+        WHEN diff_ms &lt; 1000 THEN 2
+        WHEN diff_ms &lt; 5000 THEN 3
+        WHEN diff_ms &lt; 30000 THEN 4
+        ELSE 5
+        END AS bin
+        FROM (SELECT EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000 AS diff_ms
+        FROM dc3_point_value
+        WHERE create_time &gt;= #{from}
+        AND create_time &lt; #{to}
+        AND tenant_id = #{tenantId}) deltas) bucketed
         GROUP BY bin
         ORDER BY bin ASC
     </select>
@@ -130,8 +130,8 @@
         SELECT EXTRACT(DOW FROM create_time)::int AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
         FROM dc3_point_value
         WHERE create_time &gt;= #{from}
-          AND create_time &lt; #{to}
-          AND tenant_id = #{tenantId}
+        AND create_time &lt; #{to}
+        AND tenant_id = #{tenantId}
         GROUP BY dow, hour
         ORDER BY dow ASC, hour ASC
     </select>
@@ -152,7 +152,7 @@
         SELECT device_id, point_id, MAX(create_time) AS last_seen
         FROM dc3_point_value
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
+        AND create_time &gt;= #{from}
         GROUP BY device_id, point_id
         HAVING MAX(create_time) &lt; #{silentThreshold}
         ORDER BY last_seen DESC
@@ -169,11 +169,11 @@
         SELECT p.id AS point_id, p.profile_id AS profile_id
         FROM dc3_manager.dc3_point p
         WHERE p.deleted = 0
-          AND p.tenant_id = #{tenantId}
-          AND NOT EXISTS (SELECT 1
-                          FROM dc3_point_value pv
-                          WHERE pv.point_id = p.id
-                            AND pv.tenant_id = p.tenant_id)
+        AND p.tenant_id = #{tenantId}
+        AND NOT EXISTS (SELECT 1
+        FROM dc3_point_value pv
+        WHERE pv.point_id = p.id
+        AND pv.tenant_id = p.tenant_id)
         ORDER BY p.id DESC
         LIMIT #{limit}
     </select>
@@ -182,7 +182,7 @@
         SELECT COUNT(*)
         FROM dc3_manager.dc3_point
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        AND tenant_id = #{tenantId}
     </select>
 
 </mapper>

@@ -54,6 +54,34 @@ public class QuartzService {
         this.scheduler = scheduler;
     }
 
+    private static void validateIdentity(String group, String name, Class<? extends Job> jobClass) {
+        if (Objects.isNull(group) || group.isBlank()) {
+            throw new IllegalArgumentException("Job group must not be blank");
+        }
+        if (Objects.isNull(name) || name.isBlank()) {
+            throw new IllegalArgumentException("Job name must not be blank");
+        }
+        if (Objects.isNull(jobClass)) {
+            throw new IllegalArgumentException("Job class must not be null");
+        }
+    }
+
+    private static long toMillis(int interval, DateBuilder.IntervalUnit intervalUnit) {
+        if (Objects.isNull(intervalUnit)) {
+            throw new IllegalArgumentException("Interval unit must not be null");
+        }
+        return switch (intervalUnit) {
+            case MILLISECOND -> interval;
+            case SECOND -> TimeUnit.SECONDS.toMillis(interval);
+            case MINUTE -> TimeUnit.MINUTES.toMillis(interval);
+            case HOUR -> TimeUnit.HOURS.toMillis(interval);
+            case DAY -> TimeUnit.DAYS.toMillis(interval);
+            case WEEK -> TimeUnit.DAYS.toMillis(interval * 7L);
+            case MONTH, YEAR -> throw new IllegalArgumentException(
+                    "Interval unit " + intervalUnit + " has variable length and is not supported");
+        };
+    }
+
     /**
      * Create scheduled job with interval trigger
      *
@@ -153,34 +181,6 @@ public class QuartzService {
         if (scheduler.checkExists(jobKey)) {
             scheduler.deleteJob(jobKey);
         }
-    }
-
-    private static void validateIdentity(String group, String name, Class<? extends Job> jobClass) {
-        if (Objects.isNull(group) || group.isBlank()) {
-            throw new IllegalArgumentException("Job group must not be blank");
-        }
-        if (Objects.isNull(name) || name.isBlank()) {
-            throw new IllegalArgumentException("Job name must not be blank");
-        }
-        if (Objects.isNull(jobClass)) {
-            throw new IllegalArgumentException("Job class must not be null");
-        }
-    }
-
-    private static long toMillis(int interval, DateBuilder.IntervalUnit intervalUnit) {
-        if (Objects.isNull(intervalUnit)) {
-            throw new IllegalArgumentException("Interval unit must not be null");
-        }
-        return switch (intervalUnit) {
-            case MILLISECOND -> interval;
-            case SECOND -> TimeUnit.SECONDS.toMillis(interval);
-            case MINUTE -> TimeUnit.MINUTES.toMillis(interval);
-            case HOUR -> TimeUnit.HOURS.toMillis(interval);
-            case DAY -> TimeUnit.DAYS.toMillis(interval);
-            case WEEK -> TimeUnit.DAYS.toMillis(interval * 7L);
-            case MONTH, YEAR -> throw new IllegalArgumentException(
-                    "Interval unit " + intervalUnit + " has variable length and is not supported");
-        };
     }
 
 }

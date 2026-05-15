@@ -17,7 +17,7 @@
 package io.github.pnoker.common.agentic.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.agentic.entity.model.SessionConfig;
+import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.entity.base.BaseVO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,9 +42,7 @@ public class SessionVO extends BaseVO {
 
     private String title;
 
-    private String model;
-
-    private SessionConfig sessionConfig;
+    private SessionExt sessionExt;
 
     private Long tenantId;
 
