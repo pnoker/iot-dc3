@@ -25,6 +25,7 @@ import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.MessageHandler;
@@ -46,6 +47,7 @@ import java.util.concurrent.ExecutorService;
  */
 @Slf4j
 @Component
+@ConditionalOnBean(MqttReceiveService.class)
 public class MqttReceiveHandler {
 
     @Resource
@@ -86,22 +88,24 @@ public class MqttReceiveHandler {
                 // Determine whether to process data in batch based on transmission speed
                 Integer batchSpeed = mqttProperties.getBatch().getSpeed();
                 if (MqttScheduleJob.messageSpeed.get() < batchSpeed) {
-                    virtualThreadExecutor.execute(() ->
-                            // Process single MQTT message
-                            mqttReceiveService.receiveValue(mqttMessage));
+                    virtualThreadExecutor.execute(() -> receiveSingle(mqttMessage));
                 } else {
                     // Save message to batch schedule for processing
-                    MqttScheduleJob.messageLock.writeLock().lock();
-                    try {
-                        MqttScheduleJob.addMqttMessages(mqttMessage);
-                    } finally {
-                        MqttScheduleJob.messageLock.writeLock().unlock();
-                    }
+                    MqttScheduleJob.addMqttMessages(mqttMessage);
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         };
+    }
+
+    private void receiveSingle(MqttMessage mqttMessage) {
+        try {
+            mqttReceiveService.receiveValue(mqttMessage);
+        } catch (Exception e) {
+            log.error("MQTT single message handling failed, topic={}, qos={}",
+                    mqttMessage.getHeader().getMqttReceivedTopic(), mqttMessage.getHeader().getMqttReceivedQos(), e);
+        }
     }
 
 }
