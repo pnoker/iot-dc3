@@ -29,6 +29,11 @@ export interface Attribute {
   name: string;
   attributeName: string;
   attributeCode: string;
+  attributeTypeFlag?: 'STRING' | 'BYTE' | 'SHORT' | 'INT' | 'LONG' | 'FLOAT' | 'DOUBLE' | 'BOOLEAN' | string;
+  defaultValue?: string;
+  remark?: string;
+  attributeExt?: Record<string, unknown>;
+  enableFlag?: string;
 }
 
 /** Dictionary item */

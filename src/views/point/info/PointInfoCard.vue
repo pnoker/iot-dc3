@@ -29,7 +29,7 @@
             <ul>
               <li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
                 <el-icon><Goblet /></el-icon>
-                {{ attribute.attributeName }}: {{ data[attribute.attributeCode].configValue }}
+                {{ attribute.attributeName }}: {{ displayConfigValue(attribute.attributeCode) }}
               </li>
             </ul>
           </div>
@@ -62,8 +62,15 @@
 
   defineEmits(['select']);
 
+  const hasConfigValue = (value: unknown) => value !== '' && value !== null && value !== undefined;
+
+  const displayConfigValue = (attributeCode: string) => {
+    const value = props.data[attributeCode]?.configValue;
+    return hasConfigValue(value) ? value : '-';
+  };
+
   const isConfig = computed(() =>
-    props.attributes.every((attr: any) => props.data[attr.attributeCode]?.configValue !== '')
+    props.attributes.every((attr: any) => hasConfigValue(props.data[attr.attributeCode]?.configValue))
   );
 
   const isSelect = computed(() =>

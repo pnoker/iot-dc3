@@ -33,7 +33,7 @@ import {
   updatePointInfo,
 } from '@/api/info';
 
-import type { Dictionary } from '@/config/types';
+import type { Attribute, Dictionary } from '@/config/types';
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue';
@@ -43,6 +43,90 @@ import { getProfileByIds } from '@/api/profile';
 import { getPointByDeviceId } from '@/api/point';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
+
+type AttributeConfigValue = string | number | boolean | null;
+
+interface AttributeFormItem {
+  id?: string;
+  configValue: any;
+}
+
+type AttributeFormData = Record<string, AttributeFormItem>;
+
+const INTEGER_ATTRIBUTE_TYPES = new Set(['BYTE', 'SHORT', 'INT', 'LONG']);
+const DECIMAL_ATTRIBUTE_TYPES = new Set(['FLOAT', 'DOUBLE']);
+const BOOLEAN_TRUE_VALUES = new Set(['true', '1', 'yes', 'y', 'on']);
+const BOOLEAN_FALSE_VALUES = new Set(['false', '0', 'no', 'n', 'off']);
+
+function attributeType(attribute: Attribute): string {
+  return String(attribute.attributeTypeFlag || 'STRING').toUpperCase();
+}
+
+function isBooleanAttribute(attribute: Attribute): boolean {
+  return attributeType(attribute) === 'BOOLEAN';
+}
+
+function isNumberAttribute(attribute: Attribute): boolean {
+  const type = attributeType(attribute);
+  return INTEGER_ATTRIBUTE_TYPES.has(type) || DECIMAL_ATTRIBUTE_TYPES.has(type);
+}
+
+function attributePrecision(attribute: Attribute): number | undefined {
+  return DECIMAL_ATTRIBUTE_TYPES.has(attributeType(attribute)) ? 3 : 0;
+}
+
+function attributePlaceholder(attribute: Attribute): string {
+  return attribute.defaultValue ? `Default: ${attribute.defaultValue}` : `Enter ${attribute.attributeName}`;
+}
+
+function coerceAttributeValue(attribute: Attribute, value?: unknown): AttributeConfigValue {
+  if (value === undefined || value === null || value === '') {
+    return isBooleanAttribute(attribute) ? false : null;
+  }
+
+  if (isBooleanAttribute(attribute)) {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    const normalized = String(value).trim().toLowerCase();
+    if (BOOLEAN_TRUE_VALUES.has(normalized)) {
+      return true;
+    }
+    if (BOOLEAN_FALSE_VALUES.has(normalized)) {
+      return false;
+    }
+    return false;
+  }
+
+  if (isNumberAttribute(attribute)) {
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) ? numericValue : null;
+  }
+
+  return String(value);
+}
+
+function createAttributeFormItem(attribute: Attribute, id?: string, value?: unknown): AttributeFormItem {
+  return {
+    id: id || undefined,
+    configValue: coerceAttributeValue(attribute, value ?? attribute.defaultValue),
+  };
+}
+
+function serializeAttributeValue(value: AttributeConfigValue): string {
+  return value === null || value === undefined ? '' : String(value);
+}
+
+function attributeFormItem(formData: Record<string, AttributeFormItem>, attribute: Attribute): AttributeFormItem {
+  if (!formData[attribute.attributeCode]) {
+    formData[attribute.attributeCode] = createAttributeFormItem(attribute);
+  }
+  return formData[attribute.attributeCode] as AttributeFormItem;
+}
+
+function clone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value));
+}
 
 export default defineComponent({
   name: 'DeviceEdit',
@@ -75,11 +159,11 @@ export default defineComponent({
       loading: true,
       oldDeviceFormData: {} as Record<string, any>,
       deviceFormData: {} as any,
-      driverAttributes: [] as any[],
+      driverAttributes: [] as Attribute[],
       driverAttributeTable: {} as Record<string, any>,
-      oldDriverFormData: {} as Record<string, any>,
-      driverFormData: {} as any,
-      pointAttributes: [] as any[],
+      oldDriverFormData: {} as AttributeFormData,
+      driverFormData: {} as AttributeFormData,
+      pointAttributes: [] as Attribute[],
       pointAttributeTable: {} as Record<string, any>,
       oldPointFormData: {} as Record<string, any>,
       pointFormData: {} as any,
@@ -219,15 +303,12 @@ export default defineComponent({
             {} as Record<string, any>
           );
 
-          const driverFormData: Record<string, any> = {};
+          const driverFormData: AttributeFormData = {};
           reactiveData.driverAttributes.forEach((attribute) => {
-            driverFormData[attribute.attributeCode] = {
-              id: null,
-              configValue: '',
-            };
+            driverFormData[attribute.attributeCode] = createAttributeFormItem(attribute);
           });
-          reactiveData.driverFormData = JSON.parse(JSON.stringify(driverFormData));
-          reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(driverFormData));
+          reactiveData.driverFormData = clone(driverFormData);
+          reactiveData.oldDriverFormData = clone(driverFormData);
 
           driverInfo();
         })
@@ -259,16 +340,17 @@ export default defineComponent({
     const driverInfo = () => {
       getDriverInfoByDeviceId(reactiveData.id)
         .then((res) => {
-          const formData: Record<string, any> = reactiveData.driverFormData;
+          const formData: AttributeFormData = reactiveData.driverFormData;
           res.data.forEach((info: { attributeId: string | number; id: any; configValue: any }) => {
-            formData[reactiveData.driverAttributeTable[info.attributeId]] = {
-              id: info.id,
-              configValue: info.configValue,
-            };
+            const attributeCode = reactiveData.driverAttributeTable[info.attributeId];
+            const attribute = reactiveData.driverAttributes.find((item) => item.attributeCode === attributeCode);
+            if (attribute) {
+              formData[attributeCode] = createAttributeFormItem(attribute, info.id, info.configValue);
+            }
           });
 
-          reactiveData.driverFormData = JSON.parse(JSON.stringify(formData));
-          reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(formData));
+          reactiveData.driverFormData = clone(formData);
+          reactiveData.oldDriverFormData = clone(formData);
         })
         .catch(() => {
           // nothing to do
@@ -286,10 +368,7 @@ export default defineComponent({
             };
 
             reactiveData.pointAttributes.forEach((attribute) => {
-              pointInfo[attribute.attributeCode] = {
-                id: null,
-                configValue: '',
-              };
+              pointInfo[attribute.attributeCode] = createAttributeFormItem(attribute);
             });
             return pointInfo;
           });
@@ -299,10 +378,11 @@ export default defineComponent({
               res.data.forEach((info: { pointId: any; attributeId: string | number; id: any; configValue: any }) => {
                 reactiveData.pointInfoData.forEach((pointInfo) => {
                   if (pointInfo.id === info.pointId) {
-                    pointInfo[reactiveData.pointAttributeTable[info.attributeId]] = {
-                      id: info.id,
-                      configValue: info.configValue,
-                    };
+                    const attributeCode = reactiveData.pointAttributeTable[info.attributeId];
+                    const attribute = reactiveData.pointAttributes.find((item) => item.attributeCode === attributeCode);
+                    if (attribute) {
+                      pointInfo[attributeCode] = createAttributeFormItem(attribute, info.id, info.configValue);
+                    }
                   }
                   return pointInfo;
                 });
@@ -341,30 +421,26 @@ export default defineComponent({
 
       try {
         await form.validate();
-        const driverFormData: Record<string, unknown> = {};
         await Promise.all(
           reactiveData.driverAttributes.map((attribute) => {
+            const formItem = reactiveData.driverFormData[attribute.attributeCode];
+            if (!formItem) {
+              return Promise.resolve();
+            }
             const driverInfo = {
-              id: reactiveData.driverFormData[attribute.attributeCode].id,
+              id: formItem.id || undefined,
               attributeId: attribute.id,
               deviceId: reactiveData.id,
-              configValue: reactiveData.driverFormData[attribute.attributeCode].configValue,
+              configValue: serializeAttributeValue(formItem.configValue),
             };
 
             const persist = driverInfo.id ? updateDriverInfo(driverInfo) : addDriverInfo(driverInfo);
-            return persist
-              .then(() => {
-                driverFormData[attribute.attributeCode] = {
-                  id: driverInfo.id,
-                  configValue: driverInfo.configValue,
-                };
-                reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(driverFormData));
-              })
-              .catch(() => {
-                // nothing to do
-              });
+            return persist.catch(() => {
+              // nothing to do
+            });
           })
         );
+        reactiveData.oldDriverFormData = clone(reactiveData.driverFormData);
         return true;
       } catch {
         return false;
@@ -381,12 +457,16 @@ export default defineComponent({
         await form.validate();
         await Promise.all(
           reactiveData.pointAttributes.map((attribute) => {
+            const formItem = reactiveData.pointFormData[attribute.attributeCode];
+            if (!formItem) {
+              return Promise.resolve();
+            }
             const pointInfo = {
-              id: reactiveData.pointFormData[attribute.attributeCode].id,
+              id: formItem.id || undefined,
               attributeId: attribute.id,
               deviceId: reactiveData.id,
               pointId: reactiveData.pointFormData.id,
-              configValue: reactiveData.pointFormData[attribute.attributeCode].configValue,
+              configValue: serializeAttributeValue(formItem.configValue),
             };
 
             const persist = pointInfo.id ? updatePointInfo(pointInfo) : addPointInfo(pointInfo);
@@ -396,9 +476,9 @@ export default defineComponent({
                   if (row.id === reactiveData.pointFormData.id) {
                     row[attribute.attributeCode] = {
                       id: pointInfo.id,
-                      configValue: pointInfo.configValue,
+                      configValue: reactiveData.pointFormData[attribute.attributeCode].configValue,
                     };
-                    reactiveData.oldPointFormData = JSON.parse(JSON.stringify(row));
+                    reactiveData.oldPointFormData = clone(row);
                   }
                   return row;
                 });
@@ -414,17 +494,14 @@ export default defineComponent({
       }
     };
 
-    const selectPoint = (row: { [x: string]: { id: null; configValue: string }; id: any }) => {
+    const selectPoint = (row: { [x: string]: AttributeFormItem | any; id: any }) => {
       reactiveData.pointAttributes.forEach((attribute) => {
         if (!row[attribute.attributeCode]) {
-          row[attribute.attributeCode] = {
-            id: null,
-            configValue: '',
-          };
+          row[attribute.attributeCode] = createAttributeFormItem(attribute);
         }
       });
-      reactiveData.pointFormData = JSON.parse(JSON.stringify(row));
-      reactiveData.oldPointFormData = JSON.parse(JSON.stringify(row));
+      reactiveData.pointFormData = clone(row);
+      reactiveData.oldPointFormData = clone(row);
 
       reactiveData.pointInfoData.forEach((pointInfo) => {
         pointInfo.shadow = 'hover';
@@ -472,15 +549,15 @@ export default defineComponent({
     };
 
     const deviceReset = () => {
-      reactiveData.deviceFormData = JSON.parse(JSON.stringify(reactiveData.oldDeviceFormData));
+      reactiveData.deviceFormData = clone(reactiveData.oldDeviceFormData);
     };
 
     const driverInfoReset = () => {
-      reactiveData.driverFormData = JSON.parse(JSON.stringify(reactiveData.oldDriverFormData));
+      reactiveData.driverFormData = clone(reactiveData.oldDriverFormData);
     };
 
     const pointInfoReset = () => {
-      reactiveData.pointFormData = JSON.parse(JSON.stringify(reactiveData.oldPointFormData));
+      reactiveData.pointFormData = clone(reactiveData.oldPointFormData);
     };
 
     const changeActive = (step: number) => {
@@ -515,6 +592,11 @@ export default defineComponent({
       driverInfoReset,
       pointInfoReset,
       changeActive,
+      attributeFormItem,
+      attributePlaceholder,
+      attributePrecision,
+      isBooleanAttribute,
+      isNumberAttribute,
       ...Icon,
     };
   },

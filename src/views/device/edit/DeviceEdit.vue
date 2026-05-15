@@ -124,17 +124,37 @@
           <el-form-item
             v-for="attribute in reactiveData.driverAttributes"
             :key="attribute.id"
-            :label="attribute.attributeName"
-            :prop="attribute.attributeCode"
+            :prop="`${attribute.attributeCode}.configValue`"
           >
+            <template #label>
+              <span>{{ attribute.attributeName }}</span>
+              <el-tag class="attribute-type" effect="plain" size="small">{{ attribute.attributeTypeFlag }}</el-tag>
+            </template>
+            <el-switch
+              v-if="isBooleanAttribute(attribute)"
+              v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
+              :active-value="true"
+              :inactive-value="false"
+            />
+            <el-input-number
+              v-else-if="isNumberAttribute(attribute)"
+              v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
+              class="attribute-number-input"
+              :precision="attributePrecision(attribute)"
+              :placeholder="attributePlaceholder(attribute)"
+              controls-position="right"
+            />
             <el-input
-              v-if="reactiveData.driverFormData[attribute.attributeCode]"
-              :key="reactiveData.driverFormData[attribute.attributeCode].id"
-              v-model="reactiveData.driverFormData[attribute.attributeCode].configValue"
-              :placeholder="'Enter ' + attribute.attributeName"
+              v-else
+              v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
+              :placeholder="attributePlaceholder(attribute)"
               clearable
               @keyup.enter="driverUpdate"
             />
+            <div v-if="attribute.remark || attribute.defaultValue" class="attribute-hint">
+              <span v-if="attribute.remark">{{ attribute.remark }}</span>
+              <span v-if="attribute.defaultValue">Default: {{ attribute.defaultValue }}</span>
+            </div>
           </el-form-item>
         </el-form>
         <el-empty v-else :description="$t('device.edit.driverConfigEmpty')" />
@@ -155,30 +175,44 @@
           :title="$t('device.edit.pointConfig')"
           type="success"
         />
-        <el-form
-          v-if="reactiveData.pointFormData.length > 0"
-          ref="pointFormRef"
-          label-position="top"
-          :model="reactiveData.pointFormData"
-        >
+        <el-form v-if="hasPointFormData" ref="pointFormRef" label-position="top" :model="reactiveData.pointFormData">
           <el-form-item :label="$t('device.edit.pointName')" prop="pointName">
             <el-input v-model="reactiveData.pointFormData.pointName" disabled />
           </el-form-item>
           <el-form-item
             v-for="attribute in reactiveData.pointAttributes"
             :key="attribute.id"
-            :label="attribute.attributeName"
-            :prop="attribute.attributeCode"
+            :prop="`${attribute.attributeCode}.configValue`"
           >
+            <template #label>
+              <span>{{ attribute.attributeName }}</span>
+              <el-tag class="attribute-type" effect="plain" size="small">{{ attribute.attributeTypeFlag }}</el-tag>
+            </template>
+            <el-switch
+              v-if="isBooleanAttribute(attribute)"
+              v-model="attributeFormItem(reactiveData.pointFormData, attribute).configValue"
+              :active-value="true"
+              :inactive-value="false"
+            />
+            <el-input-number
+              v-else-if="isNumberAttribute(attribute)"
+              v-model="attributeFormItem(reactiveData.pointFormData, attribute).configValue"
+              class="attribute-number-input"
+              :precision="attributePrecision(attribute)"
+              :placeholder="attributePlaceholder(attribute)"
+              controls-position="right"
+            />
             <el-input
-              v-if="reactiveData.pointFormData[attribute.attributeCode]"
-              :key="reactiveData.pointFormData[attribute.attributeCode].id"
-              v-model="reactiveData.pointFormData[attribute.attributeCode].configValue"
-              :placeholder="'Enter ' + attribute.attributeName"
+              v-else
+              v-model="attributeFormItem(reactiveData.pointFormData, attribute).configValue"
+              :placeholder="attributePlaceholder(attribute)"
               clearable
               @keyup.enter="pointUpdate"
             />
-            <el-input v-else disabled />
+            <div v-if="attribute.remark || attribute.defaultValue" class="attribute-hint">
+              <span v-if="attribute.remark">{{ attribute.remark }}</span>
+              <span v-if="attribute.defaultValue">Default: {{ attribute.defaultValue }}</span>
+            </div>
           </el-form-item>
         </el-form>
         <el-form-item class="edit-form-button">
@@ -224,4 +258,23 @@
 
 <style lang="scss" scoped>
   @use '@/styles/edit-card.scss';
+
+  .attribute-type {
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .attribute-number-input {
+    width: 100%;
+  }
+
+  .attribute-hint {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+    line-height: 18px;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+  }
 </style>
