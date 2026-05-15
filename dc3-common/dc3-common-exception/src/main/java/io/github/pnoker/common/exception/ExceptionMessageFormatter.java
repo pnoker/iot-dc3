@@ -37,10 +37,11 @@ final class ExceptionMessageFormatter {
             return template;
         }
 
-        StringBuilder builder = new StringBuilder(template.length() + params.length * 16);
+        int paramLimit = formatParamLimit(params);
+        StringBuilder builder = new StringBuilder(template.length() + paramLimit * 16);
         int searchIndex = 0;
         int paramIndex = 0;
-        while (paramIndex < params.length) {
+        while (paramIndex < paramLimit) {
             int placeholderIndex = template.indexOf("{}", searchIndex);
             if (placeholderIndex < 0) {
                 break;
@@ -51,6 +52,17 @@ final class ExceptionMessageFormatter {
         }
         builder.append(template, searchIndex, template.length());
         return builder.toString();
+    }
+
+    static Throwable cause(Object... params) {
+        if (Objects.isNull(params) || params.length == 0 || !(params[params.length - 1] instanceof Throwable cause)) {
+            return null;
+        }
+        return cause;
+    }
+
+    private static int formatParamLimit(Object... params) {
+        return Objects.nonNull(cause(params)) ? params.length - 1 : params.length;
     }
 
 }

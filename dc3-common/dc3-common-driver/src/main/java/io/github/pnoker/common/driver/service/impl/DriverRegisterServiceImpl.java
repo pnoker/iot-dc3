@@ -57,8 +57,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             // Register driver with the driver client
             driverClient.driverRegister(entityBO);
         } catch (Exception e) {
-            log.error("Driver initialization failed: {}", e.getMessage(), e);
-            throw new ServiceException("Driver initialization failed: {}", e.getMessage());
+            log.error("Driver initialization failed", e);
+            throw new ServiceException("Driver initialization failed: {}", e.getMessage(), e);
         }
     }
 

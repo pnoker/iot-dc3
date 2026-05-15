@@ -84,6 +84,16 @@ class CustomExceptionContractTest {
                                     .getDeclaredConstructor(String.class, Object[].class)
                                     .newInstance("hello {} number {}", new Object[]{"world", 42});
                             assertThat(exception.getMessage()).isEqualTo("hello world number 42");
+                        }),
+                DynamicTest.dynamicTest(
+                        exceptionClass.getSimpleName() + " template constructor preserves trailing cause",
+                        () -> {
+                            Throwable cause = new IllegalStateException("root");
+                            RuntimeException exception = exceptionClass
+                                    .getDeclaredConstructor(String.class, Object[].class)
+                                    .newInstance("hello {}", new Object[]{"world", cause});
+                            assertThat(exception.getMessage()).isEqualTo("hello world");
+                            assertThat(exception.getCause()).isSameAs(cause);
                         })));
     }
 }

@@ -58,7 +58,7 @@ public class HostUtil {
             InetAddress address = InetAddress.getLocalHost();
             return address.getHostAddress();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Failed to resolve local host address", e);
         }
         return null;
     }

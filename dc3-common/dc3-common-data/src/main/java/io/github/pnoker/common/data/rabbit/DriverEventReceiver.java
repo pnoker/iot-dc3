@@ -75,7 +75,9 @@ public class DriverEventReceiver {
             }
             RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Driver event consume failed, type={}, deliveryTag={}, routingKey={}",
+                    Objects.nonNull(entityDTO) ? entityDTO.getType() : null, deliveryTag,
+                    message.getMessageProperties().getReceivedRoutingKey(), e);
             RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }

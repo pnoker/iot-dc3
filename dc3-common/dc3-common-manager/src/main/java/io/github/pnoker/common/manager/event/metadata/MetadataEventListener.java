@@ -66,7 +66,7 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
                 entityBOList.forEach(entityBO -> notifyDriver(entityBO.getServiceName(), entityDTO));
             }
         } catch (Exception e) {
-            log.error("Metadata event listener error: {}", e.getMessage(), e);
+            log.error("Metadata event listener failed, event={}", JsonUtil.toJsonString(metadataEvent), e);
         }
     }
 

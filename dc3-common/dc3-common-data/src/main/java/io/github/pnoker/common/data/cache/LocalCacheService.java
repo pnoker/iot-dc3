@@ -89,7 +89,7 @@ public class LocalCacheService {
                 try {
                     listener.onExpire(key, value.value);
                 } catch (Exception e) {
-                    log.warn("Expire listener failed for key {}: {}", key, e.getMessage());
+                    log.warn("Expire listener failed, key={}", key, e);
                 }
             }
         }).build();

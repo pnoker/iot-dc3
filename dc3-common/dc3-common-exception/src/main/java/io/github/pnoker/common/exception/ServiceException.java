@@ -55,7 +55,7 @@ public class ServiceException extends RuntimeException {
      * @param params   the parameters to format the template
      */
     public ServiceException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
 }

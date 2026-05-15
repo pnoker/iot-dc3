@@ -104,7 +104,7 @@ public class OfflineExpiryListener {
                     handleDeviceExpiry(key, lastStatus);
                 }
             } catch (Exception e) {
-                log.warn("Offline expiry handling failed for key {}: {}", key, e.getMessage(), e);
+                log.warn("Offline expiry handling failed, key={}", key, e);
             }
         });
     }
