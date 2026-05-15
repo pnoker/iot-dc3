@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.driver.entity.bo;
+package io.github.pnoker.common.driver.entity.bean;
 
 import io.github.pnoker.common.driver.support.TypedValueConverter;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,11 +30,11 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Represents a typed attribute value resolved from driver or point configuration.
+ * Typed point value to be written to a device.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.5.15
+ * @since 2026.5.15
  */
 @Getter
 @Setter
@@ -42,30 +42,30 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttributeBO implements Serializable {
+public class WritePointValue implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * Raw attribute value stored as a string.
+     * Raw value content stored as a string before type conversion.
      */
     private String value;
 
     /**
-     * Declared attribute type used for conversion.
+     * Declared point type used to convert the raw string value.
      */
-    private AttributeTypeFlagEnum type;
+    private PointTypeFlagEnum type;
 
     /**
-     * Converts the attribute value to the requested Java type.
+     * Converts the stored string value to the requested Java type.
      *
      * @param clazz target type
      * @param <T>   target type parameter
      * @return converted value
      */
     public <T> T getValue(Class<T> clazz) {
-        return TypedValueConverter.convertAttributeValue(value, type, clazz);
+        return TypedValueConverter.convertPointValue(value, type, clazz);
     }
 
 }

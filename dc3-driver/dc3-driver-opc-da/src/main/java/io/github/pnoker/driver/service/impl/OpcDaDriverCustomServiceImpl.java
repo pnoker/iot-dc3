@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -115,16 +115,16 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                        PointBO point) {
-        return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
+        return new ReadPointValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WValue wValue) {
+                         PointBO point, WritePointValue writePointValue) {
         Server server = getConnector(device.getId(), driverConfig);
-        return writeValue(server, pointConfig, wValue);
+        return writeValue(server, pointConfig, writePointValue);
     }
 
     /**
@@ -243,14 +243,14 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      *
      * @param server      active OPC DA server connection
      * @param pointConfig tag configuration (group, tag)
-     * @param wValue      value to write
+     * @param writePointValue      value to write
      * @return true if the write succeeded
      * @throws WritePointException if writing fails (server is disposed on error)
      */
-    private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, WValue wValue) {
+    private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
         try {
             Item item = getItem(server, pointConfig);
-            return writeItem(item, wValue);
+            return writeItem(item, writePointValue);
         } catch (NotConnectedException | AddFailedException | DuplicateGroupException | UnknownHostException
                  | JIException e) {
             server.dispose();
@@ -265,45 +265,45 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      * Supports SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
      *
      * @param item   target OPC DA Item
-     * @param wValue value and type to write
+     * @param writePointValue value and type to write
      * @return true if the server reported success
      * @throws JIException        if DCOM communication fails
      * @throws UnSupportException if the value type is unsupported
      */
-    private boolean writeItem(Item item, WValue wValue) throws JIException {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());
+    private boolean writeItem(Item item, WritePointValue writePointValue) throws JIException {
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(writePointValue.getType().getCode());
         if (Objects.isNull(valueType)) {
-            throw new UnSupportException("Unsupported type of " + wValue.getType());
+            throw new UnSupportException("Unsupported type of " + writePointValue.getType());
         }
 
         int writeResult = 0;
         switch (valueType) {
             case SHORT:
-                short shortValue = wValue.getValue(Short.class);
+                short shortValue = writePointValue.getValue(Short.class);
                 writeResult = item.write(new JIVariant(shortValue, false));
                 break;
             case INT:
-                int intValue = wValue.getValue(Integer.class);
+                int intValue = writePointValue.getValue(Integer.class);
                 writeResult = item.write(new JIVariant(intValue, false));
                 break;
             case LONG:
-                long longValue = wValue.getValue(Long.class);
+                long longValue = writePointValue.getValue(Long.class);
                 writeResult = item.write(new JIVariant(longValue, false));
                 break;
             case FLOAT:
-                float floatValue = wValue.getValue(Float.class);
+                float floatValue = writePointValue.getValue(Float.class);
                 writeResult = item.write(new JIVariant(floatValue, false));
                 break;
             case DOUBLE:
-                double doubleValue = wValue.getValue(Double.class);
+                double doubleValue = writePointValue.getValue(Double.class);
                 writeResult = item.write(new JIVariant(doubleValue, false));
                 break;
             case BOOLEAN:
-                boolean booleanValue = wValue.getValue(Boolean.class);
+                boolean booleanValue = writePointValue.getValue(Boolean.class);
                 writeResult = item.write(new JIVariant(booleanValue, false));
                 break;
             case STRING:
-                writeResult = item.write(new JIVariant(wValue.getValue(), false));
+                writeResult = item.write(new JIVariant(writePointValue.getValue(), false));
                 break;
             default:
                 break;

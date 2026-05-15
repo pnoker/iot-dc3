@@ -17,7 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
@@ -162,7 +162,7 @@ class ListeningVirtualDriverCustomServiceImplTest {
         NettyTcpServer.deviceChannelMap.put(900L, channel);
 
         Boolean ok = service.write(null, null, device, point,
-                WValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
 
         assertThat(ok).isTrue();
         verify(channel).writeAndFlush(any(byte[].class));
@@ -174,7 +174,7 @@ class ListeningVirtualDriverCustomServiceImplTest {
         PointBO point = point(2L);
 
         Boolean ok = service.write(null, null, device, point,
-                WValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
 
         assertThat(ok).isTrue();
         // No channel was registered, so nothing was flushed.

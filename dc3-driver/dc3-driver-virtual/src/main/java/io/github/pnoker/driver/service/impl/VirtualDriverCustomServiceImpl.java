@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -164,10 +164,10 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
      * @param pointConfig  point configuration attributes
      * @param device       the device to read from
      * @param point        the point to read
-     * @return the read value wrapped in an RValue object
+     * @return the read value wrapped in a ReadPointValue object
      */
     @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                        PointBO point) {
         /*
          * Read device point data logic
@@ -179,17 +179,17 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
          * float between 0 and 100.
          */
         if (PointTypeFlagEnum.STRING.equals(point.getPointTypeFlag())) {
-            return new RValue(device, point, "abcd1234");
+            return new ReadPointValue(device, point, "abcd1234");
         }
         if (PointTypeFlagEnum.BOOLEAN.equals(point.getPointTypeFlag())) {
             Random random = new Random();
             boolean b = random.nextBoolean();
-            return new RValue(device, point, String.valueOf(b));
+            return new ReadPointValue(device, point, String.valueOf(b));
         }
 
         Random random = new Random();
         double value = random.nextDouble() * 100;
-        return new RValue(device, point, String.valueOf(value));
+        return new ReadPointValue(device, point, String.valueOf(value));
     }
 
     /**
@@ -204,12 +204,12 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
      * @param pointConfig  point configuration attributes
      * @param device       the device to write to
      * @param point        the point to write
-     * @param wValue       the value to write
+     * @param writePointValue       the value to write
      * @return true if the write operation succeeded, false otherwise
      */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WValue wValue) {
+                         PointBO point, WritePointValue writePointValue) {
         /*
          * Write device point data logic
          *

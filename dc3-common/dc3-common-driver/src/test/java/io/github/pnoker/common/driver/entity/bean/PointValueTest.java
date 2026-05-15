@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link PointValue} verifying that the RValue constructor
+ * Tests for {@link PointValue} verifying that the ReadPointValue constructor
  * correctly propagates calValue and numValue.
  */
 class PointValueTest {
@@ -49,8 +49,8 @@ class PointValueTest {
     @Test
     void numericTypePopulatesNumValue() {
         point.setPointTypeFlag(PointTypeFlagEnum.DOUBLE);
-        RValue rValue = new RValue(device, point, "42.5");
-        PointValue pv = new PointValue(rValue);
+        ReadPointValue readPointValue = new ReadPointValue(device, point, "42.5");
+        PointValue pv = new PointValue(readPointValue);
 
         assertThat(pv.getCalValue()).isEqualTo("42.5");
         assertThat(pv.getNumValue()).isEqualTo(42.5);
@@ -62,8 +62,8 @@ class PointValueTest {
     @Test
     void stringTypeLeavesNumValueNull() {
         point.setPointTypeFlag(PointTypeFlagEnum.STRING);
-        RValue rValue = new RValue(device, point, "hello");
-        PointValue pv = new PointValue(rValue);
+        ReadPointValue readPointValue = new ReadPointValue(device, point, "hello");
+        PointValue pv = new PointValue(readPointValue);
 
         assertThat(pv.getCalValue()).isEqualTo("hello");
         assertThat(pv.getNumValue()).isNull();
@@ -72,8 +72,8 @@ class PointValueTest {
     @Test
     void booleanTrueMapsNumValueToOne() {
         point.setPointTypeFlag(PointTypeFlagEnum.BOOLEAN);
-        RValue rValue = new RValue(device, point, "true");
-        PointValue pv = new PointValue(rValue);
+        ReadPointValue readPointValue = new ReadPointValue(device, point, "true");
+        PointValue pv = new PointValue(readPointValue);
 
         assertThat(pv.getCalValue()).isEqualTo("true");
         assertThat(pv.getNumValue()).isEqualTo(1.0);
@@ -82,8 +82,8 @@ class PointValueTest {
     @Test
     void booleanFalseMapsNumValueToZero() {
         point.setPointTypeFlag(PointTypeFlagEnum.BOOLEAN);
-        RValue rValue = new RValue(device, point, "false");
-        PointValue pv = new PointValue(rValue);
+        ReadPointValue readPointValue = new ReadPointValue(device, point, "false");
+        PointValue pv = new PointValue(readPointValue);
 
         assertThat(pv.getCalValue()).isEqualTo("false");
         assertThat(pv.getNumValue()).isEqualTo(0.0);
@@ -92,8 +92,8 @@ class PointValueTest {
     @Test
     void intTypePopulatesNumValue() {
         point.setPointTypeFlag(PointTypeFlagEnum.INT);
-        RValue rValue = new RValue(device, point, "100");
-        PointValue pv = new PointValue(rValue);
+        ReadPointValue readPointValue = new ReadPointValue(device, point, "100");
+        PointValue pv = new PointValue(readPointValue);
 
         assertThat(pv.getCalValue()).isEqualTo("100");
         assertThat(pv.getNumValue()).isEqualTo(100.0);

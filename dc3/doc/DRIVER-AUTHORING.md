@@ -201,16 +201,16 @@ public class BacnetDriverCustomServiceImpl implements DriverCustomService {
      * `dc3.driver.schedule.read.cron`. driverConfig holds the device-level attributes the
      * operator filled in; pointConfig holds the per-point attributes.
      *
-     * Return RValue with the raw string; the framework will run any configured
+     * Return ReadPointValue with the raw string; the framework will run any configured
      * scaling / unit conversion before persisting.
      */
     @Override
-    public RValue read(Map<String, AttributeBO> driverConfig,
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig,
                        Map<String, AttributeBO> pointConfig,
                        DeviceBO device, PointBO point) {
         String host = driverConfig.get("host").getValue(String.class);
         int port    = driverConfig.get("port").getValue(Integer.class);
-        // ... protocol-specific read, return new RValue(device, point, "<raw value>")
+        // ... protocol-specific read, return new ReadPointValue(device, point, "<raw value>")
     }
 
     /**
@@ -220,7 +220,7 @@ public class BacnetDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig,
                          Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WValue wValue) {
+                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
         // ... protocol-specific write
         return true;
     }
@@ -234,7 +234,7 @@ You don't need to write any RabbitMQ or gRPC plumbing. Use the injected
 
 | Method                                                                    | Purpose                                                                                                                                                                                                 |
 |---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pointValueSender(PointValue)` / `pointValueSender(List<PointValue>)`     | Push a single (or batch) of values to `dc3-center-data`. Use this for *push-style* drivers (MQTT, OPC subscriptions); polling drivers usually just return `RValue` from `read` and let the SDK send it. |
+| `pointValueSender(PointValue)` / `pointValueSender(List<PointValue>)`     | Push a single (or batch) of values to `dc3-center-data`. Use this for *push-style* drivers (MQTT, OPC subscriptions); polling drivers usually just return `ReadPointValue` from `read` and let the SDK send it. |
 | `deviceStatusSender(deviceId, status)` / `(deviceId, status, ttl, unit)`  | Report a device as ONLINE / OFFLINE / FAULT / MAINTAIN. The TTL drives auto-OFFLINE on silence (default ~25 s if you use the no-TTL overload).                                                          |
 | `driverEventSender(DriverEventDTO)` / `deviceEventSender(DeviceEventDTO)` | Emit structured driver- or device-scoped events that show up in the dashboard alert feed.                                                                                                               |
 | `driverAlarmSender(String)` / `deviceAlarmSender(deviceId, String)`       | Quick path for alarm-style events with just a human-readable reason (e.g. `"OPC UA session dropped"`).                                                                                                  |

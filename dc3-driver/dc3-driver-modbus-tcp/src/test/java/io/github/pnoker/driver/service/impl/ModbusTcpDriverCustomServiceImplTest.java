@@ -25,7 +25,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -120,8 +120,8 @@ class ModbusTcpDriverCustomServiceImplTest {
         return point;
     }
 
-    private static WValue wValue(String value, PointTypeFlagEnum type) {
-        return WValue.builder().value(value).type(type).build();
+    private static WritePointValue writePointValue(String value, PointTypeFlagEnum type) {
+        return WritePointValue.builder().value(value).type(type).build();
     }
 
     private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
@@ -264,7 +264,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusMaster.send(any(com.serotonin.modbus4j.msg.WriteCoilRequest.class))).thenReturn(response);
 
         Boolean ok = service.write(driverConfig("h", 1), pointConfig(1, 1, 0), device(7L),
-                point(PointTypeFlagEnum.BOOLEAN), wValue("true", PointTypeFlagEnum.BOOLEAN));
+                point(PointTypeFlagEnum.BOOLEAN), writePointValue("true", PointTypeFlagEnum.BOOLEAN));
         assertThat(ok).isTrue();
     }
 
@@ -276,7 +276,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusMaster.send(any(com.serotonin.modbus4j.msg.WriteCoilRequest.class))).thenReturn(response);
 
         Boolean ok = service.write(driverConfig("h", 1), pointConfig(1, 1, 0), device(7L),
-                point(PointTypeFlagEnum.BOOLEAN), wValue("false", PointTypeFlagEnum.BOOLEAN));
+                point(PointTypeFlagEnum.BOOLEAN), writePointValue("false", PointTypeFlagEnum.BOOLEAN));
         assertThat(ok).isFalse();
     }
 
@@ -287,7 +287,7 @@ class ModbusTcpDriverCustomServiceImplTest {
                 .thenThrow(new ModbusTransportException("transport reset"));
 
         assertThatThrownBy(() -> service.write(driverConfig("h", 1), pointConfig(1, 1, 0), device(7L),
-                point(PointTypeFlagEnum.BOOLEAN), wValue("true", PointTypeFlagEnum.BOOLEAN)))
+                point(PointTypeFlagEnum.BOOLEAN), writePointValue("true", PointTypeFlagEnum.BOOLEAN)))
                 .isInstanceOf(WritePointException.class)
                 .hasMessageContaining("transport reset");
     }
@@ -297,7 +297,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
 
         Boolean ok = service.write(driverConfig("h", 1), pointConfig(1, 3, 0), device(8L),
-                point(PointTypeFlagEnum.FLOAT), wValue("3.14", PointTypeFlagEnum.FLOAT));
+                point(PointTypeFlagEnum.FLOAT), writePointValue("3.14", PointTypeFlagEnum.FLOAT));
         assertThat(ok).isTrue();
         verify(modbusMaster).setValue(any(BaseLocator.class), any());
     }
@@ -308,7 +308,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         doThrow(new ModbusTransportException("offline")).when(modbusMaster).setValue(any(BaseLocator.class), any());
 
         assertThatThrownBy(() -> service.write(driverConfig("h", 1), pointConfig(1, 3, 0), device(8L),
-                point(PointTypeFlagEnum.FLOAT), wValue("1.0", PointTypeFlagEnum.FLOAT)))
+                point(PointTypeFlagEnum.FLOAT), writePointValue("1.0", PointTypeFlagEnum.FLOAT)))
                 .isInstanceOf(WritePointException.class)
                 .hasMessageContaining("offline");
     }
@@ -317,7 +317,7 @@ class ModbusTcpDriverCustomServiceImplTest {
     void writeUnsupportedFunctionCodeReturnsFalse() throws Exception {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
         Boolean ok = service.write(driverConfig("h", 1), pointConfig(1, 4, 0), device(8L),
-                point(PointTypeFlagEnum.INT), wValue("1", PointTypeFlagEnum.INT));
+                point(PointTypeFlagEnum.INT), writePointValue("1", PointTypeFlagEnum.INT));
         assertThat(ok).isFalse();
         verify(modbusMaster, never()).setValue(any(BaseLocator.class), any());
         verify(modbusMaster, never()).send(any(com.serotonin.modbus4j.msg.WriteCoilRequest.class));

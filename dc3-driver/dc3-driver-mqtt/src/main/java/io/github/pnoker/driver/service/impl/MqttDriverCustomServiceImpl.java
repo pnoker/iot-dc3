@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -169,7 +169,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
      * @return null (data is received asynchronously)
      */
     @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                        PointBO point) {
         /*
          * Hint: The logic here is for reference only; please modify it according to the
@@ -200,7 +200,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
      */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WValue values) {
+                         PointBO point, WritePointValue values) {
         /*
          * Hint: The logic here is for reference only; please modify it according to the
          * actual application scenario.
