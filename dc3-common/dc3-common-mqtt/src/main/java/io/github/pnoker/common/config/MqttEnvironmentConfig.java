@@ -68,7 +68,7 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
             prefix = MessageFormat.format("dc3/{0}/{1}/", tenant, name);
         }
 
-        Map<String, Object> source = new HashMap<>(2);
+        Map<String, Object> source = new HashMap<>(3);
         source.put(EnvironmentConstant.DRIVER_NODE, node);
         source.put(EnvironmentConstant.MQTT_CLIENT, client);
         source.put(EnvironmentConstant.MQTT_PREFIX, prefix);

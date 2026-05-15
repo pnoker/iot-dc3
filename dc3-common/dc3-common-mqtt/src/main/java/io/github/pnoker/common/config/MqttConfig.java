@@ -18,10 +18,13 @@
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
+import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MqttUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
@@ -34,7 +37,7 @@ import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -102,21 +105,24 @@ public class MqttConfig {
      * @return Configured MessageProducer for MQTT inbound processing
      */
     @Bean
-    public MessageProducer mqttInbound(MqttPahoClientFactory mqttClientFactory) {
-        if (Objects.isNull(mqttProperties.getReceiveTopics())) {
-            mqttProperties.setReceiveTopics(new ArrayList<>());
+    @ConditionalOnBean(MqttReceiveService.class)
+    public MessageProducer mqttInbound(MqttPahoClientFactory mqttClientFactory, MessageChannel mqttInboundChannel) {
+        List<MqttProperties.Topic> receiveTopics = mqttProperties.getReceiveTopics();
+        if (Objects.isNull(receiveTopics) || receiveTopics.isEmpty()) {
+            throw new IllegalStateException("MQTT receive topics must be configured when MqttReceiveService is present");
         }
 
-        mqttProperties.getReceiveTopics()
-                .forEach(topic -> topic.setName(mqttProperties.getTopicPrefix() + topic.getName()));
+        List<MqttProperties.Topic> prefixedTopics = receiveTopics.stream()
+                .map(topic -> new MqttProperties.Topic(prefixedTopicName(topic.getName()), topic.getQos()))
+                .toList();
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
                 mqttProperties.getClient() + "_in", mqttClientFactory,
-                mqttProperties.getReceiveTopics().stream().map(MqttProperties.Topic::getName).toArray(String[]::new));
-        adapter.setQos(mqttProperties.getReceiveTopics().stream().mapToInt(MqttProperties.Topic::getQos).toArray());
-        adapter.setOutputChannel(mqttInboundChannel());
+                prefixedTopics.stream().map(MqttProperties.Topic::getName).toArray(String[]::new));
+        adapter.setQos(prefixedTopics.stream().mapToInt(MqttProperties.Topic::getQos).toArray());
+        adapter.setOutputChannel(mqttInboundChannel);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setCompletionTimeout(mqttProperties.getCompletionTimeout());
-        log.info("Set receive topics: {}", JsonUtil.toJsonString(mqttProperties.getReceiveTopics()));
+        log.info("Set receive topics: {}", JsonUtil.toJsonString(prefixedTopics));
         return adapter;
     }
 
@@ -129,15 +135,24 @@ public class MqttConfig {
     @Bean
     @ServiceActivator(inputChannel = "mqttOutboundChannel")
     public MessageHandler mqttOutbound(MqttPahoClientFactory mqttClientFactory) {
-        mqttProperties.getDefaultSendTopic()
-                .setName(mqttProperties.getTopicPrefix() + mqttProperties.getDefaultSendTopic().getName());
+        MqttProperties.Topic defaultSendTopic = mqttProperties.getDefaultSendTopic();
+        MqttProperties.Topic prefixedDefaultSendTopic = new MqttProperties.Topic(
+                prefixedTopicName(defaultSendTopic.getName()), defaultSendTopic.getQos());
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(mqttProperties.getClient() + "_out",
                 mqttClientFactory);
         messageHandler.setAsync(true);
-        messageHandler.setDefaultQos(mqttProperties.getDefaultSendTopic().getQos());
-        messageHandler.setDefaultTopic(mqttProperties.getDefaultSendTopic().getName());
-        log.info("Set default send topic: {}", JsonUtil.toJsonString(mqttProperties.getDefaultSendTopic()));
+        messageHandler.setDefaultQos(prefixedDefaultSendTopic.getQos());
+        messageHandler.setDefaultTopic(prefixedDefaultSendTopic.getName());
+        log.info("Set default send topic: {}", JsonUtil.toJsonString(prefixedDefaultSendTopic));
         return messageHandler;
+    }
+
+    private String prefixedTopicName(String topicName) {
+        String topicPrefix = mqttProperties.getTopicPrefix();
+        if (StringUtils.isBlank(topicPrefix) || StringUtils.startsWith(topicName, topicPrefix)) {
+            return topicName;
+        }
+        return topicPrefix + topicName;
     }
 
 }
