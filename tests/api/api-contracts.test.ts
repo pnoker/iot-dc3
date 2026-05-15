@@ -114,7 +114,7 @@ const coveredApiSourceFiles = new Set([
 ]);
 
 const apiSourceFileExclusions = new Set(['common', 'dashboard/index']);
-const excludedExports = new Set(['streamAgenticChatCompletion']);
+const excludedExports = new Set(['streamAgenticChatCompletion', 'completeAgenticChatCompletion']);
 
 const pageQuery = {
   page: { current: 2, size: 20 },
@@ -269,6 +269,10 @@ describe('agentic streaming contract', () => {
       const body = [
         'data: {"object":"agentic.event","type":"tool","title":"Tool call","detail":"done","created":1}',
         '',
+        'data: {"choices":[{"delta":{"reasoning_content":"let me think "}}]}',
+        '',
+        'data: {"choices":[{"delta":{"reasoning_content":"about this"}}]}',
+        '',
         'data: {"choices":[{"delta":{"content":"hello "}}]}',
         '',
         'data: {"choices":[{"delta":{"content":"world"}}]}',
@@ -287,6 +291,7 @@ describe('agentic streaming contract', () => {
 
     const onDelta = vi.fn();
     const onEvent = vi.fn();
+    const onReasoning = vi.fn();
     const onDone = vi.fn();
 
     await agenticApi.streamAgenticChatCompletion(
@@ -298,6 +303,7 @@ describe('agentic streaming contract', () => {
       {
         onDelta,
         onEvent,
+        onReasoning,
         onDone,
       }
     );
@@ -317,6 +323,7 @@ describe('agentic streaming contract', () => {
       })
     );
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'tool', title: 'Tool call' }));
+    expect(onReasoning.mock.calls.map(([chunk]) => chunk)).toEqual(['let me think ', 'about this']);
     expect(onDelta.mock.calls.map(([chunk]) => chunk)).toEqual(['hello ', 'world']);
     expect(onDone).toHaveBeenCalledTimes(1);
   });
