@@ -149,7 +149,7 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
      */
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                       PointBO point) {
+                               PointBO point) {
         return null;
     }
 
@@ -161,11 +161,11 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
      * device-channel mapping, the value is converted to bytes and sent to the device.
      * </p>
      *
-     * @param driverConfig Driver configuration attributes
-     * @param pointConfig  Point configuration attributes
-     * @param device       The device to write to
-     * @param point        The point to write
-     * @param writePointValue       The value to write
+     * @param driverConfig    Driver configuration attributes
+     * @param pointConfig     Point configuration attributes
+     * @param device          The device to write to
+     * @param point           The point to write
+     * @param writePointValue The value to write
      * @return true if the write operation was processed
      */
     @Override

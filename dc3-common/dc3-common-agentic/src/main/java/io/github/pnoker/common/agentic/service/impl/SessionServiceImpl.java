@@ -22,8 +22,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.dal.SessionManager;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
-import io.github.pnoker.common.agentic.entity.model.SessionConfig;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
+import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.MessageService;
@@ -67,13 +67,13 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public SessionBO touch(String conversationId, Long tenantId, Long userId, String model,
-                           SessionConfig sessionConfig) {
+                           SessionExt sessionExt) {
         SessionDO existing = findByConversationId(conversationId);
         if (Objects.nonNull(existing)) {
             existing.setTenantId(tenantId);
             existing.setUserId(userId);
             applyModel(existing, model);
-            applySessionConfig(existing, sessionConfig);
+            applySessionExt(existing, sessionExt);
             sessionManager.updateById(existing);
             return sessionBuilder.buildBOByDO(existing);
         }
@@ -84,7 +84,7 @@ public class SessionServiceImpl implements SessionService {
         entityDO.setUserId(userId);
         entityDO.setTitle("New Conversation");
         applyModel(entityDO, model);
-        applySessionConfig(entityDO, sessionConfig);
+        applySessionExt(entityDO, sessionExt);
         sessionManager.save(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
     }
@@ -116,46 +116,51 @@ public class SessionServiceImpl implements SessionService {
         if (StringUtils.isNotBlank(request.getTitle())) {
             entityDO.setTitle(request.getTitle().trim());
         }
-        applyModel(entityDO, request.getModel());
-        applySessionConfig(entityDO, request.getSessionConfig());
+        applySessionExt(entityDO, request.getSessionExt());
         sessionManager.updateById(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
     }
 
     private void applyModel(SessionDO entityDO, String model) {
         if (StringUtils.isNotBlank(model)) {
-            entityDO.setModel(model.trim());
+            SessionExt target = Objects.nonNull(entityDO.getSessionExt()) ? entityDO.getSessionExt()
+                    : new SessionExt();
+            target.setModel(model.trim());
+            entityDO.setSessionExt(target);
         }
     }
 
-    private void applySessionConfig(SessionDO entityDO, SessionConfig requestConfig) {
-        if (Objects.isNull(requestConfig)) {
+    private void applySessionExt(SessionDO entityDO, SessionExt requestExt) {
+        if (Objects.isNull(requestExt)) {
             return;
         }
-        validateSessionConfig(requestConfig);
-        SessionConfig target = Objects.nonNull(entityDO.getSessionConfig()) ? entityDO.getSessionConfig()
-                : new SessionConfig();
-        if (Objects.nonNull(requestConfig.getReasoningEnabled())) {
-            target.setReasoningEnabled(requestConfig.getReasoningEnabled());
+        validateSessionExt(requestExt);
+        SessionExt target = Objects.nonNull(entityDO.getSessionExt()) ? entityDO.getSessionExt()
+                : new SessionExt();
+        if (StringUtils.isNotBlank(requestExt.getModel())) {
+            target.setModel(requestExt.getModel().trim());
         }
-        if (Objects.nonNull(requestConfig.getTemperature())) {
-            target.setTemperature(requestConfig.getTemperature());
+        if (Objects.nonNull(requestExt.getReasoningEnabled())) {
+            target.setReasoningEnabled(requestExt.getReasoningEnabled());
         }
-        if (Objects.nonNull(requestConfig.getMaxTokens())) {
-            target.setMaxTokens(requestConfig.getMaxTokens());
+        if (Objects.nonNull(requestExt.getTemperature())) {
+            target.setTemperature(requestExt.getTemperature());
         }
-        if (Objects.nonNull(requestConfig.getRequireConfirmation())) {
-            target.setRequireConfirmation(requestConfig.getRequireConfirmation());
+        if (Objects.nonNull(requestExt.getMaxTokens())) {
+            target.setMaxTokens(requestExt.getMaxTokens());
         }
-        entityDO.setSessionConfig(target);
+        if (Objects.nonNull(requestExt.getRequireConfirmation())) {
+            target.setRequireConfirmation(requestExt.getRequireConfirmation());
+        }
+        entityDO.setSessionExt(target);
     }
 
-    private void validateSessionConfig(SessionConfig sessionConfig) {
-        if (Objects.nonNull(sessionConfig.getTemperature())
-                && (sessionConfig.getTemperature() < 0.0 || sessionConfig.getTemperature() > 2.0)) {
+    private void validateSessionExt(SessionExt sessionExt) {
+        if (Objects.nonNull(sessionExt.getTemperature())
+                && (sessionExt.getTemperature() < 0.0 || sessionExt.getTemperature() > 2.0)) {
             throw new RequestException("Temperature must be between 0.0 and 2.0");
         }
-        if (Objects.nonNull(sessionConfig.getMaxTokens()) && sessionConfig.getMaxTokens() < 1) {
+        if (Objects.nonNull(sessionExt.getMaxTokens()) && sessionExt.getMaxTokens() < 1) {
             throw new RequestException("Max tokens must be greater than 0");
         }
     }

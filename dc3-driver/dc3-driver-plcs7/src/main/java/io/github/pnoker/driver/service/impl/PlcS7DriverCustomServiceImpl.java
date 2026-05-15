@@ -114,7 +114,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                       PointBO point) {
+                               PointBO point) {
         log.debug("Driver point read requested, protocol=plcS7, deviceId={}, pointId={}, pointType={}", device.getId(),
                 point.getId(), point.getPointTypeFlag());
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);

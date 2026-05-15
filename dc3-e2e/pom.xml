@@ -38,32 +38,10 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <rest-assured.groovy.version>4.0.22</rest-assured.groovy.version>
         <!-- E2E is only invoked by an explicit profile or workflow. -->
         <skip.unit.tests>true</skip.unit.tests>
         <skip.integration.tests>true</skip.integration.tests>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Rest Assured 5.5.0 imports Groovy [4.0,5.0); override Spring Boot's Groovy 5 management. -->
-            <dependency>
-                <groupId>org.apache.groovy</groupId>
-                <artifactId>groovy</artifactId>
-                <version>${rest-assured.groovy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.groovy</groupId>
-                <artifactId>groovy-json</artifactId>
-                <version>${rest-assured.groovy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.groovy</groupId>
-                <artifactId>groovy-xml</artifactId>
-                <version>${rest-assured.groovy.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -85,17 +63,17 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>rabbitmq</artifactId>
+            <artifactId>testcontainers-rabbitmq</artifactId>
             <scope>test</scope>
         </dependency>
 

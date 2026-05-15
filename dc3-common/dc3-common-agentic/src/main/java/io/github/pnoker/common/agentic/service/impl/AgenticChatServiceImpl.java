@@ -16,13 +16,15 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import com.openai.core.JsonValue;
+import com.openai.models.chat.completions.ChatCompletionChunk;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.entity.model.SessionConfig;
+import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.entity.request.ChatMessageDTO;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
@@ -53,6 +55,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -71,6 +75,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -139,9 +144,11 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             long created = Instant.now().getEpochSecond();
             StringBuilder assistantContent = new StringBuilder();
 
-            Flux<String> contentFlux = promptSpec.stream().content()
+            Flux<StreamDelta> contentFlux = promptSpec.stream().chatResponse()
                     .doOnSubscribe(subscription -> AgenticRequestContext.set(userHeader))
-                    .doOnNext(assistantContent::append)
+                    .map(this::extractStreamDelta)
+                    .filter(StreamDelta::hasContent)
+                    .doOnNext(delta -> assistantContent.append(delta.content()))
                     .doOnComplete(() -> persistAssistantMessage(prepared, assistantContent.toString(), userHeader))
                     .doFinally(signalType -> AgenticRequestContext.clear());
 
@@ -232,7 +239,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 mode, model, request.getMessages().size(), StringUtils.isNotBlank(request.getConversationId()),
                 Objects.isNull(skill) ? null : skill.getName(), userHeader.getTenantId(), userHeader.getUserId());
 
-        touchSession(scopedConversationId, conversationId, userHeader, model, buildSessionConfig(request));
+        touchSession(scopedConversationId, conversationId, userHeader, model, buildSessionExt(request, model));
 
         return new PreparedChatRequest(rawUserMessage, scopedConversationId, skillSystemPrompt,
                 requestSystemContext, normalizeToolNames(toolNames), model, effectiveSkillName, toolContext,
@@ -479,7 +486,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         return Objects.nonNull(optionsBuilder) ? promptSpec.options(optionsBuilder) : promptSpec;
     }
 
-    private String formatChunk(String id, long created, String model, String content) {
+    private String formatChunk(String id, long created, String model, StreamDelta streamDelta) {
         ChatCompletionChunkResponse chunk = ChatCompletionChunkResponse.builder()
                 .id(id)
                 .object("chat.completion.chunk")
@@ -487,7 +494,8 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 .model(model)
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkResponse.Delta(null, content))
+                        .delta(new ChatCompletionChunkResponse.Delta(null, streamDelta.content(),
+                                streamDelta.reasoningContent()))
                         .finishReason(null)
                         .build()))
                 .build();
@@ -502,7 +510,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 .model(model)
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkResponse.Delta(null, null))
+                        .delta(new ChatCompletionChunkResponse.Delta(null, null, null))
                         .finishReason("stop")
                         .build()))
                 .build();
@@ -537,7 +545,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     }
 
     private List<ServerSentEvent<String>> chunkEvents(PreparedChatRequest prepared, String chatId, long created,
-                                                      String chunk) {
+                                                      StreamDelta streamDelta) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
         AgenticRequestContext.ToolEvent event = prepared.toolEvents().poll();
         while (Objects.nonNull(event)) {
@@ -548,9 +556,38 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             event = prepared.toolEvents().poll();
         }
         events.add(ServerSentEvent.<String>builder()
-                .data(formatChunk(chatId, created, prepared.model(), chunk))
+                .data(formatChunk(chatId, created, prepared.model(), streamDelta))
                 .build());
         return events;
+    }
+
+    private StreamDelta extractStreamDelta(ChatResponse response) {
+        if (Objects.isNull(response) || Objects.isNull(response.getResult())) {
+            return StreamDelta.empty();
+        }
+        Generation generation = response.getResult();
+        String content = Objects.nonNull(generation.getOutput()) ? generation.getOutput().getText() : null;
+        return new StreamDelta(StringUtils.defaultString(content), extractReasoningContent(generation));
+    }
+
+    private String extractReasoningContent(Generation generation) {
+        if (Objects.isNull(generation) || Objects.isNull(generation.getOutput())) {
+            return null;
+        }
+        Object chunkChoice = generation.getOutput().getMetadata().get("chunkChoice");
+        if (Objects.isNull(chunkChoice)) {
+            return null;
+        }
+
+        if (chunkChoice instanceof ChatCompletionChunk.Choice openAiChunkChoice) {
+            Object rawValue = openAiChunkChoice.delta()._additionalProperties().get("reasoning_content");
+            if (!(rawValue instanceof JsonValue value)) {
+                return null;
+            }
+            Optional<String> reasoningContent = value.asString();
+            return reasoningContent.orElse(null);
+        }
+        return null;
     }
 
     private String formatEvent(String type, String title, String detail, String name) {
@@ -670,24 +707,26 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         return StringUtils.defaultString(value).replace("|", "\\|").replace("\n", " ");
     }
 
-    private SessionConfig buildSessionConfig(ChatCompletionRequest request) {
+    private SessionExt buildSessionExt(ChatCompletionRequest request, String model) {
         if (Objects.isNull(request.getReasoning()) && Objects.isNull(request.getTemperature())
-                && Objects.isNull(request.getMaxTokens()) && Objects.isNull(request.getConfirmActions())) {
+                && Objects.isNull(request.getMaxTokens()) && Objects.isNull(request.getConfirmActions())
+                && StringUtils.isBlank(model)) {
             return null;
         }
-        SessionConfig sessionConfig = new SessionConfig();
-        sessionConfig.setReasoningEnabled(request.getReasoning());
-        sessionConfig.setTemperature(request.getTemperature());
-        sessionConfig.setMaxTokens(request.getMaxTokens());
-        sessionConfig.setRequireConfirmation(request.getConfirmActions());
-        return sessionConfig;
+        SessionExt sessionExt = new SessionExt();
+        sessionExt.setModel(model);
+        sessionExt.setReasoningEnabled(request.getReasoning());
+        sessionExt.setTemperature(request.getTemperature());
+        sessionExt.setMaxTokens(request.getMaxTokens());
+        sessionExt.setRequireConfirmation(request.getConfirmActions());
+        return sessionExt;
     }
 
     private void touchSession(String scopedConversationId, String conversationId, RequestHeader.UserHeader userHeader,
-                              String model, SessionConfig sessionConfig) {
+                              String model, SessionExt sessionExt) {
         try {
             sessionService.touch(scopedConversationId, userHeader.getTenantId(), userHeader.getUserId(), model,
-                    sessionConfig);
+                    sessionExt);
         } catch (Exception e) {
             log.warn(
                     "Agentic session touch failed, tenantId={}, userId={}, conversationId={}",
@@ -805,6 +844,18 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                                        List<AgenticMessageContent.Context> contexts,
                                        AgenticMessageContent.Tokens inputTokens,
                                        List<AgenticRequestContext.ToolEvent> toolTraceEvents) {
+    }
+
+    private record StreamDelta(String content, String reasoningContent) {
+
+        static StreamDelta empty() {
+            return new StreamDelta("", null);
+        }
+
+        boolean hasContent() {
+            return StringUtils.isNotEmpty(content) || StringUtils.isNotEmpty(reasoningContent);
+        }
+
     }
 
 }

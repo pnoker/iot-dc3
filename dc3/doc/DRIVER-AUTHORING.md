@@ -232,12 +232,12 @@ public class BacnetDriverCustomServiceImpl implements DriverCustomService {
 You don't need to write any RabbitMQ or gRPC plumbing. Use the injected
 `DriverSenderService`:
 
-| Method                                                                    | Purpose                                                                                                                                                                                                 |
-|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Method                                                                    | Purpose                                                                                                                                                                                                         |
+|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `pointValueSender(PointValue)` / `pointValueSender(List<PointValue>)`     | Push a single (or batch) of values to `dc3-center-data`. Use this for *push-style* drivers (MQTT, OPC subscriptions); polling drivers usually just return `ReadPointValue` from `read` and let the SDK send it. |
-| `deviceStatusSender(deviceId, status)` / `(deviceId, status, ttl, unit)`  | Report a device as ONLINE / OFFLINE / FAULT / MAINTAIN. The TTL drives auto-OFFLINE on silence (default ~25 s if you use the no-TTL overload).                                                          |
-| `driverEventSender(DriverEventDTO)` / `deviceEventSender(DeviceEventDTO)` | Emit structured driver- or device-scoped events that show up in the dashboard alert feed.                                                                                                               |
-| `driverAlarmSender(String)` / `deviceAlarmSender(deviceId, String)`       | Quick path for alarm-style events with just a human-readable reason (e.g. `"OPC UA session dropped"`).                                                                                                  |
+| `deviceStatusSender(deviceId, status)` / `(deviceId, status, ttl, unit)`  | Report a device as ONLINE / OFFLINE / FAULT / MAINTAIN. The TTL drives auto-OFFLINE on silence (default ~25 s if you use the no-TTL overload).                                                                  |
+| `driverEventSender(DriverEventDTO)` / `deviceEventSender(DeviceEventDTO)` | Emit structured driver- or device-scoped events that show up in the dashboard alert feed.                                                                                                                       |
+| `driverAlarmSender(String)` / `deviceAlarmSender(deviceId, String)`       | Quick path for alarm-style events with just a human-readable reason (e.g. `"OPC UA session dropped"`).                                                                                                          |
 
 Status TTLs: pick a number larger than your `schedule` cron interval. Otherwise the device
 flips to OFFLINE between two heartbeats. For example, with `cron: '0/5 * * * * ?'` (every

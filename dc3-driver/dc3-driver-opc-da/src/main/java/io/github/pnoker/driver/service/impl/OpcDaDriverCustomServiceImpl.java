@@ -116,7 +116,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                       PointBO point) {
+                               PointBO point) {
         return new ReadPointValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
     }
 
@@ -242,9 +242,9 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Write a value to an OPC DA tag.
      *
-     * @param server      active OPC DA server connection
-     * @param pointConfig tag configuration (group, tag)
-     * @param writePointValue      value to write
+     * @param server          active OPC DA server connection
+     * @param pointConfig     tag configuration (group, tag)
+     * @param writePointValue value to write
      * @return true if the write succeeded
      * @throws WritePointException if writing fails (server is disposed on error)
      */
@@ -265,7 +265,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      * <p>
      * Supports SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
      *
-     * @param item   target OPC DA Item
+     * @param item            target OPC DA Item
      * @param writePointValue value and type to write
      * @return true if the server reported success
      * @throws JIException        if DCOM communication fails

@@ -116,7 +116,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                       PointBO point) {
+                               PointBO point) {
         return new ReadPointValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
     }
 
@@ -205,9 +205,9 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Write a value to an OPC UA node.
      *
-     * @param client      connected OPC UA client
-     * @param pointConfig point configuration (namespace, tag)
-     * @param writePointValue      value to write
+     * @param client          connected OPC UA client
+     * @param pointConfig     point configuration (namespace, tag)
+     * @param writePointValue value to write
      * @return true if the write succeeded
      * @throws WritePointException if writing fails
      */
@@ -232,8 +232,8 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
      * <p>
      * Supports INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
      *
-     * @param client connected OPC UA client
-     * @param nodeId target node identifier
+     * @param client          connected OPC UA client
+     * @param nodeId          target node identifier
      * @param writePointValue value and type to write
      * @return true if the server reported a good status
      */
