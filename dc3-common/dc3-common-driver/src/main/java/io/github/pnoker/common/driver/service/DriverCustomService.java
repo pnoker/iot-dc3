@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.driver.service;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -85,10 +85,10 @@ public interface DriverCustomService {
      *                     configuration information
      * @param device       device object containing basic device information and properties
      * @param point        point object containing basic point information and properties
-     * @return returns the read data encapsulated in a {@link RValue} object
+     * @return returns the read data encapsulated in a {@link ReadPointValue} object
      */
-    RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                PointBO point);
+    ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+                        PointBO point);
 
     /**
      * Execute Write Operation
@@ -106,11 +106,12 @@ public interface DriverCustomService {
      *                     configuration information
      * @param device       device object containing basic device information and properties
      * @param point        point object containing basic point information and properties
-     * @param wValue       data to be written encapsulated in a {@link WValue} object
+     * @param writePointValue data to be written encapsulated in a
+     *                        {@link WritePointValue} object
      * @return returns whether the write operation was successful, returns {@code true} if
      * successful, otherwise returns {@code false} or throws an exception
      */
     Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                  PointBO point, WValue wValue);
+                  PointBO point, WritePointValue writePointValue);
 
 }

@@ -27,8 +27,8 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -121,17 +121,17 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                        PointBO point) {
-        return new RValue(device, point,
+        return new ReadPointValue(device, point,
                 readValue(getConnector(device.getId(), driverConfig), pointConfig, point.getPointTypeFlag().getCode()));
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WValue wValue) {
+                         PointBO point, WritePointValue writePointValue) {
         ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
-        return writeValue(modbusMaster, pointConfig, wValue);
+        return writeValue(modbusMaster, pointConfig, writePointValue);
     }
 
     /**
@@ -231,21 +231,21 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      *
      * @param modbusMaster active Modbus connection
      * @param pointConfig  point configuration (slaveId, functionCode, offset)
-     * @param wValue       value to write
+     * @param writePointValue       value to write
      * @return true if write succeeded, false if failed or unsupported function code
      */
-    private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WValue wValue) {
+    private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
         int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
         int functionCode = pointConfig.get("functionCode").getValue(Integer.class);
         int offset = pointConfig.get("offset").getValue(Integer.class);
         switch (functionCode) {
             case 1:
-                WriteCoilResponse coilResponse = setMasterValue(modbusMaster, slaveId, offset, wValue);
+                WriteCoilResponse coilResponse = setMasterValue(modbusMaster, slaveId, offset, writePointValue);
                 return !coilResponse.isException();
             case 3:
                 BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset,
-                        getValueType(wValue.getType().getCode()));
-                setMasterValue(modbusMaster, locator, wValue);
+                        getValueType(writePointValue.getType().getCode()));
+                setMasterValue(modbusMaster, locator, writePointValue);
                 return true;
             default:
                 log.warn("Unsupported Modbus write function code, slaveId={}, functionCode={}, offset={}", slaveId,
@@ -283,13 +283,13 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      * @param modbusMaster active Modbus connection
      * @param slaveId      target slave address
      * @param offset       coil offset
-     * @param wValue       value containing the boolean to write
+     * @param writePointValue       value containing the boolean to write
      * @return the coil write response
      * @throws WritePointException if a transport error occurs
      */
-    private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, WValue wValue) {
+    private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, WritePointValue writePointValue) {
         try {
-            WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, wValue.getValue(Boolean.class));
+            WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, writePointValue.getValue(Boolean.class));
             return (WriteCoilResponse) modbusMaster.send(coilRequest);
         } catch (ModbusTransportException e) {
             log.error("Driver point write failed, protocol=modbusTcp, slaveId={}, offset={}", slaveId, offset, e);
@@ -302,13 +302,13 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      *
      * @param modbusMaster active Modbus connection
      * @param locator      identifies the target register
-     * @param wValue       value to write (read as Float)
+     * @param writePointValue       value to write (read as Float)
      * @param <T>          value type determined by the locator
      * @throws WritePointException if a transport or error response occurs
      */
-    private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WValue wValue) {
+    private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WritePointValue writePointValue) {
         try {
-            modbusMaster.setValue(locator, wValue.getValue(Float.class));
+            modbusMaster.setValue(locator, writePointValue.getValue(Float.class));
         } catch (ModbusTransportException | ErrorResponseException e) {
             log.error("Driver point write failed, protocol=modbusTcp", e);
             throw new WritePointException(e.getMessage());

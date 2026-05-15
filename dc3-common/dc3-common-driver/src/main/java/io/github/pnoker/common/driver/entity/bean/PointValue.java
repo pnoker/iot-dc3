@@ -94,12 +94,13 @@ public class PointValue implements Serializable {
      */
     private LocalDateTime createTime;
 
-    public PointValue(RValue rValue) {
-        this.deviceId = rValue.getDevice().getId();
-        this.pointId = rValue.getPoint().getId();
-        this.rawValue = rValue.getValue();
-        this.calValue = rValue.getFinalValue();
-        this.numValue = rValue.getNumericValue();
+    public PointValue(ReadPointValue readPointValue) {
+        CalculatedPointValue calculatedValue = readPointValue.calculate();
+        this.deviceId = readPointValue.getDevice().getId();
+        this.pointId = readPointValue.getPoint().getId();
+        this.rawValue = readPointValue.getValue();
+        this.calValue = calculatedValue.getFinalValue();
+        this.numValue = calculatedValue.getNumericValue();
         this.createTime = LocalDateTimeUtil.now();
     }
 

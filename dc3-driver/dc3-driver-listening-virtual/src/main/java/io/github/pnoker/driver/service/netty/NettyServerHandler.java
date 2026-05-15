@@ -18,7 +18,7 @@
 package io.github.pnoker.driver.service.netty;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
-import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -131,7 +131,7 @@ public class NettyServerHandler {
                 };
 
                 if (StringUtils.isNotEmpty(value)) {
-                    pointValues.add(new PointValue(new RValue(device, point, value)));
+                    pointValues.add(new PointValue(new ReadPointValue(device, point, value)));
                 }
             }
         }
