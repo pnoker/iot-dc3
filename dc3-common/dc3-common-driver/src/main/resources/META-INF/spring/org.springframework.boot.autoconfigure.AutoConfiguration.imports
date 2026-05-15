@@ -15,5 +15,5 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-io.github.pnoker.common.init.DriverInitRunner
-io.github.pnoker.common.config.DriverTopicConfig
+io.github.pnoker.common.driver.init.DriverInitRunner
+io.github.pnoker.common.driver.config.DriverTopicConfig

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.config;
+package io.github.pnoker.common.driver.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.utils.EnvironmentUtil;

@@ -15,5 +15,5 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 org.springframework.boot.EnvironmentPostProcessor=\
-  io.github.pnoker.common.config.ActiveDriverProfileConfig,\
-  io.github.pnoker.common.config.DriverEnvironmentConfig
+  io.github.pnoker.common.driver.config.ActiveDriverProfileConfig,\
+  io.github.pnoker.common.driver.config.DriverEnvironmentConfig

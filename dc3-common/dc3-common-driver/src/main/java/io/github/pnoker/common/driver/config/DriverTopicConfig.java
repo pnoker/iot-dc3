@@ -15,8 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.config;
+package io.github.pnoker.common.driver.config;
 
+import io.github.pnoker.common.config.ExchangeConfig;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -82,35 +83,6 @@ public class DriverTopicConfig {
         Binding binding = BindingBuilder.bind(metadataQueue)
                 .to(metadataExchange)
                 .with(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverProperties.getService());
-        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
-        return binding;
-    }
-
-    /**
-     * Creates the driver command queue used to receive driver-level commands.
-     *
-     * @return driver command queue
-     */
-    @Bean
-    Queue driverCommandQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 30 seconds: 30 * 1000 = 30000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX + driverProperties.getService(), true, false, false,
-                arguments);
-    }
-
-    /**
-     * Binds the driver command queue to the command exchange.
-     *
-     * @param driverCommandQueue driver command queue
-     * @return queue binding
-     */
-    @Bean
-    Binding driverCommandBinding(Queue driverCommandQueue) {
-        Binding binding = BindingBuilder.bind(driverCommandQueue)
-                .to(commandExchange)
-                .with(RabbitConstant.ROUTING_DRIVER_COMMAND_PREFIX + driverProperties.getService());
         binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
