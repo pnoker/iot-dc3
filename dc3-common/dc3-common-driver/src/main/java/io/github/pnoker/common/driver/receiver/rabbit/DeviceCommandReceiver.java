@@ -83,9 +83,6 @@ public class DeviceCommandReceiver {
                     // Execute write operation
                     driverWriteService.write(entityDTO);
                     break;
-                case CONFIG:
-                    // to do something
-                    break;
                 default:
                     log.error("Unsupported device command type: {}", entityDTO.getType());
                     RabbitAckUtil.reject(channel, deliveryTag);
