@@ -26,6 +26,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
@@ -37,12 +38,19 @@ import java.util.Set;
  * Quartz job that iterates through enabled devices and points and triggers periodic
  * reads.
  *
+ * <p>The scan walks every device and every point sequentially, so a single slow
+ * point can stretch one execution past the next trigger. {@link DisallowConcurrentExecution}
+ * stops Quartz from launching overlapping fires when that happens — the next
+ * trigger waits for the in-flight scan to finish instead of stacking up worker
+ * threads on the same metadata structures.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 @Slf4j
 @Component
+@DisallowConcurrentExecution
 public class DriverReadScheduleJob extends QuartzJobBean {
 
     @Resource

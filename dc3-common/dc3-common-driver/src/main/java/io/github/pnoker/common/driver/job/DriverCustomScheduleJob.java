@@ -19,12 +19,15 @@ package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 /**
  * Quartz job that invokes the custom scheduled task implemented by the driver.
+ * Marked {@link DisallowConcurrentExecution} so a slow custom job cannot stack
+ * overlapping invocations against the same driver state.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@DisallowConcurrentExecution
 public class DriverCustomScheduleJob extends QuartzJobBean {
 
     private final DriverCustomService driverCustomService;

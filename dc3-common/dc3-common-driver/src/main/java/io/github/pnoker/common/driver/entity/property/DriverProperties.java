@@ -153,9 +153,12 @@ public class DriverProperties {
             private Boolean enable = false;
 
             /**
-             * Quartz cron expression used by the job.
+             * Quartz cron expression used by the job. Defaults to every 15 minutes on
+             * the 0th second; the previous default fired every second whenever the
+             * minute was a multiple of 15, which let read scans pile up well past the
+             * SDK's intent.
              */
-            private String cron = "* */15 * * * ?";
+            private String cron = "0 */15 * * * ?";
 
         }
 
