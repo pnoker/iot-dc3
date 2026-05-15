@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.utils;
 
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,9 +59,10 @@ public class HmacAuthSigner {
             this.secret = null;
             this.enabled = false;
             log.warn(
-                    "dc3.auth.hmac.secret (env AUTH_HMAC_SECRET) is not configured — X-Auth-User header signing is DISABLED. "
+                    "{} (env {}) is not configured. X-Auth-User header signing is DISABLED. "
                             + "Backend services will trust the X-Auth-User header without verification, which is unsafe in production. "
-                            + "Set a strong shared secret to enable signing.");
+                            + "Set a strong shared secret to enable signing.",
+                    EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY, EnvironmentConstant.AUTH_HMAC_SECRET_ENV);
         } else {
             this.secret = secret.getBytes(StandardCharsets.UTF_8);
             this.enabled = true;
