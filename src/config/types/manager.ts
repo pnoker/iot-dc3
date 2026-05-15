@@ -20,13 +20,22 @@
 
 // ─── Device ──────────────────────────────────────────────────────────
 
+export interface DeviceExt {
+  content?: {
+    keep?: string;
+  };
+}
+
 export interface DeviceForm {
   id?: string;
   deviceName?: string;
   deviceCode?: string;
   driverId?: string;
   profileIds?: string[];
+  deviceExt?: DeviceExt;
   enableFlag?: string;
+  signature?: string;
+  version?: number;
   remark?: string;
   [key: string]: unknown;
 }
@@ -54,11 +63,22 @@ export interface DriverRecord {
 
 // ─── Profile ─────────────────────────────────────────────────────────
 
+export interface ProfileExt {
+  content?: {
+    keep?: string;
+  };
+}
+
 export interface ProfileForm {
   id?: string;
   profileName?: string;
   profileCode?: string;
+  profileShareFlag?: string;
+  profileTypeFlag?: string;
+  profileExt?: ProfileExt;
   enableFlag?: string;
+  signature?: string;
+  version?: number;
   remark?: string;
   [key: string]: unknown;
 }
@@ -71,14 +91,27 @@ export interface ProfileRecord extends ProfileForm {
 
 // ─── Point ───────────────────────────────────────────────────────────
 
+export interface PointExt {
+  content?: {
+    keep?: string;
+  };
+}
+
 export interface PointForm {
   id?: string;
   pointName?: string;
   pointCode?: string;
   pointTypeFlag?: string;
-  profileId?: string;
+  rwFlag?: string;
+  baseValue?: number | string;
+  multiple?: number | string;
+  valueDecimal?: number | string;
   unit?: string;
+  profileId?: string;
+  pointExt?: PointExt;
   enableFlag?: string;
+  signature?: string;
+  version?: number;
   remark?: string;
   [key: string]: unknown;
 }

@@ -81,24 +81,30 @@
       </el-col>
     </div>
     <div class="body">
-      <el-scrollbar ref="scrollbarRef">
-        <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
-          <el-breadcrumb separator="/">
-            <el-breadcrumb-item v-for="(item, index) in breadcrumbItems" :key="`${item.path}-${index}`" :to="item.path">
-              <span class="breadcrumb__item">
-                <el-icon v-if="item.icon" class="breadcrumb__icon">
-                  <component :is="item.icon" />
-                </el-icon>
-                <span>{{ item.title }}</span>
-              </span>
-            </el-breadcrumb-item>
-          </el-breadcrumb>
-        </div>
-        <router-view />
-      </el-scrollbar>
-      <el-backtop :bottom="40" :right="40" target=".body .el-scrollbar__wrap" />
+      <div class="body-main">
+        <el-scrollbar ref="scrollbarRef">
+          <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
+            <el-breadcrumb separator="/">
+              <el-breadcrumb-item
+                v-for="(item, index) in breadcrumbItems"
+                :key="`${item.path}-${index}`"
+                :to="item.path"
+              >
+                <span class="breadcrumb__item">
+                  <el-icon v-if="item.icon" class="breadcrumb__icon">
+                    <component :is="item.icon" />
+                  </el-icon>
+                  <span>{{ item.title }}</span>
+                </span>
+              </el-breadcrumb-item>
+            </el-breadcrumb>
+          </div>
+          <router-view />
+        </el-scrollbar>
+      </div>
+      <agentic-assistant />
+      <el-backtop :bottom="40" :right="40" target=".body-main .el-scrollbar__wrap" />
     </div>
-    <agentic-assistant />
   </div>
 </template>
 
@@ -353,10 +359,22 @@
       right: 0;
       left: 0;
       bottom: 0;
+      display: flex;
       min-width: 1280px;
       padding: 5px 0 5px 0;
+      overflow: hidden;
       position: absolute;
       background: #f6f7f9;
+
+      .body-main {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 100%;
+
+        > .el-scrollbar {
+          height: 100%;
+        }
+      }
 
       .breadcrumb {
         padding: 12px 20px;

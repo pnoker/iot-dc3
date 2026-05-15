@@ -23,81 +23,191 @@
     </el-button>
   </el-tooltip>
 
-  <el-drawer
-    v-model="visible"
-    :close-on-click-modal="false"
-    :with-header="false"
-    append-to-body
-    custom-class="agentic-drawer"
-    size="900px"
-  >
+  <aside v-if="visible" ref="panelRef" :style="panelStyle" class="agentic-panel">
+    <button :aria-label="t('agentic.resize')" class="agentic-resizer" type="button" @mousedown="handleResizeStart" />
     <section v-loading="loading" class="agentic-shell">
       <header class="agentic-header">
-        <div class="agentic-title">
-          <div class="agentic-mark">AI</div>
-          <div>
-            <strong>{{ t('agentic.title') }}</strong>
-            <span>{{ currentSession?.title || t('agentic.newConversation') }}</span>
+        <div class="agentic-header__top">
+          <div class="agentic-title">
+            <div class="agentic-mark">
+              <img alt="" src="/images/common/llm.svg" />
+            </div>
+            <div>
+              <strong>{{ t('agentic.title') }}</strong>
+              <span>{{ currentSession?.title || t('agentic.newConversation') }}</span>
+            </div>
+          </div>
+
+          <div class="agentic-header__primary-actions">
+            <el-tooltip :content="t('agentic.headerNew')">
+              <el-button circle size="small" type="success" @click="handleNewSession">
+                <el-icon>
+                  <Plus />
+                </el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip :content="t('agentic.headerClose')">
+              <el-button circle size="small" type="danger" @click="agenticStore.close">
+                <el-icon>
+                  <Close />
+                </el-icon>
+              </el-button>
+            </el-tooltip>
           </div>
         </div>
 
         <div class="agentic-header__actions">
-          <el-button size="small" @click="handleNewSession">
-            <el-icon>
-              <Plus />
-            </el-icon>
-            New
-          </el-button>
-          <el-dropdown max-height="360" trigger="click" @command="handleHistoryCommand">
-            <el-button size="small">
-              <el-icon>
-                <Clock />
-              </el-icon>
-              History
-              <el-icon class="el-icon--right">
-                <ArrowDown />
-              </el-icon>
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item
-                  v-for="session in conversationItems"
-                  :key="session.conversationId"
-                  :command="`select:${session.conversationId}`"
+          <div class="agentic-header__actions-left">
+            <el-select
+              :model-value="selectedModel"
+              class="agentic-model agentic-model--toolbar"
+              filterable
+              size="small"
+              @update:model-value="handleModelChange"
+            >
+              <el-option
+                v-for="model in models"
+                :key="model.model"
+                :label="model.label || model.model"
+                :value="model.model"
+              />
+            </el-select>
+
+            <el-tooltip :content="t('agentic.reasoning')">
+              <el-switch
+                v-model="reasoningEnabled"
+                :active-icon="Cpu"
+                :aria-label="t('agentic.reasoning')"
+                :disabled="!activeModel.reasoning"
+                :inactive-icon="Lightning"
+                class="agentic-reasoning-switch"
+                inline-prompt
+                size="small"
+                @change="handlePrefsChange"
+              />
+            </el-tooltip>
+          </div>
+
+          <div class="agentic-header__actions-right">
+            <el-popover placement="bottom-end" trigger="click" width="300">
+              <template #reference>
+                <el-button :title="t('agentic.headerSettings')" circle size="small">
+                  <el-icon>
+                    <Setting />
+                  </el-icon>
+                </el-button>
+              </template>
+              <div class="agentic-settings">
+                <div class="agentic-setting">
+                  <span>{{ t('agentic.temperature') }}</span>
+                  <el-slider
+                    v-model="temperatureProxy"
+                    :max="2"
+                    :min="0"
+                    :step="0.1"
+                    size="small"
+                    @change="handlePrefsChange"
+                  />
+                </div>
+                <div class="agentic-setting">
+                  <span>{{ t('agentic.maxTokens') }}</span>
+                  <el-input-number
+                    v-model="maxTokensProxy"
+                    :min="1"
+                    :step="256"
+                    controls-position="right"
+                    size="small"
+                    @change="handlePrefsChange"
+                  />
+                </div>
+                <div class="agentic-setting agentic-setting--row">
+                  <span>{{ t('agentic.confirmActions') }}</span>
+                  <el-switch v-model="requireConfirmation" size="small" @change="handlePrefsChange" />
+                </div>
+                <div class="agentic-capabilities">
+                  <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small">{{
+                    t('agentic.capStream')
+                  }}</el-tag>
+                  <el-tag :type="activeModel.toolCall ? 'success' : 'info'" size="small">{{
+                    t('agentic.capTools')
+                  }}</el-tag>
+                  <el-tag :type="activeModel.vision ? 'success' : 'info'" size="small">{{
+                    t('agentic.capVision')
+                  }}</el-tag>
+                  <el-tag :type="activeModel.reasoning ? 'success' : 'info'" size="small">{{
+                    t('agentic.capReasoning')
+                  }}</el-tag>
+                </div>
+              </div>
+            </el-popover>
+
+            <el-dropdown max-height="360" trigger="click" @command="handleHistoryCommand">
+              <el-button :title="t('agentic.headerHistory')" circle size="small">
+                <el-icon>
+                  <Clock />
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    v-for="session in conversationItems"
+                    :key="session.conversationId"
+                    :command="`select:${session.conversationId}`"
+                  >
+                    <span class="agentic-history-item">{{ session.title }}</span>
+                  </el-dropdown-item>
+                  <el-dropdown-item v-if="conversationItems.length === 0" disabled>{{
+                    t('agentic.headerNoHistory')
+                  }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-popover v-model:visible="renamePopoverVisible" placement="bottom-end" trigger="click" width="280">
+              <template #reference>
+                <el-button
+                  :disabled="!activeConversationId"
+                  :title="t('agentic.headerRename')"
+                  circle
+                  size="small"
+                  @click="prepareRenameTitle"
                 >
-                  <span class="agentic-history-item">{{ session.title }}</span>
-                </el-dropdown-item>
-                <el-dropdown-item v-if="conversationItems.length === 0" disabled>{{
-                  t('agentic.headerNoHistory')
-                }}</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-          <el-tooltip :content="t('agentic.headerRename')">
-            <el-button :disabled="!activeConversationId" circle size="small" @click="handleRenameCurrent">
-              <el-icon>
-                <EditPen />
-              </el-icon>
-            </el-button>
-          </el-tooltip>
-          <el-tooltip :content="t('agentic.headerDelete')">
-            <el-button :disabled="!activeConversationId" circle size="small" @click="handleDeleteCurrent">
-              <el-icon>
-                <Delete />
-              </el-icon>
-            </el-button>
-          </el-tooltip>
-          <el-tooltip :content="t('agentic.headerClose')">
-            <el-button circle size="small" @click="agenticStore.close">
-              <el-icon>
-                <Close />
-              </el-icon>
-            </el-button>
-          </el-tooltip>
+                  <el-icon>
+                    <EditPen />
+                  </el-icon>
+                </el-button>
+              </template>
+              <div class="agentic-rename-form">
+                <span class="agentic-popover-title">{{ t('agentic.dialogConversationTitle') }}</span>
+                <el-input
+                  v-model="renameTitle"
+                  :maxlength="80"
+                  :placeholder="t('agentic.dialogConversationTitle')"
+                  clearable
+                  size="small"
+                  @keydown.enter.prevent="handleRenameCurrent"
+                />
+                <div class="agentic-popover-actions">
+                  <el-button size="small" @click="renamePopoverVisible = false">
+                    {{ t('agentic.dialogCancel') }}
+                  </el-button>
+                  <el-button :disabled="!renameTitle.trim()" size="small" type="primary" @click="handleRenameCurrent">
+                    {{ t('agentic.dialogSave') }}
+                  </el-button>
+                </div>
+              </div>
+            </el-popover>
+            <el-tooltip :content="t('agentic.headerDelete')">
+              <el-button :disabled="!activeConversationId" circle size="small" @click="handleDeleteCurrent">
+                <el-icon>
+                  <Delete />
+                </el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
         </div>
       </header>
 
-      <main class="agentic-body">
+      <main ref="bodyRef" class="agentic-body">
         <div v-if="currentMessages.length === 0" class="agentic-empty">
           <Welcome
             :description="t('agentic.welcomeDescription')"
@@ -115,123 +225,165 @@
             :class="`agentic-message--${message.role}`"
             class="agentic-message"
           >
-            <div class="agentic-message__avatar">
-              <img :src="message.role === 'user' ? '/images/common/avatar.png' : '/images/common/llm.svg'" alt="" />
-            </div>
-            <div class="agentic-message__content">
-              <div v-if="message.role === 'assistant'" class="agentic-markdown" v-html="renderMarkdown(message)" />
-              <div v-else class="agentic-text">{{ message.content }}</div>
-              <span v-if="message.streaming && !message.content" class="agentic-cursor">{{
-                t('agentic.thinking')
-              }}</span>
-              <div v-if="message.reasoning" class="agentic-reasoning">
-                <div class="agentic-reasoning__content" v-html="renderReasoning(message.reasoning)" />
-              </div>
-              <details
-                v-if="message.role === 'assistant' && hasAssistantDetails(message)"
-                :open="message.streaming"
-                class="agentic-details"
-              >
-                <summary>
+            <div class="agentic-message__main">
+              <div class="agentic-message__content">
+                <RenderedAssistantMessage
+                  v-if="message.role === 'assistant'"
+                  :content="message.content || (message.streaming ? t('agentic.thinking') : '')"
+                />
+                <div v-else class="agentic-text">{{ message.content }}</div>
+                <span v-if="message.streaming && !message.content" class="agentic-cursor">{{
+                  t('agentic.thinking')
+                }}</span>
+                <div
+                  v-if="message.role === 'assistant' && !message.streaming && truncatedReason(message)"
+                  class="agentic-message__warning"
+                >
                   <el-icon>
-                    <Cpu />
+                    <Warning />
                   </el-icon>
-                  <span>{{ assistantDetailSummary(message) }}</span>
-                </summary>
+                  <span>{{ truncatedReason(message) }}</span>
+                </div>
+                <div
+                  v-if="message.role === 'assistant' && !message.streaming && message.content"
+                  class="agentic-message__toolbar"
+                >
+                  <el-tooltip :content="t('agentic.actionCopy')" placement="top">
+                    <button class="agentic-message__action" type="button" @click="handleCopyMessage(message)">
+                      <el-icon>
+                        <DocumentCopy />
+                      </el-icon>
+                    </button>
+                  </el-tooltip>
+                  <el-tooltip :content="t('agentic.actionQuote')" placement="top">
+                    <button class="agentic-message__action" type="button" @click="handleQuoteMessage(message)">
+                      <el-icon>
+                        <ChatLineSquare />
+                      </el-icon>
+                    </button>
+                  </el-tooltip>
+                </div>
+                <div v-if="message.reasoning" class="agentic-reasoning">
+                  <div class="agentic-reasoning__content" v-html="renderReasoning(message.reasoning)" />
+                </div>
+                <details v-if="message.role === 'assistant' && hasAssistantDetails(message)" class="agentic-details">
+                  <summary>
+                    <el-icon>
+                      <Cpu />
+                    </el-icon>
+                    <span>{{ assistantDetailSummary(message) }}</span>
+                  </summary>
 
-                <div class="agentic-details__body">
-                  <div class="agentic-run-overview">
-                    <div v-for="item in assistantRunOverview(message)" :key="item.label" class="agentic-run-stat">
-                      <span>{{ item.label }}</span>
-                      <strong>{{ item.value }}</strong>
-                    </div>
-                  </div>
-
-                  <section v-if="assistantThinkingItems(message).length" class="agentic-trace-section">
-                    <div class="agentic-trace-section__header">
-                      <span>{{ t('agentic.detailThinking') }}</span>
-                    </div>
-                    <div class="agentic-thinking-list">
-                      <div v-for="item in assistantThinkingItems(message)" :key="item.label" class="agentic-thinking">
-                        <span>{{ item.label }}</span>
-                        <small>{{ item.detail }}</small>
-                      </div>
-                    </div>
-                  </section>
-
-                  <section v-if="assistantSkillSteps(message).length" class="agentic-trace-section">
-                    <div class="agentic-trace-section__header">
-                      <span>{{ t('agentic.detailSkillChain') }}</span>
-                    </div>
-                    <ol class="agentic-chain">
-                      <li v-for="step in assistantSkillSteps(message)" :key="step.id">
-                        <span class="agentic-chain__index">{{ step.index }}</span>
-                        <div class="agentic-chain__content">
-                          <strong>{{ step.label }}</strong>
-                          <small v-if="step.detail">{{ step.detail }}</small>
-                        </div>
-                      </li>
-                    </ol>
-                  </section>
-
-                  <section
-                    v-if="assistantToolSteps(message).length || assistantAvailableTools(message).length"
-                    class="agentic-trace-section"
-                  >
-                    <div class="agentic-trace-section__header">
-                      <span>{{ t('agentic.detailToolChain') }}</span>
-                    </div>
-                    <div v-if="assistantAvailableTools(message).length" class="agentic-tool-scope">
-                      <span>{{ t('agentic.detailScope') }}</span>
-                      <div class="agentic-details__tags">
-                        <el-tag v-for="tool in assistantAvailableTools(message)" :key="tool" size="small" type="info">
-                          {{ tool }}
-                        </el-tag>
-                      </div>
-                    </div>
-                    <ol v-if="assistantToolSteps(message).length" class="agentic-chain">
-                      <li v-for="step in assistantToolSteps(message)" :key="step.id">
-                        <span class="agentic-chain__index">{{ step.index }}</span>
-                        <div class="agentic-chain__content">
-                          <strong>{{ step.label }}</strong>
-                          <small v-if="step.detail">{{ step.detail }}</small>
-                          <em v-if="step.meta">{{ step.meta }}</em>
-                        </div>
-                      </li>
-                    </ol>
-                  </section>
-
-                  <section v-if="assistantTokenItems(message).length" class="agentic-trace-section">
-                    <div class="agentic-trace-section__header">
-                      <span>{{ t('agentic.detailTokenUsage') }}</span>
-                      <strong>{{ assistantTokenTotalLabel(message) }}</strong>
-                    </div>
-                    <div class="agentic-token-grid">
-                      <div v-for="item in assistantTokenItems(message)" :key="item.label" class="agentic-token-item">
+                  <div class="agentic-details__body">
+                    <div v-if="assistantRunOverview(message).length" class="agentic-run-overview">
+                      <div v-for="item in assistantRunOverview(message)" :key="item.label" class="agentic-run-stat">
                         <span>{{ item.label }}</span>
                         <strong>{{ item.value }}</strong>
                       </div>
                     </div>
-                  </section>
 
-                  <div
-                    v-if="assistantContexts(message).length"
-                    class="agentic-details__row agentic-details__row--stack"
-                  >
-                    <span class="agentic-details__label">{{ t('agentic.detailContexts') }}</span>
-                    <div class="agentic-contexts">
-                      <div
-                        v-for="(context, index) in assistantContexts(message)"
-                        :key="`${context.type}-${index}`"
-                        class="agentic-context"
-                      >
-                        <el-tag size="small" type="info">{{ context.type }}</el-tag>
-                        <pre>{{ context.content }}</pre>
+                    <section v-if="assistantToolNarrations(message).length" class="agentic-trace-section">
+                      <div class="agentic-trace-section__header">
+                        <span>{{ t('agentic.detailToolNarration') }}</span>
+                      </div>
+                      <div class="agentic-tool-narration-list">
+                        <div
+                          v-for="(narration, index) in assistantToolNarrations(message)"
+                          :key="`${narration.tool}-${index}`"
+                          class="agentic-tool-narration"
+                        >
+                          <el-tag size="small" type="warning">{{ narration.tool }}</el-tag>
+                          <pre>{{ formatToolArguments(narration.arguments) }}</pre>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section v-if="assistantThinkingItems(message).length" class="agentic-trace-section">
+                      <div class="agentic-trace-section__header">
+                        <span>{{ t('agentic.detailThinking') }}</span>
+                      </div>
+                      <div class="agentic-thinking-list">
+                        <div v-for="item in assistantThinkingItems(message)" :key="item.label" class="agentic-thinking">
+                          <span>{{ item.label }}</span>
+                          <small>{{ item.detail }}</small>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section v-if="assistantSkillSteps(message).length" class="agentic-trace-section">
+                      <div class="agentic-trace-section__header">
+                        <span>{{ t('agentic.detailSkillChain') }}</span>
+                      </div>
+                      <ol class="agentic-chain">
+                        <li v-for="step in assistantSkillSteps(message)" :key="step.id">
+                          <span class="agentic-chain__index">{{ step.index }}</span>
+                          <div class="agentic-chain__content">
+                            <strong>{{ step.label }}</strong>
+                            <small v-if="step.detail">{{ step.detail }}</small>
+                          </div>
+                        </li>
+                      </ol>
+                    </section>
+
+                    <section
+                      v-if="assistantToolSteps(message).length || assistantAvailableTools(message).length"
+                      class="agentic-trace-section"
+                    >
+                      <div class="agentic-trace-section__header">
+                        <span>{{ t('agentic.detailToolChain') }}</span>
+                      </div>
+                      <div v-if="assistantAvailableTools(message).length" class="agentic-tool-scope">
+                        <span>{{ t('agentic.detailScope') }}</span>
+                        <div class="agentic-details__tags">
+                          <el-tag v-for="tool in assistantAvailableTools(message)" :key="tool" size="small" type="info">
+                            {{ tool }}
+                          </el-tag>
+                        </div>
+                      </div>
+                      <ol v-if="assistantToolSteps(message).length" class="agentic-chain">
+                        <li v-for="step in assistantToolSteps(message)" :key="step.id">
+                          <span class="agentic-chain__index">{{ step.index }}</span>
+                          <div class="agentic-chain__content">
+                            <strong>{{ step.label }}</strong>
+                            <small v-if="step.detail">{{ step.detail }}</small>
+                            <em v-if="step.meta">{{ step.meta }}</em>
+                          </div>
+                        </li>
+                      </ol>
+                    </section>
+
+                    <section v-if="assistantTokenItems(message).length" class="agentic-trace-section">
+                      <div class="agentic-trace-section__header">
+                        <span>{{ t('agentic.detailTokenUsage') }}</span>
+                        <strong>{{ assistantTokenTotalLabel(message) }}</strong>
+                      </div>
+                      <div class="agentic-token-grid">
+                        <div v-for="item in assistantTokenItems(message)" :key="item.label" class="agentic-token-item">
+                          <span>{{ item.label }}</span>
+                          <strong>{{ item.value }}</strong>
+                        </div>
+                      </div>
+                    </section>
+
+                    <div
+                      v-if="assistantContexts(message).length"
+                      class="agentic-details__row agentic-details__row--stack"
+                    >
+                      <span class="agentic-details__label">{{ t('agentic.detailContexts') }}</span>
+                      <div class="agentic-contexts">
+                        <div
+                          v-for="(context, index) in assistantContexts(message)"
+                          :key="`${context.type}-${index}`"
+                          class="agentic-context"
+                        >
+                          <el-tag size="small" type="info">{{ context.type }}</el-tag>
+                          <pre>{{ context.content }}</pre>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </details>
+                </details>
+              </div>
             </div>
           </article>
         </div>
@@ -300,76 +452,6 @@
                   </el-icon>
                 </el-button>
               </el-tooltip>
-
-              <el-select
-                :model-value="selectedModel"
-                class="agentic-model"
-                filterable
-                size="small"
-                @update:model-value="handleModelChange"
-              >
-                <el-option
-                  v-for="model in models"
-                  :key="model.model"
-                  :label="model.label || model.model"
-                  :value="model.model"
-                />
-              </el-select>
-
-              <el-tooltip :content="t('agentic.reasoning')">
-                <el-switch
-                  v-model="reasoningEnabled"
-                  :active-text="t('agentic.think')"
-                  :disabled="!activeModel.reasoning"
-                  :inactive-text="t('agentic.fast')"
-                  inline-prompt
-                  size="small"
-                />
-              </el-tooltip>
-
-              <el-popover placement="top-start" trigger="click" width="300">
-                <template #reference>
-                  <el-button circle size="small">
-                    <el-icon>
-                      <Setting />
-                    </el-icon>
-                  </el-button>
-                </template>
-                <div class="agentic-settings">
-                  <div class="agentic-setting">
-                    <span>{{ t('agentic.temperature') }}</span>
-                    <el-slider v-model="temperatureProxy" :max="2" :min="0" :step="0.1" size="small" />
-                  </div>
-                  <div class="agentic-setting">
-                    <span>{{ t('agentic.maxTokens') }}</span>
-                    <el-input-number
-                      v-model="maxTokensProxy"
-                      :min="1"
-                      :step="256"
-                      controls-position="right"
-                      size="small"
-                    />
-                  </div>
-                  <div class="agentic-setting agentic-setting--row">
-                    <span>{{ t('agentic.confirmActions') }}</span>
-                    <el-switch v-model="requireConfirmation" size="small" />
-                  </div>
-                  <div class="agentic-capabilities">
-                    <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small">{{
-                      t('agentic.capStream')
-                    }}</el-tag>
-                    <el-tag :type="activeModel.toolCall ? 'success' : 'info'" size="small">{{
-                      t('agentic.capTools')
-                    }}</el-tag>
-                    <el-tag :type="activeModel.vision ? 'success' : 'info'" size="small">{{
-                      t('agentic.capVision')
-                    }}</el-tag>
-                    <el-tag :type="activeModel.reasoning ? 'success' : 'info'" size="small">{{
-                      t('agentic.capReasoning')
-                    }}</el-tag>
-                  </div>
-                </div>
-              </el-popover>
             </div>
 
             <el-button v-if="streaming" circle class="agentic-send" type="warning" @click="agenticStore.stopStreaming">
@@ -393,7 +475,7 @@
         </div>
       </footer>
     </section>
-  </el-drawer>
+  </aside>
 </template>
 
 <script lang="ts" setup>
@@ -401,8 +483,8 @@
 
   import { Prompts, Welcome } from 'vue-element-plus-x';
   import {
-    ArrowDown,
     ChatDotRound,
+    ChatLineSquare,
     Check,
     CircleClose,
     Clock,
@@ -410,20 +492,25 @@
     Cpu,
     Delete,
     Document,
+    DocumentCopy,
     EditPen,
+    Lightning,
     Paperclip,
     Plus,
     Promotion,
     Setting,
     VideoPause,
+    Warning,
   } from '@element-plus/icons-vue';
   import { ElMessage, ElMessageBox } from 'element-plus';
   import { marked } from 'marked';
   import { storeToRefs } from 'pinia';
   import { useI18n } from 'vue-i18n';
-  import { computed, ref } from 'vue';
+  import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
   import type { AgenticMessage, AgenticMessageContext, AgenticMessageTokens, AgenticTraceEvent } from '@/config/types';
   import { useAgenticStore } from '@/store';
+  import RenderedAssistantMessage from './RenderedAssistantMessage.vue';
+  import { parseAssistantContent, toPlainText, type ToolNarration } from './assistantContent';
 
   interface AssistantPromptItem {
     key: string | number;
@@ -479,6 +566,24 @@
 
   const draft = ref('');
   const fileInputRef = ref<HTMLInputElement>();
+  const bodyRef = ref<HTMLElement>();
+  const panelRef = ref<HTMLElement>();
+  const panelWidth = ref<number>();
+  const resizeFrame = ref<number>();
+  const renamePopoverVisible = ref(false);
+  const renameTitle = ref('');
+  const ASSISTANT_WIDTH_STORAGE_KEY = 'dc3-agentic-panel-width';
+  const MIN_PANEL_WIDTH = 320;
+  const MAX_PANEL_WIDTH = 520;
+
+  const storedPanelWidth = Number(localStorage.getItem(ASSISTANT_WIDTH_STORAGE_KEY) || '');
+  if (Number.isFinite(storedPanelWidth) && storedPanelWidth > 0) {
+    panelWidth.value = storedPanelWidth;
+  }
+
+  const panelStyle = computed(() => ({
+    width: panelWidth.value ? `${panelWidth.value}px` : 'clamp(340px, 30vw, 520px)',
+  }));
 
   const promptItems = computed<AssistantPromptItem[]>(() => [
     { key: 'device-status', label: t('agentic.promptDeviceStatus'), description: t('agentic.promptDeviceStatusDesc') },
@@ -512,6 +617,44 @@
     },
   });
 
+  const messageScrollSignature = computed(() =>
+    currentMessages.value
+      .map((message) =>
+        [message.id, message.content.length, message.reasoning?.length || 0, message.streaming].join(':')
+      )
+      .join('|')
+  );
+
+  watch(
+    () => visible.value,
+    (isVisible) => {
+      if (isVisible) {
+        void nextTick(() => scrollToBottom('auto'));
+      }
+    }
+  );
+
+  watch(
+    () => activeConversationId.value,
+    () => {
+      void nextTick(() => scrollToBottom('auto'));
+    }
+  );
+
+  watch(
+    () => messageScrollSignature.value,
+    () => scheduleScrollToBottom(),
+    { flush: 'post' }
+  );
+
+  onBeforeUnmount(() => {
+    if (resizeFrame.value) {
+      cancelAnimationFrame(resizeFrame.value);
+    }
+    window.removeEventListener('mousemove', handleResizeMove);
+    window.removeEventListener('mouseup', handleResizeEnd);
+  });
+
   const handleNewSession = () => {
     agenticStore.newSession();
   };
@@ -522,17 +665,18 @@
     }
   };
 
+  const prepareRenameTitle = () => {
+    renameTitle.value = currentSession.value?.title || t('agentic.newConversation');
+  };
+
   const handleRenameCurrent = async () => {
     const conversationId = activeConversationId.value;
-    if (!conversationId) {
+    const title = renameTitle.value.trim();
+    if (!conversationId || !title) {
       return;
     }
-    const result = await ElMessageBox.prompt(t('agentic.dialogConversationTitle'), t('agentic.dialogRename'), {
-      inputValue: currentSession.value?.title || t('agentic.newConversation'),
-      confirmButtonText: t('agentic.dialogSave'),
-      cancelButtonText: t('agentic.dialogCancel'),
-    });
-    await agenticStore.renameSession(conversationId, result.value);
+    await agenticStore.renameSession(conversationId, title);
+    renamePopoverVisible.value = false;
   };
 
   const handleDeleteCurrent = async () => {
@@ -555,6 +699,40 @@
 
   const handleModelChange = (model: string | number) => {
     void agenticStore.setSelectedModel(model);
+  };
+
+  const handlePrefsChange = () => {
+    void agenticStore.persistCurrentSessionPrefs();
+  };
+
+  const handleResizeStart = (event: MouseEvent) => {
+    event.preventDefault();
+    window.addEventListener('mousemove', handleResizeMove);
+    window.addEventListener('mouseup', handleResizeEnd);
+    document.body.classList.add('agentic-resizing');
+  };
+
+  const handleResizeMove = (event: MouseEvent) => {
+    const container = panelRef.value?.parentElement;
+    const rect = container?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
+    const maxWidth = Math.min(MAX_PANEL_WIDTH, Math.floor(rect.width * 0.45));
+    panelWidth.value = clamp(
+      Math.round(rect.right - event.clientX),
+      MIN_PANEL_WIDTH,
+      Math.max(MIN_PANEL_WIDTH, maxWidth)
+    );
+  };
+
+  const handleResizeEnd = () => {
+    window.removeEventListener('mousemove', handleResizeMove);
+    window.removeEventListener('mouseup', handleResizeEnd);
+    document.body.classList.remove('agentic-resizing');
+    if (panelWidth.value) {
+      localStorage.setItem(ASSISTANT_WIDTH_STORAGE_KEY, String(panelWidth.value));
+    }
   };
 
   const handleSubmit = async () => {
@@ -598,13 +776,66 @@
     ElMessage.success('Action rejected');
   };
 
-  const renderMarkdown = (message: AgenticMessage) => {
-    return sanitizeHtml(String(marked.parse(message.content || (message.streaming ? t('agentic.thinking') : ''))));
-  };
-
   const renderReasoning = (reasoning: string) => {
     if (!reasoning) return '';
     return sanitizeHtml(String(marked.parse(reasoning)));
+  };
+
+  const handleCopyMessage = async (message: AgenticMessage) => {
+    const text = toPlainText(message.content);
+    try {
+      await navigator.clipboard.writeText(text);
+      ElMessage.success(t('agentic.actionCopied'));
+    } catch {
+      ElMessage.error(t('agentic.actionCopyFailed'));
+    }
+  };
+
+  const handleQuoteMessage = (message: AgenticMessage) => {
+    const text = toPlainText(message.content);
+    if (!text) return;
+    const quoted = text
+      .split('\n')
+      .map((line) => `> ${line}`)
+      .join('\n');
+    draft.value = `${quoted}\n\n${draft.value || ''}`.trim();
+  };
+
+  const assistantToolNarrations = (message: AgenticMessage): ToolNarration[] => {
+    if (message.role !== 'assistant') return [];
+    return parseAssistantContent(message.content).toolNarrations;
+  };
+
+  const formatToolArguments = (args: unknown) => {
+    try {
+      return JSON.stringify(args, null, 2);
+    } catch {
+      return String(args);
+    }
+  };
+
+  const truncatedReason = (message: AgenticMessage): string => {
+    const reason = message.finishReason?.toLowerCase();
+    if (!reason || reason === 'stop') {
+      return '';
+    }
+    if (reason === 'length') {
+      return t('agentic.finishLength');
+    }
+    if (reason === 'content_filter') {
+      return t('agentic.finishContentFilter');
+    }
+    if (reason === 'tool_calls') {
+      return t('agentic.finishToolCalls');
+    }
+    return t('agentic.finishOther', { reason });
+  };
+
+  const assistantStatus = (message: AgenticMessage) => {
+    if (message.streaming) {
+      return message.content ? t('agentic.statusStreaming') : t('agentic.statusThinking');
+    }
+    return t('agentic.statusDone');
   };
 
   const hasAssistantDetails = (message: AgenticMessage) => {
@@ -616,7 +847,8 @@
       assistantAvailableTools(message).length > 0 ||
       assistantReasoning(message) ||
       assistantContexts(message).length > 0 ||
-      assistantTokenItems(message).length > 0
+      assistantTokenItems(message).length > 0 ||
+      assistantToolNarrations(message).length > 0
     );
   };
 
@@ -626,9 +858,7 @@
     const tools = assistantToolSteps(message);
     const contexts = assistantContexts(message);
     const tokenTotal = assistantTokenTotal(message);
-    if (message.streaming && !currentTraceEvents.value.length) {
-      parts.push(t('agentic.detailSummaryThinking'));
-    }
+    parts.push(`${t('agentic.statusLabel')} ${assistantStatus(message)}`);
     if (assistantReasoning(message)) {
       parts.push(t('agentic.thinkingReasoningMode').toLowerCase());
     }
@@ -644,7 +874,7 @@
     if (typeof tokenTotal === 'number') {
       parts.push(t('agentic.detailSummaryTokens', { n: formatCount(tokenTotal) }));
     }
-    return parts.length ? parts.join(' · ') : t('agentic.detailSummaryThinking');
+    return parts.join(' · ');
   };
 
   const assistantRunOverview = (message: AgenticMessage): AssistantRunStat[] => {
@@ -652,14 +882,6 @@
     const skills = assistantSkillSteps(message).length;
     const tools = assistantToolSteps(message).length;
     const tokenTotal = assistantTokenTotal(message);
-    stats.push({
-      label: t('agentic.statusLabel'),
-      value: message.streaming
-        ? message.content
-          ? t('agentic.statusStreaming')
-          : t('agentic.statusThinking')
-        : t('agentic.statusDone'),
-    });
     if (assistantReasoning(message)) {
       stats.push({ label: t('agentic.thinkingReasoningMode'), value: t('agentic.statusEnabled') });
     }
@@ -899,6 +1121,30 @@
     return new Intl.NumberFormat('en-US').format(value);
   };
 
+  const scheduleScrollToBottom = () => {
+    if (resizeFrame.value) {
+      cancelAnimationFrame(resizeFrame.value);
+    }
+    resizeFrame.value = requestAnimationFrame(() => {
+      void nextTick(() => scrollToBottom('smooth'));
+    });
+  };
+
+  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    const body = bodyRef.value;
+    if (!body) {
+      return;
+    }
+    body.scrollTo({
+      top: body.scrollHeight,
+      behavior,
+    });
+  };
+
+  const clamp = (value: number, min: number, max: number) => {
+    return Math.min(Math.max(value, min), max);
+  };
+
   const sanitizeHtml = (html: string) => {
     return html
       .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
@@ -925,32 +1171,110 @@
     box-shadow: 0 10px 26px rgba(46, 64, 88, 0.24);
   }
 
+  .agentic-panel {
+    position: relative;
+    flex: 0 0 auto;
+    min-width: 320px;
+    max-width: 520px;
+    height: 100%;
+    min-height: 0;
+    border-left: 1px solid #dfe5ee;
+    background: #ffffff;
+  }
+
+  .agentic-resizer {
+    position: absolute;
+    top: 0;
+    left: -5px;
+    z-index: 4;
+    width: 10px;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    cursor: col-resize;
+    background: transparent;
+
+    &::after {
+      position: absolute;
+      top: 0;
+      left: 4px;
+      width: 2px;
+      height: 100%;
+      content: '';
+      background: transparent;
+      transition: background 0.16s ease;
+    }
+
+    &:hover::after {
+      background: #2563eb;
+    }
+  }
+
   .agentic-shell {
     display: flex;
     flex-direction: column;
     height: 100%;
     min-height: 0;
-    background: #f5f7fb;
+    background: #ffffff;
   }
 
   .agentic-header {
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    flex-direction: column;
     justify-content: space-between;
-    gap: 16px;
-    min-height: 64px;
-    padding: 12px 18px;
+    gap: 10px;
+    min-height: 0;
+    padding: 10px 10px 9px;
     border-bottom: 1px solid #dfe5ee;
     background: #ffffff;
   }
 
   .agentic-title,
+  .agentic-header__top,
   .agentic-header__actions,
+  .agentic-header__actions-left,
+  .agentic-header__actions-right,
+  .agentic-header__primary-actions,
   .agentic-composer__left {
     display: flex;
     align-items: center;
     gap: 8px;
     min-width: 0;
+  }
+
+  .agentic-header__top {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .agentic-header__actions {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 6px;
+    width: 100%;
+  }
+
+  .agentic-header__actions-left {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+  }
+
+  .agentic-header__actions-right {
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .agentic-header__primary-actions {
+    flex: 0 0 auto;
+  }
+
+  .agentic-header {
+    :deep(.el-button + .el-button) {
+      margin-left: 0;
+    }
   }
 
   .agentic-mark {
@@ -960,11 +1284,16 @@
     justify-content: center;
     width: 34px;
     height: 34px;
+    padding: 5px;
+    border: 1px solid #dbe4f0;
     border-radius: 8px;
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: 700;
-    background: #2563eb;
+    background: #f8fafc;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   }
 
   .agentic-title {
@@ -981,7 +1310,7 @@
 
     span {
       overflow: hidden;
-      max-width: 320px;
+      max-width: 100%;
       color: #64748b;
       font-size: 12px;
       text-overflow: ellipsis;
@@ -1001,8 +1330,9 @@
     position: relative;
     flex: 1;
     min-height: 0;
-    padding: 18px;
+    padding: 12px 4px;
     overflow-y: auto;
+    background: #ffffff;
   }
 
   .agentic-empty {
@@ -1016,62 +1346,164 @@
   .agentic-messages {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    max-width: 820px;
-    margin: 0 auto;
+    gap: 12px;
+    width: 100%;
+    margin: 0;
   }
 
   .agentic-message {
     display: flex;
-    gap: 10px;
     align-items: flex-start;
   }
 
   .agentic-message--user {
     justify-content: flex-end;
 
-    .agentic-message__avatar {
-      order: 2;
+    .agentic-message__main {
+      align-items: flex-end;
+      padding-left: 0;
+      padding-right: 7px;
     }
 
     .agentic-message__content {
-      max-width: 72%;
       color: #ffffff;
       background: #2563eb;
+      border-color: #2563eb;
+
+      &::before {
+        right: -7px;
+        left: auto;
+        border-right: 0;
+        border-left: 7px solid #2563eb;
+      }
+
+      &::after {
+        right: -6px;
+        left: auto;
+        border-right: 0;
+        border-left: 7px solid #2563eb;
+      }
     }
   }
 
-  .agentic-message__avatar {
+  .agentic-message__main {
+    box-sizing: border-box;
     display: flex;
-    flex: 0 0 30px;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    flex-direction: column;
+    gap: 4px;
+    max-width: 100%;
+    min-width: 0;
+    padding-left: 7px;
   }
 
   .agentic-message__content {
-    max-width: 78%;
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
     padding: 10px 12px;
+    border: 1px solid #e7edf5;
     border-radius: 8px;
     color: #1f2937;
     line-height: 1.58;
     background: #ffffff;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+
+    &::before,
+    &::after {
+      position: absolute;
+      top: 13px;
+      width: 0;
+      height: 0;
+      content: '';
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+    }
+
+    &::before {
+      left: -7px;
+      border-right: 7px solid #e7edf5;
+    }
+
+    &::after {
+      left: -6px;
+      border-right: 7px solid #ffffff;
+    }
   }
 
   .agentic-text {
     white-space: pre-wrap;
+  }
+
+  .agentic-message__warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 8px;
+    border: 1px solid #fcd34d;
+    border-radius: 4px;
+    color: #92400e;
+    font-size: 12px;
+    line-height: 1.5;
+    background: #fffbeb;
+  }
+
+  .agentic-message__toolbar {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+    opacity: 0;
+    transition: opacity 0.16s ease;
+  }
+
+  .agentic-message:hover .agentic-message__toolbar {
+    opacity: 1;
+  }
+
+  .agentic-message__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    color: #64748b;
+    font-size: 13px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.16s ease;
+
+    &:hover {
+      color: #2563eb;
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+  }
+
+  .agentic-tool-narration-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .agentic-tool-narration {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 8px;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    background: #fffbeb;
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      color: #334155;
+      font-size: 11px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
   }
 
   .agentic-cursor {
@@ -1401,7 +1833,7 @@
   }
 
   .agentic-composer {
-    padding: 14px 18px 18px;
+    padding: 10px 4px 12px;
     border-top: 1px solid #dfe5ee;
     background: #ffffff;
   }
@@ -1410,8 +1842,8 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-width: 820px;
-    margin: 0 auto 10px;
+    width: 100%;
+    margin: 0 0 10px;
   }
 
   .agentic-action {
@@ -1454,8 +1886,9 @@
   }
 
   .agentic-input-shell {
-    max-width: 820px;
-    margin: 0 auto;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
     padding: 10px;
     border: 1px solid #d6dde8;
     border-radius: 8px;
@@ -1515,7 +1948,16 @@
   }
 
   .agentic-model {
-    width: 190px;
+    width: 136px;
+  }
+
+  .agentic-model--toolbar {
+    flex: 0 1 136px;
+    min-width: 104px;
+  }
+
+  .agentic-reasoning-switch {
+    flex: 0 0 auto;
   }
 
   .agentic-send {
@@ -1527,6 +1969,28 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+  }
+
+  .agentic-rename-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .agentic-popover-title {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .agentic-popover-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    :deep(.el-button + .el-button) {
+      margin-left: 0;
+    }
   }
 
   .agentic-setting {
@@ -1604,9 +2068,8 @@
   }
 
   @media (max-width: 900px) {
-    .agentic-header {
-      align-items: flex-start;
-      flex-direction: column;
+    .agentic-panel {
+      width: min(420px, 40vw) !important;
     }
 
     .agentic-header__actions,
@@ -1616,21 +2079,15 @@
       width: 100%;
     }
 
-    .agentic-message__content,
-    .agentic-message--user .agentic-message__content {
-      max-width: calc(100% - 44px);
-    }
-
     .agentic-model {
-      width: 100%;
+      width: 112px;
     }
   }
 </style>
 
 <style lang="scss">
-  .agentic-drawer {
-    .el-drawer__body {
-      padding: 0;
-    }
+  .agentic-resizing {
+    cursor: col-resize;
+    user-select: none;
   }
 </style>

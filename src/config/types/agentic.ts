@@ -80,6 +80,7 @@ export interface AgenticMessage {
   status?: number;
   streaming?: boolean;
   reasoning?: string;
+  finishReason?: string;
   createTime?: string;
 }
 
@@ -186,6 +187,7 @@ export interface AgenticStreamCallbacks {
   onDelta?: (content: string) => void;
   onReasoning?: (content: string) => void;
   onEvent?: (event: AgenticTraceEvent) => void;
+  onFinish?: (reason: string) => void;
   onDone?: () => void;
   onError?: (error: Error) => void;
 }

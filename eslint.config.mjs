@@ -28,9 +28,11 @@ export default [
     ignores: [
       'node_modules/**',
       'dist/**',
+      'playwright-report/**',
       'public/**',
       'src/assets/**',
       'src-tauri/**',
+      'test-results/**',
       '.github/**',
       '.vscode/**',
       '.idea/**',

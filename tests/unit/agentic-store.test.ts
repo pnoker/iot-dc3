@@ -51,6 +51,8 @@ describe('agentic store', () => {
     apiMocks.getAgenticMessages.mockResolvedValue({ data: undefined });
     apiMocks.getAgenticAttachments.mockResolvedValue({ data: [] });
     apiMocks.getPendingAgenticActions.mockResolvedValue({ data: [] });
+    apiMocks.getAgenticModels.mockResolvedValue({ data: [] });
+    apiMocks.getAgenticSkills.mockResolvedValue({ data: [] });
     apiMocks.getAgenticSessions.mockResolvedValue({ data: { records: [] } });
     apiMocks.updateAgenticSession.mockImplementation((conversationId: string, data: Record<string, unknown>) =>
       Promise.resolve({ data: { conversationId, ...data } })
@@ -113,5 +115,56 @@ describe('agentic store', () => {
       expect(payload).not.toHaveProperty('model');
       expect(payload).not.toHaveProperty('sessionConfig');
     }
+  });
+
+  it('restores session preferences from persisted session_ext metadata', async () => {
+    apiMocks.getAgenticModels.mockResolvedValue({
+      data: [
+        {
+          model: 'deepseek-v4-pro',
+          label: 'DeepSeek V4 Pro',
+          stream: true,
+          toolCall: true,
+          vision: false,
+          reasoning: true,
+          temperature: 0.7,
+          maxTokens: 2048,
+        },
+      ],
+    });
+    apiMocks.getAgenticSessions.mockResolvedValue({
+      data: {
+        records: [
+          {
+            conversationId: 'conversation-1',
+            title: 'Device status',
+            session_ext: {
+              model: 'deepseek-v4-pro',
+              reasoning_enabled: true,
+              temperature: 0.2,
+              max_tokens: 4096,
+              require_confirmation: false,
+            },
+          },
+        ],
+      },
+    });
+
+    const store = useAgenticStore();
+    await store.bootstrap();
+
+    expect(store.activeConversationId).toBe('conversation-1');
+    expect(store.selectedModel).toBe('deepseek-v4-pro');
+    expect(store.reasoningEnabled).toBe(true);
+    expect(store.requireConfirmation).toBe(false);
+    expect(store.temperature).toBe(0.2);
+    expect(store.maxTokens).toBe(4096);
+    expect(store.currentSession?.sessionExt).toEqual(
+      expect.objectContaining({
+        model: 'deepseek-v4-pro',
+        reasoningEnabled: true,
+        requireConfirmation: false,
+      })
+    );
   });
 });

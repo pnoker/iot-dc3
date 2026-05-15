@@ -130,15 +130,23 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const bootstrap = async () => {
     if (bootstrapped.value) {
-      ensureActiveSession();
+      const conversationId = ensureActiveSession();
+      restoreSessionModel(currentSession.value);
+      await Promise.all([
+        loadMessages(conversationId),
+        loadAttachments(conversationId),
+        loadPendingActions(conversationId),
+      ]);
       return;
     }
 
     loading.value = true;
     try {
-      await Promise.all([loadModels(), loadSkills(), loadSessions()]);
+      await loadModels();
+      await Promise.all([loadSkills(), loadSessions()]);
       bootstrapped.value = true;
       const conversationId = ensureActiveSession();
+      restoreSessionModel(currentSession.value);
       await Promise.all([
         loadMessages(conversationId),
         loadAttachments(conversationId),
@@ -180,7 +188,10 @@ export const useAgenticStore = defineStore('agentic', () => {
   const loadSessions = async () => {
     try {
       const response = await getAgenticSessions({ page: { current: 1, size: 50 } });
-      sessions.value = response.data?.records || [];
+      sessions.value = (response.data?.records || []).map(normalizeSession);
+      if (activeConversationId.value) {
+        restoreSessionModel(sessions.value.find((session) => session.conversationId === activeConversationId.value));
+      }
     } catch (error) {
       sessions.value = [];
       warnMessage('Failed to load agentic sessions.', 'Agentic', error);
@@ -264,7 +275,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         title: normalizedTitle,
       });
       sessions.value = sessions.value.map((session) =>
-        session.conversationId === conversationId ? { ...session, ...response.data } : session
+        session.conversationId === conversationId ? normalizeSession({ ...session, ...(response.data || {}) }) : session
       );
     } catch (error) {
       warnMessage('Failed to update agentic session metadata.', 'Agentic', error);
@@ -323,10 +334,15 @@ export const useAgenticStore = defineStore('agentic', () => {
           onEvent: (event) => appendTraceEvent(conversationId, event),
           onDelta: (delta) => appendAssistantDelta(conversationId, assistantMessage.id, delta),
           onReasoning: (reasoning) => appendAssistantReasoning(conversationId, assistantMessage.id, reasoning),
+          onFinish: (reason) => setAssistantFinishReason(conversationId, assistantMessage.id, reason),
         });
       } else {
         const response = await completeAgenticChatCompletion(request, abortController.signal);
         appendAssistantDelta(conversationId, assistantMessage.id, response.choices?.[0]?.message?.content || '');
+        const finishReason = response.choices?.[0]?.finishReason ?? response.choices?.[0]?.finish_reason;
+        if (finishReason) {
+          setAssistantFinishReason(conversationId, assistantMessage.id, finishReason);
+        }
       }
       markAssistantComplete(conversationId, assistantMessage.id);
       await syncSessionAfterMessage(conversationId, text);
@@ -478,7 +494,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     try {
       const response = await updateAgenticSession(conversationId, { sessionExt: { model: nextModel } });
       sessions.value = sessions.value.map((session) =>
-        session.conversationId === conversationId ? { ...session, ...response.data } : session
+        session.conversationId === conversationId ? normalizeSession({ ...session, ...(response.data || {}) }) : session
       );
     } catch (error) {
       warnMessage('Failed to update agentic session model.', 'Agentic', error);
@@ -525,6 +541,13 @@ export const useAgenticStore = defineStore('agentic', () => {
     } catch (error) {
       warnMessage('Failed to update agentic session preferences.', 'Agentic', error);
     }
+  };
+
+  const persistCurrentSessionPrefs = async () => {
+    if (!activeConversationId.value) {
+      return;
+    }
+    await persistSessionPrefs(activeConversationId.value);
   };
 
   const buildCurrentSessionExt = (model = resolveModelName(selectedModel.value)): AgenticSessionExt => ({
@@ -582,6 +605,16 @@ export const useAgenticStore = defineStore('agentic', () => {
     );
   };
 
+  const setAssistantFinishReason = (conversationId: string, messageId: string, reason: string) => {
+    const messages = messagesByConversation.value[conversationId];
+    if (!messages) return;
+    const index = messages.findIndex((message) => message.id === messageId);
+    if (index < 0) return;
+    const target = messages[index]!;
+    messages[index] = { ...target, finishReason: reason };
+    messagesByConversation.value[conversationId] = [...messages];
+  };
+
   const appendTraceEvent = (conversationId: string, event: AgenticTraceEvent) => {
     traceEventsByConversation.value[conversationId] = [
       ...(traceEventsByConversation.value[conversationId] || []),
@@ -631,6 +664,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     deleteSession,
     renameSession,
     setSelectedModel,
+    persistCurrentSessionPrefs,
     sendMessage,
     stopStreaming,
     loadMessages,
@@ -680,8 +714,41 @@ const normalizeTitle = (title: string) => {
   return trimmed.length > 32 ? `${trimmed.slice(0, 32)}...` : trimmed || 'New Conversation';
 };
 
+type RawAgenticSessionExt = AgenticSessionExt & {
+  reasoning_enabled?: boolean;
+  max_tokens?: number;
+  require_confirmation?: boolean;
+};
+
+type RawAgenticSession = AgenticSession & {
+  session_ext?: RawAgenticSessionExt;
+};
+
+const normalizeSession = (session: RawAgenticSession): AgenticSession => {
+  const { session_ext: _sessionExt, sessionExt, ...rest } = session;
+  const normalizedExt = normalizeSessionExt(sessionExt || _sessionExt);
+  return {
+    ...rest,
+    conversationId: String(rest.conversationId || ''),
+    sessionExt: normalizedExt,
+  };
+};
+
+const normalizeSessionExt = (sessionExt?: RawAgenticSessionExt): AgenticSessionExt | undefined => {
+  if (!sessionExt) {
+    return undefined;
+  }
+  return {
+    model: sessionExt.model,
+    reasoningEnabled: sessionExt.reasoningEnabled ?? sessionExt.reasoning_enabled,
+    temperature: sessionExt.temperature,
+    maxTokens: sessionExt.maxTokens ?? sessionExt.max_tokens,
+    requireConfirmation: sessionExt.requireConfirmation ?? sessionExt.require_confirmation,
+  };
+};
+
 const sessionExtOf = (session?: AgenticSession): AgenticSessionExt | undefined => {
-  return session?.sessionExt;
+  return normalizeSessionExt((session as RawAgenticSession | undefined)?.sessionExt);
 };
 
 const sessionModel = (session?: AgenticSession) => {

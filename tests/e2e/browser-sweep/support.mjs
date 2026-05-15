@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+import JSONBigInt from 'json-bigint';
+
+const JSONBigIntStr = JSONBigInt({ storeAsString: true });
+
 export function delay(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -161,7 +165,7 @@ export async function clickButtonIfPresent(page, name, options = {}) {
 }
 
 export async function apiPost(page, url, body = {}, params = {}) {
-  return page.evaluate(
+  const response = await page.evaluate(
     async ({ requestUrl, requestBody, requestParams }) => {
       const decodeStorage = (key) => {
         const raw = localStorage.getItem(key);
@@ -187,16 +191,19 @@ export async function apiPost(page, url, body = {}, params = {}) {
         body: JSON.stringify(requestBody),
       });
       const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = text;
-      }
-      return { status: res.status, data, text };
+      return { status: res.status, text };
     },
     { requestUrl: url, requestBody: body, requestParams: params }
   );
+
+  let data;
+  try {
+    data = JSONBigIntStr.parse(response.text);
+  } catch {
+    data = response.text;
+  }
+
+  return { status: response.status, data, text: response.text };
 }
 
 export async function listCount(page, url, nameField, name) {

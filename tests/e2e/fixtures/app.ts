@@ -15,6 +15,7 @@
  */
 
 import { expect, type Page } from '@playwright/test';
+import JSONBigInt from 'json-bigint';
 import type { RouteIds } from './routes';
 
 export interface PageHealth {
@@ -47,6 +48,8 @@ export interface E2eDataContext {
   cleanup: () => Promise<void>;
 }
 
+const JSONBigIntStr = JSONBigInt({ storeAsString: true });
+
 export function isBusinessApi(url: string) {
   return url.includes('/api/v3/');
 }
@@ -77,7 +80,7 @@ export async function apiPost<T = unknown>(
   body: Record<string, unknown> = {},
   params: Record<string, string | number | boolean | undefined> = {}
 ) {
-  return page.evaluate(
+  const response = await page.evaluate(
     async ({ requestUrl, requestBody, requestParams }) => {
       const decodeStorage = (key: string) => {
         const raw = localStorage.getItem(key);
@@ -109,16 +112,19 @@ export async function apiPost<T = unknown>(
         body: JSON.stringify(requestBody),
       });
       const text = await response.text();
-      let data: unknown;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = text;
-      }
-      return { status: response.status, data };
+      return { status: response.status, text };
     },
     { requestUrl: url, requestBody: body, requestParams: params }
-  ) as Promise<ApiResult<T>>;
+  );
+
+  let data: unknown;
+  try {
+    data = JSONBigIntStr.parse(response.text);
+  } catch {
+    data = response.text;
+  }
+
+  return { status: response.status, data } as ApiResult<T>;
 }
 
 function idOf(record: unknown) {

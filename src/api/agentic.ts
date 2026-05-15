@@ -80,7 +80,7 @@ export const deleteAgenticProvider = (id: string) =>
   httpPost<R<boolean>>(`${API_AGENTIC_BASE}/provider/config/delete`, undefined, { params: { id } });
 
 export const getAgenticSessions = (query?: PageQuery) =>
-  httpGet<R<PageResult<AgenticSession>>>(`${API_AGENTIC_BASE}/session/list`, { params: flattenSessionQuery(query) });
+  httpPost<R<PageResult<AgenticSession>>>(`${API_AGENTIC_BASE}/session/list`, query ?? {});
 
 export const deleteAgenticSession = (conversationId: string) =>
   request<R<boolean>>({
@@ -215,19 +215,6 @@ const buildFetchHeaders = (): HeadersInit => {
   return headers;
 };
 
-const flattenSessionQuery = (query?: PageQuery) => {
-  if (!query?.page) {
-    return query;
-  }
-
-  const { page, ...rest } = query;
-  return {
-    ...rest,
-    'page.current': page.current,
-    'page.size': page.size,
-  };
-};
-
 const handleStreamHttpError = async (response: Response): Promise<never> => {
   if (response.status === 401) {
     localStorage.clear();
@@ -286,6 +273,10 @@ const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
     const reasoningContent = chunk.choices?.[0]?.delta?.reasoning_content;
     if (reasoningContent) {
       callbacks.onReasoning?.(reasoningContent);
+    }
+    const finishReason = chunk.choices?.[0]?.finish_reason;
+    if (finishReason) {
+      callbacks.onFinish?.(finishReason);
     }
   } catch (error) {
     callbacks.onError?.(error instanceof Error ? error : new Error(String(error)));

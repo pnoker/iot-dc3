@@ -94,7 +94,7 @@ export default (configEnv: ConfigEnv) => {
       port: Number(env.APP_CLI_PORT) || 8080,
       proxy,
       watch: {
-        ignored: ['**/src-tauri/**'],
+        ignored: ['**/dist/**', '**/playwright-report/**', '**/src-tauri/**', '**/test-results/**'],
       },
       open: false,
     },
@@ -129,6 +129,7 @@ export default (configEnv: ConfigEnv) => {
       }),
     ],
     optimizeDeps: {
+      entries: ['index.html'],
       include: ['vue', 'vue-router', 'element-plus', '@element-plus/icons-vue', '@antv/g2'],
       exclude: ['@vitejs/plugin-vue'],
     },
