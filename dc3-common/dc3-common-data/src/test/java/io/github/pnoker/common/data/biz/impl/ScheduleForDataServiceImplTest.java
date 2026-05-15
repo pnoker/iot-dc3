@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.DateBuilder;
+import io.github.pnoker.common.exception.ServiceException;
 import org.quartz.SchedulerException;
 
 import java.lang.reflect.Field;
@@ -77,10 +78,13 @@ class ScheduleForDataServiceImplTest {
     }
 
     @Test
-    void initialSwallowsSchedulerExceptionToKeepStartupGoing() throws Exception {
+    void initialThrowsServiceExceptionOnSchedulerFailure() throws Exception {
         doThrow(new SchedulerException("scheduler down")).when(quartzService)
                 .createJobWithInterval(any(), any(), any(int.class), any(), any());
-        assertThatNoException().isThrownBy(() -> service.initial());
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.initial())
+                .isInstanceOf(ServiceException.class)
+                .hasMessageContaining("Failed to initialize data scheduler")
+                .hasCauseInstanceOf(SchedulerException.class);
         verify(quartzService, never()).startScheduler();
     }
 }
