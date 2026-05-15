@@ -25,8 +25,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Spring environment post-processor that ensures the {@code driver} profile is always
- * active before driver beans are initialized.
+ * Spring environment post-processor that activates the {@code driver} profile so the
+ * driver-scoped {@code application-driver.yml} defaults take effect alongside the
+ * driver's own configuration.
+ *
+ * <p>Profile activation can be turned off by setting
+ * {@code dc3.driver.auto-profile=false} in any property source (env var,
+ * application.yml, system property), which is occasionally necessary when an
+ * application embeds the SDK but wants its own profile model intact.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,9 +42,16 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveDriverProfileConfig implements EnvironmentPostProcessor {
 
+    private static final String AUTO_PROFILE_PROPERTY = "dc3.driver.auto-profile";
+    private static final String DRIVER_PROFILE = "driver";
+
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("driver");
+        if (Boolean.FALSE.equals(environment.getProperty(AUTO_PROFILE_PROPERTY, Boolean.class, Boolean.TRUE))) {
+            log.debug("Skipping driver profile activation, {}=false", AUTO_PROFILE_PROPERTY);
+            return;
+        }
+        environment.addActiveProfile(DRIVER_PROFILE);
     }
 
 }
