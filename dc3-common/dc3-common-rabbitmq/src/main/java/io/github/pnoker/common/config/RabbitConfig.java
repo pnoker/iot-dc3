@@ -63,6 +63,16 @@ public class RabbitConfig {
         this.connectionFactory = connectionFactory;
     }
 
+    private static String summarizeBody(Message message) {
+        if (message == null || message.getBody() == null) {
+            return "<empty>";
+        }
+        byte[] body = message.getBody();
+        int len = Math.min(body.length, RETURN_BODY_LOG_LIMIT);
+        String prefix = new String(body, 0, len, StandardCharsets.UTF_8);
+        return body.length <= RETURN_BODY_LOG_LIMIT ? prefix : prefix + "…(truncated " + body.length + "B)";
+    }
+
     /**
      * Configure RabbitTemplate for message publishing.
      *
@@ -130,7 +140,7 @@ public class RabbitConfig {
     }
 
     private SimpleRabbitListenerContainerFactory buildContainerFactory(MessageConverter messageConverter,
-                                                                      int concurrent, int maxConcurrent, int prefetch) {
+                                                                       int concurrent, int maxConcurrent, int prefetch) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(messageConverter);
@@ -139,16 +149,6 @@ public class RabbitConfig {
         factory.setMaxConcurrentConsumers(maxConcurrent);
         factory.setPrefetchCount(prefetch);
         return factory;
-    }
-
-    private static String summarizeBody(Message message) {
-        if (message == null || message.getBody() == null) {
-            return "<empty>";
-        }
-        byte[] body = message.getBody();
-        int len = Math.min(body.length, RETURN_BODY_LOG_LIMIT);
-        String prefix = new String(body, 0, len, StandardCharsets.UTF_8);
-        return body.length <= RETURN_BODY_LOG_LIMIT ? prefix : prefix + "…(truncated " + body.length + "B)";
     }
 
 }

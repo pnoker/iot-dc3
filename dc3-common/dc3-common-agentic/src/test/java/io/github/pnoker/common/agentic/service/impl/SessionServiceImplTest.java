@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.common.agentic.dal.SessionManager;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
-import io.github.pnoker.common.agentic.entity.model.SessionConfig;
+import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.MessageService;
@@ -91,13 +91,13 @@ class SessionServiceImplTest {
         SessionBO bo = new SessionBO();
         when(sessionBuilder.buildBOByDO(any(SessionDO.class))).thenReturn(bo);
 
-        SessionConfig sessionConfig = new SessionConfig();
-        sessionConfig.setReasoningEnabled(true);
-        sessionConfig.setTemperature(0.3);
-        sessionConfig.setMaxTokens(1024);
-        sessionConfig.setRequireConfirmation(false);
+        SessionExt sessionExt = new SessionExt();
+        sessionExt.setReasoningEnabled(true);
+        sessionExt.setTemperature(0.3);
+        sessionExt.setMaxTokens(1024);
+        sessionExt.setRequireConfirmation(false);
 
-        SessionBO result = service.touch("conv-1", 1L, 2L, "deepseek-chat", sessionConfig);
+        SessionBO result = service.touch("conv-1", 1L, 2L, "deepseek-chat", sessionExt);
 
         ArgumentCaptor<SessionDO> captor = ArgumentCaptor.forClass(SessionDO.class);
         verify(sessionManager).save(captor.capture());
@@ -106,11 +106,11 @@ class SessionServiceImplTest {
         assertThat(saved.getTenantId()).isEqualTo(1L);
         assertThat(saved.getUserId()).isEqualTo(2L);
         assertThat(saved.getTitle()).isEqualTo("New Conversation");
-        assertThat(saved.getModel()).isEqualTo("deepseek-chat");
-        assertThat(saved.getSessionConfig().getReasoningEnabled()).isTrue();
-        assertThat(saved.getSessionConfig().getTemperature()).isEqualTo(0.3);
-        assertThat(saved.getSessionConfig().getMaxTokens()).isEqualTo(1024);
-        assertThat(saved.getSessionConfig().getRequireConfirmation()).isFalse();
+        assertThat(saved.getSessionExt().getModel()).isEqualTo("deepseek-chat");
+        assertThat(saved.getSessionExt().getReasoningEnabled()).isTrue();
+        assertThat(saved.getSessionExt().getTemperature()).isEqualTo(0.3);
+        assertThat(saved.getSessionExt().getMaxTokens()).isEqualTo(1024);
+        assertThat(saved.getSessionExt().getRequireConfirmation()).isFalse();
         assertThat(result).isSameAs(bo);
     }
 
@@ -127,7 +127,7 @@ class SessionServiceImplTest {
 
         service.touch("conv-1", 1L, 2L, "qwen-plus");
 
-        assertThat(existing.getModel()).isEqualTo("qwen-plus");
+        assertThat(existing.getSessionExt().getModel()).isEqualTo("qwen-plus");
         verify(sessionManager).updateById(existing);
         verify(sessionManager, never()).save(any(SessionDO.class));
     }
@@ -182,11 +182,13 @@ class SessionServiceImplTest {
 
         SessionUpdateRequest request = new SessionUpdateRequest();
         request.setTitle("  New title  ");
-        request.setModel("  glm-4  ");
+        SessionExt sessionExt = new SessionExt();
+        sessionExt.setModel("  glm-4  ");
+        request.setSessionExt(sessionExt);
         service.update("conv-1", request);
 
         assertThat(existing.getTitle()).isEqualTo("New title");
-        assertThat(existing.getModel()).isEqualTo("glm-4");
+        assertThat(existing.getSessionExt().getModel()).isEqualTo("glm-4");
         verify(sessionManager).updateById(existing);
     }
 
@@ -205,40 +207,40 @@ class SessionServiceImplTest {
     }
 
     @Test
-    void updateMergesSessionConfig() {
+    void updateMergesSessionExt() {
         SessionDO existing = new SessionDO();
-        SessionConfig existingConfig = new SessionConfig();
+        SessionExt existingConfig = new SessionExt();
         existingConfig.setReasoningEnabled(false);
         existingConfig.setTemperature(0.7);
         existingConfig.setMaxTokens(2048);
         existingConfig.setRequireConfirmation(true);
-        existing.setSessionConfig(existingConfig);
+        existing.setSessionExt(existingConfig);
         when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
-        SessionConfig patch = new SessionConfig();
+        SessionExt patch = new SessionExt();
         patch.setReasoningEnabled(true);
         patch.setMaxTokens(4096);
         SessionUpdateRequest request = new SessionUpdateRequest();
-        request.setSessionConfig(patch);
+        request.setSessionExt(patch);
         service.update("conv-1", request);
 
-        assertThat(existing.getSessionConfig().getReasoningEnabled()).isTrue();
-        assertThat(existing.getSessionConfig().getTemperature()).isEqualTo(0.7);
-        assertThat(existing.getSessionConfig().getMaxTokens()).isEqualTo(4096);
-        assertThat(existing.getSessionConfig().getRequireConfirmation()).isTrue();
+        assertThat(existing.getSessionExt().getReasoningEnabled()).isTrue();
+        assertThat(existing.getSessionExt().getTemperature()).isEqualTo(0.7);
+        assertThat(existing.getSessionExt().getMaxTokens()).isEqualTo(4096);
+        assertThat(existing.getSessionExt().getRequireConfirmation()).isTrue();
         verify(sessionManager).updateById(existing);
     }
 
     @Test
-    void updateRejectsInvalidSessionConfig() {
+    void updateRejectsInvalidSessionExt() {
         SessionDO existing = new SessionDO();
         when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
 
-        SessionConfig patch = new SessionConfig();
+        SessionExt patch = new SessionExt();
         patch.setTemperature(3.0);
         SessionUpdateRequest request = new SessionUpdateRequest();
-        request.setSessionConfig(patch);
+        request.setSessionExt(patch);
 
         assertThatThrownBy(() -> service.update("conv-1", request))
                 .isInstanceOf(RequestException.class)

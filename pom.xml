@@ -73,35 +73,10 @@
         <!-- DC3 Version -->
         <dc3.version>2026.5.5</dc3.version>
 
-        <!-- Spring AI -->
-        <spring-ai.version>2.0.0-M6</spring-ai.version>
-
-        <!-- Test toolchain -->
-        <testcontainers.version>1.21.4</testcontainers.version>
-        <junit.bom.version>5.11.3</junit.bom.version>
-        <assertj.version>3.26.3</assertj.version>
-        <awaitility.version>4.2.2</awaitility.version>
-        <instancio.version>5.3.0</instancio.version>
-        <rest-assured.version>5.5.0</rest-assured.version>
-        <wiremock.version>3.10.0</wiremock.version>
-        <surefire.version>3.5.2</surefire.version>
-        <jacoco.version>0.8.12</jacoco.version>
-
         <!-- Test execution toggles (consumed by surefire/failsafe) -->
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <modules>
         <module>dc3-api</module>
@@ -115,58 +90,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- AI Related -->
-            <dependency>
-                <groupId>org.springframework.ai</groupId>
-                <artifactId>spring-ai-bom</artifactId>
-                <version>${spring-ai.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!-- Test BOMs -->
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>${junit.bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainers.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!-- Test toolchain (versions kept here so child pom usages stay terse) -->
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitility.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.instancio</groupId>
-                <artifactId>instancio-junit</artifactId>
-                <version>${instancio.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>rest-assured</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wiremock</groupId>
-                <artifactId>wiremock-standalone</artifactId>
-                <version>${wiremock.version}</version>
-            </dependency>
-
             <!-- DC3 API Related -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>

@@ -168,7 +168,7 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
      */
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                       PointBO point) {
+                               PointBO point) {
         /*
          * Read device point data logic
          *
@@ -200,11 +200,11 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
      * devices.
      * </p>
      *
-     * @param driverConfig driver configuration attributes
-     * @param pointConfig  point configuration attributes
-     * @param device       the device to write to
-     * @param point        the point to write
-     * @param writePointValue       the value to write
+     * @param driverConfig    driver configuration attributes
+     * @param pointConfig     point configuration attributes
+     * @param device          the device to write to
+     * @param point           the point to write
+     * @param writePointValue the value to write
      * @return true if the write operation succeeded, false otherwise
      */
     @Override

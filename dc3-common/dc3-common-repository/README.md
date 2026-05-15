@@ -15,13 +15,13 @@ storage implementation.
 
 ## Key Components
 
-| Component                          | Purpose                                                                                                 |
-|------------------------------------|---------------------------------------------------------------------------------------------------------|
-| `RepositoryService`                | Storage interface: save point values and query latest/history/page data                                 |
-| `RepositoryStrategyFactory`        | Runtime registry for available `RepositoryService` implementations                                      |
-| `PointValueBO`                     | Business object representing a point value with timestamp, device ID, point ID, and raw value           |
-| `PointQueryBO` / `PointValueQuery` | Query objects for paginated and filter-based retrieval                                                  |
-| `ActiveRepositoryProfileConfig`    | Activates the `repository` profile unless `dc3.repository.auto-profile=false` is set                    |
+| Component                          | Purpose                                                                                       |
+|------------------------------------|-----------------------------------------------------------------------------------------------|
+| `RepositoryService`                | Storage interface: save point values and query latest/history/page data                       |
+| `RepositoryStrategyFactory`        | Runtime registry for available `RepositoryService` implementations                            |
+| `PointValueBO`                     | Business object representing a point value with timestamp, device ID, point ID, and raw value |
+| `PointQueryBO` / `PointValueQuery` | Query objects for paginated and filter-based retrieval                                        |
+| `ActiveRepositoryProfileConfig`    | Activates the `repository` profile unless `dc3.repository.auto-profile=false` is set          |
 
 ## Usage Pattern
 

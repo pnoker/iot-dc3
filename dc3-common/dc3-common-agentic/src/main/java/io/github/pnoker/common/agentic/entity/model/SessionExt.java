@@ -25,7 +25,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Session-level chat preferences persisted as JSON.
+ * Session extension metadata persisted as JSON.
  *
  * @author pnoker
  * @version 2026.5.15
@@ -35,10 +35,12 @@ import java.io.Serializable;
 @Setter
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SessionConfig implements Serializable {
+public class SessionExt implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    private String model;
 
     private Boolean reasoningEnabled;
 

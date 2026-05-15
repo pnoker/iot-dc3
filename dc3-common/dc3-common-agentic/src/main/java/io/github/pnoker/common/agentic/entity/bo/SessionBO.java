@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.entity.bo;
 
-import io.github.pnoker.common.agentic.entity.model.SessionConfig;
+import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,9 +40,7 @@ public class SessionBO extends BaseBO {
 
     private String title;
 
-    private String model;
-
-    private SessionConfig sessionConfig;
+    private SessionExt sessionExt;
 
     private Long tenantId;
 
