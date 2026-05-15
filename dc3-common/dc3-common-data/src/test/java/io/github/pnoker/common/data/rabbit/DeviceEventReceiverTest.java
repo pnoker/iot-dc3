@@ -118,16 +118,17 @@ class DeviceEventReceiverTest {
     }
 
     @Test
-    void nacksWhenAckIoFails() throws Exception {
-        // Belt-and-braces: even if basicAck throws (e.g. broker disconnected mid-message)
-        // we expect the receiver to fall through to basicNack via the catch-all rather
-        // than letting the IOException bubble up and stall the listener container.
+    void ackFailureIsSwallowedGracefully() throws Exception {
+        // RabbitAckUtil.ack() catches IOException internally, so the receiver
+        // returns normally without hitting the outer nack catch block.
         DeviceEventDTO dto = new DeviceEventDTO();
         dto.setType(DeviceEventTypeEnum.HEARTBEAT);
         dto.setContent("{}");
         doThrow(new java.io.IOException("broker gone"))
                 .when(channel).basicAck(eq(7L), eq(false));
         receiver.deviceEventReceive(channel, message, dto);
-        verify(channel).basicNack(eq(7L), eq(false), eq(true));
+        // ack was attempted (and failed inside RabbitAckUtil), nack was NOT called
+        verify(channel).basicAck(eq(7L), eq(false));
+        verify(channel, never()).basicNack(eq(7L), eq(false), eq(true));
     }
 }
