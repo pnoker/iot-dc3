@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -24,8 +25,9 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
+import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,6 +60,9 @@ class DriverWriteServiceImplTest {
     @Mock
     private DriverCustomService driverCustomService;
 
+    @Mock
+    private DriverSenderService driverSenderService;
+
     @InjectMocks
     private DriverWriteServiceImpl service;
 
@@ -86,20 +91,22 @@ class DriverWriteServiceImplTest {
 
         verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
                 any(WritePointValue.class));
+        verify(driverSenderService).pointValueSender(any(PointValue.class));
     }
 
     @Test
     void writeRejectsUnknownDevice() {
         when(deviceMetadata.getCache(10L)).thenReturn(null);
-        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ServiceException.class);
+        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ReadPointException.class);
+        verifyNoInteractions(driverSenderService);
     }
 
     @Test
     void writeRejectsPointNotBoundToDevice() {
         device.setPointIds(new HashSet<>(java.util.List.of(99L)));
         when(deviceMetadata.getCache(10L)).thenReturn(device);
-        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ServiceException.class);
-        verifyNoInteractions(driverCustomService);
+        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ReadPointException.class);
+        verifyNoInteractions(driverCustomService, driverSenderService);
     }
 
     @Test
@@ -108,7 +115,8 @@ class DriverWriteServiceImplTest {
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(Map.of("k", AttributeBO.builder().build()));
         when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(Map.of("k", AttributeBO.builder().build()));
         when(pointMetadata.getCache(20L)).thenReturn(null);
-        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ServiceException.class);
+        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ReadPointException.class);
+        verifyNoInteractions(driverSenderService);
     }
 
     @Test
@@ -134,5 +142,6 @@ class DriverWriteServiceImplTest {
 
         verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
                 any(WritePointValue.class));
+        verify(driverSenderService).pointValueSender(any(PointValue.class));
     }
 }
