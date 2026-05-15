@@ -21,24 +21,24 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="$t('pointValue.edit.title')"
     class="things-dialog"
     draggable
-    :title="$t('pointValue.edit.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
       <el-form-item :label="$t('pointValue.edit.pointValue')" prop="value">
         <el-input
           v-model="reactiveData.formData.value"
-          clearable
           :placeholder="$t('pointValue.edit.pointValuePlaceholder')"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('pointValue.edit.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
+          :placeholder="$t('pointValue.edit.descriptionPlaceholder')"
           clearable
           maxlength="300"
-          :placeholder="$t('pointValue.edit.descriptionPlaceholder')"
           show-word-limit
           type="textarea"
         ></el-input>
@@ -55,8 +55,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, unref } from 'vue';
   import type { PropType } from 'vue';
+  import { reactive, ref, unref } from 'vue';
   import type { FormInstance, FormRules } from 'element-plus';
   import { useI18n } from 'vue-i18n';
 

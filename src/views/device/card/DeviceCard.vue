@@ -19,9 +19,9 @@
     <el-card shadow="hover">
       <div class="things-card-content">
         <things-card-header
-          :name="data.deviceName"
-          :icon="icon"
           :enabled="data.enableFlag === 'ENABLE'"
+          :icon="icon"
+          :name="data.deviceName"
           :status-title="$t('common.enableFlag')"
           @copy-id="copy(data.id, 'Device ID')"
         >
@@ -48,7 +48,7 @@
               </li>
             </ul>
           </div>
-          <div class="things-card-body-content" :title="$t('device.card.remarkTitle')">
+          <div :title="$t('device.card.remarkTitle')" class="things-card-body-content">
             <p class="nowrap-description">
               {{ data.remark || $t('common.noDescription') }}
             </p>
@@ -56,15 +56,15 @@
         </div>
         <things-card-actions
           v-if="!embedded"
-          :enabled="data.enableFlag === 'ENABLE'"
+          :delete-title="$t('device.card.confirmDelete')"
           :disable-title="$t('device.card.confirmDisable')"
           :enable-title="$t('device.card.confirmEnable')"
-          :delete-title="$t('device.card.confirmDelete')"
-          @disable="emitToggle('disable-thing')"
-          @enable="emitToggle('enable-thing')"
+          :enabled="data.enableFlag === 'ENABLE'"
           @delete="emitDelete"
-          @edit="edit"
           @detail="detail"
+          @disable="emitToggle('disable-thing')"
+          @edit="edit"
+          @enable="emitToggle('enable-thing')"
         />
       </div>
     </el-card>

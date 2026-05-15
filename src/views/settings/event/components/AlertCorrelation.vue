@@ -16,15 +16,15 @@
 
 <template>
   <dashboard-card
-    class="alert-correlation"
-    :title="t('settings.event.overview.correlationTitle')"
-    :subtitle="t('settings.event.overview.correlationSubtitle', { hours, windowSec })"
-    :loading="loading"
     :empty="!loading && pairs.length === 0"
-    :empty-text="t('settings.event.overview.correlationEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.correlationEmpty')"
     :height="520"
+    :loading="loading"
+    :subtitle="t('settings.event.overview.correlationSubtitle', { hours, windowSec })"
+    :title="t('settings.event.overview.correlationTitle')"
     body-mode="chart"
+    class="alert-correlation"
     @refresh="load"
   >
     <template #tools>

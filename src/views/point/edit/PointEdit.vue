@@ -28,19 +28,19 @@
     <div class="edit-card-body">
       <el-card v-if="reactiveData.active === 0" shadow="hover">
         <el-divider content-position="left">{{ $t('point.edit.pointConfig') }}</el-divider>
-        <el-form ref="formDataRef" label-position="top" :model="reactiveData.pointFormData" :rules="pointFormRule">
+        <el-form ref="formDataRef" :model="reactiveData.pointFormData" :rules="pointFormRule" label-position="top">
           <el-form-item :label="$t('point.edit.pointName')" prop="pointName">
             <el-input
               v-model="reactiveData.pointFormData.pointName"
-              clearable
               :placeholder="$t('point.edit.pointNamePlaceholder')"
+              clearable
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.dataType')" prop="pointTypeFlag">
             <el-select
               v-model="reactiveData.pointFormData.pointTypeFlag"
-              clearable
               :placeholder="$t('point.edit.dataTypeRequired')"
+              clearable
             >
               <el-option :label="$t('dataType.string')" value="STRING" />
               <el-option :label="$t('dataType.byte')" value="BYTE" />
@@ -55,8 +55,8 @@
           <el-form-item :label="$t('point.edit.rwType')" prop="rwFlag">
             <el-select
               v-model="reactiveData.pointFormData.rwFlag"
-              clearable
               :placeholder="$t('point.edit.rwTypeRequired')"
+              clearable
             >
               <el-option :label="$t('status.readOnly')" value="R" />
               <el-option :label="$t('status.writeOnly')" value="W" />
@@ -66,46 +66,46 @@
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
             <el-switch
               v-model="reactiveData.pointFormData.enableFlag"
-              active-value="ENABLE"
-              inactive-value="DISABLE"
               :active-text="$t('common.enable')"
               :inactive-text="$t('common.disable')"
+              active-value="ENABLE"
+              inactive-value="DISABLE"
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.accuracy')" prop="valueDecimal">
             <el-input
               v-model="reactiveData.pointFormData.valueDecimal"
-              clearable
               :placeholder="$t('point.edit.accuracyPlaceholder')"
+              clearable
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.unit')" prop="unit">
             <el-input
               v-model="reactiveData.pointFormData.unit"
-              clearable
               :placeholder="$t('point.edit.unitPlaceholder')"
+              clearable
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.baseValue')" prop="baseValue">
             <el-input
               v-model="reactiveData.pointFormData.baseValue"
-              clearable
               :placeholder="$t('point.edit.baseValuePlaceholder')"
+              clearable
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.ratio')" prop="multiple">
             <el-input
               v-model="reactiveData.pointFormData.multiple"
-              clearable
               :placeholder="$t('point.edit.ratioPlaceholder')"
+              clearable
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.description')" prop="remark">
             <el-input
               v-model="reactiveData.pointFormData.remark"
+              :placeholder="$t('point.edit.descriptionPlaceholder')"
               clearable
               maxlength="300"
-              :placeholder="$t('point.edit.descriptionPlaceholder')"
               show-word-limit
               type="textarea"
             />
@@ -120,9 +120,9 @@
       <el-card v-if="reactiveData.active === 1" shadow="hover">
         <el-divider content-position="left">{{ $t('point.edit.complete') }}</el-divider>
         <el-result
-          icon="success"
           :sub-title="$t('point.edit.completeSubTitle')"
           :title="$t('point.edit.completeTitle')"
+          icon="success"
         >
           <template #extra>
             <el-button plain type="primary" @click="done">{{ $t('common.return') }}</el-button>

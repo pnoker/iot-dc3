@@ -18,9 +18,9 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -29,17 +29,17 @@
       <el-form-item :label="$t('settings.label.labelName')" prop="labelName">
         <el-input
           v-model="formData.labelName"
+          :placeholder="$t('settings.label.labelNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.label.labelNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.common.entityType')" prop="entityTypeFlag">
         <el-select
           v-model="formData.entityTypeFlag"
-          clearable
-          class="edit-form-default"
           :placeholder="$t('common.all')"
+          class="edit-form-default"
+          clearable
         >
           <el-option v-for="opt in ENTITY_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>

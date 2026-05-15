@@ -18,9 +18,9 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -29,22 +29,22 @@
       <el-form-item :label="$t('device.tool.deviceName')" prop="deviceName">
         <el-input
           v-model="formData.deviceName"
+          :placeholder="$t('device.tool.deviceNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('device.tool.deviceNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item v-if="embedded !== 'driver'" :label="$t('device.tool.driver')" prop="driverId">
         <el-select
           v-model="formData.driverId"
+          :loading="driverLoading"
+          :placeholder="$t('device.tool.driverPlaceholder')"
+          :remote-method="driverDictionary"
           class="edit-form-special"
           clearable
           filterable
           remote
           reserve-keyword
-          :placeholder="$t('device.tool.driverPlaceholder')"
-          :remote-method="driverDictionary"
-          :loading="driverLoading"
           @visible-change="driverDictionaryVisible"
         >
           <el-option

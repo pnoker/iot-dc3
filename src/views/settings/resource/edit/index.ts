@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, ref } from 'vue';
 import type { PropType } from 'vue';
+import { computed, defineComponent, reactive, ref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 

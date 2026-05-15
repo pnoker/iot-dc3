@@ -40,17 +40,17 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.creatorName')" prop="creatorName" min-width="110" show-overflow-tooltip>
+        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.creatorName || '-' }}</template>
         </el-table-column>
-        <el-table-column :label="t('common.createTime')" prop="createTime" :formatter="timestampColumn" width="180" />
-        <el-table-column :label="t('common.operatorName')" prop="operatorName" min-width="110" show-overflow-tooltip>
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
+        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.operatorName || '-' }}</template>
         </el-table-column>
         <el-table-column
+          :formatter="timestampColumn"
           :label="t('common.operationTime')"
           prop="operateTime"
-          :formatter="timestampColumn"
           width="180"
         />
         <el-table-column :label="t('common.operation')" fixed="right" width="320">

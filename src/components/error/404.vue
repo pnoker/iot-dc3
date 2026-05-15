@@ -16,7 +16,7 @@
 
 <template>
   <div class="error">
-    <el-result icon="warning" :sub-title="t('error.notFound')" title="404">
+    <el-result :sub-title="t('error.notFound')" icon="warning" title="404">
       <template #extra>
         <router-link :to="{ path: '/' }">
           <el-button plain type="primary">{{ t('error.backHome') }}</el-button>

@@ -30,24 +30,24 @@
     <div class="edit-card-body">
       <el-card v-if="reactiveData.active === 0" shadow="hover">
         <el-divider content-position="left">{{ $t('device.edit.deviceConfig') }}</el-divider>
-        <el-form ref="deviceFormRef" label-position="top" :model="reactiveData.deviceFormData" :rules="deviceFormRule">
+        <el-form ref="deviceFormRef" :model="reactiveData.deviceFormData" :rules="deviceFormRule" label-position="top">
           <el-form-item :label="$t('device.edit.deviceName')" prop="deviceName">
             <el-input
               v-model="reactiveData.deviceFormData.deviceName"
-              clearable
               :placeholder="$t('device.edit.deviceNamePlaceholder')"
+              clearable
             />
           </el-form-item>
           <el-form-item :label="$t('device.edit.driver')" prop="driverId">
             <el-select
               v-model="reactiveData.deviceFormData.driverId"
+              :loading="reactiveData.driverLoading"
+              :placeholder="$t('device.edit.driverPlaceholder')"
+              :remote-method="driverDictionary"
               clearable
               filterable
               remote
               reserve-keyword
-              :placeholder="$t('device.edit.driverPlaceholder')"
-              :remote-method="driverDictionary"
-              :loading="reactiveData.driverLoading"
               @change="changeAttribute"
               @visible-change="driverDictionaryVisible"
             >
@@ -62,23 +62,23 @@
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
             <el-switch
               v-model="reactiveData.deviceFormData.enableFlag"
-              active-value="ENABLE"
-              inactive-value="DISABLE"
               :active-text="$t('common.enable')"
               :inactive-text="$t('common.disable')"
+              active-value="ENABLE"
+              inactive-value="DISABLE"
             />
           </el-form-item>
           <el-form-item :label="$t('device.edit.profiles')" prop="profileIds">
             <el-select
               v-model="reactiveData.deviceFormData.profileIds"
+              :loading="reactiveData.profileLoading"
               :multiple="true"
+              :placeholder="$t('device.edit.driverPlaceholder')"
+              :remote-method="profileDictionary"
               clearable
               filterable
               remote
               reserve-keyword
-              :placeholder="$t('device.edit.driverPlaceholder')"
-              :remote-method="profileDictionary"
-              :loading="reactiveData.profileLoading"
               @visible-change="profileDictionaryVisible"
             >
               <el-option
@@ -92,9 +92,9 @@
           <el-form-item :label="$t('device.edit.description')" prop="remark">
             <el-input
               v-model="reactiveData.deviceFormData.remark"
+              :placeholder="$t('device.edit.descriptionPlaceholder')"
               clearable
               maxlength="300"
-              :placeholder="$t('device.edit.descriptionPlaceholder')"
               show-word-limit
               type="textarea"
             />
@@ -118,8 +118,8 @@
         <el-form
           v-if="hasDriverAttributes"
           ref="driverFormRef"
-          label-position="top"
           :model="reactiveData.driverFormData"
+          label-position="top"
         >
           <el-form-item
             v-for="attribute in reactiveData.driverAttributes"
@@ -139,9 +139,9 @@
             <el-input-number
               v-else-if="isNumberAttribute(attribute)"
               v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
-              class="attribute-number-input"
-              :precision="attributePrecision(attribute)"
               :placeholder="attributePlaceholder(attribute)"
+              :precision="attributePrecision(attribute)"
+              class="attribute-number-input"
               controls-position="right"
             />
             <el-input
@@ -175,7 +175,7 @@
           :title="$t('device.edit.pointConfig')"
           type="success"
         />
-        <el-form v-if="hasPointFormData" ref="pointFormRef" label-position="top" :model="reactiveData.pointFormData">
+        <el-form v-if="hasPointFormData" ref="pointFormRef" :model="reactiveData.pointFormData" label-position="top">
           <el-form-item :label="$t('device.edit.pointName')" prop="pointName">
             <el-input v-model="reactiveData.pointFormData.pointName" disabled />
           </el-form-item>
@@ -197,9 +197,9 @@
             <el-input-number
               v-else-if="isNumberAttribute(attribute)"
               v-model="attributeFormItem(reactiveData.pointFormData, attribute).configValue"
-              class="attribute-number-input"
-              :precision="attributePrecision(attribute)"
               :placeholder="attributePlaceholder(attribute)"
+              :precision="attributePrecision(attribute)"
+              class="attribute-number-input"
               controls-position="right"
             />
             <el-input
@@ -241,9 +241,9 @@
       <el-card v-if="reactiveData.active === 3" shadow="hover">
         <el-divider content-position="left">{{ $t('device.edit.complete') }}</el-divider>
         <el-result
-          icon="success"
           :sub-title="$t('device.edit.completeSubTitle')"
           :title="$t('device.edit.completeTitle')"
+          icon="success"
         >
           <template #extra>
             <el-button plain type="primary" @click="done">{{ $t('common.return') }}</el-button>

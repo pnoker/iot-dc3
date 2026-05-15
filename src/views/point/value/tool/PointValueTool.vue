@@ -19,9 +19,9 @@
     :form-model="formData"
     :page="page"
     hide-sort
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
   >
@@ -29,14 +29,14 @@
       <el-form-item v-if="embedded === ''" :label="$t('pointValue.tool.device')" prop="deviceId">
         <el-select
           v-model="formData.deviceId"
+          :loading="deviceLoading"
+          :placeholder="$t('pointValue.tool.devicePlaceholder')"
+          :remote-method="deviceDictionary"
           class="edit-form-special"
           clearable
           filterable
           remote
           reserve-keyword
-          :placeholder="$t('pointValue.tool.devicePlaceholder')"
-          :remote-method="deviceDictionary"
-          :loading="deviceLoading"
           @visible-change="deviceDictionaryVisible"
         >
           <el-option
@@ -50,14 +50,14 @@
       <el-form-item v-if="embedded === ''" :label="$t('pointValue.tool.point')" prop="pointId">
         <el-select
           v-model="formData.pointId"
+          :loading="pointLoading"
+          :placeholder="$t('pointValue.tool.pointPlaceholder')"
+          :remote-method="pointDictionary"
           class="edit-form-special"
           clearable
           filterable
           remote
           reserve-keyword
-          :placeholder="$t('pointValue.tool.pointPlaceholder')"
-          :remote-method="pointDictionary"
-          :loading="pointLoading"
           @visible-change="pointDictionaryVisible"
         >
           <el-option
@@ -71,9 +71,9 @@
       <el-form-item v-if="embedded === 'device'" :label="$t('pointValue.tool.pointName')" prop="pointName">
         <el-input
           v-model="formData.pointName"
+          :placeholder="$t('pointValue.tool.pointNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('pointValue.tool.pointNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item v-if="embedded === 'device'" :label="$t('common.enableFlag')" prop="enableFlag">

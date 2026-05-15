@@ -15,7 +15,7 @@
   -->
 
 <template>
-  <dashboard-card :title="$t('home.latency.title')" :loading="loading" body-mode="chart" @refresh="load">
+  <dashboard-card :loading="loading" :title="$t('home.latency.title')" body-mode="chart" @refresh="load">
     <template #tools>
       <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
     </template>
@@ -30,8 +30,8 @@
 
   import { statsLatency } from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
   const { t } = useI18n();
   const rangeKey = ref<RangeKey>('24h');

@@ -68,13 +68,13 @@
                    <el-dropdown-item> variants would close the menu on
                    every click. -->
               <li class="user_lang_row" @click.stop>
-                <el-segmented v-model="langModel" :options="langOptions" size="small" class="user_lang_seg" />
+                <el-segmented v-model="langModel" :options="langOptions" class="user_lang_seg" size="small" />
               </li>
-              <el-dropdown-item divided command="settings" :icon="Setting">
+              <el-dropdown-item :icon="Setting" command="settings" divided>
                 {{ t('layout.settings') }}
               </el-dropdown-item>
-              <el-dropdown-item command="help" :icon="QuestionFilled">{{ t('layout.about') }}</el-dropdown-item>
-              <el-dropdown-item command="logout" :icon="SwitchButton">{{ t('layout.logout') }}</el-dropdown-item>
+              <el-dropdown-item :icon="QuestionFilled" command="help">{{ t('layout.about') }}</el-dropdown-item>
+              <el-dropdown-item :icon="SwitchButton" command="logout">{{ t('layout.logout') }}</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -96,7 +96,7 @@
         </div>
         <router-view />
       </el-scrollbar>
-      <el-backtop :right="40" :bottom="40" target=".body .el-scrollbar__wrap" />
+      <el-backtop :bottom="40" :right="40" target=".body .el-scrollbar__wrap" />
     </div>
     <agentic-assistant />
   </div>

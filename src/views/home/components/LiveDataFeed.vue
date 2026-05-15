@@ -17,14 +17,14 @@
 <template>
   <dashboard-card
     v-model:interval="intervalMs"
-    class="live-feed"
-    :title="$t('home.liveFeed.title')"
-    :loading="loading"
-    loading-target="none"
+    :auto-refresh="intervalOptions"
     :empty="!loading && rows.length === 0"
     :empty-text="$t('home.liveFeed.empty')"
+    :loading="loading"
+    :title="$t('home.liveFeed.title')"
     body-mode="scroll"
-    :auto-refresh="intervalOptions"
+    class="live-feed"
+    loading-target="none"
     @refresh="refresh"
   >
     <el-timeline>

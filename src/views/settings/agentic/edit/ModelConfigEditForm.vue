@@ -21,9 +21,9 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="isEdit ? 'Edit Model' : 'Add Model'"
     class="things-dialog"
     draggable
-    :title="isEdit ? 'Edit Model' : 'Add Model'"
     @closed="onClosed"
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
@@ -47,7 +47,7 @@
         </div>
       </el-form-item>
       <el-form-item label="Temperature">
-        <el-slider v-model="form.temperature" :min="0" :max="2" :step="0.1" />
+        <el-slider v-model="form.temperature" :max="2" :min="0" :step="0.1" />
       </el-form-item>
       <el-form-item label="Max Tokens" prop="maxTokens">
         <el-input-number v-model="form.maxTokens" :min="1" :step="256" controls-position="right" />
@@ -55,29 +55,29 @@
       <el-form-item label="Default">
         <el-switch
           v-model="form.defaultFlag"
-          active-value="DEFAULT"
-          inactive-value="NOT_DEFAULT"
           active-text="Yes"
+          active-value="DEFAULT"
           inactive-text="No"
+          inactive-value="NOT_DEFAULT"
         />
       </el-form-item>
       <el-form-item :label="$t('common.enable')">
         <el-switch
           v-model="form.enableFlag"
-          active-value="ENABLE"
-          inactive-value="DISABLE"
           :active-text="$t('common.enable')"
           :inactive-text="$t('common.disable')"
+          active-value="ENABLE"
+          inactive-value="DISABLE"
         />
       </el-form-item>
       <el-form-item :label="$t('common.remark')">
-        <el-input v-model="form.remark" type="textarea" :rows="3" maxlength="300" show-word-limit />
+        <el-input v-model="form.remark" :rows="3" maxlength="300" show-word-limit type="textarea" />
       </el-form-item>
     </el-form>
     <div class="things-dialog-footer">
       <el-button @click="visible = false">{{ $t('common.cancel') }}</el-button>
       <el-button plain type="success" @click="onReset">{{ $t('common.reset') }}</el-button>
-      <el-button type="primary" :loading="submitting" @click="onSubmit">
+      <el-button :loading="submitting" type="primary" @click="onSubmit">
         {{ $t('common.confirm') }}
       </el-button>
     </div>

@@ -20,7 +20,8 @@ pnpm check             # vue-tsc type check
 pnpm lint              # eslint --fix + prettier
 ```
 
-The backend API lives at `http://localhost:8000` by default (see `src/config/env/.env.dev`). The dev server proxies `/api` there via Vite. **The dev server runs fine without the
+The backend API lives at `http://localhost:8000` by default (see `src/config/env/.env.dev`). The dev server proxies
+`/api` there via Vite. **The dev server runs fine without the
 backend**, but login and data endpoints will fail.
 
 ## Stack Highlights
@@ -37,7 +38,8 @@ backend**, but login and data endpoints will fail.
 
 ### 1. Types must use `import type` (strict)
 
-`tsconfig.json` enables `verbatimModuleSyntax: true`. **Any import that is used only as a type must use `import type`** — otherwise Vite keeps the import at runtime, the browser
+`tsconfig.json` enables `verbatimModuleSyntax: true`. **Any import that is used only as a type must use `import type`
+** — otherwise Vite keeps the import at runtime, the browser
 can't find the named export, and you get a `SyntaxError` → blank page.
 
 ```ts
@@ -55,18 +57,23 @@ Common type-only names to watch out for:
 - `vue-router`: `RouteRecordRaw`, `RouteLocationNormalized`, `NavigationGuardNext`, `RouteMeta`.
 - `axios`: `AxiosInstance`, `AxiosError`, `AxiosResponse`, `InternalAxiosRequestConfig`.
 
-Icons from `@element-plus/icons-vue` (`Box`, `Edit`, …) are **values (Vue components)**, so regular `import { ... }` is correct.
+Icons from `@element-plus/icons-vue` (`Box`, `Edit`, …) are **values (Vue components)**, so regular `import { ... }` is
+correct.
 
 ### 2. Router guards must always call `next()`
 
-Every branch of `beforeEach` in `src/config/router/index.ts` must eventually call `next()` (or `next({ path: '/login' })`). A missing call leaves the navigation pending →
-`<router-view>` renders nothing → blank page with NProgress stuck. In particular, watch the `.then(!res.data)` and `.catch` branches of `checkTokenValid`.
+Every branch of `beforeEach` in `src/config/router/index.ts` must eventually call `next()` (or
+`next({ path: '/login' })`). A missing call leaves the navigation pending →
+`<router-view>` renders nothing → blank page with NProgress stuck. In particular, watch the `.then(!res.data)` and
+`.catch` branches of `checkTokenValid`.
 
-Note: vue-router 5 has deprecated the callback style (`next(...)`) in favor of returning a value. It still works (warn only), but new code should prefer the return style.
+Note: vue-router 5 has deprecated the callback style (`next(...)`) in favor of returning a value. It still works (warn
+only), but new code should prefer the return style.
 
 ### 3. `envDir` is under `src/config/env`
 
-Vite is configured with `envDir: './src/config/env'`, so dotenv files are **not** at the repo root. The env-var prefix is `APP_`.
+Vite is configured with `envDir: './src/config/env'`, so dotenv files are **not** at the repo root. The env-var prefix
+is `APP_`.
 
 ## Project Layout
 
@@ -89,15 +96,22 @@ src/
 
 ## Known Issues & Notes
 
-- **`src/components/particles/particles.vue`**: the login page's 3D particle background. Under Vue 3.5 its `mounted` hook may fire before the canvas ref is ready, causing
-  `Cannot read properties of null (reading 'appendChild')`. Non-blocking for login. Fix by wrapping the init in `onMounted(() => nextTick(...))` or replacing the canvas setup.
-- **`auto-imports.d.ts` declarations like `const FormInstance: typeof import('element-plus').FormInstance`** are for TS only. You still must write `import type` in source files —
+- **`src/components/particles/particles.vue`**: the login page's 3D particle background. Under Vue 3.5 its `mounted`
+  hook may fire before the canvas ref is ready, causing
+  `Cannot read properties of null (reading 'appendChild')`. Non-blocking for login. Fix by wrapping the init in
+  `onMounted(() => nextTick(...))` or replacing the canvas setup.
+- **`auto-imports.d.ts` declarations like `const FormInstance: typeof import('element-plus').FormInstance`** are for TS
+  only. You still must write `import type` in source files —
   auto-import alone would inject a runtime import and crash.
-- **Ignored build scripts for `@parcel/watcher` / `core-js`**: disabled by default in pnpm 10 as a security hardening. Harmless — macOS/Linux use the prebuilt binary for
-  `@parcel/watcher`, and core-js's postinstall is only an ad. Run `pnpm approve-builds` if you want to silence the warning.
-- **Tauri desktop**: `src-tauri/` is kept around; `@tauri-apps/api` is currently not imported anywhere in `src/`. Revisit when desktop work starts.
+- **Ignored build scripts for `@parcel/watcher` / `core-js`**: disabled by default in pnpm 10 as a security hardening.
+  Harmless — macOS/Linux use the prebuilt binary for
+  `@parcel/watcher`, and core-js's postinstall is only an ad. Run `pnpm approve-builds` if you want to silence the
+  warning.
+- **Tauri desktop**: `src-tauri/` is kept around; `@tauri-apps/api` is currently not imported anywhere in `src/`.
+  Revisit when desktop work starts.
 
 ## Dockerfile Build
 
-Uses `pnpm@10.33.2`, matching `package.json`'s `packageManager` field. **When bumping pnpm, update the `corepack prepare pnpm@X --activate` line in `Dockerfile` in lockstep** —
+Uses `pnpm@10.33.2`, matching `package.json`'s `packageManager` field. **When bumping pnpm, update
+the `corepack prepare pnpm@X --activate` line in `Dockerfile` in lockstep** —
 otherwise CI will resolve a different version than local.

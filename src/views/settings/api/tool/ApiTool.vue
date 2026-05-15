@@ -18,9 +18,9 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -29,37 +29,37 @@
       <el-form-item :label="$t('settings.api.apiName')" prop="apiName">
         <el-input
           v-model="formData.apiName"
+          :placeholder="$t('settings.api.apiNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.api.apiNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.api.apiCode')" prop="apiCode">
         <el-input
           v-model="formData.apiCode"
+          :placeholder="$t('settings.api.apiCodePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.api.apiCodePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.api.apiGroup')" prop="apiGroup">
         <el-input
           v-model="formData.apiGroup"
+          :placeholder="$t('settings.api.apiGroupPlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.api.apiGroupPlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.api.serviceName')" prop="serviceName">
         <el-input
           v-model="formData.serviceName"
+          :placeholder="$t('settings.api.serviceNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.api.serviceNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.api.apiType')" prop="apiTypeFlag">
-        <el-select v-model="formData.apiTypeFlag" clearable :placeholder="$t('common.all')">
+        <el-select v-model="formData.apiTypeFlag" :placeholder="$t('common.all')" clearable>
           <el-option label="GET" value="GET" />
           <el-option label="POST" value="POST" />
           <el-option label="PUT" value="PUT" />

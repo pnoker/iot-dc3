@@ -21,42 +21,42 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="reactiveData.mode === 'add' ? t('settings.menu.addTitle') : t('settings.menu.editTitle')"
     class="things-dialog things-dialog--wide"
     draggable
-    :title="reactiveData.mode === 'add' ? t('settings.menu.addTitle') : t('settings.menu.editTitle')"
     @closed="reset"
   >
-    <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top" class="things-form-grid">
-      <el-form-item class="things-form-grid__span-2" :label="t('settings.menu.parentMenuId')" prop="parentMenuId">
+    <el-form ref="formRef" :model="reactiveData.form" :rules="rules" class="things-form-grid" label-position="top">
+      <el-form-item :label="t('settings.menu.parentMenuId')" class="things-form-grid__span-2" prop="parentMenuId">
         <el-tree-select
           v-model="reactiveData.form.parentMenuId"
           :data="parentTreeOptions"
-          :props="{ label: 'menuName', children: 'children' }"
           :placeholder="t('settings.menu.parentMenuIdPlaceholder')"
-          clearable
+          :props="{ label: 'menuName', children: 'children' }"
           check-strictly
+          clearable
           node-key="id"
         />
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuName')" prop="menuName">
         <el-input
           v-model="reactiveData.form.menuName"
-          clearable
           :placeholder="t('settings.menu.menuNamePlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuCode')" prop="menuCode">
         <el-input
           v-model="reactiveData.form.menuCode"
-          clearable
           :placeholder="t('settings.menu.menuCodePlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('settings.menu.titleZh')" prop="titleZh">
-        <el-input v-model="reactiveData.form.titleZh" clearable :placeholder="t('settings.menu.titleZhPlaceholder')" />
+        <el-input v-model="reactiveData.form.titleZh" :placeholder="t('settings.menu.titleZhPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="t('settings.menu.titleEn')" prop="titleEn">
-        <el-input v-model="reactiveData.form.titleEn" clearable :placeholder="t('settings.menu.titleEnPlaceholder')" />
+        <el-input v-model="reactiveData.form.titleEn" :placeholder="t('settings.menu.titleEnPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuType')" prop="menuTypeFlag">
         <el-select v-model="reactiveData.form.menuTypeFlag">
@@ -69,14 +69,14 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuIndex')" prop="menuIndex">
-        <el-input-number v-model="reactiveData.form.menuIndex" :min="0" :max="999" />
+        <el-input-number v-model="reactiveData.form.menuIndex" :max="999" :min="0" />
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuIcon')" prop="icon">
         <el-select
           v-model="reactiveData.form.icon"
+          :placeholder="t('settings.menu.menuIconPlaceholder')"
           clearable
           filterable
-          :placeholder="t('settings.menu.menuIconPlaceholder')"
         >
           <template #prefix>
             <el-icon v-if="reactiveData.form.icon" :size="16">
@@ -92,25 +92,25 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuUrl')" prop="url">
-        <el-input v-model="reactiveData.form.url" clearable :placeholder="t('settings.menu.menuUrlPlaceholder')" />
+        <el-input v-model="reactiveData.form.url" :placeholder="t('settings.menu.menuUrlPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <el-switch
           v-model="reactiveData.form.enableFlag"
-          active-value="ENABLE"
-          inactive-value="DISABLE"
           :active-text="t('common.enable')"
           :inactive-text="t('common.disable')"
+          active-value="ENABLE"
+          inactive-value="DISABLE"
         />
       </el-form-item>
-      <el-form-item class="things-form-grid__span-2" :label="t('common.remark')" prop="remark">
+      <el-form-item :label="t('common.remark')" class="things-form-grid__span-2" prop="remark">
         <el-input v-model="reactiveData.form.remark" clearable maxlength="300" show-word-limit type="textarea" />
       </el-form-item>
     </el-form>
     <div class="things-dialog-footer">
       <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
       <el-button plain type="success" @click="reset">{{ t('common.reset') }}</el-button>
-      <el-button type="primary" :loading="reactiveData.submitting" @click="submit">
+      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
         {{ t('common.confirm') }}
       </el-button>
     </div>

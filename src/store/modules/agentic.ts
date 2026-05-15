@@ -21,10 +21,10 @@ import {
   getAgenticAttachments,
   getAgenticMessages,
   getAgenticModels,
-  getPendingAgenticActions,
-  rejectAgenticAction,
   getAgenticSessions,
   getAgenticSkills,
+  getPendingAgenticActions,
+  rejectAgenticAction,
   streamAgenticChatCompletion,
   updateAgenticSession,
   uploadAgenticAttachment,
@@ -35,7 +35,7 @@ import type {
   AgenticMessage,
   AgenticModel,
   AgenticSession,
-  AgenticSessionConfig,
+  AgenticSessionExt,
   AgenticSkill,
   AgenticTraceEvent,
 } from '@/config/types';
@@ -159,7 +159,9 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
 
     const firstModel = models.value[0] || DEFAULT_MODEL;
-    selectedModel.value = resolveModelName(selectedModel.value || currentSession.value?.model || firstModel.model);
+    selectedModel.value = resolveModelName(
+      selectedModel.value || sessionModel(currentSession.value) || firstModel.model
+    );
     applyModelCapabilities();
     temperature.value = temperature.value ?? firstModel.temperature;
     maxTokens.value = maxTokens.value ?? firstModel.maxTokens;
@@ -201,8 +203,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         {
           conversationId,
           title: 'New Conversation',
-          model,
-          sessionConfig: buildCurrentSessionConfig(),
+          sessionExt: buildCurrentSessionExt(model),
         },
         ...sessions.value,
       ];
@@ -281,10 +282,10 @@ export const useAgenticStore = defineStore('agentic', () => {
       failMessage('Missing conversation context.', 'Agentic');
       return;
     }
-    const model = resolveModelName(selectedModel.value || currentSession.value?.model);
+    const model = resolveModelName(selectedModel.value || sessionModel(currentSession.value));
     selectedModel.value = model;
     applyModelCapabilities();
-    updateSessionLocally(conversationId, { model, sessionConfig: buildCurrentSessionConfig() });
+    updateSessionLocally(conversationId, { sessionExt: buildCurrentSessionExt(model) });
     await persistSessionPrefs(conversationId);
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
@@ -453,8 +454,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         {
           conversationId,
           title,
-          model: resolveModelName(selectedModel.value),
-          sessionConfig: buildCurrentSessionConfig(),
+          sessionExt: buildCurrentSessionExt(resolveModelName(selectedModel.value)),
         },
         ...sessions.value,
       ];
@@ -470,13 +470,13 @@ export const useAgenticStore = defineStore('agentic', () => {
     if (!conversationId) {
       return;
     }
-    updateSessionLocally(conversationId, { model: nextModel });
+    updateSessionLocally(conversationId, { sessionExt: { model: nextModel } });
     const session = sessions.value.find((item) => item.conversationId === conversationId);
     if (!session?.createTime && !session?.operateTime) {
       return;
     }
     try {
-      const response = await updateAgenticSession(conversationId, { model: nextModel });
+      const response = await updateAgenticSession(conversationId, { sessionExt: { model: nextModel } });
       sessions.value = sessions.value.map((session) =>
         session.conversationId === conversationId ? { ...session, ...response.data } : session
       );
@@ -486,28 +486,25 @@ export const useAgenticStore = defineStore('agentic', () => {
   };
 
   const restoreSessionModel = (session?: AgenticSession) => {
-    selectedModel.value = resolveModelName(session?.model || selectedModel.value);
+    selectedModel.value = resolveModelName(sessionModel(session) || selectedModel.value);
     const modelDefaults = models.value.find((model) => model.model === selectedModel.value) || activeModel.value;
-    const sessionConfig = session?.sessionConfig;
-    reasoningEnabled.value = sessionConfig?.reasoningEnabled ?? false;
-    requireConfirmation.value = sessionConfig?.requireConfirmation ?? true;
-    temperature.value = sessionConfig?.temperature ?? modelDefaults.temperature;
-    maxTokens.value = sessionConfig?.maxTokens ?? modelDefaults.maxTokens;
+    const sessionExt = sessionExtOf(session);
+    reasoningEnabled.value = sessionExt?.reasoningEnabled ?? false;
+    requireConfirmation.value = sessionExt?.requireConfirmation ?? true;
+    temperature.value = sessionExt?.temperature ?? modelDefaults.temperature;
+    maxTokens.value = sessionExt?.maxTokens ?? modelDefaults.maxTokens;
     applyModelCapabilities();
   };
 
-  const updateSessionLocally = (
-    conversationId: string,
-    patch: Partial<Pick<AgenticSession, 'model' | 'sessionConfig'>>
-  ) => {
+  const updateSessionLocally = (conversationId: string, patch: Partial<Pick<AgenticSession, 'sessionExt'>>) => {
     sessions.value = sessions.value.map((session) =>
       session.conversationId === conversationId
         ? {
             ...session,
             ...patch,
-            sessionConfig: patch.sessionConfig
-              ? { ...session.sessionConfig, ...patch.sessionConfig }
-              : session.sessionConfig,
+            sessionExt: patch.sessionExt
+              ? { ...(sessionExtOf(session) || {}), ...patch.sessionExt }
+              : session.sessionExt,
           }
         : session
     );
@@ -515,22 +512,23 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const persistSessionPrefs = async (conversationId: string) => {
     if (!conversationId) return;
-    const sessionConfig = buildCurrentSessionConfig();
-    updateSessionLocally(conversationId, { sessionConfig });
+    const sessionExt = buildCurrentSessionExt();
+    updateSessionLocally(conversationId, { sessionExt });
     const session = sessions.value.find((item) => item.conversationId === conversationId);
     if (!session?.createTime && !session?.operateTime) {
       return;
     }
     try {
       await updateAgenticSession(conversationId, {
-        sessionConfig,
+        sessionExt,
       });
     } catch (error) {
       warnMessage('Failed to update agentic session preferences.', 'Agentic', error);
     }
   };
 
-  const buildCurrentSessionConfig = (): AgenticSessionConfig => ({
+  const buildCurrentSessionExt = (model = resolveModelName(selectedModel.value)): AgenticSessionExt => ({
+    model,
     reasoningEnabled: reasoningEnabled.value,
     temperature: temperature.value,
     maxTokens: maxTokens.value,
@@ -680,6 +678,14 @@ const createTraceEventId = (type: string) => {
 const normalizeTitle = (title: string) => {
   const trimmed = title.trim().replace(/\s+/g, ' ');
   return trimmed.length > 32 ? `${trimmed.slice(0, 32)}...` : trimmed || 'New Conversation';
+};
+
+const sessionExtOf = (session?: AgenticSession): AgenticSessionExt | undefined => {
+  return session?.sessionExt;
+};
+
+const sessionModel = (session?: AgenticSession) => {
+  return sessionExtOf(session)?.model;
 };
 
 const normalizeDisplayContent = (role: string, content?: string) => {

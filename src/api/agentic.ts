@@ -19,13 +19,13 @@ import request from '@/config/axios';
 import { API_AGENTIC_BASE } from '@/config/constant/api';
 import { AUTH_HEADERS } from '@/config/constant/common';
 import type {
-  AgenticChatCompletionRequest,
-  AgenticChatCompletionResponse,
   AgenticAction,
   AgenticAttachment,
+  AgenticChatCompletionRequest,
+  AgenticChatCompletionResponse,
+  AgenticMessage,
   AgenticModel,
   AgenticModelConfig,
-  AgenticMessage,
   AgenticProvider,
   AgenticSession,
   AgenticSkill,
@@ -91,7 +91,7 @@ export const deleteAgenticSession = (conversationId: string) =>
 
 export const updateAgenticSession = (
   conversationId: string,
-  data: Partial<Pick<AgenticSession, 'title' | 'model' | 'sessionConfig'>>
+  data: Partial<Pick<AgenticSession, 'title' | 'sessionExt'>>
 ) =>
   httpPost<R<AgenticSession>>(`${API_AGENTIC_BASE}/session/update`, data, {
     params: { conversation_id: conversationId },

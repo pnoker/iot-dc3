@@ -16,7 +16,7 @@
 
 <template>
   <el-tooltip v-if="!visible" :content="t('agentic.tooltip')" placement="left">
-    <el-button class="agentic-launcher" type="primary" circle @click="agenticStore.toggle">
+    <el-button circle class="agentic-launcher" type="primary" @click="agenticStore.toggle">
       <el-icon>
         <ChatDotRound />
       </el-icon>
@@ -25,11 +25,11 @@
 
   <el-drawer
     v-model="visible"
+    :close-on-click-modal="false"
+    :with-header="false"
+    append-to-body
     custom-class="agentic-drawer"
     size="900px"
-    :with-header="false"
-    :close-on-click-modal="false"
-    append-to-body
   >
     <section v-loading="loading" class="agentic-shell">
       <header class="agentic-header">
@@ -48,7 +48,7 @@
             </el-icon>
             New
           </el-button>
-          <el-dropdown trigger="click" max-height="360" @command="handleHistoryCommand">
+          <el-dropdown max-height="360" trigger="click" @command="handleHistoryCommand">
             <el-button size="small">
               <el-icon>
                 <Clock />
@@ -74,21 +74,21 @@
             </template>
           </el-dropdown>
           <el-tooltip :content="t('agentic.headerRename')">
-            <el-button size="small" circle :disabled="!activeConversationId" @click="handleRenameCurrent">
+            <el-button :disabled="!activeConversationId" circle size="small" @click="handleRenameCurrent">
               <el-icon>
                 <EditPen />
               </el-icon>
             </el-button>
           </el-tooltip>
           <el-tooltip :content="t('agentic.headerDelete')">
-            <el-button size="small" circle :disabled="!activeConversationId" @click="handleDeleteCurrent">
+            <el-button :disabled="!activeConversationId" circle size="small" @click="handleDeleteCurrent">
               <el-icon>
                 <Delete />
               </el-icon>
             </el-button>
           </el-tooltip>
           <el-tooltip :content="t('agentic.headerClose')">
-            <el-button size="small" circle @click="agenticStore.close">
+            <el-button circle size="small" @click="agenticStore.close">
               <el-icon>
                 <Close />
               </el-icon>
@@ -100,9 +100,9 @@
       <main class="agentic-body">
         <div v-if="currentMessages.length === 0" class="agentic-empty">
           <Welcome
-            icon="/images/logo/logo.png"
-            :title="t('agentic.title')"
             :description="t('agentic.welcomeDescription')"
+            :title="t('agentic.title')"
+            icon="/images/logo/logo.png"
             variant="borderless"
           />
           <Prompts :items="promptItems" :wrap="true" @item-click="handlePromptClick" />
@@ -112,8 +112,8 @@
           <article
             v-for="message in currentMessages"
             :key="message.id"
-            class="agentic-message"
             :class="`agentic-message--${message.role}`"
+            class="agentic-message"
           >
             <div class="agentic-message__avatar">
               <img :src="message.role === 'user' ? '/images/common/avatar.png' : '/images/common/llm.svg'" alt="" />
@@ -129,8 +129,8 @@
               </div>
               <details
                 v-if="message.role === 'assistant' && hasAssistantDetails(message)"
-                class="agentic-details"
                 :open="message.streaming"
+                class="agentic-details"
               >
                 <summary>
                   <el-icon>
@@ -244,7 +244,7 @@
               <strong>{{ action.title }}</strong>
               <span>{{ action.description }}</span>
             </div>
-            <el-tag type="warning" size="small">{{ t('agentic.pending') }}</el-tag>
+            <el-tag size="small" type="warning">{{ t('agentic.pending') }}</el-tag>
             <div class="agentic-action__buttons">
               <el-button size="small" type="primary" @click="handleConfirmAction(action.actionId)">
                 <el-icon>
@@ -281,20 +281,20 @@
 
           <el-input
             v-model="draft"
-            class="agentic-input"
-            type="textarea"
             :autosize="{ minRows: 2, maxRows: 6 }"
-            resize="none"
-            :placeholder="t('agentic.composerPlaceholder')"
             :disabled="streaming"
+            :placeholder="t('agentic.composerPlaceholder')"
+            class="agentic-input"
+            resize="none"
+            type="textarea"
             @keydown.enter.exact.prevent="handleSubmit"
           />
 
           <div class="agentic-composer__bar">
             <div class="agentic-composer__left">
-              <input ref="fileInputRef" class="agentic-file" type="file" multiple @change="handleFileChange" />
+              <input ref="fileInputRef" class="agentic-file" multiple type="file" @change="handleFileChange" />
               <el-tooltip :content="t('agentic.attachFile')">
-                <el-button circle size="small" :disabled="streaming" @click="handlePickFile">
+                <el-button :disabled="streaming" circle size="small" @click="handlePickFile">
                   <el-icon>
                     <Paperclip />
                   </el-icon>
@@ -304,8 +304,8 @@
               <el-select
                 :model-value="selectedModel"
                 class="agentic-model"
-                size="small"
                 filterable
+                size="small"
                 @update:model-value="handleModelChange"
               >
                 <el-option
@@ -319,11 +319,11 @@
               <el-tooltip :content="t('agentic.reasoning')">
                 <el-switch
                   v-model="reasoningEnabled"
-                  :disabled="!activeModel.reasoning"
-                  size="small"
-                  inline-prompt
                   :active-text="t('agentic.think')"
+                  :disabled="!activeModel.reasoning"
                   :inactive-text="t('agentic.fast')"
+                  inline-prompt
+                  size="small"
                 />
               </el-tooltip>
 
@@ -338,7 +338,7 @@
                 <div class="agentic-settings">
                   <div class="agentic-setting">
                     <span>{{ t('agentic.temperature') }}</span>
-                    <el-slider v-model="temperatureProxy" :min="0" :max="2" :step="0.1" size="small" />
+                    <el-slider v-model="temperatureProxy" :max="2" :min="0" :step="0.1" size="small" />
                   </div>
                   <div class="agentic-setting">
                     <span>{{ t('agentic.maxTokens') }}</span>
@@ -346,8 +346,8 @@
                       v-model="maxTokensProxy"
                       :min="1"
                       :step="256"
-                      size="small"
                       controls-position="right"
+                      size="small"
                     />
                   </div>
                   <div class="agentic-setting agentic-setting--row">
@@ -372,17 +372,17 @@
               </el-popover>
             </div>
 
-            <el-button v-if="streaming" class="agentic-send" type="warning" circle @click="agenticStore.stopStreaming">
+            <el-button v-if="streaming" circle class="agentic-send" type="warning" @click="agenticStore.stopStreaming">
               <el-icon>
                 <VideoPause />
               </el-icon>
             </el-button>
             <el-button
               v-else
+              :disabled="!draft.trim() && !currentAttachments.length"
+              circle
               class="agentic-send"
               type="primary"
-              circle
-              :disabled="!draft.trim() && !currentAttachments.length"
               @click="handleSubmit"
             >
               <el-icon>
@@ -680,6 +680,7 @@
     const traces = assistantTraceEvents(message);
     const tools = assistantToolSteps(message).length;
     const skillSteps = assistantSkillSteps(message);
+    const liveReasoning = message.reasoning?.trim();
     if (message.streaming) {
       items.push({
         label: message.content ? t('agentic.thinkingGenerating') : t('agentic.thinkingPreparing'),
@@ -689,7 +690,7 @@
     if (assistantReasoning(message)) {
       items.push({
         label: t('agentic.thinkingReasoningMode'),
-        detail: t('agentic.thinkingReasoningDetail'),
+        detail: liveReasoning || t('agentic.thinkingReasoningDetail'),
       });
     }
     if (skillSteps.length) {
@@ -718,7 +719,9 @@
 
   const assistantReasoning = (message: AgenticMessage) => {
     return Boolean(
-      message.contentExt?.reasoning || assistantTraceEvents(message).some((event) => event.type === 'reasoning')
+      message.reasoning?.trim() ||
+      message.contentExt?.reasoning ||
+      assistantTraceEvents(message).some((event) => event.type === 'reasoning')
     );
   };
 
@@ -1087,6 +1090,8 @@
   }
 
   .agentic-reasoning__content {
+    overflow-wrap: anywhere;
+
     :deep(p) {
       margin: 0 0 6px;
     }
@@ -1230,6 +1235,8 @@
       color: #64748b;
       font-size: 11px;
       line-height: 1.45;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
     }
   }
 

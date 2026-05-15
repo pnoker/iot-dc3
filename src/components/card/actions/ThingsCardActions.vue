@@ -19,9 +19,9 @@
     <div class="things-card-footer-operation">
       <el-popconfirm
         :icon="SwitchButton"
+        :title="disableTitle"
         icon-color="#e6a23c"
         placement="top"
-        :title="disableTitle"
         @confirm="$emit('disable')"
       >
         <template #reference>
@@ -32,9 +32,9 @@
       </el-popconfirm>
       <el-popconfirm
         :icon="CircleCheck"
+        :title="enableTitle"
         icon-color="#67c23a"
         placement="top"
-        :title="enableTitle"
         @confirm="$emit('enable')"
       >
         <template #reference>
@@ -45,9 +45,9 @@
       </el-popconfirm>
       <el-popconfirm
         :icon="CircleClose"
+        :title="deleteTitle"
         icon-color="#f56c6c"
         placement="top"
-        :title="deleteTitle"
         @confirm="$emit('delete')"
       >
         <template #reference>

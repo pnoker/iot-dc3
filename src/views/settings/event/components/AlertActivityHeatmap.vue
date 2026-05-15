@@ -16,8 +16,8 @@
 
 <template>
   <dashboard-card
-    :title="t('settings.event.overview.activityTitle')"
     :loading="loading"
+    :title="t('settings.event.overview.activityTitle')"
     body-mode="chart"
     @refresh="load"
   >

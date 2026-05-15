@@ -21,9 +21,9 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="reactiveData.mode === 'add' ? t('settings.resource.addTitle') : t('settings.resource.editTitle')"
     class="things-dialog"
     draggable
-    :title="reactiveData.mode === 'add' ? t('settings.resource.addTitle') : t('settings.resource.editTitle')"
     @closed="reset"
   >
     <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top">
@@ -31,26 +31,26 @@
         <el-tree-select
           v-model="reactiveData.form.parentResourceId"
           :data="parentTreeOptions"
-          :props="{ label: 'resourceName', children: 'children', disabled: 'disabled' }"
-          :placeholder="t('settings.resource.parentResourceIdPlaceholder')"
-          clearable
-          check-strictly
           :default-expanded-keys="defaultExpandedKeys"
+          :placeholder="t('settings.resource.parentResourceIdPlaceholder')"
+          :props="{ label: 'resourceName', children: 'children', disabled: 'disabled' }"
+          check-strictly
+          clearable
           node-key="id"
         />
       </el-form-item>
       <el-form-item :label="t('settings.resource.resourceName')" prop="resourceName">
         <el-input
           v-model="reactiveData.form.resourceName"
-          clearable
           :placeholder="t('settings.resource.resourceNamePlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('settings.resource.resourceCode')" prop="resourceCode">
         <el-input
           v-model="reactiveData.form.resourceCode"
-          clearable
           :placeholder="t('settings.resource.resourceCodePlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('settings.resource.resourceType')" prop="resourceTypeFlag">
@@ -67,17 +67,17 @@
       <el-form-item :label="t('settings.resource.entityId')" prop="entityId">
         <el-input
           v-model="reactiveData.form.entityId"
-          clearable
           :placeholder="t('settings.resource.entityIdPlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <el-switch
           v-model="reactiveData.form.enableFlag"
-          active-value="ENABLE"
-          inactive-value="DISABLE"
           :active-text="t('common.enable')"
           :inactive-text="t('common.disable')"
+          active-value="ENABLE"
+          inactive-value="DISABLE"
         />
       </el-form-item>
       <el-form-item :label="t('common.remark')" prop="remark">
@@ -87,7 +87,7 @@
     <div class="things-dialog-footer">
       <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
       <el-button plain type="success" @click="reset">{{ t('common.reset') }}</el-button>
-      <el-button type="primary" :loading="reactiveData.submitting" @click="submit">
+      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
         {{ t('common.confirm') }}
       </el-button>
     </div>

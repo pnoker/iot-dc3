@@ -21,23 +21,23 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="$t('point.add.title')"
     class="things-dialog"
     draggable
-    :title="$t('point.add.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
       <el-form-item :label="$t('point.add.pointName')" prop="pointName">
         <el-input
           v-model="reactiveData.formData.pointName"
-          clearable
           :placeholder="$t('point.add.pointNamePlaceholder')"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('point.add.dataType')" prop="pointTypeFlag">
         <el-select
           v-model="reactiveData.formData.pointTypeFlag"
-          clearable
           :placeholder="$t('point.add.dataTypeRequired')"
+          clearable
         >
           <el-option :label="$t('dataType.string')" value="STRING"></el-option>
           <el-option :label="$t('dataType.byte')" value="BYTE"></el-option>
@@ -50,7 +50,7 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('point.add.rwType')" prop="rwFlag">
-        <el-select v-model="reactiveData.formData.rwFlag" clearable :placeholder="$t('point.add.rwTypeRequired')">
+        <el-select v-model="reactiveData.formData.rwFlag" :placeholder="$t('point.add.rwTypeRequired')" clearable>
           <el-option :label="$t('status.readOnly')" value="R"></el-option>
           <el-option :label="$t('status.writeOnly')" value="W"></el-option>
           <el-option :label="$t('status.readWrite')" value="RW"></el-option>
@@ -59,37 +59,37 @@
       <el-form-item :label="$t('point.add.accuracy')" prop="valueDecimal">
         <el-input
           v-model="reactiveData.formData.valueDecimal"
-          clearable
           :placeholder="$t('point.add.accuracyPlaceholder')"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('point.add.unit')" prop="unit">
         <el-input
           v-model="reactiveData.formData.unit"
-          clearable
           :placeholder="$t('point.add.unitPlaceholder')"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('point.add.baseValue')" prop="baseValue">
         <el-input
           v-model="reactiveData.formData.baseValue"
-          clearable
           :placeholder="$t('point.add.baseValuePlaceholder')"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('point.add.ratio')" prop="multiple">
         <el-input
           v-model="reactiveData.formData.multiple"
-          clearable
           :placeholder="$t('point.add.ratioPlaceholder')"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('point.add.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
+          :placeholder="$t('point.add.descriptionPlaceholder')"
           clearable
           maxlength="300"
-          :placeholder="$t('point.add.descriptionPlaceholder')"
           show-word-limit
           type="textarea"
         ></el-input>

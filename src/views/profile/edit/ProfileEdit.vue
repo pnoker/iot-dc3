@@ -29,29 +29,29 @@
     <div class="edit-card-body">
       <el-card v-if="reactiveData.active === 0" shadow="hover">
         <el-divider content-position="left">{{ $t('profile.edit.profileConfig') }}</el-divider>
-        <el-form ref="formDataRef" label-position="top" :model="reactiveData.profileFormData" :rules="formRule">
+        <el-form ref="formDataRef" :model="reactiveData.profileFormData" :rules="formRule" label-position="top">
           <el-form-item :label="$t('profile.edit.profileName')" prop="name">
             <el-input
               v-model="reactiveData.profileFormData.profileName"
-              clearable
               :placeholder="$t('profile.edit.profileNamePlaceholder')"
+              clearable
             />
           </el-form-item>
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
             <el-switch
               v-model="reactiveData.profileFormData.enableFlag"
-              active-value="ENABLE"
-              inactive-value="DISABLE"
               :active-text="$t('common.enable')"
               :inactive-text="$t('common.disable')"
+              active-value="ENABLE"
+              inactive-value="DISABLE"
             />
           </el-form-item>
           <el-form-item :label="$t('profile.edit.description')" prop="remark">
             <el-input
               v-model="reactiveData.profileFormData.remark"
+              :placeholder="$t('profile.edit.descriptionPlaceholder')"
               clearable
               maxlength="300"
-              :placeholder="$t('profile.edit.descriptionPlaceholder')"
               show-word-limit
               type="textarea"
             />
@@ -76,9 +76,9 @@
       <el-card v-if="reactiveData.active === 2" shadow="hover">
         <el-divider content-position="left">{{ $t('profile.edit.complete') }}</el-divider>
         <el-result
-          icon="success"
           :sub-title="$t('profile.edit.completeSubTitle')"
           :title="$t('profile.edit.completeTitle')"
+          icon="success"
         >
           <template #extra>
             <el-button plain type="primary" @click="done">{{ $t('common.return') }}</el-button>

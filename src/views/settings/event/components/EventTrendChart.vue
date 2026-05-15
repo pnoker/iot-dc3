@@ -16,8 +16,8 @@
 
 <template>
   <dashboard-card
-    :title="$t('settings.event.overview.trendTitle')"
     :loading="loading"
+    :title="$t('settings.event.overview.trendTitle')"
     body-mode="chart"
     @refresh="load"
   >

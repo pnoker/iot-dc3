@@ -18,19 +18,19 @@
   <div>
     <role-tool
       :page="reactiveData.page"
-      @search="search"
-      @reset="reset"
-      @refresh="refresh"
-      @sort="sort"
       @add="openAdd"
+      @refresh="refresh"
+      @reset="reset"
+      @search="search"
+      @sort="sort"
       @size-change="sizeChange"
       @current-change="currentChange"
     />
 
     <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" stripe class="settings-table">
-        <el-table-column prop="roleName" :label="t('settings.role.roleName')" min-width="160" />
-        <el-table-column prop="roleCode" :label="t('settings.role.roleCode')" min-width="160" />
+      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
+        <el-table-column :label="t('settings.role.roleName')" min-width="160" prop="roleName" />
+        <el-table-column :label="t('settings.role.roleCode')" min-width="160" prop="roleCode" />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
             <el-tag :type="String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0 ? 'success' : 'info'">
@@ -42,21 +42,21 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="remark" :label="t('common.remark')" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="creatorName" :label="t('common.creatorName')" min-width="110" show-overflow-tooltip>
+        <el-table-column :label="t('common.remark')" min-width="200" prop="remark" show-overflow-tooltip />
+        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.creatorName || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="t('common.createTime')" :formatter="timestampColumn" width="180" />
-        <el-table-column prop="operatorName" :label="t('common.operatorName')" min-width="110" show-overflow-tooltip>
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
+        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.operatorName || '-' }}</template>
         </el-table-column>
         <el-table-column
-          prop="operateTime"
-          :label="t('common.operationTime')"
           :formatter="timestampColumn"
+          :label="t('common.operationTime')"
+          prop="operateTime"
           width="180"
         />
-        <el-table-column :label="t('common.operation')" width="320" fixed="right">
+        <el-table-column :label="t('common.operation')" fixed="right" width="320">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
@@ -64,9 +64,9 @@
               {{ t('settings.role.assignResources') }}
             </el-button>
             <el-popconfirm
-              :title="t('settings.role.confirmDelete')"
-              :confirm-button-text="t('common.confirm')"
               :cancel-button-text="t('common.cancel')"
+              :confirm-button-text="t('common.confirm')"
+              :title="t('settings.role.confirmDelete')"
               @confirm="remove(row.id)"
             >
               <template #reference>

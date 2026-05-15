@@ -16,8 +16,8 @@
 
 <template>
   <dashboard-card
-    :title="$t('settings.event.overview.topSourcesTitle')"
     :loading="loading"
+    :title="$t('settings.event.overview.topSourcesTitle')"
     body-mode="chart"
     @refresh="load"
   >

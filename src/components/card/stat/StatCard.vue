@@ -15,7 +15,7 @@
   -->
 
 <template>
-  <el-card class="stat-card" :class="`stat-card--${tone}`" shadow="hover" @click="emit('click')">
+  <el-card :class="`stat-card--${tone}`" class="stat-card" shadow="hover" @click="emit('click')">
     <div class="stat-card__row">
       <div class="stat-card__icon">
         <el-icon :size="28">
@@ -35,10 +35,10 @@
       </div>
       <el-button
         v-if="onRefresh"
-        class="stat-card__refresh"
         :icon="Refresh"
         :loading="refreshing"
         circle
+        class="stat-card__refresh"
         size="small"
         text
         @click.stop="doRefresh"
@@ -51,14 +51,14 @@
          v-if would create a subtle race with the internal onMounted
          draw and empty cards in the same row. -->
     <div class="stat-card__spark">
-      <mini-area-chart :data="sparkline" :color="accentColor" :height="40" />
+      <mini-area-chart :color="accentColor" :data="sparkline" :height="40" />
     </div>
   </el-card>
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
   import type { Component, PropType } from 'vue';
+  import { computed, ref } from 'vue';
   import { CaretBottom, CaretTop, Minus, Refresh } from '@element-plus/icons-vue';
 
   import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';

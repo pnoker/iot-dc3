@@ -18,9 +18,9 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -29,9 +29,9 @@
       <el-form-item :label="$t('profile.tool.profileName')" prop="profileName">
         <el-input
           v-model="formData.profileName"
+          :placeholder="$t('profile.tool.profileNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('profile.tool.profileNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">

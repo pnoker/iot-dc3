@@ -16,15 +16,15 @@
 
 <template>
   <dashboard-card
-    class="alert-storm"
-    :title="t('settings.event.overview.stormTitle')"
-    :subtitle="t('settings.event.overview.stormSubtitle', { hours: window.hours, min: window.minCount })"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && rows.length === 0"
-    :empty-text="t('settings.event.overview.stormEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.stormEmpty')"
+    :loading="loading"
+    :subtitle="t('settings.event.overview.stormSubtitle', { hours: window.hours, min: window.minCount })"
+    :title="t('settings.event.overview.stormTitle')"
     body-mode="scroll"
+    class="alert-storm"
+    loading-target="button"
     @refresh="load"
   >
     <template #tools>

@@ -19,9 +19,9 @@
     <el-card shadow="hover">
       <div class="things-card-content">
         <things-card-header
-          :name="data.driverName"
-          :icon="icon"
           :enabled="data.enableFlag === 'ENABLE'"
+          :icon="icon"
+          :name="data.driverName"
           :status-title="$t('common.name')"
           @copy-id="copy(data.id, 'Driver ID')"
         >
@@ -55,7 +55,7 @@
               </li>
             </ul>
           </div>
-          <div class="things-card-body-content" :title="data.remark || $t('driver.card.remarkTitle')">
+          <div :title="data.remark || $t('driver.card.remarkTitle')" class="things-card-body-content">
             <p class="nowrap-description">
               {{ data.remark || $t('common.noDescription') }}
             </p>

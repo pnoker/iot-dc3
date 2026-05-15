@@ -21,9 +21,9 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="reactiveData.mode === 'add' ? t('settings.role.addTitle') : t('settings.role.editTitle')"
     class="things-dialog"
     draggable
-    :title="reactiveData.mode === 'add' ? t('settings.role.addTitle') : t('settings.role.editTitle')"
     @closed="reset"
   >
     <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top">
@@ -31,34 +31,34 @@
         <el-tree-select
           v-model="reactiveData.form.parentRoleId"
           :data="parentTreeOptions"
-          :props="{ label: 'roleName', children: 'children' }"
           :placeholder="t('settings.role.parentRoleIdPlaceholder')"
-          clearable
+          :props="{ label: 'roleName', children: 'children' }"
           check-strictly
+          clearable
           node-key="id"
         />
       </el-form-item>
       <el-form-item :label="t('settings.role.roleName')" prop="roleName">
         <el-input
           v-model="reactiveData.form.roleName"
-          clearable
           :placeholder="t('settings.role.roleNamePlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('settings.role.roleCode')" prop="roleCode">
         <el-input
           v-model="reactiveData.form.roleCode"
-          clearable
           :placeholder="t('settings.role.roleCodePlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <el-switch
           v-model="reactiveData.form.enableFlag"
-          active-value="ENABLE"
-          inactive-value="DISABLE"
           :active-text="t('common.enable')"
           :inactive-text="t('common.disable')"
+          active-value="ENABLE"
+          inactive-value="DISABLE"
         />
       </el-form-item>
       <el-form-item :label="t('common.remark')" prop="remark">
@@ -68,7 +68,7 @@
     <div class="things-dialog-footer">
       <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
       <el-button plain type="success" @click="reset">{{ t('common.reset') }}</el-button>
-      <el-button type="primary" :loading="reactiveData.submitting" @click="submit">
+      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
         {{ t('common.confirm') }}
       </el-button>
     </div>

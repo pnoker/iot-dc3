@@ -31,14 +31,14 @@
     <div class="home-banner__right">
       <div class="home-banner__group">
         <span class="home-banner__group-label">{{ $t('home.banner.group.center') }}</span>
-        <span v-for="s in centerServices" :key="s.key" class="home-banner__service" :title="s.label">
+        <span v-for="s in centerServices" :key="s.key" :title="s.label" class="home-banner__service">
           <span :class="['home-banner__dot', `home-banner__dot--${s.status}`]"></span>
           <span>{{ s.label }}</span>
         </span>
       </div>
       <div class="home-banner__group">
         <span class="home-banner__group-label">{{ $t('home.banner.group.infra') }}</span>
-        <span v-for="s in infraServices" :key="s.key" class="home-banner__service" :title="s.label">
+        <span v-for="s in infraServices" :key="s.key" :title="s.label" class="home-banner__service">
           <span :class="['home-banner__dot', `home-banner__dot--${s.status}`]"></span>
           <span>{{ s.label }}</span>
         </span>

@@ -16,13 +16,13 @@
 
 <template>
   <dashboard-card
-    class="topology-sankey"
-    :title="$t('home.topology.title')"
-    :loading="loading"
     :empty="!loading && !hasData"
     :empty-text="$t('home.topology.empty')"
     :height="480"
+    :loading="loading"
+    :title="$t('home.topology.title')"
     body-mode="chart"
+    class="topology-sankey"
     @refresh="load"
   >
     <template #tools>
@@ -58,7 +58,7 @@
   <!-- Drill-in dialog for collapsed (Others) buckets. The dialog lives at
        the card root (not inside DashboardCard's body) so it escapes the
        scoped flex sizing and overlays cleanly. -->
-  <el-dialog v-model="othersDialog.visible" :title="othersDialog.title" width="560px" append-to-body>
+  <el-dialog v-model="othersDialog.visible" :title="othersDialog.title" append-to-body width="560px">
     <el-table :data="othersDialog.children" height="420" size="small">
       <el-table-column :label="$t('home.topology.colType')" prop="type" width="110">
         <template #default="{ row }">
@@ -68,7 +68,7 @@
       <el-table-column :label="$t('home.topology.colName')" prop="name" show-overflow-tooltip />
       <el-table-column :label="$t('common.operation')" width="110">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="onChildJump(row)">
+          <el-button link size="small" type="primary" @click="onChildJump(row)">
             {{ $t('common.detail') }}
           </el-button>
         </template>
@@ -93,8 +93,8 @@
     TopologyStats,
   } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
   const { t } = useI18n();
   const router = useRouter();

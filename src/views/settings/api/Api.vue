@@ -18,21 +18,21 @@
   <div>
     <api-tool
       :page="reactiveData.page"
-      @search="search"
-      @reset="reset"
       @refresh="refresh"
+      @reset="reset"
+      @search="search"
       @sort="sort"
       @size-change="sizeChange"
       @current-change="currentChange"
     />
 
     <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" stripe class="settings-table">
-        <el-table-column prop="apiName" :label="t('settings.api.apiName')" min-width="160" />
-        <el-table-column prop="apiCode" :label="t('settings.api.apiCode')" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="apiGroup" :label="t('settings.api.apiGroup')" min-width="160" />
-        <el-table-column prop="serviceName" :label="t('settings.api.serviceName')" min-width="160" />
-        <el-table-column prop="apiTypeFlag" :label="t('settings.api.apiType')" min-width="100" />
+      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
+        <el-table-column :label="t('settings.api.apiName')" min-width="160" prop="apiName" />
+        <el-table-column :label="t('settings.api.apiCode')" min-width="200" prop="apiCode" show-overflow-tooltip />
+        <el-table-column :label="t('settings.api.apiGroup')" min-width="160" prop="apiGroup" />
+        <el-table-column :label="t('settings.api.serviceName')" min-width="160" prop="serviceName" />
+        <el-table-column :label="t('settings.api.apiType')" min-width="100" prop="apiTypeFlag" />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
             <el-tag :type="String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0 ? 'success' : 'info'">
@@ -44,15 +44,15 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="remark" :label="t('common.remark')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="createTime" :label="t('common.createTime')" :formatter="timestampColumn" width="180" />
+        <el-table-column :label="t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
         <el-table-column
-          prop="operateTime"
-          :label="t('common.operationTime')"
           :formatter="timestampColumn"
+          :label="t('common.operationTime')"
+          prop="operateTime"
           width="180"
         />
-        <el-table-column :label="t('common.operation')" width="120" fixed="right">
+        <el-table-column :label="t('common.operation')" fixed="right" width="120">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
           </template>

@@ -16,7 +16,7 @@
 
 <template>
   <div class="error">
-    <el-result icon="warning" :sub-title="t('error.forbidden')" title="403">
+    <el-result :sub-title="t('error.forbidden')" icon="warning" title="403">
       <template #extra>
         <router-link :to="{ path: '/' }">
           <el-button plain type="primary">{{ t('error.backHome') }}</el-button>

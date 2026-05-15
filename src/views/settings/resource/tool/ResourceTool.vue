@@ -18,9 +18,9 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -29,28 +29,28 @@
       <el-form-item :label="$t('settings.resource.resourceName')" prop="resourceName">
         <el-input
           v-model="formData.resourceName"
+          :placeholder="$t('settings.resource.resourceNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.resource.resourceNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.resource.resourceCode')" prop="resourceCode">
         <el-input
           v-model="formData.resourceCode"
+          :placeholder="$t('settings.resource.resourceCodePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.resource.resourceCodePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.resource.resourceType')" prop="resourceTypeFlags">
         <el-select
           v-model="formData.resourceTypeFlags"
-          multiple
+          :placeholder="$t('common.all')"
+          class="edit-form-default"
+          clearable
           collapse-tags
           collapse-tags-tooltip
-          clearable
-          class="edit-form-default"
-          :placeholder="$t('common.all')"
+          multiple
         >
           <el-option v-for="opt in RESOURCE_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
@@ -58,12 +58,12 @@
       <el-form-item :label="$t('settings.resource.resourceScope')" prop="resourceScopeFlags">
         <el-select
           v-model="formData.resourceScopeFlags"
-          multiple
+          :placeholder="$t('common.all')"
+          class="edit-form-default"
+          clearable
           collapse-tags
           collapse-tags-tooltip
-          clearable
-          class="edit-form-default"
-          :placeholder="$t('common.all')"
+          multiple
         >
           <el-option v-for="opt in RESOURCE_SCOPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>

@@ -21,24 +21,24 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="$t('profile.add.title')"
     class="things-dialog"
     draggable
-    :title="$t('profile.add.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
       <el-form-item :label="$t('profile.add.profileName')" prop="profileName">
         <el-input
           v-model="reactiveData.formData.profileName"
-          clearable
           :placeholder="$t('profile.add.profileNamePlaceholder')"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('profile.add.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
+          :placeholder="$t('profile.add.descriptionPlaceholder')"
           clearable
           maxlength="300"
-          :placeholder="$t('profile.add.descriptionPlaceholder')"
           show-word-limit
           type="textarea"
         ></el-input>

@@ -18,11 +18,11 @@
   <div>
     <resource-tool
       :page="reactiveData.page"
-      @search="search"
-      @reset="reset"
-      @refresh="refresh"
-      @sort="sort"
       @add="openAdd"
+      @refresh="refresh"
+      @reset="reset"
+      @search="search"
+      @sort="sort"
       @size-change="sizeChange"
       @current-change="currentChange"
     />
@@ -31,21 +31,21 @@
       <el-table
         v-loading="reactiveData.loading"
         :data="reactiveData.listData"
-        row-key="id"
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-        default-expand-all
-        stripe
         class="settings-table"
+        default-expand-all
+        row-key="id"
+        stripe
       >
-        <el-table-column prop="resourceName" :label="t('settings.resource.resourceName')" min-width="240" />
+        <el-table-column :label="t('settings.resource.resourceName')" min-width="240" prop="resourceName" />
         <el-table-column
-          prop="resourceCode"
           :label="t('settings.resource.resourceCode')"
           min-width="200"
+          prop="resourceCode"
           show-overflow-tooltip
         />
-        <el-table-column prop="resourceTypeFlag" :label="t('settings.resource.resourceType')" min-width="120" />
-        <el-table-column prop="resourceScopeFlag" :label="t('settings.resource.resourceScope')" min-width="100" />
+        <el-table-column :label="t('settings.resource.resourceType')" min-width="120" prop="resourceTypeFlag" />
+        <el-table-column :label="t('settings.resource.resourceScope')" min-width="100" prop="resourceScopeFlag" />
         <el-table-column :label="t('settings.resource.entity')" min-width="160">
           <template #default="{ row }">
             <el-button v-if="isEntityLinkable(row)" link type="primary" @click="goEntityDetail(row)">
@@ -54,7 +54,7 @@
             <span v-else>{{ formatEntityId(row) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="remark" :label="t('common.remark')" min-width="140" show-overflow-tooltip />
+        <el-table-column :label="t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
             <el-tag :type="String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0 ? 'success' : 'info'">
@@ -66,30 +66,30 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="creatorName" :label="t('common.creatorName')" min-width="110" show-overflow-tooltip>
+        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.creatorName || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="t('common.createTime')" :formatter="timestampColumn" width="180" />
-        <el-table-column prop="operatorName" :label="t('common.operatorName')" min-width="110" show-overflow-tooltip>
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
+        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.operatorName || '-' }}</template>
         </el-table-column>
         <el-table-column
-          prop="operateTime"
-          :label="t('common.operationTime')"
           :formatter="timestampColumn"
+          :label="t('common.operationTime')"
+          prop="operateTime"
           width="180"
         />
-        <el-table-column :label="t('common.operation')" width="240" fixed="right">
+        <el-table-column :label="t('common.operation')" fixed="right" width="240">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-            <el-button link type="primary" :disabled="isGroupingNode(row)" @click="openEdit(row)">
+            <el-button :disabled="isGroupingNode(row)" link type="primary" @click="openEdit(row)">
               {{ t('common.edit') }}
             </el-button>
             <el-popconfirm
               v-if="!isGroupingNode(row)"
-              :title="t('settings.resource.confirmDelete')"
-              :confirm-button-text="t('common.confirm')"
               :cancel-button-text="t('common.cancel')"
+              :confirm-button-text="t('common.confirm')"
+              :title="t('settings.resource.confirmDelete')"
               @confirm="remove(row.id)"
             >
               <template #reference>

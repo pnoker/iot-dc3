@@ -30,9 +30,9 @@
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column prop="label" label="Label" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="model" label="Model" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="providerName" label="Provider" min-width="150" show-overflow-tooltip />
+        <el-table-column label="Label" min-width="160" prop="label" show-overflow-tooltip />
+        <el-table-column label="Model" min-width="180" prop="model" show-overflow-tooltip />
+        <el-table-column label="Provider" min-width="150" prop="providerName" show-overflow-tooltip />
         <el-table-column label="Capabilities" min-width="240">
           <template #default="{ row }">
             <div class="agentic-tags">
@@ -57,22 +57,22 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="temperature" label="Temp" width="80" />
-        <el-table-column prop="maxTokens" label="Tokens" width="90" />
-        <el-table-column prop="remark" :label="$t('common.remark')" min-width="140" show-overflow-tooltip />
-        <el-table-column :label="$t('common.operation')" width="160" fixed="right">
+        <el-table-column label="Temp" prop="temperature" width="80" />
+        <el-table-column label="Tokens" prop="maxTokens" width="90" />
+        <el-table-column :label="$t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
+        <el-table-column :label="$t('common.operation')" fixed="right" width="160">
           <template #default="{ row }">
-            <el-button link type="primary" :disabled="!row.id" @click="openEdit(row)">{{
+            <el-button :disabled="!row.id" link type="primary" @click="openEdit(row)">{{
               $t('common.edit')
             }}</el-button>
             <el-popconfirm
-              :title="`Delete model ${row.model}?`"
-              :confirm-button-text="$t('common.confirm')"
               :cancel-button-text="$t('common.cancel')"
+              :confirm-button-text="$t('common.confirm')"
+              :title="`Delete model ${row.model}?`"
               @confirm="remove(row)"
             >
               <template #reference>
-                <el-button link type="danger" :disabled="!row.id">{{ $t('common.delete') }}</el-button>
+                <el-button :disabled="!row.id" link type="danger">{{ $t('common.delete') }}</el-button>
               </template>
             </el-popconfirm>
           </template>

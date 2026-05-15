@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import type { AxiosInstance } from 'axios';
+import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 
 import { AXIOS_CONFIG, AXIOS_ERROR_MESSAGES } from '@/config/constant/axios';
 import { AUTH_HEADERS } from '@/config/constant/common';

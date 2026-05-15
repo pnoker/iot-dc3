@@ -15,12 +15,12 @@
   -->
 
 <template>
-  <div ref="containerRef" class="mini-area-chart" :style="{ height: `${height}px` }"></div>
+  <div ref="containerRef" :style="{ height: `${height}px` }" class="mini-area-chart"></div>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, onUnmounted, ref, watch } from 'vue';
   import type { PropType } from 'vue';
+  import { onMounted, onUnmounted, ref, watch } from 'vue';
   import { Chart } from '@antv/g2';
 
   /**

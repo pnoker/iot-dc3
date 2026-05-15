@@ -16,11 +16,11 @@
 
 <template>
   <dashboard-card
-    :title="t('settings.event.overview.typeDistributionTitle')"
-    :loading="loading"
     :empty="!loading && rows.length === 0"
-    :empty-text="t('settings.event.empty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.empty')"
+    :loading="loading"
+    :title="t('settings.event.overview.typeDistributionTitle')"
     body-mode="chart"
     @refresh="load"
   >

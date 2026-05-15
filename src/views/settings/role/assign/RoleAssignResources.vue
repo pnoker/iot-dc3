@@ -17,9 +17,9 @@
 <template>
   <el-dialog
     v-model="reactiveData.visible"
+    :close-on-click-modal="false"
     :title="t('settings.role.assignResourcesTitle')"
     width="640px"
-    :close-on-click-modal="false"
   >
     <div v-loading="reactiveData.loading" class="assign-body">
       <div class="assign-target">
@@ -37,9 +37,9 @@
           <span class="assign-pane__title">{{ t('settings.role.resourcesAll') }}</span>
           <el-input
             v-model="reactiveData.filter"
-            size="small"
             :placeholder="t('settings.role.resourcesSearchPlaceholder')"
             clearable
+            size="small"
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
@@ -51,8 +51,8 @@
           <el-tab-pane
             v-for="type in availableTypes"
             :key="type"
-            :name="type"
             :label="`${type} (${selectedCountByType[type] || 0}/${totalCountByType[type] || 0})`"
+            :name="type"
           />
         </el-tabs>
 
@@ -62,10 +62,10 @@
               v-show="activeType === type"
               :ref="(el) => registerTree(type, el)"
               :data="treesByType[type] || []"
+              :filter-node-method="filterNode"
               :props="{ label: 'resourceName', children: 'children' }"
               node-key="id"
               show-checkbox
-              :filter-node-method="filterNode"
               @check-change="onCheckChange"
             />
             <el-empty
@@ -80,7 +80,7 @@
 
     <template #footer>
       <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
-      <el-button type="primary" :loading="reactiveData.submitting" @click="submit">
+      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
         {{ t('common.save') }}
       </el-button>
     </template>

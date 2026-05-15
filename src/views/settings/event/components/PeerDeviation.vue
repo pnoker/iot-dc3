@@ -16,15 +16,15 @@
 
 <template>
   <dashboard-card
-    class="peer-deviation"
-    :title="t('settings.event.overview.peerTitle')"
-    :subtitle="t('settings.event.overview.peerSubtitle', { days: Number(daysKey) })"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && rows.length === 0"
-    :empty-text="t('settings.event.overview.peerEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.peerEmpty')"
+    :loading="loading"
+    :subtitle="t('settings.event.overview.peerSubtitle', { days: Number(daysKey) })"
+    :title="t('settings.event.overview.peerTitle')"
     body-mode="scroll"
+    class="peer-deviation"
+    loading-target="button"
     @refresh="load"
   >
     <template #tools>
@@ -40,17 +40,17 @@
       </el-table-column>
       <el-table-column
         :label="t('settings.event.overview.colAlarmCount')"
+        align="right"
         prop="alarmCount"
         width="100"
-        align="right"
       />
       <el-table-column
         :label="t('settings.event.overview.colPeerMedian')"
+        align="right"
         prop="peerMedian"
         width="100"
-        align="right"
       />
-      <el-table-column :label="t('settings.event.overview.colRatio')" width="100" align="right">
+      <el-table-column :label="t('settings.event.overview.colRatio')" align="right" width="100">
         <template #default="{ row }">
           <el-tag :type="row.ratio >= 5 ? 'danger' : 'warning'" size="small">
             {{ row.ratio ? `${row.ratio}×` : '—' }}

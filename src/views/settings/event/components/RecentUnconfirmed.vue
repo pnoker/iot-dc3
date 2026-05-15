@@ -16,23 +16,23 @@
 
 <template>
   <dashboard-card
-    class="recent-unconfirmed"
-    :title="$t('settings.event.overview.unconfirmedTitle')"
     :badge="rows.length || null"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && rows.length === 0"
-    :empty-text="$t('settings.event.overview.noUnconfirmed')"
     :empty-image-size="60"
+    :empty-text="$t('settings.event.overview.noUnconfirmed')"
+    :loading="loading"
+    :title="$t('settings.event.overview.unconfirmedTitle')"
     body-mode="scroll"
+    class="recent-unconfirmed"
+    loading-target="button"
     @refresh="load"
   >
     <el-timeline class="recent-unconfirmed__timeline">
       <el-timeline-item
         v-for="row in rows"
         :key="`${row.source}:${row.id}`"
-        :timestamp="formatTime(row.createTime)"
         :color="row.source === 'device' ? '#409eff' : '#e6a23c'"
+        :timestamp="formatTime(row.createTime)"
         placement="top"
       >
         <div class="recent-unconfirmed__item">
@@ -42,7 +42,7 @@
             </el-tag>
             <span class="recent-unconfirmed__name">{{ nameFor(row) }}</span>
           </div>
-          <div v-if="row.message" class="recent-unconfirmed__message" :title="row.message">{{ row.message }}</div>
+          <div v-if="row.message" :title="row.message" class="recent-unconfirmed__message">{{ row.message }}</div>
         </div>
       </el-timeline-item>
     </el-timeline>

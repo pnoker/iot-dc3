@@ -21,28 +21,28 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="$t('device.add.title')"
     class="things-dialog"
     draggable
-    :title="$t('device.add.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
       <el-form-item :label="$t('device.add.deviceName')" prop="deviceName">
         <el-input
           v-model="reactiveData.formData.deviceName"
-          clearable
           :placeholder="$t('device.add.deviceNamePlaceholder')"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('device.add.driver')" prop="driverId">
         <el-select
           v-model="reactiveData.formData.driverId"
+          :loading="reactiveData.driverLoading"
+          :placeholder="$t('device.add.driverPlaceholder')"
+          :remote-method="driverDictionary"
           clearable
           filterable
           remote
           reserve-keyword
-          :placeholder="$t('device.add.driverPlaceholder')"
-          :remote-method="driverDictionary"
-          :loading="reactiveData.driverLoading"
           @visible-change="driverDictionaryVisible"
         >
           <el-option
@@ -56,14 +56,14 @@
       <el-form-item :label="$t('device.add.profiles')" prop="profileIds">
         <el-select
           v-model="reactiveData.formData.profileIds"
+          :loading="reactiveData.profileLoading"
           :multiple="true"
+          :placeholder="$t('device.add.profilePlaceholder')"
+          :remote-method="profileDictionary"
           clearable
           filterable
           remote
           reserve-keyword
-          :placeholder="$t('device.add.profilePlaceholder')"
-          :remote-method="profileDictionary"
-          :loading="reactiveData.profileLoading"
           @visible-change="profileDictionaryVisible"
         >
           <el-option
@@ -77,9 +77,9 @@
       <el-form-item :label="$t('device.add.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
+          :placeholder="$t('device.add.descriptionPlaceholder')"
           clearable
           maxlength="300"
-          :placeholder="$t('device.add.descriptionPlaceholder')"
           show-word-limit
           type="textarea"
         ></el-input>

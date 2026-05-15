@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ref } from 'vue';
 import type { Ref } from 'vue';
+import { ref } from 'vue';
 
 /**
  * The `loading.value = true; try { ... } catch { /* handled globally *\/ }

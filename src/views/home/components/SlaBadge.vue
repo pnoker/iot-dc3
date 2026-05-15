@@ -24,7 +24,7 @@
   corresponding event-overview tab.
 -->
 <template>
-  <div v-if="visible" class="sla-badge" :class="{ 'sla-badge--warn': warn }">
+  <div v-if="visible" :class="{ 'sla-badge--warn': warn }" class="sla-badge">
     <el-icon class="sla-badge__icon"><Warning /></el-icon>
     <div v-if="backlog.over24h > 0" class="sla-badge__chip sla-badge__chip--sla" @click="jumpTo('sla')">
       <span class="sla-badge__value">{{ backlog.over24h }}</span>

@@ -54,13 +54,13 @@ export interface AgenticModelConfig extends AgenticModel {
 export interface AgenticSession {
   conversationId: string;
   title?: string;
-  model?: string;
-  sessionConfig?: AgenticSessionConfig;
+  sessionExt?: AgenticSessionExt;
   createTime?: string;
   operateTime?: string;
 }
 
-export interface AgenticSessionConfig {
+export interface AgenticSessionExt {
+  model?: string;
   reasoningEnabled?: boolean;
   temperature?: number;
   maxTokens?: number;

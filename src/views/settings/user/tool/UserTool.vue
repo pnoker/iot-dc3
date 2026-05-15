@@ -18,9 +18,9 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -29,33 +29,33 @@
       <el-form-item :label="$t('settings.user.nickName')" prop="nickName">
         <el-input
           v-model="formData.nickName"
+          :placeholder="$t('settings.user.nickNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.user.nickNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.user.userName')" prop="userName">
         <el-input
           v-model="formData.userName"
+          :placeholder="$t('settings.user.userNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.user.userNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.user.phone')" prop="phone">
         <el-input
           v-model="formData.phone"
+          :placeholder="$t('settings.user.phonePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.user.phonePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.user.email')" prop="email">
         <el-input
           v-model="formData.email"
+          :placeholder="$t('settings.user.emailPlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.user.emailPlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">

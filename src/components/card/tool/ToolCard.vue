@@ -19,7 +19,7 @@
     <el-card shadow="never">
       <el-form ref="formRef" :inline="true" :model="formModel" :rules="rules" class="tool-card__body">
         <div class="tool-card-body-form">
-          <slot name="filters" :form-data="formModel" :search="search" />
+          <slot :form-data="formModel" :search="search" name="filters" />
         </div>
         <!--
           Body-level button row only renders when a caller explicitly overrides
@@ -29,7 +29,7 @@
           button row instead of two stacked rows.
         -->
         <el-form-item v-if="$slots.buttons" class="tool-card-body-button">
-          <slot name="buttons" :search="search" :reset="reset" />
+          <slot :reset="reset" :search="search" name="buttons" />
         </el-form-item>
       </el-form>
       <div class="tool-card__footer">
@@ -40,7 +40,7 @@
                the styles below) when the actions slot renders nothing —
                e.g. DriverTool templates an Add button behind v-if="add"
                which evaluates to false by default. -->
-          <span v-if="!$slots.buttons" class="tool-card-footer-divider" aria-hidden="true" />
+          <span v-if="!$slots.buttons" aria-hidden="true" class="tool-card-footer-divider" />
           <template v-if="!$slots.buttons">
             <el-button :icon="Search" plain type="primary" @click="search">
               {{ t('common.search') }}
@@ -61,7 +61,7 @@
             @size-change="onSizeChange"
             @current-change="onCurrentChange"
           />
-          <span class="tool-card-footer-divider" aria-hidden="true" />
+          <span aria-hidden="true" class="tool-card-footer-divider" />
           <el-tooltip :content="t('common.refresh')" effect="dark" placement="top">
             <el-button :icon="Refresh" circle @click="onRefresh" />
           </el-tooltip>
@@ -75,8 +75,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, unref } from 'vue';
   import type { PropType } from 'vue';
+  import { ref, unref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import type { FormInstance, FormRules } from 'element-plus';
   import { Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue';

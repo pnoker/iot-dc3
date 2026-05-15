@@ -34,7 +34,7 @@
           >
             {{ point.pointName }}
           </div>
-          <div class="things-card-header-status" :title="$t('pointValue.card.rwType')">
+          <div :title="$t('pointValue.card.rwType')" class="things-card-header-status">
             <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">{{ $t('status.readOnly') }}</el-tag>
             <el-tag v-else-if="data.rwFlag === 'W'" effect="plain" type="info">{{ $t('status.writeOnly') }}</el-tag>
             <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">{{ $t('status.readWrite') }}</el-tag>
@@ -44,7 +44,7 @@
           <div class="things-card-body-content">
             <div class="things-card-body-content-column">
               <div class="things-card-body-content-value">
-                <span class="nowrap-item value" :title="$t('pointValue.card.processedValue')" @click="copyValue(data)"
+                <span :title="$t('pointValue.card.processedValue')" class="nowrap-item value" @click="copyValue(data)"
                   >{{ data.calValue }} {{ unit }}</span
                 >
               </div>
@@ -83,16 +83,16 @@
             </div>
           </div>
           <div v-if="embedded != ''" class="things-card-body-content-time">
-            <mini-area-chart :data="historyData" :height="80" color="#409eff" :tooltip-unit="unit" animate />
+            <mini-area-chart :data="historyData" :height="80" :tooltip-unit="unit" animate color="#409eff" />
           </div>
         </div>
         <div v-if="embedded == ''" class="things-card__footer">
           <div class="things-card-footer-operation">
             <el-popconfirm
               :icon="CircleClose"
+              :title="$t('pointValue.card.confirmDelete')"
               icon-color="#f56c6c"
               placement="top"
-              :title="$t('pointValue.card.confirmDelete')"
             >
               <template #reference>
                 <el-button link type="primary">{{ $t('common.delete') }}</el-button>

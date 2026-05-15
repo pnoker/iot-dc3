@@ -30,9 +30,9 @@
             <el-form-item prop="tenant">
               <el-input
                 v-model="reactiveData.formData.tenant"
+                :placeholder="t('login.tenantPlaceholder')"
                 :prefix-icon="Box"
                 auto-complete="off"
-                :placeholder="t('login.tenantPlaceholder')"
                 @keyup.enter="handleLogin"
               >
               </el-input>
@@ -40,19 +40,19 @@
             <el-form-item prop="name">
               <el-input
                 v-model="reactiveData.formData.name"
+                :placeholder="t('login.usernamePlaceholder')"
                 :prefix-icon="User"
                 auto-complete="off"
-                :placeholder="t('login.usernamePlaceholder')"
                 @keyup.enter="handleLogin"
               ></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input
                 v-model="reactiveData.formData.password"
+                :placeholder="t('login.passwordPlaceholder')"
                 :prefix-icon="Lock"
                 :type="reactiveData.passwordType"
                 auto-complete="off"
-                :placeholder="t('login.passwordPlaceholder')"
                 @keyup.enter="handleLogin"
               >
                 <template #append>

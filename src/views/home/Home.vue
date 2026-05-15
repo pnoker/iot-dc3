@@ -101,8 +101,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive } from 'vue';
   import type { Component } from 'vue';
+  import { computed, onMounted, reactive } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import { Bell, List, Management, Promotion, TrendCharts, Warning } from '@element-plus/icons-vue';

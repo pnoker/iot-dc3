@@ -28,10 +28,10 @@
         <el-descriptions-item :label="t('settings.about.version')">v{{ version }}</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.license')">AGPL-3.0</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.docs')">
-          <el-link type="primary" href="https://iotdc3.com" target="_blank">iotdc3.com</el-link>
+          <el-link href="https://iotdc3.com" target="_blank" type="primary">iotdc3.com</el-link>
         </el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.repo')">
-          <el-link type="primary" href="https://github.com/pnoker/iot-dc3" target="_blank">
+          <el-link href="https://github.com/pnoker/iot-dc3" target="_blank" type="primary">
             github.com/pnoker/iot-dc3
           </el-link>
         </el-descriptions-item>
@@ -41,14 +41,14 @@
       </el-descriptions>
     </blank-card>
 
-    <el-card shadow="never" class="about__card">
+    <el-card class="about__card" shadow="never">
       <template #header>
         <span class="about__title">{{ t('settings.about.introTitle') }}</span>
       </template>
       <p class="about__intro">{{ t('settings.about.intro') }}</p>
     </el-card>
 
-    <el-card shadow="never" class="about__card">
+    <el-card class="about__card" shadow="never">
       <template #header>
         <span class="about__title">{{ t('settings.about.architectureTitle') }}</span>
       </template>
@@ -68,7 +68,7 @@
       </el-descriptions>
     </el-card>
 
-    <el-card shadow="never" class="about__card">
+    <el-card class="about__card" shadow="never">
       <template #header>
         <span class="about__title">{{ t('settings.about.objectivesTitle') }}</span>
       </template>
@@ -77,16 +77,16 @@
       </ul>
     </el-card>
 
-    <el-card shadow="never" class="about__card">
+    <el-card class="about__card" shadow="never">
       <template #header>
         <span class="about__title">{{ t('settings.about.licenseTitle') }}</span>
       </template>
       <p class="about__intro">{{ t('settings.about.licenseDetail') }}</p>
       <el-link
         class="about__license-link"
-        type="primary"
         href="https://www.gnu.org/licenses/agpl-3.0.html"
         target="_blank"
+        type="primary"
       >
         AGPL-3.0 Full Text
       </el-link>

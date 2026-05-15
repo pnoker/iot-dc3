@@ -17,9 +17,9 @@
 <template>
   <el-dialog
     v-model="reactiveData.visible"
+    :close-on-click-modal="false"
     :title="t('settings.user.assignRolesTitle')"
     width="960px"
-    :close-on-click-modal="false"
   >
     <div v-loading="reactiveData.loading" class="assign-body">
       <div class="assign-target">
@@ -38,9 +38,9 @@
             </span>
             <el-input
               v-model="reactiveData.leftFilter"
-              size="small"
               :placeholder="t('settings.user.rolesSearchPlaceholder')"
               clearable
+              size="small"
             >
               <template #prefix>
                 <el-icon><Search /></el-icon>
@@ -50,26 +50,26 @@
           <el-table
             ref="leftTableRef"
             :data="filteredAvailable"
+            class="assign-pane__table"
             height="360"
             row-key="id"
             stripe
-            class="assign-pane__table"
             @selection-change="(rows: RoleRow[]) => (reactiveData.leftSelection = rows)"
           >
             <el-table-column type="selection" width="42" />
             <el-table-column
-              prop="roleName"
               :label="t('settings.role.roleName')"
               min-width="140"
+              prop="roleName"
               show-overflow-tooltip
             />
             <el-table-column
-              prop="roleCode"
               :label="t('settings.role.roleCode')"
               min-width="140"
+              prop="roleCode"
               show-overflow-tooltip
             />
-            <el-table-column prop="remark" :label="t('common.remark')" min-width="160" show-overflow-tooltip />
+            <el-table-column :label="t('common.remark')" min-width="160" prop="remark" show-overflow-tooltip />
             <template #empty>
               <el-empty :description="t('settings.user.empty')" :image-size="60" />
             </template>
@@ -77,7 +77,7 @@
         </div>
 
         <div class="assign-actions">
-          <el-button :disabled="reactiveData.leftSelection.length === 0" type="primary" size="small" @click="moveRight">
+          <el-button :disabled="reactiveData.leftSelection.length === 0" size="small" type="primary" @click="moveRight">
             {{ t('settings.user.rolesMoveRight') }}
             <el-icon class="assign-actions__icon"><ArrowRight /></el-icon>
           </el-button>
@@ -95,9 +95,9 @@
             </span>
             <el-input
               v-model="reactiveData.rightFilter"
-              size="small"
               :placeholder="t('settings.user.rolesSearchPlaceholder')"
               clearable
+              size="small"
             >
               <template #prefix>
                 <el-icon><Search /></el-icon>
@@ -107,26 +107,26 @@
           <el-table
             ref="rightTableRef"
             :data="filteredAssigned"
+            class="assign-pane__table"
             height="360"
             row-key="id"
             stripe
-            class="assign-pane__table"
             @selection-change="(rows: RoleRow[]) => (reactiveData.rightSelection = rows)"
           >
             <el-table-column type="selection" width="42" />
             <el-table-column
-              prop="roleName"
               :label="t('settings.role.roleName')"
               min-width="140"
+              prop="roleName"
               show-overflow-tooltip
             />
             <el-table-column
-              prop="roleCode"
               :label="t('settings.role.roleCode')"
               min-width="140"
+              prop="roleCode"
               show-overflow-tooltip
             />
-            <el-table-column prop="remark" :label="t('common.remark')" min-width="160" show-overflow-tooltip />
+            <el-table-column :label="t('common.remark')" min-width="160" prop="remark" show-overflow-tooltip />
             <template #empty>
               <el-empty :description="t('settings.user.empty')" :image-size="60" />
             </template>
@@ -137,7 +137,7 @@
 
     <template #footer>
       <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
-      <el-button type="primary" :loading="reactiveData.submitting" @click="submit">
+      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
         {{ t('common.save') }}
       </el-button>
     </template>

@@ -16,15 +16,15 @@
 
 <template>
   <dashboard-card
-    class="change-impact"
-    :title="t('settings.event.overview.changeImpactTitle')"
-    :subtitle="t('settings.event.overview.changeImpactSubtitle', { days: Number(daysKey) })"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && rows.length === 0"
-    :empty-text="t('settings.event.overview.changeImpactEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.changeImpactEmpty')"
+    :loading="loading"
+    :subtitle="t('settings.event.overview.changeImpactSubtitle', { days: Number(daysKey) })"
+    :title="t('settings.event.overview.changeImpactTitle')"
     body-mode="scroll"
+    class="change-impact"
+    loading-target="button"
     @refresh="load"
   >
     <template #tools>
@@ -35,8 +35,8 @@
       <el-timeline-item
         v-for="row in rows"
         :key="`${row.kind}:${row.entityId}:${row.operateTime}`"
-        :timestamp="formatDateTime(row.operateTime)"
         :color="resolveDashboardColour(row.kind)"
+        :timestamp="formatDateTime(row.operateTime)"
         placement="top"
       >
         <div class="change-impact__row" @click="onJump(row)">

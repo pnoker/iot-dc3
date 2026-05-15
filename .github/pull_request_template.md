@@ -1,6 +1,6 @@
 ## Change Summary
 
-- 
+-
 
 ## Testing Checklist
 

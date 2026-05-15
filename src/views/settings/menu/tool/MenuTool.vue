@@ -15,26 +15,26 @@
   -->
 
 <template>
-  <tool-card :form-model="formData" :page="page" @search="onSearch" @reset="onReset" @refresh="$emit('refresh')">
+  <tool-card :form-model="formData" :page="page" @refresh="$emit('refresh')" @reset="onReset" @search="onSearch">
     <template #filters>
       <el-form-item :label="$t('settings.menu.menuName')" prop="menuName">
         <el-input
           v-model="formData.menuName"
+          :placeholder="$t('settings.menu.menuNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.menu.menuNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.menu.menuCode')" prop="menuCode">
         <el-input
           v-model="formData.menuCode"
+          :placeholder="$t('settings.menu.menuCodePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.menu.menuCodePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.menu.menuType')" prop="menuTypeFlag">
-        <el-select v-model="formData.menuTypeFlag" clearable class="edit-form-default" :placeholder="$t('common.all')">
+        <el-select v-model="formData.menuTypeFlag" :placeholder="$t('common.all')" class="edit-form-default" clearable>
           <el-option v-for="opt in MENU_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
       </el-form-item>

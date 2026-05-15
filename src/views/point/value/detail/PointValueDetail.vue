@@ -19,9 +19,9 @@
     v-model="detailVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="true"
+    :title="$t('pointValue.detail.title')"
     direction="rtl"
     size="40%"
-    :title="$t('pointValue.detail.title')"
   >
     <pre v-highlightjs>
       <code class="json">{{ detailData }}</code>

@@ -17,11 +17,11 @@
 <template>
   <tool-card
     :form-model="formData"
-    :rules="formRule"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
+    :rules="formRule"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -30,25 +30,25 @@
       <el-form-item :label="$t('driver.tool.driverName')" prop="driverName">
         <el-input
           v-model="formData.driverName"
+          :placeholder="$t('driver.tool.driverNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('driver.tool.driverNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('driver.tool.serviceName')" prop="serviceName">
         <el-input
           v-model="formData.serviceName"
+          :placeholder="$t('driver.tool.serviceNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('driver.tool.serviceNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('driver.tool.host')" prop="serviceHost">
         <el-input
           v-model="formData.serviceHost"
+          :placeholder="$t('driver.tool.hostPlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('driver.tool.hostPlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">

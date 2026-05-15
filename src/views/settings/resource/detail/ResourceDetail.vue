@@ -69,8 +69,8 @@
 
         <el-tab-pane :label="$t('settings.resource.rolesOfResource')" name="role">
           <el-table v-loading="reactiveData.rolesLoading" :data="reactiveData.roles" stripe>
-            <el-table-column prop="roleName" :label="$t('settings.role.roleName')" min-width="180" />
-            <el-table-column prop="roleCode" :label="$t('settings.role.roleCode')" min-width="180" />
+            <el-table-column :label="$t('settings.role.roleName')" min-width="180" prop="roleName" />
+            <el-table-column :label="$t('settings.role.roleCode')" min-width="180" prop="roleCode" />
             <el-table-column :label="$t('common.enable')" width="90">
               <template #default="{ row }">
                 <el-tag :type="Number(row.enableFlag) === 0 ? 'success' : 'info'">
@@ -78,7 +78,7 @@
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="remark" :label="$t('common.remark')" min-width="220" show-overflow-tooltip />
+            <el-table-column :label="$t('common.remark')" min-width="220" prop="remark" show-overflow-tooltip />
             <template #empty>
               <el-empty :description="$t('settings.resource.empty')" :image-size="60" />
             </template>
@@ -89,21 +89,21 @@
           <el-table
             v-loading="reactiveData.childrenLoading"
             :data="reactiveData.children"
-            row-key="id"
             :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
             default-expand-all
+            row-key="id"
             stripe
           >
-            <el-table-column prop="resourceName" :label="$t('settings.resource.resourceName')" min-width="220" />
+            <el-table-column :label="$t('settings.resource.resourceName')" min-width="220" prop="resourceName" />
             <el-table-column
-              prop="resourceCode"
               :label="$t('settings.resource.resourceCode')"
               min-width="180"
+              prop="resourceCode"
               show-overflow-tooltip
             />
-            <el-table-column prop="resourceTypeFlag" :label="$t('settings.resource.resourceType')" min-width="110" />
-            <el-table-column prop="resourceScopeFlag" :label="$t('settings.resource.resourceScope')" min-width="100" />
-            <el-table-column prop="remark" :label="$t('common.remark')" min-width="180" show-overflow-tooltip />
+            <el-table-column :label="$t('settings.resource.resourceType')" min-width="110" prop="resourceTypeFlag" />
+            <el-table-column :label="$t('settings.resource.resourceScope')" min-width="100" prop="resourceScopeFlag" />
+            <el-table-column :label="$t('common.remark')" min-width="180" prop="remark" show-overflow-tooltip />
             <template #empty>
               <el-empty :description="$t('settings.resource.empty')" :image-size="60" />
             </template>

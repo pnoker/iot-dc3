@@ -30,9 +30,9 @@
 -->
 <template>
   <el-card
-    class="dashboard-card"
     :class="[`dashboard-card--${bodyMode}`, { 'dashboard-card--tabs': variant === 'tabs' }]"
     :style="rootStyle"
+    class="dashboard-card"
     shadow="never"
   >
     <template #header>
@@ -44,10 +44,10 @@
             <span class="dashboard-card__title-text">{{ title }}</span>
             <el-badge
               v-if="badge !== null && badge !== undefined && badge !== 0 && badge !== ''"
-              :value="badge"
               :max="99"
-              type="danger"
+              :value="badge"
               class="dashboard-card__badge"
+              type="danger"
             />
             <span v-if="subtitle" class="dashboard-card__subtitle">{{ subtitle }}</span>
             <slot name="title-extra" />

@@ -18,29 +18,29 @@
   <div>
     <label-tool
       :page="reactiveData.page"
-      @search="search"
-      @reset="reset"
-      @refresh="refresh"
-      @sort="sort"
       @add="openAdd"
+      @refresh="refresh"
+      @reset="reset"
+      @search="search"
+      @sort="sort"
       @size-change="sizeChange"
       @current-change="currentChange"
     />
 
     <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" stripe class="settings-table">
-        <el-table-column prop="labelName" :label="t('settings.label.labelName')" min-width="160" />
+      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
+        <el-table-column :label="t('settings.label.labelName')" min-width="160" prop="labelName" />
         <el-table-column
-          prop="labelCode"
           :label="t('settings.label.labelCode')"
           min-width="160"
+          prop="labelCode"
           show-overflow-tooltip
         />
-        <el-table-column prop="entityTypeFlag" :label="t('settings.common.entityType')" width="120" />
+        <el-table-column :label="t('settings.common.entityType')" prop="entityTypeFlag" width="120" />
         <el-table-column :label="t('settings.label.labelColor')" width="140">
           <template #default="{ row }">
             <span class="label-color">
-              <span class="label-color__swatch" :style="{ backgroundColor: row.labelColor || '#F4F4F5' }" />
+              <span :style="{ backgroundColor: row.labelColor || '#F4F4F5' }" class="label-color__swatch" />
               <span>{{ row.labelColor || '-' }}</span>
             </span>
           </template>
@@ -56,27 +56,27 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="remark" :label="t('common.remark')" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="creatorName" :label="t('common.creatorName')" min-width="110" show-overflow-tooltip>
+        <el-table-column :label="t('common.remark')" min-width="160" prop="remark" show-overflow-tooltip />
+        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.creatorName || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="t('common.createTime')" :formatter="timestampColumn" width="180" />
-        <el-table-column prop="operatorName" :label="t('common.operatorName')" min-width="110" show-overflow-tooltip>
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
+        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.operatorName || '-' }}</template>
         </el-table-column>
         <el-table-column
-          prop="operateTime"
-          :label="t('common.operationTime')"
           :formatter="timestampColumn"
+          :label="t('common.operationTime')"
+          prop="operateTime"
           width="180"
         />
-        <el-table-column :label="t('common.operation')" width="180" fixed="right">
+        <el-table-column :label="t('common.operation')" fixed="right" width="180">
           <template #default="{ row }">
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
             <el-popconfirm
-              :title="t('settings.label.confirmDelete')"
-              :confirm-button-text="t('common.confirm')"
               :cancel-button-text="t('common.cancel')"
+              :confirm-button-text="t('common.confirm')"
+              :title="t('settings.label.confirmDelete')"
               @confirm="remove(row.id)"
             >
               <template #reference>

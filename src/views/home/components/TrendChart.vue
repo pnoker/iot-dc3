@@ -15,7 +15,7 @@
   -->
 
 <template>
-  <dashboard-card :title="$t('home.trendTitle')" :loading="loading" body-mode="chart" @refresh="load">
+  <dashboard-card :loading="loading" :title="$t('home.trendTitle')" body-mode="chart" @refresh="load">
     <template #tools>
       <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
     </template>
@@ -29,8 +29,8 @@
 
   import { statsTimeseries } from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
   const rangeKey = ref<RangeKey>('24h');
   const loading = ref(false);

@@ -16,7 +16,7 @@
 
 <template>
   <div class="error">
-    <el-result icon="error" :sub-title="t('error.serverError')" title="500">
+    <el-result :sub-title="t('error.serverError')" icon="error" title="500">
       <template #extra>
         <router-link :to="{ path: '/' }">
           <el-button plain type="primary">{{ t('error.backHome') }}</el-button>

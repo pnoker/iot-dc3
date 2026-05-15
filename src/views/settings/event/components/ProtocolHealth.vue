@@ -16,14 +16,14 @@
 
 <template>
   <dashboard-card
-    class="protocol-health"
-    :title="t('settings.event.overview.protocolTitle')"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && rows.length === 0"
-    :empty-text="t('settings.event.overview.protocolEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.protocolEmpty')"
+    :loading="loading"
+    :title="t('settings.event.overview.protocolTitle')"
     body-mode="scroll"
+    class="protocol-health"
+    loading-target="button"
     @refresh="load"
   >
     <el-table :data="rows" size="small">
@@ -32,22 +32,22 @@
           <span class="protocol-health__name">{{ stripPrefix(row.serviceName) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('settings.event.overview.colDrivers')" prop="driverCount" width="100" align="right" />
-      <el-table-column :label="t('settings.event.overview.colEnabled')" width="120" align="right">
+      <el-table-column :label="t('settings.event.overview.colDrivers')" align="right" prop="driverCount" width="100" />
+      <el-table-column :label="t('settings.event.overview.colEnabled')" align="right" width="120">
         <template #default="{ row }">
-          <span class="protocol-health__enabled" :class="enabledClass(row)">
+          <span :class="enabledClass(row)" class="protocol-health__enabled">
             {{ row.enabledCount }} / {{ row.driverCount }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('settings.event.overview.colDevices')" prop="deviceCount" width="100" align="right" />
+      <el-table-column :label="t('settings.event.overview.colDevices')" align="right" prop="deviceCount" width="100" />
       <el-table-column :label="t('settings.event.overview.colHealthRatio')" min-width="130">
         <template #default="{ row }">
           <el-progress
-            :percentage="healthPercent(row)"
             :color="healthColor(row)"
-            :stroke-width="8"
+            :percentage="healthPercent(row)"
             :show-text="false"
+            :stroke-width="8"
           />
         </template>
       </el-table-column>

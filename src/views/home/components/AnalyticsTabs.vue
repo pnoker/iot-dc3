@@ -16,13 +16,13 @@
 
 <template>
   <dashboard-card
+    :empty="!loading && empty"
+    :empty-image-size="80"
+    :empty-text="$t('home.liveFeed.empty')"
+    :loading="loading"
+    body-mode="chart"
     class="analytics-tabs"
     variant="tabs"
-    :loading="loading"
-    :empty="!loading && empty"
-    :empty-text="$t('home.liveFeed.empty')"
-    :empty-image-size="80"
-    body-mode="chart"
     @refresh="load"
   >
     <template #title>
@@ -56,8 +56,8 @@
   import { getPointByIds } from '@/api/point';
   import { getProfileByIds } from '@/api/profile';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
   type TabKey = 'deviceStatus' | 'protocol' | 'profile' | 'topDevice' | 'topPoint' | 'topDriver';
   type Group = 'structural' | 'top';

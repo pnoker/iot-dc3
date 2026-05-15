@@ -16,14 +16,14 @@
 
 <template>
   <dashboard-card
-    class="alert-list"
-    :title="$t('home.alertList.title')"
     :badge="rows.length || null"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && rows.length === 0"
     :empty-text="$t('home.alertList.empty')"
+    :loading="loading"
+    :title="$t('home.alertList.title')"
     body-mode="scroll"
+    class="alert-list"
+    loading-target="button"
     @refresh="refresh"
   >
     <div v-for="group in groupedRows" :key="group.date" class="alert-list__group">
@@ -32,9 +32,9 @@
         <el-timeline-item
           v-for="row in group.items"
           :key="row.id"
+          :hollow="row.confirmFlag === 1"
           :timestamp="formatClock(row.createTime)"
           :type="timelineColour(row.eventTypeFlag)"
-          :hollow="row.confirmFlag === 1"
           placement="top"
         >
           <div class="alert-list__body">
@@ -46,11 +46,11 @@
                 {{ sourceLabel(row) }}
               </el-tag>
               <span class="alert-list__name">{{ nameFor(row) }}</span>
-              <el-tag v-if="row.confirmFlag === 1" type="success" size="small" effect="plain">
+              <el-tag v-if="row.confirmFlag === 1" effect="plain" size="small" type="success">
                 {{ $t('common.confirmed') }}
               </el-tag>
             </div>
-            <div v-if="row.message" class="alert-list__message" :title="row.message">{{ row.message }}</div>
+            <div v-if="row.message" :title="row.message" class="alert-list__message">{{ row.message }}</div>
           </div>
         </el-timeline-item>
       </el-timeline>

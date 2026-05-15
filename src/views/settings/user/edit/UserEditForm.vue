@@ -21,47 +21,47 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="reactiveData.mode === 'add' ? t('settings.user.addTitle') : t('settings.user.editTitle')"
     class="things-dialog"
     draggable
-    :title="reactiveData.mode === 'add' ? t('settings.user.addTitle') : t('settings.user.editTitle')"
     @closed="reset"
   >
     <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top">
       <el-form-item :label="t('settings.user.userName')" prop="userName">
         <el-input
           v-model="reactiveData.form.userName"
-          clearable
-          :placeholder="t('settings.user.userNamePlaceholder')"
           :disabled="reactiveData.mode === 'edit'"
+          :placeholder="t('settings.user.userNamePlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('settings.user.nickName')" prop="nickName">
         <el-input
           v-model="reactiveData.form.nickName"
-          clearable
           :placeholder="t('settings.user.nickNamePlaceholder')"
+          clearable
         />
       </el-form-item>
       <el-form-item :label="t('settings.user.phone')" prop="phone">
-        <el-input v-model="reactiveData.form.phone" clearable :placeholder="t('settings.user.phonePlaceholder')" />
+        <el-input v-model="reactiveData.form.phone" :placeholder="t('settings.user.phonePlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="t('settings.user.email')" prop="email">
-        <el-input v-model="reactiveData.form.email" clearable :placeholder="t('settings.user.emailPlaceholder')" />
+        <el-input v-model="reactiveData.form.email" :placeholder="t('settings.user.emailPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <el-switch
           v-model="reactiveData.form.enableFlag"
-          :active-value="0"
-          :inactive-value="1"
           :active-text="t('common.enable')"
+          :active-value="0"
           :inactive-text="t('common.disable')"
+          :inactive-value="1"
         />
       </el-form-item>
     </el-form>
     <div class="things-dialog-footer">
       <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
       <el-button plain type="success" @click="reset">{{ t('common.reset') }}</el-button>
-      <el-button type="primary" :loading="reactiveData.submitting" @click="submit">
+      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
         {{ t('common.confirm') }}
       </el-button>
     </div>

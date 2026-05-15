@@ -18,9 +18,9 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -29,17 +29,17 @@
       <el-form-item :label="$t('settings.role.roleName')" prop="roleName">
         <el-input
           v-model="formData.roleName"
+          :placeholder="$t('settings.role.roleNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.role.roleNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.role.roleCode')" prop="roleCode">
         <el-input
           v-model="formData.roleCode"
+          :placeholder="$t('settings.role.roleCodePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.role.roleCodePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">

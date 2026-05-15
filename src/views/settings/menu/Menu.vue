@@ -16,23 +16,23 @@
 
 <template>
   <div>
-    <menu-tool :page="reactiveData.page" @search="search" @reset="reset" @refresh="refresh" @add="openAdd" />
+    <menu-tool :page="reactiveData.page" @add="openAdd" @refresh="refresh" @reset="reset" @search="search" />
 
     <blank-card>
       <el-table
         v-loading="reactiveData.loading"
         :data="reactiveData.listData"
-        row-key="id"
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-        default-expand-all
-        stripe
         class="settings-table"
+        default-expand-all
+        row-key="id"
+        stripe
       >
-        <el-table-column prop="menuName" :label="t('settings.menu.menuName')" min-width="240" />
-        <el-table-column prop="menuCode" :label="t('settings.menu.menuCode')" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="menuTypeFlag" :label="t('settings.menu.menuType')" min-width="100" />
-        <el-table-column prop="menuLevel" :label="t('settings.menu.menuLevel')" min-width="90" />
-        <el-table-column prop="menuIndex" :label="t('settings.menu.menuIndex')" min-width="80" />
+        <el-table-column :label="t('settings.menu.menuName')" min-width="240" prop="menuName" />
+        <el-table-column :label="t('settings.menu.menuCode')" min-width="200" prop="menuCode" show-overflow-tooltip />
+        <el-table-column :label="t('settings.menu.menuType')" min-width="100" prop="menuTypeFlag" />
+        <el-table-column :label="t('settings.menu.menuLevel')" min-width="90" prop="menuLevel" />
+        <el-table-column :label="t('settings.menu.menuIndex')" min-width="80" prop="menuIndex" />
         <el-table-column :label="t('settings.menu.menuUrl')" min-width="180" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.menuExt?.content?.url || '-' }}
@@ -60,27 +60,27 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="creatorName" :label="t('common.creatorName')" min-width="110" show-overflow-tooltip>
+        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.creatorName || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="t('common.createTime')" :formatter="timestampColumn" width="180" />
-        <el-table-column prop="operatorName" :label="t('common.operatorName')" min-width="110" show-overflow-tooltip>
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
+        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
           <template #default="{ row }">{{ row.operatorName || '-' }}</template>
         </el-table-column>
         <el-table-column
-          prop="operateTime"
-          :label="t('common.operationTime')"
           :formatter="timestampColumn"
+          :label="t('common.operationTime')"
+          prop="operateTime"
           width="180"
         />
-        <el-table-column :label="t('common.operation')" width="240" fixed="right">
+        <el-table-column :label="t('common.operation')" fixed="right" width="240">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
             <el-popconfirm
-              :title="t('settings.menu.confirmDelete')"
-              :confirm-button-text="t('common.confirm')"
               :cancel-button-text="t('common.cancel')"
+              :confirm-button-text="t('common.confirm')"
+              :title="t('settings.menu.confirmDelete')"
               @confirm="remove(row.id)"
             >
               <template #reference>

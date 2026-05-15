@@ -16,16 +16,16 @@
 
 <template>
   <dashboard-card
-    class="silent-sources"
-    :title="t('settings.event.overview.silentTitle')"
-    :subtitle="t('settings.event.overview.silentSubtitle', { min: silentKey })"
     :badge="rows.length || null"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && rows.length === 0"
-    :empty-text="t('settings.event.overview.silentEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.silentEmpty')"
+    :loading="loading"
+    :subtitle="t('settings.event.overview.silentSubtitle', { min: silentKey })"
+    :title="t('settings.event.overview.silentTitle')"
     body-mode="scroll"
+    class="silent-sources"
+    loading-target="button"
     @refresh="load"
   >
     <template #tools>
@@ -33,18 +33,18 @@
     </template>
 
     <el-table :data="rows" size="small" @row-click="onRowClick">
-      <el-table-column prop="deviceId" :label="t('settings.event.overview.colDevice')" min-width="110">
+      <el-table-column :label="t('settings.event.overview.colDevice')" min-width="110" prop="deviceId">
         <template #default="{ row }">{{ deviceName(row.deviceId) }}</template>
       </el-table-column>
-      <el-table-column prop="pointId" :label="t('settings.event.overview.colPoint')" min-width="110">
+      <el-table-column :label="t('settings.event.overview.colPoint')" min-width="110" prop="pointId">
         <template #default="{ row }">{{ pointName(row.pointId) }}</template>
       </el-table-column>
-      <el-table-column prop="lastSeen" :label="t('settings.event.overview.colLastSeen')" min-width="160">
+      <el-table-column :label="t('settings.event.overview.colLastSeen')" min-width="160" prop="lastSeen">
         <template #default="{ row }">{{ formatDateTime(row.lastSeen) }}</template>
       </el-table-column>
-      <el-table-column prop="silentSeconds" :label="t('settings.event.overview.colSilentFor')" min-width="110">
+      <el-table-column :label="t('settings.event.overview.colSilentFor')" min-width="110" prop="silentSeconds">
         <template #default="{ row }">
-          <el-tag type="warning" size="small">{{ humanDuration(row.silentSeconds) }}</el-tag>
+          <el-tag size="small" type="warning">{{ humanDuration(row.silentSeconds) }}</el-tag>
         </template>
       </el-table-column>
     </el-table>

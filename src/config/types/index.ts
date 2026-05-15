@@ -22,7 +22,7 @@ export type {
   AgenticModelConfig,
   AgenticProvider,
   AgenticSession,
-  AgenticSessionConfig,
+  AgenticSessionExt,
   AgenticMessage,
   AgenticMessageContext,
   AgenticMessageTokens,

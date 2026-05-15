@@ -16,19 +16,19 @@
 
 <template>
   <dashboard-card
-    class="coverage-gap"
-    :title="t('settings.event.overview.coverageTitle')"
-    :subtitle="subtitleText"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && report.totalPoints === 0"
-    :empty-text="t('settings.event.overview.coverageEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.coverageEmpty')"
+    :loading="loading"
+    :subtitle="subtitleText"
+    :title="t('settings.event.overview.coverageTitle')"
     body-mode="scroll"
+    class="coverage-gap"
+    loading-target="button"
     @refresh="load"
   >
     <div class="coverage-gap__summary">
-      <el-progress type="dashboard" :percentage="coveragePercent" :color="coverageColor" :width="100" />
+      <el-progress :color="coverageColor" :percentage="coveragePercent" :width="100" type="dashboard" />
       <div class="coverage-gap__nums">
         <div class="coverage-gap__num">
           <span class="coverage-gap__label">{{ t('settings.event.overview.coverageCovered') }}</span>

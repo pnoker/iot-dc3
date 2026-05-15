@@ -20,9 +20,9 @@
       :form-model="formData"
       :page="page"
       hide-sort
-      @search="onSearch"
-      @reset="onReset"
       @refresh="load"
+      @reset="onReset"
+      @search="onSearch"
       @size-change="sizeChange"
       @current-change="currentChange"
     >
@@ -53,21 +53,21 @@
       </template>
       <template v-if="selection.length > 0" #actions>
         <el-popconfirm
-          :title="$t('settings.event.bulkConfirmTitle', { n: selection.length })"
-          :confirm-button-text="$t('common.confirm')"
           :cancel-button-text="$t('common.cancel')"
+          :confirm-button-text="$t('common.confirm')"
+          :title="$t('settings.event.bulkConfirmTitle', { n: selection.length })"
           @confirm="bulkConfirm(true)"
         >
           <template #reference>
-            <el-button type="primary" :loading="bulkRunning">
+            <el-button :loading="bulkRunning" type="primary">
               {{ $t('settings.event.bulkConfirm', { n: selection.length }) }}
             </el-button>
           </template>
         </el-popconfirm>
         <el-popconfirm
-          :title="$t('settings.event.bulkUnconfirmTitle', { n: selection.length })"
-          :confirm-button-text="$t('common.confirm')"
           :cancel-button-text="$t('common.cancel')"
+          :confirm-button-text="$t('common.confirm')"
+          :title="$t('settings.event.bulkUnconfirmTitle', { n: selection.length })"
           @confirm="bulkConfirm(false)"
         >
           <template #reference>
@@ -83,9 +83,9 @@
       <el-table
         v-loading="loading"
         :data="rows"
-        stripe
-        class="settings-table"
         :row-key="(row: Row) => `${row.source}:${row.id}`"
+        class="settings-table"
+        stripe
         @selection-change="onSelectionChange"
       >
         <el-table-column type="selection" width="44" />
@@ -104,7 +104,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('settings.event.message')" prop="message" show-overflow-tooltip min-width="240" />
+        <el-table-column :label="$t('settings.event.message')" min-width="240" prop="message" show-overflow-tooltip />
         <el-table-column :label="$t('settings.event.confirmFlag')" width="110">
           <template #default="{ row }">
             <el-tag :type="row.confirmFlag === 1 ? 'success' : 'warning'" size="small">
@@ -113,18 +113,18 @@
           </template>
         </el-table-column>
         <el-table-column
+          :formatter="timestampColumn"
           :label="$t('settings.event.createTime')"
           prop="createTime"
-          :formatter="timestampColumn"
           width="180"
         />
-        <el-table-column :label="$t('common.operation')" width="140" fixed="right">
+        <el-table-column :label="$t('common.operation')" fixed="right" width="140">
           <template #default="{ row }">
             <el-popconfirm
               v-if="row.confirmFlag !== 1"
-              :title="$t('settings.event.confirmTitle')"
-              :confirm-button-text="$t('common.confirm')"
               :cancel-button-text="$t('common.cancel')"
+              :confirm-button-text="$t('common.confirm')"
+              :title="$t('settings.event.confirmTitle')"
               @confirm="confirmRow(row)"
             >
               <template #reference>
@@ -133,9 +133,9 @@
             </el-popconfirm>
             <el-popconfirm
               v-else
-              :title="$t('settings.event.unconfirmTitle')"
-              :confirm-button-text="$t('common.confirm')"
               :cancel-button-text="$t('common.cancel')"
+              :confirm-button-text="$t('common.confirm')"
+              :title="$t('settings.event.unconfirmTitle')"
               @confirm="unconfirmRow(row)"
             >
               <template #reference>
@@ -164,8 +164,8 @@
   import { successMessage } from '@/utils/notificationUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
-  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
   interface Row {
     id: number | string;

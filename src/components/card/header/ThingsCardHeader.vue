@@ -22,7 +22,7 @@
     <div class="things-card-header-name nowrap-name" @click.stop="$emit('copy-id')">
       {{ name }}
     </div>
-    <div class="things-card-header-status" :title="statusTitle">
+    <div :title="statusTitle" class="things-card-header-status">
       <slot />
     </div>
   </div>

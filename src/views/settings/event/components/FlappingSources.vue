@@ -16,15 +16,15 @@
 
 <template>
   <dashboard-card
-    class="flapping-sources"
-    :title="t('settings.event.overview.flappingTitle')"
-    :subtitle="t('settings.event.overview.flappingSubtitle', { hours: windowKey, min: minCount })"
-    :loading="loading"
-    loading-target="button"
     :empty="!loading && rows.length === 0"
-    :empty-text="t('settings.event.overview.flappingEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.flappingEmpty')"
+    :loading="loading"
+    :subtitle="t('settings.event.overview.flappingSubtitle', { hours: windowKey, min: minCount })"
+    :title="t('settings.event.overview.flappingTitle')"
     body-mode="scroll"
+    class="flapping-sources"
+    loading-target="button"
     @refresh="load"
   >
     <template #tools>
@@ -37,7 +37,7 @@
           {{ row.source === 'device' ? t('settings.event.device') : t('settings.event.driver') }}
         </el-tag>
         <span class="flapping-sources__name">{{ nameBySource(row.source, row.sourceId) }}</span>
-        <el-tag type="info" size="small" effect="plain">
+        <el-tag effect="plain" size="small" type="info">
           {{ eventTypeLabel(row.eventTypeFlag) }}
         </el-tag>
         <span class="flapping-sources__count">

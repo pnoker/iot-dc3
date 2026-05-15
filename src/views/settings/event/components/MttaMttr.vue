@@ -16,14 +16,14 @@
 
 <template>
   <dashboard-card
-    class="mtta-mttr"
-    :title="t('settings.event.overview.mttaTitle')"
-    :subtitle="subtitleText"
-    :loading="loading"
     :empty="!loading && rows.length === 0"
-    :empty-text="t('settings.event.overview.mttaEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.mttaEmpty')"
+    :loading="loading"
+    :subtitle="subtitleText"
+    :title="t('settings.event.overview.mttaTitle')"
     body-mode="chart"
+    class="mtta-mttr"
     @refresh="load"
   >
     <template #tools>

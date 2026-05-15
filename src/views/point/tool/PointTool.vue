@@ -17,11 +17,11 @@
 <template>
   <tool-card
     :form-model="formData"
-    :rules="formRule"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
+    :rules="formRule"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -30,9 +30,9 @@
       <el-form-item :label="$t('point.tool.pointName')" prop="pointName">
         <el-input
           v-model="formData.pointName"
+          :placeholder="$t('point.tool.pointNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('point.tool.pointNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item
@@ -42,14 +42,14 @@
       >
         <el-select
           v-model="formData.profileId"
+          :loading="profileLoading"
+          :placeholder="$t('point.tool.profilePlaceholder')"
+          :remote-method="profileDictionary"
           class="edit-form-special"
           clearable
           filterable
           remote
           reserve-keyword
-          :placeholder="$t('point.tool.profilePlaceholder')"
-          :remote-method="profileDictionary"
-          :loading="profileLoading"
           @visible-change="profileDictionaryVisible"
         >
           <el-option

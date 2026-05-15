@@ -21,9 +21,9 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
+    :title="$t('device.import.title')"
     class="things-dialog"
     draggable
-    :title="$t('device.import.title')"
   >
     <el-form
       ref="formDataRef"
@@ -39,13 +39,13 @@
       <el-form-item :label="$t('device.import.driver')" prop="driverId">
         <el-select
           v-model="reactiveData.formData.driverId"
+          :loading="reactiveData.driverLoading"
+          :placeholder="$t('device.import.driverPlaceholder')"
+          :remote-method="driverDictionary"
           clearable
           filterable
           remote
           reserve-keyword
-          :placeholder="$t('device.import.driverPlaceholder')"
-          :remote-method="driverDictionary"
-          :loading="reactiveData.driverLoading"
           @visible-change="driverDictionaryVisible"
         >
           <el-option
@@ -59,14 +59,14 @@
       <el-form-item :label="$t('device.add.profiles')" prop="profileIds">
         <el-select
           v-model="reactiveData.formData.profileIds"
+          :loading="reactiveData.profileLoading"
           :multiple="true"
+          :placeholder="$t('device.add.profilePlaceholder')"
+          :remote-method="profileDictionary"
           clearable
           filterable
           remote
           reserve-keyword
-          :placeholder="$t('device.add.profilePlaceholder')"
-          :remote-method="profileDictionary"
-          :loading="reactiveData.profileLoading"
           @visible-change="profileDictionaryVisible"
         >
           <el-option
@@ -106,9 +106,15 @@
 
 <script lang="ts" setup>
   import { UploadFilled } from '@element-plus/icons-vue';
-  import type { UploadInstance, UploadProps, UploadRawFile, UploadRequestOptions } from 'element-plus';
+  import type {
+    FormInstance,
+    FormRules,
+    UploadInstance,
+    UploadProps,
+    UploadRawFile,
+    UploadRequestOptions,
+  } from 'element-plus';
   import { genFileId } from 'element-plus';
-  import type { FormInstance, FormRules } from 'element-plus';
   import { reactive, ref, unref } from 'vue';
   import { useI18n } from 'vue-i18n';
 

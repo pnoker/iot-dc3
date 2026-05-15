@@ -18,9 +18,9 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    @search="onSearch"
-    @reset="onReset"
     @refresh="$emit('refresh')"
+    @reset="onReset"
+    @search="onSearch"
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
@@ -29,13 +29,13 @@
       <el-form-item :label="$t('settings.group.groupName')" prop="groupName">
         <el-input
           v-model="formData.groupName"
+          :placeholder="$t('settings.group.groupNamePlaceholder')"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.group.groupNamePlaceholder')"
         />
       </el-form-item>
       <el-form-item :label="$t('settings.common.entityType')" prop="groupTypeFlag">
-        <el-select v-model="formData.groupTypeFlag" clearable class="edit-form-default" :placeholder="$t('common.all')">
+        <el-select v-model="formData.groupTypeFlag" :placeholder="$t('common.all')" class="edit-form-default" clearable>
           <el-option v-for="opt in ENTITY_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
       </el-form-item>

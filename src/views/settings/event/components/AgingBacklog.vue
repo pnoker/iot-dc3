@@ -16,14 +16,14 @@
 
 <template>
   <dashboard-card
-    class="aging-backlog"
-    :title="t('settings.event.overview.agingTitle')"
-    :subtitle="t('settings.event.overview.agingSubtitle', { n: data.total })"
-    :loading="loading"
     :empty="!loading && data.total === 0"
-    :empty-text="t('settings.event.overview.agingEmpty')"
     :empty-image-size="60"
+    :empty-text="t('settings.event.overview.agingEmpty')"
+    :loading="loading"
+    :subtitle="t('settings.event.overview.agingSubtitle', { n: data.total })"
+    :title="t('settings.event.overview.agingTitle')"
     body-mode="chart"
+    class="aging-backlog"
     @refresh="load"
   >
     <div ref="chartRef" class="aging-backlog__canvas"></div>

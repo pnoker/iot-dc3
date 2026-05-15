@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { createRouter, createWebHashHistory } from 'vue-router';
 import type { RouteLocationNormalized, RouteMeta } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
