@@ -22,6 +22,7 @@ import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -46,6 +47,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Component
+@ConditionalOnBean(MqttReceiveService.class)
 public class MqttScheduleJob extends QuartzJobBean {
 
     public static final ReentrantReadWriteLock messageLock = new ReentrantReadWriteLock();
@@ -71,14 +73,24 @@ public class MqttScheduleJob extends QuartzJobBean {
      * @return message size
      */
     public static int getMqttMessagesSize() {
-        return mqttMessages.size();
+        messageLock.readLock().lock();
+        try {
+            return mqttMessages.size();
+        } finally {
+            messageLock.readLock().unlock();
+        }
     }
 
     /**
      * Clear MqttMessage list
      */
     public static void clearMqttMessages() {
-        mqttMessages.clear();
+        messageLock.writeLock().lock();
+        try {
+            mqttMessages.clear();
+        } finally {
+            messageLock.writeLock().unlock();
+        }
     }
 
     /**
@@ -87,7 +99,12 @@ public class MqttScheduleJob extends QuartzJobBean {
      * @param mqttMessage MqttMessage
      */
     public static void addMqttMessages(MqttMessage mqttMessage) {
-        mqttMessages.add(mqttMessage);
+        messageLock.writeLock().lock();
+        try {
+            mqttMessages.add(mqttMessage);
+        } finally {
+            messageLock.writeLock().unlock();
+        }
     }
 
     /**
@@ -108,18 +125,29 @@ public class MqttScheduleJob extends QuartzJobBean {
                     interval);
         }
 
-        // Process batch MQTT messages
-        virtualThreadExecutor.execute(() -> {
-            messageLock.writeLock().lock();
-            try {
-                if (!mqttMessages.isEmpty()) {
-                    mqttReceiveService.receiveValues(mqttMessages);
-                    clearMqttMessages();
-                }
-            } finally {
-                messageLock.writeLock().unlock();
+        // Process a private snapshot outside the lock so inbound MQTT threads are not
+        // blocked by downstream parsing or publishing.
+        List<MqttMessage> snapshot;
+        messageLock.writeLock().lock();
+        try {
+            if (mqttMessages.isEmpty()) {
+                return;
             }
-        });
+            snapshot = new ArrayList<>(mqttMessages);
+            mqttMessages.clear();
+        } finally {
+            messageLock.writeLock().unlock();
+        }
+
+        virtualThreadExecutor.execute(() -> receiveBatch(snapshot));
+    }
+
+    private void receiveBatch(List<MqttMessage> mqttMessages) {
+        try {
+            mqttReceiveService.receiveValues(mqttMessages);
+        } catch (Exception e) {
+            log.error("MQTT batch message handling failed, size={}", mqttMessages.size(), e);
+        }
     }
 
 }

@@ -22,7 +22,6 @@ import io.github.pnoker.common.mqtt.service.MqttScheduleService;
 import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
 import io.github.pnoker.common.quartz.QuartzService;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,6 @@ import org.springframework.stereotype.Service;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Slf4j
 @Service
 public class MqttScheduleServiceImpl implements MqttScheduleService {
 
@@ -57,7 +55,7 @@ public class MqttScheduleServiceImpl implements MqttScheduleService {
 
             quartzService.startScheduler();
         } catch (SchedulerException e) {
-            log.error(e.getMessage(), e);
+            throw new IllegalStateException("Failed to initialize MQTT batch scheduler", e);
         }
     }
 

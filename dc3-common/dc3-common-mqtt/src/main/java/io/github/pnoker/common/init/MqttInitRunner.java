@@ -18,11 +18,14 @@
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
+import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.mqtt.service.MqttScheduleService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -35,20 +38,24 @@ import org.springframework.context.annotation.ComponentScan;
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.mqtt"})
 @EnableConfigurationProperties({MqttProperties.class})
 public class MqttInitRunner implements ApplicationRunner {
 
     private final MqttScheduleService mqttScheduleService;
+    private final ObjectProvider<MqttReceiveService> mqttReceiveServiceProvider;
 
     /**
      * Creates a new MQTT initialization runner with the specified MQTT schedule service.
      *
      * @param mqttScheduleService The MQTT schedule service to be initialized
      */
-    public MqttInitRunner(MqttScheduleService mqttScheduleService) {
+    public MqttInitRunner(MqttScheduleService mqttScheduleService,
+                          ObjectProvider<MqttReceiveService> mqttReceiveServiceProvider) {
         this.mqttScheduleService = mqttScheduleService;
+        this.mqttReceiveServiceProvider = mqttReceiveServiceProvider;
     }
 
     /**
@@ -60,6 +67,10 @@ public class MqttInitRunner implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        if (mqttReceiveServiceProvider.getIfAvailable() == null) {
+            log.info("Skip MQTT batch scheduler because no MqttReceiveService bean is present");
+            return;
+        }
         mqttScheduleService.initial();
     }
 
