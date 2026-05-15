@@ -18,7 +18,7 @@
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
-import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -88,17 +88,18 @@ public class DriverReadServiceImpl implements DriverReadService {
         // Get point from metadata cache
         PointBO point = pointMetadata.getCache(pointId);
         if (Objects.isNull(point)) {
-            throw new ReadPointException("Failed to read point value, point[{}] is null" + deviceId);
+            throw new ReadPointException("Failed to read point value, point is null, deviceId={}, pointId={}",
+                    deviceId, pointId);
         }
 
         // Read point value using custom driver service
-        RValue rValue = driverCustomService.read(driverConfig, pointConfig, device, point);
-        if (Objects.isNull(rValue)) {
+        ReadPointValue readPointValue = driverCustomService.read(driverConfig, pointConfig, device, point);
+        if (Objects.isNull(readPointValue)) {
             throw new ReadPointException("Failed to read point value, point value is null");
         }
 
         // Send point value to message queue
-        driverSenderService.pointValueSender(new PointValue(rValue));
+        driverSenderService.pointValueSender(new PointValue(readPointValue));
     }
 
     @Override

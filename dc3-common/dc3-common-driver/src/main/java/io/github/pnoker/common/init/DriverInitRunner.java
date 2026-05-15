@@ -22,24 +22,37 @@ import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverRegisterService;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
+import java.time.Duration;
+
 /**
  * Application startup runner that completes the standard driver bootstrap sequence:
  * registration, custom initialization, and schedule initialization.
+ *
+ * <p>Driver registration goes through the manager center over gRPC. Manager may not be
+ * ready when the driver process starts (rolling restart, K8s pod reschedule), so the
+ * register call retries with capped exponential backoff before giving up — without it
+ * a transient outage cascades into a full driver CrashLoopBackOff.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
+@Slf4j
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.driver"})
 @EnableConfigurationProperties({DriverProperties.class})
 public class DriverInitRunner implements ApplicationRunner {
+
+    private static final int REGISTER_MAX_ATTEMPTS = 30;
+    private static final Duration REGISTER_INITIAL_BACKOFF = Duration.ofSeconds(2);
+    private static final Duration REGISTER_MAX_BACKOFF = Duration.ofSeconds(30);
 
     @Resource
     private DriverRegisterService driverRegisterService;
@@ -53,8 +66,8 @@ public class DriverInitRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // Initialize driver registration and synchronize basic information with the
-        // platform
-        driverRegisterService.initial();
+        // platform; tolerate manager center being temporarily unavailable.
+        registerWithRetry();
 
         // Execute custom initialization functions specific to this driver module
         driverCustomService.initial();
@@ -62,6 +75,28 @@ public class DriverInitRunner implements ApplicationRunner {
         // Initialize driver tasks including status monitoring, reading operations and
         // custom tasks
         driverScheduleService.initial();
+    }
+
+    private void registerWithRetry() throws InterruptedException {
+        long backoffMs = REGISTER_INITIAL_BACKOFF.toMillis();
+        for (int attempt = 1; attempt <= REGISTER_MAX_ATTEMPTS; attempt++) {
+            try {
+                driverRegisterService.initial();
+                if (attempt > 1) {
+                    log.info("Driver register succeeded on attempt {}", attempt);
+                }
+                return;
+            } catch (Exception e) {
+                if (attempt == REGISTER_MAX_ATTEMPTS) {
+                    log.error("Driver register failed after {} attempts, giving up", attempt, e);
+                    throw e;
+                }
+                log.warn("Driver register failed on attempt {}/{}, retrying in {} ms: {}", attempt,
+                        REGISTER_MAX_ATTEMPTS, backoffMs, e.getMessage());
+                Thread.sleep(backoffMs);
+                backoffMs = Math.min(backoffMs * 2, REGISTER_MAX_BACKOFF.toMillis());
+            }
+        }
     }
 
 }
