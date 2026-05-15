@@ -15,15 +15,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# # The following content will be overwritten by application-[dev|test|pre|pro].yml,
+# The following content will be overwritten by application-[dev|test|pre|pro].yml,
 # that is: if the following properties are configured in application-[dev|test|pre|pro].yml,
 # the property values configured in application.yml will be the main ones.
+#
+# Note: spring.rabbitmq.listener.simple.* settings (acknowledge-mode,
+# concurrent-consumers, prefetch, retry) live in RabbitConfig because we own
+# a custom SimpleRabbitListenerContainerFactory bean — Spring Boot only
+# applies the listener.simple.* properties to its auto-configured factory,
+# so duplicating them here would be misleading.
 spring:
   rabbitmq:
     publisher-confirm-type: correlated
     publisher-returns: true
-    listener:
-      simple:
-        acknowledge-mode: manual
-        retry:
-          enabled: true

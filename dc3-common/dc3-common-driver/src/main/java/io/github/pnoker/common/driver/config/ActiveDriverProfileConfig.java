@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.config;
 
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -42,16 +43,14 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveDriverProfileConfig implements EnvironmentPostProcessor {
 
-    private static final String AUTO_PROFILE_PROPERTY = "dc3.driver.auto-profile";
-    private static final String DRIVER_PROFILE = "driver";
-
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if (Boolean.FALSE.equals(environment.getProperty(AUTO_PROFILE_PROPERTY, Boolean.class, Boolean.TRUE))) {
-            log.debug("Skipping driver profile activation, {}=false", AUTO_PROFILE_PROPERTY);
+        if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.DRIVER_AUTO_PROFILE, Boolean.class,
+                Boolean.TRUE))) {
+            log.debug("Skipping driver profile activation, {}=false", EnvironmentConstant.DRIVER_AUTO_PROFILE);
             return;
         }
-        environment.addActiveProfile(DRIVER_PROFILE);
+        environment.addActiveProfile(EnvironmentConstant.DRIVER_PROFILE);
     }
 
 }
