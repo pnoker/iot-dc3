@@ -22,12 +22,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.dal.SessionManager;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
+import io.github.pnoker.common.agentic.entity.model.SessionConfig;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -60,11 +62,18 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public SessionBO touch(String conversationId, Long tenantId, Long userId, String model) {
+        return touch(conversationId, tenantId, userId, model, null);
+    }
+
+    @Override
+    public SessionBO touch(String conversationId, Long tenantId, Long userId, String model,
+                           SessionConfig sessionConfig) {
         SessionDO existing = findByConversationId(conversationId);
         if (Objects.nonNull(existing)) {
             existing.setTenantId(tenantId);
             existing.setUserId(userId);
             applyModel(existing, model);
+            applySessionConfig(existing, sessionConfig);
             sessionManager.updateById(existing);
             return sessionBuilder.buildBOByDO(existing);
         }
@@ -75,6 +84,7 @@ public class SessionServiceImpl implements SessionService {
         entityDO.setUserId(userId);
         entityDO.setTitle("New Conversation");
         applyModel(entityDO, model);
+        applySessionConfig(entityDO, sessionConfig);
         sessionManager.save(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
     }
@@ -107,6 +117,7 @@ public class SessionServiceImpl implements SessionService {
             entityDO.setTitle(request.getTitle().trim());
         }
         applyModel(entityDO, request.getModel());
+        applySessionConfig(entityDO, request.getSessionConfig());
         sessionManager.updateById(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
     }
@@ -114,6 +125,38 @@ public class SessionServiceImpl implements SessionService {
     private void applyModel(SessionDO entityDO, String model) {
         if (StringUtils.isNotBlank(model)) {
             entityDO.setModel(model.trim());
+        }
+    }
+
+    private void applySessionConfig(SessionDO entityDO, SessionConfig requestConfig) {
+        if (Objects.isNull(requestConfig)) {
+            return;
+        }
+        validateSessionConfig(requestConfig);
+        SessionConfig target = Objects.nonNull(entityDO.getSessionConfig()) ? entityDO.getSessionConfig()
+                : new SessionConfig();
+        if (Objects.nonNull(requestConfig.getReasoningEnabled())) {
+            target.setReasoningEnabled(requestConfig.getReasoningEnabled());
+        }
+        if (Objects.nonNull(requestConfig.getTemperature())) {
+            target.setTemperature(requestConfig.getTemperature());
+        }
+        if (Objects.nonNull(requestConfig.getMaxTokens())) {
+            target.setMaxTokens(requestConfig.getMaxTokens());
+        }
+        if (Objects.nonNull(requestConfig.getRequireConfirmation())) {
+            target.setRequireConfirmation(requestConfig.getRequireConfirmation());
+        }
+        entityDO.setSessionConfig(target);
+    }
+
+    private void validateSessionConfig(SessionConfig sessionConfig) {
+        if (Objects.nonNull(sessionConfig.getTemperature())
+                && (sessionConfig.getTemperature() < 0.0 || sessionConfig.getTemperature() > 2.0)) {
+            throw new RequestException("Temperature must be between 0.0 and 2.0");
+        }
+        if (Objects.nonNull(sessionConfig.getMaxTokens()) && sessionConfig.getMaxTokens() < 1) {
+            throw new RequestException("Max tokens must be greater than 0");
         }
     }
 

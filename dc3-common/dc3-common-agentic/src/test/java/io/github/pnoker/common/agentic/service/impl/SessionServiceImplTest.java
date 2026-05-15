@@ -21,9 +21,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.common.agentic.dal.SessionManager;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
+import io.github.pnoker.common.agentic.entity.model.SessionConfig;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.MessageService;
+import io.github.pnoker.common.exception.RequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +38,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -64,7 +67,8 @@ class SessionServiceImplTest {
         // SessionServiceImpl uses @Resource which @InjectMocks resolves by field name; the
         // names match so injection should succeed but we re-set defensively in case the
         // resolution misses.
-        for (String name : new String[]{"sessionBuilder", "sessionManager", "agenticChatMemory", "messageService"}) {
+        for (String name : new String[]{"sessionBuilder", "sessionManager", "agenticChatMemory",
+                "messageService"}) {
             Field f = SessionServiceImpl.class.getDeclaredField(name);
             f.setAccessible(true);
             if (f.get(service) == null) {
@@ -87,7 +91,13 @@ class SessionServiceImplTest {
         SessionBO bo = new SessionBO();
         when(sessionBuilder.buildBOByDO(any(SessionDO.class))).thenReturn(bo);
 
-        SessionBO result = service.touch("conv-1", 1L, 2L, "deepseek-chat");
+        SessionConfig sessionConfig = new SessionConfig();
+        sessionConfig.setReasoningEnabled(true);
+        sessionConfig.setTemperature(0.3);
+        sessionConfig.setMaxTokens(1024);
+        sessionConfig.setRequireConfirmation(false);
+
+        SessionBO result = service.touch("conv-1", 1L, 2L, "deepseek-chat", sessionConfig);
 
         ArgumentCaptor<SessionDO> captor = ArgumentCaptor.forClass(SessionDO.class);
         verify(sessionManager).save(captor.capture());
@@ -97,6 +107,10 @@ class SessionServiceImplTest {
         assertThat(saved.getUserId()).isEqualTo(2L);
         assertThat(saved.getTitle()).isEqualTo("New Conversation");
         assertThat(saved.getModel()).isEqualTo("deepseek-chat");
+        assertThat(saved.getSessionConfig().getReasoningEnabled()).isTrue();
+        assertThat(saved.getSessionConfig().getTemperature()).isEqualTo(0.3);
+        assertThat(saved.getSessionConfig().getMaxTokens()).isEqualTo(1024);
+        assertThat(saved.getSessionConfig().getRequireConfirmation()).isFalse();
         assertThat(result).isSameAs(bo);
     }
 
@@ -188,5 +202,47 @@ class SessionServiceImplTest {
         service.update("conv-1", request);
 
         assertThat(existing.getTitle()).isEqualTo("Old");
+    }
+
+    @Test
+    void updateMergesSessionConfig() {
+        SessionDO existing = new SessionDO();
+        SessionConfig existingConfig = new SessionConfig();
+        existingConfig.setReasoningEnabled(false);
+        existingConfig.setTemperature(0.7);
+        existingConfig.setMaxTokens(2048);
+        existingConfig.setRequireConfirmation(true);
+        existing.setSessionConfig(existingConfig);
+        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+        when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
+
+        SessionConfig patch = new SessionConfig();
+        patch.setReasoningEnabled(true);
+        patch.setMaxTokens(4096);
+        SessionUpdateRequest request = new SessionUpdateRequest();
+        request.setSessionConfig(patch);
+        service.update("conv-1", request);
+
+        assertThat(existing.getSessionConfig().getReasoningEnabled()).isTrue();
+        assertThat(existing.getSessionConfig().getTemperature()).isEqualTo(0.7);
+        assertThat(existing.getSessionConfig().getMaxTokens()).isEqualTo(4096);
+        assertThat(existing.getSessionConfig().getRequireConfirmation()).isTrue();
+        verify(sessionManager).updateById(existing);
+    }
+
+    @Test
+    void updateRejectsInvalidSessionConfig() {
+        SessionDO existing = new SessionDO();
+        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+
+        SessionConfig patch = new SessionConfig();
+        patch.setTemperature(3.0);
+        SessionUpdateRequest request = new SessionUpdateRequest();
+        request.setSessionConfig(patch);
+
+        assertThatThrownBy(() -> service.update("conv-1", request))
+                .isInstanceOf(RequestException.class)
+                .hasMessage("Temperature must be between 0.0 and 2.0");
+        verify(sessionManager, never()).updateById(any(SessionDO.class));
     }
 }

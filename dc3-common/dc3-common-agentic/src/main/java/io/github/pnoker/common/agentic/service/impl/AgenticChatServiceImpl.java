@@ -22,6 +22,7 @@ import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import io.github.pnoker.common.agentic.entity.model.SessionConfig;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.entity.request.ChatMessageDTO;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
@@ -231,7 +232,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 mode, model, request.getMessages().size(), StringUtils.isNotBlank(request.getConversationId()),
                 Objects.isNull(skill) ? null : skill.getName(), userHeader.getTenantId(), userHeader.getUserId());
 
-        touchSession(scopedConversationId, conversationId, userHeader, model);
+        touchSession(scopedConversationId, conversationId, userHeader, model, buildSessionConfig(request));
 
         return new PreparedChatRequest(rawUserMessage, scopedConversationId, skillSystemPrompt,
                 requestSystemContext, normalizeToolNames(toolNames), model, effectiveSkillName, toolContext,
@@ -669,10 +670,24 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         return StringUtils.defaultString(value).replace("|", "\\|").replace("\n", " ");
     }
 
+    private SessionConfig buildSessionConfig(ChatCompletionRequest request) {
+        if (Objects.isNull(request.getReasoning()) && Objects.isNull(request.getTemperature())
+                && Objects.isNull(request.getMaxTokens()) && Objects.isNull(request.getConfirmActions())) {
+            return null;
+        }
+        SessionConfig sessionConfig = new SessionConfig();
+        sessionConfig.setReasoningEnabled(request.getReasoning());
+        sessionConfig.setTemperature(request.getTemperature());
+        sessionConfig.setMaxTokens(request.getMaxTokens());
+        sessionConfig.setRequireConfirmation(request.getConfirmActions());
+        return sessionConfig;
+    }
+
     private void touchSession(String scopedConversationId, String conversationId, RequestHeader.UserHeader userHeader,
-                              String model) {
+                              String model, SessionConfig sessionConfig) {
         try {
-            sessionService.touch(scopedConversationId, userHeader.getTenantId(), userHeader.getUserId(), model);
+            sessionService.touch(scopedConversationId, userHeader.getTenantId(), userHeader.getUserId(), model,
+                    sessionConfig);
         } catch (Exception e) {
             log.warn(
                     "Agentic session touch failed, tenantId={}, userId={}, conversationId={}",
