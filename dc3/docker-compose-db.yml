@@ -36,7 +36,7 @@ services:
     container_name: dc3-postgres
     hostname: dc3-postgres
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql
     logging: *default-logging
     networks:
       dc3net:
