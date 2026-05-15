@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.entity.request;
 
+import io.github.pnoker.common.agentic.entity.model.SessionConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,5 +34,7 @@ public class SessionUpdateRequest {
     private String title;
 
     private String model;
+
+    private SessionConfig sessionConfig;
 
 }

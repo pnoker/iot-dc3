@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
+import io.github.pnoker.common.agentic.entity.model.SessionConfig;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 
@@ -40,6 +41,18 @@ public interface SessionService {
      * @return the session BO
      */
     SessionBO touch(String conversationId, Long tenantId, Long userId, String model);
+
+    /**
+     * Create or update a session and merge session-level chat preferences.
+     *
+     * @param conversationId conversation ID
+     * @param tenantId       tenant scope
+     * @param userId         user scope
+     * @param model          latest selected model
+     * @param sessionConfig  session chat preferences
+     * @return the session BO
+     */
+    SessionBO touch(String conversationId, Long tenantId, Long userId, String model, SessionConfig sessionConfig);
 
     /**
      * Get session by conversation ID.

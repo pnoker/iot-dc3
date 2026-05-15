@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,7 +38,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_session")
+@TableName(value = "dc3_session", autoResultMap = true)
 public class SessionDO implements Serializable {
 
     @Serial
@@ -54,6 +55,9 @@ public class SessionDO implements Serializable {
 
     @TableField("model")
     private String model;
+
+    @TableField(value = "session_config", typeHandler = JacksonTypeHandler.class)
+    private SessionConfig sessionConfig;
 
     @TableField("tenant_id")
     private Long tenantId;

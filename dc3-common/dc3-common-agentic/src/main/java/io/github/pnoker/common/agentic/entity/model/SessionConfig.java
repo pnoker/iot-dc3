@@ -14,38 +14,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.bo;
+package io.github.pnoker.common.agentic.entity.model;
 
-import io.github.pnoker.common.agentic.entity.model.SessionConfig;
-import io.github.pnoker.common.entity.base.BaseBO;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
+ * Session-level chat preferences persisted as JSON.
+ *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.15
  * @since 2022.1.0
  */
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString(callSuper = true)
-public class SessionBO extends BaseBO {
+@ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class SessionConfig implements Serializable {
 
-    private String conversationId;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    private String title;
+    private Boolean reasoningEnabled;
 
-    private String model;
+    private Double temperature;
 
-    private SessionConfig sessionConfig;
+    private Integer maxTokens;
 
-    private Long tenantId;
-
-    private Long userId;
+    private Boolean requireConfirmation;
 
 }
