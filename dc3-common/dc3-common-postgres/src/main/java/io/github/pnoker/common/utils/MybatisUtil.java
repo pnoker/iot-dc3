@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import io.github.pnoker.common.constant.common.DefaultConstant;
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -65,30 +66,12 @@ public class MybatisUtil {
      */
     public static FastAutoGenerator defaultGenerator(String defaultHost, String defaultPort, String defaultDb,
                                                      String defaultSchema, String defaultUsername, String defaultPassword) {
-        String host = System.getenv("POSTGRES_HOST");
-        if (StringUtils.isEmpty(host)) {
-            host = defaultHost;
-        }
-        String port = System.getenv("POSTGRES_PORT");
-        if (StringUtils.isEmpty(port)) {
-            port = defaultPort;
-        }
-        String db = System.getenv("POSTGRES_DB");
-        if (StringUtils.isEmpty(db)) {
-            db = defaultDb;
-        }
-        String schema = System.getenv("POSTGRES_SCHEMA");
-        if (StringUtils.isEmpty(schema)) {
-            schema = defaultSchema;
-        }
-        String username = System.getenv("POSTGRES_USERNAME");
-        if (StringUtils.isEmpty(username)) {
-            username = defaultUsername;
-        }
-        String password = System.getenv("POSTGRES_PASSWORD");
-        if (StringUtils.isEmpty(password)) {
-            password = defaultPassword;
-        }
+        String host = envOrDefault(EnvironmentConstant.POSTGRES_HOST_ENV, defaultHost);
+        String port = envOrDefault(EnvironmentConstant.POSTGRES_PORT_ENV, defaultPort);
+        String db = envOrDefault(EnvironmentConstant.POSTGRES_DB_ENV, defaultDb);
+        String schema = envOrDefault(EnvironmentConstant.POSTGRES_SCHEMA_ENV, defaultSchema);
+        String username = envOrDefault(EnvironmentConstant.POSTGRES_USERNAME_ENV, defaultUsername);
+        String password = envOrDefault(EnvironmentConstant.POSTGRES_PASSWORD_ENV, defaultPassword);
 
         return FastAutoGenerator.create(
                 String.format("jdbc:postgresql://%s:%s/%s?currentSchema=%s&useSSL=false", host, port, db, schema),
@@ -146,6 +129,11 @@ public class MybatisUtil {
                 .enableFileOverride()
                 .mapperBuilder()
                 .enableFileOverride();
+    }
+
+    private static String envOrDefault(String envName, String defaultValue) {
+        String value = System.getenv(envName);
+        return StringUtils.isEmpty(value) ? defaultValue : value;
     }
 
 }

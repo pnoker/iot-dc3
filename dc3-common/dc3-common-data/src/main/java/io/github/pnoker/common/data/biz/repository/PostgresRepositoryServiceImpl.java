@@ -139,7 +139,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
 
     @Override
     public void afterPropertiesSet() {
-        RepositoryStrategyFactory.put(StrategyConstant.Storage.POSTGRES, this);
+        RepositoryStrategyFactory.put(this);
     }
 
 }

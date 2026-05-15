@@ -17,29 +17,37 @@ storage implementation.
 
 | Component                          | Purpose                                                                                                 |
 |------------------------------------|---------------------------------------------------------------------------------------------------------|
-| `RepositoryService`                | Storage interface: `save(PointValueBO)`, `saveList(List<PointValueBO>)`, `latest(query)`, `page(query)` |
+| `RepositoryService`                | Storage interface: save point values and query latest/history/page data                                 |
+| `RepositoryStrategyFactory`        | Runtime registry for available `RepositoryService` implementations                                      |
 | `PointValueBO`                     | Business object representing a point value with timestamp, device ID, point ID, and raw value           |
 | `PointQueryBO` / `PointValueQuery` | Query objects for paginated and filter-based retrieval                                                  |
+| `ActiveRepositoryProfileConfig`    | Activates the `repository` profile unless `dc3.repository.auto-profile=false` is set                    |
 
 ## Usage Pattern
 
-The Data Center depends on `RepositoryService` via Spring injection. The active implementation is selected by the
-application profile. Add a concrete storage implementation (e.g.,
-TimescaleDB, InfluxDB, MongoDB) by implementing `RepositoryService` and registering it as a Spring bean.
+The Data Center discovers storage implementations through `RepositoryStrategyFactory`. The active implementation is
+selected by the application profile. Add a concrete storage implementation (e.g. TimescaleDB, InfluxDB, MongoDB) by
+implementing `RepositoryService`, registering it as a Spring bean, and adding it to the factory during initialization.
 
 ```java
+@Service
+public class TimescaleRepositoryServiceImpl implements RepositoryService, InitializingBean {
 
-@Resource
-private RepositoryService repositoryService;
+    @Override
+    public String getRepositoryName() {
+        return StrategyConstant.Storage.POSTGRES;
+    }
 
-// Persist ingested point value
-repositoryService.
+    @Override
+    public void afterPropertiesSet() {
+        RepositoryStrategyFactory.put(this);
+    }
 
-save(pointValueBO);
-
-// Query latest value for a point
-PointValueBO latest = repositoryService.latest(queryBO);
+    // Implement savePointValue, selectLatestPointValue, selectPagePointValue, etc.
+}
 ```
+
+Set `dc3.repository.auto-profile=false` to opt out of automatic `repository` profile activation.
 
 ## Build Instructions
 
@@ -49,7 +57,7 @@ mvn -s ../../.mvn/settings.xml clean package
 
 ## Related Modules
 
-- `dc3-common-data` — Injects and uses `RepositoryService` for all persistence operations
+- `dc3-common-data` — Uses `RepositoryStrategyFactory` to route point-value persistence operations
 - `dc3-common-redis` — Caches latest point values alongside repository storage
 
 ## License
@@ -57,4 +65,3 @@ mvn -s ../../.mvn/settings.xml clean package
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-
