@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -84,7 +84,8 @@ class DriverWriteServiceImplTest {
 
         service.write(10L, 20L, "42");
 
-        verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point), any(WValue.class));
+        verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
+                any(WritePointValue.class));
     }
 
     @Test
@@ -115,7 +116,7 @@ class DriverWriteServiceImplTest {
         DeviceCommandDTO commandDTO = new DeviceCommandDTO();
         commandDTO.setContent(null);
         assertThatNoException().isThrownBy(() -> service.write(commandDTO));
-        verify(driverCustomService, never()).write(any(), any(), any(), any(), any(WValue.class));
+        verify(driverCustomService, never()).write(any(), any(), any(), any(), any(WritePointValue.class));
     }
 
     @Test
@@ -131,6 +132,7 @@ class DriverWriteServiceImplTest {
         commandDTO.setContent(JsonUtil.toJsonString(new DeviceCommandDTO.DeviceWrite(10L, 20L, "99")));
         service.write(commandDTO);
 
-        verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point), any(WValue.class));
+        verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
+                any(WritePointValue.class));
     }
 }

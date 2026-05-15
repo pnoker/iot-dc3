@@ -18,7 +18,7 @@
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
-import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -87,8 +87,8 @@ class DriverReadServiceImplTest {
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
         when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
         when(pointMetadata.getCache(20L)).thenReturn(point);
-        RValue rValue = new RValue(device, point, "42");
-        when(driverCustomService.read(driverConfig, pointConfig, device, point)).thenReturn(rValue);
+        ReadPointValue readPointValue = new ReadPointValue(device, point, "42");
+        when(driverCustomService.read(driverConfig, pointConfig, device, point)).thenReturn(readPointValue);
 
         service.read(10L, 20L);
 
@@ -174,7 +174,7 @@ class DriverReadServiceImplTest {
         when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
         when(pointMetadata.getCache(20L)).thenReturn(point);
         when(driverCustomService.read(driverConfig, pointConfig, device, point))
-                .thenReturn(new RValue(device, point, "42"));
+                .thenReturn(new ReadPointValue(device, point, "42"));
 
         DeviceCommandDTO commandDTO = new DeviceCommandDTO();
         commandDTO.setContent(JsonUtil.toJsonString(new DeviceCommandDTO.DeviceRead(10L, 20L)));
