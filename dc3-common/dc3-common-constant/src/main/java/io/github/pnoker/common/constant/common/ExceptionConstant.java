@@ -18,6 +18,7 @@
 package io.github.pnoker.common.constant.common;
 
 /**
+ * Exception-related common messages shared across modules.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -26,22 +27,22 @@ package io.github.pnoker.common.constant.common;
 public class ExceptionConstant {
 
     /**
-     *
+     * Utility class constructor message.
      */
-    public static final String UTILITY_CLASS = "Utility class";
+    public static final String UTILITY_CLASS = BaseConstant.UTILITY_CLASS;
 
     /**
-     *
+     * No available service instance for the requested client.
      */
     public static final String NO_AVAILABLE_SERVER = "No available server for client";
 
     /**
-     * Tenant,
+     * Tenant and user authentication context does not match.
      */
     public static final String NO_AVAILABLE_AUTH = "Tenant, user information does not match";
 
     private ExceptionConstant() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

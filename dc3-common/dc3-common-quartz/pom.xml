@@ -74,6 +74,12 @@
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
 
+        <!-- DC3 Common Related -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-constant</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

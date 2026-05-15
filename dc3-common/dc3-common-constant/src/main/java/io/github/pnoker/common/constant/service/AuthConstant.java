@@ -56,6 +56,26 @@ public class AuthConstant {
 
     public static final String MENU_URL_PREFIX = "/menu";
 
+    /**
+     * dc3_resource.resource_code prefix for API leaf resources.
+     */
+    public static final String API_RESOURCE_CODE_PREFIX = "api:";
+
+    /**
+     * dc3_resource.resource_code prefix for virtual service grouping nodes.
+     */
+    public static final String API_SERVICE_NODE_CODE_PREFIX = "api:service:";
+
+    /**
+     * dc3_resource.resource_code prefix for virtual API group nodes.
+     */
+    public static final String API_GROUP_NODE_CODE_PREFIX = "api:group:";
+
+    /**
+     * dc3_resource.resource_code prefix for menu leaf resources.
+     */
+    public static final String MENU_RESOURCE_CODE_PREFIX = "menu:";
+
     private AuthConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
