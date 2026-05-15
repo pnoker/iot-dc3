@@ -26,6 +26,7 @@ import io.github.pnoker.common.agentic.entity.model.AttachmentDO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class AttachmentServiceImpl implements AttachmentService {
 
@@ -73,7 +75,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                         .subscribeOn(Schedulers.boundedElastic()))
                 .doOnError(error -> deleteFile(filePath))
                 .onErrorMap(Exception.class, error -> error instanceof RequestException ? error
-                        : new RequestException("Attachment file save failed"));
+                        : new RequestException("Attachment file save failed", error));
     }
 
     private AttachmentBO saveAttachment(String conversationId, FilePart filePart, Path filePath,
@@ -143,7 +145,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             Files.createDirectories(directory);
         } catch (Exception e) {
-            throw new RequestException("Attachment directory create failed");
+            throw new RequestException("Attachment directory create failed: {}", directory, e);
         }
 
         Path filePath = directory.resolve(UUID.randomUUID() + "-" + safePathPart(fileName)).normalize();
@@ -163,8 +165,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     private void deleteFile(Path filePath) {
         try {
             Files.deleteIfExists(filePath);
-        } catch (Exception ignored) {
-            // best effort cleanup for failed uploads
+        } catch (Exception e) {
+            log.warn("Failed to clean up attachment file after upload error: {}", filePath, e);
         }
     }
 

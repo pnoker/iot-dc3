@@ -182,7 +182,8 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             } catch (Exception e) {
                 log.error("Driver connection failed, protocol=plcS7, deviceId={}, host={}, port={}", deviceId, host,
                         port, e);
-                throw new ServiceException("new s7connector fail" + e.getMessage());
+                throw new ServiceException("Driver connection failed, protocol=plcS7, deviceId={}, host={}, port={}",
+                        deviceId, host, port, e);
             }
             connectMap.put(deviceId, myS7Connector);
             log.info("Driver connection established, protocol=plcS7, deviceId={}, host={}, port={}", deviceId, host,

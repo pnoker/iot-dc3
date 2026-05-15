@@ -62,7 +62,7 @@ public class FileUtil {
             try {
                 Files.createDirectories(dir);
             } catch (IOException e) {
-                log.error(e.getMessage(), e);
+                log.error("Failed to create temp directory: {}", dir, e);
             }
         }
         return dir.toString() + "/";

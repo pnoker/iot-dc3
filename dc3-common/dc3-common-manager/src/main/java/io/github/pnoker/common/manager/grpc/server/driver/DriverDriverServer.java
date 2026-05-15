@@ -105,7 +105,8 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
             rBuilder.setMessage(e.getMessage());
 
-            log.error(e.getMessage(), e);
+            log.error("Driver register gRPC request failed, tenant={}, client={}, driver={}", request.getTenant(),
+                    request.getClient(), request.getDriver(), e);
         }
 
         builder.setResult(rBuilder);

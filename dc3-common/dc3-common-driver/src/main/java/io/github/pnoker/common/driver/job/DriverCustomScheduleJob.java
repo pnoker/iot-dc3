@@ -49,7 +49,7 @@ public class DriverCustomScheduleJob extends QuartzJobBean {
         try {
             driverCustomService.schedule();
         } catch (Exception e) {
-            log.error("Failed to execute custom schedule job: {}", e.getMessage(), e);
+            log.error("Failed to execute custom schedule job", e);
         }
     }
 

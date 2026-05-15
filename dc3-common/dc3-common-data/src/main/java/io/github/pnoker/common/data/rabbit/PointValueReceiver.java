@@ -85,7 +85,10 @@ public class PointValueReceiver {
             }
             RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Point value consume failed, deviceId={}, pointId={}, deliveryTag={}, routingKey={}",
+                    Objects.nonNull(pointValueBO) ? pointValueBO.getDeviceId() : null,
+                    Objects.nonNull(pointValueBO) ? pointValueBO.getPointId() : null,
+                    deliveryTag, message.getMessageProperties().getReceivedRoutingKey(), e);
             RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }

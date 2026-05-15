@@ -35,7 +35,7 @@ public class JsonException extends RuntimeException {
     }
 
     public JsonException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
 }

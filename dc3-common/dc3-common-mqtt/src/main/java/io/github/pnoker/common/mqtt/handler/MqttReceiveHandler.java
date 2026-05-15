@@ -94,7 +94,7 @@ public class MqttReceiveHandler {
                     MqttScheduleJob.addMqttMessages(mqttMessage);
                 }
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                log.error("MQTT inbound dispatch failed, headers={}", message.getHeaders(), e);
             }
         };
     }

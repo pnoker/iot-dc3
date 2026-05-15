@@ -34,7 +34,7 @@ public class ConfigException extends RuntimeException {
     }
 
     public ConfigException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
 }

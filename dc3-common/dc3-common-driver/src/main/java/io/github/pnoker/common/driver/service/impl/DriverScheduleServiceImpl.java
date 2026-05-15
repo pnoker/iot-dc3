@@ -24,8 +24,8 @@ import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
 import io.github.pnoker.common.driver.job.DriverStatusScheduleJob;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
 import io.github.pnoker.common.exception.CronException;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
-import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,6 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Slf4j
 @Service
 public class DriverScheduleServiceImpl implements DriverScheduleService {
 
@@ -92,8 +91,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             // Start the scheduler after all jobs are configured
             quartzService.startScheduler();
         } catch (SchedulerException e) {
-            // Log any scheduler initialization errors
-            log.error("Driver schedule initial error: {}", e.getMessage(), e);
+            throw new ServiceException("Failed to initialize driver scheduler", e);
         }
     }
 

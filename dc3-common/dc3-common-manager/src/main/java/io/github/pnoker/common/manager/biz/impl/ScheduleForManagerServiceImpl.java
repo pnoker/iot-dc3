@@ -18,11 +18,11 @@
 package io.github.pnoker.common.manager.biz.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.manager.biz.ScheduleForManagerService;
 import io.github.pnoker.common.manager.job.HourlyJobForManager;
 import io.github.pnoker.common.quartz.QuartzService;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Slf4j
 @Service
 public class ScheduleForManagerServiceImpl implements ScheduleForManagerService {
 
@@ -47,7 +46,7 @@ public class ScheduleForManagerServiceImpl implements ScheduleForManagerService 
 
             quartzService.startScheduler();
         } catch (SchedulerException e) {
-            log.error(e.getMessage(), e);
+            throw new ServiceException("Failed to initialize manager scheduler", e);
         }
     }
 

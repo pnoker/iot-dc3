@@ -34,7 +34,7 @@ public class RepositoryException extends RuntimeException {
     }
 
     public RepositoryException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
 }

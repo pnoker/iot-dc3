@@ -104,7 +104,8 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("PointValueServer.lastValue error: {}", e.getMessage(), e);
+            log.error("PointValueServer.lastValue failed, tenantId={}, deviceId={}, pointId={}", request.getTenantId(),
+                    request.getDeviceId(), request.getPointId(), e);
             responseObserver.onNext(GrpcRPointValueDTO.newBuilder()
                     .setResult(GrpcR.newBuilder()
                             .setOk(false)
@@ -136,7 +137,8 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("PointValueServer.historyValue error: {}", e.getMessage(), e);
+            log.error("PointValueServer.historyValue failed, tenantId={}, deviceId={}, pointId={}, count={}",
+                    request.getTenantId(), request.getDeviceId(), request.getPointId(), request.getCount(), e);
             responseObserver.onNext(GrpcRPointValueStringList.newBuilder()
                     .setResult(GrpcR.newBuilder()
                             .setOk(false)
@@ -166,7 +168,8 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("PointValueServer.readCommand error: {}", e.getMessage(), e);
+            log.error("PointValueServer.readCommand failed, tenantId={}, deviceId={}, pointId={}",
+                    request.getTenantId(), request.getDeviceId(), request.getPointId(), e);
             responseObserver.onNext(GrpcRBoolean.newBuilder()
                     .setResult(GrpcR.newBuilder()
                             .setOk(false)
@@ -198,7 +201,8 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("PointValueServer.writeCommand error: {}", e.getMessage(), e);
+            log.error("PointValueServer.writeCommand failed, tenantId={}, deviceId={}, pointId={}",
+                    request.getTenantId(), request.getDeviceId(), request.getPointId(), e);
             responseObserver.onNext(GrpcRBoolean.newBuilder()
                     .setResult(GrpcR.newBuilder()
                             .setOk(false)

@@ -124,7 +124,7 @@ public class ThreadPoolConfig {
                     runnable.run();
                 }
             } catch (Exception e) {
-                log.error("BlockingRejectedExecutionHandler: {}", e.getMessage(), e);
+                log.error("BlockingRejectedExecutionHandler failed", e);
             }
         }
 

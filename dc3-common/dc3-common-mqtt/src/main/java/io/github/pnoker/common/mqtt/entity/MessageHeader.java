@@ -82,7 +82,7 @@ public class MessageHeader implements Serializable {
         try {
             return messageHeaders.get(key, type);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.warn("Invalid MQTT message header, key={}, expectedType={}", key, type.getSimpleName(), e);
         }
         return null;
     }

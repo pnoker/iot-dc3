@@ -34,7 +34,7 @@ public class WritePointException extends RuntimeException {
     }
 
     public WritePointException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params));
+        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
 }

@@ -194,7 +194,8 @@ public class PointValueServiceImpl implements PointValueService {
             RepositoryService repositoryService = getFirstRepositoryService();
             repositoryService.savePointValue(pointValueBO);
         } catch (Exception e) {
-            log.error("Save point value to error {}", e.getMessage());
+            log.error("Save point value failed, tenantId={}, deviceId={}, pointId={}", pointValueBO.getTenantId(),
+                    pointValueBO.getDeviceId(), pointValueBO.getPointId(), e);
         }
     }
 
@@ -216,7 +217,7 @@ public class PointValueServiceImpl implements PointValueService {
                 repositoryService.savePointValues(splitPointValueBO);
             }
         } catch (Exception e) {
-            log.error("Save point values to error {}", e.getMessage());
+            log.error("Save point values failed, deviceId={}, size={}", deviceId, pointValueBOList.size(), e);
         }
     }
 
