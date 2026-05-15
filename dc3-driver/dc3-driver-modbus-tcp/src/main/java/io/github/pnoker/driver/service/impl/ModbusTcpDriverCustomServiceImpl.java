@@ -162,7 +162,8 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
                 connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
                 log.error("Driver connection failed, protocol=modbusTcp, deviceId={}, host={}, port={}", deviceId,
                         host, port, e);
-                throw new ConnectorException(e.getMessage());
+                throw new ConnectorException("Driver connection failed, protocol=modbusTcp, deviceId={}, host={}, port={}, message={}",
+                        deviceId, host, port, e.getMessage(), e);
             }
         }
         return modbusMaster;
@@ -220,7 +221,8 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             return modbusMaster.getValue(locator);
         } catch (ModbusTransportException | ErrorResponseException e) {
             log.error("Driver point read failed, protocol=modbusTcp", e);
-            throw new ReadPointException(e.getMessage());
+            throw new ReadPointException("Driver point read failed, protocol=modbusTcp, message={}", e.getMessage(),
+                    e);
         }
     }
 
@@ -293,7 +295,8 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             return (WriteCoilResponse) modbusMaster.send(coilRequest);
         } catch (ModbusTransportException e) {
             log.error("Driver point write failed, protocol=modbusTcp, slaveId={}, offset={}", slaveId, offset, e);
-            throw new WritePointException(e.getMessage());
+            throw new WritePointException("Driver point write failed, protocol=modbusTcp, slaveId={}, offset={}, message={}",
+                    slaveId, offset, e.getMessage(), e);
         }
     }
 
@@ -311,7 +314,8 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             modbusMaster.setValue(locator, writePointValue.getValue(Float.class));
         } catch (ModbusTransportException | ErrorResponseException e) {
             log.error("Driver point write failed, protocol=modbusTcp", e);
-            throw new WritePointException(e.getMessage());
+            throw new WritePointException("Driver point write failed, protocol=modbusTcp, message={}", e.getMessage(),
+                    e);
         }
     }
 

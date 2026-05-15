@@ -159,7 +159,8 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                 connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
                 log.error("Driver connection failed, protocol=opcUa, deviceId={}, host={}, port={}, path={}", deviceId,
                         host, port, path, e);
-                throw new ConnectorException(e.getMessage());
+                throw new ConnectorException("Driver connection failed, protocol=opcUa, deviceId={}, host={}, port={}, path={}, message={}",
+                        deviceId, host, port, path, e.getMessage(), e);
             }
         }
         return opcUaClient;
@@ -193,10 +194,11 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         } catch (InterruptedException e) {
             log.error("Driver point read interrupted, protocol=opcUa", e);
             Thread.currentThread().interrupt();
-            throw new ReadPointException(e.getMessage());
+            throw new ReadPointException("Driver point read interrupted, protocol=opcUa, message={}", e.getMessage(),
+                    e);
         } catch (ExecutionException | TimeoutException e) {
             log.error("Driver point read failed, protocol=opcUa", e);
-            throw new ReadPointException(e.getMessage());
+            throw new ReadPointException("Driver point read failed, protocol=opcUa, message={}", e.getMessage(), e);
         }
     }
 
@@ -217,10 +219,11 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         } catch (InterruptedException e) {
             log.error("Driver point write interrupted, protocol=opcUa", e);
             Thread.currentThread().interrupt();
-            throw new WritePointException(e.getMessage());
+            throw new WritePointException("Driver point write interrupted, protocol=opcUa, message={}", e.getMessage(),
+                    e);
         } catch (ExecutionException e) {
             log.error("Driver point write failed, protocol=opcUa", e);
-            throw new WritePointException(e.getMessage());
+            throw new WritePointException("Driver point write failed, protocol=opcUa, message={}", e.getMessage(), e);
         }
     }
 
