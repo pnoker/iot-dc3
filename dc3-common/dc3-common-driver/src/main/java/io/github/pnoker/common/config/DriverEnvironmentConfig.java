@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -46,7 +45,6 @@ import java.util.Map;
  * @since 2022.1.0
  */
 @Slf4j
-@Configuration
 @Order(Ordered.LOWEST_PRECEDENCE - 100)
 public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
 
