@@ -126,12 +126,14 @@ class DriverScheduleServiceImplTest {
     }
 
     @Test
-    void initialSwallowsSchedulerExceptionFromStatusJob() throws Exception {
+    void initialWrapsSchedulerExceptionInServiceException() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
         properties.setSchedule(s);
         doThrow(new SchedulerException("scheduler down")).when(quartzService)
                 .createJobWithCron(any(), any(), any(), any());
-        assertThatNoException().isThrownBy(() -> service.initial());
+        assertThatThrownBy(() -> service.initial())
+                .isInstanceOf(io.github.pnoker.common.exception.ServiceException.class)
+                .hasMessageContaining("Failed to initialize driver scheduler");
         verify(quartzService, never()).startScheduler();
     }
 }
