@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -83,12 +83,13 @@ public class DriverWriteServiceImpl implements DriverWriteService {
             // Get point from metadata cache
             PointBO point = pointMetadata.getCache(pointId);
             if (Objects.isNull(point)) {
-                throw new ReadPointException("Failed to write point value, point[{}] is null" + deviceId);
+                throw new ReadPointException("Failed to write point value, point is null, deviceId={}, pointId={}",
+                        deviceId, pointId);
             }
 
             // Write value to device through custom driver service
             driverCustomService.write(driverConfig, pointConfig, device, point,
-                    new WValue(value, point.getPointTypeFlag()));
+                    new WritePointValue(value, point.getPointTypeFlag()));
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
