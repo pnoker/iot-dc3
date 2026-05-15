@@ -46,9 +46,11 @@ class RabbitAckUtilTest {
     }
 
     @Test
-    void ackPropagatesIoExceptionFromBroker() throws IOException {
+    void ackSwallowsIoExceptionToKeepConsumerRunning() throws IOException {
         doThrow(new IOException("broker gone")).when(channel).basicAck(eq(7L), eq(false));
-        assertThatThrownBy(() -> RabbitAckUtil.ack(channel, 7L)).isInstanceOf(IOException.class);
+        // Match reject/nack: a closed channel cannot accept any further frames anyway,
+        // so propagating IOException here only adds noise to the listener loop.
+        assertThatNoException().isThrownBy(() -> RabbitAckUtil.ack(channel, 7L));
     }
 
     @Test
