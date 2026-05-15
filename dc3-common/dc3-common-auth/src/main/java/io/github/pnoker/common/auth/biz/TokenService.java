@@ -53,4 +53,16 @@ public interface TokenService {
      */
     TokenValid checkValid(String loginName, String salt, String token, String tenantCode);
 
+    /**
+     * Acknowledge a client-initiated logout. The current token implementation is
+     * stateless JWT, so server-side state does not need to change; this hook lets
+     * us record the logout event and gives us a single seam for future token
+     * revocation (denylist, refresh-token cleanup, etc.).
+     *
+     * @param loginName  login name
+     * @param tenantCode tenant code
+     * @return true when the logout was accepted
+     */
+    boolean cancelToken(String loginName, String tenantCode);
+
 }

@@ -83,6 +83,7 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
             return Collections.emptyList();
         }
         List<MessageBO> history;
+        boolean fromContext = AgenticRequestContext.getMemoryHistory(conversationId).isPresent();
         try {
             history = AgenticRequestContext.getMemoryHistory(conversationId)
                     .orElseGet(() -> messageService.loadHistory(conversationId, properties.getHistoryWindowSize()));
@@ -91,6 +92,8 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
             return Collections.emptyList();
         }
         if (Objects.isNull(history) || history.isEmpty()) {
+            // TODO(diagnostic): remove after multi-turn memory regression is fixed.
+            log.info("Agentic memory replay empty, conversationId={}, fromContext={}", conversationId, fromContext);
             return Collections.emptyList();
         }
         List<Message> messages = new ArrayList<>(history.size());
@@ -100,7 +103,11 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
                 messages.add(message);
             }
         }
+        int rawCount = messages.size();
         stripTrailingUserMessages(messages);
+        // TODO(diagnostic): remove after multi-turn memory regression is fixed.
+        log.info("Agentic memory replay, conversationId={}, fromContext={}, raw={}, afterStrip={}",
+                conversationId, fromContext, rawCount, messages.size());
         return messages;
     }
 

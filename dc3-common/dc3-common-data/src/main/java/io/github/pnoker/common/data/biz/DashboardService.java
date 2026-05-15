@@ -124,7 +124,9 @@ public interface DashboardService {
      * Bulk confirm / unconfirm. {@code confirm} chooses the direction (true = set to 1,
      * false = set to 0). Returns the number of rows actually changed across all entries.
      */
-    int bulkConfirmAlert(Long tenantId, java.util.List<java.util.Map<String, Object>> items, boolean confirm);
+    int bulkConfirmAlert(Long tenantId,
+                         java.util.List<io.github.pnoker.common.data.entity.vo.dashboard.AlertBulkConfirmRequest.Item> items,
+                         boolean confirm);
 
     /**
      * Daily event trend for the last {@code days} days, split by device/driver source.

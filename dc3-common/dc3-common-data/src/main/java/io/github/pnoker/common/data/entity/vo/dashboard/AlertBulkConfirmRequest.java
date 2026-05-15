@@ -15,50 +15,66 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.auth.entity.vo;
+package io.github.pnoker.common.data.entity.vo.dashboard;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.base.BaseVO;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
+
 /**
- * UserLogin VO
+ * Bulk confirm/unconfirm request body for the dashboard alert panel.
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2026.5.2
  */
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class UserLoginVO extends BaseVO {
+public class AlertBulkConfirmRequest implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Name
+     * Direction of the bulk operation: true sets confirm_flag to 1, false sets it back
+     * to 0. Defaults to true when null.
      */
-    private String loginName;
+    private Boolean confirm;
 
     /**
-     * ID
+     * Targets to act on.
      */
-    private Long userId;
+    private List<Item> items;
 
-    /**
-     * ID
-     */
-    private Long userPasswordId;
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Item implements Serializable {
 
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Alert source: {@code device} or {@code driver}.
+         */
+        private String source;
+
+        /**
+         * Alert row id.
+         */
+        private Long id;
+
+    }
 
 }

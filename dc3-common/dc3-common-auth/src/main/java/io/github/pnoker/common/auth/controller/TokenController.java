@@ -80,6 +80,20 @@ public class TokenController implements BaseController {
     }
 
     /**
+     * Acknowledge a client-initiated logout for the current token.
+     *
+     * @param entityVO {@link TokenQuery}
+     * @return true when the logout was accepted
+     */
+    @PostMapping("/cancel")
+    public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
+        return async(() -> {
+            boolean ok = tokenService.cancelToken(entityVO.getName(), entityVO.getTenant());
+            return ok ? R.ok(true, "Token cancelled") : R.fail("Cancel token failed");
+        });
+    }
+
+    /**
      * Token
      *
      * @param entityVO {@link TokenQuery}
