@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.config;
 
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,24 +33,27 @@ import java.util.concurrent.TimeUnit;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Slf4j
 @AutoConfiguration
+@EnableConfigurationProperties(OkHttpProperties.class)
 public class OkHttpConfig {
 
     /**
      * Configure OkHttpClient bean with optimized settings
      *
+     * @param properties OkHttp client properties
      * @return Configured OkHttpClient instance
      */
     @Bean
-    public OkHttpClient okHttpClient() {
-        ConnectionPool pool = new ConnectionPool(16, 5, TimeUnit.SECONDS);
-        return new OkHttpClient.Builder().retryOnConnectionFailure(true)
+    @ConditionalOnMissingBean
+    public OkHttpClient okHttpClient(OkHttpProperties properties) {
+        ConnectionPool pool = new ConnectionPool(properties.getMaxIdleConnections(),
+                properties.getKeepAliveDuration().toMillis(), TimeUnit.MILLISECONDS);
+        return new OkHttpClient.Builder().retryOnConnectionFailure(properties.isRetryOnConnectionFailure())
                 .connectionPool(pool)
-                .callTimeout(Duration.ofSeconds(15))
-                .connectTimeout(Duration.ofSeconds(15))
-                .readTimeout(Duration.ofSeconds(15))
-                .writeTimeout(Duration.ofSeconds(15))
+                .callTimeout(properties.getCallTimeout())
+                .connectTimeout(properties.getConnectTimeout())
+                .readTimeout(properties.getReadTimeout())
+                .writeTimeout(properties.getWriteTimeout())
                 .build();
     }
 

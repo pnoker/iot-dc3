@@ -51,7 +51,30 @@ Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
 
 ### HTTP Client
 
-`OkHttpConfig` — Pre-configured `OkHttpClient` bean with timeout and retry settings.
+`OkHttpConfig` — Pre-configured `OkHttpClient` bean with timeout and retry settings. Applications can override it by
+declaring their own `OkHttpClient` bean.
+
+Common properties:
+
+| Property                                      | Default |
+|-----------------------------------------------|---------|
+| `dc3.http.client.retry-on-connection-failure` | `true`  |
+| `dc3.http.client.max-idle-connections`        | `16`    |
+| `dc3.http.client.keep-alive-duration`         | `5s`    |
+| `dc3.http.client.call-timeout`                | `15s`   |
+| `dc3.http.client.connect-timeout`             | `15s`   |
+| `dc3.http.client.read-timeout`                | `15s`   |
+| `dc3.http.client.write-timeout`               | `15s`   |
+
+### HMAC Auth
+
+`HmacAuthConfig` — Auto-configures the shared `HmacAuthSigner` bean for trusted gateway-to-backend user headers.
+Applications can override it by declaring their own `HmacAuthSigner` bean.
+
+Secret lookup order:
+
+1. `dc3.auth.hmac.secret`
+2. `AUTH_HMAC_SECRET`
 
 ## Build Instructions
 
@@ -68,4 +91,3 @@ Foundation for all `dc3-common-*`, `dc3-center-*`, and `dc3-driver-*` modules.
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

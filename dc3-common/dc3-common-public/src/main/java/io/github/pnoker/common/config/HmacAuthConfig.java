@@ -17,9 +17,11 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -39,8 +41,10 @@ import org.springframework.core.env.Environment;
 public class HmacAuthConfig {
 
     @Bean
+    @ConditionalOnMissingBean
     public HmacAuthSigner hmacAuthSigner(HmacAuthProperties properties, Environment environment) {
-        String secret = StringUtils.defaultIfBlank(properties.getSecret(), environment.getProperty("AUTH_HMAC_SECRET", ""));
+        String secret = StringUtils.defaultIfBlank(properties.getSecret(),
+                environment.getProperty(EnvironmentConstant.AUTH_HMAC_SECRET_ENV, ""));
         return new HmacAuthSigner(secret);
     }
 
