@@ -88,6 +88,13 @@
             <artifactId>dc3-common-public</artifactId>
         </dependency>
 
+        <!-- Unit test toolkit -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
