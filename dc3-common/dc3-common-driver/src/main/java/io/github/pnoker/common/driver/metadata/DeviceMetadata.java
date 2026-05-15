@@ -38,6 +38,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +54,18 @@ import java.util.stream.Collectors;
 public final class DeviceMetadata {
 
     /**
-     * Asynchronous cache keyed by device identifier.
+     * Upper bound on a single cache lookup so a stuck manager center cannot pin
+     * driver worker threads forever; expired waits return {@code null} and let
+     * callers move on instead of holding the Quartz / RabbitMQ thread hostage.
+     */
+    private static final long CACHE_LOAD_TIMEOUT_SECONDS = 5L;
+
+    /**
+     * Asynchronous cache keyed by device identifier. No time-based expiration —
+     * cache contents are kept current by RabbitMQ metadata events that call
+     * {@link #loadCache(long)} or {@link #removeCache(long)}; the
+     * {@code maximumSize} bound caps memory if the driver attaches an
+     * unexpectedly large device fleet.
      */
     private final AsyncLoadingCache<Long, DeviceBO> cache;
 
@@ -66,7 +78,6 @@ public final class DeviceMetadata {
     private DeviceMetadata() {
         this.cache = Caffeine.newBuilder()
                 .maximumSize(5000)
-                .expireAfterWrite(24, TimeUnit.HOURS)
                 .removalListener(
                         (key, value, cause) -> log.info("Remove key={}, value={} cache, reason is: {}", key, value, cause))
                 .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> {
@@ -86,10 +97,16 @@ public final class DeviceMetadata {
     public DeviceBO getCache(long id) {
         try {
             CompletableFuture<DeviceBO> future = cache.get(id);
-            return future.get();
-        } catch (InterruptedException | ExecutionException e) {
+            return future.get(CACHE_LOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("Failed to get the device cache: {}", e.getMessage(), e);
+            log.error("Interrupted while loading device cache, deviceId={}", id, e);
+            return null;
+        } catch (TimeoutException e) {
+            log.warn("Timed out loading device cache after {}s, deviceId={}", CACHE_LOAD_TIMEOUT_SECONDS, id);
+            return null;
+        } catch (ExecutionException e) {
+            log.error("Failed to load device cache, deviceId={}", id, e);
             return null;
         }
     }
