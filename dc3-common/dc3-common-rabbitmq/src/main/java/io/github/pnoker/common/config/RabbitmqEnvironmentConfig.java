@@ -23,7 +23,6 @@ import io.github.pnoker.common.utils.EnvironmentUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
@@ -41,7 +40,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  */
 @Slf4j
 @Order
-@Configuration
 public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
 
     /**
