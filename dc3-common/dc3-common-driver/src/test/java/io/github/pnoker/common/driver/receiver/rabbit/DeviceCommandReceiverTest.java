@@ -87,11 +87,12 @@ class DeviceCommandReceiverTest {
     }
 
     @Test
-    void configCommandIsAckedWithoutAnyDispatch() throws Exception {
+    void configCommandIsRejectedAsUnsupported() throws Exception {
         DeviceCommandDTO dto = new DeviceCommandDTO(DeviceCommandTypeEnum.CONFIG, "{}");
         receiver.deviceCommandReceive(channel, message, dto);
         verifyNoInteractions(driverReadService, driverWriteService);
-        verify(channel).basicAck(eq(7L), eq(false));
+        verify(channel).basicReject(eq(7L), eq(false));
+        verify(channel, never()).basicAck(eq(7L), eq(false));
     }
 
     @Test
