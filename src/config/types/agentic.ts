@@ -55,12 +55,16 @@ export interface AgenticSession {
   conversationId: string;
   title?: string;
   model?: string;
+  sessionConfig?: AgenticSessionConfig;
+  createTime?: string;
+  operateTime?: string;
+}
+
+export interface AgenticSessionConfig {
   reasoningEnabled?: boolean;
   temperature?: number;
   maxTokens?: number;
   requireConfirmation?: boolean;
-  createTime?: string;
-  operateTime?: string;
 }
 
 export type AgenticMessageRole = 'user' | 'assistant' | 'system';

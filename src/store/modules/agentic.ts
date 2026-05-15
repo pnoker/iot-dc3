@@ -35,6 +35,7 @@ import type {
   AgenticMessage,
   AgenticModel,
   AgenticSession,
+  AgenticSessionConfig,
   AgenticSkill,
   AgenticTraceEvent,
 } from '@/config/types';
@@ -201,6 +202,7 @@ export const useAgenticStore = defineStore('agentic', () => {
           conversationId,
           title: 'New Conversation',
           model,
+          sessionConfig: buildCurrentSessionConfig(),
         },
         ...sessions.value,
       ];
@@ -282,7 +284,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     const model = resolveModelName(selectedModel.value || currentSession.value?.model);
     selectedModel.value = model;
     applyModelCapabilities();
-    updateSessionLocally(conversationId, { model });
+    updateSessionLocally(conversationId, { model, sessionConfig: buildCurrentSessionConfig() });
     await persistSessionPrefs(conversationId);
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
@@ -447,7 +449,15 @@ export const useAgenticStore = defineStore('agentic', () => {
     await renameSession(conversationId, title);
     await loadSessions();
     if (!sessions.value.some((item) => item.conversationId === conversationId)) {
-      sessions.value = [{ conversationId, title, model: resolveModelName(selectedModel.value) }, ...sessions.value];
+      sessions.value = [
+        {
+          conversationId,
+          title,
+          model: resolveModelName(selectedModel.value),
+          sessionConfig: buildCurrentSessionConfig(),
+        },
+        ...sessions.value,
+      ];
     }
   };
 
@@ -477,37 +487,55 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const restoreSessionModel = (session?: AgenticSession) => {
     selectedModel.value = resolveModelName(session?.model || selectedModel.value);
-    reasoningEnabled.value = session?.reasoningEnabled ?? false;
-    requireConfirmation.value = session?.requireConfirmation ?? true;
-    temperature.value = session?.temperature;
-    maxTokens.value = session?.maxTokens;
+    const modelDefaults = models.value.find((model) => model.model === selectedModel.value) || activeModel.value;
+    const sessionConfig = session?.sessionConfig;
+    reasoningEnabled.value = sessionConfig?.reasoningEnabled ?? false;
+    requireConfirmation.value = sessionConfig?.requireConfirmation ?? true;
+    temperature.value = sessionConfig?.temperature ?? modelDefaults.temperature;
+    maxTokens.value = sessionConfig?.maxTokens ?? modelDefaults.maxTokens;
     applyModelCapabilities();
   };
 
   const updateSessionLocally = (
     conversationId: string,
-    patch: Partial<
-      Pick<AgenticSession, 'model' | 'reasoningEnabled' | 'temperature' | 'maxTokens' | 'requireConfirmation'>
-    >
+    patch: Partial<Pick<AgenticSession, 'model' | 'sessionConfig'>>
   ) => {
     sessions.value = sessions.value.map((session) =>
-      session.conversationId === conversationId ? { ...session, ...patch } : session
+      session.conversationId === conversationId
+        ? {
+            ...session,
+            ...patch,
+            sessionConfig: patch.sessionConfig
+              ? { ...session.sessionConfig, ...patch.sessionConfig }
+              : session.sessionConfig,
+          }
+        : session
     );
   };
 
   const persistSessionPrefs = async (conversationId: string) => {
     if (!conversationId) return;
+    const sessionConfig = buildCurrentSessionConfig();
+    updateSessionLocally(conversationId, { sessionConfig });
+    const session = sessions.value.find((item) => item.conversationId === conversationId);
+    if (!session?.createTime && !session?.operateTime) {
+      return;
+    }
     try {
       await updateAgenticSession(conversationId, {
-        reasoningEnabled: reasoningEnabled.value,
-        temperature: temperature.value,
-        maxTokens: maxTokens.value,
-        requireConfirmation: requireConfirmation.value,
+        sessionConfig,
       });
     } catch (error) {
       warnMessage('Failed to update agentic session preferences.', 'Agentic', error);
     }
   };
+
+  const buildCurrentSessionConfig = (): AgenticSessionConfig => ({
+    reasoningEnabled: reasoningEnabled.value,
+    temperature: temperature.value,
+    maxTokens: maxTokens.value,
+    requireConfirmation: requireConfirmation.value,
+  });
 
   const resolveModelName = (model?: string) => {
     const candidate = model?.trim();
