@@ -91,7 +91,7 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    public Mono<R<PointBO>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);

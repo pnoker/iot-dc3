@@ -182,12 +182,12 @@ public class DashboardController implements BaseController {
      */
     @org.springframework.web.bind.annotation.PostMapping("/alert/bulk_confirm")
     public Mono<R<Integer>> alertBulkConfirm(
-            @org.springframework.web.bind.annotation.RequestBody Map<String, Object> body) {
+            @org.springframework.web.bind.annotation.RequestBody AlertBulkConfirmRequest body) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> items = (List<Map<String, Object>>) body.getOrDefault("items",
-                    java.util.Collections.emptyList());
-            boolean confirm = Objects.isNull(body.get("confirm")) || Boolean.parseBoolean(body.get("confirm").toString());
+            List<AlertBulkConfirmRequest.Item> items = Objects.isNull(body) || Objects.isNull(body.getItems())
+                    ? java.util.Collections.emptyList()
+                    : body.getItems();
+            boolean confirm = Objects.isNull(body) || Objects.isNull(body.getConfirm()) || body.getConfirm();
             return R.ok(dashboardService.bulkConfirmAlert(tenantId, items, confirm));
         }));
     }

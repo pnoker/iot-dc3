@@ -79,6 +79,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Default agentic chat orchestration service.
@@ -143,13 +144,21 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             String chatId = newChatId();
             long created = Instant.now().getEpochSecond();
             StringBuilder assistantContent = new StringBuilder();
+            AtomicReference<String> lastFinishReason = new AtomicReference<>();
 
             Flux<StreamDelta> contentFlux = promptSpec.stream().chatResponse()
                     .doOnSubscribe(subscription -> AgenticRequestContext.set(userHeader))
+                    .doOnNext(response -> rememberFinishReason(response, lastFinishReason))
                     .map(this::extractStreamDelta)
                     .filter(StreamDelta::hasContent)
                     .doOnNext(delta -> assistantContent.append(delta.content()))
-                    .doOnComplete(() -> persistAssistantMessage(prepared, assistantContent.toString(), userHeader))
+                    .doOnComplete(() -> {
+                        persistAssistantMessage(prepared, assistantContent.toString(), userHeader);
+                        log.info(
+                                "Agentic stream complete, conversationId={}, model={}, contentLen={}, finishReason={}",
+                                prepared.scopedConversationId(), prepared.model(), assistantContent.length(),
+                                lastFinishReason.get());
+                    })
                     .doFinally(signalType -> AgenticRequestContext.clear());
 
             Flux<ServerSentEvent<String>> initialEvents = Flux.fromIterable(initialEvents(prepared));
@@ -165,9 +174,10 @@ public class AgenticChatServiceImpl implements AgenticChatService {
 
             return initialEvents
                     .concatWith(responseEvents)
-                    .concatWith(Mono.just(ServerSentEvent.<String>builder()
-                            .data(formatFinalChunk(chatId, created, prepared.model()))
-                            .build()))
+                    .concatWith(Mono.defer(() -> Mono.just(ServerSentEvent.<String>builder()
+                            .data(formatFinalChunk(chatId, created, prepared.model(),
+                                    normalizeFinishReason(lastFinishReason.get())))
+                            .build())))
                     .concatWith(Mono.just(ServerSentEvent.<String>builder().data("[DONE]").build()));
         }).doFinally(signalType -> AgenticRequestContext.clear()).subscribeOn(Schedulers.boundedElastic());
     }
@@ -181,9 +191,19 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 persistUserMessage(prepared, userHeader);
 
                 AgenticRequestContext.set(userHeader);
-                String content;
-                content = promptSpec.call().content();
+                ChatResponse chatResponse = promptSpec.call().chatResponse();
+                String content = Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
+                        && Objects.nonNull(chatResponse.getResult().getOutput())
+                                ? StringUtils.defaultString(chatResponse.getResult().getOutput().getText())
+                                : "";
+                String finishReason = normalizeFinishReason(
+                        Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
+                                && Objects.nonNull(chatResponse.getResult().getMetadata())
+                                        ? chatResponse.getResult().getMetadata().getFinishReason()
+                                        : null);
                 persistAssistantMessage(prepared, content, userHeader);
+                log.info("Agentic blocking complete, conversationId={}, model={}, contentLen={}, finishReason={}",
+                        prepared.scopedConversationId(), prepared.model(), content.length(), finishReason);
 
                 return ChatCompletionResponse.builder()
                         .id(newChatId())
@@ -193,7 +213,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                         .choices(List.of(ChatCompletionResponse.Choice.builder()
                                 .index(0)
                                 .message(new ChatCompletionResponse.Message("assistant", content))
-                                .finishReason("stop")
+                                .finishReason(finishReason)
                                 .build()))
                         .usage(new ChatCompletionResponse.Usage(0, 0, 0))
                         .build();
@@ -231,6 +251,12 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         String requestSystemContext = buildRequestSystemContext(contexts);
         List<MessageBO> memoryHistory = loadMemoryHistory(scopedConversationId);
         AgenticRequestContext.setMemoryHistory(scopedConversationId, memoryHistory);
+        // TODO(diagnostic): remove once multi-turn memory loss is confirmed fixed.
+        // Surfaces the count actually loaded for this scoped conversation so we can
+        // tell whether memory is failing because of an empty SQL load, a scoping
+        // mismatch, or because the advisor strips it later.
+        log.info("Agentic memory loaded, scopedConversationId={}, memoryEnabled={}, count={}",
+                scopedConversationId, properties.isMemoryEnabled(), memoryHistory.size());
         AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, skillSystemPrompt,
                 requestSystemContext, contexts, memoryHistory);
 
@@ -502,7 +528,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         return toJson(chunk);
     }
 
-    private String formatFinalChunk(String id, long created, String model) {
+    private String formatFinalChunk(String id, long created, String model, String finishReason) {
         ChatCompletionChunkResponse chunk = ChatCompletionChunkResponse.builder()
                 .id(id)
                 .object("chat.completion.chunk")
@@ -511,10 +537,41 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
                         .index(0)
                         .delta(new ChatCompletionChunkResponse.Delta(null, null, null))
-                        .finishReason("stop")
+                        .finishReason(finishReason)
                         .build()))
                 .build();
         return toJson(chunk);
+    }
+
+    /**
+     * Capture the LLM's finish reason from each streaming chunk. Spring AI emits the
+     * reason on the final {@link Generation} (one of {@code STOP}, {@code LENGTH},
+     * {@code TOOL_CALLS}, {@code CONTENT_FILTER}, …); earlier chunks have it null.
+     * Latest non-null wins so the UI sees the actual termination cause and can warn
+     * the user when the answer was truncated.
+     */
+    private void rememberFinishReason(ChatResponse response, AtomicReference<String> sink) {
+        if (Objects.isNull(response) || Objects.isNull(response.getResult())
+                || Objects.isNull(response.getResult().getMetadata())) {
+            return;
+        }
+        String reason = response.getResult().getMetadata().getFinishReason();
+        if (StringUtils.isNotBlank(reason)) {
+            sink.set(reason);
+        }
+    }
+
+    /**
+     * Normalize the provider's finish reason to the OpenAI-compatible lowercase form
+     * the frontend expects ({@code stop}/{@code length}/{@code tool_calls}/
+     * {@code content_filter}). Falls back to {@code stop} when nothing was captured
+     * so older clients do not break.
+     */
+    private String normalizeFinishReason(String reason) {
+        if (StringUtils.isBlank(reason)) {
+            return "stop";
+        }
+        return reason.toLowerCase(Locale.ROOT);
     }
 
     private List<ServerSentEvent<String>> initialEvents(PreparedChatRequest prepared) {
@@ -567,6 +624,15 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         }
         Generation generation = response.getResult();
         String content = Objects.nonNull(generation.getOutput()) ? generation.getOutput().getText() : null;
+        // TODO(diagnostic): remove once token-level streaming parity is verified.
+        // Confirms whether Spring AI's stream pipeline emits per-token chunks (small
+        // content lengths, hundreds of frames) or batches the final answer in a
+        // single chunk after tool execution completes.
+        if (log.isDebugEnabled()) {
+            log.debug("Agentic stream chunk, contentLen={}, hasReasoning={}",
+                    Objects.isNull(content) ? 0 : content.length(),
+                    Objects.nonNull(extractReasoningContent(generation)));
+        }
         return new StreamDelta(StringUtils.defaultString(content), extractReasoningContent(generation));
     }
 

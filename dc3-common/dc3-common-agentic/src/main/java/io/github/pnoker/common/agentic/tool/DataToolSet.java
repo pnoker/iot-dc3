@@ -94,7 +94,7 @@ public class DataToolSet {
         }
     }
 
-    @Tool(description = "Get historical point values for a specific device and point. Returns a list of value strings.")
+    @Tool(description = "Get historical point values for a specific device and point. Returns a list of value strings together with a chart-renderable JSON block.")
     public String getPointValueHistory(@ToolParam(description = "The device ID") Long deviceId,
                                        @ToolParam(description = "The point (metric) ID") Long pointId,
                                        @ToolParam(description = "Number of historical records to retrieve") int count,
@@ -108,12 +108,52 @@ public class DataToolSet {
             if (Objects.isNull(history) || history.isEmpty()) {
                 return "No history data found for device " + deviceId + " point " + pointId;
             }
-            return "History values (" + history.size() + " records): " + String.join(", ", history);
+            String summary = "History values (" + history.size() + " records): " + String.join(", ", history);
+            String chart = buildHistoryChartFence(deviceId, pointId, history);
+            return chart.isEmpty() ? summary : summary + "\n\n" + chart;
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
                     "getPointValueHistory", tenantId, deviceId, pointId, count, e);
             return "Error retrieving history: " + e.getMessage();
         }
+    }
+
+    /**
+     * Render a {@code ```chart:line``` } fence so the assistant frontend can plot the
+     * history without an extra tool round-trip. The facade currently returns values
+     * only (newest → oldest), so we use the array index as the x axis. Non-numeric
+     * entries are dropped; if nothing remains we return an empty string and the
+     * caller skips the fence.
+     */
+    private String buildHistoryChartFence(Long deviceId, Long pointId, List<String> history) {
+        StringBuilder dataPoints = new StringBuilder();
+        int rendered = 0;
+        // Reverse so x=0 is the oldest sample — easier to read left-to-right.
+        for (int i = history.size() - 1; i >= 0; i--) {
+            String raw = history.get(i);
+            if (Objects.isNull(raw)) {
+                continue;
+            }
+            try {
+                double value = Double.parseDouble(raw.trim());
+                if (rendered > 0) {
+                    dataPoints.append(',');
+                }
+                dataPoints.append('[').append(rendered).append(',').append(value).append(']');
+                rendered++;
+            } catch (NumberFormatException ignored) {
+                // skip non-numeric entries
+            }
+        }
+        if (rendered == 0) {
+            return "";
+        }
+        return "```chart:line\n"
+                + "{\"title\":\"Device " + deviceId + " / Point " + pointId + "\","
+                + "\"xLabel\":\"index (oldest → newest)\","
+                + "\"xType\":\"linear\","
+                + "\"series\":[{\"name\":\"value\",\"data\":[" + dataPoints + "]}]}\n"
+                + "```";
     }
 
     @Tool(description = "Get a latest-value snapshot for points bound to a device. Returns point metadata and latest values for up to the requested limit.")
