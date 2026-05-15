@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -113,7 +113,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                        PointBO point) {
         log.debug("Driver point read requested, protocol=plcS7, deviceId={}, pointId={}, pointType={}", device.getId(),
                 point.getId(), point.getPointTypeFlag());
@@ -123,7 +123,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             myS7Connector.lock.writeLock().lock();
             S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
             PlcS7PointVariable plcs7PointVariable = getPointVariable(pointConfig, point.getPointTypeFlag().getCode());
-            return new RValue(device, point, String.valueOf(serializer.dispense(plcs7PointVariable)));
+            return new ReadPointValue(device, point, String.valueOf(serializer.dispense(plcs7PointVariable)));
         } catch (Exception e) {
             log.error("Driver point read failed, protocol=plcS7, deviceId={}, pointId={}", device.getId(),
                     point.getId(), e);
@@ -135,16 +135,16 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WValue wValue) {
+                         PointBO point, WritePointValue writePointValue) {
         log.debug("Driver point write requested, protocol=plcS7, deviceId={}, pointId={}, pointType={}, valueLength={}",
-                device.getId(), point.getId(), wValue.getType(), Objects.toString(wValue.getValue(), "").length());
+                device.getId(), point.getId(), writePointValue.getType(), Objects.toString(writePointValue.getValue(), "").length());
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
         myS7Connector.lock.writeLock().lock();
         S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
-        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointConfig, wValue.getType().getCode());
+        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointConfig, writePointValue.getType().getCode());
 
         try {
-            store(serializer, plcs7PointVariable, wValue.getType().getCode(), wValue.getValue());
+            store(serializer, plcs7PointVariable, writePointValue.getType().getCode(), writePointValue.getValue());
             return true;
         } catch (Exception e) {
             log.error("Driver point write failed, protocol=plcS7, deviceId={}, pointId={}", device.getId(),

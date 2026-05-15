@@ -17,7 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -130,7 +130,7 @@ class MqttDriverCustomServiceImplTest {
         pointConfig.put("commandQos", AttributeBO.builder().value("1").type(AttributeTypeFlagEnum.INT).build());
 
         Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", 1, "23.5");
@@ -145,7 +145,7 @@ class MqttDriverCustomServiceImplTest {
         // commandQos missing entirely → service catches NPE and falls back
 
         Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");
@@ -162,7 +162,7 @@ class MqttDriverCustomServiceImplTest {
                 AttributeBO.builder().value("not-a-number").type(AttributeTypeFlagEnum.STRING).build());
 
         Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");

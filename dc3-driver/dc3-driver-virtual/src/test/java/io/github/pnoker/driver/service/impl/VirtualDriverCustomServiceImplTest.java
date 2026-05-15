@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -126,15 +126,15 @@ class VirtualDriverCustomServiceImplTest {
     @Test
     void readReturnsConstantStringForStringPoint() {
         PointBO point = pointOfType(PointTypeFlagEnum.STRING);
-        RValue rv = service.read(null, null, null, point);
-        assertThat(rv.getValue()).isEqualTo("abcd1234");
+        ReadPointValue readPointValue = service.read(null, null, null, point);
+        assertThat(readPointValue.getValue()).isEqualTo("abcd1234");
     }
 
     @Test
     void readProducesParsableBooleanForBooleanPoint() {
         PointBO point = pointOfType(PointTypeFlagEnum.BOOLEAN);
-        RValue rv = service.read(null, null, null, point);
-        assertThat(rv.getValue()).isIn("true", "false");
+        ReadPointValue readPointValue = service.read(null, null, null, point);
+        assertThat(readPointValue.getValue()).isIn("true", "false");
     }
 
     @Test
@@ -144,8 +144,8 @@ class VirtualDriverCustomServiceImplTest {
                 PointTypeFlagEnum.BYTE, PointTypeFlagEnum.SHORT
         }) {
             PointBO point = pointOfType(type);
-            RValue rv = service.read(null, null, null, point);
-            double v = Double.parseDouble(rv.getValue());
+            ReadPointValue readPointValue = service.read(null, null, null, point);
+            double v = Double.parseDouble(readPointValue.getValue());
             assertThat(v).isBetween(0.0, 100.0);
         }
     }
@@ -153,7 +153,7 @@ class VirtualDriverCustomServiceImplTest {
     @Test
     void writeReturnsFalseUnconditionally() {
         Boolean result = service.write(null, null, null, null,
-                WValue.builder().value("anything").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("anything").type(PointTypeFlagEnum.STRING).build());
         assertThat(result).isFalse();
         verify(driverSenderService, never()).pointValueSender(org.mockito.ArgumentMatchers.anyList());
     }

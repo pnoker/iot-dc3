@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -148,7 +148,7 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
      * @return null as data is received passively
      */
     @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                        PointBO point) {
         return null;
     }
@@ -165,18 +165,18 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
      * @param pointConfig  Point configuration attributes
      * @param device       The device to write to
      * @param point        The point to write
-     * @param wValue       The value to write
+     * @param writePointValue       The value to write
      * @return true if the write operation was processed
      */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WValue wValue) {
+                         PointBO point, WritePointValue writePointValue) {
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
         if (Objects.nonNull(channel)) {
             log.debug("Driver point write requested, protocol=tcp, deviceId={}, pointId={}, valueLength={}", deviceId,
-                    point.getId(), Objects.toString(wValue.getValue(), "").length());
-            channel.writeAndFlush(DecodeUtil.stringToByte(wValue.getValue()));
+                    point.getId(), Objects.toString(writePointValue.getValue(), "").length());
+            channel.writeAndFlush(DecodeUtil.stringToByte(writePointValue.getValue()));
         } else {
             log.warn("Driver point write skipped, protocol=tcp, deviceId={}, pointId={}, reason=channelMissing",
                     deviceId, point.getId());

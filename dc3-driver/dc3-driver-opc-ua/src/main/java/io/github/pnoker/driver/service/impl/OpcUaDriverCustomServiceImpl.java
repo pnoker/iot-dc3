@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -115,16 +115,16 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                        PointBO point) {
-        return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
+        return new ReadPointValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WValue wValue) {
+                         PointBO point, WritePointValue writePointValue) {
         OpcUaClient client = getConnector(device.getId(), driverConfig);
-        return writeValue(client, pointConfig, wValue);
+        return writeValue(client, pointConfig, writePointValue);
     }
 
     /**
@@ -205,15 +205,15 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
      *
      * @param client      connected OPC UA client
      * @param pointConfig point configuration (namespace, tag)
-     * @param wValue      value to write
+     * @param writePointValue      value to write
      * @return true if the write succeeded
      * @throws WritePointException if writing fails
      */
-    private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WValue wValue) {
+    private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
         try {
             NodeId nodeId = getNode(pointConfig);
             client.connect().get();
-            return writeNode(client, nodeId, wValue);
+            return writeNode(client, nodeId, writePointValue);
         } catch (InterruptedException e) {
             log.error("Driver point write interrupted, protocol=opcUa", e);
             Thread.currentThread().interrupt();
@@ -231,40 +231,40 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
      *
      * @param client connected OPC UA client
      * @param nodeId target node identifier
-     * @param wValue value and type to write
+     * @param writePointValue value and type to write
      * @return true if the server reported a good status
      */
-    private boolean writeNode(OpcUaClient client, NodeId nodeId, WValue wValue)
+    private boolean writeNode(OpcUaClient client, NodeId nodeId, WritePointValue writePointValue)
             throws ExecutionException, InterruptedException {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(writePointValue.getType().getCode());
         if (Objects.isNull(valueType)) {
-            throw new UnSupportException("Unsupported type of " + wValue.getType());
+            throw new UnSupportException("Unsupported type of " + writePointValue.getType());
         }
 
         CompletableFuture<StatusCode> status = new CompletableFuture<>();
         switch (valueType) {
             case INT:
-                int intValue = wValue.getValue(Integer.class);
+                int intValue = writePointValue.getValue(Integer.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(intValue)));
                 break;
             case LONG:
-                long longValue = wValue.getValue(Long.class);
+                long longValue = writePointValue.getValue(Long.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(longValue)));
                 break;
             case FLOAT:
-                float floatValue = wValue.getValue(Float.class);
+                float floatValue = writePointValue.getValue(Float.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
                 break;
             case DOUBLE:
-                double doubleValue = wValue.getValue(Double.class);
+                double doubleValue = writePointValue.getValue(Double.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
                 break;
             case BOOLEAN:
-                boolean booleanValue = wValue.getValue(Boolean.class);
+                boolean booleanValue = writePointValue.getValue(Boolean.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
                 break;
             case STRING:
-                status = client.writeValue(nodeId, new DataValue(new Variant(wValue.getValue())));
+                status = client.writeValue(nodeId, new DataValue(new Variant(writePointValue.getValue())));
                 break;
             default:
                 break;

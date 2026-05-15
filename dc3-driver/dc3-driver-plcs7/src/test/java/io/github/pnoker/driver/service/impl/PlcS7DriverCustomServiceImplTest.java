@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.driver.entity.bean.RValue;
-import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -108,8 +108,8 @@ class PlcS7DriverCustomServiceImplTest {
         return point;
     }
 
-    private static WValue wValue(String value, PointTypeFlagEnum type) {
-        return WValue.builder().value(value).type(type).build();
+    private static WritePointValue writePointValue(String value, PointTypeFlagEnum type) {
+        return WritePointValue.builder().value(value).type(type).build();
     }
 
     private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
@@ -181,10 +181,10 @@ class PlcS7DriverCustomServiceImplTest {
             staticMock.when(() -> S7SerializerFactory.buildSerializer(connector)).thenReturn(serializer);
             when(serializer.dispense(any(PlcS7PointVariable.class))).thenReturn((short) 42);
 
-            RValue rv = service.read(driverConfig("h", 102), pointConfig(1, 0, 0, 2), device(10L),
+            ReadPointValue readPointValue = service.read(driverConfig("h", 102), pointConfig(1, 0, 0, 2), device(10L),
                     point(PointTypeFlagEnum.INT, "int"));
 
-            assertThat(rv.getValue()).isEqualTo("42");
+            assertThat(readPointValue.getValue()).isEqualTo("42");
             verify(serializer, times(1)).dispense(any(PlcS7PointVariable.class));
         }
     }
@@ -196,10 +196,10 @@ class PlcS7DriverCustomServiceImplTest {
             staticMock.when(() -> S7SerializerFactory.buildSerializer(connector)).thenReturn(serializer);
             when(serializer.dispense(any(PlcS7PointVariable.class))).thenThrow(new RuntimeException("plc offline"));
 
-            RValue rv = service.read(driverConfig("h", 102), pointConfig(1, 0, 0, 2), device(11L),
+            ReadPointValue readPointValue = service.read(driverConfig("h", 102), pointConfig(1, 0, 0, 2), device(11L),
                     point(PointTypeFlagEnum.INT, "int"));
 
-            assertThat(rv).isNull();
+            assertThat(readPointValue).isNull();
         }
     }
 
@@ -210,7 +210,7 @@ class PlcS7DriverCustomServiceImplTest {
             staticMock.when(() -> S7SerializerFactory.buildSerializer(connector)).thenReturn(serializer);
 
             Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 4, 0, 2), device(20L),
-                    point(PointTypeFlagEnum.INT, "int"), wValue("123", PointTypeFlagEnum.INT));
+                    point(PointTypeFlagEnum.INT, "int"), writePointValue("123", PointTypeFlagEnum.INT));
 
             assertThat(ok).isTrue();
             verify(serializer).store(eq(123), eq(1), eq(4));
@@ -226,7 +226,7 @@ class PlcS7DriverCustomServiceImplTest {
                     any(int.class));
 
             Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 4, 0, 2), device(21L),
-                    point(PointTypeFlagEnum.INT, "int"), wValue("1", PointTypeFlagEnum.INT));
+                    point(PointTypeFlagEnum.INT, "int"), writePointValue("1", PointTypeFlagEnum.INT));
 
             assertThat(ok).isFalse();
         }
