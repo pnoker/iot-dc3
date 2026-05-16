@@ -131,7 +131,7 @@ public class PointValueTool {
         }
     }
 
-    @Tool(description = "Send a write command to a device for a specific point. Sets the point to the specified value on the physical device.")
+    @Tool(description = "Prepare a point write command for a specific device and point. This tool never writes directly; it creates a pending action that requires explicit user confirmation before execution.")
     public AgenticToolResult<PointCommandResult> writePointValue(
             @ToolParam(description = "The device ID") Long deviceId,
             @ToolParam(description = "The point (metric) ID to write") Long pointId,
@@ -157,7 +157,7 @@ public class PointValueTool {
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "writePointValue", tenantId,
                     deviceId, pointId, e);
-            return AgenticToolResult.error("Error sending write command: " + e.getMessage());
+            return AgenticToolResult.error("Error preparing write command: " + e.getMessage());
         }
     }
 
