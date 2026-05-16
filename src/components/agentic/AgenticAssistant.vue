@@ -836,7 +836,7 @@
     if (assistantReasoning(message)) {
       items.push({
         label: t('agentic.thinkingReasoningMode'),
-        detail: t('agentic.thinkingReasoningDetail'),
+        detail: assistantReasoningText(message) || t('agentic.thinkingReasoningDetail'),
       });
     }
     if (tools > 0) {
@@ -850,10 +850,14 @@
 
   const assistantReasoning = (message: AgenticMessage) => {
     return Boolean(
-      message.reasoning?.trim() ||
+      assistantReasoningText(message) ||
       message.contentExt?.reasoning ||
       assistantTraceEvents(message).some((event) => event.type === 'reasoning')
     );
+  };
+
+  const assistantReasoningText = (message: AgenticMessage) => {
+    return (message.reasoning || message.contentExt?.reasoningContent || '').trim();
   };
 
   const assistantTools = (message: AgenticMessage) => {

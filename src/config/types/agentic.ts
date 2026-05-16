@@ -86,6 +86,7 @@ export interface AgenticMessageContent {
   contexts?: AgenticMessageContext[];
   tokens?: AgenticMessageTokens;
   reasoning?: boolean;
+  reasoningContent?: string;
 }
 
 export interface AgenticMessageContext {

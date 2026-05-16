@@ -79,6 +79,7 @@ describe('agentic store', () => {
           content: '设备运行正常。',
           contentExt: {
             reasoning: true,
+            reasoningContent: '检查设备状态，确认采集点。',
           },
           messageIndex: 2,
         },

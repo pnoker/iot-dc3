@@ -361,7 +361,7 @@ export const useAgenticStore = defineStore('agentic', () => {
           content: message.content || '',
           contentExt: message.contentExt,
           messageIndex: message.messageIndex,
-          reasoning: message.reasoning,
+          reasoning: message.reasoning || message.contentExt?.reasoningContent,
         }));
         messagesByConversation.value[conversationId] = mergeEphemeralAssistantState(previousMessages, loadedMessages);
         persistMessages();
