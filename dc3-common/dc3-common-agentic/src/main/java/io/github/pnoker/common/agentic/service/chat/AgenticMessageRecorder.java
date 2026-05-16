@@ -50,11 +50,11 @@ public class AgenticMessageRecorder {
 
     public void persistAssistantMessage(AgenticPreparedChatRequest prepared, String content,
                                         RequestHeader.UserHeader userHeader) {
-        if (StringUtils.isBlank(content)) {
+        AgenticMessageContent messageContent = buildAssistantContent(prepared, StringUtils.defaultString(content));
+        if (!hasPersistableAssistantContent(messageContent)) {
             return;
         }
-        messageService.save(prepared.scopedConversationId(), "assistant", buildAssistantContent(prepared, content),
-                prepared.model(), userHeader);
+        messageService.save(prepared.scopedConversationId(), "assistant", messageContent, prepared.model(), userHeader);
     }
 
     private AgenticMessageContent buildUserContent(AgenticPreparedChatRequest prepared) {
@@ -82,6 +82,18 @@ public class AgenticMessageRecorder {
         content.setContexts(prepared.contexts());
         content.setTokens(outputTokens(prepared.inputTokens(), text));
         return content;
+    }
+
+    private boolean hasPersistableAssistantContent(AgenticMessageContent content) {
+        return StringUtils.isNotBlank(content.getText())
+                || Boolean.TRUE.equals(content.getReasoning())
+                || hasItems(content.getTools())
+                || hasItems(content.getTraces())
+                || hasItems(content.getContexts());
+    }
+
+    private boolean hasItems(List<?> values) {
+        return values != null && !values.isEmpty();
     }
 
     private List<AgenticMessageContent.Trace> buildTraceEvents(AgenticPreparedChatRequest prepared,
