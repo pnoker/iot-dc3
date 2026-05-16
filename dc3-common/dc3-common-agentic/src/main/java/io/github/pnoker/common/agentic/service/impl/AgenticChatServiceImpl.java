@@ -26,8 +26,10 @@ import io.github.pnoker.common.agentic.service.chat.AgenticMessageRecorder;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
+import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -100,9 +102,11 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             Flux<ServerSentEvent<String>> responseEvents = runtimeEvents.onErrorResume(error -> {
                 log.warn("Agentic stream chat failed, conversationId={}, model={}",
                         prepared.scopedConversationId(), prepared.model(), error);
-                return Flux.just(ServerSentEvent.<String>builder()
-                        .data(responseCodec.formatEvent(AgenticRunEvent.requestFailed(error.getMessage())))
-                        .build());
+                lastFinishReason.set("error");
+                prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
+                return Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created, AgenticStreamDelta.empty()))
+                        .doOnComplete(() -> messageRecorder.persistAssistantMessage(prepared,
+                                assistantContent.toString(), userHeader));
             });
 
             return initialEvents
@@ -121,12 +125,20 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "blocking");
             messageRecorder.persistUserMessage(prepared, userHeader);
 
-            AgenticRuntimeResult result = agenticRuntime.call(prepared);
-            messageRecorder.persistAssistantMessage(prepared, result.content(), userHeader);
+            AgenticRuntimeResult result;
+            try {
+                result = agenticRuntime.call(prepared);
+            } catch (RuntimeException e) {
+                prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(e.getMessage()));
+                messageRecorder.persistAssistantMessage(prepared, "", userHeader);
+                throw e;
+            }
+            String assistantText = StringUtils.defaultString(result.content());
+            messageRecorder.persistAssistantMessage(prepared, assistantText, userHeader);
             log.info("Agentic blocking complete, conversationId={}, model={}, contentLen={}, finishReason={}",
-                    prepared.scopedConversationId(), prepared.model(), result.content().length(), result.finishReason());
+                    prepared.scopedConversationId(), prepared.model(), assistantText.length(), result.finishReason());
 
-            return responseCodec.blockingResponse(prepared, result.content(), result.finishReason());
+            return responseCodec.blockingResponse(prepared, assistantText, result.finishReason());
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
