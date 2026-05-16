@@ -149,7 +149,7 @@ public class PointValueTool {
             if (StringUtils.isBlank(value)) {
                 return AgenticToolResult.invalid("Point write value is required.");
             }
-            RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader();
+            RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader(toolContext);
             String conversationId = AgenticRequestContext.requireConversationId(toolContext);
             String actionId = actionService.createWritePointValueAction(conversationId, deviceId, pointId, value,
                     header);

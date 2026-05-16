@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.config;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.service.MessageService;
@@ -81,17 +80,14 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
             return Collections.emptyList();
         }
         List<MessageBO> history;
-        boolean fromContext = AgenticRequestContext.getMemoryHistory(conversationId).isPresent();
         try {
-            history = AgenticRequestContext.getMemoryHistory(conversationId)
-                    .orElseGet(() -> messageService.loadHistory(conversationId, properties.getHistoryWindowSize()));
+            history = messageService.loadHistory(conversationId, properties.getHistoryWindowSize());
         } catch (Exception e) {
             log.warn("Agentic chat memory load failed, conversationId={}", conversationId, e);
             return Collections.emptyList();
         }
         if (Objects.isNull(history) || history.isEmpty()) {
-            // TODO(diagnostic): remove after multi-turn memory regression is fixed.
-            log.info("Agentic memory replay empty, conversationId={}, fromContext={}", conversationId, fromContext);
+            log.debug("Agentic memory replay empty, conversationId={}", conversationId);
             return Collections.emptyList();
         }
         List<Message> messages = new ArrayList<>(history.size());
@@ -103,9 +99,8 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
         }
         int rawCount = messages.size();
         stripTrailingUserMessages(messages);
-        // TODO(diagnostic): remove after multi-turn memory regression is fixed.
-        log.info("Agentic memory replay, conversationId={}, fromContext={}, raw={}, afterStrip={}",
-                conversationId, fromContext, rawCount, messages.size());
+        log.debug("Agentic memory replay, conversationId={}, raw={}, afterStrip={}",
+                conversationId, rawCount, messages.size());
         return messages;
     }
 

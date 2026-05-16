@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.context;
 
-import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
@@ -24,86 +23,57 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.springframework.ai.chat.model.ToolContext;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Queue;
 
 /**
- * Request-scoped auth context used by Spring AI tools.
+ * Accessors for the explicit Spring AI tool context passed into platform tools.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.16
  * @since 2026.5.9
  */
 public class AgenticRequestContext {
-
-    private static final ThreadLocal<RequestHeader.UserHeader> USER_HEADER = new InheritableThreadLocal<>();
-    private static final ThreadLocal<Map<String, List<MessageBO>>> MEMORY_HISTORY = new InheritableThreadLocal<>();
 
     private AgenticRequestContext() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
-    public static void set(RequestHeader.UserHeader userHeader) {
-        USER_HEADER.set(userHeader);
+    public static RequestHeader.UserHeader requireUserHeader(ToolContext toolContext) {
+        Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.USER_HEADER);
+        if (value instanceof RequestHeader.UserHeader userHeader) {
+            validateUserHeader(userHeader);
+            return userHeader;
+        }
+        RequestHeader.UserHeader userHeader = new RequestHeader.UserHeader();
+        userHeader.setTenantId(getLongContextValue(toolContext, AgenticConstant.ToolContextKey.TENANT_ID));
+        userHeader.setUserId(getLongContextValue(toolContext, AgenticConstant.ToolContextKey.USER_ID));
+        validateUserHeader(userHeader);
+        return userHeader;
     }
 
-    public static void clear() {
-        USER_HEADER.remove();
-        MEMORY_HISTORY.remove();
-    }
-
-    public static void setMemoryHistory(String conversationId, List<MessageBO> history) {
-        if (Objects.isNull(conversationId) || conversationId.isBlank()) {
-            return;
-        }
-        Map<String, List<MessageBO>> histories = MEMORY_HISTORY.get();
-        if (Objects.isNull(histories)) {
-            histories = new HashMap<>();
-            MEMORY_HISTORY.set(histories);
-        }
-        histories.put(conversationId, Objects.isNull(history) ? List.of() : List.copyOf(history));
-    }
-
-    public static Optional<List<MessageBO>> getMemoryHistory(String conversationId) {
-        if (Objects.isNull(conversationId) || conversationId.isBlank()) {
-            return Optional.empty();
-        }
-        Map<String, List<MessageBO>> histories = MEMORY_HISTORY.get();
-        if (Objects.isNull(histories) || !histories.containsKey(conversationId)) {
-            return Optional.empty();
-        }
-        return Optional.of(histories.get(conversationId));
-    }
-
-    public static RequestHeader.UserHeader requireUserHeader() {
-        RequestHeader.UserHeader userHeader = USER_HEADER.get();
+    private static void validateUserHeader(RequestHeader.UserHeader userHeader) {
         if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId())
                 || Objects.isNull(userHeader.getUserId())) {
             throw new UnAuthorizedException("Unable to get agentic user header");
         }
-        return userHeader;
     }
 
     public static Long requireTenantId(ToolContext toolContext) {
         Long tenantId = getLongContextValue(toolContext, AgenticConstant.ToolContextKey.TENANT_ID);
-        return Objects.nonNull(tenantId) ? tenantId : requireTenantId();
-    }
-
-    public static Long requireTenantId() {
-        return requireUserHeader().getTenantId();
+        if (Objects.nonNull(tenantId)) {
+            return tenantId;
+        }
+        return requireUserHeader(toolContext).getTenantId();
     }
 
     public static Long requireUserId(ToolContext toolContext) {
         Long userId = getLongContextValue(toolContext, AgenticConstant.ToolContextKey.USER_ID);
-        return Objects.nonNull(userId) ? userId : requireUserId();
-    }
-
-    public static Long requireUserId() {
-        return requireUserHeader().getUserId();
+        if (Objects.nonNull(userId)) {
+            return userId;
+        }
+        return requireUserHeader(toolContext).getUserId();
     }
 
     public static String requireConversationId(ToolContext toolContext) {

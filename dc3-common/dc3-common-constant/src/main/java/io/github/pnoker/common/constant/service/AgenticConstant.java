@@ -87,6 +87,8 @@ public class AgenticConstant {
 
         public static final String USER_ID = "dc3.agentic.userId";
 
+        public static final String USER_HEADER = "dc3.agentic.userHeader";
+
         public static final String CONVERSATION_ID = "dc3.agentic.conversationId";
 
         public static final String RUN_EVENTS = "dc3.agentic.runEvents";

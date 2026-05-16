@@ -17,14 +17,12 @@
 
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.service.ActionService;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,12 +61,6 @@ class PointValueToolTest {
         header = new RequestHeader.UserHeader();
         header.setTenantId(1L);
         header.setUserId(2L);
-        AgenticRequestContext.set(header);
-    }
-
-    @AfterEach
-    void tearDown() {
-        AgenticRequestContext.clear();
     }
 
     @Test
@@ -77,7 +69,9 @@ class PointValueToolTest {
                 .thenReturn("action-1");
 
         AgenticToolResult<PointValueTool.PointCommandResult> result = tool.writePointValue(10L, 20L, "42",
-                toolContext(Map.of(AgenticConstant.ToolContextKey.CONVERSATION_ID, "conv-1")));
+                toolContext(Map.of(
+                        AgenticConstant.ToolContextKey.CONVERSATION_ID, "conv-1",
+                        AgenticConstant.ToolContextKey.USER_HEADER, header)));
 
         assertThat(result.success()).isTrue();
         assertThat(result.data()).isNotNull();

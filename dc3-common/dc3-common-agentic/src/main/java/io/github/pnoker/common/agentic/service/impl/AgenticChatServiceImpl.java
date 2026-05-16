@@ -77,7 +77,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             StringBuilder assistantContent = new StringBuilder();
             AtomicReference<String> lastFinishReason = new AtomicReference<>();
 
-            Flux<ServerSentEvent<String>> runtimeEvents = agenticRuntime.stream(prepared, userHeader)
+            Flux<ServerSentEvent<String>> runtimeEvents = agenticRuntime.stream(prepared)
                     .doOnNext(frame -> {
                         if (frame.hasFinishReason()) {
                             lastFinishReason.set(frame.finishReason());
@@ -121,7 +121,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "blocking");
             messageRecorder.persistUserMessage(prepared, userHeader);
 
-            AgenticRuntimeResult result = agenticRuntime.call(prepared, userHeader);
+            AgenticRuntimeResult result = agenticRuntime.call(prepared);
             messageRecorder.persistAssistantMessage(prepared, result.content(), userHeader);
             log.info("Agentic blocking complete, conversationId={}, model={}, contentLen={}, finishReason={}",
                     prepared.scopedConversationId(), prepared.model(), result.content().length(), result.finishReason());
