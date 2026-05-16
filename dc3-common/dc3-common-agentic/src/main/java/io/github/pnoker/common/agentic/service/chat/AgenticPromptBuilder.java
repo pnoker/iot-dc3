@@ -87,7 +87,10 @@ public class AgenticPromptBuilder {
 
     private String buildSystemPrompt(AgenticPreparedChatRequest prepared) {
         List<String> sections = new ArrayList<>();
-        sections.add(ChatClientConfig.SYSTEM_PROMPT);
+        sections.add(ChatClientConfig.BASE_SYSTEM_PROMPT);
+        if (prepared.toolCallingEnabled()) {
+            sections.add(ChatClientConfig.TOOL_SYSTEM_PROMPT);
+        }
         if (StringUtils.isNotBlank(prepared.requestSystemContext())) {
             sections.add(prepared.requestSystemContext().trim());
         }

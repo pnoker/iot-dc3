@@ -20,5 +20,8 @@ dc3:
     memory-enabled: ${AGENTIC_MEMORY_ENABLED:true}
     history-window-size: ${AGENTIC_HISTORY_WINDOW_SIZE:30}
     tool-calling-enabled: ${AGENTIC_TOOL_CALLING_ENABLED:true}
+    fallback-tool-calling-enabled: ${AGENTIC_FALLBACK_TOOL_CALLING_ENABLED:true}
+    fallback-vision-enabled: ${AGENTIC_FALLBACK_VISION_ENABLED:true}
+    fallback-reasoning-enabled: ${AGENTIC_FALLBACK_REASONING_ENABLED:false}
     memory-max-messages: ${AGENTIC_MEMORY_MAX_MESSAGES:50}
     attachment-storage-path: ${AGENTIC_ATTACHMENT_STORAGE_PATH:dc3/data/upload/agentic/attachment}

@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.dal.ModelConfigManager;
 import io.github.pnoker.common.agentic.dal.ModelProviderManager;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
@@ -46,6 +47,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
     private final ModelConfigManager modelConfigManager;
     private final ModelProviderManager modelProviderManager;
     private final ModelConfigBuilder modelConfigBuilder;
+    private final AgenticProperties properties;
 
     @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
     private String fallbackModel;
@@ -58,18 +60,21 @@ public class ModelConfigServiceImpl implements ModelConfigService {
 
     public ModelConfigServiceImpl(ModelConfigManager modelConfigManager,
                                   ModelProviderManager modelProviderManager,
-                                  ModelConfigBuilder modelConfigBuilder) {
+                                  ModelConfigBuilder modelConfigBuilder,
+                                  AgenticProperties properties) {
         this.modelConfigManager = modelConfigManager;
         this.modelProviderManager = modelProviderManager;
         this.modelConfigBuilder = modelConfigBuilder;
+        this.properties = properties;
     }
 
     @Override
     public List<ModelVO> listOptions() {
         List<ModelConfigBO> configs = enabledConfigs();
         if (configs.isEmpty()) {
-            return List.of(new ModelVO(fallbackModel, fallbackModel, true, true, true, false, fallbackTemperature,
-                    fallbackMaxTokens));
+            return List.of(new ModelVO(fallbackModel, fallbackModel, true,
+                    properties.isFallbackToolCallingEnabled(), properties.isFallbackVisionEnabled(),
+                    properties.isFallbackReasoningEnabled(), fallbackTemperature, fallbackMaxTokens));
         }
         return configs.stream().map(item -> new ModelVO(item.getModel(), item.getLabel(), truthy(item.getStream()),
                 truthy(item.getToolCall()), truthy(item.getVision()), truthy(item.getReasoning()),

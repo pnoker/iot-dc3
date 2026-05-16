@@ -35,6 +35,8 @@ import java.util.function.Consumer;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -91,6 +93,29 @@ class AgenticPromptBuilderTest {
 
         verify(promptSpec, never()).toolCallbacks(toolCallbackProvider);
         verify(promptSpec, never()).advisors(toolCallAdvisor);
+    }
+
+    @Test
+    void buildDoesNotAdvertisePlatformToolsWhenToolCallingIsDisabled() {
+        promptBuilder.build(prepared(false));
+
+        var systemPrompt = forClass(String.class);
+        verify(promptSpec).system(systemPrompt.capture());
+        assertThat(systemPrompt.getValue()).doesNotContain("native tool calls");
+        assertThat(systemPrompt.getValue()).doesNotContain("Device, driver, profile, and point metadata lookup");
+    }
+
+    @Test
+    void buildAdvertisesPlatformToolsWhenToolCallingIsEnabled() {
+        when(promptSpec.toolCallbacks(toolCallbackProvider)).thenReturn(promptSpec);
+        when(promptSpec.advisors(toolCallAdvisor)).thenReturn(promptSpec);
+
+        promptBuilder.build(prepared(true));
+
+        var systemPrompt = forClass(String.class);
+        verify(promptSpec).system(systemPrompt.capture());
+        assertThat(systemPrompt.getValue()).contains("native tool calls");
+        assertThat(systemPrompt.getValue()).contains("Device, driver, profile, and point metadata lookup");
     }
 
     private AgenticPreparedChatRequest prepared(boolean toolCallingEnabled) {

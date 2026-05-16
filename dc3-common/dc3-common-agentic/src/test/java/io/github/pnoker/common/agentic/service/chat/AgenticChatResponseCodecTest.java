@@ -73,7 +73,7 @@ class AgenticChatResponseCodecTest {
         AgenticPreparedChatRequest prepared = prepared(runTrace);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
-                new AgenticStreamDelta("Device loaded", null));
+                new AgenticStreamDelta("Device loaded"));
 
         assertThat(events).hasSize(3);
         assertThat(events.get(0).data()).contains("\"object\":\"agentic.event\"");

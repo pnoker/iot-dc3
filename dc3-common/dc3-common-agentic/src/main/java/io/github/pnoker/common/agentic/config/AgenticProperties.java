@@ -70,6 +70,24 @@ public class AgenticProperties {
     private boolean toolCallingEnabled = true;
 
     /**
+     * Whether the Spring AI fallback model should be advertised and executed with
+     * provider-native tool calls when no database model configuration exists.
+     */
+    private boolean fallbackToolCallingEnabled = true;
+
+    /**
+     * Whether the Spring AI fallback model should be advertised as vision-capable
+     * when no database model configuration exists.
+     */
+    private boolean fallbackVisionEnabled = true;
+
+    /**
+     * Whether the Spring AI fallback model should be advertised as reasoning-capable
+     * when no database model configuration exists.
+     */
+    private boolean fallbackReasoningEnabled = false;
+
+    /**
      * Root directory used to persist uploaded agentic attachment files. Runtime files
      * are stored under tenant/user/conversation subfolders.
      */
