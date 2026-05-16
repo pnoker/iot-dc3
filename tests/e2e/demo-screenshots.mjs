@@ -28,13 +28,6 @@ const VIEWPORT_HEIGHT = Number(process.env.E2E_SCREENSHOT_HEIGHT || 1080);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = path.resolve(__dirname, '../../artifacts/page-screenshots');
 
-const DEMO_IDS = {
-  driverId: '861000000001',
-  deviceId: '862000000001',
-  profileId: '863000000001',
-  pointId: '864000000001',
-};
-
 function isBusinessApi(url) {
   return url.includes('/api/v3/');
 }
@@ -126,7 +119,11 @@ async function expectEditDivider(page, pattern, step) {
 }
 
 async function discoverIds(page) {
-  const [api, resource, menu, user, role] = await Promise.all([
+  const [driver, profile, device, point, api, resource, menu, user, role] = await Promise.all([
+    firstRecord(page, '/api/v3/manager/driver/list'),
+    firstRecord(page, '/api/v3/manager/profile/list'),
+    firstRecord(page, '/api/v3/manager/device/list'),
+    firstRecord(page, '/api/v3/manager/point/list'),
     firstRecord(page, '/api/v3/auth/api/list'),
     firstRecord(page, '/api/v3/auth/resource/list'),
     firstRecord(page, '/api/v3/auth/menu/list'),
@@ -135,8 +132,11 @@ async function discoverIds(page) {
   ]);
 
   return {
-    ...DEMO_IDS,
-    pointProfileId: DEMO_IDS.profileId,
+    driverId: idOf(driver),
+    deviceId: idOf(device),
+    profileId: idOf(profile),
+    pointId: idOf(point),
+    pointProfileId: point?.profileId ? String(point.profileId) : idOf(profile),
     apiId: idOf(api),
     resourceId: idOf(resource),
     menuId: idOf(menu),
@@ -626,7 +626,18 @@ const watch = createScreenshotWatch(page);
 try {
   await login(page, BASE);
   const ids = await discoverIds(page);
-  for (const required of ['apiId', 'resourceId', 'menuId', 'userId', 'roleId']) {
+  for (const required of [
+    'driverId',
+    'deviceId',
+    'profileId',
+    'pointId',
+    'pointProfileId',
+    'apiId',
+    'resourceId',
+    'menuId',
+    'userId',
+    'roleId',
+  ]) {
     if (!ids[required]) throw new Error(`Cannot discover route id: ${required}`);
   }
 

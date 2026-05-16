@@ -310,37 +310,11 @@
                       </div>
                     </section>
 
-                    <section v-if="assistantSkillSteps(message).length" class="agentic-trace-section">
-                      <div class="agentic-trace-section__header">
-                        <span>{{ t('agentic.detailSkillChain') }}</span>
-                      </div>
-                      <ol class="agentic-chain">
-                        <li v-for="step in assistantSkillSteps(message)" :key="step.id">
-                          <span class="agentic-chain__index">{{ step.index }}</span>
-                          <div class="agentic-chain__content">
-                            <strong>{{ step.label }}</strong>
-                            <small v-if="step.detail">{{ step.detail }}</small>
-                          </div>
-                        </li>
-                      </ol>
-                    </section>
-
-                    <section
-                      v-if="assistantToolSteps(message).length || assistantAvailableTools(message).length"
-                      class="agentic-trace-section"
-                    >
+                    <section v-if="assistantToolSteps(message).length" class="agentic-trace-section">
                       <div class="agentic-trace-section__header">
                         <span>{{ t('agentic.detailToolChain') }}</span>
                       </div>
-                      <div v-if="assistantAvailableTools(message).length" class="agentic-tool-scope">
-                        <span>{{ t('agentic.detailScope') }}</span>
-                        <div class="agentic-details__tags">
-                          <el-tag v-for="tool in assistantAvailableTools(message)" :key="tool" size="small" type="info">
-                            {{ tool }}
-                          </el-tag>
-                        </div>
-                      </div>
-                      <ol v-if="assistantToolSteps(message).length" class="agentic-chain">
+                      <ol class="agentic-chain">
                         <li v-for="step in assistantToolSteps(message)" :key="step.id">
                           <span class="agentic-chain__index">{{ step.index }}</span>
                           <div class="agentic-chain__content">
@@ -846,9 +820,7 @@
     return (
       assistantRunOverview(message).length > 0 ||
       assistantThinkingItems(message).length > 0 ||
-      assistantSkillSteps(message).length > 0 ||
       assistantToolSteps(message).length > 0 ||
-      assistantAvailableTools(message).length > 0 ||
       assistantReasoning(message) ||
       assistantContexts(message).length > 0 ||
       assistantTokenItems(message).length > 0 ||
@@ -858,16 +830,12 @@
 
   const assistantDetailSummary = (message: AgenticMessage) => {
     const parts: string[] = [];
-    const skills = assistantSkillSteps(message);
     const tools = assistantToolSteps(message);
     const contexts = assistantContexts(message);
     const tokenTotal = assistantTokenTotal(message);
     parts.push(`${t('agentic.statusLabel')} ${assistantStatus(message)}`);
     if (assistantReasoning(message)) {
       parts.push(t('agentic.thinkingReasoningMode').toLowerCase());
-    }
-    if (skills.length) {
-      parts.push(t('agentic.detailSummarySkills', { n: skills.length }));
     }
     if (tools.length) {
       parts.push(t('agentic.detailSummaryTools', { n: tools.length }));
@@ -883,14 +851,10 @@
 
   const assistantRunOverview = (message: AgenticMessage): AssistantRunStat[] => {
     const stats: AssistantRunStat[] = [];
-    const skills = assistantSkillSteps(message).length;
     const tools = assistantToolSteps(message).length;
     const tokenTotal = assistantTokenTotal(message);
     if (assistantReasoning(message)) {
       stats.push({ label: t('agentic.thinkingReasoningMode'), value: t('agentic.statusEnabled') });
-    }
-    if (skills > 0) {
-      stats.push({ label: t('agentic.detailSkillChain'), value: String(skills) });
     }
     if (tools > 0) {
       stats.push({ label: t('agentic.detailToolChain'), value: String(tools) });
@@ -905,7 +869,6 @@
     const items: AssistantThinkingItem[] = [];
     const traces = assistantTraceEvents(message);
     const tools = assistantToolSteps(message).length;
-    const skillSteps = assistantSkillSteps(message);
     const liveReasoning = message.reasoning?.trim();
     if (message.streaming) {
       items.push({
@@ -919,12 +882,6 @@
         detail: liveReasoning || t('agentic.thinkingReasoningDetail'),
       });
     }
-    if (skillSteps.length) {
-      items.push({
-        label: t('agentic.thinkingSkillRouting'),
-        detail: t('agentic.thinkingSkillDetail', { skill: skillSteps[0]?.label || 'general' }),
-      });
-    }
     if (tools > 0) {
       items.push({
         label: t('agentic.thinkingToolExec'),
@@ -932,15 +889,6 @@
       });
     }
     return uniqueThinkingItems(items);
-  };
-
-  const assistantSkills = (message: AgenticMessage) => {
-    const persisted = message.contentExt?.skills || message.skills || [];
-    const streaming = messageTraceEvents(message)
-      .filter((event) => event.type === 'skill')
-      .map((event) => event.name || event.title)
-      .filter(Boolean);
-    return uniqueStrings([...persisted, ...streaming]);
   };
 
   const assistantReasoning = (message: AgenticMessage) => {
@@ -962,34 +910,6 @@
 
   const assistantTraceEvents = (message: AgenticMessage): AgenticTraceEvent[] => {
     return uniqueTraceEvents([...(message.contentExt?.traces || []), ...messageTraceEvents(message)]);
-  };
-
-  const assistantSkillSteps = (message: AgenticMessage): AssistantChainStep[] => {
-    const traceSteps = assistantTraceEvents(message)
-      .filter((event) => event.type === 'skill')
-      .map((event) => ({
-        id: traceKey(event),
-        index: 0,
-        label: event.name || event.title || 'general',
-        detail: event.detail || event.title,
-      }));
-    const fallbackSteps = assistantSkills(message).map((skill) => ({
-      id: `skill-${skill}`,
-      index: 0,
-      label: skill,
-      detail: '',
-    }));
-    return indexChainSteps(uniqueChainSteps([...traceSteps, ...fallbackSteps]));
-  };
-
-  const assistantAvailableTools = (message: AgenticMessage) => {
-    return uniqueStrings(
-      assistantTraceEvents(message)
-        .filter((event) => event.type === 'tools')
-        .flatMap((event) => (event.detail || '').split(','))
-        .map((tool) => tool.trim())
-        .filter(Boolean)
-    );
   };
 
   const assistantToolSteps = (message: AgenticMessage): AssistantChainStep[] => {

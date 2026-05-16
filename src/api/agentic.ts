@@ -28,7 +28,6 @@ import type {
   AgenticModelConfig,
   AgenticProvider,
   AgenticSession,
-  AgenticSkill,
   AgenticStreamCallbacks,
   AgenticTraceEvent,
   PageQuery,
@@ -52,8 +51,6 @@ interface OpenAIChunk {
     finish_reason?: string;
   }>;
 }
-
-export const getAgenticSkills = () => httpGet<R<AgenticSkill[]>>(`${API_AGENTIC_BASE}/skill/list`);
 
 export const getAgenticModels = () => httpGet<R<AgenticModel[]>>(`${API_AGENTIC_BASE}/model/list`);
 

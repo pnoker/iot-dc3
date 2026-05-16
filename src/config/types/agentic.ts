@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-export interface AgenticSkill {
-  name: string;
-  description?: string;
-}
-
 export interface AgenticModel {
   model: string;
   label: string;
@@ -75,7 +70,6 @@ export interface AgenticMessage {
   content: string;
   contentExt?: AgenticMessageContent;
   model?: string;
-  skills?: string[];
   messageIndex?: number;
   status?: number;
   streaming?: boolean;
@@ -88,7 +82,6 @@ export interface AgenticMessageContent {
   text?: string;
   format?: string;
   attachments?: number[];
-  skills?: string[];
   tools?: string[];
   traces?: AgenticTraceEvent[];
   contexts?: AgenticMessageContext[];
@@ -163,7 +156,6 @@ export interface AgenticChatCompletionRequest {
    * Leaving this empty is rejected by the backend with HTTP 400.
    */
   conversationId: string;
-  skill?: string;
   attachments?: number[];
   reasoning?: boolean;
   confirmActions?: boolean;
@@ -206,7 +198,7 @@ export interface AgenticStreamCallbacks {
 
 export interface AgenticTraceEvent {
   id?: string;
-  type: 'skill' | 'tools' | 'tool' | 'reasoning' | 'error';
+  type: 'tool' | 'reasoning' | 'error';
   title: string;
   detail?: string;
   name?: string;

@@ -17,7 +17,6 @@
 export type { Login, Attribute, Dictionary, Order, PageQuery, PageResult } from './common';
 
 export type {
-  AgenticSkill,
   AgenticModel,
   AgenticModelConfig,
   AgenticProvider,

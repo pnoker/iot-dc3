@@ -29,7 +29,6 @@ const apiMocks = vi.hoisted(() => ({
   getAgenticModels: vi.fn(),
   getPendingAgenticActions: vi.fn(),
   getAgenticSessions: vi.fn(),
-  getAgenticSkills: vi.fn(),
   rejectAgenticAction: vi.fn(),
   streamAgenticChatCompletion: vi.fn(),
   updateAgenticSession: vi.fn(),
@@ -52,7 +51,6 @@ describe('agentic store', () => {
     apiMocks.getAgenticAttachments.mockResolvedValue({ data: [] });
     apiMocks.getPendingAgenticActions.mockResolvedValue({ data: [] });
     apiMocks.getAgenticModels.mockResolvedValue({ data: [] });
-    apiMocks.getAgenticSkills.mockResolvedValue({ data: [] });
     apiMocks.getAgenticSessions.mockResolvedValue({ data: { records: [] } });
     apiMocks.updateAgenticSession.mockImplementation((conversationId: string, data: Record<string, unknown>) =>
       Promise.resolve({ data: { conversationId, ...data } })

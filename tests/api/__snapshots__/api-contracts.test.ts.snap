@@ -159,15 +159,6 @@ exports[`API wrapper contracts > agentic > getAgenticSessions maps to its transp
 }
 `;
 
-exports[`API wrapper contracts > agentic > getAgenticSkills maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/agentic/skill/list",
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > agentic > getPendingAgenticActions maps to its transport contract 1`] = `
 {
   "args": [
@@ -196,7 +187,6 @@ exports[`API wrapper contracts > agentic > has every export covered by the contr
   "getAgenticModels",
   "getAgenticProviders",
   "getAgenticSessions",
-  "getAgenticSkills",
   "getPendingAgenticActions",
   "rejectAgenticAction",
   "updateAgenticModelConfig",

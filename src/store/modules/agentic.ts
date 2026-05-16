@@ -22,7 +22,6 @@ import {
   getAgenticMessages,
   getAgenticModels,
   getAgenticSessions,
-  getAgenticSkills,
   getPendingAgenticActions,
   rejectAgenticAction,
   streamAgenticChatCompletion,
@@ -36,7 +35,6 @@ import type {
   AgenticModel,
   AgenticSession,
   AgenticSessionExt,
-  AgenticSkill,
   AgenticTraceEvent,
 } from '@/config/types';
 import { failMessage, warnMessage } from '@/utils/notificationUtil';
@@ -66,7 +64,6 @@ export const useAgenticStore = defineStore('agentic', () => {
   const streaming = ref(false);
   const sessions = ref<AgenticSession[]>([]);
   const models = ref<AgenticModel[]>([]);
-  const skills = ref<AgenticSkill[]>([]);
   const selectedModel = ref('');
   const reasoningEnabled = ref(false);
   const requireConfirmation = ref(true);
@@ -143,7 +140,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     loading.value = true;
     try {
       await loadModels();
-      await Promise.all([loadSkills(), loadSessions()]);
+      await loadSessions();
       bootstrapped.value = true;
       const conversationId = ensureActiveSession();
       restoreSessionModel(currentSession.value);
@@ -173,16 +170,6 @@ export const useAgenticStore = defineStore('agentic', () => {
     applyModelCapabilities();
     temperature.value = temperature.value ?? firstModel.temperature;
     maxTokens.value = maxTokens.value ?? firstModel.maxTokens;
-  };
-
-  const loadSkills = async () => {
-    try {
-      const response = await getAgenticSkills();
-      skills.value = response.data || [];
-    } catch (error) {
-      skills.value = [];
-      warnMessage('Failed to load agentic skills.', 'Agentic', error);
-    }
   };
 
   const loadSessions = async () => {
@@ -379,7 +366,6 @@ export const useAgenticStore = defineStore('agentic', () => {
           role: message.role,
           content: normalizeDisplayContent(message.role, message.content),
           contentExt: message.contentExt,
-          skills: message.skills,
           messageIndex: message.messageIndex,
           reasoning: message.reasoning,
         }));
@@ -637,7 +623,6 @@ export const useAgenticStore = defineStore('agentic', () => {
     streaming,
     sessions,
     models,
-    skills,
     selectedModel,
     reasoningEnabled,
     requireConfirmation,
