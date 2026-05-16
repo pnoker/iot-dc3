@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
@@ -24,12 +23,10 @@ import io.github.pnoker.common.agentic.service.chat.AgenticChatRequestPreparer;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatResponseCodec;
 import io.github.pnoker.common.agentic.service.chat.AgenticMessageRecorder;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
-import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
-import io.github.pnoker.common.agentic.service.chat.AgenticStreamDelta;
+import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
+import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -52,18 +49,19 @@ public class AgenticChatServiceImpl implements AgenticChatService {
 
     private final AgenticChatRequestPreparer requestPreparer;
 
-    private final AgenticPromptBuilder promptBuilder;
-
     private final AgenticChatResponseCodec responseCodec;
 
     private final AgenticMessageRecorder messageRecorder;
 
-    public AgenticChatServiceImpl(AgenticChatRequestPreparer requestPreparer, AgenticPromptBuilder promptBuilder,
-                                  AgenticChatResponseCodec responseCodec, AgenticMessageRecorder messageRecorder) {
+    private final AgenticRuntime agenticRuntime;
+
+    public AgenticChatServiceImpl(AgenticChatRequestPreparer requestPreparer,
+                                  AgenticChatResponseCodec responseCodec, AgenticMessageRecorder messageRecorder,
+                                  AgenticRuntime agenticRuntime) {
         this.requestPreparer = requestPreparer;
-        this.promptBuilder = promptBuilder;
         this.responseCodec = responseCodec;
         this.messageRecorder = messageRecorder;
+        this.agenticRuntime = agenticRuntime;
     }
 
     @Override
@@ -73,39 +71,38 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "stream");
             messageRecorder.persistUserMessage(prepared, userHeader);
 
-            ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
-
             String chatId = responseCodec.newChatId();
             long created = Instant.now().getEpochSecond();
             StringBuilder assistantContent = new StringBuilder();
             AtomicReference<String> lastFinishReason = new AtomicReference<>();
 
-            Flux<AgenticStreamDelta> contentFlux = promptSpec.stream().chatResponse()
-                    .doOnSubscribe(subscription -> AgenticRequestContext.set(userHeader))
-                    .doOnNext(response -> responseCodec.rememberFinishReason(response, lastFinishReason))
-                    .map(responseCodec::extractStreamDelta)
-                    .filter(AgenticStreamDelta::hasContent)
-                    .doOnNext(delta -> assistantContent.append(delta.content()))
+            Flux<ServerSentEvent<String>> runtimeEvents = agenticRuntime.stream(prepared, userHeader)
+                    .doOnNext(frame -> {
+                        if (frame.hasFinishReason()) {
+                            lastFinishReason.set(frame.finishReason());
+                        }
+                        if (frame.delta().content() != null) {
+                            assistantContent.append(frame.delta().content());
+                        }
+                    })
+                    .concatMap(frame -> Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created,
+                            frame.delta())))
                     .doOnComplete(() -> {
                         messageRecorder.persistAssistantMessage(prepared, assistantContent.toString(), userHeader);
                         log.info(
                                 "Agentic stream complete, conversationId={}, model={}, contentLen={}, finishReason={}",
                                 prepared.scopedConversationId(), prepared.model(), assistantContent.length(),
                                 lastFinishReason.get());
-                    })
-                    .doFinally(signalType -> AgenticRequestContext.clear());
+                    });
 
             Flux<ServerSentEvent<String>> initialEvents = Flux.fromIterable(responseCodec.initialEvents(prepared));
-            Flux<ServerSentEvent<String>> responseEvents = contentFlux
-                    .flatMap(chunk -> Flux.fromIterable(responseCodec.chunkEvents(prepared, chatId, created, chunk)))
-                    .onErrorResume(error -> {
-                        log.warn("Agentic stream chat failed, conversationId={}, model={}",
-                                prepared.scopedConversationId(), prepared.model(), error);
-                        return Flux.just(ServerSentEvent.<String>builder()
-                                .data(responseCodec.formatEvent("error", "Request failed", error.getMessage(),
-                                        "agentic"))
-                                .build());
-                    });
+            Flux<ServerSentEvent<String>> responseEvents = runtimeEvents.onErrorResume(error -> {
+                log.warn("Agentic stream chat failed, conversationId={}, model={}",
+                        prepared.scopedConversationId(), prepared.model(), error);
+                return Flux.just(ServerSentEvent.<String>builder()
+                        .data(responseCodec.formatEvent("error", "Request failed", error.getMessage(), "agentic"))
+                        .build());
+            });
 
             return initialEvents
                     .concatWith(responseEvents)
@@ -114,30 +111,21 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                                     responseCodec.normalizeFinishReason(lastFinishReason.get())))
                             .build())))
                     .concatWith(Mono.just(ServerSentEvent.<String>builder().data("[DONE]").build()));
-        }).doFinally(signalType -> AgenticRequestContext.clear()).subscribeOn(Schedulers.boundedElastic());
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     public Mono<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request, RequestHeader.UserHeader userHeader) {
         return Mono.fromCallable(() -> {
-            try {
-                AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "blocking");
-                messageRecorder.persistUserMessage(prepared, userHeader);
+            AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "blocking");
+            messageRecorder.persistUserMessage(prepared, userHeader);
 
-                ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
+            AgenticRuntimeResult result = agenticRuntime.call(prepared, userHeader);
+            messageRecorder.persistAssistantMessage(prepared, result.content(), userHeader);
+            log.info("Agentic blocking complete, conversationId={}, model={}, contentLen={}, finishReason={}",
+                    prepared.scopedConversationId(), prepared.model(), result.content().length(), result.finishReason());
 
-                AgenticRequestContext.set(userHeader);
-                ChatResponse chatResponse = promptSpec.call().chatResponse();
-                String content = responseCodec.assistantContent(chatResponse);
-                String finishReason = responseCodec.finishReason(chatResponse);
-                messageRecorder.persistAssistantMessage(prepared, content, userHeader);
-                log.info("Agentic blocking complete, conversationId={}, model={}, contentLen={}, finishReason={}",
-                        prepared.scopedConversationId(), prepared.model(), content.length(), finishReason);
-
-                return responseCodec.blockingResponse(prepared, content, finishReason);
-            } finally {
-                AgenticRequestContext.clear();
-            }
+            return responseCodec.blockingResponse(prepared, result.content(), result.finishReason());
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
