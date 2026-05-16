@@ -36,9 +36,7 @@ public record AgenticPreparedChatRequest(String userMessage, String scopedConver
                                          Integer maxTokens,
                                          Queue<AgenticRequestContext.ToolEvent> toolEvents,
                                          boolean toolCallingEnabled, boolean reasoning,
-                                         boolean directContextProvided, List<Long> attachments,
-                                         List<AgenticMessageContent.Context> contexts,
+                                         List<Long> attachments, List<AgenticMessageContent.Context> contexts,
                                          AgenticMessageContent.Tokens inputTokens,
-                                         List<AgenticRequestContext.ToolEvent> toolTraceEvents,
-                                         String directAnswer) {
+                                         List<AgenticRequestContext.ToolEvent> toolTraceEvents) {
 }
