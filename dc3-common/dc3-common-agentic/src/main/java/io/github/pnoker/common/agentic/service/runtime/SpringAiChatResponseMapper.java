@@ -41,15 +41,15 @@ public class SpringAiChatResponseMapper {
     public String assistantContent(ChatResponse chatResponse) {
         return Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
                 && Objects.nonNull(chatResponse.getResult().getOutput())
-                        ? StringUtils.defaultString(chatResponse.getResult().getOutput().getText())
-                        : "";
+                ? StringUtils.defaultString(chatResponse.getResult().getOutput().getText())
+                : "";
     }
 
     public String finishReasonOrNull(ChatResponse chatResponse) {
         String finishReason = Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
                 && Objects.nonNull(chatResponse.getResult().getMetadata())
-                        ? chatResponse.getResult().getMetadata().getFinishReason()
-                        : null;
+                ? chatResponse.getResult().getMetadata().getFinishReason()
+                : null;
         return StringUtils.trimToNull(finishReason);
     }
 

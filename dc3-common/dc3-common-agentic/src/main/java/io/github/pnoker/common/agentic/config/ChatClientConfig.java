@@ -64,7 +64,7 @@ public class ChatClientConfig {
 
     public static final String TOOL_SYSTEM_PROMPT = """
             Platform data access and platform actions are available through native tool calls attached to this request.
-
+            
             - Tenant and user context lookup.
             - Device, driver, profile, and point metadata lookup.
             - Point-value read, history, read-command, and pending write action preparation.

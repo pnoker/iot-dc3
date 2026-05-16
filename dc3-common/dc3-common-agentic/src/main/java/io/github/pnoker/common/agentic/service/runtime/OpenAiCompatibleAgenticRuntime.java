@@ -482,12 +482,9 @@ public class OpenAiCompatibleAgenticRuntime {
     private static class StreamingToolCallBuilder {
 
         private final long index;
-
-        private String id;
-
-        private String name;
-
         private final StringBuilder arguments = new StringBuilder();
+        private String id;
+        private String name;
 
         StreamingToolCallBuilder(long index) {
             this.index = index;

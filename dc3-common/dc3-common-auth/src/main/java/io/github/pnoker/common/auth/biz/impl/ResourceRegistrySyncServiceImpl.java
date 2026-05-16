@@ -17,11 +17,6 @@
 
 package io.github.pnoker.common.auth.biz.impl;
 
-import static io.github.pnoker.common.constant.service.AuthConstant.API_GROUP_NODE_CODE_PREFIX;
-import static io.github.pnoker.common.constant.service.AuthConstant.API_RESOURCE_CODE_PREFIX;
-import static io.github.pnoker.common.constant.service.AuthConstant.API_SERVICE_NODE_CODE_PREFIX;
-import static io.github.pnoker.common.constant.service.AuthConstant.MENU_RESOURCE_CODE_PREFIX;
-
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.auth.biz.ResourceRegistrySyncService;
 import io.github.pnoker.common.auth.dal.ApiManager;
@@ -54,6 +49,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import static io.github.pnoker.common.constant.service.AuthConstant.API_GROUP_NODE_CODE_PREFIX;
+import static io.github.pnoker.common.constant.service.AuthConstant.API_RESOURCE_CODE_PREFIX;
+import static io.github.pnoker.common.constant.service.AuthConstant.API_SERVICE_NODE_CODE_PREFIX;
+import static io.github.pnoker.common.constant.service.AuthConstant.MENU_RESOURCE_CODE_PREFIX;
 
 /**
  * Auth-side reconciler for endpoint resource registration. The registrar submits a full
