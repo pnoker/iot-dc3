@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service.runtime;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -31,7 +32,7 @@ public record AgenticRuntimeResult(String content, String finishReason) {
 
     public AgenticRuntimeResult {
         content = Objects.toString(content, "");
-        finishReason = StringUtils.isNotBlank(finishReason) ? finishReason : "stop";
+        finishReason = StringUtils.isNotBlank(finishReason) ? finishReason.trim().toLowerCase(Locale.ROOT) : "stop";
     }
 
 }
