@@ -780,6 +780,9 @@
     if (reason === 'error' || reason === 'failed') {
       return t('agentic.statusFailed');
     }
+    if (assistantTraceEvents(message).some((event) => event.type === 'error' || event.status === 'failed')) {
+      return t('agentic.statusFailed');
+    }
     return t('agentic.statusDone');
   };
 

@@ -268,9 +268,6 @@ const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
         created: chunk.created,
       };
       callbacks.onEvent?.(event);
-      if (event.type === 'error') {
-        throw new Error(event.detail ? `${event.title}: ${event.detail}` : event.title);
-      }
       return;
     }
     const content = chunk.choices?.[0]?.delta?.content;
