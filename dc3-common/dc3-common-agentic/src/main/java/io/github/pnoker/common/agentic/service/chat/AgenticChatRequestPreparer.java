@@ -19,7 +19,6 @@ package io.github.pnoker.common.agentic.service.chat;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
@@ -91,12 +90,11 @@ public class AgenticChatRequestPreparer {
         String model = chatClientFactory.resolveModel(request.getModel());
         boolean toolCallingEnabled = properties.isToolCallingEnabled() && chatClientFactory.supportsToolCall(model);
         Queue<AgenticRunEvent> runEvents = new ConcurrentLinkedQueue<>();
-        Map<String, Object> toolContext = buildToolContext(request, userHeader, scopedConversationId, runEvents);
+        Map<String, Object> toolContext = buildToolContext(userHeader, scopedConversationId, runEvents);
 
         List<AgenticMessageContent.Context> contexts = buildContexts(attachmentContext);
         String requestSystemContext = buildRequestSystemContext(contexts);
         List<MessageBO> memoryHistory = loadMemoryHistory(scopedConversationId);
-        AgenticRequestContext.setMemoryHistory(scopedConversationId, memoryHistory);
         log.debug("Agentic memory loaded, scopedConversationId={}, memoryEnabled={}, count={}",
                 scopedConversationId, properties.isMemoryEnabled(), memoryHistory.size());
         AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, requestSystemContext, contexts,
@@ -115,12 +113,12 @@ public class AgenticChatRequestPreparer {
                 new ArrayList<>());
     }
 
-    private Map<String, Object> buildToolContext(ChatCompletionRequest request, RequestHeader.UserHeader userHeader,
-                                                 String scopedConversationId,
+    private Map<String, Object> buildToolContext(RequestHeader.UserHeader userHeader, String scopedConversationId,
                                                  Queue<AgenticRunEvent> runEvents) {
         Map<String, Object> toolContext = new HashMap<>();
         toolContext.put(AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId());
         toolContext.put(AgenticConstant.ToolContextKey.USER_ID, userHeader.getUserId());
+        toolContext.put(AgenticConstant.ToolContextKey.USER_HEADER, userHeader);
         toolContext.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, scopedConversationId);
         toolContext.put(AgenticConstant.ToolContextKey.RUN_EVENTS, runEvents);
         return toolContext;

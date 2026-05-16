@@ -17,11 +17,9 @@
 
 package io.github.pnoker.common.agentic.config;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.service.MessageService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +31,6 @@ import org.springframework.ai.chat.messages.MessageType;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,21 +49,16 @@ class MessageChatMemoryRepositoryTest {
         repository = new MessageChatMemoryRepository(messageService, properties);
     }
 
-    @AfterEach
-    void cleanContext() {
-        AgenticRequestContext.clear();
-    }
-
     @Test
-    void findByConversationIdUsesCachedHistoryWhenPresent() {
-        AgenticRequestContext.setMemoryHistory("conv", List.of(row("user", "hi"), row("assistant", "hello")));
+    void findByConversationIdStripsTrailingUserMessages() {
+        when(messageService.loadHistory("conv", properties.getHistoryWindowSize()))
+                .thenReturn(List.of(row("assistant", "hello"), row("user", "current question")));
 
         List<Message> result = repository.findByConversationId("conv");
 
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getMessageType()).isEqualTo(MessageType.USER);
-        assertThat(result.get(1).getMessageType()).isEqualTo(MessageType.ASSISTANT);
-        verify(messageService, never()).loadHistory("conv", properties.getHistoryWindowSize());
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getMessageType()).isEqualTo(MessageType.ASSISTANT);
+        verify(messageService).loadHistory("conv", properties.getHistoryWindowSize());
     }
 
     @Test

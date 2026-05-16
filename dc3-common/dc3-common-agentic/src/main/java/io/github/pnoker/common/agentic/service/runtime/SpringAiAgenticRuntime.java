@@ -16,10 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
-import io.github.pnoker.common.entity.common.RequestHeader;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
@@ -45,30 +43,22 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
     }
 
     @Override
-    public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatRequest prepared,
-                                                  RequestHeader.UserHeader userHeader) {
+    public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatRequest prepared) {
         return Flux.defer(() -> {
             ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
             return promptSpec.stream()
                     .chatResponse()
-                    .doOnSubscribe(subscription -> AgenticRequestContext.set(userHeader))
                     .map(response -> new AgenticRuntimeStreamFrame(responseMapper.streamDelta(response),
-                            responseMapper.finishReasonOrNull(response)))
-                    .doFinally(signalType -> AgenticRequestContext.clear());
+                            responseMapper.finishReasonOrNull(response)));
         });
     }
 
     @Override
-    public AgenticRuntimeResult call(AgenticPreparedChatRequest prepared, RequestHeader.UserHeader userHeader) {
+    public AgenticRuntimeResult call(AgenticPreparedChatRequest prepared) {
         ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
-        try {
-            AgenticRequestContext.set(userHeader);
-            ChatResponse chatResponse = promptSpec.call().chatResponse();
-            return new AgenticRuntimeResult(responseMapper.assistantContent(chatResponse),
-                    responseMapper.finishReasonOrNull(chatResponse));
-        } finally {
-            AgenticRequestContext.clear();
-        }
+        ChatResponse chatResponse = promptSpec.call().chatResponse();
+        return new AgenticRuntimeResult(responseMapper.assistantContent(chatResponse),
+                responseMapper.finishReasonOrNull(chatResponse));
     }
 
 }
