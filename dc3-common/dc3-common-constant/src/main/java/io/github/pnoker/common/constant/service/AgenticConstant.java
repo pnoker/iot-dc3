@@ -89,8 +89,6 @@ public class AgenticConstant {
 
         public static final String CONVERSATION_ID = "dc3.agentic.conversationId";
 
-        public static final String CONFIRM_ACTIONS = "dc3.agentic.confirmActions";
-
         public static final String TOOL_EVENTS = "dc3.agentic.toolEvents";
 
         private ToolContextKey() {

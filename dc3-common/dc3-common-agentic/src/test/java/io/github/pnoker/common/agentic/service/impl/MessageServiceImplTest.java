@@ -113,56 +113,6 @@ class MessageServiceImplTest {
     }
 
     @Test
-    void listStripsConfirmationMarkerFromUserMessages() {
-        MessageDO dirty = new MessageDO();
-        when(messageManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of(dirty));
-
-        MessageBO userBO = new MessageBO();
-        userBO.setRole("user");
-        AgenticMessageContent content = AgenticMessageContent.ofText("Show me devices"
-                + "\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation.");
-        userBO.setContent(content);
-        when(messageBuilder.buildBOListByDOList(List.of(dirty))).thenReturn(List.of(userBO));
-
-        List<MessageBO> result = service.list("conv", header);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getContent().getText()).isEqualTo("Show me devices");
-    }
-
-    @Test
-    void listStripsAttachmentMarkerFromUserMessages() {
-        MessageDO dirty = new MessageDO();
-        when(messageManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of(dirty));
-
-        MessageBO userBO = new MessageBO();
-        userBO.setRole("user");
-        userBO.setContent(AgenticMessageContent.ofText("hello\n\nAttached files available to the user:\nfile.pdf"));
-        when(messageBuilder.buildBOListByDOList(List.of(dirty))).thenReturn(List.of(userBO));
-
-        List<MessageBO> result = service.list("conv", header);
-
-        assertThat(result.get(0).getContent().getText()).isEqualTo("hello");
-    }
-
-    @Test
-    void listLeavesAssistantMessagesUntouched() {
-        MessageDO dirty = new MessageDO();
-        when(messageManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of(dirty));
-
-        MessageBO assistantBO = new MessageBO();
-        assistantBO.setRole("assistant");
-        assistantBO.setContent(AgenticMessageContent.ofText("Safe answer"
-                + "\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation."));
-        when(messageBuilder.buildBOListByDOList(List.of(dirty))).thenReturn(List.of(assistantBO));
-
-        List<MessageBO> result = service.list("conv", header);
-
-        // Markers are user-only; assistant content stays intact.
-        assertThat(result.get(0).getContent().getText()).startsWith("Safe answer");
-    }
-
-    @Test
     void listInjectsEmptyTextContentWhenMissing() {
         MessageDO dirty = new MessageDO();
         when(messageManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of(dirty));

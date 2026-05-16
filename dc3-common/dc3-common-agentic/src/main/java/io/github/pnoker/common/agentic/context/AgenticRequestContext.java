@@ -114,14 +114,6 @@ public class AgenticRequestContext {
         throw new UnAuthorizedException("Unable to get agentic conversation ID");
     }
 
-    public static boolean confirmActions(ToolContext toolContext) {
-        Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.CONFIRM_ACTIONS);
-        if (value instanceof Boolean booleanValue) {
-            return booleanValue;
-        }
-        return true;
-    }
-
     @SuppressWarnings("unchecked")
     public static void recordToolInvocation(ToolContext toolContext, String toolName, String domain,
                                             String description) {

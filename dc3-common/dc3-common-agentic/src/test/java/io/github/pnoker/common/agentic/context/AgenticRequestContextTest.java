@@ -138,20 +138,6 @@ class AgenticRequestContextTest {
     }
 
     @Test
-    void confirmActionsDefaultsToTrueWhenAbsentOrNonBoolean() {
-        assertThat(AgenticRequestContext.confirmActions(toolContext(Map.of()))).isTrue();
-        assertThat(AgenticRequestContext.confirmActions((ToolContext) null)).isTrue();
-        ToolContext invalid = toolContext(Map.of(AgenticConstant.ToolContextKey.CONFIRM_ACTIONS, "yes"));
-        assertThat(AgenticRequestContext.confirmActions(invalid)).isTrue();
-    }
-
-    @Test
-    void confirmActionsReturnsExplicitFalseWhenSet() {
-        ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.CONFIRM_ACTIONS, false));
-        assertThat(AgenticRequestContext.confirmActions(ctx)).isFalse();
-    }
-
-    @Test
     void recordToolInvocationAppendsToQueueWhenPresent() {
         Queue<AgenticRequestContext.ToolEvent> events = new ConcurrentLinkedQueue<>();
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.TOOL_EVENTS, events));
