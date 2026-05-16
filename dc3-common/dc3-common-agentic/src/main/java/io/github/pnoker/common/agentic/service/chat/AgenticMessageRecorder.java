@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Persists user and assistant messages for the agentic chat pipeline.
@@ -103,12 +102,7 @@ public class AgenticMessageRecorder {
     }
 
     private List<AgenticRunEvent> drainRunEvents(AgenticPreparedChatRequest prepared) {
-        AgenticRunEvent event = prepared.runEvents().poll();
-        while (Objects.nonNull(event)) {
-            prepared.runTraceEvents().add(event);
-            event = prepared.runEvents().poll();
-        }
-        return prepared.runTraceEvents();
+        return prepared.runTrace().drainAndRecordedEvents();
     }
 
     private AgenticMessageContent.Tokens outputTokens(AgenticMessageContent.Tokens inputTokens, String assistantText) {
