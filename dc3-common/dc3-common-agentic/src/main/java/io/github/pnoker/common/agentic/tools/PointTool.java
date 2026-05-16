@@ -19,7 +19,7 @@ package io.github.pnoker.common.agentic.tools;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
@@ -70,7 +70,7 @@ public class PointTool {
             @ToolParam(description = "The numeric point IDs") List<Long> pointIds,
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        List<Long> ids = normalizeIds(pointIds);
+        List<Long> ids = AgenticToolUtil.normalizeIds(pointIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointIds={}", "lookupPointsByIds", tenantId, ids);
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid point IDs provided.");
@@ -98,13 +98,10 @@ public class PointTool {
         query.setPointName(pointName);
         query.setProfileId(profileId);
         query.setTenantId(tenantId);
-        Pages p = new Pages();
-        p.setCurrent(page);
-        p.setSize(size);
-        query.setPage(p);
+        query.setPage(AgenticToolUtil.page(page, size));
 
         FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
-        if (Objects.isNull(result) || Objects.isNull(result.getRecords()) || result.getRecords().isEmpty()) {
+        if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No points found.", result);
         }
         return AgenticToolResult.ok("Point page loaded", result);
@@ -124,13 +121,10 @@ public class PointTool {
         FacadePointQuery query = new FacadePointQuery();
         query.setDeviceId(deviceId);
         query.setTenantId(tenantId);
-        Pages p = new Pages();
-        p.setCurrent(page);
-        p.setSize(size);
-        query.setPage(p);
+        query.setPage(AgenticToolUtil.page(page, size));
 
         FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
-        if (Objects.isNull(result) || Objects.isNull(result.getRecords()) || result.getRecords().isEmpty()) {
+        if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No points found for device ID: " + deviceId, result);
         }
         return AgenticToolResult.ok("Point page loaded for device " + deviceId, result);
@@ -150,23 +144,13 @@ public class PointTool {
         FacadePointQuery query = new FacadePointQuery();
         query.setProfileId(profileId);
         query.setTenantId(tenantId);
-        Pages p = new Pages();
-        p.setCurrent(page);
-        p.setSize(size);
-        query.setPage(p);
+        query.setPage(AgenticToolUtil.page(page, size));
 
         FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
-        if (Objects.isNull(result) || Objects.isNull(result.getRecords()) || result.getRecords().isEmpty()) {
+        if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No points found for profile ID: " + profileId, result);
         }
         return AgenticToolResult.ok("Point page loaded for profile " + profileId, result);
-    }
-
-    private List<Long> normalizeIds(List<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return List.of();
-        }
-        return ids.stream().filter(Objects::nonNull).distinct().limit(50).toList();
     }
 
 }

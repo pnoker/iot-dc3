@@ -20,6 +20,7 @@ import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -54,7 +55,8 @@ public class AgenticMessageRecorder {
         if (!hasPersistableAssistantContent(messageContent)) {
             return;
         }
-        messageService.save(prepared.scopedConversationId(), "assistant", messageContent, prepared.model(), userHeader);
+        messageService.save(prepared.scopedConversationId(), AgenticConstant.Chat.ROLE_ASSISTANT, messageContent,
+                prepared.model(), userHeader);
     }
 
     private AgenticMessageContent buildUserContent(AgenticPreparedChatRequest prepared) {
@@ -68,7 +70,7 @@ public class AgenticMessageRecorder {
     private AgenticMessageContent buildAssistantContent(AgenticPreparedChatRequest prepared, String text) {
         List<AgenticRunEvent> runEvents = drainRunEvents(prepared);
         List<String> tools = runEvents.stream()
-                .filter(event -> "tool".equals(event.type()))
+                .filter(event -> AgenticConstant.RunEvent.TYPE_TOOL.equals(event.type()))
                 .map(AgenticRunEvent::name)
                 .filter(StringUtils::isNotBlank)
                 .distinct()

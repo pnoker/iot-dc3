@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.entity.model;
 
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
@@ -31,7 +32,7 @@ public record AgenticRunEvent(String type, String name, String title, String det
                               String status, String code) {
 
     public AgenticRunEvent {
-        type = StringUtils.defaultIfBlank(type, "event");
+        type = StringUtils.defaultIfBlank(type, AgenticConstant.RunEvent.TYPE_EVENT);
         name = StringUtils.defaultString(name);
         title = StringUtils.defaultString(title);
         detail = StringUtils.defaultString(detail);
@@ -42,29 +43,41 @@ public record AgenticRunEvent(String type, String name, String title, String det
     }
 
     public static AgenticRunEvent toolStart(String toolName, String domain, String title) {
-        return new AgenticRunEvent("tool", toolName, title, domain, now(), "start", "running", null);
+        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName, title, domain, now(),
+                AgenticConstant.RunEvent.PHASE_START, AgenticConstant.RunEvent.STATUS_RUNNING, null);
     }
 
     public static AgenticRunEvent toolResult(String toolName, boolean success, String code, String message) {
-        String normalizedCode = StringUtils.defaultIfBlank(code, success ? "OK" : "ERROR");
-        String status = success ? ("EMPTY".equals(normalizedCode) ? "empty" : "success") : "failed";
-        return new AgenticRunEvent("tool", toolName, StringUtils.defaultIfBlank(message, "Tool completed"),
-                normalizedCode, now(), "result", status, normalizedCode);
+        String normalizedCode = StringUtils.defaultIfBlank(code,
+                success ? AgenticConstant.ToolResult.CODE_OK : AgenticConstant.ToolResult.CODE_ERROR);
+        String status = success
+                ? (AgenticConstant.ToolResult.CODE_EMPTY.equals(normalizedCode)
+                ? AgenticConstant.RunEvent.STATUS_EMPTY : AgenticConstant.RunEvent.STATUS_SUCCESS)
+                : AgenticConstant.RunEvent.STATUS_FAILED;
+        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName,
+                StringUtils.defaultIfBlank(message, AgenticConstant.ToolResult.MESSAGE_COMPLETED),
+                normalizedCode, now(), AgenticConstant.RunEvent.PHASE_RESULT, status, normalizedCode);
     }
 
     public static AgenticRunEvent toolError(String toolName, String message) {
-        return new AgenticRunEvent("tool", toolName, StringUtils.defaultIfBlank(message, "Tool execution failed"),
-                "ERROR", now(), "error", "failed", "ERROR");
+        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName,
+                StringUtils.defaultIfBlank(message, AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED),
+                AgenticConstant.ToolResult.CODE_ERROR, now(), AgenticConstant.RunEvent.PHASE_ERROR,
+                AgenticConstant.RunEvent.STATUS_FAILED, AgenticConstant.ToolResult.CODE_ERROR);
     }
 
     public static AgenticRunEvent reasoningRequested() {
-        return new AgenticRunEvent("reasoning", "agentic", "Thinking",
-                "Reasoning mode requested for this model.", now(), "start", "running", null);
+        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_REASONING, AgenticConstant.RunEvent.NAME_AGENTIC,
+                "Thinking", "Reasoning mode requested for this model.", now(),
+                AgenticConstant.RunEvent.PHASE_START, AgenticConstant.RunEvent.STATUS_RUNNING, null);
     }
 
     public static AgenticRunEvent requestFailed(String message) {
-        return new AgenticRunEvent("error", "agentic", "Request failed",
-                StringUtils.defaultIfBlank(message, "Request failed"), now(), "error", "failed", "ERROR");
+        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_ERROR, AgenticConstant.RunEvent.NAME_AGENTIC,
+                AgenticConstant.ToolMessage.REQUEST_FAILED,
+                StringUtils.defaultIfBlank(message, AgenticConstant.ToolMessage.REQUEST_FAILED), now(),
+                AgenticConstant.RunEvent.PHASE_ERROR, AgenticConstant.RunEvent.STATUS_FAILED,
+                AgenticConstant.ToolResult.CODE_ERROR);
     }
 
     private static long now() {

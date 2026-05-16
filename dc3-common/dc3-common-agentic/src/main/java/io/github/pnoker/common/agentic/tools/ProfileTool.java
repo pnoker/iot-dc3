@@ -19,7 +19,8 @@ package io.github.pnoker.common.agentic.tools;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.facade.api.ProfileFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
@@ -47,8 +48,6 @@ import java.util.Optional;
 @Component
 public class ProfileTool {
 
-    private static final String PROFILE_UNAVAILABLE = "Profile tools are not available in this deployment mode.";
-
     private final Optional<ProfileFacade> profileFacade;
 
     public ProfileTool(Optional<ProfileFacade> profileFacade) {
@@ -65,7 +64,7 @@ public class ProfileTool {
                 profileId);
         ProfileFacade facade = profileFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(PROFILE_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
         }
         FacadeProfileBO profile = facade.selectById(tenantId, profileId);
         if (Objects.isNull(profile)) {
@@ -80,11 +79,11 @@ public class ProfileTool {
             @ToolParam(description = "The numeric profile/template IDs") List<Long> profileIds,
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        List<Long> ids = normalizeIds(profileIds);
+        List<Long> ids = AgenticToolUtil.normalizeIds(profileIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileIds={}", "lookupProfilesByIds", tenantId, ids);
         ProfileFacade facade = profileFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(PROFILE_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
         }
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid profile IDs provided.");
@@ -111,7 +110,7 @@ public class ProfileTool {
                 "searchProfiles", tenantId, profileName, profileCode, profileType, page, size);
         ProfileFacade facade = profileFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(PROFILE_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
         }
 
         FacadeProfileQuery query = new FacadeProfileQuery();
@@ -119,12 +118,9 @@ public class ProfileTool {
         query.setProfileName(profileName);
         query.setProfileCode(profileCode);
         query.setProfileTypeFlag(parseProfileType(profileType));
-        Pages p = new Pages();
-        p.setCurrent(page);
-        p.setSize(size);
-        query.setPage(p);
+        query.setPage(AgenticToolUtil.page(page, size));
         FacadePage<FacadeProfileBO> result = facade.selectByPage(query);
-        if (Objects.isNull(result) || Objects.isNull(result.getRecords()) || result.getRecords().isEmpty()) {
+        if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No profiles found.", result);
         }
         return AgenticToolResult.ok("Profile page loaded", result);
@@ -140,20 +136,13 @@ public class ProfileTool {
                 deviceId);
         ProfileFacade facade = profileFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(PROFILE_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
         }
         List<FacadeProfileBO> profiles = facade.selectByDeviceId(tenantId, deviceId);
         if (Objects.isNull(profiles) || profiles.isEmpty()) {
             return AgenticToolResult.empty("No profiles found for device ID: " + deviceId, List.of());
         }
         return AgenticToolResult.ok("Profiles loaded for device " + deviceId, profiles);
-    }
-
-    private List<Long> normalizeIds(List<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return List.of();
-        }
-        return ids.stream().filter(Objects::nonNull).distinct().limit(50).toList();
     }
 
     private ProfileTypeFlagEnum parseProfileType(String value) {

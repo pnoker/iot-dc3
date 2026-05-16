@@ -29,6 +29,7 @@ import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
@@ -80,7 +81,7 @@ public class SessionServiceImpl implements SessionService {
         entityDO.setConversationId(conversationId);
         entityDO.setTenantId(tenantId);
         entityDO.setUserId(userId);
-        entityDO.setTitle("New Conversation");
+        entityDO.setTitle(AgenticConstant.Session.DEFAULT_TITLE);
         applySessionExt(entityDO, sessionExt);
         sessionManager.save(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);

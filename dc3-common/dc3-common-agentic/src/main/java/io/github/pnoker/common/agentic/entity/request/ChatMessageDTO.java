@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.entity.request;
 
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +36,10 @@ import lombok.Setter;
 public class ChatMessageDTO {
 
     /**
-     * Message role: "system", "user", "assistant", or "tool".
+     * Message role: {@link AgenticConstant.Chat#ROLE_SYSTEM},
+     * {@link AgenticConstant.Chat#ROLE_USER},
+     * {@link AgenticConstant.Chat#ROLE_ASSISTANT}, or
+     * {@link AgenticConstant.Chat#ROLE_TOOL}.
      */
     private String role;
 

@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.service.runtime;
 
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ToolContext;
@@ -37,7 +38,6 @@ import java.util.Objects;
  * @since 2022.1.0
  */
 @Slf4j
-@SuppressWarnings("deprecation")
 public class AgenticToolTracingCallback implements ToolCallback {
 
     private final ToolCallback delegate;
@@ -82,7 +82,7 @@ public class AgenticToolTracingCallback implements ToolCallback {
             return result;
         } catch (RuntimeException e) {
             AgenticToolContextUtil.recordToolError(toolContext, toolName, StringUtils.defaultIfBlank(e.getMessage(),
-                    "Tool execution failed"));
+                    AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED));
             throw e;
         }
     }
@@ -90,7 +90,7 @@ public class AgenticToolTracingCallback implements ToolCallback {
     private void recordStart(ToolContext toolContext, String toolName) {
         AgenticToolTraceMetadata metadata = Objects.nonNull(traceMetadata)
                 ? traceMetadata
-                : new AgenticToolTraceMetadata("tool", toolName);
+                : new AgenticToolTraceMetadata(AgenticConstant.RunEvent.TYPE_TOOL, toolName);
         AgenticToolContextUtil.recordToolInvocation(toolContext, toolName, metadata.domain(),
                 StringUtils.defaultIfBlank(metadata.title(), toolName));
     }
@@ -103,27 +103,34 @@ public class AgenticToolTracingCallback implements ToolCallback {
 
     private ToolResultSummary parseResult(String result) {
         if (StringUtils.isBlank(result)) {
-            return new ToolResultSummary(true, "OK", "Tool completed");
+            return new ToolResultSummary(true, AgenticConstant.ToolResult.CODE_OK,
+                    AgenticConstant.ToolResult.MESSAGE_COMPLETED);
         }
         try {
             JsonNode root = objectMapper.readTree(result);
             if (Objects.isNull(root) || !root.isObject() || !root.has("success")) {
-                return new ToolResultSummary(true, "OK", "Tool completed");
+                return new ToolResultSummary(true, AgenticConstant.ToolResult.CODE_OK,
+                        AgenticConstant.ToolResult.MESSAGE_COMPLETED);
             }
             boolean success = root.path("success").asBoolean(false);
-            String code = StringUtils.defaultIfBlank(root.path("code").asString(), success ? "OK" : "ERROR");
-            String message = StringUtils.defaultIfBlank(root.path("message").asString(), "Tool completed");
+            String code = StringUtils.defaultIfBlank(root.path("code").asString(),
+                    success ? AgenticConstant.ToolResult.CODE_OK : AgenticConstant.ToolResult.CODE_ERROR);
+            String message = StringUtils.defaultIfBlank(root.path("message").asString(),
+                    AgenticConstant.ToolResult.MESSAGE_COMPLETED);
             return new ToolResultSummary(success, code, message);
         } catch (JacksonException e) {
             log.debug("Agentic tool result trace parse skipped, tool={}, resultLen={}", toolName(),
                     result.length(), e);
-            return new ToolResultSummary(true, "OK", "Tool completed");
+            return new ToolResultSummary(true, AgenticConstant.ToolResult.CODE_OK,
+                    AgenticConstant.ToolResult.MESSAGE_COMPLETED);
         }
     }
 
     private String toolName() {
         ToolDefinition definition = getToolDefinition();
-        return Objects.nonNull(definition) ? StringUtils.defaultString(definition.name(), "tool") : "tool";
+        return Objects.nonNull(definition)
+                ? Objects.toString(definition.name(), AgenticConstant.RunEvent.TYPE_TOOL)
+                : AgenticConstant.RunEvent.TYPE_TOOL;
     }
 
     private record ToolResultSummary(boolean success, String code, String message) {

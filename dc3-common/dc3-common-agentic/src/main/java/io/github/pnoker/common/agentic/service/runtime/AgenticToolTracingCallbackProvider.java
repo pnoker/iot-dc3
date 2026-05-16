@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.service.runtime;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -88,7 +89,7 @@ public class AgenticToolTracingCallbackProvider implements ToolCallbackProvider 
     private String toolName(ToolCallback callback) {
         ToolDefinition definition = callback.getToolDefinition();
         if (Objects.isNull(definition) || StringUtils.isBlank(definition.name())) {
-            return "tool";
+            return AgenticConstant.RunEvent.TYPE_TOOL;
         }
         return definition.name();
     }

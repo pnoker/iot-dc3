@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.config;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.service.MessageService;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
@@ -135,9 +136,9 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
             return null;
         }
         return switch (row.getRole().toLowerCase()) {
-            case "user" -> new UserMessage(text);
-            case "assistant" -> new AssistantMessage(text);
-            case "system" -> new SystemMessage(text);
+            case AgenticConstant.Chat.ROLE_USER -> new UserMessage(text);
+            case AgenticConstant.Chat.ROLE_ASSISTANT -> new AssistantMessage(text);
+            case AgenticConstant.Chat.ROLE_SYSTEM -> new SystemMessage(text);
             default -> null;
         };
     }
