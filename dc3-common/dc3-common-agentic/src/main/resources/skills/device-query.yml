@@ -30,4 +30,4 @@ tools:
   - getSystemHealth
 examples:
   - user: "Show devices under driver 1"
-    assistant: "Querying the device list under driver 1..."
+    assistant: "Show the device rows returned by the backend in a concise table."
