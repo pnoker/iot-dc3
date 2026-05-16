@@ -59,6 +59,7 @@ public class FacadeGrpcPointValueBuilder {
         }
         StringOptional.ofNullable(dto.getValue()).ifPresent(bo::setValue);
         StringOptional.ofNullable(dto.getRawValue()).ifPresent(bo::setRawValue);
+        bo.setNumValue(dto.getNumValue());
 
         return bo;
     }

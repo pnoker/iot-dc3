@@ -23,6 +23,8 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * Auth-domain tools exposed to the LLM via Spring AI @Tool.
  * <p>
@@ -39,21 +41,23 @@ import org.springframework.stereotype.Component;
 public class AuthToolSet {
 
     @Tool(description = "Get the current tenant context. Returns only the current tenant ID.")
-    public String getCurrentTenantInfo(ToolContext toolContext) {
+    public AgenticToolResult<Map<String, Long>> getCurrentTenantInfo(ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getCurrentTenantInfo", tenantId);
         recordTool(toolContext, "getCurrentTenantInfo", "Read current tenant context");
-        return String.format("CurrentTenant: tenantId=%d", tenantId);
+        return AgenticToolResult.ok("Current tenant context loaded", Map.of("tenantId", tenantId));
     }
 
     @Tool(description = "Get the current user profile. Returns only user ID, username, and nickname.")
-    public String getCurrentUserProfile(ToolContext toolContext) {
+    public AgenticToolResult<Map<String, Object>> getCurrentUserProfile(ToolContext toolContext) {
         RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader();
         Long userId = AgenticRequestContext.requireUserId(toolContext);
         log.debug("Agentic tool invoked, tool={}, userId={}", "getCurrentUserProfile", userId);
         recordTool(toolContext, "getCurrentUserProfile", "Read current user profile");
-        return String.format("CurrentUser: userId=%d, username=%s, nickname=%s", userId, header.getUserName(),
-                header.getNickName());
+        return AgenticToolResult.ok("Current user profile loaded", Map.of(
+                "userId", userId,
+                "username", header.getUserName(),
+                "nickname", header.getNickName()));
     }
 
     private void recordTool(ToolContext toolContext, String toolName, String description) {

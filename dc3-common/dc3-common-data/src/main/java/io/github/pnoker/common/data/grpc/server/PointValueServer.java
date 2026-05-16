@@ -97,6 +97,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                         .setPointId(Objects.nonNull(bo.getPointId()) ? bo.getPointId() : 0)
                         .setValue(Objects.nonNull(bo.getCalValue()) ? bo.getCalValue() : "")
                         .setRawValue(Objects.nonNull(bo.getRawValue()) ? bo.getRawValue() : "")
+                        .setNumValue(Objects.nonNull(bo.getNumValue()) ? bo.getNumValue() : 0d)
                         .setCreateTime(
                                 Objects.nonNull(bo.getCreateTime()) ? bo.getCreateTime().toEpochSecond(java.time.ZoneOffset.UTC) : 0)
                         .build());

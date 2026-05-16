@@ -35,6 +35,7 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,9 +74,10 @@ public class DataToolSet {
     }
 
     @Tool(description = "Get the latest point value for a specific device and point. Returns the current value.")
-    public String getLatestPointValue(@ToolParam(description = "The device ID") Long deviceId,
-                                      @ToolParam(description = "The point (metric) ID") Long pointId,
-                                      ToolContext toolContext) {
+    public AgenticToolResult<FacadePointValueBO> getLatestPointValue(
+            @ToolParam(description = "The device ID") Long deviceId,
+            @ToolParam(description = "The point (metric) ID") Long pointId,
+            ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "getLatestPointValue",
                 tenantId, deviceId, pointId);
@@ -83,52 +85,47 @@ public class DataToolSet {
         try {
             FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, pointId);
             if (Objects.isNull(value)) {
-                return "No latest value found for device " + deviceId + " point " + pointId;
+                return AgenticToolResult.empty("No latest value found for device " + deviceId + " point " + pointId,
+                        null);
             }
-            return String.format("Device %d / Point %d: value=%s, rawValue=%s, time=%d", value.getDeviceId(),
-                    value.getPointId(), value.getValue(), value.getRawValue(), value.getCreateTime());
+            return AgenticToolResult.ok("Latest point value loaded", value);
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "getLatestPointValue",
                     tenantId, deviceId, pointId, e);
-            return "Error retrieving latest value: " + e.getMessage();
+            return AgenticToolResult.error("Error retrieving latest value: " + e.getMessage());
         }
     }
 
-    @Tool(description = "Get historical point values for a specific device and point. Returns a list of value strings together with a chart-renderable JSON block.")
-    public String getPointValueHistory(@ToolParam(description = "The device ID") Long deviceId,
-                                       @ToolParam(description = "The point (metric) ID") Long pointId,
-                                       @ToolParam(description = "Number of historical records to retrieve") int count,
-                                       ToolContext toolContext) {
+    @Tool(description = "Get historical point values for a specific device and point. Returns raw values and chart-ready numeric points as structured data.")
+    public AgenticToolResult<PointValueHistory> getPointValueHistory(
+            @ToolParam(description = "The device ID") Long deviceId,
+            @ToolParam(description = "The point (metric) ID") Long pointId,
+            @ToolParam(description = "Number of historical records to retrieve") int count,
+            ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
                 "getPointValueHistory", tenantId, deviceId, pointId, count);
         recordTool(toolContext, "getPointValueHistory", "Get point value history");
+        int size = Math.max(1, Math.min(count, 200));
         try {
-            List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, count);
+            List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, size);
             if (Objects.isNull(history) || history.isEmpty()) {
-                return "No history data found for device " + deviceId + " point " + pointId;
+                return AgenticToolResult.empty("No history data found for device " + deviceId + " point " + pointId,
+                        new PointValueHistory(deviceId, pointId, size, List.of(), null));
             }
-            String summary = "History values (" + history.size() + " records): " + String.join(", ", history);
-            String chart = buildHistoryChartFence(deviceId, pointId, history);
-            return chart.isEmpty() ? summary : summary + "\n\n" + chart;
+            PointValueHistory result = new PointValueHistory(deviceId, pointId, size, history,
+                    buildHistoryChart(deviceId, pointId, history));
+            return AgenticToolResult.ok("Point value history loaded", result);
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
-                    "getPointValueHistory", tenantId, deviceId, pointId, count, e);
-            return "Error retrieving history: " + e.getMessage();
+                    "getPointValueHistory", tenantId, deviceId, pointId, size, e);
+            return AgenticToolResult.error("Error retrieving history: " + e.getMessage());
         }
     }
 
-    /**
-     * Render a {@code ```chart:line``` } fence so the assistant frontend can plot the
-     * history without an extra tool round-trip. The facade currently returns values
-     * only (newest → oldest), so we use the array index as the x axis. Non-numeric
-     * entries are dropped; if nothing remains we return an empty string and the
-     * caller skips the fence.
-     */
-    private String buildHistoryChartFence(Long deviceId, Long pointId, List<String> history) {
-        StringBuilder dataPoints = new StringBuilder();
+    private HistoryChart buildHistoryChart(Long deviceId, Long pointId, List<String> history) {
+        List<List<Number>> dataPoints = new ArrayList<>();
         int rendered = 0;
-        // Reverse so x=0 is the oldest sample — easier to read left-to-right.
         for (int i = history.size() - 1; i >= 0; i--) {
             String raw = history.get(i);
             if (Objects.isNull(raw)) {
@@ -136,30 +133,24 @@ public class DataToolSet {
             }
             try {
                 double value = Double.parseDouble(raw.trim());
-                if (rendered > 0) {
-                    dataPoints.append(',');
-                }
-                dataPoints.append('[').append(rendered).append(',').append(value).append(']');
+                dataPoints.add(List.of(rendered, value));
                 rendered++;
             } catch (NumberFormatException ignored) {
-                // skip non-numeric entries
+                // Keep non-numeric values in the raw history; only chart data skips them.
             }
         }
         if (rendered == 0) {
-            return "";
+            return null;
         }
-        return "```chart:line\n"
-                + "{\"title\":\"Device " + deviceId + " / Point " + pointId + "\","
-                + "\"xLabel\":\"index (oldest → newest)\","
-                + "\"xType\":\"linear\","
-                + "\"series\":[{\"name\":\"value\",\"data\":[" + dataPoints + "]}]}\n"
-                + "```";
+        return new HistoryChart("line", "Device " + deviceId + " / Point " + pointId, "index (oldest to newest)",
+                "linear", List.of(new ChartSeries("value", dataPoints)));
     }
 
     @Tool(description = "Get a latest-value snapshot for points bound to a device. Returns point metadata and latest values for up to the requested limit.")
-    public String getDeviceLatestPointValues(@ToolParam(description = "The device ID") Long deviceId,
-                                             @ToolParam(description = "Maximum number of points to include") int limit,
-                                             ToolContext toolContext) {
+    public AgenticToolResult<DeviceLatestPointValues> getDeviceLatestPointValues(
+            @ToolParam(description = "The device ID") Long deviceId,
+            @ToolParam(description = "Maximum number of points to include") int limit,
+            ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         int size = Math.max(1, Math.min(limit, 50));
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, limit={}",
@@ -168,7 +159,7 @@ public class DataToolSet {
         try {
             FacadeDeviceBO device = deviceFacade.selectById(tenantId, deviceId);
             if (Objects.isNull(device)) {
-                return "Device not found for ID: " + deviceId;
+                return AgenticToolResult.notFound("Device not found for ID: " + deviceId);
             }
 
             FacadePointQuery query = new FacadePointQuery();
@@ -180,57 +171,53 @@ public class DataToolSet {
             query.setPage(page);
             FacadePage<FacadePointBO> points = pointFacade.selectByPage(query);
             if (Objects.isNull(points) || points.getRecords().isEmpty()) {
-                return "No points found for device " + deviceId;
+                return AgenticToolResult.empty("No points found for device " + deviceId,
+                        new DeviceLatestPointValues(device, List.of()));
             }
 
-            StringBuilder builder = new StringBuilder();
-            builder.append("Latest values for device ").append(deviceId).append(" (")
-                    .append(device.getDeviceName()).append("):\n");
-            builder.append("| Point ID | Point Name | Code | Value | Raw Value | Unit | Time |\n");
-            builder.append("| --- | --- | --- | --- | --- | --- | --- |\n");
+            List<PointLatestValue> values = new ArrayList<>();
             for (FacadePointBO point : points.getRecords()) {
                 FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, point.getId());
-                builder.append("| ")
-                        .append(point.getId()).append(" | ")
-                        .append(escape(point.getPointName())).append(" | ")
-                        .append(escape(point.getPointCode())).append(" | ")
-                        .append(Objects.isNull(value) ? "" : escape(value.getValue())).append(" | ")
-                        .append(Objects.isNull(value) ? "" : escape(value.getRawValue())).append(" | ")
-                        .append(escape(point.getUnit())).append(" | ")
-                        .append(Objects.isNull(value) ? "" : value.getCreateTime()).append(" |\n");
+                values.add(new PointLatestValue(point, value));
             }
-            return builder.toString();
+            return AgenticToolResult.ok("Device latest point values loaded",
+                    new DeviceLatestPointValues(device, values));
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, limit={}",
                     "getDeviceLatestPointValues", tenantId, deviceId, size, e);
-            return "Error retrieving device latest values: " + e.getMessage();
+            return AgenticToolResult.error("Error retrieving device latest values: " + e.getMessage());
         }
     }
 
     @Tool(description = "Send a read command to a device for a specific point. The driver will read the current value from the physical device.")
-    public String readPointValue(@ToolParam(description = "The device ID") Long deviceId,
-                                 @ToolParam(description = "The point (metric) ID to read") Long pointId,
-                                 ToolContext toolContext) {
+    public AgenticToolResult<PointCommandResult> readPointValue(
+            @ToolParam(description = "The device ID") Long deviceId,
+            @ToolParam(description = "The point (metric) ID to read") Long pointId,
+            ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
                 deviceId, pointId);
         recordTool(toolContext, "readPointValue", "Send point read command");
         try {
             boolean success = pointValueCommandFacade.read(tenantId, deviceId, pointId);
-            return success ? "Read command sent successfully for device " + deviceId + " point " + pointId
-                    : "Read command failed for device " + deviceId + " point " + pointId;
+            PointCommandResult result = new PointCommandResult(deviceId, pointId, null, success, false, null);
+            if (success) {
+                return AgenticToolResult.ok("Read command sent", result);
+            }
+            return AgenticToolResult.error("Read command failed for device " + deviceId + " point " + pointId);
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
                     deviceId, pointId, e);
-            return "Error sending read command: " + e.getMessage();
+            return AgenticToolResult.error("Error sending read command: " + e.getMessage());
         }
     }
 
     @Tool(description = "Send a write command to a device for a specific point. Sets the point to the specified value on the physical device.")
-    public String writePointValue(@ToolParam(description = "The device ID") Long deviceId,
-                                  @ToolParam(description = "The point (metric) ID to write") Long pointId,
-                                  @ToolParam(description = "The value to write (as a string)") String value,
-                                  ToolContext toolContext) {
+    public AgenticToolResult<PointCommandResult> writePointValue(
+            @ToolParam(description = "The device ID") Long deviceId,
+            @ToolParam(description = "The point (metric) ID to write") Long pointId,
+            @ToolParam(description = "The value to write (as a string)") String value,
+            ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, valueLength={}",
                 "writePointValue", tenantId, deviceId, pointId, Objects.isNull(value) ? 0 : value.length());
@@ -241,17 +228,19 @@ public class DataToolSet {
                 String conversationId = AgenticRequestContext.requireConversationId(toolContext);
                 String actionId = actionService.createWritePointValueAction(conversationId, deviceId, pointId, value,
                         header);
-                return "Write command is pending user confirmation. actionId=" + actionId
-                        + ". Ask the user to confirm before executing it.";
+                return AgenticToolResult.ok("Write command is pending user confirmation",
+                        new PointCommandResult(deviceId, pointId, value, false, true, actionId));
             }
             boolean success = pointValueCommandFacade.write(tenantId, deviceId, pointId, value);
-            return success
-                    ? "Write command sent successfully for device " + deviceId + " point " + pointId + " value=" + value
-                    : "Write command failed for device " + deviceId + " point " + pointId;
+            PointCommandResult result = new PointCommandResult(deviceId, pointId, value, success, false, null);
+            if (success) {
+                return AgenticToolResult.ok("Write command sent", result);
+            }
+            return AgenticToolResult.error("Write command failed for device " + deviceId + " point " + pointId);
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "writePointValue", tenantId,
                     deviceId, pointId, e);
-            return "Error sending write command: " + e.getMessage();
+            return AgenticToolResult.error("Error sending write command: " + e.getMessage());
         }
     }
 
@@ -259,8 +248,44 @@ public class DataToolSet {
         AgenticRequestContext.recordToolInvocation(toolContext, toolName, "data", description);
     }
 
-    private String escape(String value) {
-        return Objects.toString(value, "").replace("|", "\\|").replace("\n", " ");
+    public record PointValueHistory(Long deviceId, Long pointId, int requestedCount, List<String> values,
+                                    HistoryChart chart) {
+
+        public PointValueHistory {
+            values = List.copyOf(Objects.requireNonNullElse(values, List.of()));
+        }
+
+    }
+
+    public record HistoryChart(String type, String title, String xLabel, String xType, List<ChartSeries> series) {
+
+        public HistoryChart {
+            series = List.copyOf(Objects.requireNonNullElse(series, List.of()));
+        }
+
+    }
+
+    public record ChartSeries(String name, List<List<Number>> data) {
+
+        public ChartSeries {
+            data = List.copyOf(Objects.requireNonNullElse(data, List.of()));
+        }
+
+    }
+
+    public record DeviceLatestPointValues(FacadeDeviceBO device, List<PointLatestValue> points) {
+
+        public DeviceLatestPointValues {
+            points = List.copyOf(Objects.requireNonNullElse(points, List.of()));
+        }
+
+    }
+
+    public record PointLatestValue(FacadePointBO point, FacadePointValueBO value) {
+    }
+
+    public record PointCommandResult(Long deviceId, Long pointId, String value, boolean sent,
+                                     boolean pendingConfirmation, String actionId) {
     }
 
 }
