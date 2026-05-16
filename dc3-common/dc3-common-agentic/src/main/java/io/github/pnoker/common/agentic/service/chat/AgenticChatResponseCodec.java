@@ -139,7 +139,8 @@ public class AgenticChatResponseCodec {
         while (Objects.nonNull(event)) {
             prepared.toolTraceEvents().add(event);
             events.add(ServerSentEvent.<String>builder()
-                    .data(formatEvent("tool", event.description(), event.domain(), event.toolName()))
+                    .data(formatEvent("tool", event.description(), event.detail(), event.toolName(), event.phase(),
+                            event.status(), event.code()))
                     .build());
             event = prepared.toolEvents().poll();
         }
@@ -166,12 +167,26 @@ public class AgenticChatResponseCodec {
     }
 
     public String formatEvent(String type, String title, String detail, String name) {
+        return formatEvent(type, title, detail, name, null, null, null);
+    }
+
+    public String formatEvent(String type, String title, String detail, String name, String phase, String status,
+                              String code) {
         Map<String, Object> event = new HashMap<>();
         event.put("object", "agentic.event");
         event.put("type", type);
         event.put("title", StringUtils.defaultString(title));
         event.put("detail", StringUtils.defaultString(detail));
         event.put("name", StringUtils.defaultString(name));
+        if (StringUtils.isNotBlank(phase)) {
+            event.put("phase", phase);
+        }
+        if (StringUtils.isNotBlank(status)) {
+            event.put("status", status);
+        }
+        if (StringUtils.isNotBlank(code)) {
+            event.put("code", code);
+        }
         event.put("created", Instant.now().getEpochSecond());
         return toJson(event);
     }

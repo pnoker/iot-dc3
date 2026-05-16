@@ -95,8 +95,8 @@ public class AgenticMessageRecorder {
                     "Reasoning mode requested for this model.", "agentic", created));
         }
         for (AgenticRequestContext.ToolEvent event : toolEvents) {
-            traces.add(AgenticMessageContent.Trace.of("tool", event.description(), event.domain(), event.toolName(),
-                    event.timestamp() / 1000));
+            traces.add(AgenticMessageContent.Trace.of("tool", event.description(), event.detail(), event.toolName(),
+                    event.timestamp() / 1000, event.phase(), event.status(), event.code()));
         }
         return traces;
     }
