@@ -113,7 +113,7 @@ public class AgenticChatRequestPreparer {
         return new AgenticPreparedChatRequest(rawUserMessage, scopedConversationId, requestSystemContext, model,
                 toolContext, request.getTemperature(), request.getMaxTokens(), runTrace,
                 toolCallingEnabled, Boolean.TRUE.equals(request.getReasoning()), attachments, contexts,
-                inputTokens);
+                inputTokens, memoryHistory);
     }
 
     private Map<String, Object> buildToolContext(RequestHeader.UserHeader userHeader, String scopedConversationId,

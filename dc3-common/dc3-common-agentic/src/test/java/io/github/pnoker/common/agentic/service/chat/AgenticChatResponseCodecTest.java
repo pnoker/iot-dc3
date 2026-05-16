@@ -73,7 +73,7 @@ class AgenticChatResponseCodecTest {
         AgenticPreparedChatRequest prepared = prepared(runTrace);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
-                new AgenticStreamDelta("Device loaded"));
+                new AgenticStreamDelta("Device loaded", null));
 
         assertThat(events).hasSize(3);
         assertThat(events.get(0).data()).contains("\"object\":\"agentic.event\"");
@@ -84,6 +84,19 @@ class AgenticChatResponseCodecTest {
         assertThat(events.get(2).data()).contains("\"content\":\"Device loaded\"");
     }
 
+    @Test
+    void streamEventsSerializesReasoningContentChunk() {
+        AgenticPreparedChatRequest prepared = prepared(new AgenticRunTrace(), true);
+
+        List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
+                new AgenticStreamDelta("", "Checking platform data."));
+
+        assertThat(events).hasSize(1);
+        assertThat(events.get(0).data()).contains("\"object\":\"chat.completion.chunk\"");
+        assertThat(events.get(0).data()).contains("\"reasoning_content\":\"Checking platform data.\"");
+        assertThat(events.get(0).data()).doesNotContain("\"content\":");
+    }
+
     private AgenticPreparedChatRequest prepared(AgenticRunTrace runTrace) {
         return prepared(runTrace, false);
     }
@@ -91,7 +104,7 @@ class AgenticChatResponseCodecTest {
     private AgenticPreparedChatRequest prepared(AgenticRunTrace runTrace, boolean reasoning) {
         return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, runTrace, true, reasoning, List.of(), List.of(),
-                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0));
+                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }
 
 }

@@ -77,7 +77,7 @@ class AgenticMessageRecorderTest {
     void persistAssistantMessageSavesReasoningOnlyMessage() {
         AgenticPreparedChatRequest prepared = prepared(new AgenticRunTrace(), true, List.of());
 
-        recorder.persistAssistantMessage(prepared, "", userHeader);
+        recorder.persistAssistantMessage(prepared, "", "查询驱动列表前，先确认租户上下文。", userHeader);
 
         ArgumentCaptor<AgenticMessageContent> captor = ArgumentCaptor.forClass(AgenticMessageContent.class);
         verify(messageService).save(eq("tenant:user:conversation"), eq("assistant"), captor.capture(),
@@ -85,6 +85,7 @@ class AgenticMessageRecorderTest {
         AgenticMessageContent content = captor.getValue();
         assertThat(content.getText()).isEmpty();
         assertThat(content.getReasoning()).isTrue();
+        assertThat(content.getReasoningContent()).isEqualTo("查询驱动列表前，先确认租户上下文。");
         assertThat(content.getTraces()).extracting(AgenticMessageContent.Trace::getType).containsExactly("reasoning");
     }
 
@@ -101,7 +102,7 @@ class AgenticMessageRecorderTest {
                                                 List<AgenticMessageContent.Context> contexts) {
         return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, runTrace, true, reasoning, List.of(), contexts,
-                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0));
+                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }
 
 }

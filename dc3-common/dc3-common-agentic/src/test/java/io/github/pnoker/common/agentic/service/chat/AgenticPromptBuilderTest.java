@@ -121,7 +121,7 @@ class AgenticPromptBuilderTest {
     private AgenticPreparedChatRequest prepared(boolean toolCallingEnabled) {
         return new AgenticPreparedChatRequest("show me device status", "tenant:user:conversation",
                 null, "dc3-test-model", Map.of(), null, null, new AgenticRunTrace(), toolCallingEnabled,
-                false, List.of(), List.of(), AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0));
+                false, List.of(), List.of(), AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }
 
 }

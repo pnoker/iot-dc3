@@ -78,6 +78,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             String chatId = responseCodec.newChatId();
             long created = Instant.now().getEpochSecond();
             StringBuilder assistantContent = new StringBuilder();
+            StringBuilder assistantReasoningContent = new StringBuilder();
             AtomicReference<String> lastFinishReason = new AtomicReference<>();
 
             Flux<ServerSentEvent<String>> runtimeEvents = agenticRuntime.stream(prepared)
@@ -88,11 +89,15 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                         if (frame.delta().content() != null) {
                             assistantContent.append(frame.delta().content());
                         }
+                        if (frame.delta().reasoningContent() != null) {
+                            assistantReasoningContent.append(frame.delta().reasoningContent());
+                        }
                     })
                     .concatMap(frame -> Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created,
                             frame.delta())))
                     .doOnComplete(() -> {
-                        messageRecorder.persistAssistantMessage(prepared, assistantContent.toString(), userHeader);
+                        messageRecorder.persistAssistantMessage(prepared, assistantContent.toString(),
+                                assistantReasoningContent.toString(), userHeader);
                         log.info(
                                 "Agentic stream complete, conversationId={}, model={}, contentLen={}, finishReason={}",
                                 prepared.scopedConversationId(), prepared.model(), assistantContent.length(),
@@ -107,7 +112,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
                 return Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created, AgenticStreamDelta.empty()))
                         .doOnComplete(() -> messageRecorder.persistAssistantMessage(prepared,
-                                assistantContent.toString(), userHeader));
+                                assistantContent.toString(), assistantReasoningContent.toString(), userHeader));
             });
 
             return initialEvents

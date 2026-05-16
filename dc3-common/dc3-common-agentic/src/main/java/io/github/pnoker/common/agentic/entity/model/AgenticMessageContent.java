@@ -59,6 +59,8 @@ public class AgenticMessageContent implements Serializable {
 
     private Boolean reasoning;
 
+    private String reasoningContent;
+
     public static AgenticMessageContent ofText(String text) {
         AgenticMessageContent content = new AgenticMessageContent();
         content.setText(text);
