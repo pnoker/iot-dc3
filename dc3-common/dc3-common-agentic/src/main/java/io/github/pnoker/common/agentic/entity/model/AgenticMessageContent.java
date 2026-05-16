@@ -82,14 +82,28 @@ public class AgenticMessageContent implements Serializable {
 
         private String name;
 
+        private String phase;
+
+        private String status;
+
+        private String code;
+
         private Long created;
 
         public static Trace of(String type, String title, String detail, String name, Long created) {
+            return of(type, title, detail, name, created, null, null, null);
+        }
+
+        public static Trace of(String type, String title, String detail, String name, Long created, String phase,
+                               String status, String code) {
             Trace trace = new Trace();
             trace.setType(type);
             trace.setTitle(title);
             trace.setDetail(detail);
             trace.setName(name);
+            trace.setPhase(phase);
+            trace.setStatus(status);
+            trace.setCode(code);
             trace.setCreated(created);
             return trace;
         }

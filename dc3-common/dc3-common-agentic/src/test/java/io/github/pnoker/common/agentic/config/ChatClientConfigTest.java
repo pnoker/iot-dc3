@@ -40,6 +40,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -93,7 +94,7 @@ class ChatClientConfigTest {
         PointValueTool pointValueTool = new PointValueTool(pointValueFacade, pointValueCommandFacade, actionService);
         SystemTool systemTool = new SystemTool(Optional.of(statusHealthFacade));
         provider = config.agenticToolCallbackProvider(tenantTool, userTool, deviceTool, driverTool, profileTool,
-                pointTool, pointValueTool, systemTool);
+                pointTool, pointValueTool, systemTool, new ObjectMapper());
     }
 
     @Test

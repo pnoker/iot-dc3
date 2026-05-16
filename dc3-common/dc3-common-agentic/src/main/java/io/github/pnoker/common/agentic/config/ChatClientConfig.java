@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.config;
 
 import io.github.pnoker.common.agentic.service.MessageService;
+import io.github.pnoker.common.agentic.service.runtime.AgenticToolTracingCallbackProvider;
 import io.github.pnoker.common.agentic.tools.DeviceTool;
 import io.github.pnoker.common.agentic.tools.DriverTool;
 import io.github.pnoker.common.agentic.tools.PointTool;
@@ -39,6 +40,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Configures Spring AI chat memory backed by the {@code dc3_message} business table
@@ -97,11 +99,13 @@ public class ChatClientConfig {
     public ToolCallbackProvider agenticToolCallbackProvider(TenantTool tenantTool, UserTool userTool,
                                                             DeviceTool deviceTool, DriverTool driverTool,
                                                             ProfileTool profileTool, PointTool pointTool,
-                                                            PointValueTool pointValueTool, SystemTool systemTool) {
-        return MethodToolCallbackProvider.builder()
+                                                            PointValueTool pointValueTool, SystemTool systemTool,
+                                                            ObjectMapper objectMapper) {
+        ToolCallbackProvider provider = MethodToolCallbackProvider.builder()
                 .toolObjects(tenantTool, userTool, deviceTool, driverTool, profileTool, pointTool, pointValueTool,
                         systemTool)
                 .build();
+        return new AgenticToolTracingCallbackProvider(provider, objectMapper);
     }
 
     @Bean

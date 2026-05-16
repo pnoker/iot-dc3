@@ -55,15 +55,20 @@ class AgenticChatResponseCodecTest {
         Queue<AgenticRequestContext.ToolEvent> toolEvents = new ConcurrentLinkedQueue<>();
         toolEvents.offer(new AgenticRequestContext.ToolEvent("lookupDeviceById", "device", "Query device by ID",
                 1000L));
+        toolEvents.offer(new AgenticRequestContext.ToolEvent("lookupDeviceById", "tool", "Device loaded",
+                1100L, "result", "success", "OK"));
         AgenticPreparedChatRequest prepared = prepared(toolEvents);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 new AgenticStreamDelta("Device loaded", null));
 
-        assertThat(events).hasSize(2);
+        assertThat(events).hasSize(3);
         assertThat(events.get(0).data()).contains("\"object\":\"agentic.event\"");
-        assertThat(events.get(1).data()).contains("\"object\":\"chat.completion.chunk\"");
-        assertThat(events.get(1).data()).contains("\"content\":\"Device loaded\"");
+        assertThat(events.get(1).data()).contains("\"phase\":\"result\"");
+        assertThat(events.get(1).data()).contains("\"status\":\"success\"");
+        assertThat(events.get(1).data()).contains("\"code\":\"OK\"");
+        assertThat(events.get(2).data()).contains("\"object\":\"chat.completion.chunk\"");
+        assertThat(events.get(2).data()).contains("\"content\":\"Device loaded\"");
     }
 
     private AgenticPreparedChatRequest prepared(Queue<AgenticRequestContext.ToolEvent> toolEvents) {
