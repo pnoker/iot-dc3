@@ -267,7 +267,9 @@ describe('agentic streaming contract', () => {
 
     const fetchMock = vi.fn(async () => {
       const body = [
-        'data: {"object":"agentic.event","type":"tool","title":"Tool call","detail":"done","created":1}',
+        'data: {"object":"agentic.event","type":"tool","title":"Tool call","detail":"device","name":"searchDevices","phase":"start","status":"running","created":1}',
+        '',
+        'data: {"object":"agentic.event","type":"tool","title":"Device page loaded","detail":"OK","name":"searchDevices","phase":"result","status":"success","code":"OK","created":2}',
         '',
         'data: {"choices":[{"delta":{"reasoning_content":"let me think "}}]}',
         '',
@@ -322,7 +324,12 @@ describe('agentic streaming contract', () => {
         }),
       })
     );
-    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'tool', title: 'Tool call' }));
+    expect(onEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'tool', title: 'Tool call', phase: 'start', status: 'running' })
+    );
+    expect(onEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'tool', title: 'Device page loaded', phase: 'result', status: 'success' })
+    );
     expect(onReasoning.mock.calls.map(([chunk]) => chunk)).toEqual(['let me think ', 'about this']);
     expect(onDelta.mock.calls.map(([chunk]) => chunk)).toEqual(['hello ', 'world']);
     expect(onDone).toHaveBeenCalledTimes(1);

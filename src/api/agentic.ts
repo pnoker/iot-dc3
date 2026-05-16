@@ -42,6 +42,9 @@ interface OpenAIChunk {
   title?: string;
   detail?: string;
   name?: string;
+  phase?: AgenticTraceEvent['phase'];
+  status?: AgenticTraceEvent['status'];
+  code?: string;
   created?: number;
   choices?: Array<{
     delta?: {
@@ -259,6 +262,9 @@ const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
         title: chunk.title,
         detail: chunk.detail,
         name: chunk.name,
+        phase: chunk.phase,
+        status: chunk.status,
+        code: chunk.code,
         created: chunk.created,
       };
       callbacks.onEvent?.(event);

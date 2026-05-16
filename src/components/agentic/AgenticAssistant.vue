@@ -488,6 +488,7 @@
     label: string;
     detail?: string;
     meta?: string;
+    status?: AgenticTraceEvent['status'];
   }
 
   interface AssistantTokenItem {
@@ -878,27 +879,60 @@
   };
 
   const assistantToolSteps = (message: AgenticMessage): AssistantChainStep[] => {
-    const traceSteps = assistantTraceEvents(message)
-      .filter((event) => event.type === 'tool')
-      .map((event) => {
-        const label = event.name || event.title || 'tool';
-        const detail = event.title;
-        const meta = event.detail;
-        return {
-          id: traceKey(event),
-          index: 0,
-          label,
-          detail,
-          meta: meta && meta !== detail ? meta : undefined,
-        };
-      });
-    const fallbackSteps = assistantTools(message).map((tool) => ({
-      id: `tool-${tool}`,
-      index: 0,
-      label: tool,
-      detail: '',
-    }));
+    const traceSteps = groupedToolTraceEvents(message).map((event) => {
+      const label = event.name || event.title || 'tool';
+      const detail = event.title;
+      const meta = toolTraceMeta(event, detail);
+      return {
+        id: traceKey(event),
+        index: 0,
+        label,
+        detail,
+        meta,
+        status: event.status,
+      };
+    });
+    const tracedToolLabels = new Set(traceSteps.map((step) => step.label));
+    const fallbackSteps = assistantTools(message)
+      .filter((tool) => !tracedToolLabels.has(tool))
+      .map((tool) => ({
+        id: `tool-${tool}`,
+        index: 0,
+        label: tool,
+        detail: '',
+      }));
     return indexChainSteps(uniqueChainSteps([...traceSteps, ...fallbackSteps]));
+  };
+
+  const groupedToolTraceEvents = (message: AgenticMessage): AgenticTraceEvent[] => {
+    const grouped = new Map<string, AgenticTraceEvent>();
+    assistantTraceEvents(message)
+      .filter((event) => event.type === 'tool')
+      .forEach((event) => {
+        const key = event.name || event.title || traceKey(event);
+        const current = grouped.get(key);
+        if (!current || toolEventRank(event) >= toolEventRank(current)) {
+          grouped.set(key, event);
+        }
+      });
+    return Array.from(grouped.values());
+  };
+
+  const toolEventRank = (event: AgenticTraceEvent) => {
+    if (event.phase === 'error' || event.status === 'failed') return 4;
+    if (event.phase === 'result') return 3;
+    if (event.phase === 'start') return 2;
+    return 1;
+  };
+
+  const toolTraceMeta = (event: AgenticTraceEvent, detail?: string) => {
+    const seen = new Set<string>();
+    const parts = [event.status, event.code, event.detail].filter((part): part is string => {
+      if (!part || part === detail || seen.has(part)) return false;
+      seen.add(part);
+      return true;
+    });
+    return parts.length ? parts.join(' · ') : undefined;
   };
 
   const assistantContexts = (message: AgenticMessage): AgenticMessageContext[] => {
@@ -963,13 +997,21 @@
   };
 
   const traceKey = (event: AgenticTraceEvent) => {
-    return [event.type, event.name || '', event.title || '', event.detail || ''].join('|');
+    return [
+      event.type,
+      event.name || '',
+      event.phase || '',
+      event.status || '',
+      event.code || '',
+      event.title || '',
+      event.detail || '',
+    ].join('|');
   };
 
   const uniqueChainSteps = (steps: AssistantChainStep[]) => {
     const seen = new Set<string>();
     return steps.filter((step) => {
-      const key = [step.label, step.detail || '', step.meta || ''].join('|');
+      const key = [step.label, step.status || '', step.detail || '', step.meta || ''].join('|');
       if (seen.has(key)) {
         return false;
       }

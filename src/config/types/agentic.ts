@@ -187,5 +187,8 @@ export interface AgenticTraceEvent {
   title: string;
   detail?: string;
   name?: string;
+  phase?: 'start' | 'result' | 'error';
+  status?: 'running' | 'success' | 'empty' | 'failed';
+  code?: string;
   created?: number;
 }
