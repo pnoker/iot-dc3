@@ -43,6 +43,7 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
 const MESSAGE_STORAGE_KEY = 'dc3-agentic-messages';
+const DEFAULT_SESSION_TITLE = 'New Conversation';
 const DEFAULT_MODEL: AgenticModel = {
   model: 'dc3-agentic',
   label: 'DC3 Agentic',
@@ -194,7 +195,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       sessions.value = [
         {
           conversationId,
-          title: 'New Conversation',
+          title: DEFAULT_SESSION_TITLE,
           sessionExt: buildCurrentSessionExt(model),
         },
         ...sessions.value,
@@ -278,7 +279,6 @@ export const useAgenticStore = defineStore('agentic', () => {
     selectedModel.value = model;
     applyModelCapabilities();
     updateSessionLocally(conversationId, { sessionExt: buildCurrentSessionExt(model) });
-    await persistSessionPrefs(conversationId);
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
       role: 'user',
@@ -440,12 +440,10 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const syncSessionAfterMessage = async (conversationId: string, firstUserText: string) => {
     const session = sessions.value.find((item) => item.conversationId === conversationId);
-    const title = normalizeTitle(
-      session?.title && session.title !== 'New Conversation' ? session.title : firstUserText
-    );
-    await renameSession(conversationId, title);
-    await loadSessions();
-    if (!sessions.value.some((item) => item.conversationId === conversationId)) {
+    const title = shouldGenerateSessionTitle(session?.title)
+      ? normalizeTitle(firstUserText)
+      : normalizeTitle(session!.title!);
+    if (!session) {
       sessions.value = [
         {
           conversationId,
@@ -454,6 +452,11 @@ export const useAgenticStore = defineStore('agentic', () => {
         },
         ...sessions.value,
       ];
+      await renameSession(conversationId, title);
+      return;
+    }
+    if (normalizeTitle(session.title || DEFAULT_SESSION_TITLE) !== title) {
+      await renameSession(conversationId, title);
     }
   };
 
@@ -687,7 +690,11 @@ const createTraceEventId = (type: string) => {
 
 const normalizeTitle = (title: string) => {
   const trimmed = title.trim().replace(/\s+/g, ' ');
-  return trimmed.length > 32 ? `${trimmed.slice(0, 32)}...` : trimmed || 'New Conversation';
+  return trimmed.length > 32 ? `${trimmed.slice(0, 32)}...` : trimmed || DEFAULT_SESSION_TITLE;
+};
+
+const shouldGenerateSessionTitle = (title?: string) => {
+  return !title || normalizeTitle(title) === DEFAULT_SESSION_TITLE;
 };
 
 type RawAgenticSessionExt = AgenticSessionExt & {

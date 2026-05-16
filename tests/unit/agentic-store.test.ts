@@ -57,7 +57,7 @@ describe('agentic store', () => {
     );
   });
 
-  it('accumulates streaming reasoning text and persists session state through sessionExt only', async () => {
+  it('accumulates streaming reasoning text and avoids redundant session preference updates while sending', async () => {
     apiMocks.streamAgenticChatCompletion.mockImplementation(
       async (_request: unknown, callbacks: AgenticStreamCallbacks) => {
         callbacks.onReasoning?.('检查设备状态，');
@@ -100,19 +100,17 @@ describe('agentic store', () => {
       model: 'deepseek-v4-pro',
       reasoning: true,
       conversationId,
+      messages: [{ role: 'user', content: '查看设备状态' }],
     });
 
     const sessionPayloads = apiMocks.updateAgenticSession.mock.calls.map(([, payload]) => payload);
-    expect(sessionPayloads).toContainEqual({
-      sessionExt: expect.objectContaining({
-        model: 'deepseek-v4-pro',
-        reasoningEnabled: true,
-      }),
-    });
+    expect(sessionPayloads).toEqual([{ title: '查看设备状态' }]);
     for (const payload of sessionPayloads) {
       expect(payload).not.toHaveProperty('model');
       expect(payload).not.toHaveProperty('sessionConfig');
+      expect(payload).not.toHaveProperty('sessionExt');
     }
+    expect(apiMocks.getAgenticSessions).not.toHaveBeenCalled();
   });
 
   it('restores session preferences from persisted session_ext metadata', async () => {
