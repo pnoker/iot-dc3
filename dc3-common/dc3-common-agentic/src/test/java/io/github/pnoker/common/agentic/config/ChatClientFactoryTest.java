@@ -70,15 +70,30 @@ class ChatClientFactoryTest {
         return field;
     }
 
+    private static void injectField(Object target, String name, Object value) throws Exception {
+        Field field = ChatClientFactory.class.getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
+        AgenticProperties properties = new AgenticProperties();
         factory = new ChatClientFactory(modelProviderManager, modelConfigManager, modelProviderBuilder,
-                modelConfigBuilder, fallbackBuilder, memoryAdvisor);
+                modelConfigBuilder, fallbackBuilder, memoryAdvisor, properties);
+        injectField(factory, "fallbackModel", "gpt-4o");
     }
 
     @Test
-    void resolveModelReturnsTrimmedNonBlankInputDirectly() {
+    void resolveModelReturnsConfiguredFallbackWhenNoModelConfigExists() {
         assertThat(factory.resolveModel("  gpt-4o  ")).isEqualTo("gpt-4o");
+        assertThat(factory.resolveModel("unknown-model")).isEqualTo("gpt-4o");
+    }
+
+    @Test
+    void supportsToolCallUsesFallbackCapabilityWhenNoModelConfigExists() {
+        assertThat(factory.supportsToolCall("gpt-4o")).isTrue();
+        assertThat(factory.supportsToolCall("unknown-model")).isFalse();
     }
 
     @Test

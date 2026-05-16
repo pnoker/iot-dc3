@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.service.impl;
 
 import io.github.pnoker.common.agentic.dal.ModelConfigManager;
 import io.github.pnoker.common.agentic.dal.ModelProviderManager;
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
 import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
@@ -59,7 +60,8 @@ class ModelConfigServiceImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new ModelConfigServiceImpl(modelConfigManager, modelProviderManager, modelConfigBuilder);
+        service = new ModelConfigServiceImpl(modelConfigManager, modelProviderManager, modelConfigBuilder,
+                new AgenticProperties());
         injectField("fallbackModel", "gpt-4o");
         injectField("fallbackTemperature", 0.7);
         injectField("fallbackMaxTokens", 2048);
