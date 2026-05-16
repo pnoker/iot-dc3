@@ -64,7 +64,7 @@ public class ChatClientConfig {
 
             - **Tenant and user tools**: Read the current low-sensitivity tenant and user context.
             - **Device, driver, profile, and point tools**: Query platform metadata.
-            - **Point-value tools**: Read real-time values, query historical data, and send read/write commands to devices.
+            - **Point-value tools**: Read real-time values, query historical data, send read commands, and prepare pending write actions that require user confirmation.
             - **System tools**: Query platform health summaries.
 
             Guidelines:
