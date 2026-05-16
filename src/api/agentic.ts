@@ -256,14 +256,18 @@ const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
   try {
     const chunk = JSON.parse(data) as OpenAIChunk;
     if (chunk.object === 'agentic.event' && chunk.type && chunk.title) {
-      callbacks.onEvent?.({
+      const event: AgenticTraceEvent = {
         id: `${chunk.type}-${chunk.created || Date.now()}-${Math.random().toString(16).slice(2)}`,
         type: chunk.type,
         title: chunk.title,
         detail: chunk.detail,
         name: chunk.name,
         created: chunk.created,
-      });
+      };
+      callbacks.onEvent?.(event);
+      if (event.type === 'error') {
+        throw new Error(event.detail ? `${event.title}: ${event.detail}` : event.title);
+      }
       return;
     }
     const content = chunk.choices?.[0]?.delta?.content;
@@ -279,6 +283,6 @@ const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
       callbacks.onFinish?.(finishReason);
     }
   } catch (error) {
-    callbacks.onError?.(error instanceof Error ? error : new Error(String(error)));
+    throw error instanceof Error ? error : new Error(String(error));
   }
 };

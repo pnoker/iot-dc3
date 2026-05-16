@@ -148,14 +148,14 @@ exports[`API wrapper contracts > agentic > getAgenticSessions maps to its transp
   "args": [
     "api/v3/agentic/session/list",
     {
-      "params": {
-        "keyword": "demo",
-        "page.current": 2,
-        "page.size": 20,
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
       },
     },
   ],
-  "transport": "httpGet",
+  "transport": "httpPost",
 }
 `;
 

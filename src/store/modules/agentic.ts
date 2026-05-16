@@ -353,6 +353,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       } else {
         failMessage('Agentic chat failed.', 'Agentic', error);
         appendAssistantDelta(conversationId, assistantMessage.id, '\n\nRequest failed.');
+        setAssistantFinishReason(conversationId, assistantMessage.id, 'error');
       }
       markAssistantComplete(conversationId, assistantMessage.id);
     } finally {

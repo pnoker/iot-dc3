@@ -835,6 +835,10 @@
     if (message.streaming) {
       return message.content ? t('agentic.statusStreaming') : t('agentic.statusThinking');
     }
+    const reason = message.finishReason?.toLowerCase();
+    if (reason === 'error' || reason === 'failed') {
+      return t('agentic.statusFailed');
+    }
     return t('agentic.statusDone');
   };
 

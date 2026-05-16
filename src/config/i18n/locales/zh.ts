@@ -910,6 +910,7 @@ export default {
     statusStreaming: '输出中',
     statusThinking: '思考中',
     statusDone: '完成',
+    statusFailed: '失败',
     statusEnabled: '已启用',
     actionCopy: '复制',
     actionCopied: '已复制',

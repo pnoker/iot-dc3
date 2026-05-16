@@ -910,6 +910,7 @@ export default {
     statusStreaming: 'Streaming',
     statusThinking: 'Thinking',
     statusDone: 'Done',
+    statusFailed: 'Failed',
     statusEnabled: 'Enabled',
     actionCopy: 'Copy',
     actionCopied: 'Copied',

@@ -346,4 +346,40 @@ describe('agentic streaming contract', () => {
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
     expect(window.location.hash).toBe('#/login');
   });
+
+  it('rejects backend SSE error events instead of treating them as a completed stream', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        const body = [
+          'data: {"object":"agentic.event","type":"error","title":"Request failed","detail":"backend failed","created":1}',
+          '',
+          'data: {"choices":[{"delta":{},"finish_reason":"stop"}]}',
+          '',
+          'data: [DONE]',
+          '',
+        ].join('\n');
+
+        return new Response(body, {
+          status: 200,
+          headers: { 'Content-Type': 'text/event-stream' },
+        });
+      })
+    );
+
+    const onEvent = vi.fn();
+    const onDone = vi.fn();
+    const onError = vi.fn();
+
+    await expect(
+      agenticApi.streamAgenticChatCompletion(
+        { messages: [{ role: 'user', content: 'hello' }], conversationId: 'conversation-test', stream: true } as never,
+        { onEvent, onDone, onError }
+      )
+    ).rejects.toThrow('Request failed: backend failed');
+
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'error', title: 'Request failed' }));
+    expect(onDone).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalledWith(expect.any(Error));
+  });
 });
