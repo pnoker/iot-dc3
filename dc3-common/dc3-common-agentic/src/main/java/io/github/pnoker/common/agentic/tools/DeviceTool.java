@@ -19,7 +19,8 @@ package io.github.pnoker.common.agentic.tools;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
@@ -52,8 +53,6 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class DeviceTool {
-
-    private static final String STATUS_UNAVAILABLE = "Status and health tools are not available in this deployment mode.";
 
     private final DeviceFacade deviceFacade;
 
@@ -91,7 +90,7 @@ public class DeviceTool {
             @ToolParam(description = "The numeric device IDs") List<Long> deviceIds,
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        List<Long> ids = normalizeIds(deviceIds);
+        List<Long> ids = AgenticToolUtil.normalizeIds(deviceIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceIds={}", "lookupDevicesByIds", tenantId, ids);
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid device IDs provided.");
@@ -122,13 +121,10 @@ public class DeviceTool {
         query.setDeviceCode(deviceCode);
         query.setDriverId(driverId);
         query.setTenantId(tenantId);
-        Pages p = new Pages();
-        p.setCurrent(page);
-        p.setSize(size);
-        query.setPage(p);
+        query.setPage(AgenticToolUtil.page(page, size));
 
         FacadePage<FacadeDeviceBO> result = deviceFacade.selectByPage(query);
-        if (Objects.isNull(result) || Objects.isNull(result.getRecords()) || result.getRecords().isEmpty()) {
+        if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No devices found.", result);
         }
         return AgenticToolResult.ok("Device page loaded", result);
@@ -171,7 +167,7 @@ public class DeviceTool {
             @ToolParam(description = "Maximum number of points to include") int limit,
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        int size = Math.max(1, Math.min(limit, 50));
+        int size = AgenticToolUtil.clamp(limit, 1, AgenticConstant.ToolLimit.MAX_IDS);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, limit={}",
                 "getDeviceLatestPointValues", tenantId, deviceId, size);
         try {
@@ -183,12 +179,9 @@ public class DeviceTool {
             FacadePointQuery query = new FacadePointQuery();
             query.setTenantId(tenantId);
             query.setDeviceId(deviceId);
-            Pages page = new Pages();
-            page.setCurrent(1);
-            page.setSize(size);
-            query.setPage(page);
+            query.setPage(AgenticToolUtil.page(1, size));
             FacadePage<FacadePointBO> points = pointFacade.selectByPage(query);
-            if (Objects.isNull(points) || Objects.isNull(points.getRecords()) || points.getRecords().isEmpty()) {
+            if (!AgenticToolUtil.hasRecords(points)) {
                 return AgenticToolResult.empty("No points found for device " + deviceId,
                         new DeviceLatestPointValues(device, List.of()));
             }
@@ -213,17 +206,17 @@ public class DeviceTool {
             @ToolParam(description = "The numeric device IDs") List<Long> deviceIds,
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        List<Long> ids = normalizeIds(deviceIds);
+        List<Long> ids = AgenticToolUtil.normalizeIds(deviceIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceIds={}", "getDeviceStatusesByIds", tenantId, ids);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid device IDs provided.");
         }
         Map<Long, String> statuses = facade.selectDeviceStatusesByIds(tenantId, ids);
-        if (Objects.isNull(statuses) || statuses.isEmpty()) {
+        if (AgenticToolUtil.isEmpty(statuses)) {
             return AgenticToolResult.empty("No device statuses found.", Map.of());
         }
         return AgenticToolResult.ok("Device statuses loaded", statuses);
@@ -239,20 +232,13 @@ public class DeviceTool {
                 tenantId, profileId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
         Map<Long, String> statuses = facade.selectDeviceStatusesByProfileId(tenantId, profileId);
-        if (Objects.isNull(statuses) || statuses.isEmpty()) {
+        if (AgenticToolUtil.isEmpty(statuses)) {
             return AgenticToolResult.empty("No device statuses found for profile ID: " + profileId, Map.of());
         }
         return AgenticToolResult.ok("Device statuses loaded for profile " + profileId, statuses);
-    }
-
-    private List<Long> normalizeIds(List<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return List.of();
-        }
-        return ids.stream().filter(Objects::nonNull).distinct().limit(50).toList();
     }
 
     public record DeviceLatestPointValues(FacadeDeviceBO device, List<PointLatestValue> points) {

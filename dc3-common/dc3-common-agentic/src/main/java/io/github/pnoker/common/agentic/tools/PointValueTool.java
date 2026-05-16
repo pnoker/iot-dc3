@@ -18,8 +18,10 @@ package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
-import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.agentic.service.ActionService;
+import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
+import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
@@ -92,10 +94,10 @@ public class PointValueTool {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
                 "getPointValueHistory", tenantId, deviceId, pointId, count);
-        int size = Math.max(1, Math.min(count, 200));
+        int size = AgenticToolUtil.clamp(count, 1, AgenticConstant.ToolLimit.MAX_HISTORY_RECORDS);
         try {
             List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, size);
-            if (Objects.isNull(history) || history.isEmpty()) {
+            if (AgenticToolUtil.isEmpty(history)) {
                 return AgenticToolResult.empty("No history data found for device " + deviceId + " point " + pointId,
                         new PointValueHistory(deviceId, pointId, size, List.of(), null));
             }

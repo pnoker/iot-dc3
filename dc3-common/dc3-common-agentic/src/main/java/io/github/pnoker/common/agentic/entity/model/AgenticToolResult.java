@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.common.agentic.entity.model;
 
+import io.github.pnoker.common.constant.service.AgenticConstant;
+
 /**
  * Structured return envelope for agentic tool calls.
  *
@@ -26,27 +28,27 @@ package io.github.pnoker.common.agentic.entity.model;
 public record AgenticToolResult<T>(boolean success, String code, String message, T data) {
 
     public static <T> AgenticToolResult<T> ok(String message, T data) {
-        return new AgenticToolResult<>(true, "OK", message, data);
+        return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_OK, message, data);
     }
 
     public static <T> AgenticToolResult<T> empty(String message, T data) {
-        return new AgenticToolResult<>(true, "EMPTY", message, data);
+        return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_EMPTY, message, data);
     }
 
     public static <T> AgenticToolResult<T> invalid(String message) {
-        return new AgenticToolResult<>(false, "INVALID_ARGUMENT", message, null);
+        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT, message, null);
     }
 
     public static <T> AgenticToolResult<T> notFound(String message) {
-        return new AgenticToolResult<>(false, "NOT_FOUND", message, null);
+        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_NOT_FOUND, message, null);
     }
 
     public static <T> AgenticToolResult<T> unavailable(String message) {
-        return new AgenticToolResult<>(false, "UNAVAILABLE", message, null);
+        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_UNAVAILABLE, message, null);
     }
 
     public static <T> AgenticToolResult<T> error(String message) {
-        return new AgenticToolResult<>(false, "ERROR", message, null);
+        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_ERROR, message, null);
     }
 
 }
