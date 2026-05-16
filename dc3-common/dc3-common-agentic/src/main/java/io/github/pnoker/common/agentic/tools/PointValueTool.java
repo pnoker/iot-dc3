@@ -24,6 +24,7 @@ import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -141,20 +142,18 @@ public class PointValueTool {
                 "writePointValue", tenantId, deviceId, pointId, Objects.isNull(value) ? 0 : value.length());
         recordTool(toolContext, "writePointValue", "Prepare point write command");
         try {
-            if (AgenticRequestContext.confirmActions(toolContext)) {
-                RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader();
-                String conversationId = AgenticRequestContext.requireConversationId(toolContext);
-                String actionId = actionService.createWritePointValueAction(conversationId, deviceId, pointId, value,
-                        header);
-                return AgenticToolResult.ok("Write command is pending user confirmation",
-                        new PointCommandResult(deviceId, pointId, value, false, true, actionId));
+            if (Objects.isNull(deviceId) || Objects.isNull(pointId)) {
+                return AgenticToolResult.invalid("Device ID and point ID are required for point write commands.");
             }
-            boolean success = pointValueCommandFacade.write(tenantId, deviceId, pointId, value);
-            PointCommandResult result = new PointCommandResult(deviceId, pointId, value, success, false, null);
-            if (success) {
-                return AgenticToolResult.ok("Write command sent", result);
+            if (StringUtils.isBlank(value)) {
+                return AgenticToolResult.invalid("Point write value is required.");
             }
-            return AgenticToolResult.error("Write command failed for device " + deviceId + " point " + pointId);
+            RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader();
+            String conversationId = AgenticRequestContext.requireConversationId(toolContext);
+            String actionId = actionService.createWritePointValueAction(conversationId, deviceId, pointId, value,
+                    header);
+            return AgenticToolResult.ok("Write command is pending user confirmation",
+                    new PointCommandResult(deviceId, pointId, value, false, true, actionId));
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "writePointValue", tenantId,
                     deviceId, pointId, e);

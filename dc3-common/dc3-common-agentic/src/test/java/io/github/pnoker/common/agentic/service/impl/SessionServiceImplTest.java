@@ -96,7 +96,6 @@ class SessionServiceImplTest {
         sessionExt.setReasoningEnabled(true);
         sessionExt.setTemperature(0.3);
         sessionExt.setMaxTokens(1024);
-        sessionExt.setRequireConfirmation(false);
 
         SessionBO result = service.touch("conv-1", 1L, 2L, sessionExt);
 
@@ -111,7 +110,6 @@ class SessionServiceImplTest {
         assertThat(saved.getSessionExt().getReasoningEnabled()).isTrue();
         assertThat(saved.getSessionExt().getTemperature()).isEqualTo(0.3);
         assertThat(saved.getSessionExt().getMaxTokens()).isEqualTo(1024);
-        assertThat(saved.getSessionExt().getRequireConfirmation()).isFalse();
         assertThat(result).isSameAs(bo);
     }
 
@@ -216,7 +214,6 @@ class SessionServiceImplTest {
         existingConfig.setReasoningEnabled(false);
         existingConfig.setTemperature(0.7);
         existingConfig.setMaxTokens(2048);
-        existingConfig.setRequireConfirmation(true);
         existing.setSessionExt(existingConfig);
         when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
@@ -231,7 +228,6 @@ class SessionServiceImplTest {
         assertThat(existing.getSessionExt().getReasoningEnabled()).isTrue();
         assertThat(existing.getSessionExt().getTemperature()).isEqualTo(0.7);
         assertThat(existing.getSessionExt().getMaxTokens()).isEqualTo(4096);
-        assertThat(existing.getSessionExt().getRequireConfirmation()).isTrue();
         verify(sessionManager).updateById(existing);
     }
 

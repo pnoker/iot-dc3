@@ -42,9 +42,7 @@ import java.util.Objects;
  * <p>Behaviour notes:
  * <ul>
  *   <li>{@link #findByConversationId} returns at most {@code historyWindowSize}
- *       persisted messages, oldest first, with text already stripped of internal
- *       markers (backend context, attachment summaries, confirmation suffixes) so
- *       replayed history stays clean.</li>
+ *       persisted messages, oldest first.</li>
  *   <li>Trailing {@code user} messages are removed from the replay window so the
  *       in-flight turn (already persisted by the orchestration service before the
  *       LLM call) does not appear twice in the prompt — once via memory and once

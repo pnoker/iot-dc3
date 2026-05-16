@@ -66,7 +66,6 @@ public class ChatClientConfig {
             - **System tools**: Query platform health summaries.
 
             Guidelines:
-            - Always confirm before sending write commands to physical devices.
             - Present data in a clear, structured format.
             - If a query fails, explain the error and suggest alternatives.
             - Use the tools to fetch real data rather than making up values.
