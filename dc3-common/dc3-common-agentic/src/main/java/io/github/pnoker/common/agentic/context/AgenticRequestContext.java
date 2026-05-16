@@ -117,9 +117,26 @@ public class AgenticRequestContext {
     @SuppressWarnings("unchecked")
     public static void recordToolInvocation(ToolContext toolContext, String toolName, String domain,
                                             String description) {
+        recordToolEvent(toolContext, new ToolEvent(toolName, domain, description, Instant.now().toEpochMilli()));
+    }
+
+    public static void recordToolResult(ToolContext toolContext, String toolName, boolean success, String code,
+                                        String message) {
+        String status = success ? ("EMPTY".equals(code) ? "empty" : "success") : "failed";
+        recordToolEvent(toolContext, new ToolEvent(toolName, "tool", message, Instant.now().toEpochMilli(),
+                "result", status, code));
+    }
+
+    public static void recordToolError(ToolContext toolContext, String toolName, String message) {
+        recordToolEvent(toolContext, new ToolEvent(toolName, "tool", message, Instant.now().toEpochMilli(),
+                "error", "failed", "ERROR"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void recordToolEvent(ToolContext toolContext, ToolEvent event) {
         Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.TOOL_EVENTS);
         if (value instanceof Queue<?>) {
-            ((Queue<ToolEvent>) value).offer(new ToolEvent(toolName, domain, description, Instant.now().toEpochMilli()));
+            ((Queue<ToolEvent>) value).offer(event);
         }
     }
 
@@ -141,7 +158,20 @@ public class AgenticRequestContext {
         return toolContext.getContext().get(key);
     }
 
-    public record ToolEvent(String toolName, String domain, String description, long timestamp) {
+    public record ToolEvent(String toolName, String domain, String description, long timestamp, String phase,
+                            String status, String code) {
+
+        public ToolEvent(String toolName, String domain, String description, long timestamp) {
+            this(toolName, domain, description, timestamp, "start", "running", null);
+        }
+
+        public String detail() {
+            if ("start".equals(phase)) {
+                return domain;
+            }
+            return code;
+        }
+
     }
 
 }
