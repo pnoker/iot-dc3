@@ -21,8 +21,7 @@ import com.openai.models.chat.completions.ChatCompletionChunk;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
-import io.github.pnoker.common.agentic.skill.SkillDefinition;
-import io.github.pnoker.common.agentic.util.AgenticTokenEstimator;
+import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -62,7 +61,7 @@ public class AgenticChatResponseCodec {
 
     public ChatCompletionResponse blockingResponse(AgenticPreparedChatRequest prepared, String content,
                                                    String finishReason) {
-        int completionTokens = AgenticTokenEstimator.estimate(content);
+        int completionTokens = AgenticTokenEstimatorUtil.estimate(content);
         int promptTokens = Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
         return ChatCompletionResponse.builder()
                 .id(newChatId())
@@ -133,28 +132,15 @@ public class AgenticChatResponseCodec {
 
     public List<ServerSentEvent<String>> initialEvents(AgenticPreparedChatRequest prepared) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
-        SkillDefinition skillDefinition = prepared.skillDefinition();
-        String skillName = Objects.nonNull(skillDefinition) ? skillDefinition.getName() : "general";
-        String skillDescription = Objects.nonNull(skillDefinition) ? skillDefinition.getDescription()
-                : "General assistant mode";
-        events.add(ServerSentEvent.<String>builder()
-                .data(formatEvent("skill", "Auto skill", skillDescription, skillName))
-                .build());
-        if (StringUtils.isBlank(prepared.directAnswer()) && prepared.toolCallingEnabled()
-                && !prepared.toolNames().isEmpty()) {
-            events.add(ServerSentEvent.<String>builder()
-                    .data(formatEvent("tools", "Available tools", String.join(", ", prepared.toolNames()), skillName))
-                    .build());
-        }
         if (prepared.directContextProvided()) {
             events.add(ServerSentEvent.<String>builder()
                     .data(formatEvent("tool", "Backend context loaded", "Queried DC3 backend before response",
-                            skillName))
+                            "agentic"))
                     .build());
         }
         if (prepared.reasoning()) {
             events.add(ServerSentEvent.<String>builder()
-                    .data(formatEvent("reasoning", "Thinking", "Reasoning mode requested for this model.", skillName))
+                    .data(formatEvent("reasoning", "Thinking", "Reasoning mode requested for this model.", "agentic"))
                     .build());
         }
         return events;

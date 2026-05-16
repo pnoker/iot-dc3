@@ -92,12 +92,13 @@ class SessionServiceImplTest {
         when(sessionBuilder.buildBOByDO(any(SessionDO.class))).thenReturn(bo);
 
         SessionExt sessionExt = new SessionExt();
+        sessionExt.setModel("deepseek-chat");
         sessionExt.setReasoningEnabled(true);
         sessionExt.setTemperature(0.3);
         sessionExt.setMaxTokens(1024);
         sessionExt.setRequireConfirmation(false);
 
-        SessionBO result = service.touch("conv-1", 1L, 2L, "deepseek-chat", sessionExt);
+        SessionBO result = service.touch("conv-1", 1L, 2L, sessionExt);
 
         ArgumentCaptor<SessionDO> captor = ArgumentCaptor.forClass(SessionDO.class);
         verify(sessionManager).save(captor.capture());
@@ -125,7 +126,9 @@ class SessionServiceImplTest {
         when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
-        service.touch("conv-1", 1L, 2L, "qwen-plus");
+        SessionExt sessionExt = new SessionExt();
+        sessionExt.setModel("qwen-plus");
+        service.touch("conv-1", 1L, 2L, sessionExt);
 
         assertThat(existing.getSessionExt().getModel()).isEqualTo("qwen-plus");
         verify(sessionManager).updateById(existing);

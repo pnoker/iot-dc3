@@ -71,11 +71,7 @@ public class AgenticPromptBuilder {
         if (!prepared.toolCallingEnabled()) {
             return promptSpec;
         }
-        promptSpec = promptSpec.toolCallbacks(toolCallbackProvider);
-        if (!prepared.toolNames().isEmpty()) {
-            promptSpec = promptSpec.toolNames(prepared.toolNames().toArray(String[]::new));
-        }
-        return promptSpec;
+        return promptSpec.toolCallbacks(toolCallbackProvider);
     }
 
     private ChatClient.ChatClientRequestSpec applyRequestOptions(ChatClient.ChatClientRequestSpec promptSpec,
@@ -87,9 +83,6 @@ public class AgenticPromptBuilder {
     private String buildSystemPrompt(AgenticPreparedChatRequest prepared) {
         List<String> sections = new ArrayList<>();
         sections.add(ChatClientConfig.SYSTEM_PROMPT);
-        if (StringUtils.isNotBlank(prepared.skillSystemPrompt())) {
-            sections.add(prepared.skillSystemPrompt().trim());
-        }
         if (StringUtils.isNotBlank(prepared.requestSystemContext())) {
             sections.add(prepared.requestSystemContext().trim());
         }

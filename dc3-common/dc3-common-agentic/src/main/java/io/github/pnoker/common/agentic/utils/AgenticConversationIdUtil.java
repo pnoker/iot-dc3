@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.util;
+package io.github.pnoker.common.agentic.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 
@@ -32,7 +32,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-public class AgenticConversationIds {
+public class AgenticConversationIdUtil {
 
     /**
      * ASCII Unit Separator (0x1F). Not allowed in printable client conversation IDs.
@@ -46,7 +46,7 @@ public class AgenticConversationIds {
      */
     private static final String LEGACY_SEPARATOR = ":";
 
-    private AgenticConversationIds() {
+    private AgenticConversationIdUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 

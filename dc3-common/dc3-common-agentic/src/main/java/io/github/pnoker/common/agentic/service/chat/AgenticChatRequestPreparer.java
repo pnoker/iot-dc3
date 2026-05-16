@@ -25,17 +25,14 @@ import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.entity.request.ChatMessageDTO;
-import io.github.pnoker.common.agentic.entity.request.DirectQueryRequest;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.agentic.service.direct.AgenticDirectBackendService;
 import io.github.pnoker.common.agentic.service.direct.DirectAnswerRenderer;
 import io.github.pnoker.common.agentic.service.direct.DirectBackendResult;
-import io.github.pnoker.common.agentic.skill.SkillDefinition;
-import io.github.pnoker.common.agentic.skill.SkillRegistry;
-import io.github.pnoker.common.agentic.util.AgenticConversationIds;
-import io.github.pnoker.common.agentic.util.AgenticTokenEstimator;
+import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
+import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
@@ -46,7 +43,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
@@ -65,8 +61,6 @@ public class AgenticChatRequestPreparer {
 
     private final ChatClientFactory chatClientFactory;
 
-    private final SkillRegistry skillRegistry;
-
     private final SessionService sessionService;
 
     private final MessageService messageService;
@@ -79,14 +73,13 @@ public class AgenticChatRequestPreparer {
 
     private final AgenticProperties properties;
 
-    public AgenticChatRequestPreparer(ChatClientFactory chatClientFactory, SkillRegistry skillRegistry,
-                                      SessionService sessionService, MessageService messageService,
+    public AgenticChatRequestPreparer(ChatClientFactory chatClientFactory, SessionService sessionService,
+                                      MessageService messageService,
                                       AttachmentService attachmentService,
                                       AgenticDirectBackendService directBackendService,
                                       DirectAnswerRenderer directAnswerRenderer,
                                       AgenticProperties properties) {
         this.chatClientFactory = chatClientFactory;
-        this.skillRegistry = skillRegistry;
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.attachmentService = attachmentService;
@@ -103,19 +96,15 @@ public class AgenticChatRequestPreparer {
         List<Long> attachments = normalizeAttachments(request);
         String attachmentContext = attachmentService.summarize(attachments, userHeader);
         String conversationId = resolveConversationId(request);
-        String scopedConversationId = AgenticConversationIds.scope(userHeader.getTenantId(), userHeader.getUserId(),
+        String scopedConversationId = AgenticConversationIdUtil.scope(userHeader.getTenantId(), userHeader.getUserId(),
                 conversationId);
-        SkillDefinition skill = resolveSkill(request.getSkill(), rawUserMessage, request.getDirectQuery());
-        String effectiveSkillName = Objects.isNull(skill) ? null : skill.getName();
-        List<String> toolNames = Objects.isNull(skill) ? List.of() : skillRegistry.getEnabledToolNames(skill.getName());
-        String skillSystemPrompt = Objects.isNull(skill) ? null : buildSkillSystemPrompt(skill);
         String model = chatClientFactory.resolveModel(request.getModel());
         boolean toolCallingEnabled = properties.isToolCallingEnabled() && chatClientFactory.supportsToolCall(model);
         Queue<AgenticRequestContext.ToolEvent> toolEvents = new ConcurrentLinkedQueue<>();
         Map<String, Object> toolContext = buildToolContext(request, userHeader, scopedConversationId, toolEvents);
 
-        DirectBackendResult directBackendResult = directBackendService.build(effectiveSkillName,
-                request.getDirectQuery(), userHeader, toolEvents);
+        DirectBackendResult directBackendResult = directBackendService.build(request.getDirectQuery(), userHeader,
+                toolEvents);
         String directContext = Objects.isNull(directBackendResult) ? null : directBackendResult.context();
         String directAnswer = Objects.isNull(directBackendResult)
                 ? null
@@ -126,19 +115,18 @@ public class AgenticChatRequestPreparer {
         AgenticRequestContext.setMemoryHistory(scopedConversationId, memoryHistory);
         log.debug("Agentic memory loaded, scopedConversationId={}, memoryEnabled={}, count={}",
                 scopedConversationId, properties.isMemoryEnabled(), memoryHistory.size());
-        AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, skillSystemPrompt,
-                requestSystemContext, contexts, memoryHistory);
+        AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, requestSystemContext, contexts,
+                memoryHistory);
 
         log.debug(
-                "Agentic chat request received, mode={}, model={}, messageCount={}, conversationIdPresent={}, skill={}, tenantId={}, userId={}",
+                "Agentic chat request received, mode={}, model={}, messageCount={}, conversationIdPresent={}, tenantId={}, userId={}",
                 mode, model, request.getMessages().size(), StringUtils.isNotBlank(request.getConversationId()),
-                Objects.isNull(skill) ? null : skill.getName(), userHeader.getTenantId(), userHeader.getUserId());
+                userHeader.getTenantId(), userHeader.getUserId());
 
-        touchSession(scopedConversationId, conversationId, userHeader, model, buildSessionExt(request, model));
+        touchSession(scopedConversationId, conversationId, userHeader, buildSessionExt(request, model));
 
-        return new AgenticPreparedChatRequest(rawUserMessage, scopedConversationId, skillSystemPrompt,
-                requestSystemContext, normalizeToolNames(toolNames), model, effectiveSkillName, toolContext,
-                request.getTemperature(), request.getMaxTokens(), skill, toolEvents,
+        return new AgenticPreparedChatRequest(rawUserMessage, scopedConversationId, requestSystemContext, model,
+                toolContext, request.getTemperature(), request.getMaxTokens(), toolEvents,
                 toolCallingEnabled, Boolean.TRUE.equals(request.getReasoning()),
                 StringUtils.isNotBlank(directContext) || StringUtils.isNotBlank(directAnswer),
                 attachments, contexts, inputTokens, new ArrayList<>(),
@@ -193,82 +181,6 @@ public class AgenticChatRequestPreparer {
         return conversationId;
     }
 
-    private SkillDefinition resolveSkill(String skillName, String userMessage, DirectQueryRequest directQuery) {
-        String normalizedSkillName = StringUtils.trimToNull(skillName);
-        if (Objects.isNull(normalizedSkillName)) {
-            normalizedSkillName = inferSkillName(userMessage, directQuery);
-        }
-        if (Objects.isNull(normalizedSkillName)) {
-            return null;
-        }
-        SkillDefinition skill = skillRegistry.get(normalizedSkillName);
-        if (Objects.isNull(skill)) {
-            log.warn("Agentic skill not found, skill={}", normalizedSkillName);
-            throw new RequestException("Agentic skill does not exist: {}", normalizedSkillName);
-        }
-        log.debug("Agentic skill activated, skill={}, toolNames={}", skill.getName(), skill.getTools());
-        return skill;
-    }
-
-    private String inferSkillName(String userMessage, DirectQueryRequest directQuery) {
-        if (Objects.nonNull(directQuery)) {
-            return "data-monitor";
-        }
-        String text = normalizeInferenceText(userMessage);
-        if (StringUtils.containsAny(text, "write", "control", "command", "set ", "read ", "写入", "控制", "命令",
-                "下发", "读取")) {
-            return "device-control";
-        }
-        if (StringUtils.containsAny(text, "value", "history", "trend", "event", "alarm", "monitor", "data", "point",
-                "值", "历史", "趋势", "事件", "告警", "报警", "监控", "数据", "位号")) {
-            return "data-monitor";
-        }
-        if (StringUtils.containsAny(text, "device", "driver", "profile", "status", "list", "search", "设备", "驱动",
-                "模板", "状态", "列表", "查询", "搜索")) {
-            return "device-query";
-        }
-        return null;
-    }
-
-    private String normalizeInferenceText(String userMessage) {
-        String text = StringUtils.defaultString(userMessage).toLowerCase(Locale.ROOT);
-        int confirmationIndex = text.indexOf("before executing any write");
-        if (confirmationIndex >= 0) {
-            text = text.substring(0, confirmationIndex);
-        }
-        int attachmentIndex = text.indexOf("attached files available");
-        if (attachmentIndex >= 0) {
-            text = text.substring(0, attachmentIndex);
-        }
-        return text;
-    }
-
-    private List<String> normalizeToolNames(List<String> toolNames) {
-        if (Objects.isNull(toolNames) || toolNames.isEmpty()) {
-            return List.of();
-        }
-        return toolNames.stream().filter(StringUtils::isNotBlank).distinct().toList();
-    }
-
-    private String buildSkillSystemPrompt(SkillDefinition skill) {
-        List<String> sections = new ArrayList<>();
-        if (StringUtils.isNotBlank(skill.getSystemPromptAddition())) {
-            sections.add(skill.getSystemPromptAddition().trim());
-        }
-        if (Objects.nonNull(skill.getExamples()) && !skill.getExamples().isEmpty()) {
-            StringBuilder examples = new StringBuilder("Examples:");
-            for (SkillDefinition.SkillExample example : skill.getExamples()) {
-                if (Objects.isNull(example) || StringUtils.isAnyBlank(example.getUser(), example.getAssistant())) {
-                    continue;
-                }
-                examples.append("\n- User: ").append(example.getUser().trim())
-                        .append("\n  Assistant: ").append(example.getAssistant().trim());
-            }
-            sections.add(examples.toString());
-        }
-        return sections.isEmpty() ? null : String.join("\n\n", sections);
-    }
-
     private List<AgenticMessageContent.Context> buildContexts(String attachmentContext, String directContext) {
         List<AgenticMessageContent.Context> contexts = new ArrayList<>();
         if (StringUtils.isNotBlank(attachmentContext)) {
@@ -299,18 +211,16 @@ public class AgenticChatRequestPreparer {
         return sections.isEmpty() ? null : String.join("\n\n", sections);
     }
 
-    private AgenticMessageContent.Tokens buildInputTokens(String userMessage, String skillSystemPrompt,
-                                                          String requestSystemContext,
+    private AgenticMessageContent.Tokens buildInputTokens(String userMessage, String requestSystemContext,
                                                           List<AgenticMessageContent.Context> contexts,
                                                           List<MessageBO> memoryHistory) {
-        int textTokens = AgenticTokenEstimator.estimate(userMessage);
+        int textTokens = AgenticTokenEstimatorUtil.estimate(userMessage);
         int contextTokens = contexts.stream()
                 .map(AgenticMessageContent.Context::getContent)
-                .mapToInt(AgenticTokenEstimator::estimate)
+                .mapToInt(AgenticTokenEstimatorUtil::estimate)
                 .sum();
-        int systemTokens = AgenticTokenEstimator.estimate(ChatClientConfig.SYSTEM_PROMPT)
-                + AgenticTokenEstimator.estimate(skillSystemPrompt)
-                + AgenticTokenEstimator.estimate(systemInstructions(requestSystemContext, contexts));
+        int systemTokens = AgenticTokenEstimatorUtil.estimate(ChatClientConfig.SYSTEM_PROMPT)
+                + AgenticTokenEstimatorUtil.estimate(systemInstructions(requestSystemContext, contexts));
         int memoryTokens = estimateMemoryTokens(memoryHistory);
         return AgenticMessageContent.Tokens.of(textTokens + contextTokens + systemTokens + memoryTokens, 0,
                 textTokens, contextTokens, systemTokens, memoryTokens);
@@ -350,7 +260,7 @@ public class AgenticChatRequestPreparer {
                 .map(message -> Objects.nonNull(message.getContent()) ? message.getContent().getText() : null)
                 .map(StringUtils::defaultString)
                 .filter(StringUtils::isNotBlank)
-                .mapToInt(AgenticTokenEstimator::estimate)
+                .mapToInt(AgenticTokenEstimatorUtil::estimate)
                 .sum();
     }
 
@@ -370,10 +280,9 @@ public class AgenticChatRequestPreparer {
     }
 
     private void touchSession(String scopedConversationId, String conversationId, RequestHeader.UserHeader userHeader,
-                              String model, SessionExt sessionExt) {
+                              SessionExt sessionExt) {
         try {
-            sessionService.touch(scopedConversationId, userHeader.getTenantId(), userHeader.getUserId(), model,
-                    sessionExt);
+            sessionService.touch(scopedConversationId, userHeader.getTenantId(), userHeader.getUserId(), sessionExt);
         } catch (Exception e) {
             log.warn(
                     "Agentic session touch failed, tenantId={}, userId={}, conversationId={}",

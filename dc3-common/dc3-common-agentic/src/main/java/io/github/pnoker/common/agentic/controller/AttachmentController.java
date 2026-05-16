@@ -19,7 +19,7 @@ package io.github.pnoker.common.agentic.controller;
 import io.github.pnoker.common.agentic.entity.builder.AttachmentBuilder;
 import io.github.pnoker.common.agentic.entity.vo.AttachmentVO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
-import io.github.pnoker.common.agentic.util.AgenticConversationIds;
+import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
@@ -53,7 +53,7 @@ public class AttachmentController implements BaseController {
     public Mono<R<AttachmentVO>> upload(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {
         return getUserHeader().flatMap(header -> filePart.flatMap(part -> {
-            String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
+            String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
             return attachmentService.upload(scopedConversationId, part, header).map(attachmentBO -> {
                 AttachmentVO attachment = attachmentBuilder.buildVOByBO(attachmentBO);
@@ -66,7 +66,7 @@ public class AttachmentController implements BaseController {
     @GetMapping("/list")
     public Mono<R<List<AttachmentVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
+            String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
             List<AttachmentVO> attachments = attachmentBuilder.buildVOListByBOList(attachmentService.list(
                     scopedConversationId, header));
@@ -76,7 +76,7 @@ public class AttachmentController implements BaseController {
     }
 
     private void sanitize(RequestHeader.UserHeader header, AttachmentVO attachment) {
-        attachment.setConversationId(AgenticConversationIds.stripScope(header.getTenantId(), header.getUserId(),
+        attachment.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
                 attachment.getConversationId()));
     }
 

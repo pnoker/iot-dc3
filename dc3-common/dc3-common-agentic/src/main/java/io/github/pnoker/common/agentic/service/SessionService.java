@@ -32,15 +32,14 @@ public interface SessionService {
 
     /**
      * Create a new session if one does not exist for the given conversation ID. If a
-     * session already exists, update its operate_time and latest model.
+     * session already exists, update its operate_time.
      *
      * @param conversationId conversation ID
      * @param tenantId       tenant scope
      * @param userId         user scope
-     * @param model          latest selected model
      * @return the session BO
      */
-    SessionBO touch(String conversationId, Long tenantId, Long userId, String model);
+    SessionBO touch(String conversationId, Long tenantId, Long userId);
 
     /**
      * Create or update a session and merge session-level chat preferences.
@@ -48,11 +47,10 @@ public interface SessionService {
      * @param conversationId conversation ID
      * @param tenantId       tenant scope
      * @param userId         user scope
-     * @param model          latest selected model
      * @param sessionExt     session extension metadata and chat preferences
      * @return the session BO
      */
-    SessionBO touch(String conversationId, Long tenantId, Long userId, String model, SessionExt sessionExt);
+    SessionBO touch(String conversationId, Long tenantId, Long userId, SessionExt sessionExt);
 
     /**
      * Get session by conversation ID.

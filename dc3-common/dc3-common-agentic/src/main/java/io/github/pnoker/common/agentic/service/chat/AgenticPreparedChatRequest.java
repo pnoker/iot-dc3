@@ -18,7 +18,6 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.skill.SkillDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -31,10 +30,10 @@ import java.util.Queue;
  * @version 2026.5.16
  * @since 2022.1.0
  */
-public record AgenticPreparedChatRequest(String userMessage, String scopedConversationId, String skillSystemPrompt,
-                                         String requestSystemContext, List<String> toolNames, String model,
-                                         String skill, Map<String, Object> toolContext, Double temperature,
-                                         Integer maxTokens, SkillDefinition skillDefinition,
+public record AgenticPreparedChatRequest(String userMessage, String scopedConversationId,
+                                         String requestSystemContext, String model,
+                                         Map<String, Object> toolContext, Double temperature,
+                                         Integer maxTokens,
                                          Queue<AgenticRequestContext.ToolEvent> toolEvents,
                                          boolean toolCallingEnabled, boolean reasoning,
                                          boolean directContextProvided, List<Long> attachments,

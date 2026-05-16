@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.agentic.util;
+package io.github.pnoker.common.agentic.utils;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,42 +25,42 @@ import java.lang.reflect.InvocationTargetException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class AgenticTokenEstimatorTest {
+class AgenticTokenEstimatorUtilTest {
 
     @Test
     void blankReturnsZero() {
-        assertThat(AgenticTokenEstimator.estimate(null)).isZero();
-        assertThat(AgenticTokenEstimator.estimate("")).isZero();
-        assertThat(AgenticTokenEstimator.estimate("   ")).isZero();
+        assertThat(AgenticTokenEstimatorUtil.estimate(null)).isZero();
+        assertThat(AgenticTokenEstimatorUtil.estimate("")).isZero();
+        assertThat(AgenticTokenEstimatorUtil.estimate("   ")).isZero();
     }
 
     @Test
     void singleCharacterAlwaysCostsAtLeastOneToken() {
-        assertThat(AgenticTokenEstimator.estimate("a")).isOne();
-        assertThat(AgenticTokenEstimator.estimate("中")).isOne();
+        assertThat(AgenticTokenEstimatorUtil.estimate("a")).isOne();
+        assertThat(AgenticTokenEstimatorUtil.estimate("中")).isOne();
     }
 
     @Test
     void asciiHeavyTextUsesFourBytePerTokenRatio() {
         // 16 ASCII chars -> ceil(16 / 4.0) = 4
-        assertThat(AgenticTokenEstimator.estimate("abcdefghijklmnop")).isEqualTo(4);
+        assertThat(AgenticTokenEstimatorUtil.estimate("abcdefghijklmnop")).isEqualTo(4);
     }
 
     @Test
     void cjkHeavyTextUsesTighterRatio() {
         // 4 CJK chars -> ceil(4 / 1.8) = 3
-        assertThat(AgenticTokenEstimator.estimate("你好世界")).isEqualTo(3);
+        assertThat(AgenticTokenEstimatorUtil.estimate("你好世界")).isEqualTo(3);
     }
 
     @Test
     void mixedAsciiAndNonAsciiSumIndependentRatios() {
         // 8 ASCII (2.0) + 2 CJK (1.111...) -> ceil(3.111...) = 4
-        assertThat(AgenticTokenEstimator.estimate("hello you 你好")).isGreaterThanOrEqualTo(4);
+        assertThat(AgenticTokenEstimatorUtil.estimate("hello you 你好")).isGreaterThanOrEqualTo(4);
     }
 
     @Test
     void utilityConstructorMustReject() throws NoSuchMethodException {
-        Constructor<AgenticTokenEstimator> ctor = AgenticTokenEstimator.class.getDeclaredConstructor();
+        Constructor<AgenticTokenEstimatorUtil> ctor = AgenticTokenEstimatorUtil.class.getDeclaredConstructor();
         ctor.setAccessible(true);
         assertThatThrownBy(ctor::newInstance)
                 .isInstanceOf(InvocationTargetException.class)

@@ -23,8 +23,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * Agentic message response.
  *
@@ -46,8 +44,6 @@ public class MessageVO extends BaseVO {
     private AgenticMessageContent contentExt;
 
     private String model;
-
-    private List<String> skills;
 
     private Long messageIndex;
 

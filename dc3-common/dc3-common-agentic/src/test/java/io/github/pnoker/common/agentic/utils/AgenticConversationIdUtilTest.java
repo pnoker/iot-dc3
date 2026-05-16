@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.agentic.util;
+package io.github.pnoker.common.agentic.utils;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,49 +25,49 @@ import java.lang.reflect.InvocationTargetException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class AgenticConversationIdsTest {
+class AgenticConversationIdUtilTest {
 
     private static final String SEPARATOR = Character.toString(31);
 
     @Test
     void scopePrefixesTenantAndUserBeforeConversationId() {
-        assertThat(AgenticConversationIds.scope(1L, 2L, "abc")).isEqualTo("1" + SEPARATOR + "2" + SEPARATOR + "abc");
+        assertThat(AgenticConversationIdUtil.scope(1L, 2L, "abc")).isEqualTo("1" + SEPARATOR + "2" + SEPARATOR + "abc");
     }
 
     @Test
     void scopeAcceptsBlankConversationId() {
-        assertThat(AgenticConversationIds.scope(1L, 2L, "")).isEqualTo("1" + SEPARATOR + "2" + SEPARATOR);
+        assertThat(AgenticConversationIdUtil.scope(1L, 2L, "")).isEqualTo("1" + SEPARATOR + "2" + SEPARATOR);
     }
 
     @Test
     void stripScopeRemovesMatchingPrefix() {
-        assertThat(AgenticConversationIds.stripScope(1L, 2L, "1" + SEPARATOR + "2" + SEPARATOR + "abc"))
+        assertThat(AgenticConversationIdUtil.stripScope(1L, 2L, "1" + SEPARATOR + "2" + SEPARATOR + "abc"))
                 .isEqualTo("abc");
     }
 
     @Test
     void stripScopeRemovesLegacyColonPrefix() {
-        assertThat(AgenticConversationIds.stripScope(1L, 2L, "1:2:abc")).isEqualTo("abc");
+        assertThat(AgenticConversationIdUtil.stripScope(1L, 2L, "1:2:abc")).isEqualTo("abc");
     }
 
     @Test
     void stripScopeReturnsOriginalWhenPrefixMismatch() {
-        assertThat(AgenticConversationIds.stripScope(1L, 2L, "9:9:abc")).isEqualTo("9:9:abc");
+        assertThat(AgenticConversationIdUtil.stripScope(1L, 2L, "9:9:abc")).isEqualTo("9:9:abc");
     }
 
     @Test
     void stripScopeReturnsNullWhenInputIsNull() {
-        assertThat(AgenticConversationIds.stripScope(1L, 2L, null)).isNull();
+        assertThat(AgenticConversationIdUtil.stripScope(1L, 2L, null)).isNull();
     }
 
     @Test
     void stripScopeReturnsEmptyWhenInputIsExactlyThePrefix() {
-        assertThat(AgenticConversationIds.stripScope(1L, 2L, "1" + SEPARATOR + "2" + SEPARATOR)).isEmpty();
+        assertThat(AgenticConversationIdUtil.stripScope(1L, 2L, "1" + SEPARATOR + "2" + SEPARATOR)).isEmpty();
     }
 
     @Test
     void utilityConstructorMustReject() throws NoSuchMethodException {
-        Constructor<AgenticConversationIds> ctor = AgenticConversationIds.class.getDeclaredConstructor();
+        Constructor<AgenticConversationIdUtil> ctor = AgenticConversationIdUtil.class.getDeclaredConstructor();
         ctor.setAccessible(true);
         assertThatThrownBy(ctor::newInstance)
                 .isInstanceOf(InvocationTargetException.class)
