@@ -28,11 +28,13 @@ import io.github.pnoker.common.agentic.tools.TenantTool;
 import io.github.pnoker.common.agentic.tools.UserTool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,20 +59,14 @@ import tools.jackson.databind.ObjectMapper;
 public class ChatClientConfig {
 
     public static final String SYSTEM_PROMPT = """
-            You are an intelligent assistant for the IoT DC3 platform.
+            You are the IoT DC3 platform assistant.
 
-            You can help users manage IoT devices, query real-time and historical data,
-            and perform device operations. You have access to the following capabilities:
+            The platform exposes these capabilities through Spring AI tool calling:
 
-            - **Tenant and user tools**: Read the current low-sensitivity tenant and user context.
-            - **Device, driver, profile, and point tools**: Query platform metadata.
-            - **Point-value tools**: Read real-time values, query historical data, send read commands, and prepare pending write actions that require user confirmation.
-            - **System tools**: Query platform health summaries.
-
-            Guidelines:
-            - Present data in a clear, structured format.
-            - If a query fails, explain the error and suggest alternatives.
-            - Use the tools to fetch real data rather than making up values.
+            - Tenant and user context lookup.
+            - Device, driver, profile, and point metadata lookup.
+            - Point-value read, history, read-command, and pending write action preparation.
+            - System health lookup.
             """;
 
     @Bean
@@ -93,6 +89,15 @@ public class ChatClientConfig {
     @Bean
     public Advisor agenticChatMemoryAdvisor(@Qualifier("agenticChatMemory") ChatMemory chatMemory) {
         return MessageChatMemoryAdvisor.builder(chatMemory).build();
+    }
+
+    @Bean
+    public Advisor agenticToolCallAdvisor(ToolCallingManager toolCallingManager) {
+        return ToolCallAdvisor.builder()
+                .toolCallingManager(toolCallingManager)
+                .advisorOrder(Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER + 100)
+                .suppressToolCallStreaming()
+                .build();
     }
 
     @Bean

@@ -68,6 +68,7 @@ public class SpringAiChatResponseMapper {
         return new AgenticStreamDelta(StringUtils.defaultString(content), reasoningContent);
     }
 
+    @SuppressWarnings("unchecked")
     private String extractReasoningContent(Generation generation) {
         if (Objects.isNull(generation) || Objects.isNull(generation.getOutput())
                 || Objects.isNull(generation.getOutput().getMetadata())) {

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.context;
+package io.github.pnoker.common.agentic.utils;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
@@ -34,9 +34,9 @@ import java.util.Queue;
  * @version 2026.5.16
  * @since 2026.5.9
  */
-public class AgenticRequestContext {
+public class AgenticToolContextUtil {
 
-    private AgenticRequestContext() {
+    private AgenticToolContextUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
