@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.service.runtime;
-
-import io.github.pnoker.common.agentic.service.chat.AgenticStreamDelta;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;

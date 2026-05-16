@@ -109,7 +109,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                     .concatWith(responseEvents)
                     .concatWith(Mono.defer(() -> Mono.just(ServerSentEvent.<String>builder()
                             .data(responseCodec.formatFinalChunk(chatId, created, prepared.model(),
-                                    responseCodec.normalizeFinishReason(lastFinishReason.get())))
+                                    lastFinishReason.get()))
                             .build())))
                     .concatWith(Mono.just(ServerSentEvent.<String>builder().data("[DONE]").build()));
         }).subscribeOn(Schedulers.boundedElastic());
