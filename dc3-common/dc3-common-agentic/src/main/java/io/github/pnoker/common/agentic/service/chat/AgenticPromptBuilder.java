@@ -85,7 +85,7 @@ public class AgenticPromptBuilder {
         return Objects.nonNull(optionsBuilder) ? promptSpec.options(optionsBuilder) : promptSpec;
     }
 
-    private String buildSystemPrompt(AgenticPreparedChatRequest prepared) {
+    public String buildSystemPrompt(AgenticPreparedChatRequest prepared) {
         List<String> sections = new ArrayList<>();
         sections.add(ChatClientConfig.BASE_SYSTEM_PROMPT);
         if (prepared.toolCallingEnabled()) {

@@ -35,7 +35,7 @@ class ChatCompletionChunkResponseTest {
                 .model("deepseek-v4-pro")
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkResponse.Delta(null, "answer"))
+                        .delta(new ChatCompletionChunkResponse.Delta(null, "answer", "thought"))
                         .finishReason("stop")
                         .build()))
                 .build();
@@ -44,7 +44,7 @@ class ChatCompletionChunkResponseTest {
 
         assertThat(json).contains("\"finish_reason\":\"stop\"");
         assertThat(json).contains("\"content\":\"answer\"");
-        assertThat(json).doesNotContain("reasoning_content");
+        assertThat(json).contains("\"reasoning_content\":\"thought\"");
     }
 
 }

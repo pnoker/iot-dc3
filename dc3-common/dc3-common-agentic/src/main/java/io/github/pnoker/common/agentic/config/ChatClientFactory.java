@@ -147,6 +147,11 @@ public class ChatClientFactory {
      * @return resolved provider type, or {@code null} when no provider record is found
      */
     public AgenticModelProviderTypeEnum resolveProviderType(String model) {
+        ModelProviderBO provider = resolveProviderForModel(model);
+        return Objects.nonNull(provider) ? provider.getProviderType() : null;
+    }
+
+    public ModelProviderBO resolveProviderForModel(String model) {
         ModelConfigBO config = StringUtils.isNotBlank(model) ? resolveConfig(model) : null;
         if (Objects.isNull(config)) {
             config = resolveDefaultConfig();
@@ -154,8 +159,7 @@ public class ChatClientFactory {
         if (Objects.isNull(config)) {
             return null;
         }
-        ModelProviderBO provider = resolveProvider(config.getProviderId());
-        return Objects.nonNull(provider) ? provider.getProviderType() : null;
+        return resolveProvider(config.getProviderId());
     }
 
     public boolean supportsToolCall(String model) {

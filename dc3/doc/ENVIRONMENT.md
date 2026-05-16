@@ -164,7 +164,7 @@ want Compose-only variables to appear in the local Java process environment.
 | `AGENTIC_FALLBACK_OPENAI_MAX_TOKENS`  | Runtime | Fallback maximum output token budget for one model response.                                                |
 | `AGENTIC_MEMORY_SCHEMA_INIT`          | Runtime | Spring AI JDBC memory schema initialization mode. Keep `never`; DC3 pre-creates `dc3_chat_memory`.          |
 | `AGENTIC_MEMORY_ENABLED`              | Runtime | Whether Agentic Center should include persisted conversation memory when preparing chat requests.           |
-| `AGENTIC_TOOL_CALLING_ENABLED`        | Runtime | Whether Agentic Center should expose provider-native tool calling when the implementation path supports it. |
+| `AGENTIC_TOOL_CALLING_ENABLED`        | Runtime | Whether Agentic Center exposes provider-native tool calling. Default is enabled; disable only for provider troubleshooting. |
 | `AGENTIC_MEMORY_MAX_MESSAGES`         | Runtime | Maximum chat messages retained per conversation window.                                                     |
 | `AGENTIC_ATTACHMENT_STORAGE_PATH`     | Runtime | Directory used by Agentic Center to store uploaded attachment files.                                        |
 

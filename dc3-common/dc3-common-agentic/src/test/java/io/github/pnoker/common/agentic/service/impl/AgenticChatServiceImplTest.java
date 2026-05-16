@@ -89,7 +89,7 @@ class AgenticChatServiceImplTest {
                 .verifyComplete();
 
         verify(messageRecorder).persistUserMessage(prepared, userHeader);
-        verify(messageRecorder).persistAssistantMessage(prepared, "", userHeader);
+        verify(messageRecorder).persistAssistantMessage(prepared, "", "", userHeader);
         assertThat(prepared.runTrace().recordedEvents()).hasSize(1);
         assertThat(prepared.runTrace().recordedEvents().get(0).status()).isEqualTo("failed");
     }
@@ -97,7 +97,7 @@ class AgenticChatServiceImplTest {
     private AgenticPreparedChatRequest prepared() {
         return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, new AgenticRunTrace(), true, false, List.of(), List.of(),
-                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0));
+                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }
 
 }
