@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 
 import java.util.List;
@@ -35,5 +36,5 @@ public record AgenticPreparedChatRequest(String userMessage, String scopedConver
                                          AgenticRunTrace runTrace,
                                          boolean toolCallingEnabled, boolean reasoning,
                                          List<Long> attachments, List<AgenticMessageContent.Context> contexts,
-                                         AgenticMessageContent.Tokens inputTokens) {
+                                         AgenticMessageContent.Tokens inputTokens, List<MessageBO> memoryHistory) {
 }

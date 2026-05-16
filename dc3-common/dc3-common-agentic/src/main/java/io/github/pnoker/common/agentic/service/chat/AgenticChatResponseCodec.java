@@ -85,7 +85,7 @@ public class AgenticChatResponseCodec {
                 .model(model)
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkResponse.Delta(null, null))
+                        .delta(new ChatCompletionChunkResponse.Delta(null, null, null))
                         .finishReason(normalizeFinishReason(finishReason))
                         .build()))
                 .build();
@@ -130,7 +130,8 @@ public class AgenticChatResponseCodec {
                 .model(model)
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkResponse.Delta(null, streamDelta.content()))
+                        .delta(new ChatCompletionChunkResponse.Delta(null, StringUtils.trimToNull(streamDelta.content()),
+                                streamDelta.reasoningContent()))
                         .finishReason(null)
                         .build()))
                 .build();

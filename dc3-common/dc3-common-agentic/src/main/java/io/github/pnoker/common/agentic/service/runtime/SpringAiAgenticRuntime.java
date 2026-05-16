@@ -37,13 +37,20 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
 
     private final SpringAiChatResponseMapper responseMapper;
 
-    public SpringAiAgenticRuntime(AgenticPromptBuilder promptBuilder, SpringAiChatResponseMapper responseMapper) {
+    private final OpenAiCompatibleAgenticRuntime openAiCompatibleAgenticRuntime;
+
+    public SpringAiAgenticRuntime(AgenticPromptBuilder promptBuilder, SpringAiChatResponseMapper responseMapper,
+                                  OpenAiCompatibleAgenticRuntime openAiCompatibleAgenticRuntime) {
         this.promptBuilder = promptBuilder;
         this.responseMapper = responseMapper;
+        this.openAiCompatibleAgenticRuntime = openAiCompatibleAgenticRuntime;
     }
 
     @Override
     public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatRequest prepared) {
+        if (openAiCompatibleAgenticRuntime.supports(prepared)) {
+            return openAiCompatibleAgenticRuntime.stream(prepared);
+        }
         return Flux.defer(() -> {
             ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
             return promptSpec.stream()
@@ -55,6 +62,9 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
 
     @Override
     public AgenticRuntimeResult call(AgenticPreparedChatRequest prepared) {
+        if (openAiCompatibleAgenticRuntime.supports(prepared)) {
+            return openAiCompatibleAgenticRuntime.call(prepared);
+        }
         ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
         ChatResponse chatResponse = promptSpec.call().chatResponse();
         return new AgenticRuntimeResult(responseMapper.assistantContent(chatResponse),

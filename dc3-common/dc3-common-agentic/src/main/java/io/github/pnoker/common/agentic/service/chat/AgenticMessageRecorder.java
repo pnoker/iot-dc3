@@ -51,7 +51,13 @@ public class AgenticMessageRecorder {
 
     public void persistAssistantMessage(AgenticPreparedChatRequest prepared, String content,
                                         RequestHeader.UserHeader userHeader) {
-        AgenticMessageContent messageContent = buildAssistantContent(prepared, StringUtils.defaultString(content));
+        persistAssistantMessage(prepared, content, null, userHeader);
+    }
+
+    public void persistAssistantMessage(AgenticPreparedChatRequest prepared, String content, String reasoningContent,
+                                        RequestHeader.UserHeader userHeader) {
+        AgenticMessageContent messageContent = buildAssistantContent(prepared, StringUtils.defaultString(content),
+                StringUtils.trimToNull(reasoningContent));
         if (!hasPersistableAssistantContent(messageContent)) {
             return;
         }
@@ -67,7 +73,8 @@ public class AgenticMessageRecorder {
         return content;
     }
 
-    private AgenticMessageContent buildAssistantContent(AgenticPreparedChatRequest prepared, String text) {
+    private AgenticMessageContent buildAssistantContent(AgenticPreparedChatRequest prepared, String text,
+                                                        String reasoningContent) {
         List<AgenticRunEvent> runEvents = drainRunEvents(prepared);
         List<String> tools = runEvents.stream()
                 .filter(event -> AgenticConstant.RunEvent.TYPE_TOOL.equals(event.type()))
@@ -81,6 +88,7 @@ public class AgenticMessageRecorder {
         content.setTools(tools);
         content.setTraces(buildTraceEvents(prepared, runEvents));
         content.setReasoning(prepared.reasoning());
+        content.setReasoningContent(reasoningContent);
         content.setContexts(prepared.contexts());
         content.setTokens(outputTokens(prepared.inputTokens(), text));
         return content;
@@ -89,6 +97,7 @@ public class AgenticMessageRecorder {
     private boolean hasPersistableAssistantContent(AgenticMessageContent content) {
         return StringUtils.isNotBlank(content.getText())
                 || Boolean.TRUE.equals(content.getReasoning())
+                || StringUtils.isNotBlank(content.getReasoningContent())
                 || hasItems(content.getTools())
                 || hasItems(content.getTraces())
                 || hasItems(content.getContexts());
