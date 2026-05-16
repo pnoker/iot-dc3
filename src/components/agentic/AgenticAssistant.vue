@@ -902,7 +902,7 @@
   const assistantTools = (message: AgenticMessage) => {
     const persisted = message.contentExt?.tools || [];
     const streaming = messageTraceEvents(message)
-      .filter((event) => event.type === 'tool' && event.title !== 'Backend context loaded')
+      .filter((event) => event.type === 'tool')
       .map((event) => event.name || event.title)
       .filter(Boolean);
     return uniqueStrings([...persisted, ...streaming]);
@@ -916,10 +916,9 @@
     const traceSteps = assistantTraceEvents(message)
       .filter((event) => event.type === 'tool')
       .map((event) => {
-        const backendContext = event.title === 'Backend context loaded';
-        const label = backendContext ? 'Backend context' : event.name || event.title || 'tool';
-        const detail = backendContext ? event.detail : event.title;
-        const meta = backendContext ? event.name : event.detail;
+        const label = event.name || event.title || 'tool';
+        const detail = event.title;
+        const meta = event.detail;
         return {
           id: traceKey(event),
           index: 0,
@@ -938,14 +937,7 @@
   };
 
   const assistantContexts = (message: AgenticMessage): AgenticMessageContext[] => {
-    const persisted = message.contentExt?.contexts || [];
-    const streamingContexts = messageTraceEvents(message)
-      .filter((event) => event.title === 'Backend context loaded')
-      .map((event) => ({
-        type: 'backend' as const,
-        content: event.detail || event.title,
-      }));
-    return [...persisted, ...streamingContexts];
+    return message.contentExt?.contexts || [];
   };
 
   const assistantTokens = (message: AgenticMessage): AgenticMessageTokens | undefined => {

@@ -87,11 +87,10 @@ export interface AgenticMessageContent {
   contexts?: AgenticMessageContext[];
   tokens?: AgenticMessageTokens;
   reasoning?: boolean;
-  directContextProvided?: boolean;
 }
 
 export interface AgenticMessageContext {
-  type: 'backend' | 'attachment' | 'retrieval' | 'memory' | 'tool' | 'system';
+  type: 'attachment' | 'retrieval' | 'memory' | 'tool' | 'system';
   content: string;
 }
 
@@ -132,17 +131,6 @@ export interface AgenticChatMessage {
   content: string;
 }
 
-export interface AgenticDirectQuery {
-  type: 'point-value';
-  deviceId?: number;
-  deviceName?: string;
-  deviceCode?: string;
-  pointId?: number;
-  pointName?: string;
-  pointCode?: string;
-  limit?: number;
-}
-
 export interface AgenticChatCompletionRequest {
   model?: string;
   messages: AgenticChatMessage[];
@@ -159,7 +147,6 @@ export interface AgenticChatCompletionRequest {
   attachments?: number[];
   reasoning?: boolean;
   confirmActions?: boolean;
-  directQuery?: AgenticDirectQuery;
 }
 
 export interface AgenticChatCompletionResponse {
