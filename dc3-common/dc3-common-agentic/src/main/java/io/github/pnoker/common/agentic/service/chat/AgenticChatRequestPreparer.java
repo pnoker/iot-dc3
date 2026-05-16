@@ -22,6 +22,7 @@ import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.entity.request.ChatMessageDTO;
@@ -89,8 +90,8 @@ public class AgenticChatRequestPreparer {
                 conversationId);
         String model = chatClientFactory.resolveModel(request.getModel());
         boolean toolCallingEnabled = properties.isToolCallingEnabled() && chatClientFactory.supportsToolCall(model);
-        Queue<AgenticRequestContext.ToolEvent> toolEvents = new ConcurrentLinkedQueue<>();
-        Map<String, Object> toolContext = buildToolContext(request, userHeader, scopedConversationId, toolEvents);
+        Queue<AgenticRunEvent> runEvents = new ConcurrentLinkedQueue<>();
+        Map<String, Object> toolContext = buildToolContext(request, userHeader, scopedConversationId, runEvents);
 
         List<AgenticMessageContent.Context> contexts = buildContexts(attachmentContext);
         String requestSystemContext = buildRequestSystemContext(contexts);
@@ -109,19 +110,19 @@ public class AgenticChatRequestPreparer {
         touchSession(scopedConversationId, conversationId, userHeader, buildSessionExt(request, model));
 
         return new AgenticPreparedChatRequest(rawUserMessage, scopedConversationId, requestSystemContext, model,
-                toolContext, request.getTemperature(), request.getMaxTokens(), toolEvents,
+                toolContext, request.getTemperature(), request.getMaxTokens(), runEvents,
                 toolCallingEnabled, Boolean.TRUE.equals(request.getReasoning()), attachments, contexts, inputTokens,
                 new ArrayList<>());
     }
 
     private Map<String, Object> buildToolContext(ChatCompletionRequest request, RequestHeader.UserHeader userHeader,
                                                  String scopedConversationId,
-                                                 Queue<AgenticRequestContext.ToolEvent> toolEvents) {
+                                                 Queue<AgenticRunEvent> runEvents) {
         Map<String, Object> toolContext = new HashMap<>();
         toolContext.put(AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId());
         toolContext.put(AgenticConstant.ToolContextKey.USER_ID, userHeader.getUserId());
         toolContext.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, scopedConversationId);
-        toolContext.put(AgenticConstant.ToolContextKey.TOOL_EVENTS, toolEvents);
+        toolContext.put(AgenticConstant.ToolContextKey.RUN_EVENTS, runEvents);
         return toolContext;
     }
 

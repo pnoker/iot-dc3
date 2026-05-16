@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
@@ -35,8 +35,8 @@ class AgenticToolTracingCallbackTest {
 
     @Test
     void recordsStructuredToolResultFromAgenticEnvelope() {
-        Queue<AgenticRequestContext.ToolEvent> events = new ConcurrentLinkedQueue<>();
-        ToolContext context = new ToolContext(Map.of(AgenticConstant.ToolContextKey.TOOL_EVENTS, events));
+        Queue<AgenticRunEvent> events = new ConcurrentLinkedQueue<>();
+        ToolContext context = new ToolContext(Map.of(AgenticConstant.ToolContextKey.RUN_EVENTS, events));
         ToolCallback callback = new AgenticToolTracingCallback(new StubToolCallback(
                 "{\"success\":false,\"code\":\"INVALID_ARGUMENT\",\"message\":\"Device ID is required\"}"),
                 new ObjectMapper());
@@ -45,18 +45,18 @@ class AgenticToolTracingCallbackTest {
 
         assertThat(result).contains("INVALID_ARGUMENT");
         assertThat(events).hasSize(1);
-        AgenticRequestContext.ToolEvent event = events.poll();
-        assertThat(event.toolName()).isEqualTo("lookupDeviceById");
+        AgenticRunEvent event = events.poll();
+        assertThat(event.name()).isEqualTo("lookupDeviceById");
         assertThat(event.phase()).isEqualTo("result");
         assertThat(event.status()).isEqualTo("failed");
         assertThat(event.code()).isEqualTo("INVALID_ARGUMENT");
-        assertThat(event.description()).isEqualTo("Device ID is required");
+        assertThat(event.title()).isEqualTo("Device ID is required");
     }
 
     @Test
     void recordsToolErrorWhenDelegateThrows() {
-        Queue<AgenticRequestContext.ToolEvent> events = new ConcurrentLinkedQueue<>();
-        ToolContext context = new ToolContext(Map.of(AgenticConstant.ToolContextKey.TOOL_EVENTS, events));
+        Queue<AgenticRunEvent> events = new ConcurrentLinkedQueue<>();
+        ToolContext context = new ToolContext(Map.of(AgenticConstant.ToolContextKey.RUN_EVENTS, events));
         ToolCallback callback = new AgenticToolTracingCallback(new ThrowingToolCallback(), new ObjectMapper());
 
         try {
@@ -66,11 +66,11 @@ class AgenticToolTracingCallbackTest {
         }
 
         assertThat(events).hasSize(1);
-        AgenticRequestContext.ToolEvent event = events.poll();
+        AgenticRunEvent event = events.poll();
         assertThat(event.phase()).isEqualTo("error");
         assertThat(event.status()).isEqualTo("failed");
         assertThat(event.code()).isEqualTo("ERROR");
-        assertThat(event.description()).isEqualTo("backend unavailable");
+        assertThat(event.title()).isEqualTo("backend unavailable");
     }
 
     private static class StubToolCallback implements ToolCallback {
