@@ -44,9 +44,17 @@ public class AgenticToolTracingCallback implements ToolCallback {
 
     private final ObjectMapper objectMapper;
 
+    private final AgenticToolTraceMetadata traceMetadata;
+
     public AgenticToolTracingCallback(ToolCallback delegate, ObjectMapper objectMapper) {
+        this(delegate, objectMapper, null);
+    }
+
+    public AgenticToolTracingCallback(ToolCallback delegate, ObjectMapper objectMapper,
+                                      AgenticToolTraceMetadata traceMetadata) {
         this.delegate = Objects.requireNonNull(delegate, "delegate");
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper");
+        this.traceMetadata = traceMetadata;
     }
 
     @Override
@@ -67,6 +75,7 @@ public class AgenticToolTracingCallback implements ToolCallback {
     @Override
     public String call(String toolInput, ToolContext toolContext) {
         String toolName = toolName();
+        recordStart(toolContext, toolName);
         try {
             String result = delegate.call(toolInput, toolContext);
             recordResult(toolContext, toolName, result);
@@ -76,6 +85,14 @@ public class AgenticToolTracingCallback implements ToolCallback {
                     "Tool execution failed"));
             throw e;
         }
+    }
+
+    private void recordStart(ToolContext toolContext, String toolName) {
+        AgenticToolTraceMetadata metadata = Objects.nonNull(traceMetadata)
+                ? traceMetadata
+                : new AgenticToolTraceMetadata("tool", toolName);
+        AgenticRequestContext.recordToolInvocation(toolContext, toolName, metadata.domain(),
+                StringUtils.defaultIfBlank(metadata.title(), toolName));
     }
 
     private void recordResult(ToolContext toolContext, String toolName, String result) {

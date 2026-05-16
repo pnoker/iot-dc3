@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.entity.common.Pages;
@@ -71,12 +72,12 @@ public class DeviceTool {
     }
 
     @Tool(description = "Look up a device by its numeric ID. Returns device name, code, driver ID, enable status, and profile IDs.")
+    @AgenticToolMetadata(domain = "device", title = "Query device by ID")
     public AgenticToolResult<FacadeDeviceBO> lookupDeviceById(
             @ToolParam(description = "The numeric device ID") Long deviceId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "lookupDeviceById", tenantId, deviceId);
-        recordTool(toolContext, "lookupDeviceById", "Query device by ID");
         FacadeDeviceBO bo = deviceFacade.selectById(tenantId, deviceId);
         if (Objects.isNull(bo)) {
             return AgenticToolResult.notFound("Device not found for ID: " + deviceId);
@@ -85,13 +86,13 @@ public class DeviceTool {
     }
 
     @Tool(description = "Batch look up devices by numeric IDs. Returns up to 50 tenant-scoped devices.")
+    @AgenticToolMetadata(domain = "device", title = "Batch query devices by IDs")
     public AgenticToolResult<List<FacadeDeviceBO>> lookupDevicesByIds(
             @ToolParam(description = "The numeric device IDs") List<Long> deviceIds,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(deviceIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceIds={}", "lookupDevicesByIds", tenantId, ids);
-        recordTool(toolContext, "lookupDevicesByIds", "Batch query devices by IDs");
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid device IDs provided.");
         }
@@ -103,6 +104,7 @@ public class DeviceTool {
     }
 
     @Tool(description = "Search for devices with optional filters. Supports filtering by device name, code, or driver ID. Returns a paginated list of devices.")
+    @AgenticToolMetadata(domain = "device", title = "Search devices")
     public AgenticToolResult<FacadePage<FacadeDeviceBO>> searchDevices(
             @ToolParam(description = "Device name filter (partial match), or null to skip") String deviceName,
             @ToolParam(description = "Device code filter, or null to skip") String deviceCode,
@@ -114,7 +116,6 @@ public class DeviceTool {
         log.debug(
                 "Agentic tool invoked, tool={}, tenantId={}, deviceName={}, deviceCode={}, driverId={}, page={}, size={}",
                 "searchDevices", tenantId, deviceName, deviceCode, driverId, page, size);
-        recordTool(toolContext, "searchDevices", "Search devices");
 
         FacadeDeviceQuery query = new FacadeDeviceQuery();
         query.setDeviceName(deviceName);
@@ -134,13 +135,13 @@ public class DeviceTool {
     }
 
     @Tool(description = "List all devices attached to a given driver ID.")
+    @AgenticToolMetadata(domain = "device", title = "List devices by driver")
     public AgenticToolResult<List<FacadeDeviceBO>> listDevicesByDriverId(
             @ToolParam(description = "The driver ID") Long driverId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "listDevicesByDriverId", tenantId,
                 driverId);
-        recordTool(toolContext, "listDevicesByDriverId", "List devices by driver");
         List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
         if (Objects.isNull(devices) || devices.isEmpty()) {
             return AgenticToolResult.empty("No devices found for driver ID: " + driverId, List.of());
@@ -149,13 +150,13 @@ public class DeviceTool {
     }
 
     @Tool(description = "List all devices that use a given profile (device template) ID.")
+    @AgenticToolMetadata(domain = "device", title = "List devices by profile")
     public AgenticToolResult<List<FacadeDeviceBO>> listDevicesByProfileId(
             @ToolParam(description = "The profile ID") Long profileId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "listDevicesByProfileId", tenantId,
                 profileId);
-        recordTool(toolContext, "listDevicesByProfileId", "List devices by profile");
         List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(tenantId, profileId);
         if (Objects.isNull(devices) || devices.isEmpty()) {
             return AgenticToolResult.empty("No devices found for profile ID: " + profileId, List.of());
@@ -164,6 +165,7 @@ public class DeviceTool {
     }
 
     @Tool(description = "Get a latest-value snapshot for points bound to a device. Returns point metadata and latest values for up to the requested limit.")
+    @AgenticToolMetadata(domain = "device", title = "Get device latest point values")
     public AgenticToolResult<DeviceLatestPointValues> getDeviceLatestPointValues(
             @ToolParam(description = "The device ID") Long deviceId,
             @ToolParam(description = "Maximum number of points to include") int limit,
@@ -172,7 +174,6 @@ public class DeviceTool {
         int size = Math.max(1, Math.min(limit, 50));
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, limit={}",
                 "getDeviceLatestPointValues", tenantId, deviceId, size);
-        recordTool(toolContext, "getDeviceLatestPointValues", "Get device latest point values");
         try {
             FacadeDeviceBO device = deviceFacade.selectById(tenantId, deviceId);
             if (Objects.isNull(device)) {
@@ -207,13 +208,13 @@ public class DeviceTool {
     }
 
     @Tool(description = "Get device online/offline statuses for device IDs. Returns up to 50 tenant-scoped statuses.")
+    @AgenticToolMetadata(domain = "device", title = "Get device statuses")
     public AgenticToolResult<Map<Long, String>> getDeviceStatusesByIds(
             @ToolParam(description = "The numeric device IDs") List<Long> deviceIds,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(deviceIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceIds={}", "getDeviceStatusesByIds", tenantId, ids);
-        recordTool(toolContext, "getDeviceStatusesByIds", "Get device statuses");
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
@@ -229,13 +230,13 @@ public class DeviceTool {
     }
 
     @Tool(description = "Get device online/offline statuses for devices bound to a profile/template.")
+    @AgenticToolMetadata(domain = "device", title = "Get device statuses by profile")
     public AgenticToolResult<Map<Long, String>> getDeviceStatusesByProfileId(
             @ToolParam(description = "The profile/template ID") Long profileId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "getDeviceStatusesByProfileId",
                 tenantId, profileId);
-        recordTool(toolContext, "getDeviceStatusesByProfileId", "Get device statuses by profile");
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
@@ -245,10 +246,6 @@ public class DeviceTool {
             return AgenticToolResult.empty("No device statuses found for profile ID: " + profileId, Map.of());
         }
         return AgenticToolResult.ok("Device statuses loaded for profile " + profileId, statuses);
-    }
-
-    private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "device", description);
     }
 
     private List<Long> normalizeIds(List<Long> ids) {

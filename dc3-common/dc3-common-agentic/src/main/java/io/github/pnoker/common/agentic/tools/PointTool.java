@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.entity.common.Pages;
@@ -50,12 +51,12 @@ public class PointTool {
     }
 
     @Tool(description = "Look up a point (data point / metric) by its numeric ID. Returns point name, code, type, read/write flag, unit, base value, and multiplier.")
+    @AgenticToolMetadata(domain = "point", title = "Query point by ID")
     public AgenticToolResult<FacadePointBO> lookupPointById(
             @ToolParam(description = "The numeric point ID") Long pointId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointId={}", "lookupPointById", tenantId, pointId);
-        recordTool(toolContext, "lookupPointById", "Query point by ID");
         FacadePointBO bo = pointFacade.selectById(tenantId, pointId);
         if (Objects.isNull(bo)) {
             return AgenticToolResult.notFound("Point not found for ID: " + pointId);
@@ -64,13 +65,13 @@ public class PointTool {
     }
 
     @Tool(description = "Batch look up points by numeric IDs. Returns up to 50 tenant-scoped points.")
+    @AgenticToolMetadata(domain = "point", title = "Batch query points by IDs")
     public AgenticToolResult<List<FacadePointBO>> lookupPointsByIds(
             @ToolParam(description = "The numeric point IDs") List<Long> pointIds,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(pointIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointIds={}", "lookupPointsByIds", tenantId, ids);
-        recordTool(toolContext, "lookupPointsByIds", "Batch query points by IDs");
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid point IDs provided.");
         }
@@ -82,6 +83,7 @@ public class PointTool {
     }
 
     @Tool(description = "Search for points with optional filters. Returns a paginated list.")
+    @AgenticToolMetadata(domain = "point", title = "Search points")
     public AgenticToolResult<FacadePage<FacadePointBO>> searchPoints(
             @ToolParam(description = "Point name filter (partial match), or null to skip") String pointName,
             @ToolParam(description = "Profile ID filter, or null to skip") Long profileId,
@@ -91,7 +93,6 @@ public class PointTool {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointName={}, profileId={}, page={}, size={}",
                 "searchPoints", tenantId, pointName, profileId, page, size);
-        recordTool(toolContext, "searchPoints", "Search points");
 
         FacadePointQuery query = new FacadePointQuery();
         query.setPointName(pointName);
@@ -110,6 +111,7 @@ public class PointTool {
     }
 
     @Tool(description = "List points bound to a specific device ID. Use this before reading or writing values when the user knows the device but not the point ID.")
+    @AgenticToolMetadata(domain = "point", title = "List points by device")
     public AgenticToolResult<FacadePage<FacadePointBO>> listPointsByDeviceId(
             @ToolParam(description = "The device ID") Long deviceId,
             @ToolParam(description = "Page number (1-based)") int page,
@@ -118,7 +120,6 @@ public class PointTool {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, page={}, size={}", "listPointsByDeviceId",
                 tenantId, deviceId, page, size);
-        recordTool(toolContext, "listPointsByDeviceId", "List points by device");
 
         FacadePointQuery query = new FacadePointQuery();
         query.setDeviceId(deviceId);
@@ -136,6 +137,7 @@ public class PointTool {
     }
 
     @Tool(description = "List points under a specific profile/template ID. Use this when the user wants all metrics defined by a template.")
+    @AgenticToolMetadata(domain = "point", title = "List points by profile")
     public AgenticToolResult<FacadePage<FacadePointBO>> listPointsByProfileId(
             @ToolParam(description = "The profile/template ID") Long profileId,
             @ToolParam(description = "Page number (1-based)") int page,
@@ -144,7 +146,6 @@ public class PointTool {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}, page={}, size={}",
                 "listPointsByProfileId", tenantId, profileId, page, size);
-        recordTool(toolContext, "listPointsByProfileId", "List points by profile");
 
         FacadePointQuery query = new FacadePointQuery();
         query.setProfileId(profileId);
@@ -159,10 +160,6 @@ public class PointTool {
             return AgenticToolResult.empty("No points found for profile ID: " + profileId, result);
         }
         return AgenticToolResult.ok("Point page loaded for profile " + profileId, result);
-    }
-
-    private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "point", description);
     }
 
     private List<Long> normalizeIds(List<Long> ids) {

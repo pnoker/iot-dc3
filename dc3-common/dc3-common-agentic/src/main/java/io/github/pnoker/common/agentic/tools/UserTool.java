@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -38,19 +39,15 @@ import java.util.Map;
 public class UserTool {
 
     @Tool(description = "Get the current user profile. Returns only user ID, username, and nickname.")
+    @AgenticToolMetadata(domain = "user", title = "Read current user profile")
     public AgenticToolResult<Map<String, Object>> getCurrentUserProfile(ToolContext toolContext) {
         RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader();
         Long userId = AgenticRequestContext.requireUserId(toolContext);
         log.debug("Agentic tool invoked, tool={}, userId={}", "getCurrentUserProfile", userId);
-        recordTool(toolContext, "getCurrentUserProfile", "Read current user profile");
         return AgenticToolResult.ok("Current user profile loaded", Map.of(
                 "userId", userId,
                 "username", header.getUserName(),
                 "nickname", header.getNickName()));
-    }
-
-    private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "user", description);
     }
 
 }
