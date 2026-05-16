@@ -18,6 +18,7 @@
 package io.github.pnoker.common.agentic.context;
 
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -139,13 +140,14 @@ class AgenticRequestContextTest {
 
     @Test
     void recordToolInvocationAppendsToQueueWhenPresent() {
-        Queue<AgenticRequestContext.ToolEvent> events = new ConcurrentLinkedQueue<>();
-        ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.TOOL_EVENTS, events));
+        Queue<AgenticRunEvent> events = new ConcurrentLinkedQueue<>();
+        ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.RUN_EVENTS, events));
         AgenticRequestContext.recordToolInvocation(ctx, "readPoint", "data", "Read point value");
         assertThat(events).hasSize(1);
-        assertThat(events.peek().toolName()).isEqualTo("readPoint");
-        assertThat(events.peek().domain()).isEqualTo("data");
-        assertThat(events.peek().description()).isEqualTo("Read point value");
+        assertThat(events.peek().type()).isEqualTo("tool");
+        assertThat(events.peek().name()).isEqualTo("readPoint");
+        assertThat(events.peek().detail()).isEqualTo("data");
+        assertThat(events.peek().title()).isEqualTo("Read point value");
         assertThat(events.peek().timestamp()).isPositive();
     }
 

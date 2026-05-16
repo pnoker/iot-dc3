@@ -16,8 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +34,9 @@ public record AgenticPreparedChatRequest(String userMessage, String scopedConver
                                          String requestSystemContext, String model,
                                          Map<String, Object> toolContext, Double temperature,
                                          Integer maxTokens,
-                                         Queue<AgenticRequestContext.ToolEvent> toolEvents,
+                                         Queue<AgenticRunEvent> runEvents,
                                          boolean toolCallingEnabled, boolean reasoning,
                                          List<Long> attachments, List<AgenticMessageContent.Context> contexts,
                                          AgenticMessageContent.Tokens inputTokens,
-                                         List<AgenticRequestContext.ToolEvent> toolTraceEvents) {
+                                         List<AgenticRunEvent> runTraceEvents) {
 }

@@ -18,7 +18,7 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import com.openai.core.JsonValue;
 import com.openai.models.chat.completions.ChatCompletionChunk;
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
@@ -135,14 +135,14 @@ public class AgenticChatResponseCodec {
     public List<ServerSentEvent<String>> streamEvents(AgenticPreparedChatRequest prepared, String chatId, long created,
                                                       AgenticStreamDelta streamDelta) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
-        AgenticRequestContext.ToolEvent event = prepared.toolEvents().poll();
+        AgenticRunEvent event = prepared.runEvents().poll();
         while (Objects.nonNull(event)) {
-            prepared.toolTraceEvents().add(event);
+            prepared.runTraceEvents().add(event);
             events.add(ServerSentEvent.<String>builder()
-                    .data(formatEvent("tool", event.description(), event.detail(), event.toolName(), event.phase(),
+                    .data(formatEvent(event.type(), event.title(), event.detail(), event.name(), event.phase(),
                             event.status(), event.code()))
                     .build());
-            event = prepared.toolEvents().poll();
+            event = prepared.runEvents().poll();
         }
         if (Objects.nonNull(streamDelta) && streamDelta.hasContent()) {
             events.add(ServerSentEvent.<String>builder()
