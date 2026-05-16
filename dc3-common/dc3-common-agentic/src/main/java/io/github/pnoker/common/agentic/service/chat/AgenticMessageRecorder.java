@@ -24,7 +24,6 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -89,16 +88,18 @@ public class AgenticMessageRecorder {
     private List<AgenticMessageContent.Trace> buildTraceEvents(AgenticPreparedChatRequest prepared,
                                                                List<AgenticRunEvent> runEvents) {
         List<AgenticMessageContent.Trace> traces = new ArrayList<>();
-        long created = Instant.now().getEpochSecond();
         if (prepared.reasoning()) {
-            traces.add(AgenticMessageContent.Trace.of("reasoning", "Thinking",
-                    "Reasoning mode requested for this model.", "agentic", created));
+            traces.add(traceOf(AgenticRunEvent.reasoningRequested()));
         }
         for (AgenticRunEvent event : runEvents) {
-            traces.add(AgenticMessageContent.Trace.of(event.type(), event.title(), event.detail(), event.name(),
-                    event.timestamp() / 1000, event.phase(), event.status(), event.code()));
+            traces.add(traceOf(event));
         }
         return traces;
+    }
+
+    private AgenticMessageContent.Trace traceOf(AgenticRunEvent event) {
+        return AgenticMessageContent.Trace.of(event.type(), event.title(), event.detail(), event.name(),
+                event.timestamp() / 1000, event.phase(), event.status(), event.code());
     }
 
     private List<AgenticRunEvent> drainRunEvents(AgenticPreparedChatRequest prepared) {

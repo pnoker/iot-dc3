@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
@@ -100,7 +101,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 log.warn("Agentic stream chat failed, conversationId={}, model={}",
                         prepared.scopedConversationId(), prepared.model(), error);
                 return Flux.just(ServerSentEvent.<String>builder()
-                        .data(responseCodec.formatEvent("error", "Request failed", error.getMessage(), "agentic"))
+                        .data(responseCodec.formatEvent(AgenticRunEvent.requestFailed(error.getMessage())))
                         .build());
             });
 
