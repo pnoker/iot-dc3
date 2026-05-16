@@ -23,11 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.codec.ServerSentEvent;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,7 +34,7 @@ class AgenticChatResponseCodecTest {
 
     @Test
     void initialEventsUsesRunEventModelForReasoning() {
-        AgenticPreparedChatRequest prepared = prepared(new ConcurrentLinkedQueue<>(), true);
+        AgenticPreparedChatRequest prepared = prepared(new AgenticRunTrace(), true);
 
         List<ServerSentEvent<String>> events = codec.initialEvents(prepared);
 
@@ -51,10 +48,10 @@ class AgenticChatResponseCodecTest {
 
     @Test
     void streamEventsFlushesRunEventsWithoutContentChunk() {
-        Queue<AgenticRunEvent> runEvents = new ConcurrentLinkedQueue<>();
-        runEvents.offer(new AgenticRunEvent("tool", "searchDevices", "Search devices", "device",
+        AgenticRunTrace runTrace = new AgenticRunTrace();
+        runTrace.pendingEvents().offer(new AgenticRunEvent("tool", "searchDevices", "Search devices", "device",
                 1000L, "start", "running", null));
-        AgenticPreparedChatRequest prepared = prepared(runEvents);
+        AgenticPreparedChatRequest prepared = prepared(runTrace);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 AgenticStreamDelta.empty());
@@ -63,17 +60,17 @@ class AgenticChatResponseCodecTest {
         assertThat(events.get(0).data()).contains("\"object\":\"agentic.event\"");
         assertThat(events.get(0).data()).contains("\"name\":\"searchDevices\"");
         assertThat(events.get(0).data()).doesNotContain("\"object\":\"chat.completion.chunk\"");
-        assertThat(prepared.runTraceEvents()).hasSize(1);
+        assertThat(prepared.runTrace().recordedEvents()).hasSize(1);
     }
 
     @Test
     void streamEventsKeepsRunEventsBeforeContentChunk() {
-        Queue<AgenticRunEvent> runEvents = new ConcurrentLinkedQueue<>();
-        runEvents.offer(new AgenticRunEvent("tool", "lookupDeviceById", "Query device by ID", "device",
+        AgenticRunTrace runTrace = new AgenticRunTrace();
+        runTrace.pendingEvents().offer(new AgenticRunEvent("tool", "lookupDeviceById", "Query device by ID", "device",
                 1000L, "start", "running", null));
-        runEvents.offer(new AgenticRunEvent("tool", "lookupDeviceById", "Device loaded", "OK",
+        runTrace.pendingEvents().offer(new AgenticRunEvent("tool", "lookupDeviceById", "Device loaded", "OK",
                 1100L, "result", "success", "OK"));
-        AgenticPreparedChatRequest prepared = prepared(runEvents);
+        AgenticPreparedChatRequest prepared = prepared(runTrace);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 new AgenticStreamDelta("Device loaded", null));
@@ -87,14 +84,14 @@ class AgenticChatResponseCodecTest {
         assertThat(events.get(2).data()).contains("\"content\":\"Device loaded\"");
     }
 
-    private AgenticPreparedChatRequest prepared(Queue<AgenticRunEvent> runEvents) {
-        return prepared(runEvents, false);
+    private AgenticPreparedChatRequest prepared(AgenticRunTrace runTrace) {
+        return prepared(runTrace, false);
     }
 
-    private AgenticPreparedChatRequest prepared(Queue<AgenticRunEvent> runEvents, boolean reasoning) {
+    private AgenticPreparedChatRequest prepared(AgenticRunTrace runTrace, boolean reasoning) {
         return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
-                Map.of(), null, null, runEvents, true, reasoning, List.of(), List.of(),
-                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), new ArrayList<>());
+                Map.of(), null, null, runTrace, true, reasoning, List.of(), List.of(),
+                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0));
     }
 
 }
