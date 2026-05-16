@@ -42,6 +42,12 @@ public class AgenticRunTrace {
         return pendingEvents;
     }
 
+    public void recordPendingEvent(AgenticRunEvent event) {
+        if (Objects.nonNull(event)) {
+            pendingEvents.offer(event);
+        }
+    }
+
     public List<AgenticRunEvent> drainPendingEvents() {
         List<AgenticRunEvent> drained = new ArrayList<>();
         AgenticRunEvent event = pendingEvents.poll();
