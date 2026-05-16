@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.entity.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +36,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgenticMessageContent implements Serializable {
 
@@ -56,8 +58,6 @@ public class AgenticMessageContent implements Serializable {
     private Tokens tokens;
 
     private Boolean reasoning;
-
-    private Boolean directContextProvided;
 
     public static AgenticMessageContent ofText(String text) {
         AgenticMessageContent content = new AgenticMessageContent();

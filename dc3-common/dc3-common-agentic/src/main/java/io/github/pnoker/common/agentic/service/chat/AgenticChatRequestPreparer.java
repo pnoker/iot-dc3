@@ -28,9 +28,6 @@ import io.github.pnoker.common.agentic.entity.request.ChatMessageDTO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.SessionService;
-import io.github.pnoker.common.agentic.service.direct.AgenticDirectBackendService;
-import io.github.pnoker.common.agentic.service.direct.DirectAnswerRenderer;
-import io.github.pnoker.common.agentic.service.direct.DirectBackendResult;
 import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
@@ -67,24 +64,16 @@ public class AgenticChatRequestPreparer {
 
     private final AttachmentService attachmentService;
 
-    private final AgenticDirectBackendService directBackendService;
-
-    private final DirectAnswerRenderer directAnswerRenderer;
-
     private final AgenticProperties properties;
 
     public AgenticChatRequestPreparer(ChatClientFactory chatClientFactory, SessionService sessionService,
                                       MessageService messageService,
                                       AttachmentService attachmentService,
-                                      AgenticDirectBackendService directBackendService,
-                                      DirectAnswerRenderer directAnswerRenderer,
                                       AgenticProperties properties) {
         this.chatClientFactory = chatClientFactory;
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.attachmentService = attachmentService;
-        this.directBackendService = directBackendService;
-        this.directAnswerRenderer = directAnswerRenderer;
         this.properties = properties;
     }
 
@@ -103,13 +92,7 @@ public class AgenticChatRequestPreparer {
         Queue<AgenticRequestContext.ToolEvent> toolEvents = new ConcurrentLinkedQueue<>();
         Map<String, Object> toolContext = buildToolContext(request, userHeader, scopedConversationId, toolEvents);
 
-        DirectBackendResult directBackendResult = directBackendService.build(request.getDirectQuery(), userHeader,
-                toolEvents);
-        String directContext = Objects.isNull(directBackendResult) ? null : directBackendResult.context();
-        String directAnswer = Objects.isNull(directBackendResult)
-                ? null
-                : directAnswerRenderer.render(directBackendResult.answer());
-        List<AgenticMessageContent.Context> contexts = buildContexts(attachmentContext, directContext);
+        List<AgenticMessageContent.Context> contexts = buildContexts(attachmentContext);
         String requestSystemContext = buildRequestSystemContext(contexts);
         List<MessageBO> memoryHistory = loadMemoryHistory(scopedConversationId);
         AgenticRequestContext.setMemoryHistory(scopedConversationId, memoryHistory);
@@ -127,10 +110,8 @@ public class AgenticChatRequestPreparer {
 
         return new AgenticPreparedChatRequest(rawUserMessage, scopedConversationId, requestSystemContext, model,
                 toolContext, request.getTemperature(), request.getMaxTokens(), toolEvents,
-                toolCallingEnabled, Boolean.TRUE.equals(request.getReasoning()),
-                StringUtils.isNotBlank(directContext) || StringUtils.isNotBlank(directAnswer),
-                attachments, contexts, inputTokens, new ArrayList<>(),
-                directAnswer);
+                toolCallingEnabled, Boolean.TRUE.equals(request.getReasoning()), attachments, contexts, inputTokens,
+                new ArrayList<>());
     }
 
     private Map<String, Object> buildToolContext(ChatCompletionRequest request, RequestHeader.UserHeader userHeader,
@@ -181,13 +162,10 @@ public class AgenticChatRequestPreparer {
         return conversationId;
     }
 
-    private List<AgenticMessageContent.Context> buildContexts(String attachmentContext, String directContext) {
+    private List<AgenticMessageContent.Context> buildContexts(String attachmentContext) {
         List<AgenticMessageContent.Context> contexts = new ArrayList<>();
         if (StringUtils.isNotBlank(attachmentContext)) {
             contexts.add(AgenticMessageContent.Context.of("attachment", attachmentContext.trim()));
-        }
-        if (StringUtils.isNotBlank(directContext)) {
-            contexts.add(AgenticMessageContent.Context.of("backend", directContext.trim()));
         }
         return contexts;
     }
@@ -198,10 +176,7 @@ public class AgenticChatRequestPreparer {
             if (Objects.isNull(context) || StringUtils.isBlank(context.getContent())) {
                 continue;
             }
-            if ("backend".equals(context.getType())) {
-                sections.add("Backend context:\n" + context.getContent().trim()
-                        + "\n\nThe backend context above is returned by server-side DC3 queries.");
-            } else if ("attachment".equals(context.getType())) {
+            if ("attachment".equals(context.getType())) {
                 sections.add("Attachment context:\n" + context.getContent().trim()
                         + "\n\nUse only the metadata above unless a future multimodal model endpoint provides file contents.");
             } else {
@@ -231,9 +206,6 @@ public class AgenticChatRequestPreparer {
             return "";
         }
         List<String> instructions = new ArrayList<>();
-        if (contexts.stream().anyMatch(context -> "backend".equals(context.getType()))) {
-            instructions.add("Backend context is returned by server-side DC3 queries.");
-        }
         if (contexts.stream().anyMatch(context -> "attachment".equals(context.getType()))) {
             instructions.add("Use attachment metadata only unless a future multimodal model endpoint provides file contents.");
         }

@@ -40,8 +40,7 @@ public class MessageServiceImpl implements MessageService {
 
     private static final List<String> INTERNAL_TEXT_MARKERS = List.of(
             "\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation.",
-            "\n\nAttached files available to the user:",
-            "\n\nBackend context:");
+            "\n\nAttached files available to the user:");
 
     private final MessageManager messageManager;
     private final MessageBuilder messageBuilder;

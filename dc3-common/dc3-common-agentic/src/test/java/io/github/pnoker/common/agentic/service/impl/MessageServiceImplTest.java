@@ -152,13 +152,14 @@ class MessageServiceImplTest {
 
         MessageBO assistantBO = new MessageBO();
         assistantBO.setRole("assistant");
-        assistantBO.setContent(AgenticMessageContent.ofText("Backend context: foo\n\nBackend context: bar"));
+        assistantBO.setContent(AgenticMessageContent.ofText("Safe answer"
+                + "\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation."));
         when(messageBuilder.buildBOListByDOList(List.of(dirty))).thenReturn(List.of(assistantBO));
 
         List<MessageBO> result = service.list("conv", header);
 
         // Markers are user-only; assistant content stays intact.
-        assertThat(result.get(0).getContent().getText()).startsWith("Backend context: foo");
+        assertThat(result.get(0).getContent().getText()).startsWith("Safe answer");
     }
 
     @Test
