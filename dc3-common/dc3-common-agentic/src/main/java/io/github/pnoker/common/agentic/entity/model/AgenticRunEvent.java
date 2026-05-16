@@ -57,6 +57,16 @@ public record AgenticRunEvent(String type, String name, String title, String det
                 "ERROR", now(), "error", "failed", "ERROR");
     }
 
+    public static AgenticRunEvent reasoningRequested() {
+        return new AgenticRunEvent("reasoning", "agentic", "Thinking",
+                "Reasoning mode requested for this model.", now(), "start", "running", null);
+    }
+
+    public static AgenticRunEvent requestFailed(String message) {
+        return new AgenticRunEvent("error", "agentic", "Request failed",
+                StringUtils.defaultIfBlank(message, "Request failed"), now(), "error", "failed", "ERROR");
+    }
+
     private static long now() {
         return Instant.now().toEpochMilli();
     }

@@ -35,6 +35,20 @@ class AgenticChatResponseCodecTest {
     private final AgenticChatResponseCodec codec = new AgenticChatResponseCodec(new ObjectMapper());
 
     @Test
+    void initialEventsUsesRunEventModelForReasoning() {
+        AgenticPreparedChatRequest prepared = prepared(new ConcurrentLinkedQueue<>(), true);
+
+        List<ServerSentEvent<String>> events = codec.initialEvents(prepared);
+
+        assertThat(events).hasSize(1);
+        assertThat(events.get(0).data()).contains("\"object\":\"agentic.event\"");
+        assertThat(events.get(0).data()).contains("\"type\":\"reasoning\"");
+        assertThat(events.get(0).data()).contains("\"name\":\"agentic\"");
+        assertThat(events.get(0).data()).contains("\"phase\":\"start\"");
+        assertThat(events.get(0).data()).contains("\"status\":\"running\"");
+    }
+
+    @Test
     void streamEventsFlushesRunEventsWithoutContentChunk() {
         Queue<AgenticRunEvent> runEvents = new ConcurrentLinkedQueue<>();
         runEvents.offer(new AgenticRunEvent("tool", "searchDevices", "Search devices", "device",
@@ -73,8 +87,12 @@ class AgenticChatResponseCodecTest {
     }
 
     private AgenticPreparedChatRequest prepared(Queue<AgenticRunEvent> runEvents) {
+        return prepared(runEvents, false);
+    }
+
+    private AgenticPreparedChatRequest prepared(Queue<AgenticRunEvent> runEvents, boolean reasoning) {
         return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
-                Map.of(), null, null, runEvents, true, false, List.of(), List.of(),
+                Map.of(), null, null, runEvents, true, reasoning, List.of(), List.of(),
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), new ArrayList<>());
     }
 
