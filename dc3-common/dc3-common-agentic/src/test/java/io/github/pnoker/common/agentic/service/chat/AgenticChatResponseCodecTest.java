@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
+import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.codec.ServerSentEvent;
 import tools.jackson.databind.ObjectMapper;

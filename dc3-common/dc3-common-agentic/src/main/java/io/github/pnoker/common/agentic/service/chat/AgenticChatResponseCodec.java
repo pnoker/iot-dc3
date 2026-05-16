@@ -16,16 +16,13 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
-import com.openai.core.JsonValue;
-import com.openai.models.chat.completions.ChatCompletionChunk;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
+import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.model.Generation;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.DatabindException;
@@ -38,7 +35,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -70,30 +66,11 @@ public class AgenticChatResponseCodec {
                 .choices(List.of(ChatCompletionResponse.Choice.builder()
                         .index(0)
                         .message(new ChatCompletionResponse.Message("assistant", content))
-                        .finishReason(finishReason)
+                        .finishReason(normalizeFinishReason(finishReason))
                         .build()))
                 .usage(new ChatCompletionResponse.Usage(promptTokens, completionTokens,
                         promptTokens + completionTokens))
                 .build();
-    }
-
-    public String assistantContent(ChatResponse chatResponse) {
-        return Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
-                && Objects.nonNull(chatResponse.getResult().getOutput())
-                        ? StringUtils.defaultString(chatResponse.getResult().getOutput().getText())
-                        : "";
-    }
-
-    public String finishReason(ChatResponse chatResponse) {
-        return normalizeFinishReason(finishReasonOrNull(chatResponse));
-    }
-
-    public String finishReasonOrNull(ChatResponse chatResponse) {
-        String finishReason = Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
-                && Objects.nonNull(chatResponse.getResult().getMetadata())
-                        ? chatResponse.getResult().getMetadata().getFinishReason()
-                        : null;
-        return StringUtils.trimToNull(finishReason);
     }
 
     public String newChatId() {
@@ -109,17 +86,10 @@ public class AgenticChatResponseCodec {
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
                         .index(0)
                         .delta(new ChatCompletionChunkResponse.Delta(null, null, null))
-                        .finishReason(finishReason)
+                        .finishReason(normalizeFinishReason(finishReason))
                         .build()))
                 .build();
         return toJson(chunk);
-    }
-
-    public String normalizeFinishReason(String reason) {
-        if (StringUtils.isBlank(reason)) {
-            return "stop";
-        }
-        return reason.toLowerCase(Locale.ROOT);
     }
 
     public List<ServerSentEvent<String>> initialEvents(AgenticPreparedChatRequest prepared) {
@@ -149,20 +119,6 @@ public class AgenticChatResponseCodec {
                     .build());
         }
         return events;
-    }
-
-    public AgenticStreamDelta extractStreamDelta(ChatResponse response) {
-        if (Objects.isNull(response) || Objects.isNull(response.getResult())) {
-            return AgenticStreamDelta.empty();
-        }
-        Generation generation = response.getResult();
-        String content = Objects.nonNull(generation.getOutput()) ? generation.getOutput().getText() : null;
-        if (log.isDebugEnabled()) {
-            log.debug("Agentic stream chunk, contentLen={}, hasReasoning={}",
-                    Objects.isNull(content) ? 0 : content.length(),
-                    Objects.nonNull(extractReasoningContent(generation)));
-        }
-        return new AgenticStreamDelta(StringUtils.defaultString(content), extractReasoningContent(generation));
     }
 
     public String formatEvent(AgenticRunEvent runEvent) {
@@ -201,24 +157,11 @@ public class AgenticChatResponseCodec {
         return toJson(chunk);
     }
 
-    private String extractReasoningContent(Generation generation) {
-        if (Objects.isNull(generation) || Objects.isNull(generation.getOutput())) {
-            return null;
+    private String normalizeFinishReason(String reason) {
+        if (StringUtils.isBlank(reason)) {
+            return "stop";
         }
-        Object chunkChoice = generation.getOutput().getMetadata().get("chunkChoice");
-        if (Objects.isNull(chunkChoice)) {
-            return null;
-        }
-
-        if (chunkChoice instanceof ChatCompletionChunk.Choice openAiChunkChoice) {
-            Object rawValue = openAiChunkChoice.delta()._additionalProperties().get("reasoning_content");
-            if (!(rawValue instanceof JsonValue value)) {
-                return null;
-            }
-            Optional<String> reasoningContent = value.asString();
-            return reasoningContent.orElse(null);
-        }
-        return null;
+        return reason.toLowerCase(Locale.ROOT);
     }
 
     private String toJson(Object obj) {
