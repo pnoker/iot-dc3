@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.tool;
+package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
-import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
@@ -26,19 +26,15 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * Auth-domain tools exposed to the LLM via Spring AI @Tool.
- * <p>
- * These tools only expose low-sensitivity information from the current authenticated
- * request context. They intentionally do not accept IDs, login names, tenant codes, or
- * return phone/email/login/password-related data.
+ * Tenant-context tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.16
  * @since 2022.1.0
  */
 @Slf4j
 @Component
-public class AuthToolSet {
+public class TenantTool {
 
     @Tool(description = "Get the current tenant context. Returns only the current tenant ID.")
     public AgenticToolResult<Map<String, Long>> getCurrentTenantInfo(ToolContext toolContext) {
@@ -48,20 +44,8 @@ public class AuthToolSet {
         return AgenticToolResult.ok("Current tenant context loaded", Map.of("tenantId", tenantId));
     }
 
-    @Tool(description = "Get the current user profile. Returns only user ID, username, and nickname.")
-    public AgenticToolResult<Map<String, Object>> getCurrentUserProfile(ToolContext toolContext) {
-        RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader();
-        Long userId = AgenticRequestContext.requireUserId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, userId={}", "getCurrentUserProfile", userId);
-        recordTool(toolContext, "getCurrentUserProfile", "Read current user profile");
-        return AgenticToolResult.ok("Current user profile loaded", Map.of(
-                "userId", userId,
-                "username", header.getUserName(),
-                "nickname", header.getNickName()));
-    }
-
     private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "auth", description);
+        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "tenant", description);
     }
 
 }

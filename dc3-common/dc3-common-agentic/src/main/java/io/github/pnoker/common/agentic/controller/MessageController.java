@@ -19,7 +19,7 @@ package io.github.pnoker.common.agentic.controller;
 import io.github.pnoker.common.agentic.entity.builder.MessageBuilder;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
 import io.github.pnoker.common.agentic.service.MessageService;
-import io.github.pnoker.common.agentic.util.AgenticConversationIds;
+import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
@@ -49,7 +49,7 @@ public class MessageController implements BaseController {
     @GetMapping("/list")
     public Mono<R<List<MessageVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
+            String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
             List<MessageVO> messages = messageBuilder.buildVOListByBOList(messageService.list(scopedConversationId,
                     header));
@@ -59,7 +59,7 @@ public class MessageController implements BaseController {
     }
 
     private void sanitize(RequestHeader.UserHeader header, MessageVO message) {
-        message.setConversationId(AgenticConversationIds.stripScope(header.getTenantId(), header.getUserId(),
+        message.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
                 message.getConversationId()));
     }
 

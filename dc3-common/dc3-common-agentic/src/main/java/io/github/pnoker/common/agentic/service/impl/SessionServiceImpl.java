@@ -61,18 +61,16 @@ public class SessionServiceImpl implements SessionService {
     private MessageService messageService;
 
     @Override
-    public SessionBO touch(String conversationId, Long tenantId, Long userId, String model) {
-        return touch(conversationId, tenantId, userId, model, null);
+    public SessionBO touch(String conversationId, Long tenantId, Long userId) {
+        return touch(conversationId, tenantId, userId, null);
     }
 
     @Override
-    public SessionBO touch(String conversationId, Long tenantId, Long userId, String model,
-                           SessionExt sessionExt) {
+    public SessionBO touch(String conversationId, Long tenantId, Long userId, SessionExt sessionExt) {
         SessionDO existing = findByConversationId(conversationId);
         if (Objects.nonNull(existing)) {
             existing.setTenantId(tenantId);
             existing.setUserId(userId);
-            applyModel(existing, model);
             applySessionExt(existing, sessionExt);
             sessionManager.updateById(existing);
             return sessionBuilder.buildBOByDO(existing);
@@ -83,7 +81,6 @@ public class SessionServiceImpl implements SessionService {
         entityDO.setTenantId(tenantId);
         entityDO.setUserId(userId);
         entityDO.setTitle("New Conversation");
-        applyModel(entityDO, model);
         applySessionExt(entityDO, sessionExt);
         sessionManager.save(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
@@ -119,15 +116,6 @@ public class SessionServiceImpl implements SessionService {
         applySessionExt(entityDO, request.getSessionExt());
         sessionManager.updateById(entityDO);
         return sessionBuilder.buildBOByDO(entityDO);
-    }
-
-    private void applyModel(SessionDO entityDO, String model) {
-        if (StringUtils.isNotBlank(model)) {
-            SessionExt target = Objects.nonNull(entityDO.getSessionExt()) ? entityDO.getSessionExt()
-                    : new SessionExt();
-            target.setModel(model.trim());
-            entityDO.setSessionExt(target);
-        }
     }
 
     private void applySessionExt(SessionDO entityDO, SessionExt requestExt) {

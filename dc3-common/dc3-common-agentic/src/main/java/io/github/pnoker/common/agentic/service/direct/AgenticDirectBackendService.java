@@ -20,7 +20,6 @@ import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.request.DirectQueryRequest;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -38,17 +37,13 @@ import java.util.Queue;
 @Service
 public class AgenticDirectBackendService {
 
-    private final DeviceQueryDirectBackendProvider deviceQueryProvider;
-
     private final DataMonitorDirectBackendProvider dataMonitorProvider;
 
-    public AgenticDirectBackendService(DeviceQueryDirectBackendProvider deviceQueryProvider,
-                                       DataMonitorDirectBackendProvider dataMonitorProvider) {
-        this.deviceQueryProvider = deviceQueryProvider;
+    public AgenticDirectBackendService(DataMonitorDirectBackendProvider dataMonitorProvider) {
         this.dataMonitorProvider = dataMonitorProvider;
     }
 
-    public DirectBackendResult build(String skillName, DirectQueryRequest directQuery, RequestHeader.UserHeader userHeader,
+    public DirectBackendResult build(DirectQueryRequest directQuery, RequestHeader.UserHeader userHeader,
                                      Queue<AgenticRequestContext.ToolEvent> toolEvents) {
         try {
             if (Objects.nonNull(directQuery)) {
@@ -56,20 +51,11 @@ public class AgenticDirectBackendService {
                     return dataMonitorProvider.build(directQuery, userHeader, toolEvents);
                 }
                 return DirectBackendResult.direct(DirectAnswer.message("查询失败",
-                        "不支持的确定性查询类型：" + StringUtils.defaultString(directQuery.getType())));
-            }
-            if (StringUtils.isBlank(skillName)) {
-                return null;
-            }
-            if ("device-query".equals(skillName)) {
-                return deviceQueryProvider.build(userHeader, toolEvents);
-            }
-            if ("data-monitor".equals(skillName)) {
-                return dataMonitorProvider.build(directQuery, userHeader, toolEvents);
+                        "不支持的确定性查询类型：" + directQuery.getType()));
             }
         } catch (Exception e) {
-            log.warn("Agentic direct backend lookup failed, skill={}, tenantId={}, userId={}", skillName,
-                    userHeader.getTenantId(), userHeader.getUserId(), e);
+            log.warn("Agentic direct backend lookup failed, tenantId={}, userId={}", userHeader.getTenantId(),
+                    userHeader.getUserId(), e);
             offerToolEvent(toolEvents, "directContext", "agentic",
                     "Backend context query failed: " + e.getMessage());
             if (dataMonitorProvider.isResolvedPointValueRequest(directQuery)) {

@@ -20,7 +20,7 @@ import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.agentic.entity.builder.ActionBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ActionVO;
 import io.github.pnoker.common.agentic.service.ActionService;
-import io.github.pnoker.common.agentic.util.AgenticConversationIds;
+import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
@@ -51,7 +51,7 @@ public class ActionController implements BaseController {
     @GetMapping("/pending")
     public Mono<R<List<ActionVO>>> pending(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            String scopedConversationId = AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
+            String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
             List<ActionVO> actions = actionBuilder.buildVOListByBOList(actionService.listPending(scopedConversationId,
                     header));
@@ -81,7 +81,7 @@ public class ActionController implements BaseController {
     }
 
     private void sanitize(RequestHeader.UserHeader header, ActionVO action) {
-        action.setConversationId(AgenticConversationIds.stripScope(header.getTenantId(), header.getUserId(),
+        action.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
                 action.getConversationId()));
     }
 

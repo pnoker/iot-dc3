@@ -50,8 +50,8 @@ import java.util.Objects;
  *       LLM call) does not appear twice in the prompt — once via memory and once
  *       via {@code .user(...)}.</li>
  *   <li>{@link #saveAll} is intentionally a no-op. Persistence is owned by the
- *       orchestration service which writes a richer payload (skills, tools,
- *       contexts, tokens) than the {@link Message} envelope can carry.</li>
+ *       orchestration service which writes a richer payload (tools, contexts,
+ *       tokens) than the {@link Message} envelope can carry.</li>
  *   <li>{@link #deleteByConversationId} delegates to
  *       {@link MessageService#removeByConversationId(String)} so wiping a session
  *       wipes both replay history and persisted business records together.</li>
@@ -114,7 +114,7 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
     @Override
     public void saveAll(String conversationId, List<Message> messages) {
         // Intentionally no-op. dc3_message persistence is performed by the
-        // orchestration service so that skills, tools, contexts, and token
+        // orchestration service so that tools, contexts, and token
         // accounting are captured atomically alongside text content.
     }
 

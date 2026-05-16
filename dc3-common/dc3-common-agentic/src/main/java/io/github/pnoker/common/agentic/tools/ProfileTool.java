@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-package io.github.pnoker.common.agentic.tool;
+package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
+import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.facade.api.ProfileFacade;
-import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
 import lombok.extern.slf4j.Slf4j;
@@ -34,32 +32,26 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Platform-level tools for profiles/templates, fleet status, and health summaries.
+ * Profile/template-domain tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.14
- * @since 2026.5.10
+ * @version 2026.5.16
+ * @since 2022.1.0
  */
 @Slf4j
 @Component
-public class PlatformToolSet {
+public class ProfileTool {
 
     private static final String PROFILE_UNAVAILABLE = "Profile tools are not available in this deployment mode.";
 
-    private static final String STATUS_UNAVAILABLE = "Status and health tools are not available in this deployment mode.";
-
     private final Optional<ProfileFacade> profileFacade;
 
-    private final Optional<StatusHealthFacade> statusHealthFacade;
-
-    public PlatformToolSet(Optional<ProfileFacade> profileFacade, Optional<StatusHealthFacade> statusHealthFacade) {
+    public ProfileTool(Optional<ProfileFacade> profileFacade) {
         this.profileFacade = profileFacade;
-        this.statusHealthFacade = statusHealthFacade;
     }
 
     @Tool(description = "Look up a profile/template by its numeric ID. Returns template name, code, type, share flag, enable status, and version.")
@@ -156,107 +148,8 @@ public class PlatformToolSet {
         return AgenticToolResult.ok("Profiles loaded for device " + deviceId, profiles);
     }
 
-    @Tool(description = "Get device online/offline statuses for device IDs. Returns up to 50 tenant-scoped statuses.")
-    public AgenticToolResult<Map<Long, String>> getDeviceStatusesByIds(
-            @ToolParam(description = "The numeric device IDs") List<Long> deviceIds,
-            ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
-        List<Long> ids = normalizeIds(deviceIds);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceIds={}", "getDeviceStatusesByIds", tenantId, ids);
-        recordTool(toolContext, "getDeviceStatusesByIds", "Get device statuses");
-        StatusHealthFacade facade = statusHealthFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
-        }
-        if (ids.isEmpty()) {
-            return AgenticToolResult.invalid("No valid device IDs provided.");
-        }
-        Map<Long, String> statuses = facade.selectDeviceStatusesByIds(tenantId, ids);
-        if (Objects.isNull(statuses) || statuses.isEmpty()) {
-            return AgenticToolResult.empty("No device statuses found.", Map.of());
-        }
-        return AgenticToolResult.ok("Device statuses loaded", statuses);
-    }
-
-    @Tool(description = "Get device online/offline statuses for devices bound to a profile/template.")
-    public AgenticToolResult<Map<Long, String>> getDeviceStatusesByProfileId(
-            @ToolParam(description = "The profile/template ID") Long profileId,
-            ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "getDeviceStatusesByProfileId",
-                tenantId, profileId);
-        recordTool(toolContext, "getDeviceStatusesByProfileId", "Get device statuses by profile");
-        StatusHealthFacade facade = statusHealthFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
-        }
-        Map<Long, String> statuses = facade.selectDeviceStatusesByProfileId(tenantId, profileId);
-        if (Objects.isNull(statuses) || statuses.isEmpty()) {
-            return AgenticToolResult.empty("No device statuses found for profile ID: " + profileId, Map.of());
-        }
-        return AgenticToolResult.ok("Device statuses loaded for profile " + profileId, statuses);
-    }
-
-    @Tool(description = "Get driver online/offline statuses for driver IDs. Returns up to 50 tenant-scoped statuses.")
-    public AgenticToolResult<Map<Long, String>> getDriverStatusesByIds(
-            @ToolParam(description = "The numeric driver IDs") List<Long> driverIds,
-            ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
-        List<Long> ids = normalizeIds(driverIds);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, driverIds={}", "getDriverStatusesByIds", tenantId, ids);
-        recordTool(toolContext, "getDriverStatusesByIds", "Get driver statuses");
-        StatusHealthFacade facade = statusHealthFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
-        }
-        if (ids.isEmpty()) {
-            return AgenticToolResult.invalid("No valid driver IDs provided.");
-        }
-        Map<Long, String> statuses = facade.selectDriverStatusesByIds(tenantId, ids);
-        if (Objects.isNull(statuses) || statuses.isEmpty()) {
-            return AgenticToolResult.empty("No driver statuses found.", Map.of());
-        }
-        return AgenticToolResult.ok("Driver statuses loaded", statuses);
-    }
-
-    @Tool(description = "Get the online/offline device count summary under a driver.")
-    public AgenticToolResult<Map<String, String>> getDriverDeviceStatusSummary(
-            @ToolParam(description = "The driver ID") Long driverId,
-            ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "getDriverDeviceStatusSummary", tenantId,
-                driverId);
-        recordTool(toolContext, "getDriverDeviceStatusSummary", "Get driver device status summary");
-        StatusHealthFacade facade = statusHealthFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
-        }
-        Map<String, String> summary = facade.getDriverDeviceStatusSummary(tenantId, driverId);
-        if (Objects.isNull(summary) || summary.isEmpty()) {
-            return AgenticToolResult.empty("No driver device status summary found for driver ID: " + driverId,
-                    Map.of());
-        }
-        return AgenticToolResult.ok("Driver device status summary loaded", summary);
-    }
-
-    @Tool(description = "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
-    public AgenticToolResult<FacadeSystemHealthBO> getSystemHealth(ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}", "getSystemHealth", tenantId);
-        recordTool(toolContext, "getSystemHealth", "Get system health");
-        StatusHealthFacade facade = statusHealthFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
-        }
-        FacadeSystemHealthBO health = facade.systemHealth(tenantId);
-        if (Objects.isNull(health)) {
-            return AgenticToolResult.unavailable("System health snapshot is unavailable.");
-        }
-        return AgenticToolResult.ok("System health loaded", health);
-    }
-
     private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "platform", description);
+        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "profile", description);
     }
 
     private List<Long> normalizeIds(List<Long> ids) {

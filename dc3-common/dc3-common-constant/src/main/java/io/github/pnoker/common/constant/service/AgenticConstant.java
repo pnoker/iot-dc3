@@ -46,11 +46,6 @@ public class AgenticConstant {
     public static final String SESSION_URL_PREFIX = "/session";
 
     /**
-     * URL prefix for the skill REST API.
-     */
-    public static final String SKILL_URL_PREFIX = "/skill";
-
-    /**
      * URL prefix for the model REST API.
      */
     public static final String MODEL_URL_PREFIX = "/model";

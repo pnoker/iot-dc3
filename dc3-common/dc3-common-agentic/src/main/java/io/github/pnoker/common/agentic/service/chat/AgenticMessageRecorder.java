@@ -18,9 +18,8 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.skill.SkillDefinition;
 import io.github.pnoker.common.agentic.service.MessageService;
-import io.github.pnoker.common.agentic.util.AgenticTokenEstimator;
+import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -79,7 +78,6 @@ public class AgenticMessageRecorder {
 
         AgenticMessageContent content = AgenticMessageContent.ofText(text);
         content.setFormat("markdown");
-        content.setSkills(skillNames(prepared));
         content.setTools(tools);
         content.setTraces(buildTraceEvents(prepared, toolEvents));
         content.setReasoning(prepared.reasoning());
@@ -93,23 +91,13 @@ public class AgenticMessageRecorder {
                                                                List<AgenticRequestContext.ToolEvent> toolEvents) {
         List<AgenticMessageContent.Trace> traces = new ArrayList<>();
         long created = Instant.now().getEpochSecond();
-        SkillDefinition skillDefinition = prepared.skillDefinition();
-        String skillName = Objects.nonNull(skillDefinition) ? skillDefinition.getName() : "general";
-        String skillDescription = Objects.nonNull(skillDefinition) ? skillDefinition.getDescription()
-                : "General assistant mode";
-        traces.add(AgenticMessageContent.Trace.of("skill", "Auto skill", skillDescription, skillName, created));
-        if (StringUtils.isBlank(prepared.directAnswer()) && prepared.toolCallingEnabled()
-                && !prepared.toolNames().isEmpty()) {
-            traces.add(AgenticMessageContent.Trace.of("tools", "Available tools",
-                    String.join(", ", prepared.toolNames()), skillName, created));
-        }
         if (prepared.directContextProvided()) {
             traces.add(AgenticMessageContent.Trace.of("tool", "Backend context loaded",
-                    "Queried DC3 backend before response", skillName, created));
+                    "Queried DC3 backend before response", "agentic", created));
         }
         if (prepared.reasoning()) {
             traces.add(AgenticMessageContent.Trace.of("reasoning", "Thinking",
-                    "Reasoning mode requested for this model.", skillName, created));
+                    "Reasoning mode requested for this model.", "agentic", created));
         }
         for (AgenticRequestContext.ToolEvent event : toolEvents) {
             traces.add(AgenticMessageContent.Trace.of("tool", event.description(), event.domain(), event.toolName(),
@@ -128,7 +116,7 @@ public class AgenticMessageRecorder {
     }
 
     private AgenticMessageContent.Tokens outputTokens(AgenticMessageContent.Tokens inputTokens, String assistantText) {
-        int outputTokens = AgenticTokenEstimator.estimate(assistantText);
+        int outputTokens = AgenticTokenEstimatorUtil.estimate(assistantText);
         AgenticMessageContent.Tokens tokens = new AgenticMessageContent.Tokens();
         tokens.setInput(inputTokens.getInput());
         tokens.setOutput(outputTokens);
@@ -137,10 +125,6 @@ public class AgenticMessageRecorder {
         tokens.setSystem(inputTokens.getSystem());
         tokens.setMemory(inputTokens.getMemory());
         return tokens;
-    }
-
-    private List<String> skillNames(AgenticPreparedChatRequest prepared) {
-        return StringUtils.isBlank(prepared.skill()) ? List.of() : List.of(prepared.skill());
     }
 
 }

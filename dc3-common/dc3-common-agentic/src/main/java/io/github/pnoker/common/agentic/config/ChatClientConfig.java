@@ -17,10 +17,14 @@
 package io.github.pnoker.common.agentic.config;
 
 import io.github.pnoker.common.agentic.service.MessageService;
-import io.github.pnoker.common.agentic.tool.AuthToolSet;
-import io.github.pnoker.common.agentic.tool.DataToolSet;
-import io.github.pnoker.common.agentic.tool.ManagerToolSet;
-import io.github.pnoker.common.agentic.tool.PlatformToolSet;
+import io.github.pnoker.common.agentic.tools.DeviceTool;
+import io.github.pnoker.common.agentic.tools.DriverTool;
+import io.github.pnoker.common.agentic.tools.PointTool;
+import io.github.pnoker.common.agentic.tools.PointValueTool;
+import io.github.pnoker.common.agentic.tools.ProfileTool;
+import io.github.pnoker.common.agentic.tools.SystemTool;
+import io.github.pnoker.common.agentic.tools.TenantTool;
+import io.github.pnoker.common.agentic.tools.UserTool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -56,9 +60,10 @@ public class ChatClientConfig {
             You can help users manage IoT devices, query real-time and historical data,
             and perform device operations. You have access to the following capabilities:
 
-            - **Auth tools**: Read the current low-sensitivity tenant and user context.
-            - **Manager tools**: Query devices, drivers, and data points (metrics).
-            - **Data tools**: Read real-time point values, query historical data, and send read/write commands to devices.
+            - **Tenant and user tools**: Read the current low-sensitivity tenant and user context.
+            - **Device, driver, profile, and point tools**: Query platform metadata.
+            - **Point-value tools**: Read real-time values, query historical data, and send read/write commands to devices.
+            - **System tools**: Query platform health summaries.
 
             Guidelines:
             - Always confirm before sending write commands to physical devices.
@@ -90,11 +95,13 @@ public class ChatClientConfig {
     }
 
     @Bean
-    public ToolCallbackProvider agenticToolCallbackProvider(AuthToolSet authToolSet, ManagerToolSet managerToolSet,
-                                                            DataToolSet dataToolSet,
-                                                            PlatformToolSet platformToolSet) {
+    public ToolCallbackProvider agenticToolCallbackProvider(TenantTool tenantTool, UserTool userTool,
+                                                            DeviceTool deviceTool, DriverTool driverTool,
+                                                            ProfileTool profileTool, PointTool pointTool,
+                                                            PointValueTool pointValueTool, SystemTool systemTool) {
         return MethodToolCallbackProvider.builder()
-                .toolObjects(authToolSet, managerToolSet, dataToolSet, platformToolSet)
+                .toolObjects(tenantTool, userTool, deviceTool, driverTool, profileTool, pointTool, pointValueTool,
+                        systemTool)
                 .build();
     }
 
