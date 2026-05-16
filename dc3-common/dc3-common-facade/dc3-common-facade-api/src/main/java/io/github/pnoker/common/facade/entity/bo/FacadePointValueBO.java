@@ -64,6 +64,11 @@ public class FacadePointValueBO {
     private String rawValue;
 
     /**
+     * Numeric projection of {@link #value}; null when value is non-numeric
+     */
+    private Double numValue;
+
+    /**
      * Storage timestamp (epoch seconds)
      */
     private long createTime;

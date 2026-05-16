@@ -19,4 +19,4 @@ tools:
   - getSystemHealth
 examples:
   - user: "Show the latest data for device 1"
-    assistant: "Fetching real-time data for device 1..."
+    assistant: "Show the device, point, value, timestamp, and unit returned by the backend."

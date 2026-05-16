@@ -82,6 +82,9 @@ message GrpcPointValueDTO {
 
   // Storage timestamp
   int64 create_time = 6;
+
+  // Numeric projection of value; populated when value parses cleanly as a double
+  double num_value = 7;
 }
 
 // Request structure for querying historical point values
