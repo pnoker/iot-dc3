@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.service.ActionService;
@@ -59,6 +60,7 @@ public class PointValueTool {
     }
 
     @Tool(description = "Get the latest point value for a specific device and point. Returns the current value.")
+    @AgenticToolMetadata(domain = "point-value", title = "Get latest point value")
     public AgenticToolResult<FacadePointValueBO> getLatestPointValue(
             @ToolParam(description = "The device ID") Long deviceId,
             @ToolParam(description = "The point (metric) ID") Long pointId,
@@ -66,7 +68,6 @@ public class PointValueTool {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "getLatestPointValue",
                 tenantId, deviceId, pointId);
-        recordTool(toolContext, "getLatestPointValue", "Get latest point value");
         try {
             FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, pointId);
             if (Objects.isNull(value)) {
@@ -82,6 +83,7 @@ public class PointValueTool {
     }
 
     @Tool(description = "Get historical point values for a specific device and point. Returns raw values and chart-ready numeric points as structured data.")
+    @AgenticToolMetadata(domain = "point-value", title = "Get point value history")
     public AgenticToolResult<PointValueHistory> getPointValueHistory(
             @ToolParam(description = "The device ID") Long deviceId,
             @ToolParam(description = "The point (metric) ID") Long pointId,
@@ -90,7 +92,6 @@ public class PointValueTool {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
                 "getPointValueHistory", tenantId, deviceId, pointId, count);
-        recordTool(toolContext, "getPointValueHistory", "Get point value history");
         int size = Math.max(1, Math.min(count, 200));
         try {
             List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, size);
@@ -109,6 +110,7 @@ public class PointValueTool {
     }
 
     @Tool(description = "Send a read command to a device for a specific point. The driver will read the current value from the physical device.")
+    @AgenticToolMetadata(domain = "point-value", title = "Send point read command")
     public AgenticToolResult<PointCommandResult> readPointValue(
             @ToolParam(description = "The device ID") Long deviceId,
             @ToolParam(description = "The point (metric) ID to read") Long pointId,
@@ -116,7 +118,6 @@ public class PointValueTool {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
                 deviceId, pointId);
-        recordTool(toolContext, "readPointValue", "Send point read command");
         try {
             boolean success = pointValueCommandFacade.read(tenantId, deviceId, pointId);
             PointCommandResult result = new PointCommandResult(deviceId, pointId, null, success, false, null);
@@ -132,6 +133,7 @@ public class PointValueTool {
     }
 
     @Tool(description = "Prepare a point write command for a specific device and point. This tool never writes directly; it creates a pending action that requires explicit user confirmation before execution.")
+    @AgenticToolMetadata(domain = "point-value", title = "Prepare point write command")
     public AgenticToolResult<PointCommandResult> writePointValue(
             @ToolParam(description = "The device ID") Long deviceId,
             @ToolParam(description = "The point (metric) ID to write") Long pointId,
@@ -140,7 +142,6 @@ public class PointValueTool {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, valueLength={}",
                 "writePointValue", tenantId, deviceId, pointId, Objects.isNull(value) ? 0 : value.length());
-        recordTool(toolContext, "writePointValue", "Prepare point write command");
         try {
             if (Objects.isNull(deviceId) || Objects.isNull(pointId)) {
                 return AgenticToolResult.invalid("Device ID and point ID are required for point write commands.");
@@ -182,10 +183,6 @@ public class PointValueTool {
         }
         return new HistoryChart("line", "Device " + deviceId + " / Point " + pointId, "index (oldest to newest)",
                 "linear", List.of(new ChartSeries("value", dataPoints)));
-    }
-
-    private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "point-value", description);
     }
 
     public record PointValueHistory(Long deviceId, Long pointId, int requestedCount, List<String> values,

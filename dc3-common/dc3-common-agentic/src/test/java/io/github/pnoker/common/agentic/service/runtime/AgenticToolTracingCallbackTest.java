@@ -16,11 +16,13 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.ObjectMapper;
@@ -44,13 +46,38 @@ class AgenticToolTracingCallbackTest {
         String result = callback.call("{}", context);
 
         assertThat(result).contains("INVALID_ARGUMENT");
-        assertThat(events).hasSize(1);
-        AgenticRunEvent event = events.poll();
-        assertThat(event.name()).isEqualTo("lookupDeviceById");
-        assertThat(event.phase()).isEqualTo("result");
-        assertThat(event.status()).isEqualTo("failed");
-        assertThat(event.code()).isEqualTo("INVALID_ARGUMENT");
-        assertThat(event.title()).isEqualTo("Device ID is required");
+        assertThat(events).hasSize(2);
+        AgenticRunEvent startEvent = events.poll();
+        assertThat(startEvent.name()).isEqualTo("lookupDeviceById");
+        assertThat(startEvent.phase()).isEqualTo("start");
+        assertThat(startEvent.status()).isEqualTo("running");
+        AgenticRunEvent resultEvent = events.poll();
+        assertThat(resultEvent.name()).isEqualTo("lookupDeviceById");
+        assertThat(resultEvent.phase()).isEqualTo("result");
+        assertThat(resultEvent.status()).isEqualTo("failed");
+        assertThat(resultEvent.code()).isEqualTo("INVALID_ARGUMENT");
+        assertThat(resultEvent.title()).isEqualTo("Device ID is required");
+    }
+
+    @Test
+    void providerUsesAgenticMetadataWhenRecordingToolStart() {
+        Queue<AgenticRunEvent> events = new ConcurrentLinkedQueue<>();
+        ToolContext context = new ToolContext(Map.of(AgenticConstant.ToolContextKey.RUN_EVENTS, events));
+        ToolCallbackProvider provider = new AgenticToolTracingCallbackProvider(
+                ToolCallbackProvider.from(new StubToolCallback(
+                        "{\"success\":true,\"code\":\"OK\",\"message\":\"Device loaded\"}")),
+                new ObjectMapper(), new MetadataFixtureTool());
+
+        String result = provider.getToolCallbacks()[0].call("{}", context);
+
+        assertThat(result).contains("Device loaded");
+        assertThat(events).hasSize(2);
+        AgenticRunEvent startEvent = events.poll();
+        assertThat(startEvent.name()).isEqualTo("lookupDeviceById");
+        assertThat(startEvent.title()).isEqualTo("Fixture lookup");
+        assertThat(startEvent.detail()).isEqualTo("fixture");
+        assertThat(startEvent.phase()).isEqualTo("start");
+        assertThat(startEvent.status()).isEqualTo("running");
     }
 
     @Test
@@ -65,12 +92,15 @@ class AgenticToolTracingCallbackTest {
             // Expected test path.
         }
 
-        assertThat(events).hasSize(1);
-        AgenticRunEvent event = events.poll();
-        assertThat(event.phase()).isEqualTo("error");
-        assertThat(event.status()).isEqualTo("failed");
-        assertThat(event.code()).isEqualTo("ERROR");
-        assertThat(event.title()).isEqualTo("backend unavailable");
+        assertThat(events).hasSize(2);
+        AgenticRunEvent startEvent = events.poll();
+        assertThat(startEvent.phase()).isEqualTo("start");
+        assertThat(startEvent.status()).isEqualTo("running");
+        AgenticRunEvent errorEvent = events.poll();
+        assertThat(errorEvent.phase()).isEqualTo("error");
+        assertThat(errorEvent.status()).isEqualTo("failed");
+        assertThat(errorEvent.code()).isEqualTo("ERROR");
+        assertThat(errorEvent.title()).isEqualTo("backend unavailable");
     }
 
     private static class StubToolCallback implements ToolCallback {
@@ -111,6 +141,15 @@ class AgenticToolTracingCallbackTest {
         @Override
         public String call(String toolInput, ToolContext toolContext) {
             throw new IllegalStateException("backend unavailable");
+        }
+
+    }
+
+    private static class MetadataFixtureTool {
+
+        @AgenticToolMetadata(domain = "fixture", title = "Fixture lookup")
+        void lookupDeviceById() {
+            // Metadata-only fixture.
         }
 
     }

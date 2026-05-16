@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.entity.common.Pages;
@@ -55,13 +56,13 @@ public class ProfileTool {
     }
 
     @Tool(description = "Look up a profile/template by its numeric ID. Returns template name, code, type, share flag, enable status, and version.")
+    @AgenticToolMetadata(domain = "profile", title = "Query profile by ID")
     public AgenticToolResult<FacadeProfileBO> lookupProfileById(
             @ToolParam(description = "The numeric profile/template ID") Long profileId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "lookupProfileById", tenantId,
                 profileId);
-        recordTool(toolContext, "lookupProfileById", "Query profile by ID");
         ProfileFacade facade = profileFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(PROFILE_UNAVAILABLE);
@@ -74,13 +75,13 @@ public class ProfileTool {
     }
 
     @Tool(description = "Batch look up profiles/templates by numeric IDs. Returns up to 50 tenant-scoped templates.")
+    @AgenticToolMetadata(domain = "profile", title = "Batch query profiles by IDs")
     public AgenticToolResult<List<FacadeProfileBO>> lookupProfilesByIds(
             @ToolParam(description = "The numeric profile/template IDs") List<Long> profileIds,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(profileIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileIds={}", "lookupProfilesByIds", tenantId, ids);
-        recordTool(toolContext, "lookupProfilesByIds", "Batch query profiles by IDs");
         ProfileFacade facade = profileFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(PROFILE_UNAVAILABLE);
@@ -96,6 +97,7 @@ public class ProfileTool {
     }
 
     @Tool(description = "Search profiles/templates with optional filters. profileType accepts system, driver, user, or their enum names.")
+    @AgenticToolMetadata(domain = "profile", title = "Search profiles")
     public AgenticToolResult<FacadePage<FacadeProfileBO>> searchProfiles(
             @ToolParam(description = "Profile/template name filter (partial match), or null to skip") String profileName,
             @ToolParam(description = "Profile/template code filter, or null to skip") String profileCode,
@@ -107,7 +109,6 @@ public class ProfileTool {
         log.debug(
                 "Agentic tool invoked, tool={}, tenantId={}, profileName={}, profileCode={}, profileType={}, page={}, size={}",
                 "searchProfiles", tenantId, profileName, profileCode, profileType, page, size);
-        recordTool(toolContext, "searchProfiles", "Search profiles");
         ProfileFacade facade = profileFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(PROFILE_UNAVAILABLE);
@@ -130,13 +131,13 @@ public class ProfileTool {
     }
 
     @Tool(description = "List profiles/templates bound to a specific device ID.")
+    @AgenticToolMetadata(domain = "profile", title = "List profiles by device")
     public AgenticToolResult<List<FacadeProfileBO>> listProfilesByDeviceId(
             @ToolParam(description = "The device ID") Long deviceId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "listProfilesByDeviceId", tenantId,
                 deviceId);
-        recordTool(toolContext, "listProfilesByDeviceId", "List profiles by device");
         ProfileFacade facade = profileFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(PROFILE_UNAVAILABLE);
@@ -146,10 +147,6 @@ public class ProfileTool {
             return AgenticToolResult.empty("No profiles found for device ID: " + deviceId, List.of());
         }
         return AgenticToolResult.ok("Profiles loaded for device " + deviceId, profiles);
-    }
-
-    private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "profile", description);
     }
 
     private List<Long> normalizeIds(List<Long> ids) {

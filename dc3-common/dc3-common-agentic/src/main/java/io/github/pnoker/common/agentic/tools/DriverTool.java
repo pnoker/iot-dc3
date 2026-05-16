@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.entity.common.Pages;
@@ -58,12 +59,12 @@ public class DriverTool {
     }
 
     @Tool(description = "Look up a driver by its numeric ID. Returns driver name, code, service name, host, type, and enable status.")
+    @AgenticToolMetadata(domain = "driver", title = "Query driver by ID")
     public AgenticToolResult<FacadeDriverBO> lookupDriverById(
             @ToolParam(description = "The numeric driver ID") Long driverId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "lookupDriverById", tenantId, driverId);
-        recordTool(toolContext, "lookupDriverById", "Query driver by ID");
         FacadeDriverBO bo = driverFacade.selectById(tenantId, driverId);
         if (Objects.isNull(bo)) {
             return AgenticToolResult.notFound("Driver not found for ID: " + driverId);
@@ -72,13 +73,13 @@ public class DriverTool {
     }
 
     @Tool(description = "Batch look up drivers by numeric IDs. Returns up to 50 tenant-scoped drivers.")
+    @AgenticToolMetadata(domain = "driver", title = "Batch query drivers by IDs")
     public AgenticToolResult<List<FacadeDriverBO>> lookupDriversByIds(
             @ToolParam(description = "The numeric driver IDs") List<Long> driverIds,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(driverIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverIds={}", "lookupDriversByIds", tenantId, ids);
-        recordTool(toolContext, "lookupDriversByIds", "Batch query drivers by IDs");
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid driver IDs provided.");
         }
@@ -90,13 +91,13 @@ public class DriverTool {
     }
 
     @Tool(description = "Resolve the driver that owns a given device. Returns the driver details.")
+    @AgenticToolMetadata(domain = "driver", title = "Query device driver")
     public AgenticToolResult<FacadeDriverBO> lookupDriverByDeviceId(
             @ToolParam(description = "The device ID") Long deviceId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "lookupDriverByDeviceId", tenantId,
                 deviceId);
-        recordTool(toolContext, "lookupDriverByDeviceId", "Query device driver");
         FacadeDriverBO bo = driverFacade.selectByDeviceId(tenantId, deviceId);
         if (Objects.isNull(bo)) {
             return AgenticToolResult.notFound("No driver found for device ID: " + deviceId);
@@ -105,6 +106,7 @@ public class DriverTool {
     }
 
     @Tool(description = "Search for drivers with optional name filter. Returns a paginated list.")
+    @AgenticToolMetadata(domain = "driver", title = "Search drivers")
     public AgenticToolResult<FacadePage<FacadeDriverBO>> searchDrivers(
             @ToolParam(description = "Driver name filter (partial match), or null to skip") String driverName,
             @ToolParam(description = "Page number (1-based)") int page,
@@ -113,7 +115,6 @@ public class DriverTool {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverName={}, page={}, size={}", "searchDrivers",
                 tenantId, driverName, page, size);
-        recordTool(toolContext, "searchDrivers", "Search drivers");
 
         FacadeDriverQuery query = new FacadeDriverQuery();
         query.setDriverName(driverName);
@@ -131,13 +132,13 @@ public class DriverTool {
     }
 
     @Tool(description = "Get driver online/offline statuses for driver IDs. Returns up to 50 tenant-scoped statuses.")
+    @AgenticToolMetadata(domain = "driver", title = "Get driver statuses")
     public AgenticToolResult<Map<Long, String>> getDriverStatusesByIds(
             @ToolParam(description = "The numeric driver IDs") List<Long> driverIds,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(driverIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverIds={}", "getDriverStatusesByIds", tenantId, ids);
-        recordTool(toolContext, "getDriverStatusesByIds", "Get driver statuses");
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
@@ -153,13 +154,13 @@ public class DriverTool {
     }
 
     @Tool(description = "Get the online/offline device count summary under a driver.")
+    @AgenticToolMetadata(domain = "driver", title = "Get driver device status summary")
     public AgenticToolResult<Map<String, String>> getDriverDeviceStatusSummary(
             @ToolParam(description = "The driver ID") Long driverId,
             ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "getDriverDeviceStatusSummary", tenantId,
                 driverId);
-        recordTool(toolContext, "getDriverDeviceStatusSummary", "Get driver device status summary");
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
@@ -170,10 +171,6 @@ public class DriverTool {
                     Map.of());
         }
         return AgenticToolResult.ok("Driver device status summary loaded", summary);
-    }
-
-    private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "driver", description);
     }
 
     private List<Long> normalizeIds(List<Long> ids) {
