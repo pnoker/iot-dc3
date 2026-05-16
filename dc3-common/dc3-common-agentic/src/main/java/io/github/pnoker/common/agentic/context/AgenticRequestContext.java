@@ -17,13 +17,13 @@
 package io.github.pnoker.common.agentic.context;
 
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.springframework.ai.chat.model.ToolContext;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,29 +114,28 @@ public class AgenticRequestContext {
         throw new UnAuthorizedException("Unable to get agentic conversation ID");
     }
 
-    @SuppressWarnings("unchecked")
     public static void recordToolInvocation(ToolContext toolContext, String toolName, String domain,
                                             String description) {
-        recordToolEvent(toolContext, new ToolEvent(toolName, domain, description, Instant.now().toEpochMilli()));
+        recordRunEvent(toolContext, AgenticRunEvent.toolStart(toolName, domain, description));
     }
 
     public static void recordToolResult(ToolContext toolContext, String toolName, boolean success, String code,
                                         String message) {
-        String status = success ? ("EMPTY".equals(code) ? "empty" : "success") : "failed";
-        recordToolEvent(toolContext, new ToolEvent(toolName, "tool", message, Instant.now().toEpochMilli(),
-                "result", status, code));
+        recordRunEvent(toolContext, AgenticRunEvent.toolResult(toolName, success, code, message));
     }
 
     public static void recordToolError(ToolContext toolContext, String toolName, String message) {
-        recordToolEvent(toolContext, new ToolEvent(toolName, "tool", message, Instant.now().toEpochMilli(),
-                "error", "failed", "ERROR"));
+        recordRunEvent(toolContext, AgenticRunEvent.toolError(toolName, message));
     }
 
     @SuppressWarnings("unchecked")
-    private static void recordToolEvent(ToolContext toolContext, ToolEvent event) {
-        Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.TOOL_EVENTS);
+    public static void recordRunEvent(ToolContext toolContext, AgenticRunEvent event) {
+        if (Objects.isNull(event)) {
+            return;
+        }
+        Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.RUN_EVENTS);
         if (value instanceof Queue<?>) {
-            ((Queue<ToolEvent>) value).offer(event);
+            ((Queue<AgenticRunEvent>) value).offer(event);
         }
     }
 
@@ -156,22 +155,6 @@ public class AgenticRequestContext {
             return null;
         }
         return toolContext.getContext().get(key);
-    }
-
-    public record ToolEvent(String toolName, String domain, String description, long timestamp, String phase,
-                            String status, String code) {
-
-        public ToolEvent(String toolName, String domain, String description, long timestamp) {
-            this(toolName, domain, description, timestamp, "start", "running", null);
-        }
-
-        public String detail() {
-            if ("start".equals(phase)) {
-                return domain;
-            }
-            return code;
-        }
-
     }
 
 }

@@ -16,8 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -68,10 +68,10 @@ public class AgenticMessageRecorder {
     }
 
     private AgenticMessageContent buildAssistantContent(AgenticPreparedChatRequest prepared, String text) {
-        List<AgenticRequestContext.ToolEvent> toolEvents = drainToolEvents(prepared);
-        List<String> tools = toolEvents.stream()
-                .filter(event -> !"agentic".equals(event.domain()))
-                .map(AgenticRequestContext.ToolEvent::toolName)
+        List<AgenticRunEvent> runEvents = drainRunEvents(prepared);
+        List<String> tools = runEvents.stream()
+                .filter(event -> "tool".equals(event.type()))
+                .map(AgenticRunEvent::name)
                 .filter(StringUtils::isNotBlank)
                 .distinct()
                 .toList();
@@ -79,7 +79,7 @@ public class AgenticMessageRecorder {
         AgenticMessageContent content = AgenticMessageContent.ofText(text);
         content.setFormat("markdown");
         content.setTools(tools);
-        content.setTraces(buildTraceEvents(prepared, toolEvents));
+        content.setTraces(buildTraceEvents(prepared, runEvents));
         content.setReasoning(prepared.reasoning());
         content.setContexts(prepared.contexts());
         content.setTokens(outputTokens(prepared.inputTokens(), text));
@@ -87,27 +87,27 @@ public class AgenticMessageRecorder {
     }
 
     private List<AgenticMessageContent.Trace> buildTraceEvents(AgenticPreparedChatRequest prepared,
-                                                               List<AgenticRequestContext.ToolEvent> toolEvents) {
+                                                               List<AgenticRunEvent> runEvents) {
         List<AgenticMessageContent.Trace> traces = new ArrayList<>();
         long created = Instant.now().getEpochSecond();
         if (prepared.reasoning()) {
             traces.add(AgenticMessageContent.Trace.of("reasoning", "Thinking",
                     "Reasoning mode requested for this model.", "agentic", created));
         }
-        for (AgenticRequestContext.ToolEvent event : toolEvents) {
-            traces.add(AgenticMessageContent.Trace.of("tool", event.description(), event.detail(), event.toolName(),
+        for (AgenticRunEvent event : runEvents) {
+            traces.add(AgenticMessageContent.Trace.of(event.type(), event.title(), event.detail(), event.name(),
                     event.timestamp() / 1000, event.phase(), event.status(), event.code()));
         }
         return traces;
     }
 
-    private List<AgenticRequestContext.ToolEvent> drainToolEvents(AgenticPreparedChatRequest prepared) {
-        AgenticRequestContext.ToolEvent event = prepared.toolEvents().poll();
+    private List<AgenticRunEvent> drainRunEvents(AgenticPreparedChatRequest prepared) {
+        AgenticRunEvent event = prepared.runEvents().poll();
         while (Objects.nonNull(event)) {
-            prepared.toolTraceEvents().add(event);
-            event = prepared.toolEvents().poll();
+            prepared.runTraceEvents().add(event);
+            event = prepared.runEvents().poll();
         }
-        return prepared.toolTraceEvents();
+        return prepared.runTraceEvents();
     }
 
     private AgenticMessageContent.Tokens outputTokens(AgenticMessageContent.Tokens inputTokens, String assistantText) {

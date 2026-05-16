@@ -89,7 +89,7 @@ public class AgenticConstant {
 
         public static final String CONVERSATION_ID = "dc3.agentic.conversationId";
 
-        public static final String TOOL_EVENTS = "dc3.agentic.toolEvents";
+        public static final String RUN_EVENTS = "dc3.agentic.runEvents";
 
         private ToolContextKey() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);

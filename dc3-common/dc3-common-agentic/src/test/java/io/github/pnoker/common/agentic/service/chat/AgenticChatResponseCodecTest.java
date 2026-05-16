@@ -16,8 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.codec.ServerSentEvent;
 import tools.jackson.databind.ObjectMapper;
@@ -35,10 +35,11 @@ class AgenticChatResponseCodecTest {
     private final AgenticChatResponseCodec codec = new AgenticChatResponseCodec(new ObjectMapper());
 
     @Test
-    void streamEventsFlushesToolEventsWithoutContentChunk() {
-        Queue<AgenticRequestContext.ToolEvent> toolEvents = new ConcurrentLinkedQueue<>();
-        toolEvents.offer(new AgenticRequestContext.ToolEvent("searchDevices", "device", "Search devices", 1000L));
-        AgenticPreparedChatRequest prepared = prepared(toolEvents);
+    void streamEventsFlushesRunEventsWithoutContentChunk() {
+        Queue<AgenticRunEvent> runEvents = new ConcurrentLinkedQueue<>();
+        runEvents.offer(new AgenticRunEvent("tool", "searchDevices", "Search devices", "device",
+                1000L, "start", "running", null));
+        AgenticPreparedChatRequest prepared = prepared(runEvents);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 AgenticStreamDelta.empty());
@@ -47,17 +48,17 @@ class AgenticChatResponseCodecTest {
         assertThat(events.get(0).data()).contains("\"object\":\"agentic.event\"");
         assertThat(events.get(0).data()).contains("\"name\":\"searchDevices\"");
         assertThat(events.get(0).data()).doesNotContain("\"object\":\"chat.completion.chunk\"");
-        assertThat(prepared.toolTraceEvents()).hasSize(1);
+        assertThat(prepared.runTraceEvents()).hasSize(1);
     }
 
     @Test
-    void streamEventsKeepsToolEventsBeforeContentChunk() {
-        Queue<AgenticRequestContext.ToolEvent> toolEvents = new ConcurrentLinkedQueue<>();
-        toolEvents.offer(new AgenticRequestContext.ToolEvent("lookupDeviceById", "device", "Query device by ID",
-                1000L));
-        toolEvents.offer(new AgenticRequestContext.ToolEvent("lookupDeviceById", "tool", "Device loaded",
+    void streamEventsKeepsRunEventsBeforeContentChunk() {
+        Queue<AgenticRunEvent> runEvents = new ConcurrentLinkedQueue<>();
+        runEvents.offer(new AgenticRunEvent("tool", "lookupDeviceById", "Query device by ID", "device",
+                1000L, "start", "running", null));
+        runEvents.offer(new AgenticRunEvent("tool", "lookupDeviceById", "Device loaded", "OK",
                 1100L, "result", "success", "OK"));
-        AgenticPreparedChatRequest prepared = prepared(toolEvents);
+        AgenticPreparedChatRequest prepared = prepared(runEvents);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 new AgenticStreamDelta("Device loaded", null));
@@ -71,9 +72,9 @@ class AgenticChatResponseCodecTest {
         assertThat(events.get(2).data()).contains("\"content\":\"Device loaded\"");
     }
 
-    private AgenticPreparedChatRequest prepared(Queue<AgenticRequestContext.ToolEvent> toolEvents) {
+    private AgenticPreparedChatRequest prepared(Queue<AgenticRunEvent> runEvents) {
         return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
-                Map.of(), null, null, toolEvents, true, false, List.of(), List.of(),
+                Map.of(), null, null, runEvents, true, false, List.of(), List.of(),
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), new ArrayList<>());
     }
 
