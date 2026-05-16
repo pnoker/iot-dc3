@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Encodes agentic chat responses and server-sent events.
@@ -86,11 +85,15 @@ public class AgenticChatResponseCodec {
     }
 
     public String finishReason(ChatResponse chatResponse) {
+        return normalizeFinishReason(finishReasonOrNull(chatResponse));
+    }
+
+    public String finishReasonOrNull(ChatResponse chatResponse) {
         String finishReason = Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
                 && Objects.nonNull(chatResponse.getResult().getMetadata())
                         ? chatResponse.getResult().getMetadata().getFinishReason()
                         : null;
-        return normalizeFinishReason(finishReason);
+        return StringUtils.trimToNull(finishReason);
     }
 
     public String newChatId() {
@@ -112,17 +115,6 @@ public class AgenticChatResponseCodec {
         return toJson(chunk);
     }
 
-    public void rememberFinishReason(ChatResponse response, AtomicReference<String> sink) {
-        if (Objects.isNull(response) || Objects.isNull(response.getResult())
-                || Objects.isNull(response.getResult().getMetadata())) {
-            return;
-        }
-        String reason = response.getResult().getMetadata().getFinishReason();
-        if (StringUtils.isNotBlank(reason)) {
-            sink.set(reason);
-        }
-    }
-
     public String normalizeFinishReason(String reason) {
         if (StringUtils.isBlank(reason)) {
             return "stop";
@@ -140,8 +132,8 @@ public class AgenticChatResponseCodec {
         return events;
     }
 
-    public List<ServerSentEvent<String>> chunkEvents(AgenticPreparedChatRequest prepared, String chatId, long created,
-                                                     AgenticStreamDelta streamDelta) {
+    public List<ServerSentEvent<String>> streamEvents(AgenticPreparedChatRequest prepared, String chatId, long created,
+                                                      AgenticStreamDelta streamDelta) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
         AgenticRequestContext.ToolEvent event = prepared.toolEvents().poll();
         while (Objects.nonNull(event)) {
@@ -151,9 +143,11 @@ public class AgenticChatResponseCodec {
                     .build());
             event = prepared.toolEvents().poll();
         }
-        events.add(ServerSentEvent.<String>builder()
-                .data(formatChunk(chatId, created, prepared.model(), streamDelta))
-                .build());
+        if (Objects.nonNull(streamDelta) && streamDelta.hasContent()) {
+            events.add(ServerSentEvent.<String>builder()
+                    .data(formatChunk(chatId, created, prepared.model(), streamDelta))
+                    .build());
+        }
         return events;
     }
 
