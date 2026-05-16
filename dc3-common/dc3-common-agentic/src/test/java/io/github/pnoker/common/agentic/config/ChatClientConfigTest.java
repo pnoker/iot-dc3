@@ -18,10 +18,14 @@
 package io.github.pnoker.common.agentic.config;
 
 import io.github.pnoker.common.agentic.service.ActionService;
-import io.github.pnoker.common.agentic.tool.AuthToolSet;
-import io.github.pnoker.common.agentic.tool.DataToolSet;
-import io.github.pnoker.common.agentic.tool.ManagerToolSet;
-import io.github.pnoker.common.agentic.tool.PlatformToolSet;
+import io.github.pnoker.common.agentic.tools.DeviceTool;
+import io.github.pnoker.common.agentic.tools.DriverTool;
+import io.github.pnoker.common.agentic.tools.PointTool;
+import io.github.pnoker.common.agentic.tools.PointValueTool;
+import io.github.pnoker.common.agentic.tools.ProfileTool;
+import io.github.pnoker.common.agentic.tools.SystemTool;
+import io.github.pnoker.common.agentic.tools.TenantTool;
+import io.github.pnoker.common.agentic.tools.UserTool;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
@@ -36,16 +40,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -86,17 +83,21 @@ class ChatClientConfigTest {
     @BeforeEach
     void setUp() {
         ChatClientConfig config = new ChatClientConfig();
-        AuthToolSet authToolSet = new AuthToolSet();
-        ManagerToolSet managerToolSet = new ManagerToolSet(deviceFacade, driverFacade, pointFacade);
-        DataToolSet dataToolSet = new DataToolSet(pointValueFacade, pointValueCommandFacade, deviceFacade, pointFacade,
-                actionService);
-        PlatformToolSet platformToolSet = new PlatformToolSet(Optional.of(profileFacade),
+        TenantTool tenantTool = new TenantTool();
+        UserTool userTool = new UserTool();
+        DeviceTool deviceTool = new DeviceTool(deviceFacade, pointFacade, pointValueFacade,
                 Optional.of(statusHealthFacade));
-        provider = config.agenticToolCallbackProvider(authToolSet, managerToolSet, dataToolSet, platformToolSet);
+        DriverTool driverTool = new DriverTool(driverFacade, Optional.of(statusHealthFacade));
+        ProfileTool profileTool = new ProfileTool(Optional.of(profileFacade));
+        PointTool pointTool = new PointTool(pointFacade);
+        PointValueTool pointValueTool = new PointValueTool(pointValueFacade, pointValueCommandFacade, actionService);
+        SystemTool systemTool = new SystemTool(Optional.of(statusHealthFacade));
+        provider = config.agenticToolCallbackProvider(tenantTool, userTool, deviceTool, driverTool, profileTool,
+                pointTool, pointValueTool, systemTool);
     }
 
     @Test
-    void agenticToolCallbackProviderRegistersExpectedToolSets() {
+    void agenticToolCallbackProviderRegistersExpectedTools() {
         assertThat(toolNames()).contains(
                 "getCurrentTenantInfo",
                 "getCurrentUserProfile",
@@ -128,30 +129,6 @@ class ChatClientConfigTest {
                 "getDriverStatusesByIds",
                 "getDriverDeviceStatusSummary",
                 "getSystemHealth");
-    }
-
-    @Test
-    void skillToolNamesAreBackedByRegisteredCallbacks() throws Exception {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        Resource[] resources = resolver.getResources("classpath*:skills/*.yml");
-        Set<String> registeredToolNames = toolNames();
-        Set<String> declaredToolNames = new LinkedHashSet<>();
-        Yaml yaml = new Yaml();
-
-        for (Resource resource : resources) {
-            try (InputStreamReader reader = new InputStreamReader(resource.getInputStream(),
-                    StandardCharsets.UTF_8)) {
-                Map<String, Object> map = yaml.load(reader);
-                @SuppressWarnings("unchecked")
-                List<String> tools = (List<String>) map.get("tools");
-                if (tools != null) {
-                    declaredToolNames.addAll(tools);
-                }
-            }
-        }
-
-        assertThat(declaredToolNames).isNotEmpty();
-        assertThat(registeredToolNames).containsAll(declaredToolNames);
     }
 
     private Set<String> toolNames() {

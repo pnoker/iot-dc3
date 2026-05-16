@@ -70,12 +70,6 @@ public class ChatCompletionRequest {
     private String conversationId;
 
     /**
-     * Skill name to activate for this request. Null = all tools available. When set,
-     * the skill's configured tool allow-list is enforced for this request.
-     */
-    private String skill;
-
-    /**
      * Uploaded attachment database IDs associated with this request.
      */
     private List<Long> attachments;

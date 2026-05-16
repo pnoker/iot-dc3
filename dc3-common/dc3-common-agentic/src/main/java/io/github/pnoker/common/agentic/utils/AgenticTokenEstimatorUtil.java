@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.util;
+package io.github.pnoker.common.agentic.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import org.apache.commons.lang3.StringUtils;
@@ -29,9 +29,9 @@ import org.apache.commons.lang3.StringUtils;
  * @version 2026.5.10
  * @since 2026.5.10
  */
-public class AgenticTokenEstimator {
+public class AgenticTokenEstimatorUtil {
 
-    private AgenticTokenEstimator() {
+    private AgenticTokenEstimatorUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 

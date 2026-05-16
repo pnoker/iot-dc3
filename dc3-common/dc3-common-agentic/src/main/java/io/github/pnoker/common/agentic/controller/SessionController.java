@@ -23,7 +23,7 @@ import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.SessionService;
-import io.github.pnoker.common.agentic.util.AgenticConversationIds;
+import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
@@ -76,7 +76,7 @@ public class SessionController implements BaseController {
     @GetMapping("/select_by_conversation_id")
     public Mono<R<SessionVO>> get(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            SessionBO session = sessionService.getByConversationId(AgenticConversationIds.scope(header.getTenantId(),
+            SessionBO session = sessionService.getByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(),
                     header.getUserId(), conversationId));
             if (Objects.isNull(session)) {
                 return R.fail("Session not found");
@@ -90,7 +90,7 @@ public class SessionController implements BaseController {
     @DeleteMapping("/delete")
     public Mono<R<Boolean>> delete(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            sessionService.removeByConversationId(AgenticConversationIds.scope(header.getTenantId(), header.getUserId(),
+            sessionService.removeByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
             return R.ok();
         }));
@@ -100,7 +100,7 @@ public class SessionController implements BaseController {
     public Mono<R<SessionVO>> update(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionUpdateRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
-            SessionBO session = sessionService.update(AgenticConversationIds.scope(header.getTenantId(),
+            SessionBO session = sessionService.update(AgenticConversationIdUtil.scope(header.getTenantId(),
                     header.getUserId(), conversationId), request);
             if (Objects.isNull(session)) {
                 return R.fail("Session not found");
@@ -112,7 +112,7 @@ public class SessionController implements BaseController {
     }
 
     private void sanitizeSession(RequestHeader.UserHeader header, SessionVO session) {
-        session.setConversationId(AgenticConversationIds.stripScope(header.getTenantId(), header.getUserId(),
+        session.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
                 session.getConversationId()));
         session.setTenantId(null);
         session.setUserId(null);

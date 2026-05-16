@@ -76,7 +76,6 @@ public interface MessageBuilder {
 
     @Mapping(target = "content", ignore = true)
     @Mapping(target = "contentExt", source = "content")
-    @Mapping(target = "skills", ignore = true)
     MessageVO buildVOByBO(MessageBO entityBO);
 
     @AfterMapping
@@ -85,7 +84,6 @@ public interface MessageBuilder {
                 : AgenticMessageContent.ofText("");
         entityVO.setContent(StringUtils.defaultString(content.getText()));
         entityVO.setContentExt(content);
-        entityVO.setSkills(content.getSkills());
     }
 
     List<MessageVO> buildVOListByBOList(List<MessageBO> entityBOList);

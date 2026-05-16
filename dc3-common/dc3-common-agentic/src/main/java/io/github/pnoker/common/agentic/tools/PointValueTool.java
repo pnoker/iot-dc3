@@ -14,21 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.tool;
+package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
+import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.service.ActionService;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.facade.api.DeviceFacade;
-import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
-import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
@@ -40,36 +34,26 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Data-domain tools exposed to the LLM via Spring AI @Tool.
- * <p>
- * Delegates to the facade layer ({@link PointValueFacade} and
- * {@link PointValueCommandFacade}) so that calls follow the project's local/gRPC
- * dual-mode convention.
+ * Point-value tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.16
  * @since 2022.1.0
  */
 @Slf4j
 @Component
-public class DataToolSet {
+public class PointValueTool {
 
     private final PointValueFacade pointValueFacade;
 
     private final PointValueCommandFacade pointValueCommandFacade;
 
-    private final DeviceFacade deviceFacade;
-
-    private final PointFacade pointFacade;
-
     private final ActionService actionService;
 
-    public DataToolSet(PointValueFacade pointValueFacade, PointValueCommandFacade pointValueCommandFacade,
-                       DeviceFacade deviceFacade, PointFacade pointFacade, ActionService actionService) {
+    public PointValueTool(PointValueFacade pointValueFacade, PointValueCommandFacade pointValueCommandFacade,
+                          ActionService actionService) {
         this.pointValueFacade = pointValueFacade;
         this.pointValueCommandFacade = pointValueCommandFacade;
-        this.deviceFacade = deviceFacade;
-        this.pointFacade = pointFacade;
         this.actionService = actionService;
     }
 
@@ -120,72 +104,6 @@ public class DataToolSet {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
                     "getPointValueHistory", tenantId, deviceId, pointId, size, e);
             return AgenticToolResult.error("Error retrieving history: " + e.getMessage());
-        }
-    }
-
-    private HistoryChart buildHistoryChart(Long deviceId, Long pointId, List<String> history) {
-        List<List<Number>> dataPoints = new ArrayList<>();
-        int rendered = 0;
-        for (int i = history.size() - 1; i >= 0; i--) {
-            String raw = history.get(i);
-            if (Objects.isNull(raw)) {
-                continue;
-            }
-            try {
-                double value = Double.parseDouble(raw.trim());
-                dataPoints.add(List.of(rendered, value));
-                rendered++;
-            } catch (NumberFormatException ignored) {
-                // Keep non-numeric values in the raw history; only chart data skips them.
-            }
-        }
-        if (rendered == 0) {
-            return null;
-        }
-        return new HistoryChart("line", "Device " + deviceId + " / Point " + pointId, "index (oldest to newest)",
-                "linear", List.of(new ChartSeries("value", dataPoints)));
-    }
-
-    @Tool(description = "Get a latest-value snapshot for points bound to a device. Returns point metadata and latest values for up to the requested limit.")
-    public AgenticToolResult<DeviceLatestPointValues> getDeviceLatestPointValues(
-            @ToolParam(description = "The device ID") Long deviceId,
-            @ToolParam(description = "Maximum number of points to include") int limit,
-            ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
-        int size = Math.max(1, Math.min(limit, 50));
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, limit={}",
-                "getDeviceLatestPointValues", tenantId, deviceId, size);
-        recordTool(toolContext, "getDeviceLatestPointValues", "Get device latest point values");
-        try {
-            FacadeDeviceBO device = deviceFacade.selectById(tenantId, deviceId);
-            if (Objects.isNull(device)) {
-                return AgenticToolResult.notFound("Device not found for ID: " + deviceId);
-            }
-
-            FacadePointQuery query = new FacadePointQuery();
-            query.setTenantId(tenantId);
-            query.setDeviceId(deviceId);
-            Pages page = new Pages();
-            page.setCurrent(1);
-            page.setSize(size);
-            query.setPage(page);
-            FacadePage<FacadePointBO> points = pointFacade.selectByPage(query);
-            if (Objects.isNull(points) || points.getRecords().isEmpty()) {
-                return AgenticToolResult.empty("No points found for device " + deviceId,
-                        new DeviceLatestPointValues(device, List.of()));
-            }
-
-            List<PointLatestValue> values = new ArrayList<>();
-            for (FacadePointBO point : points.getRecords()) {
-                FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, point.getId());
-                values.add(new PointLatestValue(point, value));
-            }
-            return AgenticToolResult.ok("Device latest point values loaded",
-                    new DeviceLatestPointValues(device, values));
-        } catch (Exception e) {
-            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, limit={}",
-                    "getDeviceLatestPointValues", tenantId, deviceId, size, e);
-            return AgenticToolResult.error("Error retrieving device latest values: " + e.getMessage());
         }
     }
 
@@ -244,8 +162,31 @@ public class DataToolSet {
         }
     }
 
+    private HistoryChart buildHistoryChart(Long deviceId, Long pointId, List<String> history) {
+        List<List<Number>> dataPoints = new ArrayList<>();
+        int rendered = 0;
+        for (int i = history.size() - 1; i >= 0; i--) {
+            String raw = history.get(i);
+            if (Objects.isNull(raw)) {
+                continue;
+            }
+            try {
+                double value = Double.parseDouble(raw.trim());
+                dataPoints.add(List.of(rendered, value));
+                rendered++;
+            } catch (NumberFormatException ignored) {
+                // Keep non-numeric values in the raw history; only chart data skips them.
+            }
+        }
+        if (rendered == 0) {
+            return null;
+        }
+        return new HistoryChart("line", "Device " + deviceId + " / Point " + pointId, "index (oldest to newest)",
+                "linear", List.of(new ChartSeries("value", dataPoints)));
+    }
+
     private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "data", description);
+        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "point-value", description);
     }
 
     public record PointValueHistory(Long deviceId, Long pointId, int requestedCount, List<String> values,
@@ -271,17 +212,6 @@ public class DataToolSet {
             data = List.copyOf(Objects.requireNonNullElse(data, List.of()));
         }
 
-    }
-
-    public record DeviceLatestPointValues(FacadeDeviceBO device, List<PointLatestValue> points) {
-
-        public DeviceLatestPointValues {
-            points = List.copyOf(Objects.requireNonNullElse(points, List.of()));
-        }
-
-    }
-
-    public record PointLatestValue(FacadePointBO point, FacadePointValueBO value) {
     }
 
     public record PointCommandResult(Long deviceId, Long pointId, String value, boolean sent,

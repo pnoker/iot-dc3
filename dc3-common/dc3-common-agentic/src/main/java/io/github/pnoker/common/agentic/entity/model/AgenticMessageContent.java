@@ -47,8 +47,6 @@ public class AgenticMessageContent implements Serializable {
 
     private List<Long> attachments;
 
-    private List<String> skills;
-
     private List<String> tools;
 
     private List<Trace> traces;
