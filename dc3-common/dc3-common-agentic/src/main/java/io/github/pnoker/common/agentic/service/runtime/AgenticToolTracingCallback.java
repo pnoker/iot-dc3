@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
+import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ToolContext;
@@ -81,7 +81,7 @@ public class AgenticToolTracingCallback implements ToolCallback {
             recordResult(toolContext, toolName, result);
             return result;
         } catch (RuntimeException e) {
-            AgenticRequestContext.recordToolError(toolContext, toolName, StringUtils.defaultIfBlank(e.getMessage(),
+            AgenticToolContextUtil.recordToolError(toolContext, toolName, StringUtils.defaultIfBlank(e.getMessage(),
                     "Tool execution failed"));
             throw e;
         }
@@ -91,13 +91,13 @@ public class AgenticToolTracingCallback implements ToolCallback {
         AgenticToolTraceMetadata metadata = Objects.nonNull(traceMetadata)
                 ? traceMetadata
                 : new AgenticToolTraceMetadata("tool", toolName);
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, metadata.domain(),
+        AgenticToolContextUtil.recordToolInvocation(toolContext, toolName, metadata.domain(),
                 StringUtils.defaultIfBlank(metadata.title(), toolName));
     }
 
     private void recordResult(ToolContext toolContext, String toolName, String result) {
         ToolResultSummary summary = parseResult(result);
-        AgenticRequestContext.recordToolResult(toolContext, toolName, summary.success(), summary.code(),
+        AgenticToolContextUtil.recordToolResult(toolContext, toolName, summary.success(), summary.code(),
                 summary.message());
     }
 

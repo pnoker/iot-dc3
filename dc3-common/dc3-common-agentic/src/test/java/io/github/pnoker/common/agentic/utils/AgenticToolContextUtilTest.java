@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.agentic.context;
+package io.github.pnoker.common.agentic.utils;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.constant.service.AgenticConstant;
@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class AgenticRequestContextTest {
+class AgenticToolContextUtilTest {
 
     private static RequestHeader.UserHeader userHeader(Long tenantId, Long userId) {
         RequestHeader.UserHeader h = new RequestHeader.UserHeader();
@@ -47,21 +47,21 @@ class AgenticRequestContextTest {
 
     @Test
     void requireUserHeaderThrowsWhenAbsent() {
-        assertThatThrownBy(() -> AgenticRequestContext.requireUserHeader(toolContext(Map.of())))
+        assertThatThrownBy(() -> AgenticToolContextUtil.requireUserHeader(toolContext(Map.of())))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
     @Test
     void requireUserHeaderThrowsWhenTenantIdMissing() {
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, userHeader(null, 5L)));
-        assertThatThrownBy(() -> AgenticRequestContext.requireUserHeader(ctx))
+        assertThatThrownBy(() -> AgenticToolContextUtil.requireUserHeader(ctx))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
     @Test
     void requireUserHeaderThrowsWhenUserIdMissing() {
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, userHeader(1L, null)));
-        assertThatThrownBy(() -> AgenticRequestContext.requireUserHeader(ctx))
+        assertThatThrownBy(() -> AgenticToolContextUtil.requireUserHeader(ctx))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
@@ -69,9 +69,9 @@ class AgenticRequestContextTest {
     void requireUserHeaderReturnsHeaderFromToolContextWhenComplete() {
         RequestHeader.UserHeader header = userHeader(1L, 5L);
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header));
-        assertThat(AgenticRequestContext.requireUserHeader(ctx)).isSameAs(header);
-        assertThat(AgenticRequestContext.requireTenantId(ctx)).isEqualTo(1L);
-        assertThat(AgenticRequestContext.requireUserId(ctx)).isEqualTo(5L);
+        assertThat(AgenticToolContextUtil.requireUserHeader(ctx)).isSameAs(header);
+        assertThat(AgenticToolContextUtil.requireTenantId(ctx)).isEqualTo(1L);
+        assertThat(AgenticToolContextUtil.requireUserId(ctx)).isEqualTo(5L);
     }
 
     @Test
@@ -79,7 +79,7 @@ class AgenticRequestContextTest {
         ToolContext ctx = toolContext(Map.of(
                 AgenticConstant.ToolContextKey.TENANT_ID, 1L,
                 AgenticConstant.ToolContextKey.USER_ID, 5L));
-        RequestHeader.UserHeader header = AgenticRequestContext.requireUserHeader(ctx);
+        RequestHeader.UserHeader header = AgenticToolContextUtil.requireUserHeader(ctx);
         assertThat(header.getTenantId()).isEqualTo(1L);
         assertThat(header.getUserId()).isEqualTo(5L);
     }
@@ -89,21 +89,21 @@ class AgenticRequestContextTest {
         ToolContext ctx = toolContext(Map.of(
                 AgenticConstant.ToolContextKey.TENANT_ID, 99L,
                 AgenticConstant.ToolContextKey.USER_HEADER, userHeader(1L, 5L)));
-        assertThat(AgenticRequestContext.requireTenantId(ctx)).isEqualTo(99L);
+        assertThat(AgenticToolContextUtil.requireTenantId(ctx)).isEqualTo(99L);
     }
 
     @Test
     void requireTenantIdFallsBackToHeaderWhenContextValueMissing() {
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, userHeader(1L, 5L)));
-        assertThat(AgenticRequestContext.requireTenantId(ctx)).isEqualTo(1L);
-        assertThatThrownBy(() -> AgenticRequestContext.requireTenantId((ToolContext) null))
+        assertThat(AgenticToolContextUtil.requireTenantId(ctx)).isEqualTo(1L);
+        assertThatThrownBy(() -> AgenticToolContextUtil.requireTenantId((ToolContext) null))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
     @Test
     void requireTenantIdAcceptsNumberSubtypesInToolContext() {
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.TENANT_ID, Integer.valueOf(7)));
-        assertThat(AgenticRequestContext.requireTenantId(ctx)).isEqualTo(7L);
+        assertThat(AgenticToolContextUtil.requireTenantId(ctx)).isEqualTo(7L);
     }
 
     @Test
@@ -111,20 +111,20 @@ class AgenticRequestContextTest {
         ToolContext ctx = toolContext(Map.of(
                 AgenticConstant.ToolContextKey.USER_ID, 88L,
                 AgenticConstant.ToolContextKey.USER_HEADER, userHeader(1L, 5L)));
-        assertThat(AgenticRequestContext.requireUserId(ctx)).isEqualTo(88L);
+        assertThat(AgenticToolContextUtil.requireUserId(ctx)).isEqualTo(88L);
     }
 
     @Test
     void requireConversationIdAcceptsNonBlankString() {
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.CONVERSATION_ID, "abc"));
-        assertThat(AgenticRequestContext.requireConversationId(ctx)).isEqualTo("abc");
+        assertThat(AgenticToolContextUtil.requireConversationId(ctx)).isEqualTo("abc");
     }
 
     @Test
     void requireConversationIdRejectsBlankOrMissing() {
-        assertThatThrownBy(() -> AgenticRequestContext.requireConversationId(toolContext(Map.of())))
+        assertThatThrownBy(() -> AgenticToolContextUtil.requireConversationId(toolContext(Map.of())))
                 .isInstanceOf(UnAuthorizedException.class);
-        assertThatThrownBy(() -> AgenticRequestContext.requireConversationId(
+        assertThatThrownBy(() -> AgenticToolContextUtil.requireConversationId(
                 toolContext(Map.of(AgenticConstant.ToolContextKey.CONVERSATION_ID, "   "))))
                 .isInstanceOf(UnAuthorizedException.class);
     }
@@ -133,7 +133,7 @@ class AgenticRequestContextTest {
     void recordToolInvocationAppendsToQueueWhenPresent() {
         Queue<AgenticRunEvent> events = new ConcurrentLinkedQueue<>();
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.RUN_EVENTS, events));
-        AgenticRequestContext.recordToolInvocation(ctx, "readPoint", "data", "Read point value");
+        AgenticToolContextUtil.recordToolInvocation(ctx, "readPoint", "data", "Read point value");
         assertThat(events).hasSize(1);
         assertThat(events.peek().type()).isEqualTo("tool");
         assertThat(events.peek().name()).isEqualTo("readPoint");
@@ -146,7 +146,7 @@ class AgenticRequestContextTest {
     void recordToolInvocationIsNoOpWhenContextHasNoQueue() {
         ToolContext ctx = toolContext(Map.of());
         // Just assert it doesn't throw.
-        AgenticRequestContext.recordToolInvocation(ctx, "tool", "domain", "desc");
-        AgenticRequestContext.recordToolInvocation(null, "tool", "domain", "desc");
+        AgenticToolContextUtil.recordToolInvocation(ctx, "tool", "domain", "desc");
+        AgenticToolContextUtil.recordToolInvocation(null, "tool", "domain", "desc");
     }
 }

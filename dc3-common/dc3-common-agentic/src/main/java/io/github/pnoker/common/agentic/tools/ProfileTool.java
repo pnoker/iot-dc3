@@ -17,8 +17,8 @@
 package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.facade.api.ProfileFacade;
@@ -60,7 +60,7 @@ public class ProfileTool {
     public AgenticToolResult<FacadeProfileBO> lookupProfileById(
             @ToolParam(description = "The numeric profile/template ID") Long profileId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "lookupProfileById", tenantId,
                 profileId);
         ProfileFacade facade = profileFacade.orElse(null);
@@ -79,7 +79,7 @@ public class ProfileTool {
     public AgenticToolResult<List<FacadeProfileBO>> lookupProfilesByIds(
             @ToolParam(description = "The numeric profile/template IDs") List<Long> profileIds,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(profileIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileIds={}", "lookupProfilesByIds", tenantId, ids);
         ProfileFacade facade = profileFacade.orElse(null);
@@ -105,7 +105,7 @@ public class ProfileTool {
             @ToolParam(description = "Page number (1-based)") int page,
             @ToolParam(description = "Page size") int size,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug(
                 "Agentic tool invoked, tool={}, tenantId={}, profileName={}, profileCode={}, profileType={}, page={}, size={}",
                 "searchProfiles", tenantId, profileName, profileCode, profileType, page, size);
@@ -135,7 +135,7 @@ public class ProfileTool {
     public AgenticToolResult<List<FacadeProfileBO>> listProfilesByDeviceId(
             @ToolParam(description = "The device ID") Long deviceId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "listProfilesByDeviceId", tenantId,
                 deviceId);
         ProfileFacade facade = profileFacade.orElse(null);

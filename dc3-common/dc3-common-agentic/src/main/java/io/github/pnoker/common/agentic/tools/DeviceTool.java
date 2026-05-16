@@ -17,8 +17,8 @@
 package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
@@ -76,7 +76,7 @@ public class DeviceTool {
     public AgenticToolResult<FacadeDeviceBO> lookupDeviceById(
             @ToolParam(description = "The numeric device ID") Long deviceId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "lookupDeviceById", tenantId, deviceId);
         FacadeDeviceBO bo = deviceFacade.selectById(tenantId, deviceId);
         if (Objects.isNull(bo)) {
@@ -90,7 +90,7 @@ public class DeviceTool {
     public AgenticToolResult<List<FacadeDeviceBO>> lookupDevicesByIds(
             @ToolParam(description = "The numeric device IDs") List<Long> deviceIds,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(deviceIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceIds={}", "lookupDevicesByIds", tenantId, ids);
         if (ids.isEmpty()) {
@@ -112,7 +112,7 @@ public class DeviceTool {
             @ToolParam(description = "Page number (1-based)") int page,
             @ToolParam(description = "Page size") int size,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug(
                 "Agentic tool invoked, tool={}, tenantId={}, deviceName={}, deviceCode={}, driverId={}, page={}, size={}",
                 "searchDevices", tenantId, deviceName, deviceCode, driverId, page, size);
@@ -139,7 +139,7 @@ public class DeviceTool {
     public AgenticToolResult<List<FacadeDeviceBO>> listDevicesByDriverId(
             @ToolParam(description = "The driver ID") Long driverId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "listDevicesByDriverId", tenantId,
                 driverId);
         List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
@@ -154,7 +154,7 @@ public class DeviceTool {
     public AgenticToolResult<List<FacadeDeviceBO>> listDevicesByProfileId(
             @ToolParam(description = "The profile ID") Long profileId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "listDevicesByProfileId", tenantId,
                 profileId);
         List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(tenantId, profileId);
@@ -170,7 +170,7 @@ public class DeviceTool {
             @ToolParam(description = "The device ID") Long deviceId,
             @ToolParam(description = "Maximum number of points to include") int limit,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         int size = Math.max(1, Math.min(limit, 50));
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, limit={}",
                 "getDeviceLatestPointValues", tenantId, deviceId, size);
@@ -212,7 +212,7 @@ public class DeviceTool {
     public AgenticToolResult<Map<Long, String>> getDeviceStatusesByIds(
             @ToolParam(description = "The numeric device IDs") List<Long> deviceIds,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(deviceIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceIds={}", "getDeviceStatusesByIds", tenantId, ids);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
@@ -234,7 +234,7 @@ public class DeviceTool {
     public AgenticToolResult<Map<Long, String>> getDeviceStatusesByProfileId(
             @ToolParam(description = "The profile/template ID") Long profileId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "getDeviceStatusesByProfileId",
                 tenantId, profileId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);

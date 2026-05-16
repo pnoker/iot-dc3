@@ -17,8 +17,8 @@
 package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
@@ -63,7 +63,7 @@ public class DriverTool {
     public AgenticToolResult<FacadeDriverBO> lookupDriverById(
             @ToolParam(description = "The numeric driver ID") Long driverId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "lookupDriverById", tenantId, driverId);
         FacadeDriverBO bo = driverFacade.selectById(tenantId, driverId);
         if (Objects.isNull(bo)) {
@@ -77,7 +77,7 @@ public class DriverTool {
     public AgenticToolResult<List<FacadeDriverBO>> lookupDriversByIds(
             @ToolParam(description = "The numeric driver IDs") List<Long> driverIds,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(driverIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverIds={}", "lookupDriversByIds", tenantId, ids);
         if (ids.isEmpty()) {
@@ -95,7 +95,7 @@ public class DriverTool {
     public AgenticToolResult<FacadeDriverBO> lookupDriverByDeviceId(
             @ToolParam(description = "The device ID") Long deviceId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "lookupDriverByDeviceId", tenantId,
                 deviceId);
         FacadeDriverBO bo = driverFacade.selectByDeviceId(tenantId, deviceId);
@@ -112,7 +112,7 @@ public class DriverTool {
             @ToolParam(description = "Page number (1-based)") int page,
             @ToolParam(description = "Page size") int size,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverName={}, page={}, size={}", "searchDrivers",
                 tenantId, driverName, page, size);
 
@@ -136,7 +136,7 @@ public class DriverTool {
     public AgenticToolResult<Map<Long, String>> getDriverStatusesByIds(
             @ToolParam(description = "The numeric driver IDs") List<Long> driverIds,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(driverIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverIds={}", "getDriverStatusesByIds", tenantId, ids);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
@@ -158,7 +158,7 @@ public class DriverTool {
     public AgenticToolResult<Map<String, String>> getDriverDeviceStatusSummary(
             @ToolParam(description = "The driver ID") Long driverId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "getDriverDeviceStatusSummary", tenantId,
                 driverId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
