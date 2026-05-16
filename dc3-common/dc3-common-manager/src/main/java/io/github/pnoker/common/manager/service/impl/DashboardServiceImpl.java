@@ -418,8 +418,8 @@ public class DashboardServiceImpl implements DashboardService {
         // Cardinality mode keeps everything so operators can still see
         // "unconfigured" entities on the structural view.
         List<TopologyDriverRow> activeDrivers = volumeMode ? driverRows.stream()
-                                                             .filter(r -> nullZero(driverWeight.get(r.getId())) > 0)
-                                                             .collect(java.util.stream.Collectors.toList()) : new ArrayList<>(driverRows);
+                .filter(r -> nullZero(driverWeight.get(r.getId())) > 0)
+                .collect(java.util.stream.Collectors.toList()) : new ArrayList<>(driverRows);
 
         // ---- Crop Top-N drivers ----------------------------------------
         activeDrivers.sort(cmpByMap(driverWeight, v -> v.getId()));

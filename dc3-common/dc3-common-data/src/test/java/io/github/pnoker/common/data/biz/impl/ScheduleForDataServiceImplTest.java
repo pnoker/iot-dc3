@@ -21,6 +21,7 @@ import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.data.job.HourlyJobForData;
 import io.github.pnoker.common.data.job.PointValueJob;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,12 +29,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.DateBuilder;
-import io.github.pnoker.common.exception.ServiceException;
 import org.quartz.SchedulerException;
 
 import java.lang.reflect.Field;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;

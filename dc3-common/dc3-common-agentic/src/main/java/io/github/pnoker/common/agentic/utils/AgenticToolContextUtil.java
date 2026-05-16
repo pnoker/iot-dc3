@@ -23,7 +23,6 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.springframework.ai.chat.model.ToolContext;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 

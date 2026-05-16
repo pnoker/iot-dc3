@@ -52,7 +52,7 @@ public record AgenticRunEvent(String type, String name, String title, String det
                 success ? AgenticConstant.ToolResult.CODE_OK : AgenticConstant.ToolResult.CODE_ERROR);
         String status = success
                 ? (AgenticConstant.ToolResult.CODE_EMPTY.equals(normalizedCode)
-                ? AgenticConstant.RunEvent.STATUS_EMPTY : AgenticConstant.RunEvent.STATUS_SUCCESS)
+                   ? AgenticConstant.RunEvent.STATUS_EMPTY : AgenticConstant.RunEvent.STATUS_SUCCESS)
                 : AgenticConstant.RunEvent.STATUS_FAILED;
         return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName,
                 StringUtils.defaultIfBlank(message, AgenticConstant.ToolResult.MESSAGE_COMPLETED),

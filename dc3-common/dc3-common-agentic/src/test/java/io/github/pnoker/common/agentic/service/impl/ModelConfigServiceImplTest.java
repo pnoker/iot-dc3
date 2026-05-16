@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.agentic.service.impl;
 
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.dal.ModelConfigManager;
 import io.github.pnoker.common.agentic.dal.ModelProviderManager;
-import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
 import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
