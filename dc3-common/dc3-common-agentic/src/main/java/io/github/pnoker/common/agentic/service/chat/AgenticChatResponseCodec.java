@@ -126,7 +126,7 @@ public class AgenticChatResponseCodec {
         List<ServerSentEvent<String>> events = new ArrayList<>();
         if (prepared.reasoning()) {
             events.add(ServerSentEvent.<String>builder()
-                    .data(formatEvent("reasoning", "Thinking", "Reasoning mode requested for this model.", "agentic"))
+                    .data(formatEvent(AgenticRunEvent.reasoningRequested()))
                     .build());
         }
         return events;
@@ -139,8 +139,7 @@ public class AgenticChatResponseCodec {
         while (Objects.nonNull(event)) {
             prepared.runTraceEvents().add(event);
             events.add(ServerSentEvent.<String>builder()
-                    .data(formatEvent(event.type(), event.title(), event.detail(), event.name(), event.phase(),
-                            event.status(), event.code()))
+                    .data(formatEvent(event))
                     .build());
             event = prepared.runEvents().poll();
         }
@@ -166,28 +165,23 @@ public class AgenticChatResponseCodec {
         return new AgenticStreamDelta(StringUtils.defaultString(content), extractReasoningContent(generation));
     }
 
-    public String formatEvent(String type, String title, String detail, String name) {
-        return formatEvent(type, title, detail, name, null, null, null);
-    }
-
-    public String formatEvent(String type, String title, String detail, String name, String phase, String status,
-                              String code) {
+    public String formatEvent(AgenticRunEvent runEvent) {
         Map<String, Object> event = new HashMap<>();
         event.put("object", "agentic.event");
-        event.put("type", type);
-        event.put("title", StringUtils.defaultString(title));
-        event.put("detail", StringUtils.defaultString(detail));
-        event.put("name", StringUtils.defaultString(name));
-        if (StringUtils.isNotBlank(phase)) {
-            event.put("phase", phase);
+        event.put("type", runEvent.type());
+        event.put("title", runEvent.title());
+        event.put("detail", runEvent.detail());
+        event.put("name", runEvent.name());
+        if (StringUtils.isNotBlank(runEvent.phase())) {
+            event.put("phase", runEvent.phase());
         }
-        if (StringUtils.isNotBlank(status)) {
-            event.put("status", status);
+        if (StringUtils.isNotBlank(runEvent.status())) {
+            event.put("status", runEvent.status());
         }
-        if (StringUtils.isNotBlank(code)) {
-            event.put("code", code);
+        if (StringUtils.isNotBlank(runEvent.code())) {
+            event.put("code", runEvent.code());
         }
-        event.put("created", Instant.now().getEpochSecond());
+        event.put("created", runEvent.timestamp() / 1000);
         return toJson(event);
     }
 
