@@ -80,11 +80,6 @@ public class ChatCompletionRequest {
      */
     private Boolean reasoning;
 
-    /**
-     * Whether risky tool calls must use the pending-action confirmation protocol.
-     */
-    private Boolean confirmActions;
-
     public boolean isStream() {
         return Boolean.TRUE.equals(stream);
     }

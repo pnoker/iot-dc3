@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.entity.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +35,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SessionExt implements Serializable {
 
@@ -47,7 +49,5 @@ public class SessionExt implements Serializable {
     private Double temperature;
 
     private Integer maxTokens;
-
-    private Boolean requireConfirmation;
 
 }

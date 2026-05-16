@@ -38,10 +38,6 @@ import java.util.Objects;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-    private static final List<String> INTERNAL_TEXT_MARKERS = List.of(
-            "\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation.",
-            "\n\nAttached files available to the user:");
-
     private final MessageManager messageManager;
     private final MessageBuilder messageBuilder;
 
@@ -133,7 +129,6 @@ public class MessageServiceImpl implements MessageService {
     private MessageBO normalize(MessageBO entityBO) {
         AgenticMessageContent content = Objects.nonNull(entityBO.getContent()) ? entityBO.getContent()
                 : AgenticMessageContent.ofText("");
-        normalizeContentText(entityBO.getRole(), content);
         entityBO.setContent(content);
         return entityBO;
     }
@@ -146,21 +141,6 @@ public class MessageServiceImpl implements MessageService {
         entityBO.setCreatorName(header.getUserName());
         entityBO.setOperatorId(header.getUserId());
         entityBO.setOperatorName(header.getUserName());
-    }
-
-    private void normalizeContentText(String role, AgenticMessageContent content) {
-        if (!"user".equals(role) || Objects.isNull(content)) {
-            return;
-        }
-        String text = StringUtils.defaultString(content.getText());
-        int firstMarkerIndex = INTERNAL_TEXT_MARKERS.stream()
-                .mapToInt(text::indexOf)
-                .filter(index -> index >= 0)
-                .min()
-                .orElse(-1);
-        if (firstMarkerIndex >= 0) {
-            content.setText(StringUtils.stripEnd(text.substring(0, firstMarkerIndex), null));
-        }
     }
 
 }

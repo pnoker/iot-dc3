@@ -137,9 +137,6 @@ public class SessionServiceImpl implements SessionService {
         if (Objects.nonNull(requestExt.getMaxTokens())) {
             target.setMaxTokens(requestExt.getMaxTokens());
         }
-        if (Objects.nonNull(requestExt.getRequireConfirmation())) {
-            target.setRequireConfirmation(requestExt.getRequireConfirmation());
-        }
         entityDO.setSessionExt(target);
     }
 

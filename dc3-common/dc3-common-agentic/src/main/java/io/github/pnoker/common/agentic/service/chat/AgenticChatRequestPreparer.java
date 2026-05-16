@@ -121,8 +121,6 @@ public class AgenticChatRequestPreparer {
         toolContext.put(AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId());
         toolContext.put(AgenticConstant.ToolContextKey.USER_ID, userHeader.getUserId());
         toolContext.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, scopedConversationId);
-        toolContext.put(AgenticConstant.ToolContextKey.CONFIRM_ACTIONS,
-                !Boolean.FALSE.equals(request.getConfirmActions()));
         toolContext.put(AgenticConstant.ToolContextKey.TOOL_EVENTS, toolEvents);
         return toolContext;
     }
@@ -238,8 +236,7 @@ public class AgenticChatRequestPreparer {
 
     private SessionExt buildSessionExt(ChatCompletionRequest request, String model) {
         if (Objects.isNull(request.getReasoning()) && Objects.isNull(request.getTemperature())
-                && Objects.isNull(request.getMaxTokens()) && Objects.isNull(request.getConfirmActions())
-                && StringUtils.isBlank(model)) {
+                && Objects.isNull(request.getMaxTokens()) && StringUtils.isBlank(model)) {
             return null;
         }
         SessionExt sessionExt = new SessionExt();
@@ -247,7 +244,6 @@ public class AgenticChatRequestPreparer {
         sessionExt.setReasoningEnabled(request.getReasoning());
         sessionExt.setTemperature(request.getTemperature());
         sessionExt.setMaxTokens(request.getMaxTokens());
-        sessionExt.setRequireConfirmation(request.getConfirmActions());
         return sessionExt;
     }
 
