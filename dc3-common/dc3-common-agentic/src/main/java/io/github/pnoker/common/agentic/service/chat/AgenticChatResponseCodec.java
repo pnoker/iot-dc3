@@ -132,12 +132,6 @@ public class AgenticChatResponseCodec {
 
     public List<ServerSentEvent<String>> initialEvents(AgenticPreparedChatRequest prepared) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
-        if (prepared.directContextProvided()) {
-            events.add(ServerSentEvent.<String>builder()
-                    .data(formatEvent("tool", "Backend context loaded", "Queried DC3 backend before response",
-                            "agentic"))
-                    .build());
-        }
         if (prepared.reasoning()) {
             events.add(ServerSentEvent.<String>builder()
                     .data(formatEvent("reasoning", "Thinking", "Reasoning mode requested for this model.", "agentic"))

@@ -85,12 +85,6 @@ public class ChatCompletionRequest {
      */
     private Boolean confirmActions;
 
-    /**
-     * Structured deterministic query. When present, the backend may answer directly
-     * from DC3 data without asking the model to infer parameters from natural language.
-     */
-    private DirectQueryRequest directQuery;
-
     public boolean isStream() {
         return Boolean.TRUE.equals(stream);
     }

@@ -81,7 +81,6 @@ public class AgenticMessageRecorder {
         content.setTools(tools);
         content.setTraces(buildTraceEvents(prepared, toolEvents));
         content.setReasoning(prepared.reasoning());
-        content.setDirectContextProvided(prepared.directContextProvided());
         content.setContexts(prepared.contexts());
         content.setTokens(outputTokens(prepared.inputTokens(), text));
         return content;
@@ -91,10 +90,6 @@ public class AgenticMessageRecorder {
                                                                List<AgenticRequestContext.ToolEvent> toolEvents) {
         List<AgenticMessageContent.Trace> traces = new ArrayList<>();
         long created = Instant.now().getEpochSecond();
-        if (prepared.directContextProvided()) {
-            traces.add(AgenticMessageContent.Trace.of("tool", "Backend context loaded",
-                    "Queried DC3 backend before response", "agentic", created));
-        }
         if (prepared.reasoning()) {
             traces.add(AgenticMessageContent.Trace.of("reasoning", "Thinking",
                     "Reasoning mode requested for this model.", "agentic", created));
