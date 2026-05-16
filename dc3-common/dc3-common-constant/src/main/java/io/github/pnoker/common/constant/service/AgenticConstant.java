@@ -99,4 +99,171 @@ public class AgenticConstant {
 
     }
 
+    /**
+     * OpenAI-compatible chat response constants.
+     *
+     * @author pnoker
+     * @version 2026.5.16
+     * @since 2022.1.0
+     */
+    public static class Chat {
+
+        public static final String COMPLETION_OBJECT = "chat.completion";
+
+        public static final String COMPLETION_CHUNK_OBJECT = "chat.completion.chunk";
+
+        public static final String ID_PREFIX = "chatcmpl-";
+
+        public static final String STREAM_DONE = "[DONE]";
+
+        public static final String ROLE_SYSTEM = "system";
+
+        public static final String ROLE_USER = "user";
+
+        public static final String ROLE_ASSISTANT = "assistant";
+
+        public static final String ROLE_TOOL = "tool";
+
+        public static final String FINISH_REASON_STOP = "stop";
+
+        public static final String FINISH_REASON_ERROR = "error";
+
+        private Chat() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
+    /**
+     * Agentic session constants.
+     *
+     * @author pnoker
+     * @version 2026.5.16
+     * @since 2022.1.0
+     */
+    public static class Session {
+
+        public static final String DEFAULT_TITLE = "New Conversation";
+
+        private Session() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
+    /**
+     * Agentic runtime event constants.
+     *
+     * @author pnoker
+     * @version 2026.5.16
+     * @since 2022.1.0
+     */
+    public static class RunEvent {
+
+        public static final String OBJECT = "agentic.event";
+
+        public static final String TYPE_EVENT = "event";
+
+        public static final String TYPE_TOOL = "tool";
+
+        public static final String TYPE_REASONING = "reasoning";
+
+        public static final String TYPE_ERROR = "error";
+
+        public static final String NAME_AGENTIC = "agentic";
+
+        public static final String PHASE_START = "start";
+
+        public static final String PHASE_RESULT = "result";
+
+        public static final String PHASE_ERROR = "error";
+
+        public static final String STATUS_RUNNING = "running";
+
+        public static final String STATUS_SUCCESS = "success";
+
+        public static final String STATUS_EMPTY = "empty";
+
+        public static final String STATUS_FAILED = "failed";
+
+        private RunEvent() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
+    /**
+     * Agentic tool result envelope constants.
+     *
+     * @author pnoker
+     * @version 2026.5.16
+     * @since 2022.1.0
+     */
+    public static class ToolResult {
+
+        public static final String CODE_OK = "OK";
+
+        public static final String CODE_EMPTY = "EMPTY";
+
+        public static final String CODE_INVALID_ARGUMENT = "INVALID_ARGUMENT";
+
+        public static final String CODE_NOT_FOUND = "NOT_FOUND";
+
+        public static final String CODE_UNAVAILABLE = "UNAVAILABLE";
+
+        public static final String CODE_ERROR = "ERROR";
+
+        public static final String MESSAGE_COMPLETED = "Tool completed";
+
+        public static final String MESSAGE_EXECUTION_FAILED = "Tool execution failed";
+
+        private ToolResult() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
+    /**
+     * Shared tool execution limits.
+     *
+     * @author pnoker
+     * @version 2026.5.16
+     * @since 2022.1.0
+     */
+    public static class ToolLimit {
+
+        public static final int MAX_IDS = 50;
+
+        public static final int MAX_HISTORY_RECORDS = 200;
+
+        private ToolLimit() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
+    /**
+     * Shared agentic tool messages.
+     *
+     * @author pnoker
+     * @version 2026.5.16
+     * @since 2022.1.0
+     */
+    public static class ToolMessage {
+
+        public static final String STATUS_HEALTH_UNAVAILABLE =
+                "Status and health tools are not available in this deployment mode.";
+
+        public static final String PROFILE_UNAVAILABLE = "Profile tools are not available in this deployment mode.";
+
+        public static final String SYSTEM_HEALTH_UNAVAILABLE = "System health snapshot is unavailable.";
+
+        public static final String REQUEST_FAILED = "Request failed";
+
+        private ToolMessage() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
 }

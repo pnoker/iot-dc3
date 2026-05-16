@@ -27,6 +27,7 @@ import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -102,7 +103,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             Flux<ServerSentEvent<String>> responseEvents = runtimeEvents.onErrorResume(error -> {
                 log.warn("Agentic stream chat failed, conversationId={}, model={}",
                         prepared.scopedConversationId(), prepared.model(), error);
-                lastFinishReason.set("error");
+                lastFinishReason.set(AgenticConstant.Chat.FINISH_REASON_ERROR);
                 prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
                 return Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created, AgenticStreamDelta.empty()))
                         .doOnComplete(() -> messageRecorder.persistAssistantMessage(prepared,
@@ -115,7 +116,9 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                             .data(responseCodec.formatFinalChunk(chatId, created, prepared.model(),
                                     lastFinishReason.get()))
                             .build())))
-                    .concatWith(Mono.just(ServerSentEvent.<String>builder().data("[DONE]").build()));
+                    .concatWith(Mono.just(ServerSentEvent.<String>builder()
+                            .data(AgenticConstant.Chat.STREAM_DONE)
+                            .build()));
         }).subscribeOn(Schedulers.boundedElastic());
     }
 

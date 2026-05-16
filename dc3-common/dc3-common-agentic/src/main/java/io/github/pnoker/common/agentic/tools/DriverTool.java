@@ -19,7 +19,8 @@ package io.github.pnoker.common.agentic.tools;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
@@ -46,8 +47,6 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class DriverTool {
-
-    private static final String STATUS_UNAVAILABLE = "Status and health tools are not available in this deployment mode.";
 
     private final DriverFacade driverFacade;
 
@@ -78,7 +77,7 @@ public class DriverTool {
             @ToolParam(description = "The numeric driver IDs") List<Long> driverIds,
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        List<Long> ids = normalizeIds(driverIds);
+        List<Long> ids = AgenticToolUtil.normalizeIds(driverIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverIds={}", "lookupDriversByIds", tenantId, ids);
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid driver IDs provided.");
@@ -119,13 +118,10 @@ public class DriverTool {
         FacadeDriverQuery query = new FacadeDriverQuery();
         query.setDriverName(driverName);
         query.setTenantId(tenantId);
-        Pages p = new Pages();
-        p.setCurrent(page);
-        p.setSize(size);
-        query.setPage(p);
+        query.setPage(AgenticToolUtil.page(page, size));
 
         FacadePage<FacadeDriverBO> result = driverFacade.selectByPage(query);
-        if (Objects.isNull(result) || Objects.isNull(result.getRecords()) || result.getRecords().isEmpty()) {
+        if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No drivers found.", result);
         }
         return AgenticToolResult.ok("Driver page loaded", result);
@@ -137,17 +133,17 @@ public class DriverTool {
             @ToolParam(description = "The numeric driver IDs") List<Long> driverIds,
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        List<Long> ids = normalizeIds(driverIds);
+        List<Long> ids = AgenticToolUtil.normalizeIds(driverIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverIds={}", "getDriverStatusesByIds", tenantId, ids);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid driver IDs provided.");
         }
         Map<Long, String> statuses = facade.selectDriverStatusesByIds(tenantId, ids);
-        if (Objects.isNull(statuses) || statuses.isEmpty()) {
+        if (AgenticToolUtil.isEmpty(statuses)) {
             return AgenticToolResult.empty("No driver statuses found.", Map.of());
         }
         return AgenticToolResult.ok("Driver statuses loaded", statuses);
@@ -163,21 +159,14 @@ public class DriverTool {
                 driverId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
         Map<String, String> summary = facade.getDriverDeviceStatusSummary(tenantId, driverId);
-        if (Objects.isNull(summary) || summary.isEmpty()) {
+        if (AgenticToolUtil.isEmpty(summary)) {
             return AgenticToolResult.empty("No driver device status summary found for driver ID: " + driverId,
                     Map.of());
         }
         return AgenticToolResult.ok("Driver device status summary loaded", summary);
-    }
-
-    private List<Long> normalizeIds(List<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return List.of();
-        }
-        return ids.stream().filter(Objects::nonNull).distinct().limit(50).toList();
     }
 
 }

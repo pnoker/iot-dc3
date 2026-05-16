@@ -17,10 +17,12 @@
 package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
+import io.github.pnoker.common.agentic.entity.response.AgenticRunEventResponse;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.codec.ServerSentEvent;
@@ -30,10 +32,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -60,12 +60,12 @@ public class AgenticChatResponseCodec {
         int promptTokens = Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
         return ChatCompletionResponse.builder()
                 .id(newChatId())
-                .object("chat.completion")
+                .object(AgenticConstant.Chat.COMPLETION_OBJECT)
                 .created(Instant.now().getEpochSecond())
                 .model(prepared.model())
                 .choices(List.of(ChatCompletionResponse.Choice.builder()
                         .index(0)
-                        .message(new ChatCompletionResponse.Message("assistant", content))
+                        .message(new ChatCompletionResponse.Message(AgenticConstant.Chat.ROLE_ASSISTANT, content))
                         .finishReason(normalizeFinishReason(finishReason))
                         .build()))
                 .usage(new ChatCompletionResponse.Usage(promptTokens, completionTokens,
@@ -74,13 +74,13 @@ public class AgenticChatResponseCodec {
     }
 
     public String newChatId() {
-        return "chatcmpl-" + UUID.randomUUID().toString().replace("-", "").substring(0, 24);
+        return AgenticConstant.Chat.ID_PREFIX + UUID.randomUUID().toString().replace("-", "").substring(0, 24);
     }
 
     public String formatFinalChunk(String id, long created, String model, String finishReason) {
         ChatCompletionChunkResponse chunk = ChatCompletionChunkResponse.builder()
                 .id(id)
-                .object("chat.completion.chunk")
+                .object(AgenticConstant.Chat.COMPLETION_CHUNK_OBJECT)
                 .created(created)
                 .model(model)
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
@@ -119,29 +119,13 @@ public class AgenticChatResponseCodec {
     }
 
     public String formatEvent(AgenticRunEvent runEvent) {
-        Map<String, Object> event = new HashMap<>();
-        event.put("object", "agentic.event");
-        event.put("type", runEvent.type());
-        event.put("title", runEvent.title());
-        event.put("detail", runEvent.detail());
-        event.put("name", runEvent.name());
-        if (StringUtils.isNotBlank(runEvent.phase())) {
-            event.put("phase", runEvent.phase());
-        }
-        if (StringUtils.isNotBlank(runEvent.status())) {
-            event.put("status", runEvent.status());
-        }
-        if (StringUtils.isNotBlank(runEvent.code())) {
-            event.put("code", runEvent.code());
-        }
-        event.put("created", runEvent.timestamp() / 1000);
-        return toJson(event);
+        return toJson(AgenticRunEventResponse.of(runEvent));
     }
 
     private String formatChunk(String id, long created, String model, AgenticStreamDelta streamDelta) {
         ChatCompletionChunkResponse chunk = ChatCompletionChunkResponse.builder()
                 .id(id)
-                .object("chat.completion.chunk")
+                .object(AgenticConstant.Chat.COMPLETION_CHUNK_OBJECT)
                 .created(created)
                 .model(model)
                 .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
@@ -156,7 +140,7 @@ public class AgenticChatResponseCodec {
 
     private String normalizeFinishReason(String reason) {
         if (StringUtils.isBlank(reason)) {
-            return "stop";
+            return AgenticConstant.Chat.FINISH_REASON_STOP;
         }
         return reason.toLowerCase(Locale.ROOT);
     }

@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.tools;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +41,6 @@ import java.util.Optional;
 @Component
 public class SystemTool {
 
-    private static final String STATUS_UNAVAILABLE = "Status and health tools are not available in this deployment mode.";
-
     private final Optional<StatusHealthFacade> statusHealthFacade;
 
     public SystemTool(Optional<StatusHealthFacade> statusHealthFacade) {
@@ -55,11 +54,11 @@ public class SystemTool {
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getSystemHealth", tenantId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
         FacadeSystemHealthBO health = facade.systemHealth(tenantId);
         if (Objects.isNull(health)) {
-            return AgenticToolResult.unavailable("System health snapshot is unavailable.");
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE);
         }
         return AgenticToolResult.ok("System health loaded", health);
     }

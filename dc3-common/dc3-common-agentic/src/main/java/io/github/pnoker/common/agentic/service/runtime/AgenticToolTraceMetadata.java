@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -28,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 public record AgenticToolTraceMetadata(String domain, String title) {
 
     public AgenticToolTraceMetadata {
-        domain = StringUtils.defaultIfBlank(domain, "tool");
+        domain = StringUtils.defaultIfBlank(domain, AgenticConstant.RunEvent.TYPE_TOOL);
         title = StringUtils.defaultString(title);
     }
 
