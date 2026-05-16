@@ -141,7 +141,6 @@ describe('agentic store', () => {
               reasoning_enabled: true,
               temperature: 0.2,
               max_tokens: 4096,
-              require_confirmation: false,
             },
           },
         ],
@@ -154,14 +153,12 @@ describe('agentic store', () => {
     expect(store.activeConversationId).toBe('conversation-1');
     expect(store.selectedModel).toBe('deepseek-v4-pro');
     expect(store.reasoningEnabled).toBe(true);
-    expect(store.requireConfirmation).toBe(false);
     expect(store.temperature).toBe(0.2);
     expect(store.maxTokens).toBe(4096);
     expect(store.currentSession?.sessionExt).toEqual(
       expect.objectContaining({
         model: 'deepseek-v4-pro',
         reasoningEnabled: true,
-        requireConfirmation: false,
       })
     );
   });

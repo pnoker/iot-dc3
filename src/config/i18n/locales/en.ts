@@ -873,7 +873,7 @@ export default {
     fast: 'Fast',
     temperature: 'Temperature',
     maxTokens: 'Max Tokens',
-    confirmActions: 'Confirm Actions',
+    confirmActionTitle: 'Confirm Action',
     capStream: 'Stream',
     capTools: 'Tools',
     capVision: 'Vision',
@@ -911,7 +911,6 @@ export default {
     actionCopied: 'Copied',
     actionQuote: 'Quote',
     actionCopyFailed: 'Copy failed',
-    detailToolNarration: 'Tool calls (extracted)',
     chartHistoryTitle: 'History trend',
     finishLength:
       'Answer was truncated because the max-tokens limit was reached. Raise maxTokens in settings or ask a follow-up.',

@@ -43,11 +43,6 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
 const MESSAGE_STORAGE_KEY = 'dc3-agentic-messages';
-const INTERNAL_USER_CONTENT_MARKERS = [
-  '\n\nBefore executing any write, delete, control, or external side-effect action, ask me for explicit confirmation.',
-  '\n\nAttached files available to the user:',
-  '\n\nBackend context:',
-];
 const DEFAULT_MODEL: AgenticModel = {
   model: 'dc3-agentic',
   label: 'DC3 Agentic',
@@ -66,7 +61,6 @@ export const useAgenticStore = defineStore('agentic', () => {
   const models = ref<AgenticModel[]>([]);
   const selectedModel = ref('');
   const reasoningEnabled = ref(false);
-  const requireConfirmation = ref(true);
   const temperature = ref<number>();
   const maxTokens = ref<number>();
 
@@ -313,7 +307,6 @@ export const useAgenticStore = defineStore('agentic', () => {
         maxTokens: maxTokens.value,
         attachments: currentAttachments.value.map((attachment) => attachment.id),
         reasoning: activeModel.value.reasoning && reasoningEnabled.value,
-        confirmActions: requireConfirmation.value,
       };
       if (activeModel.value.stream) {
         await streamAgenticChatCompletion(request, {
@@ -364,7 +357,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         messagesByConversation.value[conversationId] = response.data.map((message) => ({
           id: String(message.id || createMessageId(message.role)),
           role: message.role,
-          content: normalizeDisplayContent(message.role, message.content),
+          content: message.content || '',
           contentExt: message.contentExt,
           messageIndex: message.messageIndex,
           reasoning: message.reasoning,
@@ -493,7 +486,6 @@ export const useAgenticStore = defineStore('agentic', () => {
     const modelDefaults = models.value.find((model) => model.model === selectedModel.value) || activeModel.value;
     const sessionExt = sessionExtOf(session);
     reasoningEnabled.value = sessionExt?.reasoningEnabled ?? false;
-    requireConfirmation.value = sessionExt?.requireConfirmation ?? true;
     temperature.value = sessionExt?.temperature ?? modelDefaults.temperature;
     maxTokens.value = sessionExt?.maxTokens ?? modelDefaults.maxTokens;
     applyModelCapabilities();
@@ -542,7 +534,6 @@ export const useAgenticStore = defineStore('agentic', () => {
     reasoningEnabled: reasoningEnabled.value,
     temperature: temperature.value,
     maxTokens: maxTokens.value,
-    requireConfirmation: requireConfirmation.value,
   });
 
   const resolveModelName = (model?: string) => {
@@ -625,7 +616,6 @@ export const useAgenticStore = defineStore('agentic', () => {
     models,
     selectedModel,
     reasoningEnabled,
-    requireConfirmation,
     temperature,
     maxTokens,
     activeConversationId,
@@ -674,7 +664,7 @@ const readCachedMessages = (): Record<string, AgenticMessage[]> => {
       Array.isArray(messages)
         ? messages.map((message) => ({
             ...message,
-            content: normalizeDisplayContent(message.role, message.content),
+            content: message.content || '',
           }))
         : [],
     ])
@@ -703,7 +693,6 @@ const normalizeTitle = (title: string) => {
 type RawAgenticSessionExt = AgenticSessionExt & {
   reasoning_enabled?: boolean;
   max_tokens?: number;
-  require_confirmation?: boolean;
 };
 
 type RawAgenticSession = AgenticSession & {
@@ -729,7 +718,6 @@ const normalizeSessionExt = (sessionExt?: RawAgenticSessionExt): AgenticSessionE
     reasoningEnabled: sessionExt.reasoningEnabled ?? sessionExt.reasoning_enabled,
     temperature: sessionExt.temperature,
     maxTokens: sessionExt.maxTokens ?? sessionExt.max_tokens,
-    requireConfirmation: sessionExt.requireConfirmation ?? sessionExt.require_confirmation,
   };
 };
 
@@ -739,14 +727,4 @@ const sessionExtOf = (session?: AgenticSession): AgenticSessionExt | undefined =
 
 const sessionModel = (session?: AgenticSession) => {
   return sessionExtOf(session)?.model;
-};
-
-const normalizeDisplayContent = (role: string, content?: string) => {
-  if (role !== 'user') {
-    return content || '';
-  }
-  return INTERNAL_USER_CONTENT_MARKERS.reduce((displayContent, marker) => {
-    const markerIndex = displayContent.indexOf(marker);
-    return markerIndex >= 0 ? displayContent.slice(0, markerIndex).trimEnd() : displayContent;
-  }, content || '');
 };

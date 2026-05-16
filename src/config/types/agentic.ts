@@ -59,7 +59,6 @@ export interface AgenticSessionExt {
   reasoningEnabled?: boolean;
   temperature?: number;
   maxTokens?: number;
-  requireConfirmation?: boolean;
 }
 
 export type AgenticMessageRole = 'user' | 'assistant' | 'system';
@@ -146,7 +145,6 @@ export interface AgenticChatCompletionRequest {
   conversationId: string;
   attachments?: number[];
   reasoning?: boolean;
-  confirmActions?: boolean;
 }
 
 export interface AgenticChatCompletionResponse {

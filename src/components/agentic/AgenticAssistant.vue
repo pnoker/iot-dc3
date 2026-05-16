@@ -120,10 +120,6 @@
                     @change="handlePrefsChange"
                   />
                 </div>
-                <div class="agentic-setting agentic-setting--row">
-                  <span>{{ t('agentic.confirmActions') }}</span>
-                  <el-switch v-model="requireConfirmation" size="small" @change="handlePrefsChange" />
-                </div>
                 <div class="agentic-capabilities">
                   <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small">{{
                     t('agentic.capStream')
@@ -281,22 +277,6 @@
                         <strong>{{ item.value }}</strong>
                       </div>
                     </div>
-
-                    <section v-if="assistantToolNarrations(message).length" class="agentic-trace-section">
-                      <div class="agentic-trace-section__header">
-                        <span>{{ t('agentic.detailToolNarration') }}</span>
-                      </div>
-                      <div class="agentic-tool-narration-list">
-                        <div
-                          v-for="(narration, index) in assistantToolNarrations(message)"
-                          :key="`${narration.tool}-${index}`"
-                          class="agentic-tool-narration"
-                        >
-                          <el-tag size="small" type="warning">{{ narration.tool }}</el-tag>
-                          <pre>{{ formatToolArguments(narration.arguments) }}</pre>
-                        </div>
-                      </div>
-                    </section>
 
                     <section v-if="assistantThinkingItems(message).length" class="agentic-trace-section">
                       <div class="agentic-trace-section__header">
@@ -484,7 +464,7 @@
   import type { AgenticMessage, AgenticMessageContext, AgenticMessageTokens, AgenticTraceEvent } from '@/config/types';
   import { useAgenticStore } from '@/store';
   import RenderedAssistantMessage from './RenderedAssistantMessage.vue';
-  import { parseAssistantContent, toPlainText, type ToolNarration } from './assistantContent';
+  import { toPlainText } from './assistantContent';
 
   interface AssistantPromptItem {
     key: string | number;
@@ -526,7 +506,6 @@
     models,
     selectedModel,
     reasoningEnabled,
-    requireConfirmation,
     temperature,
     maxTokens,
     activeConversationId,
@@ -736,7 +715,7 @@
   };
 
   const handleConfirmAction = async (actionId: string) => {
-    await ElMessageBox.confirm(t('agentic.confirm'), t('agentic.confirmActions'), {
+    await ElMessageBox.confirm(t('agentic.confirm'), t('agentic.confirmActionTitle'), {
       type: 'warning',
       confirmButtonText: t('agentic.confirm'),
       cancelButtonText: t('agentic.dialogCancel'),
@@ -775,19 +754,6 @@
     draft.value = `${quoted}\n\n${draft.value || ''}`.trim();
   };
 
-  const assistantToolNarrations = (message: AgenticMessage): ToolNarration[] => {
-    if (message.role !== 'assistant') return [];
-    return parseAssistantContent(message.content).toolNarrations;
-  };
-
-  const formatToolArguments = (args: unknown) => {
-    try {
-      return JSON.stringify(args, null, 2);
-    } catch {
-      return String(args);
-    }
-  };
-
   const truncatedReason = (message: AgenticMessage): string => {
     const reason = message.finishReason?.toLowerCase();
     if (!reason || reason === 'stop') {
@@ -823,8 +789,7 @@
       assistantToolSteps(message).length > 0 ||
       assistantReasoning(message) ||
       assistantContexts(message).length > 0 ||
-      assistantTokenItems(message).length > 0 ||
-      assistantToolNarrations(message).length > 0
+      assistantTokenItems(message).length > 0
     );
   };
 
@@ -1394,31 +1359,6 @@
       color: #2563eb;
       border-color: #93c5fd;
       background: #eff6ff;
-    }
-  }
-
-  .agentic-tool-narration-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .agentic-tool-narration {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 6px 8px;
-    border: 1px solid #fde68a;
-    border-radius: 6px;
-    background: #fffbeb;
-
-    pre {
-      margin: 0;
-      overflow-x: auto;
-      color: #334155;
-      font-size: 11px;
-      white-space: pre-wrap;
-      word-break: break-word;
     }
   }
 

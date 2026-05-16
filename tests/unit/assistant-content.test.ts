@@ -19,7 +19,7 @@ import { describe, expect, it } from 'vitest';
 import { parseAssistantContent, toPlainText } from '@/components/agentic/assistantContent';
 
 describe('assistant content parser', () => {
-  it('lifts fake tool-call JSON out of the visible markdown', () => {
+  it('keeps model-emitted tool-call JSON as visible markdown', () => {
     const content = [
       '准备查询设备数据。',
       '```json',
@@ -31,13 +31,8 @@ describe('assistant content parser', () => {
     const parsed = parseAssistantContent(content);
     const visibleText = parsed.segments.map((segment) => (segment.type === 'markdown' ? segment.text : '')).join('\n');
 
-    expect(parsed.toolNarrations).toHaveLength(1);
-    expect(parsed.toolNarrations[0]).toMatchObject({
-      tool: 'getDeviceList',
-      arguments: { name: 'HZ-PACK-L3-VISION' },
-    });
-    expect(visibleText).not.toContain('getDeviceList');
-    expect(toPlainText(content)).not.toContain('getDeviceList');
+    expect(visibleText).toContain('getDeviceList');
+    expect(toPlainText(content)).toContain('getDeviceList');
   });
 
   it('keeps chart fences as chart segments and summarizes them as plain text', () => {
