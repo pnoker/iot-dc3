@@ -105,13 +105,10 @@ public class AgenticChatResponseCodec {
     public List<ServerSentEvent<String>> streamEvents(AgenticPreparedChatRequest prepared, String chatId, long created,
                                                       AgenticStreamDelta streamDelta) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
-        AgenticRunEvent event = prepared.runEvents().poll();
-        while (Objects.nonNull(event)) {
-            prepared.runTraceEvents().add(event);
+        for (AgenticRunEvent event : prepared.runTrace().drainPendingEvents()) {
             events.add(ServerSentEvent.<String>builder()
                     .data(formatEvent(event))
                     .build());
-            event = prepared.runEvents().poll();
         }
         if (Objects.nonNull(streamDelta) && streamDelta.hasContent()) {
             events.add(ServerSentEvent.<String>builder()
