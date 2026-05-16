@@ -85,7 +85,13 @@ public class AgenticChatRequestPreparer {
         String scopedConversationId = AgenticConversationIdUtil.scope(userHeader.getTenantId(), userHeader.getUserId(),
                 conversationId);
         String model = chatClientFactory.resolveModel(request.getModel());
-        boolean toolCallingEnabled = properties.isToolCallingEnabled() && chatClientFactory.supportsToolCall(model);
+        boolean modelSupportsToolCall = chatClientFactory.supportsToolCall(model);
+        boolean toolCallingEnabled = properties.isToolCallingEnabled() && modelSupportsToolCall;
+        if (!toolCallingEnabled) {
+            log.warn(
+                    "Agentic tool calling disabled for request, requestedModel={}, resolvedModel={}, globalEnabled={}, modelSupportsToolCall={}",
+                    request.getModel(), model, properties.isToolCallingEnabled(), modelSupportsToolCall);
+        }
         AgenticRunTrace runTrace = new AgenticRunTrace();
         Map<String, Object> toolContext = buildToolContext(userHeader, scopedConversationId, runTrace);
 
@@ -94,12 +100,13 @@ public class AgenticChatRequestPreparer {
         List<MessageBO> memoryHistory = loadMemoryHistory(scopedConversationId);
         log.debug("Agentic memory loaded, scopedConversationId={}, memoryEnabled={}, count={}",
                 scopedConversationId, properties.isMemoryEnabled(), memoryHistory.size());
-        AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, contexts, memoryHistory);
+        AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, contexts, memoryHistory,
+                toolCallingEnabled);
 
         log.debug(
-                "Agentic chat request received, mode={}, model={}, messageCount={}, conversationIdPresent={}, tenantId={}, userId={}",
-                mode, model, request.getMessages().size(), StringUtils.isNotBlank(request.getConversationId()),
-                userHeader.getTenantId(), userHeader.getUserId());
+                "Agentic chat request received, mode={}, requestedModel={}, resolvedModel={}, toolCallingEnabled={}, messageCount={}, conversationIdPresent={}, tenantId={}, userId={}",
+                mode, request.getModel(), model, toolCallingEnabled, request.getMessages().size(),
+                StringUtils.isNotBlank(request.getConversationId()), userHeader.getTenantId(), userHeader.getUserId());
 
         touchSession(scopedConversationId, conversationId, userHeader, buildSessionExt(request, model));
 
@@ -179,13 +186,15 @@ public class AgenticChatRequestPreparer {
     }
 
     private AgenticMessageContent.Tokens buildInputTokens(String userMessage, List<AgenticMessageContent.Context> contexts,
-                                                          List<MessageBO> memoryHistory) {
+                                                          List<MessageBO> memoryHistory,
+                                                          boolean toolCallingEnabled) {
         int textTokens = AgenticTokenEstimatorUtil.estimate(userMessage);
         int contextTokens = contexts.stream()
                 .map(AgenticMessageContent.Context::getContent)
                 .mapToInt(AgenticTokenEstimatorUtil::estimate)
                 .sum();
-        int systemTokens = AgenticTokenEstimatorUtil.estimate(ChatClientConfig.SYSTEM_PROMPT);
+        int systemTokens = AgenticTokenEstimatorUtil.estimate(ChatClientConfig.BASE_SYSTEM_PROMPT)
+                + (toolCallingEnabled ? AgenticTokenEstimatorUtil.estimate(ChatClientConfig.TOOL_SYSTEM_PROMPT) : 0);
         int memoryTokens = estimateMemoryTokens(memoryHistory);
         return AgenticMessageContent.Tokens.of(textTokens + contextTokens + systemTokens + memoryTokens, 0,
                 textTokens, contextTokens, systemTokens, memoryTokens);

@@ -25,14 +25,14 @@ import org.apache.commons.lang3.StringUtils;
  * @version 2026.5.16
  * @since 2022.1.0
  */
-public record AgenticStreamDelta(String content, String reasoningContent) {
+public record AgenticStreamDelta(String content) {
 
     public static AgenticStreamDelta empty() {
-        return new AgenticStreamDelta("", null);
+        return new AgenticStreamDelta("");
     }
 
     public boolean hasContent() {
-        return StringUtils.isNotEmpty(content) || StringUtils.isNotEmpty(reasoningContent);
+        return StringUtils.isNotEmpty(content);
     }
 
 }

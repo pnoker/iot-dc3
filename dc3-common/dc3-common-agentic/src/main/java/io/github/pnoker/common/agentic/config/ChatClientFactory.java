@@ -46,6 +46,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -75,30 +76,52 @@ public class ChatClientFactory {
     private final ModelConfigBuilder modelConfigBuilder;
     private final ChatClient.Builder fallbackBuilder;
     private final Advisor memoryAdvisor;
+    private final AgenticProperties properties;
+
+    @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
+    private String fallbackModel;
 
     public ChatClientFactory(ModelProviderManager modelProviderManager,
                              ModelConfigManager modelConfigManager,
                              ModelProviderBuilder modelProviderBuilder,
                              ModelConfigBuilder modelConfigBuilder,
                              ChatClient.Builder fallbackBuilder,
-                             @Qualifier("agenticChatMemoryAdvisor") Advisor memoryAdvisor) {
+                             @Qualifier("agenticChatMemoryAdvisor") Advisor memoryAdvisor,
+                             AgenticProperties properties) {
         this.modelProviderManager = modelProviderManager;
         this.modelConfigManager = modelConfigManager;
         this.modelProviderBuilder = modelProviderBuilder;
         this.modelConfigBuilder = modelConfigBuilder;
         this.fallbackBuilder = fallbackBuilder;
         this.memoryAdvisor = memoryAdvisor;
+        this.properties = properties;
     }
 
     public String resolveModel(String requestedModel) {
-        if (StringUtils.isNotBlank(requestedModel)) {
-            return requestedModel.trim();
+        String candidate = StringUtils.trimToNull(requestedModel);
+        if (StringUtils.isNotBlank(candidate)) {
+            ModelConfigBO requestedConfig = resolveConfig(candidate);
+            if (Objects.nonNull(requestedConfig) && StringUtils.isNotBlank(requestedConfig.getModel())) {
+                return requestedConfig.getModel();
+            }
         }
         ModelConfigBO defaultConfig = resolveDefaultConfig();
         if (Objects.nonNull(defaultConfig) && StringUtils.isNotBlank(defaultConfig.getModel())) {
+            if (StringUtils.isNotBlank(candidate)) {
+                log.warn("Agentic requested model is not configured, falling back to default model, requestedModel={}, defaultModel={}",
+                        candidate, defaultConfig.getModel());
+            }
             return defaultConfig.getModel();
         }
-        return null;
+        String fallback = StringUtils.trimToNull(fallbackModel);
+        if (StringUtils.isNotBlank(fallback)) {
+            if (StringUtils.isNotBlank(candidate) && !StringUtils.equals(candidate, fallback)) {
+                log.warn("Agentic requested model is not configured, falling back to Spring AI model, requestedModel={}, fallbackModel={}",
+                        candidate, fallback);
+            }
+            return fallback;
+        }
+        return candidate;
     }
 
     public ChatClient getOrCreate(String model) {
@@ -140,7 +163,11 @@ public class ChatClientFactory {
         if (Objects.isNull(config)) {
             config = resolveDefaultConfig();
         }
-        return Objects.isNull(config) || Boolean.TRUE.equals(config.getToolCall());
+        if (Objects.nonNull(config)) {
+            return Boolean.TRUE.equals(config.getToolCall());
+        }
+        return StringUtils.isNotBlank(fallbackModel) && StringUtils.equals(model, fallbackModel)
+                && properties.isFallbackToolCallingEnabled();
     }
 
     public void evict(Long providerId) {

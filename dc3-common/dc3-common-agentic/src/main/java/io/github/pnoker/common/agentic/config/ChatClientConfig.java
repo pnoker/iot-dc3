@@ -58,10 +58,12 @@ import tools.jackson.databind.ObjectMapper;
 @EnableConfigurationProperties(AgenticProperties.class)
 public class ChatClientConfig {
 
-    public static final String SYSTEM_PROMPT = """
+    public static final String BASE_SYSTEM_PROMPT = """
             You are the IoT DC3 platform assistant.
+            """;
 
-            The platform exposes these capabilities through Spring AI tool calling:
+    public static final String TOOL_SYSTEM_PROMPT = """
+            Platform data access and platform actions are available through native tool calls attached to this request.
 
             - Tenant and user context lookup.
             - Device, driver, profile, and point metadata lookup.

@@ -16,8 +16,6 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import com.openai.core.JsonValue;
-import com.openai.models.chat.completions.ChatCompletionChunk;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -25,7 +23,6 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Maps Spring AI chat responses into runtime-owned result objects.
@@ -59,35 +56,10 @@ public class SpringAiChatResponseMapper {
         }
         Generation generation = response.getResult();
         String content = Objects.nonNull(generation.getOutput()) ? generation.getOutput().getText() : null;
-        String reasoningContent = extractReasoningContent(generation);
         if (log.isDebugEnabled()) {
-            log.debug("Agentic stream chunk, contentLen={}, hasReasoning={}",
-                    Objects.isNull(content) ? 0 : content.length(),
-                    Objects.nonNull(reasoningContent));
+            log.debug("Agentic stream chunk, contentLen={}", Objects.isNull(content) ? 0 : content.length());
         }
-        return new AgenticStreamDelta(StringUtils.defaultString(content), reasoningContent);
-    }
-
-    @SuppressWarnings("unchecked")
-    private String extractReasoningContent(Generation generation) {
-        if (Objects.isNull(generation) || Objects.isNull(generation.getOutput())
-                || Objects.isNull(generation.getOutput().getMetadata())) {
-            return null;
-        }
-        Object chunkChoice = generation.getOutput().getMetadata().get("chunkChoice");
-        if (Objects.isNull(chunkChoice)) {
-            return null;
-        }
-
-        if (chunkChoice instanceof ChatCompletionChunk.Choice openAiChunkChoice) {
-            Object rawValue = openAiChunkChoice.delta()._additionalProperties().get("reasoning_content");
-            if (!(rawValue instanceof JsonValue value)) {
-                return null;
-            }
-            Optional<String> reasoningContent = value.asString();
-            return reasoningContent.orElse(null);
-        }
-        return null;
+        return new AgenticStreamDelta(StringUtils.defaultString(content));
     }
 
 }

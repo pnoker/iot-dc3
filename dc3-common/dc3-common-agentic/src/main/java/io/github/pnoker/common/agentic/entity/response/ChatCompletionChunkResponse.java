@@ -80,9 +80,6 @@ public class ChatCompletionChunkResponse {
 
         private String content;
 
-        @JsonProperty("reasoning_content")
-        private String reasoningContent;
-
     }
 
 }
