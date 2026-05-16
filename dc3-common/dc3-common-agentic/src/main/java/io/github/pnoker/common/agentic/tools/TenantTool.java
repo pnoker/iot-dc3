@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import lombok.extern.slf4j.Slf4j;
@@ -37,15 +38,11 @@ import java.util.Map;
 public class TenantTool {
 
     @Tool(description = "Get the current tenant context. Returns only the current tenant ID.")
+    @AgenticToolMetadata(domain = "tenant", title = "Read current tenant context")
     public AgenticToolResult<Map<String, Long>> getCurrentTenantInfo(ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getCurrentTenantInfo", tenantId);
-        recordTool(toolContext, "getCurrentTenantInfo", "Read current tenant context");
         return AgenticToolResult.ok("Current tenant context loaded", Map.of("tenantId", tenantId));
-    }
-
-    private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "tenant", description);
     }
 
 }

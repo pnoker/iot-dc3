@@ -105,7 +105,8 @@ public class ChatClientConfig {
                 .toolObjects(tenantTool, userTool, deviceTool, driverTool, profileTool, pointTool, pointValueTool,
                         systemTool)
                 .build();
-        return new AgenticToolTracingCallbackProvider(provider, objectMapper);
+        return new AgenticToolTracingCallbackProvider(provider, objectMapper, tenantTool, userTool, deviceTool,
+                driverTool, profileTool, pointTool, pointValueTool, systemTool);
     }
 
     @Bean

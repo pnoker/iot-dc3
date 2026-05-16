@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
@@ -48,10 +49,10 @@ public class SystemTool {
     }
 
     @Tool(description = "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
+    @AgenticToolMetadata(domain = "system", title = "Get system health")
     public AgenticToolResult<FacadeSystemHealthBO> getSystemHealth(ToolContext toolContext) {
         Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getSystemHealth", tenantId);
-        recordTool(toolContext, "getSystemHealth", "Get system health");
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(STATUS_UNAVAILABLE);
@@ -61,10 +62,6 @@ public class SystemTool {
             return AgenticToolResult.unavailable("System health snapshot is unavailable.");
         }
         return AgenticToolResult.ok("System health loaded", health);
-    }
-
-    private void recordTool(ToolContext toolContext, String toolName, String description) {
-        AgenticRequestContext.recordToolInvocation(toolContext, toolName, "system", description);
     }
 
 }
