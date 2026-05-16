@@ -31,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,6 +81,36 @@ class PointValueToolTest {
         assertThat(result.data().actionId()).isEqualTo("action-1");
         verify(actionService).createWritePointValueAction("conv-1", 10L, 20L, "42", header);
         verify(pointValueCommandFacade, never()).write(anyLong(), anyLong(), anyLong(), anyString());
+    }
+
+    @Test
+    void getPointValueHistoryReturnsRawValuesAndChartData() {
+        when(pointValueFacade.history(1L, 10L, 20L, 5)).thenReturn(List.of("24.0", "23.8", "offline", "23.5"));
+
+        AgenticToolResult<PointValueTool.PointValueHistory> result = tool.getPointValueHistory(10L, 20L, 5,
+                toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header)));
+
+        assertThat(result.success()).isTrue();
+        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
+        assertThat(result.data().values()).containsExactly("24.0", "23.8", "offline", "23.5");
+        assertThat(result.data().chart()).isNotNull();
+        assertThat(result.data().chart().series()).hasSize(1);
+        assertThat(result.data().chart().series().get(0).data())
+                .containsExactly(List.of(0, 23.5D), List.of(1, 23.8D), List.of(2, 24.0D));
+    }
+
+    @Test
+    void readPointValueSendsReadCommandThroughPointValueCommandFacade() {
+        when(pointValueCommandFacade.read(1L, 10L, 20L)).thenReturn(true);
+
+        AgenticToolResult<PointValueTool.PointCommandResult> result = tool.readPointValue(10L, 20L,
+                toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header)));
+
+        assertThat(result.success()).isTrue();
+        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
+        assertThat(result.data().sent()).isTrue();
+        assertThat(result.data().pendingConfirmation()).isFalse();
+        verify(pointValueCommandFacade).read(1L, 10L, 20L);
     }
 
     private ToolContext toolContext(Map<String, Object> values) {

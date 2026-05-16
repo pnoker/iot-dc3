@@ -50,6 +50,10 @@ class MessageServiceImplTest {
     private MessageServiceImpl service;
     private RequestHeader.UserHeader header;
 
+    private static LambdaQueryWrapper<MessageDO> anyMessageQuery() {
+        return any();
+    }
+
     @BeforeEach
     void setUp() {
         service = new MessageServiceImpl(messageManager, messageBuilder);
@@ -126,9 +130,5 @@ class MessageServiceImplTest {
 
         assertThat(result.get(0).getContent()).isNotNull();
         assertThat(result.get(0).getContent().getText()).isEmpty();
-    }
-
-    private static LambdaQueryWrapper<MessageDO> anyMessageQuery() {
-        return any();
     }
 }

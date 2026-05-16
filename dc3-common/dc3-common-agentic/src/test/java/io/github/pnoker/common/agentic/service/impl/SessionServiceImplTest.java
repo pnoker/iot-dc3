@@ -21,8 +21,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.common.agentic.dal.SessionManager;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
-import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
+import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.exception.RequestException;
@@ -61,6 +61,10 @@ class SessionServiceImplTest {
 
     @InjectMocks
     private SessionServiceImpl service;
+
+    private static LambdaQueryWrapper<SessionDO> anySessionQuery() {
+        return any();
+    }
 
     @BeforeEach
     void wireResources() throws Exception {
@@ -245,9 +249,5 @@ class SessionServiceImplTest {
                 .isInstanceOf(RequestException.class)
                 .hasMessage("Temperature must be between 0.0 and 2.0");
         verify(sessionManager, never()).updateById(any(SessionDO.class));
-    }
-
-    private static LambdaQueryWrapper<SessionDO> anySessionQuery() {
-        return any();
     }
 }
