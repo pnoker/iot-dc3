@@ -65,6 +65,25 @@ describe('agentic store', () => {
         callbacks.onDelta?.('设备运行正常。');
       }
     );
+    apiMocks.getAgenticMessages.mockResolvedValue({
+      data: [
+        {
+          id: 'persisted-user-1',
+          role: 'user',
+          content: '查看设备状态',
+          messageIndex: 1,
+        },
+        {
+          id: 'persisted-assistant-1',
+          role: 'assistant',
+          content: '设备运行正常。',
+          contentExt: {
+            reasoning: true,
+          },
+          messageIndex: 2,
+        },
+      ],
+    });
 
     const store = useAgenticStore();
     store.models = [

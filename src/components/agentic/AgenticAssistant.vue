@@ -223,10 +223,7 @@
           >
             <div class="agentic-message__main">
               <div class="agentic-message__content">
-                <RenderedAssistantMessage
-                  v-if="message.role === 'assistant'"
-                  :content="message.content || (message.streaming ? t('agentic.thinking') : '')"
-                />
+                <RenderedAssistantMessage v-if="message.role === 'assistant'" :content="message.content" />
                 <div v-else class="agentic-text">{{ message.content }}</div>
                 <span v-if="message.streaming && !message.content" class="agentic-cursor">{{
                   t('agentic.thinking')
@@ -239,28 +236,6 @@
                     <Warning />
                   </el-icon>
                   <span>{{ truncatedReason(message) }}</span>
-                </div>
-                <div
-                  v-if="message.role === 'assistant' && !message.streaming && message.content"
-                  class="agentic-message__toolbar"
-                >
-                  <el-tooltip :content="t('agentic.actionCopy')" placement="top">
-                    <button class="agentic-message__action" type="button" @click="handleCopyMessage(message)">
-                      <el-icon>
-                        <DocumentCopy />
-                      </el-icon>
-                    </button>
-                  </el-tooltip>
-                  <el-tooltip :content="t('agentic.actionQuote')" placement="top">
-                    <button class="agentic-message__action" type="button" @click="handleQuoteMessage(message)">
-                      <el-icon>
-                        <ChatLineSquare />
-                      </el-icon>
-                    </button>
-                  </el-tooltip>
-                </div>
-                <div v-if="message.reasoning" class="agentic-reasoning">
-                  <div class="agentic-reasoning__content" v-html="renderReasoning(message.reasoning)" />
                 </div>
                 <details v-if="message.role === 'assistant' && hasAssistantDetails(message)" class="agentic-details">
                   <summary>
@@ -337,6 +312,22 @@
                     </div>
                   </div>
                 </details>
+              </div>
+              <div v-if="canShowMessageToolbar(message)" class="agentic-message__toolbar">
+                <el-tooltip :content="t('agentic.actionCopy')" placement="top">
+                  <button class="agentic-message__action" type="button" @click="handleCopyMessage(message)">
+                    <el-icon>
+                      <DocumentCopy />
+                    </el-icon>
+                  </button>
+                </el-tooltip>
+                <el-tooltip :content="t('agentic.actionQuote')" placement="top">
+                  <button class="agentic-message__action" type="button" @click="handleQuoteMessage(message)">
+                    <el-icon>
+                      <ChatLineSquare />
+                    </el-icon>
+                  </button>
+                </el-tooltip>
               </div>
             </div>
           </article>
@@ -457,7 +448,6 @@
     Warning,
   } from '@element-plus/icons-vue';
   import { ElMessage, ElMessageBox } from 'element-plus';
-  import { marked } from 'marked';
   import { storeToRefs } from 'pinia';
   import { useI18n } from 'vue-i18n';
   import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
@@ -730,11 +720,6 @@
     ElMessage.success('Action rejected');
   };
 
-  const renderReasoning = (reasoning: string) => {
-    if (!reasoning) return '';
-    return sanitizeHtml(String(marked.parse(reasoning)));
-  };
-
   const handleCopyMessage = async (message: AgenticMessage) => {
     const text = toPlainText(message.content);
     try {
@@ -753,6 +738,10 @@
       .map((line) => `> ${line}`)
       .join('\n');
     draft.value = `${quoted}\n\n${draft.value || ''}`.trim();
+  };
+
+  const canShowMessageToolbar = (message: AgenticMessage) => {
+    return Boolean(message.content?.trim()) && !message.streaming;
   };
 
   const truncatedReason = (message: AgenticMessage): string => {
@@ -838,7 +827,6 @@
     const items: AssistantThinkingItem[] = [];
     const traces = assistantTraceEvents(message);
     const tools = assistantToolSteps(message).length;
-    const liveReasoning = message.reasoning?.trim();
     if (message.streaming) {
       items.push({
         label: message.content ? t('agentic.thinkingGenerating') : t('agentic.thinkingPreparing'),
@@ -848,7 +836,7 @@
     if (assistantReasoning(message)) {
       items.push({
         label: t('agentic.thinkingReasoningMode'),
-        detail: liveReasoning || t('agentic.thinkingReasoningDetail'),
+        detail: t('agentic.thinkingReasoningDetail'),
       });
     }
     if (tools > 0) {
@@ -1071,14 +1059,6 @@
     return Math.min(Math.max(value, min), max);
   };
 
-  const sanitizeHtml = (html: string) => {
-    return html
-      .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
-      .replace(/\son\w+="[^"]*"/gi, '')
-      .replace(/\son\w+='[^']*'/gi, '')
-      .replace(/javascript:/gi, '');
-  };
-
   const formatFileSize = (size = 0) => {
     if (size < 1024) return `${size} B`;
     if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
@@ -1293,21 +1273,21 @@
 
     .agentic-message__content {
       color: #ffffff;
-      background: #2563eb;
-      border-color: #2563eb;
+      background: var(--el-color-primary);
+      border-color: var(--el-color-primary);
 
       &::before {
         right: -7px;
         left: auto;
         border-right: 0;
-        border-left: 7px solid #2563eb;
+        border-left: 7px solid var(--el-color-primary);
       }
 
       &::after {
         right: -6px;
         left: auto;
         border-right: 0;
-        border-left: 7px solid #2563eb;
+        border-left: 7px solid var(--el-color-primary);
       }
     }
   }
@@ -1316,6 +1296,7 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 4px;
     max-width: 100%;
     min-width: 0;
@@ -1376,13 +1357,30 @@
   .agentic-message__toolbar {
     display: flex;
     gap: 4px;
-    margin-top: 6px;
+    width: fit-content;
+    height: 0;
+    margin-top: 0;
+    overflow: hidden;
     opacity: 0;
-    transition: opacity 0.16s ease;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-2px);
+    transition:
+      opacity 0.16s ease,
+      transform 0.16s ease,
+      height 0.16s ease,
+      margin-top 0.16s ease,
+      visibility 0.16s ease;
   }
 
-  .agentic-message:hover .agentic-message__toolbar {
+  .agentic-message:hover .agentic-message__toolbar,
+  .agentic-message:focus-within .agentic-message__toolbar {
+    height: 24px;
+    margin-top: 4px;
     opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
   }
 
   .agentic-message__action {
@@ -1401,37 +1399,15 @@
     transition: all 0.16s ease;
 
     &:hover {
-      color: #2563eb;
-      border-color: #93c5fd;
-      background: #eff6ff;
+      color: var(--el-color-primary);
+      border-color: var(--el-color-primary-light-5);
+      background: var(--el-color-primary-light-9);
     }
   }
 
   .agentic-cursor {
     color: #64748b;
     font-size: 12px;
-  }
-
-  .agentic-reasoning {
-    margin-top: 8px;
-    padding: 8px 10px;
-    border-left: 3px solid #93c5fd;
-    border-radius: 4px;
-    color: #475569;
-    font-size: 13px;
-    background: #f0f7ff;
-  }
-
-  .agentic-reasoning__content {
-    overflow-wrap: anywhere;
-
-    :deep(p) {
-      margin: 0 0 6px;
-    }
-
-    :deep(p:last-child) {
-      margin-bottom: 0;
-    }
   }
 
   .agentic-details {

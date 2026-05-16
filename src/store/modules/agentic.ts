@@ -354,7 +354,8 @@ export const useAgenticStore = defineStore('agentic', () => {
     try {
       const response = await getAgenticMessages(conversationId);
       if (response.data) {
-        messagesByConversation.value[conversationId] = response.data.map((message) => ({
+        const previousMessages = messagesByConversation.value[conversationId] || [];
+        const loadedMessages = response.data.map((message) => ({
           id: String(message.id || createMessageId(message.role)),
           role: message.role,
           content: message.content || '',
@@ -362,6 +363,7 @@ export const useAgenticStore = defineStore('agentic', () => {
           messageIndex: message.messageIndex,
           reasoning: message.reasoning,
         }));
+        messagesByConversation.value[conversationId] = mergeEphemeralAssistantState(previousMessages, loadedMessages);
         persistMessages();
       }
     } catch (error) {
@@ -695,6 +697,30 @@ const normalizeTitle = (title: string) => {
 
 const shouldGenerateSessionTitle = (title?: string) => {
   return !title || normalizeTitle(title) === DEFAULT_SESSION_TITLE;
+};
+
+const mergeEphemeralAssistantState = (previous: AgenticMessage[], loaded: AgenticMessage[]) => {
+  const previousAssistantState = previous
+    .filter((message) => message.role === 'assistant')
+    .map((message) => ({
+      reasoning: message.reasoning,
+      finishReason: message.finishReason,
+    }));
+  let assistantIndex = 0;
+  return loaded.map((message) => {
+    if (message.role !== 'assistant') {
+      return message;
+    }
+    const state = previousAssistantState[assistantIndex++];
+    if (!state) {
+      return message;
+    }
+    return {
+      ...message,
+      reasoning: message.reasoning || state.reasoning,
+      finishReason: message.finishReason || state.finishReason,
+    };
+  });
 };
 
 type RawAgenticSessionExt = AgenticSessionExt & {
