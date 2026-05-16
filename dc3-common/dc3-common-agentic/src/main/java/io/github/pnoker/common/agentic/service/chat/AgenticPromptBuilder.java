@@ -20,6 +20,7 @@ import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -44,10 +45,14 @@ public class AgenticPromptBuilder {
 
     private final ToolCallbackProvider toolCallbackProvider;
 
+    private final Advisor toolCallAdvisor;
+
     public AgenticPromptBuilder(ChatClientFactory chatClientFactory,
-                                @Qualifier("agenticToolCallbackProvider") ToolCallbackProvider toolCallbackProvider) {
+                                @Qualifier("agenticToolCallbackProvider") ToolCallbackProvider toolCallbackProvider,
+                                @Qualifier("agenticToolCallAdvisor") Advisor toolCallAdvisor) {
         this.chatClientFactory = chatClientFactory;
         this.toolCallbackProvider = toolCallbackProvider;
+        this.toolCallAdvisor = toolCallAdvisor;
     }
 
     public ChatClient.ChatClientRequestSpec build(AgenticPreparedChatRequest prepared) {
@@ -71,7 +76,7 @@ public class AgenticPromptBuilder {
         if (!prepared.toolCallingEnabled()) {
             return promptSpec;
         }
-        return promptSpec.toolCallbacks(toolCallbackProvider);
+        return promptSpec.toolCallbacks(toolCallbackProvider).advisors(toolCallAdvisor);
     }
 
     private ChatClient.ChatClientRequestSpec applyRequestOptions(ChatClient.ChatClientRequestSpec promptSpec,

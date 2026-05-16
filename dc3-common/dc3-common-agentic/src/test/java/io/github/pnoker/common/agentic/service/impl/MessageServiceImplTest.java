@@ -61,7 +61,7 @@ class MessageServiceImplTest {
 
     @Test
     void saveStartsMessageIndexAtOneForFirstMessage() {
-        when(messageManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(messageManager.getOne(anyMessageQuery())).thenReturn(null);
         MessageDO entityDO = new MessageDO();
         when(messageBuilder.buildDOByBO(any(MessageBO.class))).thenReturn(entityDO);
         when(messageBuilder.buildBOByDO(entityDO)).thenAnswer(inv -> {
@@ -87,7 +87,7 @@ class MessageServiceImplTest {
     void saveIncrementsMessageIndexFromLatestRow() {
         MessageDO latest = new MessageDO();
         latest.setMessageIndex(10L);
-        when(messageManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(latest);
+        when(messageManager.getOne(anyMessageQuery())).thenReturn(latest);
         when(messageBuilder.buildDOByBO(any(MessageBO.class))).thenReturn(new MessageDO());
         when(messageBuilder.buildBOByDO(any(MessageDO.class))).thenReturn(new MessageBO());
 
@@ -100,7 +100,7 @@ class MessageServiceImplTest {
 
     @Test
     void saveCoercesNullContentToEmptyText() {
-        when(messageManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(messageManager.getOne(anyMessageQuery())).thenReturn(null);
         when(messageBuilder.buildDOByBO(any(MessageBO.class))).thenReturn(new MessageDO());
         when(messageBuilder.buildBOByDO(any(MessageDO.class))).thenReturn(new MessageBO());
 
@@ -115,7 +115,7 @@ class MessageServiceImplTest {
     @Test
     void listInjectsEmptyTextContentWhenMissing() {
         MessageDO dirty = new MessageDO();
-        when(messageManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of(dirty));
+        when(messageManager.list(anyMessageQuery())).thenReturn(List.of(dirty));
 
         MessageBO bo = new MessageBO();
         bo.setRole("user");
@@ -126,5 +126,9 @@ class MessageServiceImplTest {
 
         assertThat(result.get(0).getContent()).isNotNull();
         assertThat(result.get(0).getContent().getText()).isEmpty();
+    }
+
+    private static LambdaQueryWrapper<MessageDO> anyMessageQuery() {
+        return any();
     }
 }

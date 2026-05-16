@@ -94,8 +94,7 @@ public class AgenticChatRequestPreparer {
         List<MessageBO> memoryHistory = loadMemoryHistory(scopedConversationId);
         log.debug("Agentic memory loaded, scopedConversationId={}, memoryEnabled={}, count={}",
                 scopedConversationId, properties.isMemoryEnabled(), memoryHistory.size());
-        AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, requestSystemContext, contexts,
-                memoryHistory);
+        AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, contexts, memoryHistory);
 
         log.debug(
                 "Agentic chat request received, mode={}, model={}, messageCount={}, conversationIdPresent={}, tenantId={}, userId={}",
@@ -171,8 +170,7 @@ public class AgenticChatRequestPreparer {
                 continue;
             }
             if ("attachment".equals(context.getType())) {
-                sections.add("Attachment context:\n" + context.getContent().trim()
-                        + "\n\nUse only the metadata above unless a future multimodal model endpoint provides file contents.");
+                sections.add("Attachment context:\n" + context.getContent().trim());
             } else {
                 sections.add(context.getContent().trim());
             }
@@ -180,30 +178,17 @@ public class AgenticChatRequestPreparer {
         return sections.isEmpty() ? null : String.join("\n\n", sections);
     }
 
-    private AgenticMessageContent.Tokens buildInputTokens(String userMessage, String requestSystemContext,
-                                                          List<AgenticMessageContent.Context> contexts,
+    private AgenticMessageContent.Tokens buildInputTokens(String userMessage, List<AgenticMessageContent.Context> contexts,
                                                           List<MessageBO> memoryHistory) {
         int textTokens = AgenticTokenEstimatorUtil.estimate(userMessage);
         int contextTokens = contexts.stream()
                 .map(AgenticMessageContent.Context::getContent)
                 .mapToInt(AgenticTokenEstimatorUtil::estimate)
                 .sum();
-        int systemTokens = AgenticTokenEstimatorUtil.estimate(ChatClientConfig.SYSTEM_PROMPT)
-                + AgenticTokenEstimatorUtil.estimate(systemInstructions(requestSystemContext, contexts));
+        int systemTokens = AgenticTokenEstimatorUtil.estimate(ChatClientConfig.SYSTEM_PROMPT);
         int memoryTokens = estimateMemoryTokens(memoryHistory);
         return AgenticMessageContent.Tokens.of(textTokens + contextTokens + systemTokens + memoryTokens, 0,
                 textTokens, contextTokens, systemTokens, memoryTokens);
-    }
-
-    private String systemInstructions(String requestSystemContext, List<AgenticMessageContent.Context> contexts) {
-        if (StringUtils.isBlank(requestSystemContext)) {
-            return "";
-        }
-        List<String> instructions = new ArrayList<>();
-        if (contexts.stream().anyMatch(context -> "attachment".equals(context.getType()))) {
-            instructions.add("Use attachment metadata only unless a future multimodal model endpoint provides file contents.");
-        }
-        return String.join("\n", instructions);
     }
 
     private List<MessageBO> loadMemoryHistory(String scopedConversationId) {

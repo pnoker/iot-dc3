@@ -127,8 +127,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             return "";
         }
         String summary = attachmentBuilder.buildBOListByDOList(attachments).stream()
-                .map(item -> "- " + item.getFileName() + " (" + item.getContentType() + ", " + item.getSize()
-                        + " bytes, path=" + item.getFilePath() + ")")
+                .map(item -> "- id=" + item.getId() + ", name=" + item.getFileName() + ", contentType="
+                        + item.getContentType() + ", size=" + item.getSize() + " bytes")
                 .reduce((left, right) -> left + "\n" + right)
                 .orElse("");
         return "Attachment metadata:\n" + summary;

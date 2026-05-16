@@ -87,7 +87,7 @@ class SessionServiceImplTest {
 
     @Test
     void touchCreatesNewSessionWhenConversationIdUnknown() {
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(null);
         SessionBO bo = new SessionBO();
         when(sessionBuilder.buildBOByDO(any(SessionDO.class))).thenReturn(bo);
 
@@ -121,7 +121,7 @@ class SessionServiceImplTest {
         existing.setTitle("Old title");
         existing.setTenantId(1L);
         existing.setUserId(2L);
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
         SessionExt sessionExt = new SessionExt();
@@ -135,7 +135,7 @@ class SessionServiceImplTest {
 
     @Test
     void getByConversationIdReturnsNullWhenAbsent() {
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(null);
         assertThat(service.getByConversationId("missing")).isNull();
     }
 
@@ -143,7 +143,7 @@ class SessionServiceImplTest {
     void removeByConversationIdClearsChatMemoryWhenSessionExists() {
         SessionDO existing = new SessionDO();
         existing.setId(99L);
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
 
         service.removeByConversationId("conv-1");
 
@@ -153,7 +153,7 @@ class SessionServiceImplTest {
 
     @Test
     void removeByConversationIdIsNoOpWhenSessionMissing() {
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(null);
 
         service.removeByConversationId("missing");
 
@@ -163,14 +163,14 @@ class SessionServiceImplTest {
 
     @Test
     void updateReturnsNullWhenSessionMissing() {
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(null);
         assertThat(service.update("missing", new SessionUpdateRequest())).isNull();
     }
 
     @Test
     void updateReturnsNullWhenRequestIsNull() {
         SessionDO existing = new SessionDO();
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
         assertThat(service.update("conv-1", null)).isNull();
     }
 
@@ -178,7 +178,7 @@ class SessionServiceImplTest {
     void updateAppliesTrimmedTitle() {
         SessionDO existing = new SessionDO();
         existing.setTitle("Old");
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
         SessionUpdateRequest request = new SessionUpdateRequest();
@@ -197,7 +197,7 @@ class SessionServiceImplTest {
     void updateLeavesTitleUntouchedWhenRequestTitleBlank() {
         SessionDO existing = new SessionDO();
         existing.setTitle("Old");
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
         SessionUpdateRequest request = new SessionUpdateRequest();
@@ -215,7 +215,7 @@ class SessionServiceImplTest {
         existingConfig.setTemperature(0.7);
         existingConfig.setMaxTokens(2048);
         existing.setSessionExt(existingConfig);
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
         SessionExt patch = new SessionExt();
@@ -234,7 +234,7 @@ class SessionServiceImplTest {
     @Test
     void updateRejectsInvalidSessionExt() {
         SessionDO existing = new SessionDO();
-        when(sessionManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
+        when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
 
         SessionExt patch = new SessionExt();
         patch.setTemperature(3.0);
@@ -245,5 +245,9 @@ class SessionServiceImplTest {
                 .isInstanceOf(RequestException.class)
                 .hasMessage("Temperature must be between 0.0 and 2.0");
         verify(sessionManager, never()).updateById(any(SessionDO.class));
+    }
+
+    private static LambdaQueryWrapper<SessionDO> anySessionQuery() {
+        return any();
     }
 }

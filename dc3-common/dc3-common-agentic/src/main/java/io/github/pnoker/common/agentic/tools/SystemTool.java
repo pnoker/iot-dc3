@@ -17,8 +17,8 @@
 package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class SystemTool {
     @Tool(description = "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
     @AgenticToolMetadata(domain = "system", title = "Get system health")
     public AgenticToolResult<FacadeSystemHealthBO> getSystemHealth(ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getSystemHealth", tenantId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {

@@ -17,8 +17,8 @@
 package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
-import io.github.pnoker.common.agentic.context.AgenticRequestContext;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
@@ -55,7 +55,7 @@ public class PointTool {
     public AgenticToolResult<FacadePointBO> lookupPointById(
             @ToolParam(description = "The numeric point ID") Long pointId,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointId={}", "lookupPointById", tenantId, pointId);
         FacadePointBO bo = pointFacade.selectById(tenantId, pointId);
         if (Objects.isNull(bo)) {
@@ -69,7 +69,7 @@ public class PointTool {
     public AgenticToolResult<List<FacadePointBO>> lookupPointsByIds(
             @ToolParam(description = "The numeric point IDs") List<Long> pointIds,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         List<Long> ids = normalizeIds(pointIds);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointIds={}", "lookupPointsByIds", tenantId, ids);
         if (ids.isEmpty()) {
@@ -90,7 +90,7 @@ public class PointTool {
             @ToolParam(description = "Page number (1-based)") int page,
             @ToolParam(description = "Page size") int size,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointName={}, profileId={}, page={}, size={}",
                 "searchPoints", tenantId, pointName, profileId, page, size);
 
@@ -117,7 +117,7 @@ public class PointTool {
             @ToolParam(description = "Page number (1-based)") int page,
             @ToolParam(description = "Page size") int size,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, page={}, size={}", "listPointsByDeviceId",
                 tenantId, deviceId, page, size);
 
@@ -143,7 +143,7 @@ public class PointTool {
             @ToolParam(description = "Page number (1-based)") int page,
             @ToolParam(description = "Page size") int size,
             ToolContext toolContext) {
-        Long tenantId = AgenticRequestContext.requireTenantId(toolContext);
+        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}, page={}, size={}",
                 "listPointsByProfileId", tenantId, profileId, page, size);
 
