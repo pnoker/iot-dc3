@@ -39,7 +39,7 @@ import java.time.LocalDateTime;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
@@ -57,10 +57,10 @@ public class RuleDO implements Serializable {
     private Long id;
 
     /**
-     * Entity type flag
+     * Alarm target type flag
      */
-    @TableField("entity_type_flag")
-    private Byte entityTypeFlag;
+    @TableField("alarm_target_type_flag")
+    private Byte alarmTargetTypeFlag;
 
     /**
      * Rule name

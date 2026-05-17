@@ -50,7 +50,7 @@ import java.util.Objects;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Slf4j
 @Service
@@ -123,8 +123,14 @@ public class MessageServiceImpl implements MessageService {
      */
     private LambdaQueryWrapper<MessageDO> fuzzyQuery(MessageQuery entityQuery) {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmMessageTitle()), MessageDO::getMessageName,
-                entityQuery.getAlarmMessageTitle());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getMessageName()), MessageDO::getMessageName,
+                entityQuery.getMessageName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getMessageCode()), MessageDO::getMessageCode,
+                entityQuery.getMessageCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getMessageLevel()), MessageDO::getMessageLevel,
+                Objects.nonNull(entityQuery.getMessageLevel()) ? entityQuery.getMessageLevel().getIndex() : null);
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), MessageDO::getEnableFlag,
+                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), MessageDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

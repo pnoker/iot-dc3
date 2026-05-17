@@ -25,7 +25,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public class DataConstant {
 
@@ -39,6 +39,20 @@ public class DataConstant {
     public static final String POINT_VALUE_COMMAND_URL_PREFIX = "/point_value_command";
 
     public static final String DASHBOARD_URL_PREFIX = "/dashboard";
+
+    public static final String RULE_URL_PREFIX = "/rule";
+
+    public static final String RULE_STATE_URL_PREFIX = "/rule/state";
+
+    public static final String NOTIFY_URL_PREFIX = "/notify";
+
+    public static final String NOTIFY_CHANNEL_URL_PREFIX = "/notify/channel";
+
+    public static final String NOTIFY_CHANNEL_BIND_URL_PREFIX = "/notify/channel/bind";
+
+    public static final String NOTIFY_RECORD_URL_PREFIX = "/notify/record";
+
+    public static final String MESSAGE_URL_PREFIX = "/message";
 
     public static final String DRIVER_STATUS_URL_PREFIX = "/driver/status";
 

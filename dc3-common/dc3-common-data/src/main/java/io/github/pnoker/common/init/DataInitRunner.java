@@ -18,6 +18,7 @@
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.data.biz.ScheduleForDataService;
+import io.github.pnoker.common.data.entity.property.NotifyCredentialProperties;
 import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
@@ -33,12 +34,12 @@ import org.springframework.context.annotation.ComponentScan;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.data"})
 @MapperScan(basePackages = {"io.github.pnoker.common.data.mapper"})
-@EnableConfigurationProperties(PointBatchProperties.class)
+@EnableConfigurationProperties({PointBatchProperties.class, NotifyCredentialProperties.class})
 public class DataInitRunner implements ApplicationRunner {
 
     private final ScheduleForDataService scheduleForDataService;

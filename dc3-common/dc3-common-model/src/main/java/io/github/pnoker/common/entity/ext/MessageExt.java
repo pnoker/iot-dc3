@@ -22,6 +22,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Message Ext
  * <p>
@@ -29,7 +32,7 @@ import lombok.Setter;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
@@ -50,7 +53,38 @@ public class MessageExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        private String keep;
+        /**
+         * Variables expected by the templates.
+         */
+        private List<String> variables;
+
+        /**
+         * Channel-specific templates. Destinations and credentials belong to notification channels.
+         */
+        private List<Template> templates;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Template {
+
+        /**
+         * Channel type such as FEISHU_BOT, WEBHOOK, or EMAIL.
+         */
+        private String channelType;
+
+        /**
+         * Payload type such as CARD, TEXT, JSON, or HTML.
+         */
+        private String payloadType;
+
+        /**
+         * Structured template payload to render.
+         */
+        private Map<String, Object> template;
 
     }
 

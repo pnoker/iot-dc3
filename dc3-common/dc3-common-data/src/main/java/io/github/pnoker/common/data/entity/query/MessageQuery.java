@@ -38,7 +38,7 @@ import java.io.Serializable;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
@@ -64,17 +64,17 @@ public class MessageQuery implements Serializable {
     /**
      * Alarm message template title
      */
-    private String alarmMessageTitle;
+    private String messageName;
 
     /**
      * Alarm message template code
      */
-    private String alarmMessageCode;
+    private String messageCode;
 
     /**
      * Alarm message template level
      */
-    private AlarmMessageLevelFlagEnum alarmMessageLevel;
+    private AlarmMessageLevelFlagEnum messageLevel;
 
     /**
      * Enable flag
