@@ -1,0 +1,407 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.github.pnoker.common.data.biz.alarm;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.github.pnoker.common.constant.service.AlarmConstant;
+import io.github.pnoker.common.data.dal.MessageManager;
+import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
+import io.github.pnoker.common.data.dal.NotifyChannelManager;
+import io.github.pnoker.common.data.dal.NotifyManager;
+import io.github.pnoker.common.data.dal.NotifyRecordManager;
+import io.github.pnoker.common.data.dal.RuleStateManager;
+import io.github.pnoker.common.data.entity.bo.MessageBO;
+import io.github.pnoker.common.data.entity.bo.NotifyBO;
+import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
+import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
+import io.github.pnoker.common.data.entity.bo.NotifyRecordBO;
+import io.github.pnoker.common.data.entity.bo.RuleBO;
+import io.github.pnoker.common.data.entity.bo.RuleStateBO;
+import io.github.pnoker.common.data.entity.builder.MessageBuilder;
+import io.github.pnoker.common.data.entity.builder.NotifyBuilder;
+import io.github.pnoker.common.data.entity.builder.NotifyChannelBindBuilder;
+import io.github.pnoker.common.data.entity.builder.NotifyChannelBuilder;
+import io.github.pnoker.common.data.entity.builder.NotifyRecordBuilder;
+import io.github.pnoker.common.data.entity.builder.RuleStateBuilder;
+import io.github.pnoker.common.data.entity.model.MessageDO;
+import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
+import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
+import io.github.pnoker.common.data.entity.model.NotifyDO;
+import io.github.pnoker.common.data.entity.model.NotifyRecordDO;
+import io.github.pnoker.common.data.entity.model.RuleStateDO;
+import io.github.pnoker.common.entity.ext.NotifyExt;
+import io.github.pnoker.common.entity.ext.NotifyRecordRequestExt;
+import io.github.pnoker.common.entity.ext.NotifyRecordResponseExt;
+import io.github.pnoker.common.entity.ext.RuleExt;
+import io.github.pnoker.common.entity.ext.RuleStateExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.NotifyRecordStatusFlagEnum;
+import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Rule notification service implementation.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
+@Slf4j
+@Service
+public class RuleNotificationServiceImpl implements RuleNotificationService {
+
+    private static final long DEFAULT_ID = 0L;
+
+    @Resource
+    private NotifyManager notifyManager;
+
+    @Resource
+    private NotifyBuilder notifyBuilder;
+
+    @Resource
+    private MessageManager messageManager;
+
+    @Resource
+    private MessageBuilder messageBuilder;
+
+    @Resource
+    private NotifyChannelBindManager notifyChannelBindManager;
+
+    @Resource
+    private NotifyChannelBindBuilder notifyChannelBindBuilder;
+
+    @Resource
+    private NotifyChannelManager notifyChannelManager;
+
+    @Resource
+    private NotifyChannelBuilder notifyChannelBuilder;
+
+    @Resource
+    private RuleStateManager ruleStateManager;
+
+    @Resource
+    private RuleStateBuilder ruleStateBuilder;
+
+    @Resource
+    private NotifyRecordManager notifyRecordManager;
+
+    @Resource
+    private NotifyRecordBuilder notifyRecordBuilder;
+
+    @Resource
+    private NotifyPolicyEngine notifyPolicyEngine;
+
+    @Resource
+    private MessageRenderService messageRenderService;
+
+    @Resource
+    private NotifyChannelAdapterRegistry notifyChannelAdapterRegistry;
+
+    @Resource
+    private AlarmTemplateRenderer alarmTemplateRenderer;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<NotifyRecordBO> notify(RuleMatch match) {
+        if (Objects.isNull(match) || Objects.isNull(match.getRule()) || Objects.isNull(match.getFact())) {
+            return List.of();
+        }
+
+        RuleBO rule = match.getRule();
+        Map<String, Object> variables = variables(match);
+        NotifyBO notify = loadNotify(rule.getNotifyId());
+        RuleStateBO state = persistRuleState(match, notify, variables);
+        if (Objects.isNull(notify)) {
+            log.warn("Skip alarm notification because notify policy does not exist, ruleId={}", rule.getId());
+            return List.of();
+        }
+
+        MessageBO message = loadMessage(rule.getMessageId());
+        List<NotifyChannelBindBO> binds = loadEnabledBinds(notify);
+        List<NotifyRecordBO> records = new ArrayList<>();
+        for (NotifyChannelBindBO bind : binds) {
+            NotifyChannelBO channel = loadChannel(bind.getChannelId(), bind.getTenantId());
+            if (Objects.isNull(channel)) {
+                log.warn("Skip alarm notification because notify channel does not exist, channelId={}",
+                        bind.getChannelId());
+                continue;
+            }
+            if (!EnableFlagEnum.ENABLE.equals(channel.getEnableFlag())) {
+                records.add(recordSkipped(match, notify, message, bind, channel, variables,
+                        "Notify channel is disabled"));
+                continue;
+            }
+            if (Objects.isNull(message)) {
+                records.add(recordSkipped(match, notify, null, bind, channel, variables,
+                        "Message template does not exist"));
+                continue;
+            }
+
+            NotifyDecision decision = notifyPolicyEngine.decide(match, notify, bind, state, LocalDateTime.now());
+            if (!decision.isSend()) {
+                records.add(recordSkipped(match, notify, message, bind, channel, variables, decision.getReason()));
+                continue;
+            }
+
+            MessagePayload payload = messageRenderService.render(message, channel.getChannelTypeFlag(), variables);
+            NotifySendResult result = notifyChannelAdapterRegistry.find(channel.getChannelTypeFlag())
+                    .map(adapter -> adapter.send(channel, payload))
+                    .orElseGet(() -> NotifySendResult.failed(channel.getCredentialRef(), "Notify channel adapter is missing"));
+            NotifyRecordBO record = persistRecord(match, notify, message, bind, channel, payload, variables, result);
+            records.add(record);
+            if (NotifyRecordStatusFlagEnum.SUCCESS.equals(result.getStatusFlag())) {
+                state.setLastNotifyTime(LocalDateTime.now());
+                persistState(state);
+            }
+        }
+        return records;
+    }
+
+    private NotifyBO loadNotify(Long notifyId) {
+        if (Objects.isNull(notifyId) || DEFAULT_ID == notifyId) {
+            return null;
+        }
+        NotifyDO entityDO = notifyManager.getById(notifyId);
+        return Objects.nonNull(entityDO) ? notifyBuilder.buildBOByDO(entityDO) : null;
+    }
+
+    private MessageBO loadMessage(Long messageId) {
+        if (Objects.isNull(messageId) || DEFAULT_ID == messageId) {
+            return null;
+        }
+        MessageDO entityDO = messageManager.getById(messageId);
+        return Objects.nonNull(entityDO) ? messageBuilder.buildBOByDO(entityDO) : null;
+    }
+
+    private List<NotifyChannelBindBO> loadEnabledBinds(NotifyBO notify) {
+        List<NotifyChannelBindDO> list = notifyChannelBindManager.lambdaQuery()
+                .eq(NotifyChannelBindDO::getNotifyId, notify.getId())
+                .eq(NotifyChannelBindDO::getTenantId, notify.getTenantId())
+                .eq(NotifyChannelBindDO::getEnableFlag, EnableFlagEnum.ENABLE.getIndex())
+                .list();
+        return notifyChannelBindBuilder.buildBOListByDOList(list);
+    }
+
+    private NotifyChannelBO loadChannel(Long channelId, Long tenantId) {
+        NotifyChannelDO entityDO = notifyChannelManager.getById(channelId);
+        if (Objects.isNull(entityDO) || !Objects.equals(entityDO.getTenantId(), tenantId)
+                || Objects.isNull(entityDO.getChannelTypeFlag())) {
+            return null;
+        }
+        return notifyChannelBuilder.buildBOByDO(entityDO);
+    }
+
+    private RuleStateBO persistRuleState(RuleMatch match, NotifyBO notify, Map<String, Object> variables) {
+        RuleBO rule = match.getRule();
+        RuleFact fact = match.getFact();
+        String fingerprint = fingerprint(match, notify, variables);
+        RuleStateBO state = loadState(rule, fact, fingerprint);
+        LocalDateTime now = LocalDateTime.now();
+        if (Objects.isNull(state)) {
+            state = new RuleStateBO();
+            state.setRuleId(rule.getId());
+            state.setAlarmTargetTypeFlag(rule.getAlarmTargetTypeFlag());
+            state.setEntityId(fact.getEntityId());
+            state.setFingerprint(fingerprint);
+            state.setFirstTriggerTime(now);
+            state.setTriggerCount(0L);
+            state.setTenantId(fact.getTenantId());
+        }
+        state.setEventId(Objects.requireNonNullElse(fact.getEventId(), DEFAULT_ID));
+        state.setStateExt(ruleStateExt(match));
+
+        if (StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY)) {
+            state.setStateFlag(RuleStateFlagEnum.RECOVERED);
+            state.setLastRecoverTime(now);
+        } else {
+            state.setStateFlag(RuleStateFlagEnum.FIRING);
+            state.setLastTriggerTime(now);
+            state.setTriggerCount(Objects.requireNonNullElse(state.getTriggerCount(), 0L) + 1);
+            if (Objects.isNull(state.getFirstTriggerTime())) {
+                state.setFirstTriggerTime(now);
+            }
+        }
+        return persistState(state);
+    }
+
+    private RuleStateBO loadState(RuleBO rule, RuleFact fact, String fingerprint) {
+        LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda()
+                .eq(RuleStateDO::getTenantId, fact.getTenantId())
+                .eq(RuleStateDO::getRuleId, rule.getId())
+                .eq(RuleStateDO::getAlarmTargetTypeFlag, rule.getAlarmTargetTypeFlag().getIndex())
+                .eq(RuleStateDO::getEntityId, fact.getEntityId())
+                .eq(RuleStateDO::getFingerprint, fingerprint)
+                .last("limit 1");
+        RuleStateDO entityDO = ruleStateManager.getOne(wrapper);
+        return Objects.nonNull(entityDO) ? ruleStateBuilder.buildBOByDO(entityDO) : null;
+    }
+
+    private RuleStateBO persistState(RuleStateBO state) {
+        RuleStateDO entityDO = ruleStateBuilder.buildDOByBO(state);
+        if (Objects.isNull(state.getId())) {
+            ruleStateManager.save(entityDO);
+        } else {
+            entityDO.setOperateTime(null);
+            ruleStateManager.updateById(entityDO);
+        }
+        return ruleStateBuilder.buildBOByDO(entityDO);
+    }
+
+    private RuleStateExt ruleStateExt(RuleMatch match) {
+        RuleStateExt ext = new RuleStateExt();
+        ext.setType(AlarmConstant.EXT_RULE_STATE);
+        ext.setVersion(1);
+        ext.setContent(new RuleStateExt.Content(
+                match.getRule().getRuleCode(),
+                match.getSeverity(),
+                match.getEventType(),
+                match.getLabels(),
+                Objects.requireNonNullElse(match.getFact().getValues(), Map.of()),
+                Map.of("matchType", match.getMatchType())));
+        return ext;
+    }
+
+    private String fingerprint(RuleMatch match, NotifyBO notify, Map<String, Object> variables) {
+        NotifyExt.Dedup dedup = null;
+        if (Objects.nonNull(notify) && Objects.nonNull(notify.getNotifyExt())
+                && Objects.nonNull(notify.getNotifyExt().getContent())) {
+            dedup = notify.getNotifyExt().getContent().getDedup();
+        }
+        if (Objects.nonNull(dedup) && Boolean.TRUE.equals(dedup.getEnabled()) && StringUtils.isNotBlank(dedup.getKey())) {
+            return alarmTemplateRenderer.renderText(dedup.getKey(), variables);
+        }
+        RuleBO rule = match.getRule();
+        RuleFact fact = match.getFact();
+        return fact.getTenantId() + ":" + rule.getId() + ":" + rule.getAlarmTargetTypeFlag().getCode() + ":"
+                + fact.getEntityId();
+    }
+
+    private NotifyRecordBO recordSkipped(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
+                                         NotifyChannelBO channel, Map<String, Object> variables, String reason) {
+        MessagePayload payload = new MessagePayload(
+                Objects.nonNull(channel) ? channel.getChannelTypeFlag() : null,
+                null,
+                Map.of(),
+                List.of());
+        NotifySendResult result = NotifySendResult.skipped(
+                Objects.nonNull(channel) ? channel.getCredentialRef() : "notify-channel:" + bind.getChannelId(),
+                reason);
+        return persistRecord(match, notify, message, bind, channel, payload, variables, result);
+    }
+
+    private NotifyRecordBO persistRecord(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
+                                         NotifyChannelBO channel, MessagePayload payload, Map<String, Object> variables,
+                                         NotifySendResult result) {
+        NotifyRecordBO record = new NotifyRecordBO();
+        record.setRuleId(match.getRule().getId());
+        record.setNotifyId(Objects.nonNull(notify) ? notify.getId() : DEFAULT_ID);
+        record.setMessageId(Objects.nonNull(message) ? message.getId()
+                : Objects.requireNonNullElse(match.getRule().getMessageId(), DEFAULT_ID));
+        record.setChannelId(Objects.nonNull(channel) ? channel.getId() : bind.getChannelId());
+        record.setEventId(Objects.requireNonNullElse(match.getFact().getEventId(), DEFAULT_ID));
+        record.setChannelTypeFlag(Objects.nonNull(channel) ? channel.getChannelTypeFlag() : payload.getChannelTypeFlag());
+        record.setTarget(Objects.toString(result.getTarget(), ""));
+        record.setStatusFlag(result.getStatusFlag());
+        record.setRequestExt(requestExt(payload, variables));
+        record.setResponseExt(responseExt(result));
+        record.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
+        record.setRetryCount(0);
+        record.setTenantId(match.getFact().getTenantId());
+        NotifyRecordDO entityDO = notifyRecordBuilder.buildDOByBO(record);
+        notifyRecordManager.save(entityDO);
+        return notifyRecordBuilder.buildBOByDO(entityDO);
+    }
+
+    private NotifyRecordRequestExt requestExt(MessagePayload payload, Map<String, Object> variables) {
+        NotifyRecordRequestExt ext = new NotifyRecordRequestExt();
+        ext.setType(AlarmConstant.EXT_NOTIFY_RECORD_REQUEST);
+        ext.setVersion(1);
+        Map<String, Object> renderedPayload = Objects.requireNonNullElse(payload.getPayload(), Map.of());
+        ext.setContent(new NotifyRecordRequestExt.Content(
+                Objects.toString(renderedPayload.get("title"), ""),
+                Objects.toString(renderedPayload.getOrDefault("summary", renderedPayload.getOrDefault("text", ""))),
+                payload.getPayloadType(),
+                variables,
+                renderedPayload));
+        return ext;
+    }
+
+    private NotifyRecordResponseExt responseExt(NotifySendResult result) {
+        NotifyRecordResponseExt ext = new NotifyRecordResponseExt();
+        ext.setType(AlarmConstant.EXT_NOTIFY_RECORD_RESPONSE);
+        ext.setVersion(1);
+        ext.setContent(new NotifyRecordResponseExt.Content(
+                result.getProviderMessageId(),
+                result.getStatusCode(),
+                result.getStatusMessage(),
+                Objects.requireNonNullElse(result.getResponsePayload(), Map.of())));
+        return ext;
+    }
+
+    private Map<String, Object> variables(RuleMatch match) {
+        RuleBO rule = match.getRule();
+        RuleFact fact = match.getFact();
+        Map<String, Object> variables = new LinkedHashMap<>();
+        variables.put("tenantId", fact.getTenantId());
+        variables.put("ruleId", rule.getId());
+        variables.put("ruleCode", rule.getRuleCode());
+        variables.put("ruleName", rule.getRuleName());
+        variables.put("entityId", fact.getEntityId());
+        variables.put("alarmTargetType", rule.getAlarmTargetTypeFlag().getCode());
+        variables.put("eventId", fact.getEventId());
+        variables.put("factTime", fact.getFactTime());
+        variables.put("triggerTime", fact.getFactTime());
+        variables.put("matchType", match.getMatchType());
+        variables.put("severity", match.getSeverity());
+        variables.put("eventType", match.getEventType());
+        variables.put("labels", match.getLabels());
+        Map<String, Object> factValues = Objects.requireNonNullElse(fact.getValues(), Map.of());
+        variables.put("values", factValues);
+        variables.putAll(factValues);
+        enrichRuleConditionVariables(rule, variables);
+        return variables;
+    }
+
+    private void enrichRuleConditionVariables(RuleBO rule, Map<String, Object> variables) {
+        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())
+                || Objects.isNull(rule.getRuleExt().getContent().getCondition())) {
+            return;
+        }
+        RuleExt.Condition condition = rule.getRuleExt().getContent().getCondition();
+        variables.putIfAbsent("value", variables.get(condition.getField()));
+        variables.putIfAbsent("point", variables.getOrDefault("pointName", rule.getEntityId()));
+        variables.putIfAbsent("device", variables.getOrDefault("deviceName", rule.getEntityId()));
+        variables.putIfAbsent("threshold", condition.getThreshold());
+        variables.putIfAbsent("low", condition.getLow());
+        variables.putIfAbsent("high", condition.getHigh());
+        variables.putIfAbsent("unit", condition.getUnit());
+    }
+
+}
