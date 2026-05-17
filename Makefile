@@ -77,11 +77,11 @@ help:
 	&& echo ' - make app: run the packaged application stack (docker-compose.yml)' \
 	&& echo ' - make app-all: run db + optional + packaged application stacks' \
 	&& echo ' - make dev-db: run the base dependency stack (Postgres + RabbitMQ)' \
-	&& echo ' - make dev-optional: run optional local dependencies (EMQX)' \
+	&& echo ' - make dev-optional: run optional local dependencies (EMQX, Elasticsearch+Logstash+Kibana+APM, Prometheus+exporters+Grafana)' \
 	&& echo ' - make dev: run the local development application stack (docker-compose-dev.yml)' \
 	&& echo ' - make dev-all: run db + optional + local development application stacks' \
 	&& echo ' - make build: build images with the selected compose file (default: docker-compose-dev.yml)' \
-	&& echo ' - make compose-up STACK=<app|dev|db|optional|grafana|elasticsearch> [REGISTRY=domestic]' \
+	&& echo ' - make compose-up STACK=<app|dev|db|optional> [REGISTRY=domestic]' \
 	&& echo ' - make compose-down STACK=<...>: stop the selected compose stack' \
 	&& echo ' - make compose-ps STACK=<...>: list containers in the selected compose stack' \
 	&& echo ' - make compose-config STACK=<...>: print the rendered compose configuration' \
@@ -100,8 +100,10 @@ help:
 	&& echo '   make dev REGISTRY=domestic' \
 	&& echo '   make dev-all REGISTRY=domestic' \
 	&& echo '   make app-all REGISTRY=aliyun' \
-	&& echo '   make compose-up STACK=grafana REGISTRY=cn' \
-	&& echo '   make compose-logs STACK=dev REGISTRY=global'
+	&& echo '   make compose-up STACK=optional REGISTRY=cn' \
+	&& echo '   make compose-logs STACK=dev REGISTRY=global' \
+	&& echo '   # start a subset of optional services:' \
+	&& echo '   COMPOSE_FILE=docker-compose-optional.yml podman compose up -d grafana prometheus'
 
 clean:
 	$(MVN) clean
