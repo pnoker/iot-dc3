@@ -81,16 +81,14 @@ The compose files under `dc3/` are the canonical container definitions:
 - `docker-compose.yml`
 - `docker-compose-dev.yml`
 - `docker-compose-db.yml`
-- `docker-compose-optional.yml`
-- `docker-compose-grafana.yml`
-- `docker-compose-elasticsearch.yml`
+- `docker-compose-optional.yml` (EMQX + Elasticsearch/Logstash/Kibana/APM + Prometheus/exporters/Grafana)
 
 Registry selection is controlled by environment variables and Make arguments, not by duplicated `*-aliyun.yml` files:
 
 ```bash
 make dev REGISTRY=aliyun
 make app-all REGISTRY=global
-make compose-config STACK=grafana REGISTRY=cn
+make compose-config STACK=optional REGISTRY=cn
 ```
 
 For container changes, run `docker compose config --quiet` or the corresponding `make compose-config` path for every
