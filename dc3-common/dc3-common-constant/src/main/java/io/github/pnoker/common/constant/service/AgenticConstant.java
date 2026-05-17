@@ -147,6 +147,10 @@ public class AgenticConstant {
 
         public static final String OBJECT = "agentic.visualization";
 
+        private Visualization() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
         public static class Type {
 
             public static final String LINE = "line";
@@ -183,10 +187,6 @@ public class AgenticConstant {
                 throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
             }
 
-        }
-
-        private Visualization() {
-            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
     }
