@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
+import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,10 +37,18 @@ public class AgenticRunTrace {
 
     private final Queue<AgenticRunEvent> pendingEvents = new ConcurrentLinkedQueue<>();
 
+    private final Queue<AgenticVisualizationSpec> pendingVisualizations = new ConcurrentLinkedQueue<>();
+
     private final List<AgenticRunEvent> recordedEvents = Collections.synchronizedList(new ArrayList<>());
+
+    private final List<AgenticVisualizationSpec> recordedVisualizations = Collections.synchronizedList(new ArrayList<>());
 
     public Queue<AgenticRunEvent> pendingEvents() {
         return pendingEvents;
+    }
+
+    public Queue<AgenticVisualizationSpec> pendingVisualizations() {
+        return pendingVisualizations;
     }
 
     public void recordPendingEvent(AgenticRunEvent event) {
@@ -59,15 +68,43 @@ public class AgenticRunTrace {
         return drained;
     }
 
+    public void recordPendingVisualization(AgenticVisualizationSpec visualization) {
+        if (Objects.nonNull(visualization)) {
+            pendingVisualizations.offer(visualization);
+        }
+    }
+
+    public List<AgenticVisualizationSpec> drainPendingVisualizations() {
+        List<AgenticVisualizationSpec> drained = new ArrayList<>();
+        AgenticVisualizationSpec visualization = pendingVisualizations.poll();
+        while (Objects.nonNull(visualization)) {
+            drained.add(visualization);
+            recordedVisualizations.add(visualization);
+            visualization = pendingVisualizations.poll();
+        }
+        return drained;
+    }
+
     public List<AgenticRunEvent> recordedEvents() {
         synchronized (recordedEvents) {
             return List.copyOf(recordedEvents);
         }
     }
 
+    public List<AgenticVisualizationSpec> recordedVisualizations() {
+        synchronized (recordedVisualizations) {
+            return List.copyOf(recordedVisualizations);
+        }
+    }
+
     public List<AgenticRunEvent> drainAndRecordedEvents() {
         drainPendingEvents();
         return recordedEvents();
+    }
+
+    public List<AgenticVisualizationSpec> drainAndRecordedVisualizations() {
+        drainPendingVisualizations();
+        return recordedVisualizations();
     }
 
 }

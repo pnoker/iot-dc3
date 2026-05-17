@@ -16,8 +16,11 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
+import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.entity.response.AgenticRunEventResponse;
+import io.github.pnoker.common.agentic.entity.response.AgenticVisualizationResponse;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
@@ -65,7 +68,8 @@ public class AgenticChatResponseCodec {
                 .model(prepared.model())
                 .choices(List.of(ChatCompletionResponse.Choice.builder()
                         .index(0)
-                        .message(new ChatCompletionResponse.Message(AgenticConstant.Chat.ROLE_ASSISTANT, content))
+                        .message(new ChatCompletionResponse.Message(AgenticConstant.Chat.ROLE_ASSISTANT, content,
+                                buildResponseContentExt(prepared)))
                         .finishReason(normalizeFinishReason(finishReason))
                         .build()))
                 .usage(new ChatCompletionResponse.Usage(promptTokens, completionTokens,
@@ -110,6 +114,11 @@ public class AgenticChatResponseCodec {
                     .data(formatEvent(event))
                     .build());
         }
+        for (AgenticVisualizationSpec visualization : prepared.runTrace().drainPendingVisualizations()) {
+            events.add(ServerSentEvent.<String>builder()
+                    .data(formatVisualization(visualization))
+                    .build());
+        }
         if (Objects.nonNull(streamDelta) && streamDelta.hasContent()) {
             events.add(ServerSentEvent.<String>builder()
                     .data(formatChunk(chatId, created, prepared.model(), streamDelta))
@@ -120,6 +129,20 @@ public class AgenticChatResponseCodec {
 
     public String formatEvent(AgenticRunEvent runEvent) {
         return toJson(AgenticRunEventResponse.of(runEvent));
+    }
+
+    public String formatVisualization(AgenticVisualizationSpec visualization) {
+        return toJson(AgenticVisualizationResponse.of(visualization, Instant.now().getEpochSecond()));
+    }
+
+    private AgenticMessageContent buildResponseContentExt(AgenticPreparedChatRequest prepared) {
+        List<AgenticVisualizationSpec> visualizations = prepared.runTrace().drainAndRecordedVisualizations();
+        if (visualizations.isEmpty()) {
+            return null;
+        }
+        AgenticMessageContent content = new AgenticMessageContent();
+        content.setCharts(visualizations);
+        return content;
     }
 
     private String formatChunk(String id, long created, String model, AgenticStreamDelta streamDelta) {

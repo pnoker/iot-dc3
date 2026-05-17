@@ -17,12 +17,14 @@
 package io.github.pnoker.common.agentic.utils;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
+import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.springframework.ai.chat.model.ToolContext;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 
@@ -95,6 +97,18 @@ public class AgenticToolContextUtil {
 
     public static void recordToolError(ToolContext toolContext, String toolName, String message) {
         recordRunEvent(toolContext, AgenticRunEvent.toolError(toolName, message));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void recordVisualizations(ToolContext toolContext, List<AgenticVisualizationSpec> visualizations) {
+        if (Objects.isNull(visualizations) || visualizations.isEmpty()) {
+            return;
+        }
+        Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.VISUALIZATIONS);
+        if (value instanceof Queue<?>) {
+            Queue<AgenticVisualizationSpec> queue = (Queue<AgenticVisualizationSpec>) value;
+            visualizations.stream().filter(Objects::nonNull).forEach(queue::offer);
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service.runtime;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
+import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
@@ -57,6 +58,27 @@ class AgenticToolTracingCallbackTest {
         assertThat(resultEvent.status()).isEqualTo("failed");
         assertThat(resultEvent.code()).isEqualTo("INVALID_ARGUMENT");
         assertThat(resultEvent.title()).isEqualTo("Device ID is required");
+    }
+
+    @Test
+    void recordsVisualizationsFromStructuredToolResult() {
+        Queue<AgenticRunEvent> events = new ConcurrentLinkedQueue<>();
+        Queue<AgenticVisualizationSpec> visualizations = new ConcurrentLinkedQueue<>();
+        ToolContext context = new ToolContext(Map.of(
+                AgenticConstant.ToolContextKey.RUN_EVENTS, events,
+                AgenticConstant.ToolContextKey.VISUALIZATIONS, visualizations));
+        ToolCallback callback = new AgenticToolTracingCallback(new StubToolCallback("""
+                {"success":true,"code":"OK","message":"History loaded","visualizations":[{"id":"chart-1","type":"line","title":"Trend","dataset":[{"index":0,"value":23.5}],"encode":{"x":"index","y":"value"}}]}
+                """), new ObjectMapper());
+
+        callback.call("{}", context);
+
+        assertThat(visualizations).hasSize(1);
+        AgenticVisualizationSpec visualization = visualizations.poll();
+        assertThat(visualization.getId()).isEqualTo("chart-1");
+        assertThat(visualization.getType()).isEqualTo("line");
+        assertThat(visualization.getEncode().getX()).isEqualTo("index");
+        assertThat(visualization.getDataset()).hasSize(1);
     }
 
     @Test
