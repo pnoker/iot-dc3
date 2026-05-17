@@ -16,7 +16,8 @@
 #
 
 # Optional stack: brokers, log/APM pipeline, monitoring.
-# Use `docker compose up <service>` to start a subset, or omit to start all.
+# Use `make up STACK=optional SERVICES="<service>"` to start a subset, or omit
+# SERVICES to start all.
 
 x-logging: &default-logging
   driver: json-file
