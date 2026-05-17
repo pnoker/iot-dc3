@@ -22,6 +22,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 /**
  * Rule Ext
  * <p>
@@ -29,7 +32,7 @@ import lombok.Setter;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
@@ -50,7 +53,129 @@ public class RuleExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        private String keep;
+        /**
+         * Deterministic rule condition.
+         */
+        private Condition condition;
+
+        /**
+         * Evaluation window, expressed with ISO-8601 durations where time is needed.
+         */
+        private Window window;
+
+        /**
+         * Optional recovery condition.
+         */
+        private Recovery recovery;
+
+        /**
+         * Alarm level, for example P0/P1/P2/P3.
+         */
+        private String severity;
+
+        /**
+         * Event type produced when the rule is matched.
+         */
+        private String eventType;
+
+        /**
+         * Business labels for filtering and dashboards.
+         */
+        private List<String> labels;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Condition {
+
+        /**
+         * Source field to evaluate, for example numValue, status, or age.
+         */
+        private String field;
+
+        /**
+         * Operator code, for example >, >=, <, <=, ==, !=, between, outside, silence.
+         */
+        private String operator;
+
+        /**
+         * Expected string value for status-like rules.
+         */
+        private String expected;
+
+        /**
+         * Numeric threshold for threshold rules.
+         */
+        private BigDecimal threshold;
+
+        /**
+         * Lower bound for range rules.
+         */
+        private BigDecimal low;
+
+        /**
+         * Upper bound for range rules.
+         */
+        private BigDecimal high;
+
+        /**
+         * Display unit for value comparisons.
+         */
+        private String unit;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Window {
+
+        /**
+         * Evaluation mode, for example LAST, ALL, ANY, AVG, MIN, MAX, SUM, COUNT.
+         */
+        private String mode;
+
+        /**
+         * ISO-8601 duration such as PT3M.
+         */
+        private String duration;
+
+        /**
+         * Minimum samples required in the window.
+         */
+        private Integer minSamples;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Recovery {
+
+        /**
+         * Whether recovery evaluation is enabled.
+         */
+        private Boolean enabled;
+
+        /**
+         * Recovery operator.
+         */
+        private String operator;
+
+        /**
+         * Recovery threshold.
+         */
+        private BigDecimal threshold;
+
+        /**
+         * ISO-8601 duration that must remain recovered.
+         */
+        private String duration;
 
     }
 

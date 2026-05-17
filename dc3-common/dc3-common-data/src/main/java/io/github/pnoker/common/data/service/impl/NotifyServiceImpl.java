@@ -19,12 +19,13 @@ package io.github.pnoker.common.data.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
 import io.github.pnoker.common.data.dal.NotifyManager;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.builder.NotifyBuilder;
+import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.entity.query.NotifyQuery;
 import io.github.pnoker.common.data.service.NotifyService;
@@ -50,7 +51,7 @@ import java.util.Objects;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Slf4j
 @Service
@@ -61,6 +62,9 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Resource
     private NotifyManager notifyManager;
+
+    @Resource
+    private NotifyChannelBindManager notifyChannelBindManager;
 
     @Override
     public void save(NotifyBO entityBO) {
@@ -76,12 +80,9 @@ public class NotifyServiceImpl implements NotifyService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // Alarm notificationAlarm notification
-        LambdaQueryChainWrapper<NotifyDO> wrapper = notifyManager.lambdaQuery().eq(NotifyDO::getTenantId, id);
-        long count = wrapper.count();
+        long count = notifyChannelBindManager.lambdaQuery().eq(NotifyChannelBindDO::getNotifyId, id).count();
         if (count > 0) {
-            throw new AssociatedException(
-                    "Failed to remove alarm notify profile: some sub alarm notify profiles exists in the alarm notify profile");
+            throw new AssociatedException("Failed to remove alarm notify profile: notify channel bindings exist");
         }
 
         if (!notifyManager.removeById(id)) {
@@ -123,8 +124,17 @@ public class NotifyServiceImpl implements NotifyService {
      */
     private LambdaQueryWrapper<NotifyDO> fuzzyQuery(NotifyQuery entityQuery) {
         LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmNotifyName()), NotifyDO::getNotifyName,
-                entityQuery.getAlarmNotifyName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getNotifyName()), NotifyDO::getNotifyName,
+                entityQuery.getNotifyName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getNotifyCode()), NotifyDO::getNotifyCode,
+                entityQuery.getNotifyCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getAutoConfirmFlag()), NotifyDO::getAutoConfirmFlag,
+                Objects.nonNull(entityQuery.getAutoConfirmFlag()) ? entityQuery.getAutoConfirmFlag().getIndex()
+                        : null);
+        wrapper.eq(Objects.nonNull(entityQuery.getNotifyInterval()), NotifyDO::getNotifyInterval,
+                entityQuery.getNotifyInterval());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), NotifyDO::getEnableFlag,
+                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

@@ -55,7 +55,7 @@ class IndexedEnumContractTest {
             AgenticMessageStatusEnum.class,
             AgenticModelProviderTypeEnum.class,
             AlarmMessageLevelFlagEnum.class,
-            AlarmTypeFlagEnum.class,
+            AlarmTargetTypeFlagEnum.class,
             ApiTypeFlagEnum.class,
             AttributeTypeFlagEnum.class,
             AutoConfirmFlagEnum.class,
@@ -74,12 +74,15 @@ class IndexedEnumContractTest {
             MenuTypeFlagEnum.class,
             MetadataOperateTypeEnum.class,
             MetadataTypeEnum.class,
+            NotifyChannelTypeFlagEnum.class,
+            NotifyRecordStatusFlagEnum.class,
             PointTypeFlagEnum.class,
             ProfileShareFlagEnum.class,
             ProfileTypeFlagEnum.class,
             ResourceScopeFlagEnum.class,
             ResourceTypeFlagEnum.class,
             ResponseEnum.class,
+            RuleStateFlagEnum.class,
             RwFlagEnum.class);
 
     private static Method method(Class<?> type, String name, Class<?>... parameterTypes) {

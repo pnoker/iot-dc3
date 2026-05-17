@@ -22,6 +22,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Notify Ext
  * <p>
@@ -29,7 +31,7 @@ import lombok.Setter;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
@@ -50,7 +52,127 @@ public class NotifyExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        private String keep;
+        /**
+         * Duplicate suppression configuration.
+         */
+        private Dedup dedup;
+
+        /**
+         * Notification rate limit configuration.
+         */
+        private RateLimit rateLimit;
+
+        /**
+         * Notification silence windows.
+         */
+        private Silence silence;
+
+        /**
+         * Repeated reminder configuration while an alarm is still firing.
+         */
+        private Repeat repeat;
+
+        /**
+         * Recovery notification configuration.
+         */
+        private Recovery recovery;
+
+        /**
+         * Escalation policies for unresolved alarms.
+         */
+        private List<Escalation> escalation;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Dedup {
+
+        private Boolean enabled;
+
+        private String key;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RateLimit {
+
+        private Long intervalMs;
+
+        private Integer maxCount;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Silence {
+
+        private Boolean enabled;
+
+        private List<Window> windows;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Window {
+
+        private String timezone;
+
+        private String start;
+
+        private String end;
+
+        private List<String> daysOfWeek;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Repeat {
+
+        private Boolean enabled;
+
+        private Long intervalMs;
+
+        private Integer maxTimes;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Recovery {
+
+        private Boolean enabled;
+
+        private Boolean sendRecoveryMessage;
+
+        private Boolean autoConfirmOnRecovery;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Escalation {
+
+        private Long afterMs;
+
+        private String messageCode;
 
     }
 

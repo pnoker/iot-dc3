@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +38,7 @@ import java.io.Serializable;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
@@ -64,22 +64,22 @@ public class RuleQuery implements Serializable {
     /**
      * Rule name
      */
-    private String alarmRuleName;
+    private String ruleName;
 
     /**
      * Rule code
      */
-    private String alarmRuleCode;
+    private String ruleCode;
 
     /**
-     * Point ID
+     * Entity ID
      */
-    private Long pointId;
+    private Long entityId;
 
     /**
-     * Entity type flag
+     * Alarm target type flag
      */
-    private AlarmTypeFlagEnum alarmTypeFlag;
+    private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
 
     /**
      * Enable flag

@@ -50,7 +50,7 @@ import java.util.Objects;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Slf4j
 @Service
@@ -122,8 +122,17 @@ public class RuleServiceImpl implements RuleService {
      */
     private LambdaQueryWrapper<RuleDO> fuzzyQuery(RuleQuery entityQuery) {
         LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmRuleName()), RuleDO::getRuleName,
-                entityQuery.getAlarmRuleName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getRuleName()), RuleDO::getRuleName,
+                entityQuery.getRuleName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getRuleCode()), RuleDO::getRuleCode,
+                entityQuery.getRuleCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getEntityId()), RuleDO::getEntityId, entityQuery.getEntityId());
+        wrapper.eq(Objects.nonNull(entityQuery.getAlarmTargetTypeFlag()), RuleDO::getAlarmTargetTypeFlag,
+                Objects.nonNull(entityQuery.getAlarmTargetTypeFlag())
+                        ? entityQuery.getAlarmTargetTypeFlag().getIndex()
+                        : null);
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), RuleDO::getEnableFlag,
+                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
