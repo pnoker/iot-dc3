@@ -24,7 +24,7 @@ x-logging: &default-logging
 services:
   web:
     # Frontend follows the same DC3_IMAGE_REGISTRY switch as backend services
-    # (so `make app REGISTRY=domestic` retags everything together), but keeps
+    # (so `make app REGISTRY=cn` retags everything together), but keeps
     # an independent DC3_WEB_VERSION because the UI ships on its own cadence.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-web:${DC3_WEB_VERSION:-latest}
     restart: always
