@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
+import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,6 +91,24 @@ class AgenticMessageRecorderTest {
     }
 
     @Test
+    void persistAssistantMessageSavesVisualizationOnlyMessage() {
+        AgenticRunTrace runTrace = new AgenticRunTrace();
+        runTrace.recordPendingVisualization(visualization());
+        AgenticPreparedChatRequest prepared = prepared(runTrace, false, List.of());
+
+        recorder.persistAssistantMessage(prepared, "", userHeader);
+
+        ArgumentCaptor<AgenticMessageContent> captor = ArgumentCaptor.forClass(AgenticMessageContent.class);
+        verify(messageService).save(eq("tenant:user:conversation"), eq("assistant"), captor.capture(),
+                eq("dc3-test-model"), eq(userHeader));
+        AgenticMessageContent content = captor.getValue();
+        assertThat(content.getText()).isEmpty();
+        assertThat(content.getCharts()).hasSize(1);
+        assertThat(content.getCharts().get(0).getType()).isEqualTo("line");
+    }
+
+
+    @Test
     void persistAssistantMessageSkipsCompletelyEmptyMessage() {
         AgenticPreparedChatRequest prepared = prepared(new AgenticRunTrace(), false, List.of());
 
@@ -103,6 +122,16 @@ class AgenticMessageRecorderTest {
         return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, runTrace, true, reasoning, List.of(), contexts,
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
+    }
+
+    private AgenticVisualizationSpec visualization() {
+        AgenticVisualizationSpec visualization = new AgenticVisualizationSpec();
+        visualization.setId("chart-1");
+        visualization.setType("line");
+        visualization.setTitle("Trend");
+        visualization.setDataset(List.of(Map.of("index", 0, "value", 23.5)));
+        visualization.setEncode(AgenticVisualizationSpec.Encode.xy("index", "value"));
+        return visualization;
     }
 
 }

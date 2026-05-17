@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
+import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.codec.ServerSentEvent;
@@ -97,6 +98,36 @@ class AgenticChatResponseCodecTest {
         assertThat(events.get(0).data()).doesNotContain("\"content\":");
     }
 
+    @Test
+    void streamEventsFlushesVisualizationsBeforeContentChunk() {
+        AgenticRunTrace runTrace = new AgenticRunTrace();
+        runTrace.recordPendingVisualization(visualization());
+        AgenticPreparedChatRequest prepared = prepared(runTrace);
+
+        List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
+                new AgenticStreamDelta("Analysis ready", null));
+
+        assertThat(events).hasSize(2);
+        assertThat(events.get(0).data()).contains("\"object\":\"agentic.visualization\"");
+        assertThat(events.get(0).data()).contains("\"type\":\"line\"");
+        assertThat(events.get(1).data()).contains("\"object\":\"chat.completion.chunk\"");
+        assertThat(prepared.runTrace().recordedVisualizations()).hasSize(1);
+    }
+
+    @Test
+    void blockingResponseIncludesStructuredContentExtCharts() {
+        AgenticRunTrace runTrace = new AgenticRunTrace();
+        runTrace.recordPendingVisualization(visualization());
+        AgenticPreparedChatRequest prepared = prepared(runTrace);
+
+        String json = new ObjectMapper().writeValueAsString(codec.blockingResponse(prepared,
+                "Analysis ready", "stop"));
+
+        assertThat(json).contains("\"content_ext\"");
+        assertThat(json).contains("\"charts\"");
+        assertThat(json).contains("\"type\":\"line\"");
+    }
+
     private AgenticPreparedChatRequest prepared(AgenticRunTrace runTrace) {
         return prepared(runTrace, false);
     }
@@ -105,6 +136,15 @@ class AgenticChatResponseCodecTest {
         return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, runTrace, true, reasoning, List.of(), List.of(),
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
+    }
+
+    private AgenticVisualizationSpec visualization() {
+        AgenticVisualizationSpec visualization = new AgenticVisualizationSpec();
+        visualization.setId("chart-1");
+        visualization.setType("line");
+        visualization.setDataset(List.of(Map.of("index", 0, "value", 23.5)));
+        visualization.setEncode(AgenticVisualizationSpec.Encode.xy("index", "value"));
+        return visualization;
     }
 
 }

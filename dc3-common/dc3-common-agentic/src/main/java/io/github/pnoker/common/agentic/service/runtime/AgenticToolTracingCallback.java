@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
+import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -99,6 +102,7 @@ public class AgenticToolTracingCallback implements ToolCallback {
         ToolResultSummary summary = parseResult(result);
         AgenticToolContextUtil.recordToolResult(toolContext, toolName, summary.success(), summary.code(),
                 summary.message());
+        AgenticToolContextUtil.recordVisualizations(toolContext, parseVisualizations(result));
     }
 
     private ToolResultSummary parseResult(String result) {
@@ -123,6 +127,31 @@ public class AgenticToolTracingCallback implements ToolCallback {
                     result.length(), e);
             return new ToolResultSummary(true, AgenticConstant.ToolResult.CODE_OK,
                     AgenticConstant.ToolResult.MESSAGE_COMPLETED);
+        }
+    }
+
+    private List<AgenticVisualizationSpec> parseVisualizations(String result) {
+        if (StringUtils.isBlank(result)) {
+            return List.of();
+        }
+        try {
+            JsonNode root = objectMapper.readTree(result);
+            JsonNode visualizations = root.path(AgenticConstant.ToolResult.FIELD_VISUALIZATIONS);
+            if (!visualizations.isArray() || visualizations.isEmpty()) {
+                return List.of();
+            }
+            List<AgenticVisualizationSpec> specs = new ArrayList<>();
+            for (JsonNode node : visualizations) {
+                AgenticVisualizationSpec spec = objectMapper.treeToValue(node, AgenticVisualizationSpec.class);
+                if (Objects.nonNull(spec)) {
+                    specs.add(spec);
+                }
+            }
+            return List.copyOf(specs);
+        } catch (JacksonException e) {
+            log.debug("Agentic tool visualization parse skipped, tool={}, resultLen={}", toolName(),
+                    result.length(), e);
+            return List.of();
         }
     }
 

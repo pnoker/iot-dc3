@@ -18,9 +18,11 @@ package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.service.ActionService;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
+import io.github.pnoker.common.agentic.utils.AgenticVisualizationUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -99,11 +102,15 @@ public class PointValueTool {
             List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, size);
             if (AgenticToolUtil.isEmpty(history)) {
                 return AgenticToolResult.empty("No history data found for device " + deviceId + " point " + pointId,
-                        new PointValueHistory(deviceId, pointId, size, List.of(), null));
+                        new PointValueHistory(deviceId, pointId, size, List.of(), null,
+                                AgenticVisualizationUtil.NumericSummary.empty(0)));
             }
+            AgenticVisualizationUtil.NumericSeries numericSeries =
+                    AgenticVisualizationUtil.numericSeriesFromNewestFirst(history);
             PointValueHistory result = new PointValueHistory(deviceId, pointId, size, history,
-                    buildHistoryChart(deviceId, pointId, history));
-            return AgenticToolResult.ok("Point value history loaded", result);
+                    buildHistoryChart(deviceId, pointId, numericSeries), numericSeries.summary());
+            return AgenticToolResult.ok("Point value history loaded", result,
+                    buildHistoryVisualizations(deviceId, pointId, numericSeries));
         } catch (Exception e) {
             log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
                     "getPointValueHistory", tenantId, deviceId, pointId, size, e);
@@ -164,34 +171,59 @@ public class PointValueTool {
         }
     }
 
-    private HistoryChart buildHistoryChart(Long deviceId, Long pointId, List<String> history) {
-        List<List<Number>> dataPoints = new ArrayList<>();
-        int rendered = 0;
-        for (int i = history.size() - 1; i >= 0; i--) {
-            String raw = history.get(i);
-            if (Objects.isNull(raw)) {
-                continue;
-            }
-            try {
-                double value = Double.parseDouble(raw.trim());
-                dataPoints.add(List.of(rendered, value));
-                rendered++;
-            } catch (NumberFormatException ignored) {
-                // Keep non-numeric values in the raw history; only chart data skips them.
-            }
-        }
-        if (rendered == 0) {
+    private HistoryChart buildHistoryChart(Long deviceId, Long pointId,
+                                           AgenticVisualizationUtil.NumericSeries numericSeries) {
+        if (Objects.isNull(numericSeries) || numericSeries.dataset().isEmpty()) {
             return null;
         }
-        return new HistoryChart("line", "Device " + deviceId + " / Point " + pointId, "index (oldest to newest)",
-                "linear", List.of(new ChartSeries("value", dataPoints)));
+        List<List<Number>> dataPoints = new ArrayList<>();
+        for (Map<String, Object> row : numericSeries.dataset()) {
+            Object index = row.get(AgenticVisualizationUtil.FIELD_INDEX);
+            Object value = row.get(AgenticVisualizationUtil.FIELD_VALUE);
+            if (index instanceof Number indexNumber && value instanceof Number valueNumber) {
+                dataPoints.add(List.of(indexNumber, valueNumber));
+            }
+        }
+        return new HistoryChart(AgenticConstant.Visualization.Type.LINE, "Device " + deviceId + " / Point " + pointId,
+                "index (oldest to newest)", AgenticConstant.Visualization.Scale.LINEAR,
+                List.of(new ChartSeries("value", dataPoints)));
+    }
+
+    private List<AgenticVisualizationSpec> buildHistoryVisualizations(Long deviceId, Long pointId,
+                                                                      AgenticVisualizationUtil.NumericSeries series) {
+        if (Objects.isNull(series) || series.dataset().isEmpty()) {
+            return List.of();
+        }
+        Map<String, Object> meta = AgenticVisualizationUtil.pointHistoryMeta(deviceId, pointId, "calValue");
+        AgenticVisualizationSpec.Encode encode = AgenticVisualizationSpec.Encode.xy(
+                AgenticVisualizationUtil.FIELD_INDEX, AgenticVisualizationUtil.FIELD_VALUE);
+        encode.setColor(AgenticVisualizationUtil.FIELD_SERIES);
+        List<AgenticVisualizationSpec.Annotation> annotations = Objects.nonNull(series.summary().average())
+                ? List.of(AgenticVisualizationUtil.yAnnotation(series.summary().average(), "Average"))
+                : List.of();
+        AgenticVisualizationSpec line = AgenticVisualizationUtil.line(
+                "point-value-history-" + deviceId + "-" + pointId,
+                "Device " + deviceId + " / Point " + pointId,
+                "Point value history",
+                series.dataset(),
+                encode,
+                meta,
+                annotations);
+        AgenticVisualizationSpec stat = AgenticVisualizationUtil.stat(
+                "point-value-history-summary-" + deviceId + "-" + pointId,
+                "Point value summary",
+                "Numeric summary of the returned history window",
+                AgenticVisualizationUtil.statRow(series.summary()),
+                meta);
+        return List.of(line, stat);
     }
 
     public record PointValueHistory(Long deviceId, Long pointId, int requestedCount, List<String> values,
-                                    HistoryChart chart) {
+                                    HistoryChart chart, AgenticVisualizationUtil.NumericSummary summary) {
 
         public PointValueHistory {
             values = List.copyOf(Objects.requireNonNullElse(values, List.of()));
+            summary = Objects.requireNonNullElseGet(summary, () -> AgenticVisualizationUtil.NumericSummary.empty(0));
         }
 
     }

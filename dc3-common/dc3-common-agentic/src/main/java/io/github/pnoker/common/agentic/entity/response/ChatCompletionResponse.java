@@ -17,6 +17,8 @@
 package io.github.pnoker.common.agentic.entity.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -78,6 +80,9 @@ public class ChatCompletionResponse {
         private String role;
 
         private String content;
+
+        @JsonProperty("content_ext")
+        private AgenticMessageContent contentExt;
 
     }
 

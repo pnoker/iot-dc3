@@ -53,6 +53,8 @@ public class AgenticMessageContent implements Serializable {
 
     private List<Trace> traces;
 
+    private List<AgenticVisualizationSpec> charts;
+
     private List<Context> contexts;
 
     private Tokens tokens;
