@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.model.RuleDO;
 import io.github.pnoker.common.data.entity.vo.RuleVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -44,7 +44,7 @@ import java.util.Optional;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface RuleBuilder {
@@ -73,7 +73,7 @@ public interface RuleBuilder {
      * @return EntityDO
      */
     @Mapping(target = "ruleExt", ignore = true)
-    @Mapping(target = "entityTypeFlag", ignore = true)
+    @Mapping(target = "alarmTargetTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     RuleDO buildDOByBO(RuleBO entityBO);
@@ -96,9 +96,9 @@ public interface RuleBuilder {
         }
         entityDO.setRuleExt(ext);
 
-        // AlarmType Flag
-        AlarmTypeFlagEnum alarmTypeFlag = entityBO.getEntityTypeFlag();
-        Optional.ofNullable(alarmTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
+        // AlarmTargetType Flag
+        AlarmTargetTypeFlagEnum alarmTargetTypeFlag = entityBO.getAlarmTargetTypeFlag();
+        Optional.ofNullable(alarmTargetTypeFlag).ifPresent(value -> entityDO.setAlarmTargetTypeFlag(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
@@ -120,7 +120,7 @@ public interface RuleBuilder {
      * @return EntityBO
      */
     @Mapping(target = "ruleExt", ignore = true)
-    @Mapping(target = "entityTypeFlag", ignore = true)
+    @Mapping(target = "alarmTargetTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     RuleBO buildBOByDO(RuleDO entityDO);
 
@@ -137,9 +137,9 @@ public interface RuleBuilder {
             entityBO.setRuleExt(ext);
         }
 
-        // AlarmType Flag
-        Byte alarmTypeFlag = entityDO.getEntityTypeFlag();
-        entityBO.setEntityTypeFlag(AlarmTypeFlagEnum.ofIndex(alarmTypeFlag));
+        // AlarmTargetType Flag
+        Byte alarmTargetTypeFlag = entityDO.getAlarmTargetTypeFlag();
+        entityBO.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.ofIndex(alarmTargetTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

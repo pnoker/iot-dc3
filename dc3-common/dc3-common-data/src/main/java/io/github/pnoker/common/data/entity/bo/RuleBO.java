@@ -18,8 +18,9 @@
 package io.github.pnoker.common.data.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,19 +35,19 @@ import lombok.ToString;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class RuleBO extends BaseBO {
+public class RuleBO extends BaseBO implements TenantOwned {
 
     /**
-     * Entity type flag
+     * Alarm target type flag
      */
-    private AlarmTypeFlagEnum entityTypeFlag;
+    private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
 
     /**
      * Rule name

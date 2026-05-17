@@ -38,7 +38,7 @@ import java.io.Serializable;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
@@ -64,12 +64,12 @@ public class NotifyQuery implements Serializable {
     /**
      * Alarm notification template name
      */
-    private String alarmNotifyName;
+    private String notifyName;
 
     /**
      * Alarm notification template code
      */
-    private String alarmNotifyCode;
+    private String notifyCode;
 
     /**
      * Auto confirm flag
@@ -79,7 +79,7 @@ public class NotifyQuery implements Serializable {
     /**
      * Alarm notification interval, milliseconds
      */
-    private Long alarmNotifyInterval;
+    private Long notifyInterval;
 
     /**
      * Enable flag
