@@ -10,7 +10,7 @@ devices that push data. It demonstrates listening-type driver patterns supportin
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-listening-virtual
-- **Version**: 2026.5.5
+- **Version**: 2026.5.17
 - **Driver Name**: Listening Virtual TCP/UDP Driver
 
 ## Service Ports

@@ -10,7 +10,7 @@ manager service, enabling device registration, metadata synchronization, and poi
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-api-driver
-- **Version**: 2026.5.5
+- **Version**: 2026.5.17
 - **Package**: `io.github.pnoker.api.common.driver`
 
 ## Proto Definitions
@@ -106,10 +106,11 @@ This module depends on common proto definitions:
 ### 1. Add Dependency
 
 ```xml
+
 <dependency>
     <groupId>io.github.pnoker</groupId>
     <artifactId>dc3-api-driver</artifactId>
-    <version>2026.5.5</version>
+    <version>2026.5.17</version>
 </dependency>
 ```
 
@@ -117,7 +118,7 @@ This module depends on common proto definitions:
 
 ```protobuf
 // 1. Driver builds registration request
-GrpcDriverRegisterDTO registerRequest = GrpcDriverRegisterDTO.newBuilder()
+    GrpcDriverRegisterDTO registerRequest = GrpcDriverRegisterDTO.newBuilder()
     .setTenant("default")
     .setClient("modbus-tcp-driver-001")
     .setDriver(driverInfo)
@@ -126,23 +127,23 @@ GrpcDriverRegisterDTO registerRequest = GrpcDriverRegisterDTO.newBuilder()
     .build();
 
 // 2. Call registration service
-GrpcRDriverRegisterDTO response = driverApi.driverRegister(registerRequest);
+    GrpcRDriverRegisterDTO response = driverApi.driverRegister(registerRequest);
 
 // 3. Extract configuration from response
-GrpcDriverDTO driver = response.getDriver();
-List<Long> deviceIds = response.getDeviceIdsList();
-List<GrpcDriverAttributeDTO> driverAttrs = response.getDriverAttributesList();
-List<GrpcPointAttributeDTO> pointAttrs = response.getPointAttributesList();
+    GrpcDriverDTO driver = response.getDriver();
+    List<Long> deviceIds = response.getDeviceIdsList();
+    List<GrpcDriverAttributeDTO> driverAttrs = response.getDriverAttributesList();
+    List<GrpcPointAttributeDTO> pointAttrs = response.getPointAttributesList();
 
 // 4. Load device configurations
-for (Long deviceId : deviceIds) {
-    GrpcDeviceQuery query = GrpcDeviceQuery.newBuilder()
-        .setDriverId(driver.getId())
-        .setDeviceId(deviceId)
-        .build();
+    for (Long deviceId : deviceIds) {
+GrpcDeviceQuery query = GrpcDeviceQuery.newBuilder()
+    .setDriverId(driver.getId())
+    .setDeviceId(deviceId)
+    .build();
     GrpcRDeviceDTO deviceResponse = deviceApi.selectById(query);
-    // Process device configuration
-}
+// Process device configuration
+    }
 ```
 
 ### 3. Query Device Configuration
@@ -166,9 +167,9 @@ initializeDevice(device, driverConfigs, pointConfigs);
 ```java
 // Query point by ID
 GrpcPointQuery pointQuery = GrpcPointQuery.newBuilder()
-    .setDriverId(driverId)
-    .setPointId(pointId)
-    .build();
+                .setDriverId(driverId)
+                .setPointId(pointId)
+                .build();
 
 GrpcRPointDTO pointResponse = pointApi.selectById(pointQuery);
 GrpcPointDTO point = pointResponse.getData();

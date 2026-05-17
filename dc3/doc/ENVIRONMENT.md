@@ -120,24 +120,29 @@ want Compose-only variables to appear in the local Java process environment.
 
 ### Application Ports and Runtime Mode
 
-| Variable                         | Scope       | Meaning                                                                                                                              |
-|----------------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| `DC3_GATEWAY_PORT`               | Compose     | Published host HTTP port for `dc3-gateway`.                                                                                          |
-| `DC3_AUTH_PORT`                  | Compose     | Published host HTTP port for `dc3-center-auth`.                                                                                      |
-| `DC3_AUTH_GRPC_PORT`             | Compose     | Published host gRPC port for `dc3-center-auth`.                                                                                      |
-| `DC3_MANAGER_PORT`               | Compose     | Published host HTTP port for `dc3-center-manager`.                                                                                   |
-| `DC3_MANAGER_GRPC_PORT`          | Compose     | Published host gRPC port for `dc3-center-manager`.                                                                                   |
-| `DC3_DATA_PORT`                  | Compose     | Published host HTTP port for `dc3-center-data`.                                                                                      |
-| `DC3_DATA_GRPC_PORT`             | Compose     | Published host gRPC port for `dc3-center-data`.                                                                                      |
-| `DC3_AGENTIC_PORT`               | Compose     | Published host HTTP port for `dc3-center-agentic`.                                                                                   |
-| `DC3_LISTENING_VIRTUAL_TCP_PORT` | Compose     | Published host TCP port for the listening virtual driver.                                                                            |
-| `DC3_LISTENING_VIRTUAL_UDP_PORT` | Compose     | Published host UDP port for the listening virtual driver.                                                                            |
-| `SERVER_PORT`                    | Per-process | Spring Boot HTTP port override for one local service process.                                                                        |
-| `GRPC_SERVER_PORT`               | Per-process | Spring gRPC server port override for one local center service process.                                                               |
-| `TCP_PORT`                       | Per-process | Internal TCP listening port for one listening virtual driver process.                                                                |
-| `UDP_PORT`                       | Per-process | Internal UDP listening port for one listening virtual driver process.                                                                |
-| `NODE_ENV`                       | Runtime     | Active runtime profile group, usually `dev` for local source runs and `test` in compose app stacks.                                  |
-| `DC3_FACADE_MODE`                | Runtime     | Cross-service facade transport mode. `grpc` uses remote gRPC calls; local facade modules can override this for single-process modes. |
+| Variable                         | Scope       | Meaning                                                                                                                                                               |
+|----------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `DC3_WEB_HTTP_PORT`              | Compose     | Published host HTTP port for `dc3-web` (the nginx frontend).                                                                                                          |
+| `DC3_WEB_HTTPS_PORT`             | Compose     | Published host HTTPS port for `dc3-web`.                                                                                                                              |
+| `DC3_WEB_VERSION`                | Compose     | Image tag for the `dc3-web` frontend (independent of `DC3_IMAGE_TAG` since the UI ships on its own cadence). Defaults to `latest`.                                    |
+| `APP_API_HOST`                   | Runtime     | Backend gateway hostname seen by the `dc3-web` nginx container. Defaults to the `dc3-gateway` compose alias.                                                          |
+| `APP_API_PORT`                   | Runtime     | Backend gateway port seen by the `dc3-web` nginx container. Defaults to `8000`.                                                                                       |
+| `DC3_GATEWAY_PORT`               | Compose     | Published host HTTP port for `dc3-gateway`. Only effective in `docker-compose-dev.yml`; in production `docker-compose.yml` the gateway is reached via `dc3-web` only. |
+| `DC3_AUTH_PORT`                  | Compose     | Published host HTTP port for `dc3-center-auth`.                                                                                                                       |
+| `DC3_AUTH_GRPC_PORT`             | Compose     | Published host gRPC port for `dc3-center-auth`.                                                                                                                       |
+| `DC3_MANAGER_PORT`               | Compose     | Published host HTTP port for `dc3-center-manager`.                                                                                                                    |
+| `DC3_MANAGER_GRPC_PORT`          | Compose     | Published host gRPC port for `dc3-center-manager`.                                                                                                                    |
+| `DC3_DATA_PORT`                  | Compose     | Published host HTTP port for `dc3-center-data`.                                                                                                                       |
+| `DC3_DATA_GRPC_PORT`             | Compose     | Published host gRPC port for `dc3-center-data`.                                                                                                                       |
+| `DC3_AGENTIC_PORT`               | Compose     | Published host HTTP port for `dc3-center-agentic`.                                                                                                                    |
+| `DC3_LISTENING_VIRTUAL_TCP_PORT` | Compose     | Published host TCP port for the listening virtual driver.                                                                                                             |
+| `DC3_LISTENING_VIRTUAL_UDP_PORT` | Compose     | Published host UDP port for the listening virtual driver.                                                                                                             |
+| `SERVER_PORT`                    | Per-process | Spring Boot HTTP port override for one local service process.                                                                                                         |
+| `GRPC_SERVER_PORT`               | Per-process | Spring gRPC server port override for one local center service process.                                                                                                |
+| `TCP_PORT`                       | Per-process | Internal TCP listening port for one listening virtual driver process.                                                                                                 |
+| `UDP_PORT`                       | Per-process | Internal UDP listening port for one listening virtual driver process.                                                                                                 |
+| `NODE_ENV`                       | Runtime     | Active runtime profile group, usually `dev` for local source runs and `test` in compose app stacks.                                                                   |
+| `DC3_FACADE_MODE`                | Runtime     | Cross-service facade transport mode. `grpc` uses remote gRPC calls; local facade modules can override this for single-process modes.                                  |
 
 ### Center Service Discovery and Gateway Routes
 

@@ -10,7 +10,7 @@ simplified single-node or lightweight deployment scenarios.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-single
-- **Version**: 2026.5.5
+- **Version**: 2026.5.17
 - **Package**: `io.github.pnoker.center.single`
 
 ## Service Ports
