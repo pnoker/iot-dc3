@@ -26,15 +26,22 @@
 # targets, so multiple service images do not rerun Maven.
 #
 # Build a single service:
-#     docker build --target dc3-gateway -t pnoker/dc3-gateway:dev .
+#     podman build --target dc3-gateway -t pnoker/dc3-gateway:dev .
+#
+# Build against a locally rebuilt JRE:
+#     podman build --build-arg DC3_JRE_IMAGE=localhost/pnoker/dc3-jre:21 \
+#         --target dc3-gateway -t localhost/dc3-gateway:dev .
 #
 # Build everything via compose (BuildKit reuses the builder stage):
-#     docker compose -f dc3/docker-compose-dev.yml build
+#     podman compose -f dc3/docker-compose-dev.yml build
 #
 # Multi-arch (CI):
 #     docker buildx build --platform linux/arm64,linux/amd64 \
 #         --target dc3-gateway --push --tag ... .
 # =============================================================================
+
+ARG DC3_JDK_IMAGE=docker.io/pnoker/dc3-jdk:21
+ARG DC3_JRE_IMAGE=docker.io/pnoker/dc3-jre:21
 
 
 # -----------------------------------------------------------------------------
@@ -46,7 +53,7 @@
 #
 # --mount=type=cache caches ~/.m2/repository across builds.
 # -----------------------------------------------------------------------------
-FROM --platform=$BUILDPLATFORM pnoker/dc3-jdk:21 AS builder
+FROM --platform=$BUILDPLATFORM ${DC3_JDK_IMAGE} AS builder
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
@@ -68,7 +75,7 @@ RUN --mount=type=cache,target=/root/.m2/repository \
 # Stage 2: runtime base — the only place where JRE image, timezone and common
 # environment defaults are declared. Every service target builds on top of it.
 # -----------------------------------------------------------------------------
-FROM pnoker/dc3-jre:21 AS runtime-base
+FROM ${DC3_JRE_IMAGE} AS runtime-base
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
@@ -76,7 +83,7 @@ ENV PARAMS=''
 ENV NODE_ENV=test
 ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
-ENV APM_SERVICE=http://dc3-apm:9300
+ENV APM_SERVICE=http://dc3-apm:8200
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -94,8 +101,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 FROM runtime-base AS dc3-gateway
 ENV DC3_GATEWAY_PORT=8000
 ENV SERVER_NAME=dc3-gateway
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/gateway/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/gateway/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/gateway/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/gateway/gc/gc-%t.log
 WORKDIR /dc3-gateway
 RUN mkdir -p /dc3-gateway/dc3/logs/gateway/gc
 COPY --from=builder /build/dc3-gateway/target/dc3-gateway.jar ./
@@ -111,8 +118,8 @@ FROM runtime-base AS dc3-center-auth
 ENV DC3_AUTH_PORT=8300
 ENV DC3_AUTH_GRPC_PORT=9300
 ENV SERVER_NAME=dc3-center-auth
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/center/auth/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/auth/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/center/auth/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/center/auth/gc/gc-%t.log
 WORKDIR /dc3-center/dc3-center-auth
 RUN mkdir -p /dc3-center/dc3-center-auth/dc3/logs/center/auth/gc
 COPY --from=builder /build/dc3-center/dc3-center-auth/target/dc3-center-auth.jar ./
@@ -129,8 +136,8 @@ FROM runtime-base AS dc3-center-manager
 ENV DC3_MANAGER_PORT=8400
 ENV DC3_MANAGER_GRPC_PORT=9400
 ENV SERVER_NAME=dc3-center-manager
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/center/manager/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/manager/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/center/manager/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/center/manager/gc/gc-%t.log
 WORKDIR /dc3-center/dc3-center-manager
 RUN mkdir -p /dc3-center/dc3-center-manager/dc3/logs/center/manager/gc
 COPY --from=builder /build/dc3-center/dc3-center-manager/target/dc3-center-manager.jar ./
@@ -147,8 +154,8 @@ FROM runtime-base AS dc3-center-data
 ENV DC3_DATA_PORT=8500
 ENV DC3_DATA_GRPC_PORT=9500
 ENV SERVER_NAME=dc3-center-data
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/center/data/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/data/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/center/data/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/center/data/gc/gc-%t.log
 WORKDIR /dc3-center/dc3-center-data
 RUN mkdir -p /dc3-center/dc3-center-data/dc3/logs/center/data/gc
 COPY --from=builder /build/dc3-center/dc3-center-data/target/dc3-center-data.jar ./
@@ -164,8 +171,8 @@ CMD ["dc3-center-data.jar"]
 FROM runtime-base AS dc3-center-agentic
 ENV DC3_AGENTIC_PORT=8600
 ENV SERVER_NAME=dc3-center-agentic
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/center/agentic/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/agentic/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/center/agentic/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/center/agentic/gc/gc-%t.log
 WORKDIR /dc3-center/dc3-center-agentic
 RUN mkdir -p /dc3-center/dc3-center-agentic/dc3/logs/center/agentic/gc
 COPY --from=builder /build/dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar ./
@@ -181,8 +188,8 @@ FROM runtime-base AS dc3-center-single
 ENV DC3_SINGLE_PORT=8100
 ENV DC3_SINGLE_GRPC_PORT=9100
 ENV SERVER_NAME=dc3-center-single
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/center/single/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/single/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/center/single/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/center/single/gc/gc-%t.log
 WORKDIR /dc3-center/dc3-center-single
 RUN mkdir -p /dc3-center/dc3-center-single/dc3/logs/center/single/gc
 COPY --from=builder /build/dc3-center/dc3-center-single/target/dc3-center-single.jar ./
@@ -199,8 +206,8 @@ FROM runtime-base AS dc3-driver-listening-virtual
 ENV TCP_PORT=6270
 ENV UDP_PORT=6271
 ENV SERVER_NAME=dc3-driver-listening-virtual
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/driver/listening-virtual/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/listening-virtual/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/listening-virtual/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/listening-virtual/gc/gc-%t.log
 WORKDIR /dc3-driver/dc3-driver-listening-virtual
 RUN mkdir -p /dc3-driver/dc3-driver-listening-virtual/dc3/logs/driver/listening-virtual/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-listening-virtual/target/dc3-driver-listening-virtual.jar ./
@@ -215,8 +222,8 @@ CMD ["dc3-driver-listening-virtual.jar"]
 # ---------- dc3-driver-modbus-tcp ----------
 FROM runtime-base AS dc3-driver-modbus-tcp
 ENV SERVER_NAME=dc3-driver-modbus-tcp
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/driver/modbus-tcp/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/modbus-tcp/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/modbus-tcp/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/modbus-tcp/gc/gc-%t.log
 WORKDIR /dc3-driver/dc3-driver-modbus-tcp
 RUN mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/logs/driver/modbus-tcp/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-modbus-tcp/target/dc3-driver-modbus-tcp.jar ./
@@ -229,8 +236,8 @@ CMD ["dc3-driver-modbus-tcp.jar"]
 # ---------- dc3-driver-mqtt ----------
 FROM runtime-base AS dc3-driver-mqtt
 ENV SERVER_NAME=dc3-driver-mqtt
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/driver/mqtt/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/mqtt/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/mqtt/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/mqtt/gc/gc-%t.log
 WORKDIR /dc3-driver/dc3-driver-mqtt
 RUN mkdir -p /dc3-driver/dc3-driver-mqtt/dc3/logs/driver/mqtt/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-mqtt/target/dc3-driver-mqtt.jar ./
@@ -243,8 +250,8 @@ CMD ["dc3-driver-mqtt.jar"]
 # ---------- dc3-driver-opc-da ----------
 FROM runtime-base AS dc3-driver-opc-da
 ENV SERVER_NAME=dc3-driver-opc-da
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/driver/opc-da/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/opc-da/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/opc-da/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/opc-da/gc/gc-%t.log
 WORKDIR /dc3-driver/dc3-driver-opc-da
 RUN mkdir -p /dc3-driver/dc3-driver-opc-da/dc3/logs/driver/opc-da/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-opc-da/target/dc3-driver-opc-da.jar ./
@@ -257,8 +264,8 @@ CMD ["dc3-driver-opc-da.jar"]
 # ---------- dc3-driver-opc-ua ----------
 FROM runtime-base AS dc3-driver-opc-ua
 ENV SERVER_NAME=dc3-driver-opc-ua
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/driver/opc-ua/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/opc-ua/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/opc-ua/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/opc-ua/gc/gc-%t.log
 WORKDIR /dc3-driver/dc3-driver-opc-ua
 RUN mkdir -p /dc3-driver/dc3-driver-opc-ua/dc3/logs/driver/opc-ua/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-opc-ua/target/dc3-driver-opc-ua.jar ./
@@ -271,8 +278,8 @@ CMD ["dc3-driver-opc-ua.jar"]
 # ---------- dc3-driver-plcs7 ----------
 FROM runtime-base AS dc3-driver-plcs7
 ENV SERVER_NAME=dc3-driver-plcs7
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/driver/plcs7/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/plcs7/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/plcs7/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/plcs7/gc/gc-%t.log
 WORKDIR /dc3-driver/dc3-driver-plcs7
 RUN mkdir -p /dc3-driver/dc3-driver-plcs7/dc3/logs/driver/plcs7/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-plcs7/target/dc3-driver-plcs7.jar ./
@@ -285,8 +292,8 @@ CMD ["dc3-driver-plcs7.jar"]
 # ---------- dc3-driver-virtual ----------
 FROM runtime-base AS dc3-driver-virtual
 ENV SERVER_NAME=dc3-driver-virtual
-ENV JAVA_OPS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dc3/logs/driver/virtual/gc/dump.hprof"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/virtual/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/virtual/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/virtual/gc/gc-%t.log
 WORKDIR /dc3-driver/dc3-driver-virtual
 RUN mkdir -p /dc3-driver/dc3-driver-virtual/dc3/logs/driver/virtual/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar ./
