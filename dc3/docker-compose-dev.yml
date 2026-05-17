@@ -24,8 +24,9 @@ x-logging: &default-logging
 services:
   gateway:
     build:
-      context: ../dc3-gateway/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-gateway
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -61,8 +62,9 @@ services:
 
   auth:
     build:
-      context: ../dc3-center/dc3-center-auth/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-center-auth
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
@@ -90,8 +92,9 @@ services:
 
   manager:
     build:
-      context: ../dc3-center/dc3-center-manager/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-center-manager
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -122,8 +125,9 @@ services:
 
   data:
     build:
-      context: ../dc3-center/dc3-center-data/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-center-data
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -156,8 +160,9 @@ services:
 
   agentic:
     build:
-      context: ../dc3-center/dc3-center-agentic/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-center-agentic
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -201,8 +206,9 @@ services:
 
   listening-virtual:
     build:
-      context: ../dc3-driver/dc3-driver-listening-virtual/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-listening-virtual
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -227,8 +233,9 @@ services:
 
   modbus-tcp:
     build:
-      context: ../dc3-driver/dc3-driver-modbus-tcp/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-modbus-tcp
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -250,8 +257,9 @@ services:
 
   mqtt:
     build:
-      context: ../dc3-driver/dc3-driver-mqtt/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-mqtt
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -273,8 +281,9 @@ services:
 
   opc-da:
     build:
-      context: ../dc3-driver/dc3-driver-opc-da/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-opc-da
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -296,8 +305,9 @@ services:
 
   opc-ua:
     build:
-      context: ../dc3-driver/dc3-driver-opc-ua/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-opc-ua
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -319,8 +329,9 @@ services:
 
   plcs7:
     build:
-      context: ../dc3-driver/dc3-driver-plcs7/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-plcs7
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
@@ -342,8 +353,9 @@ services:
 
   virtual:
     build:
-      context: ../dc3-driver/dc3-driver-virtual/
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-virtual
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     depends_on:
