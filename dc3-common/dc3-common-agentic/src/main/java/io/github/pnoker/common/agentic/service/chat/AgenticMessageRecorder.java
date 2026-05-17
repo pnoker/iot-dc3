@@ -87,6 +87,7 @@ public class AgenticMessageRecorder {
         content.setFormat("markdown");
         content.setTools(tools);
         content.setTraces(buildTraceEvents(prepared, runEvents));
+        content.setCharts(prepared.runTrace().drainAndRecordedVisualizations());
         content.setReasoning(prepared.reasoning());
         content.setReasoningContent(reasoningContent);
         content.setContexts(prepared.contexts());
@@ -100,6 +101,7 @@ public class AgenticMessageRecorder {
                 || StringUtils.isNotBlank(content.getReasoningContent())
                 || hasItems(content.getTools())
                 || hasItems(content.getTraces())
+                || hasItems(content.getCharts())
                 || hasItems(content.getContexts());
     }
 

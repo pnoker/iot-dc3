@@ -124,6 +124,7 @@ public class AgenticChatRequestPreparer {
         toolContext.put(AgenticConstant.ToolContextKey.USER_HEADER, userHeader);
         toolContext.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, scopedConversationId);
         toolContext.put(AgenticConstant.ToolContextKey.RUN_EVENTS, runTrace.pendingEvents());
+        toolContext.put(AgenticConstant.ToolContextKey.VISUALIZATIONS, runTrace.pendingVisualizations());
         return toolContext;
     }
 

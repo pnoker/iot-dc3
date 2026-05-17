@@ -16,7 +16,11 @@
  */
 package io.github.pnoker.common.agentic.entity.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Structured return envelope for agentic tool calls.
@@ -25,30 +29,42 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
  * @version 2026.5.16
  * @since 2022.1.0
  */
-public record AgenticToolResult<T>(boolean success, String code, String message, T data) {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public record AgenticToolResult<T>(boolean success, String code, String message, T data,
+                                   List<AgenticVisualizationSpec> visualizations) {
+
+    public AgenticToolResult {
+        visualizations = List.copyOf(Objects.requireNonNullElse(visualizations, List.of()));
+    }
 
     public static <T> AgenticToolResult<T> ok(String message, T data) {
-        return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_OK, message, data);
+        return ok(message, data, List.of());
+    }
+
+    public static <T> AgenticToolResult<T> ok(String message, T data,
+                                              List<AgenticVisualizationSpec> visualizations) {
+        return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_OK, message, data, visualizations);
     }
 
     public static <T> AgenticToolResult<T> empty(String message, T data) {
-        return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_EMPTY, message, data);
+        return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_EMPTY, message, data, List.of());
     }
 
     public static <T> AgenticToolResult<T> invalid(String message) {
-        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT, message, null);
+        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT, message, null,
+                List.of());
     }
 
     public static <T> AgenticToolResult<T> notFound(String message) {
-        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_NOT_FOUND, message, null);
+        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_NOT_FOUND, message, null, List.of());
     }
 
     public static <T> AgenticToolResult<T> unavailable(String message) {
-        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_UNAVAILABLE, message, null);
+        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_UNAVAILABLE, message, null, List.of());
     }
 
     public static <T> AgenticToolResult<T> error(String message) {
-        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_ERROR, message, null);
+        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_ERROR, message, null, List.of());
     }
 
 }

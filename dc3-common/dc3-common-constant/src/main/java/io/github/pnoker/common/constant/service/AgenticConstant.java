@@ -93,6 +93,8 @@ public class AgenticConstant {
 
         public static final String RUN_EVENTS = "dc3.agentic.runEvents";
 
+        public static final String VISUALIZATIONS = "dc3.agentic.visualizations";
+
         private ToolContextKey() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
@@ -129,6 +131,61 @@ public class AgenticConstant {
         public static final String FINISH_REASON_ERROR = "error";
 
         private Chat() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
+    /**
+     * Structured agentic visualization constants.
+     *
+     * @author pnoker
+     * @version 2026.5.17
+     * @since 2022.1.0
+     */
+    public static class Visualization {
+
+        public static final String OBJECT = "agentic.visualization";
+
+        public static class Type {
+
+            public static final String LINE = "line";
+
+            public static final String AREA = "area";
+
+            public static final String COLUMN = "column";
+
+            public static final String BAR = "bar";
+
+            public static final String PIE = "pie";
+
+            public static final String DONUT = "donut";
+
+            public static final String HEATMAP = "heatmap";
+
+            public static final String SCATTER = "scatter";
+
+            public static final String STAT = "stat";
+
+            private Type() {
+                throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+            }
+
+        }
+
+        public static class Scale {
+
+            public static final String LINEAR = "linear";
+
+            public static final String TIME = "time";
+
+            private Scale() {
+                throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+            }
+
+        }
+
+        private Visualization() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
@@ -200,6 +257,8 @@ public class AgenticConstant {
      * @since 2022.1.0
      */
     public static class ToolResult {
+
+        public static final String FIELD_VISUALIZATIONS = "visualizations";
 
         public static final String CODE_OK = "OK";
 

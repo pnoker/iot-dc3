@@ -97,6 +97,16 @@ class PointValueToolTest {
         assertThat(result.data().chart().series()).hasSize(1);
         assertThat(result.data().chart().series().get(0).data())
                 .containsExactly(List.of(0, 23.5D), List.of(1, 23.8D), List.of(2, 24.0D));
+        assertThat(result.data().summary().numericCount()).isEqualTo(3);
+        assertThat(result.data().summary().nonNumericCount()).isEqualTo(1);
+        assertThat(result.data().summary().latest()).isEqualTo(24.0D);
+        assertThat(result.data().summary().average()).isEqualTo((23.5D + 23.8D + 24.0D) / 3);
+        assertThat(result.visualizations()).hasSize(2);
+        assertThat(result.visualizations().get(0).getType()).isEqualTo(AgenticConstant.Visualization.Type.LINE);
+        assertThat(result.visualizations().get(0).getDataset()).hasSize(3);
+        assertThat(result.visualizations().get(0).getAnnotations()).hasSize(1);
+        assertThat(result.visualizations().get(1).getType()).isEqualTo(AgenticConstant.Visualization.Type.STAT);
+        assertThat(result.visualizations().get(1).getDataset()).hasSize(1);
     }
 
     @Test
