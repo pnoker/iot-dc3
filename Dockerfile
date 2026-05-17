@@ -21,8 +21,9 @@
 # Unified multi-target Dockerfile for IoT DC3.
 #
 # Build context MUST be the repo root. Maven runs INSIDE the builder stage —
-# no host JDK / Maven required. BuildKit deduplicates the builder stage across
-# multiple --target invocations, so 13 service images cost ONE Maven build.
+# no host JDK / Maven required. When the build context and args are unchanged,
+# Docker BuildKit / Podman Buildah reuse the builder stage cache across service
+# targets, so multiple service images do not rerun Maven.
 #
 # Build a single service:
 #     docker build --target dc3-gateway -t pnoker/dc3-gateway:dev .
@@ -43,7 +44,7 @@
 # JARs are platform-agnostic, so we never want Maven to run under QEMU
 # emulation when producing arm64 + amd64 images.
 #
-# --mount=type=cache caches ~/.m2/repository across builds (BuildKit feature).
+# --mount=type=cache caches ~/.m2/repository across builds.
 # -----------------------------------------------------------------------------
 FROM --platform=$BUILDPLATFORM pnoker/dc3-jdk:21 AS builder
 LABEL dc3.author=pnoker
@@ -84,7 +85,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 # Service targets — one per microservice. Each target:
 #   1. inherits runtime-base
 #   2. sets service-specific ENV / WORKDIR / EXPOSE / VOLUME
-#   3. COPYs its prebuilt jar from the host build (build context = repo root)
+#   3. COPYs its jar from the builder stage
 #   4. copies the prebaked entrypoint.sh from the base image
 # =============================================================================
 
