@@ -49,13 +49,7 @@
         <el-input v-model="reactiveData.form.email" :placeholder="t('settings.user.emailPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
-        <el-switch
-          v-model="reactiveData.form.enableFlag"
-          :active-text="t('common.enable')"
-          :active-value="0"
-          :inactive-text="t('common.disable')"
-          :inactive-value="1"
-        />
+        <enable-flag-segmented v-model="reactiveData.form.enableFlag" value-type="number" />
       </el-form-item>
     </el-form>
     <div class="things-dialog-footer">

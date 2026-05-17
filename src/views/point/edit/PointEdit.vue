@@ -64,13 +64,7 @@
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-            <el-switch
-              v-model="reactiveData.pointFormData.enableFlag"
-              :active-text="$t('common.enable')"
-              :inactive-text="$t('common.disable')"
-              active-value="ENABLE"
-              inactive-value="DISABLE"
-            />
+            <enable-flag-segmented v-model="reactiveData.pointFormData.enableFlag" />
           </el-form-item>
           <el-form-item :label="$t('point.edit.accuracy')" prop="valueDecimal">
             <el-input

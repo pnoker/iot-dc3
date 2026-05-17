@@ -19,6 +19,8 @@ import { computed, defineComponent, reactive, ref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+
 type FormMode = 'add' | 'edit';
 
 // Ordered so the Parent picker always shows the same type ordering across
@@ -51,6 +53,7 @@ const createEmptyForm = () => ({
 
 export default defineComponent({
   name: 'ResourceEditForm',
+  components: { EnableFlagSegmented },
   props: {
     treeData: {
       type: Array as PropType<any[]>,

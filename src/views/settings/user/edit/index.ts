@@ -18,6 +18,8 @@ import { defineComponent, reactive, ref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+
 type FormMode = 'add' | 'edit';
 
 const createEmptyForm = () => ({
@@ -31,6 +33,7 @@ const createEmptyForm = () => ({
 
 export default defineComponent({
   name: 'UserEditForm',
+  components: { EnableFlagSegmented },
   emits: ['add-thing', 'update-thing'],
   setup(_, { emit }) {
     const { t } = useI18n();

@@ -36,6 +36,7 @@ import {
 import type { Attribute, Dictionary } from '@/config/types';
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue';
 import { isNull } from '@/utils/validationUtil';
 import { getDriverById } from '@/api/driver';
@@ -131,6 +132,7 @@ function clone<T>(value: T): T {
 export default defineComponent({
   name: 'DeviceEdit',
   components: {
+    EnableFlagSegmented,
     skeletonCard,
     pointInfoCard,
   },

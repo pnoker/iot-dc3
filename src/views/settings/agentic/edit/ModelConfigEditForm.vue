@@ -61,14 +61,8 @@
           inactive-value="NOT_DEFAULT"
         />
       </el-form-item>
-      <el-form-item :label="$t('common.enable')">
-        <el-switch
-          v-model="form.enableFlag"
-          :active-text="$t('common.enable')"
-          :inactive-text="$t('common.disable')"
-          active-value="ENABLE"
-          inactive-value="DISABLE"
-        />
+      <el-form-item :label="$t('common.enableFlag')">
+        <enable-flag-segmented v-model="form.enableFlag" />
       </el-form-item>
       <el-form-item :label="$t('common.remark')">
         <el-input v-model="form.remark" :rows="3" maxlength="300" show-word-limit type="textarea" />
@@ -87,6 +81,8 @@
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
   import type { FormInstance, FormRules } from 'element-plus';
+
+  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import type { AgenticModelConfig, AgenticProvider } from '@/config/types';
 
   const props = defineProps<{

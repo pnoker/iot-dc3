@@ -61,13 +61,7 @@
         <el-input-number v-model="reactiveData.form.groupIndex" :min="0" controls-position="right" />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
-        <el-switch
-          v-model="reactiveData.form.enableFlag"
-          :active-text="t('common.enable')"
-          :inactive-text="t('common.disable')"
-          active-value="ENABLE"
-          inactive-value="DISABLE"
-        />
+        <enable-flag-segmented v-model="reactiveData.form.enableFlag" />
       </el-form-item>
       <el-form-item :label="t('common.remark')" class="things-form-grid__span-2" prop="remark">
         <el-input v-model="reactiveData.form.remark" clearable maxlength="300" show-word-limit type="textarea" />

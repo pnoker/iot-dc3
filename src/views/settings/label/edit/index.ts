@@ -18,6 +18,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import { ENTITY_TYPE_OPTIONS } from '@/config/constant/enums';
 import type { LabelRecord } from '@/config/types/manager';
 
@@ -35,6 +36,7 @@ const createEmptyForm = () => ({
 
 export default defineComponent({
   name: 'LabelEditForm',
+  components: { EnableFlagSegmented },
   emits: ['add-thing', 'update-thing'],
   setup(_, { emit }) {
     const { t } = useI18n();

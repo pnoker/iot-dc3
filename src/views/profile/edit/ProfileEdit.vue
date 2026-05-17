@@ -38,13 +38,7 @@
             />
           </el-form-item>
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-            <el-switch
-              v-model="reactiveData.profileFormData.enableFlag"
-              :active-text="$t('common.enable')"
-              :inactive-text="$t('common.disable')"
-              active-value="ENABLE"
-              inactive-value="DISABLE"
-            />
+            <enable-flag-segmented v-model="reactiveData.profileFormData.enableFlag" />
           </el-form-item>
           <el-form-item :label="$t('profile.edit.description')" prop="remark">
             <el-input

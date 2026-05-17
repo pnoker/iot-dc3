@@ -25,10 +25,11 @@ import { useRoute } from 'vue-router';
 
 import { getPointById, updatePoint } from '@/api/point';
 
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import pointList from '@/views/point/Point.vue';
 
 export default defineComponent({
-  components: { pointList },
+  components: { EnableFlagSegmented, pointList },
   setup() {
     const route = useRoute();
     const { t } = useI18n();
