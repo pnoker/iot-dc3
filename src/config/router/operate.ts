@@ -129,6 +129,136 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: '/settings/group',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsGroupDetail',
+        path: '/settings/group/detail',
+        meta: {
+          icon: 'el-icon-grid',
+          title: 'Group Detail',
+        },
+        component: () => import('@/views/settings/group/detail/GroupDetail.vue'),
+      },
+    ],
+  },
+  {
+    path: '/settings/label',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsLabelDetail',
+        path: '/settings/label/detail',
+        meta: {
+          icon: 'el-icon-collection-tag',
+          title: 'Label Detail',
+        },
+        component: () => import('@/views/settings/label/detail/LabelDetail.vue'),
+      },
+    ],
+  },
+  {
+    path: '/settings/alarm',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsAlarmRuleDetail',
+        path: '/settings/alarm/rule/detail',
+        meta: {
+          icon: 'el-icon-set-up',
+          title: 'Alarm Rule Detail',
+        },
+        component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
+        props: { entity: 'rule' },
+      },
+      {
+        name: 'settingsAlarmNotifyDetail',
+        path: '/settings/alarm/notify/detail',
+        meta: {
+          icon: 'el-icon-bell',
+          title: 'Alarm Notify Policy Detail',
+        },
+        component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
+        props: { entity: 'notify' },
+      },
+      {
+        name: 'settingsAlarmMessageDetail',
+        path: '/settings/alarm/message/detail',
+        meta: {
+          icon: 'el-icon-message',
+          title: 'Alarm Message Template Detail',
+        },
+        component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
+        props: { entity: 'message' },
+      },
+      {
+        name: 'settingsAlarmChannelDetail',
+        path: '/settings/alarm/channel/detail',
+        meta: {
+          icon: 'el-icon-connection',
+          title: 'Alarm Notify Channel Detail',
+        },
+        component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
+        props: { entity: 'channel' },
+      },
+      {
+        name: 'settingsAlarmBindDetail',
+        path: '/settings/alarm/bind/detail',
+        meta: {
+          icon: 'el-icon-link',
+          title: 'Alarm Channel Binding Detail',
+        },
+        component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
+        props: { entity: 'bind' },
+      },
+      {
+        name: 'settingsAlarmStateDetail',
+        path: '/settings/alarm/state/detail',
+        meta: {
+          icon: 'el-icon-monitor',
+          title: 'Alarm Runtime State Detail',
+        },
+        component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
+        props: { entity: 'state' },
+      },
+      {
+        name: 'settingsAlarmRecordDetail',
+        path: '/settings/alarm/record/detail',
+        meta: {
+          icon: 'el-icon-document-checked',
+          title: 'Alarm Delivery Record Detail',
+        },
+        component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
+        props: { entity: 'record' },
+      },
+    ],
+  },
+  {
+    path: '/settings/agentic',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsAgenticDetail',
+        path: '/settings/agentic/detail',
+        meta: {
+          icon: 'el-icon-chat-dot-round',
+          title: 'Model Config Detail',
+        },
+        component: () => import('@/views/settings/agentic/detail/ModelConfigDetail.vue'),
+      },
+      {
+        name: 'settingsAgenticProviderDetail',
+        path: '/settings/agentic/provider/detail',
+        meta: {
+          icon: 'el-icon-chat-line-square',
+          title: 'Model Provider Detail',
+        },
+        component: () => import('@/views/settings/agentic/detail/ProviderDetail.vue'),
+      },
+    ],
+  },
+  {
     path: '/settings/resource',
     component: Layout,
     children: [

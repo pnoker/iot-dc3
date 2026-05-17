@@ -160,6 +160,14 @@
     settingsMenu: 'nav.settingsMenu',
     settingsGroup: 'nav.settingsGroup',
     settingsLabel: 'nav.settingsLabel',
+    settingsAlarm: 'nav.settingsAlarm',
+    settingsAlarmRule: 'nav.settingsAlarmRule',
+    settingsAlarmNotify: 'nav.settingsAlarmNotify',
+    settingsAlarmMessage: 'nav.settingsAlarmMessage',
+    settingsAlarmChannel: 'nav.settingsAlarmChannel',
+    settingsAlarmBind: 'nav.settingsAlarmBind',
+    settingsAlarmState: 'nav.settingsAlarmState',
+    settingsAlarmRecord: 'nav.settingsAlarmRecord',
     settingsModel: 'nav.settingsModel',
     settingsAgentic: 'nav.settingsAgentic',
     settingsAgenticProvider: 'nav.settingsAgenticProvider',
@@ -172,20 +180,102 @@
     settingsResourceDetail: 'nav.settingsResourceDetail',
     settingsApiDetail: 'nav.settingsApiDetail',
     settingsMenuDetail: 'nav.settingsMenuDetail',
+    settingsGroupDetail: 'nav.settingsGroupDetail',
+    settingsLabelDetail: 'nav.settingsLabelDetail',
+    settingsAlarmRuleDetail: 'nav.settingsAlarmRuleDetail',
+    settingsAlarmNotifyDetail: 'nav.settingsAlarmNotifyDetail',
+    settingsAlarmMessageDetail: 'nav.settingsAlarmMessageDetail',
+    settingsAlarmChannelDetail: 'nav.settingsAlarmChannelDetail',
+    settingsAlarmBindDetail: 'nav.settingsAlarmBindDetail',
+    settingsAlarmStateDetail: 'nav.settingsAlarmStateDetail',
+    settingsAlarmRecordDetail: 'nav.settingsAlarmRecordDetail',
+    settingsAgenticDetail: 'nav.settingsAgenticDetail',
+    settingsAgenticProviderDetail: 'nav.settingsAgenticProviderDetail',
   };
 
-  // For a settings detail page we want the breadcrumb to read
-  //   Home / Settings / <list> / <detail>
-  // instead of stopping at Home / Settings. Map each detail route to the list
-  // route it descends from.
-  const settingsDetailParent: Record<string, { path: string; titleKey: string; code: string }> = {
-    settingsUserDetail: { path: '/settings/user', titleKey: 'nav.settingsUser', code: 'settingsUser' },
-    settingsRoleDetail: { path: '/settings/role', titleKey: 'nav.settingsRole', code: 'settingsRole' },
-    settingsResourceDetail: { path: '/settings/resource', titleKey: 'nav.settingsResource', code: 'settingsResource' },
-    settingsApiDetail: { path: '/settings/api', titleKey: 'nav.settingsApi', code: 'settingsApi' },
-    settingsMenuDetail: { path: '/settings/menu', titleKey: 'nav.settingsMenu', code: 'settingsMenu' },
-    settingsDeviceEvent: { path: '/settings/event', titleKey: 'nav.settingsEvent', code: 'settingsEvent' },
-    settingsDriverEvent: { path: '/settings/event', titleKey: 'nav.settingsEvent', code: 'settingsEvent' },
+  interface BreadcrumbParent {
+    path: string;
+    titleKey: string;
+    code: string;
+  }
+
+  const alarmParent: BreadcrumbParent = {
+    path: '/settings/alarm',
+    titleKey: 'nav.settingsAlarm',
+    code: 'settingsAlarm',
+  };
+  const modelParent: BreadcrumbParent = {
+    path: '/settings/model',
+    titleKey: 'nav.settingsModel',
+    code: 'settingsModel',
+  };
+  const eventParent: BreadcrumbParent = {
+    path: '/settings/event',
+    titleKey: 'nav.settingsEvent',
+    code: 'settingsEvent',
+  };
+
+  // Settings children can be two levels deep in the sidebar (Alarm / Model /
+  // Event). Keep the breadcrumb path explicit so it matches the visible menu
+  // hierarchy instead of flattening every settings route directly under
+  // Settings.
+  const settingsParents: Record<string, BreadcrumbParent[]> = {
+    settingsUserDetail: [{ path: '/settings/user', titleKey: 'nav.settingsUser', code: 'settingsUser' }],
+    settingsRoleDetail: [{ path: '/settings/role', titleKey: 'nav.settingsRole', code: 'settingsRole' }],
+    settingsResourceDetail: [
+      { path: '/settings/resource', titleKey: 'nav.settingsResource', code: 'settingsResource' },
+    ],
+    settingsApiDetail: [{ path: '/settings/api', titleKey: 'nav.settingsApi', code: 'settingsApi' }],
+    settingsMenuDetail: [{ path: '/settings/menu', titleKey: 'nav.settingsMenu', code: 'settingsMenu' }],
+    settingsGroupDetail: [{ path: '/settings/group', titleKey: 'nav.settingsGroup', code: 'settingsGroup' }],
+    settingsLabelDetail: [{ path: '/settings/label', titleKey: 'nav.settingsLabel', code: 'settingsLabel' }],
+    settingsAlarmRule: [alarmParent],
+    settingsAlarmNotify: [alarmParent],
+    settingsAlarmMessage: [alarmParent],
+    settingsAlarmChannel: [alarmParent],
+    settingsAlarmBind: [alarmParent],
+    settingsAlarmState: [alarmParent],
+    settingsAlarmRecord: [alarmParent],
+    settingsAlarmRuleDetail: [
+      alarmParent,
+      { path: '/settings/alarm/rule', titleKey: 'nav.settingsAlarmRule', code: 'settingsAlarmRule' },
+    ],
+    settingsAlarmNotifyDetail: [
+      alarmParent,
+      { path: '/settings/alarm/notify', titleKey: 'nav.settingsAlarmNotify', code: 'settingsAlarmNotify' },
+    ],
+    settingsAlarmMessageDetail: [
+      alarmParent,
+      { path: '/settings/alarm/message', titleKey: 'nav.settingsAlarmMessage', code: 'settingsAlarmMessage' },
+    ],
+    settingsAlarmChannelDetail: [
+      alarmParent,
+      { path: '/settings/alarm/channel', titleKey: 'nav.settingsAlarmChannel', code: 'settingsAlarmChannel' },
+    ],
+    settingsAlarmBindDetail: [
+      alarmParent,
+      { path: '/settings/alarm/bind', titleKey: 'nav.settingsAlarmBind', code: 'settingsAlarmBind' },
+    ],
+    settingsAlarmStateDetail: [
+      alarmParent,
+      { path: '/settings/alarm/state', titleKey: 'nav.settingsAlarmState', code: 'settingsAlarmState' },
+    ],
+    settingsAlarmRecordDetail: [
+      alarmParent,
+      { path: '/settings/alarm/record', titleKey: 'nav.settingsAlarmRecord', code: 'settingsAlarmRecord' },
+    ],
+    settingsAgentic: [modelParent],
+    settingsAgenticProvider: [modelParent],
+    settingsAgenticDetail: [
+      modelParent,
+      { path: '/settings/agentic', titleKey: 'nav.settingsAgentic', code: 'settingsAgentic' },
+    ],
+    settingsAgenticProviderDetail: [
+      modelParent,
+      { path: '/settings/agentic/provider', titleKey: 'nav.settingsAgenticProvider', code: 'settingsAgenticProvider' },
+    ],
+    settingsDeviceEvent: [eventParent],
+    settingsDriverEvent: [eventParent],
   };
 
   // Static icon fallback for route names the backend menu tree does not yet
@@ -206,6 +296,14 @@
     settingsMenu: 'Menu',
     settingsGroup: 'Grid',
     settingsLabel: 'CollectionTag',
+    settingsAlarm: 'AlarmClock',
+    settingsAlarmRule: 'SetUp',
+    settingsAlarmNotify: 'Bell',
+    settingsAlarmMessage: 'Message',
+    settingsAlarmChannel: 'Connection',
+    settingsAlarmBind: 'Link',
+    settingsAlarmState: 'Monitor',
+    settingsAlarmRecord: 'DocumentChecked',
     settingsModel: 'Cpu',
     settingsAgentic: 'ChatDotRound',
     settingsAgenticProvider: 'ChatLineSquare',
@@ -226,6 +324,17 @@
     settingsResourceDetail: 'Key',
     settingsApiDetail: 'Link',
     settingsMenuDetail: 'Menu',
+    settingsGroupDetail: 'Grid',
+    settingsLabelDetail: 'CollectionTag',
+    settingsAlarmRuleDetail: 'SetUp',
+    settingsAlarmNotifyDetail: 'Bell',
+    settingsAlarmMessageDetail: 'Message',
+    settingsAlarmChannelDetail: 'Connection',
+    settingsAlarmBindDetail: 'Link',
+    settingsAlarmStateDetail: 'Monitor',
+    settingsAlarmRecordDetail: 'DocumentChecked',
+    settingsAgenticDetail: 'ChatDotRound',
+    settingsAgenticProviderDetail: 'ChatLineSquare',
   };
 
   const iconForCode = (code: string): string | undefined => {
@@ -250,11 +359,10 @@
     } else if (name.startsWith('point')) {
       items.push({ path: '/point_value', title: t('nav.pointValue'), icon: iconForCode('pointValue') });
     } else if (name.startsWith('settings')) {
-      items.push({ path: '/settings/user', title: t('nav.settings'), icon: iconForCode('settings') });
-      const mid = settingsDetailParent[name];
-      if (mid) {
+      items.push({ path: '/settings', title: t('nav.settings'), icon: iconForCode('settings') });
+      (settingsParents[name] || []).forEach((mid) => {
         items.push({ path: mid.path, title: t(mid.titleKey), icon: iconForCode(mid.code) });
-      }
+      });
     }
     if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
       const last = items[items.length - 1];
