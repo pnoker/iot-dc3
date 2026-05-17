@@ -36,6 +36,7 @@ import type {
   AgenticSession,
   AgenticSessionExt,
   AgenticTraceEvent,
+  AgenticVisualizationSpec,
 } from '@/config/types';
 import { failMessage, warnMessage } from '@/utils/notificationUtil';
 import { getStorage, setStorage } from '@/utils/storageUtil';
@@ -312,13 +313,19 @@ export const useAgenticStore = defineStore('agentic', () => {
         await streamAgenticChatCompletion(request, {
           signal: abortController.signal,
           onEvent: (event) => appendTraceEvent(conversationId, event),
+          onVisualization: (visualization) =>
+            appendAssistantVisualization(conversationId, assistantMessage.id, visualization),
           onDelta: (delta) => appendAssistantDelta(conversationId, assistantMessage.id, delta),
           onReasoning: (reasoning) => appendAssistantReasoning(conversationId, assistantMessage.id, reasoning),
           onFinish: (reason) => setAssistantFinishReason(conversationId, assistantMessage.id, reason),
         });
       } else {
         const response = await completeAgenticChatCompletion(request, abortController.signal);
-        appendAssistantDelta(conversationId, assistantMessage.id, response.choices?.[0]?.message?.content || '');
+        const responseMessage = response.choices?.[0]?.message;
+        appendAssistantDelta(conversationId, assistantMessage.id, responseMessage?.content || '');
+        for (const chart of responseMessage?.contentExt?.charts || responseMessage?.content_ext?.charts || []) {
+          appendAssistantVisualization(conversationId, assistantMessage.id, chart);
+        }
         const finishReason = response.choices?.[0]?.finishReason ?? response.choices?.[0]?.finish_reason;
         if (finishReason) {
           setAssistantFinishReason(conversationId, assistantMessage.id, finishReason);
@@ -580,6 +587,27 @@ export const useAgenticStore = defineStore('agentic', () => {
     messagesByConversation.value[conversationId] = [...messages];
   };
 
+  const appendAssistantVisualization = (
+    conversationId: string,
+    messageId: string,
+    visualization: AgenticVisualizationSpec
+  ) => {
+    const messages = messagesByConversation.value[conversationId];
+    if (!messages) return;
+    const index = messages.findIndex((message) => message.id === messageId);
+    if (index < 0) return;
+    const target = messages[index]!;
+    const contentExt = target.contentExt || {};
+    messages[index] = {
+      ...target,
+      contentExt: {
+        ...contentExt,
+        charts: [...(contentExt.charts || []), visualization],
+      },
+    };
+    messagesByConversation.value[conversationId] = [...messages];
+  };
+
   const markAssistantComplete = (conversationId: string, messageId: string) => {
     const messages = messagesByConversation.value[conversationId] || [];
     setConversationMessages(
@@ -705,6 +733,7 @@ const mergeEphemeralAssistantState = (previous: AgenticMessage[], loaded: Agenti
     .map((message) => ({
       reasoning: message.reasoning,
       finishReason: message.finishReason,
+      charts: message.contentExt?.charts,
     }));
   let assistantIndex = 0;
   return loaded.map((message) => {
@@ -719,6 +748,10 @@ const mergeEphemeralAssistantState = (previous: AgenticMessage[], loaded: Agenti
       ...message,
       reasoning: message.reasoning || state.reasoning,
       finishReason: message.finishReason || state.finishReason,
+      contentExt:
+        message.contentExt?.charts?.length || !state.charts?.length
+          ? message.contentExt
+          : { ...(message.contentExt || {}), charts: state.charts },
     };
   });
 };

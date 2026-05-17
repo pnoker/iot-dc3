@@ -20,6 +20,7 @@
       <div v-if="segment.type === 'markdown'" class="agentic-markdown" v-html="renderMarkdown(segment.text)" />
       <ChartBlock v-else :kind="segment.kind" :spec="segment.spec" />
     </template>
+    <ChartBlock v-for="(chart, index) in charts" :key="chart.id || `${chart.type}-${index}`" :chart="chart" />
   </div>
 </template>
 
@@ -28,10 +29,12 @@
   import { computed } from 'vue';
   import ChartBlock from './ChartBlock.vue';
   import { parseAssistantContent } from './assistantContent';
+  import type { AgenticVisualizationSpec } from '@/config/types';
 
-  const props = defineProps<{ content: string }>();
+  const props = defineProps<{ content: string; charts?: AgenticVisualizationSpec[] }>();
 
   const segments = computed(() => parseAssistantContent(props.content).segments);
+  const charts = computed(() => props.charts || []);
 
   const renderMarkdown = (text: string) => {
     return sanitizeHtml(String(marked.parse(text)));

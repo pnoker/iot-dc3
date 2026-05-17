@@ -180,4 +180,37 @@ describe('agentic store', () => {
       })
     );
   });
+
+  it('attaches streaming visualizations to the active assistant message', async () => {
+    apiMocks.streamAgenticChatCompletion.mockImplementation(
+      async (_request: unknown, callbacks: AgenticStreamCallbacks) => {
+        callbacks.onVisualization?.({
+          id: 'chart-1',
+          type: 'line',
+          title: 'Point Trend',
+          dataset: [{ index: 0, value: 23.5 }],
+          encode: { x: 'index', y: 'value' },
+        });
+        callbacks.onDelta?.('趋势分析完成。');
+      }
+    );
+
+    const store = useAgenticStore();
+    store.newSession();
+    const conversationId = store.activeConversationId;
+
+    await store.sendMessage('分析位号历史数据');
+
+    const assistantMessage = store.messagesByConversation[conversationId].find(
+      (message) => message.role === 'assistant'
+    );
+    expect(assistantMessage?.content).toBe('趋势分析完成。');
+    expect(assistantMessage?.contentExt?.charts).toEqual([
+      expect.objectContaining({
+        id: 'chart-1',
+        type: 'line',
+        title: 'Point Trend',
+      }),
+    ]);
+  });
 });

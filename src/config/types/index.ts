@@ -26,6 +26,9 @@ export type {
   AgenticMessageContext,
   AgenticMessageTokens,
   AgenticMessageRole,
+  AgenticVisualizationAnnotation,
+  AgenticVisualizationSpec,
+  AgenticVisualizationType,
   AgenticAttachment,
   AgenticAction,
   AgenticChatMessage,
@@ -34,6 +37,24 @@ export type {
   AgenticStreamCallbacks,
   AgenticTraceEvent,
 } from './agentic';
+
+export type {
+  AlarmTargetTypeFlag,
+  NotifyChannelTypeFlag,
+  RuleStateFlag,
+  NotifyRecordStatusFlag,
+  AutoConfirmFlag,
+  EnableFlag,
+  StructuredExt,
+  RuleRecord,
+  NotifyRecord,
+  MessageRecord,
+  NotifyChannelRecord,
+  NotifyChannelBindRecord,
+  RuleStateRecord,
+  NotifyDeliveryRecord,
+  AlarmEntityRecord,
+} from './alarm';
 
 export type {
   UserForm,

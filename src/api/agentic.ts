@@ -30,6 +30,7 @@ import type {
   AgenticSession,
   AgenticStreamCallbacks,
   AgenticTraceEvent,
+  AgenticVisualizationSpec,
   PageQuery,
   PageResult,
 } from '@/config/types';
@@ -46,6 +47,7 @@ interface OpenAIChunk {
   status?: AgenticTraceEvent['status'];
   code?: string;
   created?: number;
+  visualization?: AgenticVisualizationSpec;
   choices?: Array<{
     delta?: {
       content?: string;
@@ -268,6 +270,10 @@ const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
         created: chunk.created,
       };
       callbacks.onEvent?.(event);
+      return;
+    }
+    if (chunk.object === 'agentic.visualization' && chunk.visualization) {
+      callbacks.onVisualization?.(chunk.visualization);
       return;
     }
     const content = chunk.choices?.[0]?.delta?.content;

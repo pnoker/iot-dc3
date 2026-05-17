@@ -83,10 +83,46 @@ export interface AgenticMessageContent {
   attachments?: number[];
   tools?: string[];
   traces?: AgenticTraceEvent[];
+  charts?: AgenticVisualizationSpec[];
   contexts?: AgenticMessageContext[];
   tokens?: AgenticMessageTokens;
   reasoning?: boolean;
   reasoningContent?: string;
+}
+
+export type AgenticVisualizationType =
+  | 'line'
+  | 'area'
+  | 'column'
+  | 'bar'
+  | 'pie'
+  | 'donut'
+  | 'heatmap'
+  | 'scatter'
+  | 'stat';
+
+export interface AgenticVisualizationSpec {
+  id?: string;
+  type: AgenticVisualizationType;
+  title?: string;
+  description?: string;
+  dataset: Array<Record<string, unknown>>;
+  encode: {
+    x?: string;
+    y?: string;
+    color?: string;
+    size?: string;
+    shape?: string;
+  };
+  scale?: Record<string, unknown>;
+  meta?: Record<string, unknown>;
+  annotations?: AgenticVisualizationAnnotation[];
+}
+
+export interface AgenticVisualizationAnnotation {
+  type?: string;
+  value?: unknown;
+  label?: string;
 }
 
 export interface AgenticMessageContext {
@@ -158,6 +194,8 @@ export interface AgenticChatCompletionResponse {
     message?: {
       role?: AgenticMessageRole;
       content?: string;
+      contentExt?: AgenticMessageContent;
+      content_ext?: AgenticMessageContent;
     };
     finishReason?: string;
     finish_reason?: string;
@@ -177,6 +215,7 @@ export interface AgenticStreamCallbacks {
   onDelta?: (content: string) => void;
   onReasoning?: (content: string) => void;
   onEvent?: (event: AgenticTraceEvent) => void;
+  onVisualization?: (visualization: AgenticVisualizationSpec) => void;
   onFinish?: (reason: string) => void;
   onDone?: () => void;
   onError?: (error: Error) => void;
