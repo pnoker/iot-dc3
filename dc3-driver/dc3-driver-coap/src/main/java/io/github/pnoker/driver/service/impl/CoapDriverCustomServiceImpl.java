@@ -1,0 +1,167 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.github.pnoker.driver.service.impl;
+
+import io.github.pnoker.driver.coap.client.CoapClientManager;
+import io.github.pnoker.driver.coap.entity.CoapResult;
+import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.service.DriverCustomService;
+import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.entity.dto.MetadataEventDTO;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * CoAP Driver Custom Service Implementation
+ * <p>
+ * Unlike MQTT's pub/sub model, CoAP supports active request-response communication.
+ * The read method performs CoAP GET requests and the write method performs CoAP PUT requests.
+ *
+ * @author pnoker
+ * @version 2026.5.0
+ * @since 2026.5.0
+ */
+@Slf4j
+@Service
+public class CoapDriverCustomServiceImpl implements DriverCustomService {
+
+    @Resource
+    private DriverMetadata driverMetadata;
+
+    @Resource
+    private DriverSenderService driverSenderService;
+
+    @Resource
+    private CoapClientManager coapClientManager;
+
+    @Override
+    public void initial() {
+        log.info("CoAP driver initialized");
+    }
+
+    @Override
+    public void schedule() {
+        driverMetadata.getDeviceIds()
+                .forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+    }
+
+    @Override
+    public void event(MetadataEventDTO metadataEvent) {
+        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+        MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
+        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+            log.info("Driver metadata event received, protocol=coap, metadataType={}, operateType={}, deviceId={}",
+                    metadataType, operateType, metadataEvent.getId());
+            if (MetadataOperateTypeEnum.DELETE.equals(operateType)) {
+                // Release the CoAP client for the deleted device
+                String deviceHost = getDeviceHost(metadataEvent.getId());
+                if (deviceHost != null) {
+                    coapClientManager.releaseClient(deviceHost);
+                }
+            }
+        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+            log.info("Driver metadata event received, protocol=coap, metadataType={}, operateType={}, pointId={}",
+                    metadataType, operateType, metadataEvent.getId());
+        }
+    }
+
+    @Override
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
+                               DeviceBO device, PointBO point) {
+        String deviceHost = getConfigValue(driverConfig, "deviceHost", "localhost");
+        int devicePort = getConfigIntValue(driverConfig, "devicePort", 5683);
+        String readPath = getConfigValue(pointConfig, "readPath", "/sensors");
+
+        String uri = buildUri(deviceHost, devicePort);
+        log.debug("CoAP read: uri={}, path={}, deviceId={}, pointId={}", uri, readPath, device.getId(), point.getId());
+
+        CoapResult response = coapClientManager.get(uri, readPath);
+        if (response == null || !response.isSuccess()) {
+            log.warn("CoAP read failed, uri={}, path={}, statusCode={}", uri, readPath,
+                    response != null ? response.getStatusCode() : "timeout");
+            return null;
+        }
+
+        return new ReadPointValue(device, point, response.getPayload());
+    }
+
+    @Override
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
+                         DeviceBO device, PointBO point, WritePointValue values) {
+        String deviceHost = getConfigValue(driverConfig, "deviceHost", "localhost");
+        int devicePort = getConfigIntValue(driverConfig, "devicePort", 5683);
+        String writePath = getConfigValue(pointConfig, "writePath", "/actuators");
+        String value = values.getValue();
+
+        String uri = buildUri(deviceHost, devicePort);
+        log.debug("CoAP write: uri={}, path={}, deviceId={}, pointId={}, valueLength={}",
+                uri, writePath, device.getId(), point.getId(), value != null ? value.length() : 0);
+
+        CoapResult response = coapClientManager.put(uri, writePath, value);
+        if (response == null || !response.isSuccess()) {
+            log.warn("CoAP write failed, uri={}, path={}, statusCode={}", uri, writePath,
+                    response != null ? response.getStatusCode() : "timeout");
+            return false;
+        }
+
+        return true;
+    }
+
+    private String buildUri(String host, int port) {
+        return "coap://" + host + ":" + port;
+    }
+
+    private String getConfigValue(Map<String, AttributeBO> config, String key, String defaultValue) {
+        AttributeBO attribute = config.get(key);
+        if (attribute == null || StringUtils.isBlank(attribute.getValue(String.class))) {
+            return defaultValue;
+        }
+        return attribute.getValue(String.class);
+    }
+
+    private int getConfigIntValue(Map<String, AttributeBO> config, String key, int defaultValue) {
+        AttributeBO attribute = config.get(key);
+        if (attribute == null) {
+            return defaultValue;
+        }
+        try {
+            return attribute.getValue(Integer.class);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    private String getDeviceHost(Long deviceId) {
+        // Best-effort: cannot resolve host from deviceId alone in event handler
+        return null;
+    }
+
+}
