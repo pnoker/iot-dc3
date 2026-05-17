@@ -35,11 +35,11 @@ public interface NotifyPolicyEngine {
     /**
      * Decide whether a matched rule should notify through a channel binding.
      *
-     * @param match   rule match
-     * @param notify  notify policy
-     * @param bind    channel binding
-     * @param state   runtime state
-     * @param now     decision time
+     * @param match  rule match
+     * @param notify notify policy
+     * @param bind   channel binding
+     * @param state  runtime state
+     * @param now    decision time
      * @return decision
      */
     NotifyDecision decide(RuleMatch match, NotifyBO notify, NotifyChannelBindBO bind, RuleStateBO state,
