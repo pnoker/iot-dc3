@@ -20,6 +20,7 @@ import { join, relative } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import * as agenticApi from '@/api/agentic';
+import * as alarmApi from '@/api/alarm';
 import * as authApi from '@/api/api';
 import * as attributeApi from '@/api/attribute';
 import * as alertApi from '@/api/dashboard/alert';
@@ -65,6 +66,7 @@ type TransportCall = { transport: 'httpGet' | 'httpPost' | 'request'; args: unkn
 
 const modules: Record<string, ApiModule> = {
   agentic: agenticApi,
+  alarm: alarmApi,
   api: authApi,
   attribute: attributeApi,
   alert: alertApi,
@@ -90,6 +92,7 @@ const modules: Record<string, ApiModule> = {
 
 const coveredApiSourceFiles = new Set([
   'agentic',
+  'alarm',
   'api',
   'attribute',
   'dashboard/alert',

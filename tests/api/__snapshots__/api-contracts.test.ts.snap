@@ -275,6 +275,465 @@ exports[`API wrapper contracts > agentic > uploadAgenticAttachment maps to its t
 }
 `;
 
+exports[`API wrapper contracts > alarm > addMessage maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/message/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > addNotify maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > addNotifyChannel maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > addNotifyChannelBind maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/bind/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > addRule maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > deleteMessage maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/message/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > deleteNotify maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > deleteNotifyChannel maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > deleteNotifyChannelBind maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/bind/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > deleteRule maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getMessageById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/message/select_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getMessageList maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/message/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getNotifyById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/select_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getNotifyChannelBindById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/bind/select_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getNotifyChannelBindList maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/bind/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getNotifyChannelById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/select_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getNotifyChannelList maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getNotifyList maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getNotifyRecordById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/record/select_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getNotifyRecordList maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/record/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getRuleById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/select_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getRuleList maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getRuleStateById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/state/select_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alarm > getRuleStateList maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/state/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > has every export covered by the contract matrix 1`] = `
+[
+  "addMessage",
+  "addNotify",
+  "addNotifyChannel",
+  "addNotifyChannelBind",
+  "addRule",
+  "deleteMessage",
+  "deleteNotify",
+  "deleteNotifyChannel",
+  "deleteNotifyChannelBind",
+  "deleteRule",
+  "getMessageById",
+  "getMessageList",
+  "getNotifyById",
+  "getNotifyChannelBindById",
+  "getNotifyChannelBindList",
+  "getNotifyChannelById",
+  "getNotifyChannelList",
+  "getNotifyList",
+  "getNotifyRecordById",
+  "getNotifyRecordList",
+  "getRuleById",
+  "getRuleList",
+  "getRuleStateById",
+  "getRuleStateList",
+  "updateMessage",
+  "updateNotify",
+  "updateNotifyChannel",
+  "updateNotifyChannelBind",
+  "updateRule",
+]
+`;
+
+exports[`API wrapper contracts > alarm > updateMessage maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/message/update",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > updateNotify maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/update",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > updateNotifyChannel maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/update",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > updateNotifyChannelBind maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/bind/update",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > updateRule maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/update",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
 exports[`API wrapper contracts > alert > alertActivity maps to its transport contract 1`] = `
 {
   "args": [

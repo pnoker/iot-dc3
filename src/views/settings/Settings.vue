@@ -91,6 +91,23 @@
         ],
   });
 
+  const alarmGroup = (children?: SidebarItem[]): SidebarItem => ({
+    name: 'settingsAlarm',
+    title: t('nav.settingsAlarm'),
+    icon: 'AlarmClock',
+    children: children?.length
+      ? children
+      : [
+          { name: 'settingsAlarmRule', title: t('nav.settingsAlarmRule'), icon: 'SetUp' },
+          { name: 'settingsAlarmNotify', title: t('nav.settingsAlarmNotify'), icon: 'Bell' },
+          { name: 'settingsAlarmMessage', title: t('nav.settingsAlarmMessage'), icon: 'Message' },
+          { name: 'settingsAlarmChannel', title: t('nav.settingsAlarmChannel'), icon: 'Connection' },
+          { name: 'settingsAlarmBind', title: t('nav.settingsAlarmBind'), icon: 'Link' },
+          { name: 'settingsAlarmState', title: t('nav.settingsAlarmState'), icon: 'Monitor' },
+          { name: 'settingsAlarmRecord', title: t('nav.settingsAlarmRecord'), icon: 'DocumentChecked' },
+        ],
+  });
+
   const fallback: SidebarItem[] = [
     { name: 'settingsUser', title: t('nav.settingsUser'), icon: 'User' },
     { name: 'settingsRole', title: t('nav.settingsRole'), icon: 'UserFilled' },
@@ -99,6 +116,7 @@
     { name: 'settingsMenu', title: t('nav.settingsMenu'), icon: 'Menu' },
     { name: 'settingsGroup', title: t('nav.settingsGroup'), icon: 'Grid' },
     { name: 'settingsLabel', title: t('nav.settingsLabel'), icon: 'CollectionTag' },
+    alarmGroup(),
     modelGroup(),
     {
       name: 'settingsEvent',
@@ -139,10 +157,12 @@
       'settingsAbout',
     ]);
     ensureDirectItem(items, { name: 'settingsLabel', title: t('nav.settingsLabel'), icon: 'CollectionTag' }, [
+      'settingsAlarm',
       'settingsModel',
       'settingsEvent',
       'settingsAbout',
     ]);
+    ensureAlarmGroup(items);
     ensureModelGroup(items);
     return items;
   });
@@ -202,11 +222,40 @@
     insertBefore(items, modelGroup(extracted), ['settingsEvent', 'settingsAbout']);
   };
 
+  const ensureAlarmGroup = (items: SidebarItem[]) => {
+    const alarmChildNames = [
+      'settingsAlarmRule',
+      'settingsAlarmNotify',
+      'settingsAlarmMessage',
+      'settingsAlarmChannel',
+      'settingsAlarmBind',
+      'settingsAlarmState',
+      'settingsAlarmRecord',
+    ];
+    const extracted: SidebarItem[] = [];
+    for (const name of alarmChildNames) {
+      const index = items.findIndex((item) => item.name === name);
+      if (index >= 0) {
+        const removed = items.splice(index, 1)[0];
+        if (removed) extracted.push(removed);
+      }
+    }
+
+    const alarm = items.find((item) => item.name === 'settingsAlarm');
+    if (alarm) {
+      alarm.children = alarm.children?.length ? alarm.children : alarmGroup(extracted).children;
+      return;
+    }
+
+    insertBefore(items, alarmGroup(extracted), ['settingsModel', 'settingsEvent', 'settingsAbout']);
+  };
+
   const activeMenu = computed(() => String(route.name || 'settingsUser'));
 
   // Map API-tree menuCodes that don't match a vue-router route name.
   const ROUTE_ALIAS: Record<string, string> = {
     settingsEventOverview: 'settingsEvent',
+    settingsAlarm: 'settingsAlarmRule',
   };
 
   const onSelect = (name: string) => {
