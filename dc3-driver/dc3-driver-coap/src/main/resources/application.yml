@@ -1,0 +1,69 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: CoAP Driver
+    code: CoapDriver
+    type: DRIVER_SERVER
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    driver-attribute:
+      - attribute-name: Device Host
+        attribute-code: deviceHost
+        attribute-type-flag: STRING
+        default-value: localhost
+        remark: CoAP device host address
+      - attribute-name: Device Port
+        attribute-code: devicePort
+        attribute-type-flag: INT
+        default-value: 5683
+        remark: CoAP device port
+    point-attribute:
+      - attribute-name: Read Path
+        attribute-code: readPath
+        attribute-type-flag: STRING
+        default-value: /sensors
+        remark: CoAP resource path for reading point data
+      - attribute-name: Write Path
+        attribute-code: writePath
+        attribute-type-flag: STRING
+        default-value: /actuators
+        remark: CoAP resource path for writing point data
+      - attribute-name: Content Format
+        attribute-code: contentFormat
+        attribute-type-flag: STRING
+        default-value: json
+        remark: Content format: json, text, cbor, octet-stream
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/coap/${spring.application.name}.log
