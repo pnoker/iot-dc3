@@ -71,7 +71,7 @@ import java.util.Objects;
  *
  * @author pnoker
  * @version 2026.5.17
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Component
 public class OpenAiCompatibleAgenticRuntime {

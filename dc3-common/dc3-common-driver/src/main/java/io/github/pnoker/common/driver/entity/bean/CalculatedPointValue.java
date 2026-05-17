@@ -30,7 +30,7 @@ import java.io.Serializable;
  *
  * @author pnoker
  * @version 2026.5.15
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @ToString

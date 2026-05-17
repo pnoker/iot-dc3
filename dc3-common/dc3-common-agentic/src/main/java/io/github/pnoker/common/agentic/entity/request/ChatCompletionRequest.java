@@ -30,7 +30,7 @@ import java.util.List;
  * @version 2025.9.0
  * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API
  * Reference</a>
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter

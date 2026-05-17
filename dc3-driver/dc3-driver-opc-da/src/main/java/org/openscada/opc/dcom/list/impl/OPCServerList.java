@@ -39,7 +39,7 @@ import java.net.UnknownHostException;
  *
  * @author Jens Reimann &lt;jens.reimann@th4-systems.com&gt;
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public class OPCServerList extends BaseCOMObject {
 

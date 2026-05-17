@@ -32,8 +32,8 @@ import java.util.List;
  * el-tree-select can render the role hierarchy from a single response.
  *
  * @author pnoker
- * @version 2026.5.5
- * @since 2026.5.5
+ * @version 2026.5.17
+ * @since 2016.10.1
  */
 @Getter
 @Setter

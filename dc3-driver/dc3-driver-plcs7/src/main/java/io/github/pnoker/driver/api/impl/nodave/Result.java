@@ -22,7 +22,7 @@ package io.github.pnoker.driver.api.impl.nodave;
  * To change the template for this generated type comment go to
  * Window-Preferences-Java-Code Generation-Code and Comments
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public final class Result {
 

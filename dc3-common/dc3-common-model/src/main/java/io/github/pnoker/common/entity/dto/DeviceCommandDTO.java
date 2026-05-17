@@ -33,7 +33,7 @@ import java.time.LocalDateTime;
 /**
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Getter
 @Setter
@@ -70,7 +70,7 @@ public class DeviceCommandDTO implements Serializable {
     /**
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     @Getter
     @Setter
@@ -107,7 +107,7 @@ public class DeviceCommandDTO implements Serializable {
     /**
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     @Getter
     @Setter

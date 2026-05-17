@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @author pnoker
  * @version 2026.5.16
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public record AgenticToolResult<T>(boolean success, String code, String message, T data,
