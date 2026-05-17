@@ -25,13 +25,13 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2026.5.17</version>
+        <version>2026.5.18</version>
         <relativePath/>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-common</artifactId>
-    <version>2026.5.17</version>
+    <version>2026.5.18</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016</inceptionYear>
@@ -71,7 +71,7 @@
         <maven.deploy.skip>true</maven.deploy.skip>
 
         <!-- DC3 Version -->
-        <dc3.version>2026.5.17</dc3.version>
+        <dc3.version>2026.5.18</dc3.version>
     </properties>
 
     <modules>
