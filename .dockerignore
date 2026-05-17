@@ -17,6 +17,15 @@
 **/*.ipr
 **/*.md
 
+# Container/build metadata is parsed by the build engine or used on the host,
+# but Maven does not need it inside the builder stage. Keep it out of `COPY . .`
+# so documentation or compose-only edits do not invalidate the Maven layer.
+Dockerfile
+.dockerignore
+Makefile
+dc3/docker-compose*.yml
+.github
+
 # Maven build outputs — must be excluded so the builder stage starts from
 # clean sources and host-side jars never leak into the image.
 **/target
