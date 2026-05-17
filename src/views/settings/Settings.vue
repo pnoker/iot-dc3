@@ -18,7 +18,7 @@
   <el-container class="settings-container">
     <el-aside class="settings-aside" width="220px">
       <el-card class="settings-aside-card" shadow="never">
-        <el-menu :default-active="activeMenu" @select="onSelect">
+        <el-menu :default-active="activeMenu" :default-openeds="defaultOpeneds" @select="onSelect">
           <template v-for="item in sidebarItems" :key="item.name">
             <el-sub-menu v-if="item.children?.length" :index="item.name">
               <template #title>
@@ -130,9 +130,40 @@
     },
   ];
 
+  const SETTINGS_TITLE_KEYS: Record<string, string> = {
+    settingsUser: 'nav.settingsUser',
+    settingsRole: 'nav.settingsRole',
+    settingsResource: 'nav.settingsResource',
+    settingsApi: 'nav.settingsApi',
+    settingsMenu: 'nav.settingsMenu',
+    settingsGroup: 'nav.settingsGroup',
+    settingsLabel: 'nav.settingsLabel',
+    settingsAlarm: 'nav.settingsAlarm',
+    settingsAlarmRule: 'nav.settingsAlarmRule',
+    settingsAlarmNotify: 'nav.settingsAlarmNotify',
+    settingsAlarmMessage: 'nav.settingsAlarmMessage',
+    settingsAlarmChannel: 'nav.settingsAlarmChannel',
+    settingsAlarmBind: 'nav.settingsAlarmBind',
+    settingsAlarmState: 'nav.settingsAlarmState',
+    settingsAlarmRecord: 'nav.settingsAlarmRecord',
+    settingsModel: 'nav.settingsModel',
+    settingsAgentic: 'nav.settingsAgentic',
+    settingsAgenticProvider: 'nav.settingsAgenticProvider',
+    settingsEvent: 'nav.settingsEvent',
+    settingsEventOverview: 'nav.settingsEventOverview',
+    settingsDeviceEvent: 'nav.settingsDeviceEvent',
+    settingsDriverEvent: 'nav.settingsDriverEvent',
+    settingsAbout: 'nav.settingsAbout',
+  };
+
+  const menuTitle = (node: any) => {
+    const titleKey = SETTINGS_TITLE_KEYS[node.menuCode];
+    return titleKey ? t(titleKey) : resolveMenuTitle(node);
+  };
+
   const mapMenuNode = (node: any): SidebarItem => ({
     name: node.menuCode,
-    title: resolveMenuTitle(node),
+    title: menuTitle(node),
     icon: node.menuExt?.content?.icon,
     children: node.children?.length
       ? node.children
@@ -250,12 +281,42 @@
     insertBefore(items, alarmGroup(extracted), ['settingsModel', 'settingsEvent', 'settingsAbout']);
   };
 
-  const activeMenu = computed(() => String(route.name || 'settingsUser'));
+  const ACTIVE_ALIAS: Record<string, string> = {
+    settingsModel: 'settingsAgentic',
+    settingsAgenticDetail: 'settingsAgentic',
+    settingsAgenticProviderDetail: 'settingsAgenticProvider',
+    settingsAlarm: 'settingsAlarmRule',
+    settingsAlarmRuleDetail: 'settingsAlarmRule',
+    settingsAlarmNotifyDetail: 'settingsAlarmNotify',
+    settingsAlarmMessageDetail: 'settingsAlarmMessage',
+    settingsAlarmChannelDetail: 'settingsAlarmChannel',
+    settingsAlarmBindDetail: 'settingsAlarmBind',
+    settingsAlarmStateDetail: 'settingsAlarmState',
+    settingsAlarmRecordDetail: 'settingsAlarmRecord',
+    settingsGroupDetail: 'settingsGroup',
+    settingsLabelDetail: 'settingsLabel',
+  };
+
+  const activeMenu = computed(() => {
+    const name = String(route.name || 'settingsUser');
+    return ACTIVE_ALIAS[name] || name;
+  });
+
+  const defaultOpeneds = computed(() => {
+    const name = activeMenu.value;
+    if (name.startsWith('settingsAlarm')) return ['settingsAlarm'];
+    if (name.startsWith('settingsAgentic') || name === 'settingsModel') return ['settingsModel'];
+    if (name === 'settingsEvent' || name === 'settingsDeviceEvent' || name === 'settingsDriverEvent') {
+      return ['settingsEvent'];
+    }
+    return [];
+  });
 
   // Map API-tree menuCodes that don't match a vue-router route name.
   const ROUTE_ALIAS: Record<string, string> = {
     settingsEventOverview: 'settingsEvent',
     settingsAlarm: 'settingsAlarmRule',
+    settingsModel: 'settingsAgentic',
   };
 
   const onSelect = (name: string) => {
@@ -268,6 +329,7 @@
     align-items: stretch;
     gap: 4px;
     min-height: calc(100vh - 120px);
+    min-width: 0;
   }
 
   .settings-aside {
@@ -304,6 +366,7 @@
 
   .settings-main {
     padding: 0;
+    min-width: 0;
     // el-main ships with overflow:auto by design (aside-doesn't-scroll,
     // main-scrolls layout). We don't want that here — the Layout-level
     // el-scrollbar already owns page scrolling, and an additional auto

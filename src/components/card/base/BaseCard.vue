@@ -29,6 +29,7 @@
 <style lang="scss" scoped>
   .base-card {
     box-sizing: border-box;
+    min-width: 0;
 
     ul {
       list-style: none;
@@ -42,6 +43,7 @@
     :deep(.el-card) {
       width: 100%;
       box-sizing: border-box;
+      min-width: 0;
     }
 
     :deep(.el-tabs__nav) {
@@ -49,6 +51,8 @@
     }
 
     .base-card__container {
+      min-width: 0;
+
       :deep(.el-tabs__header) {
         margin-bottom: 0;
 

@@ -29,6 +29,7 @@
 <style lang="scss" scoped>
   .blank-card {
     box-sizing: border-box;
+    min-width: 0;
 
     ul {
       list-style: none;
@@ -42,6 +43,7 @@
     :deep(.el-card) {
       width: 100%;
       box-sizing: border-box;
+      min-width: 0;
     }
 
     :deep(.el-card.blank-card__body) {
@@ -50,6 +52,11 @@
 
     :deep(.el-card__body) {
       padding: 16px;
+      overflow: hidden;
+    }
+
+    .blank-card__container {
+      min-width: 0;
     }
 
     :deep(.el-tabs__nav) {

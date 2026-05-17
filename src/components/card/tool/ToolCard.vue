@@ -221,6 +221,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 12px;
       margin-top: 16px;
       padding-top: 12px;
       border-top: 1px solid var(--el-border-color-lighter);
@@ -234,6 +236,8 @@
       .tool-card-footer-page {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
         gap: 8px;
       }
 
