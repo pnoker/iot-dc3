@@ -10,7 +10,7 @@ Auth Center before forwarding requests in the `dc3-gateway`.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-gateway
-- **Version**: 2026.5.17
+- **Version**: 2026.5.18
 
 ## Key Components
 

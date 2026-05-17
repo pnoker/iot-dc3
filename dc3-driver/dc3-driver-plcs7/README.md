@@ -10,7 +10,7 @@ and write data block registers.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-plcs7
-- **Version**: 2026.5.17
+- **Version**: 2026.5.18
 - **Driver Name**: PLC S7 Driver
 
 ## Driver Attributes (Device-level)
