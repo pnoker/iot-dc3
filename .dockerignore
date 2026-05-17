@@ -16,3 +16,16 @@
 **/*.iws
 **/*.ipr
 **/*.md
+
+# Maven build outputs — must be excluded so the builder stage starts from
+# clean sources and host-side jars never leak into the image.
+**/target
+**/dependency-reduced-pom.xml
+
+# Frontend artifacts (if any module ever bundles a UI)
+**/node_modules
+**/dist
+
+# Local docker-compose / dev artifacts
+dc3/data
+dc3/logs
