@@ -76,18 +76,33 @@ make dev
 make dev-all
 ```
 
-Use `REGISTRY=domestic` when you want the mainland China image registry variants. Backward-compatible aliases
-`REGISTRY=aliyun` and `REGISTRY=cn` still work:
+Use `REGISTRY=cn` when you want the mainland China image registry variants:
 
 ```bash
-make dev-db REGISTRY=domestic
-make dev-all REGISTRY=domestic
-make app-all REGISTRY=aliyun
-make compose-up STACK=grafana REGISTRY=cn
+make dev-db REGISTRY=cn
+make dev-all REGISTRY=cn
+make app-all REGISTRY=cn
+make compose-up STACK=optional REGISTRY=cn
 make compose-logs STACK=dev REGISTRY=global
 ```
 
-### Docker Compose environment overrides
+Service-level shortcuts for frontend and API testing:
+
+```bash
+# Start base dependencies first
+make dev-db REGISTRY=cn
+
+# Start one service, multiple services, or a predefined group
+make up SERVICES=agentic REGISTRY=cn
+make up SERVICES="gateway agentic" REGISTRY=cn
+make up GROUP=core REGISTRY=cn
+make up GROUP=drivers REGISTRY=cn
+
+# Follow logs for the services under test
+make logs SERVICES="gateway agentic"
+```
+
+### Compose Environment Overrides
 
 Copy the example file before changing any published ports, image tags, or observability settings:
 
