@@ -29,7 +29,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public abstract class ReadNumericRequest extends ModbusRequest {
 

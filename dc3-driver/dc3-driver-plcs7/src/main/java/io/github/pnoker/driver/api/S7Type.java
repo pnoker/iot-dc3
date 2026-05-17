@@ -34,7 +34,7 @@ import io.github.pnoker.driver.api.impl.serializer.converter.TimeConverter;
  * @author Thomas Rudin Libnodave:
  * <a href="http://libnodave.sourceforge.net/">libnodave.sourceforge.net</a>
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public enum S7Type {
 

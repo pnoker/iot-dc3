@@ -28,8 +28,8 @@ import lombok.ToString;
  * A single HTTP endpoint discovered by the resource registrar scanner.
  *
  * @author pnoker
- * @version 2026.5.5
- * @since 2026.5.5
+ * @version 2026.5.17
+ * @since 2016.10.1
  */
 @Getter
 @Setter

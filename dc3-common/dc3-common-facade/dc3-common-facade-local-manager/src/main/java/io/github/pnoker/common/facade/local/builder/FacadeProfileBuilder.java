@@ -29,7 +29,7 @@ import org.mapstruct.Mapper;
  *
  * @author pnoker
  * @version 2026.5.14
- * @since 2026.5.5
+ * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeProfileBuilder {

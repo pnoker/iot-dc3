@@ -25,7 +25,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public class AgenticConstant {
 
@@ -79,7 +79,7 @@ public class AgenticConstant {
      *
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class ToolContextKey {
 
@@ -106,7 +106,7 @@ public class AgenticConstant {
      *
      * @author pnoker
      * @version 2026.5.16
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class Chat {
 
@@ -141,7 +141,7 @@ public class AgenticConstant {
      *
      * @author pnoker
      * @version 2026.5.17
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class Visualization {
 
@@ -196,7 +196,7 @@ public class AgenticConstant {
      *
      * @author pnoker
      * @version 2026.5.16
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class Session {
 
@@ -213,7 +213,7 @@ public class AgenticConstant {
      *
      * @author pnoker
      * @version 2026.5.16
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class RunEvent {
 
@@ -254,7 +254,7 @@ public class AgenticConstant {
      *
      * @author pnoker
      * @version 2026.5.16
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class ToolResult {
 
@@ -287,7 +287,7 @@ public class AgenticConstant {
      *
      * @author pnoker
      * @version 2026.5.16
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class ToolLimit {
 
@@ -308,7 +308,7 @@ public class AgenticConstant {
      *
      * @author pnoker
      * @version 2026.5.16
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class ToolMessage {
 

@@ -46,8 +46,8 @@ import java.util.Objects;
  * Api Controller
  *
  * @author pnoker
- * @version 2026.5.5
- * @since 2022.1.0
+ * @version 2026.5.17
+ * @since 2016.10.1
  */
 @Slf4j
 @RestController

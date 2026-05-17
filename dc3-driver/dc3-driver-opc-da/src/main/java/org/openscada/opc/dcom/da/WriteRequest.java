@@ -24,7 +24,7 @@ import org.jinterop.dcom.core.JIVariant;
  *
  * @author Jens Reimann jens.reimann@th4-systems.com
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public class WriteRequest {
 

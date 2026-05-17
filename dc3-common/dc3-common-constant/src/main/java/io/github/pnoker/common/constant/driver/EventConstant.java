@@ -25,7 +25,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public class EventConstant {
 
@@ -38,7 +38,7 @@ public class EventConstant {
      *
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class Driver {
 
@@ -67,7 +67,7 @@ public class EventConstant {
      *
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class Device {
 
