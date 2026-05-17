@@ -26,7 +26,7 @@ import java.time.Instant;
  *
  * @author pnoker
  * @version 2026.5.16
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public record AgenticRunEvent(String type, String name, String title, String detail, long timestamp, String phase,
                               String status, String code) {

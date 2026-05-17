@@ -23,7 +23,7 @@ import io.github.pnoker.common.agentic.entity.model.SessionDO;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public interface SessionMapper extends BaseMapper<SessionDO> {
 

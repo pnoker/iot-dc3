@@ -25,7 +25,7 @@ import io.github.pnoker.driver.api.impl.serializer.S7SerializerImpl;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 
 public final class StructConverter implements S7Serializable {

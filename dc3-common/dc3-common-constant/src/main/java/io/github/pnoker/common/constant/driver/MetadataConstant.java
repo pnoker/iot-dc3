@@ -27,7 +27,7 @@ import io.github.pnoker.common.constant.common.SuffixConstant;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public class MetadataConstant {
 
@@ -40,7 +40,7 @@ public class MetadataConstant {
      *
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class Profile {
 
@@ -61,7 +61,7 @@ public class MetadataConstant {
      *
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class Point {
 
@@ -82,7 +82,7 @@ public class MetadataConstant {
      *
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class Device {
 
@@ -103,7 +103,7 @@ public class MetadataConstant {
      *
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class DriverConfig {
 
@@ -124,7 +124,7 @@ public class MetadataConstant {
      *
      * @author pnoker
      * @version 2025.9.0
-     * @since 2022.1.0
+     * @since 2016.10.1
      */
     public static class PointConfig {
 

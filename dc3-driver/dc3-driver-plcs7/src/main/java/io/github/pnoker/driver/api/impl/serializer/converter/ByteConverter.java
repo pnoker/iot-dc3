@@ -24,7 +24,7 @@ import io.github.pnoker.driver.api.S7Type;
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 
 public class ByteConverter implements S7Serializable {

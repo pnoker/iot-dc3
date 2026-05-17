@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Matthew Lohbihler
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public class AsciiMaster extends SerialMaster {
 

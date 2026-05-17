@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author pnoker
  * @version 2026.5.16
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public record AgenticToolTraceMetadata(String domain, String title) {
 

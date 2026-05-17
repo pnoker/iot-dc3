@@ -28,7 +28,7 @@ import java.util.concurrent.Semaphore;
  *
  * @author Thomas Hergenhahn
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 @Slf4j
 public abstract class S7Connection {

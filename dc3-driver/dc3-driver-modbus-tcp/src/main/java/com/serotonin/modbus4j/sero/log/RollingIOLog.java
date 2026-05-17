@@ -32,7 +32,7 @@ import java.nio.file.StandardCopyOption;
  *
  * @author Terry Packer
  * @version 2025.9.0
- * @since 2022.1.0
+ * @since 2016.10.1
  */
 public class RollingIOLog extends BaseIOLog {
 

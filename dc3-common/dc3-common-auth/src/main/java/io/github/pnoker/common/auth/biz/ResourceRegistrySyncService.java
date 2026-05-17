@@ -27,8 +27,8 @@ import io.github.pnoker.common.auth.entity.model.MenuDO;
  * are updated, and (optionally) orphaned rows are soft-deleted.
  *
  * @author pnoker
- * @version 2026.5.5
- * @since 2026.5.5
+ * @version 2026.5.17
+ * @since 2016.10.1
  */
 public interface ResourceRegistrySyncService {
 

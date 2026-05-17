@@ -25,8 +25,8 @@ import org.apache.ibatis.annotations.Param;
  * serialize concurrent registrations of the same service.
  *
  * @author pnoker
- * @version 2026.5.5
- * @since 2026.5.5
+ * @version 2026.5.17
+ * @since 2016.10.1
  */
 @Mapper
 public interface ResourceRegistryLockMapper {
