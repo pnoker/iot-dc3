@@ -25,12 +25,12 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>2026.5.5</version>
+        <version>2026.5.17</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-gateway</artifactId>
-    <version>2026.5.5</version>
+    <version>2026.5.17</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2016</inceptionYear>
