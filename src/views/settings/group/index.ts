@@ -16,6 +16,7 @@
 
 import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { addGroup, deleteGroup, getGroupList, updateGroup } from '@/api/group';
 import { timestampColumn } from '@/utils/dateUtil';
@@ -37,6 +38,7 @@ export default defineComponent({
   },
   setup() {
     const { t } = useI18n();
+    const router = useRouter();
     const editRef = ref<InstanceType<typeof groupEditForm>>();
 
     const reactiveData = reactive({
@@ -115,6 +117,11 @@ export default defineComponent({
     };
 
     const openAdd = () => editRef.value?.show();
+    const openDetail = (row: GroupRecord) => {
+      router.push({ name: 'settingsGroupDetail', query: { id: String(row.id) } }).catch(() => {
+        // handled globally
+      });
+    };
     const openEdit = (row: GroupRecord) => editRef.value?.showEdit(row);
 
     const onAdd = (form: any, done: () => void) => {
@@ -175,6 +182,7 @@ export default defineComponent({
       refresh,
       sort,
       openAdd,
+      openDetail,
       openEdit,
       onAdd,
       onUpdate,

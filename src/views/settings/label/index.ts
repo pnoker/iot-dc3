@@ -16,6 +16,7 @@
 
 import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { addLabel, deleteLabel, getLabelList, updateLabel } from '@/api/label';
 import { timestampColumn } from '@/utils/dateUtil';
@@ -37,6 +38,7 @@ export default defineComponent({
   },
   setup() {
     const { t } = useI18n();
+    const router = useRouter();
     const editRef = ref<InstanceType<typeof labelEditForm>>();
 
     const reactiveData = reactive({
@@ -89,6 +91,11 @@ export default defineComponent({
     };
 
     const openAdd = () => editRef.value?.show();
+    const openDetail = (row: LabelRecord) => {
+      router.push({ name: 'settingsLabelDetail', query: { id: String(row.id) } }).catch(() => {
+        // handled globally
+      });
+    };
     const openEdit = (row: LabelRecord) => editRef.value?.showEdit(row);
 
     const onAdd = (form: any, done: () => void) => {
@@ -147,6 +154,7 @@ export default defineComponent({
       refresh,
       sort,
       openAdd,
+      openDetail,
       openEdit,
       onAdd,
       onUpdate,

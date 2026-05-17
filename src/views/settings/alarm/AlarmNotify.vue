@@ -32,7 +32,12 @@
           <el-input v-model="searchForm.keyword" clearable :placeholder="activeConfig.searchPlaceholder" />
         </el-form-item>
         <el-form-item v-if="activeConfig.filterProp" :label="activeConfig.filterLabel" prop="filterValue">
-          <el-select v-model="searchForm.filterValue" clearable :placeholder="activeConfig.filterPlaceholder">
+          <el-segmented
+            v-if="activeConfig.filterProp === 'enableFlag'"
+            v-model="searchForm.filterValue"
+            :options="enableFilterOptions"
+          />
+          <el-select v-else v-model="searchForm.filterValue" clearable :placeholder="activeConfig.filterPlaceholder">
             <el-option v-for="option in activeConfig.filterOptions" :key="option.value" v-bind="option" />
           </el-select>
         </el-form-item>
@@ -66,7 +71,7 @@
             <span v-else>{{ formatCell(row, column) }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.operation')" fixed="right" width="180">
+        <el-table-column :label="t('common.operation')" fixed="right" :width="activeConfig.editable ? 180 : 100">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button v-if="activeConfig.editable" link type="primary" @click="openEdit(row)">
@@ -98,12 +103,12 @@
       :close-on-press-escape="false"
       :show-close="false"
       :title="dialogTitle"
-      class="things-dialog"
+      class="things-dialog things-dialog--wide"
       destroy-on-close
       draggable
-      width="760px"
+      width="880px"
     >
-      <el-form ref="formRef" :model="formModel" :rules="formRules" label-position="top">
+      <el-form ref="formRef" :model="formModel" :rules="formRules" class="alarm-notify__form" label-position="top">
         <el-row :gutter="12">
           <el-col v-for="field in activeConfig.fields" :key="field.prop" :span="field.span || 12">
             <el-form-item :label="field.label" :prop="field.prop">
@@ -124,6 +129,7 @@
                 :precision="field.precision || 0"
                 style="width: 100%"
               />
+              <enable-flag-segmented v-else-if="field.kind === 'enableFlag'" v-model="formModel[field.prop]" />
               <el-input
                 v-else-if="field.kind === 'json' || field.kind === 'textarea'"
                 v-model="formModel[field.prop]"
@@ -145,18 +151,6 @@
         </div>
       </template>
     </el-dialog>
-
-    <el-drawer v-model="detailVisible" :title="activeConfig.label" size="560px">
-      <el-descriptions :column="1" border>
-        <el-descriptions-item v-for="field in detailFields" :key="field.prop" :label="field.label">
-          {{ formatDetail(field.prop) }}
-        </el-descriptions-item>
-      </el-descriptions>
-      <div v-for="prop in activeConfig.extProps" :key="prop" class="alarm-notify__json-block">
-        <div class="alarm-notify__json-title">{{ extLabel(prop) }}</div>
-        <pre>{{ prettyJson(detailRow?.[prop]) }}</pre>
-      </div>
-    </el-drawer>
   </div>
 </template>
 
@@ -164,6 +158,7 @@
   import type { FormInstance, FormRules } from 'element-plus';
   import { computed, reactive, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useRouter } from 'vue-router';
   import { Plus } from '@element-plus/icons-vue';
 
   import {
@@ -192,13 +187,14 @@
   } from '@/api/alarm';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import type { AlarmEntityRecord, Order, PageQuery } from '@/config/types';
   import { timestamp } from '@/utils/dateUtil';
   import { failMessage, successMessage } from '@/utils/notificationUtil';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   type TabKey = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'record';
-  type FieldKind = 'input' | 'number' | 'select' | 'textarea' | 'json';
+  type FieldKind = 'input' | 'number' | 'select' | 'enableFlag' | 'textarea' | 'json';
   type ColumnKind = 'text' | 'tag' | 'code' | 'time' | 'json';
 
   interface Option {
@@ -239,7 +235,6 @@
     filterLabel?: string;
     filterPlaceholder?: string;
     filterOptions: Option[];
-    extProps: string[];
     columns: ColumnConfig[];
     fields: FieldConfig[];
     defaultForm: () => Record<string, unknown>;
@@ -250,10 +245,16 @@
   }
 
   const { t } = useI18n();
+  const router = useRouter();
   const props = defineProps<{
     entity: TabKey;
   }>();
 
+  const enableFilterOptions: Option[] = [
+    { label: t('common.all'), value: '' },
+    { label: t('common.enable'), value: 'ENABLE' },
+    { label: t('common.disable'), value: 'DISABLE' },
+  ];
   const enableOptions: Option[] = [
     { label: t('common.enable'), value: 'ENABLE' },
     { label: t('common.disable'), value: 'DISABLE' },
@@ -348,13 +349,12 @@
     });
 
   const commonColumns = (): ColumnConfig[] => [
-    { prop: 'remark', label: t('common.remark'), minWidth: 180 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 180 },
-    { prop: 'operateTime', label: t('common.operationTime'), kind: 'time', width: 180 },
+    { prop: 'remark', label: t('common.remark'), minWidth: 150 },
+    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
   ];
 
   const commonFields = (): FieldConfig[] => [
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'select', options: enableOptions, span: 12 },
+    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', span: 12 },
     { prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, rows: 3 },
   ];
 
@@ -370,14 +370,13 @@
       filterLabel: t('common.enableFlag'),
       filterPlaceholder: t('common.enableFlag'),
       filterOptions: enableOptions,
-      extProps: ['ruleExt'],
       columns: [
-        { prop: 'ruleName', label: t('settings.alarm.ruleName'), minWidth: 210 },
-        { prop: 'ruleCode', label: t('settings.alarm.ruleCode'), kind: 'code', minWidth: 220 },
+        { prop: 'ruleName', label: t('settings.alarm.ruleName'), minWidth: 180 },
+        { prop: 'ruleCode', label: t('settings.alarm.ruleCode'), kind: 'code', minWidth: 180 },
         { prop: 'alarmTargetTypeFlag', label: t('settings.alarm.targetType'), kind: 'tag', width: 110 },
-        { prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code', minWidth: 150 },
-        { prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code', minWidth: 150 },
-        { prop: 'messageId', label: t('settings.alarm.messageId'), kind: 'code', minWidth: 150 },
+        { prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code', minWidth: 130 },
+        { prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code', minWidth: 130 },
+        { prop: 'messageId', label: t('settings.alarm.messageId'), kind: 'code', minWidth: 130 },
         { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
         ...commonColumns(),
       ],
@@ -424,10 +423,9 @@
       filterLabel: t('common.enableFlag'),
       filterPlaceholder: t('common.enableFlag'),
       filterOptions: enableOptions,
-      extProps: ['notifyExt'],
       columns: [
-        { prop: 'notifyName', label: t('settings.alarm.notifyName'), minWidth: 220 },
-        { prop: 'notifyCode', label: t('settings.alarm.notifyCode'), kind: 'code', minWidth: 220 },
+        { prop: 'notifyName', label: t('settings.alarm.notifyName'), minWidth: 180 },
+        { prop: 'notifyCode', label: t('settings.alarm.notifyCode'), kind: 'code', minWidth: 180 },
         { prop: 'autoConfirmFlag', label: t('settings.alarm.autoConfirm'), kind: 'tag', width: 120 },
         { prop: 'notifyInterval', label: t('settings.alarm.notifyInterval'), width: 130 },
         { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
@@ -472,10 +470,9 @@
       filterLabel: t('common.enableFlag'),
       filterPlaceholder: t('common.enableFlag'),
       filterOptions: enableOptions,
-      extProps: ['messageExt'],
       columns: [
-        { prop: 'messageName', label: t('settings.alarm.messageName'), minWidth: 240 },
-        { prop: 'messageCode', label: t('settings.alarm.messageCode'), kind: 'code', minWidth: 240 },
+        { prop: 'messageName', label: t('settings.alarm.messageName'), minWidth: 190 },
+        { prop: 'messageCode', label: t('settings.alarm.messageCode'), kind: 'code', minWidth: 190 },
         { prop: 'messageLevel', label: t('settings.alarm.messageLevel'), kind: 'tag', width: 110 },
         { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
         ...commonColumns(),
@@ -517,12 +514,11 @@
       filterLabel: t('settings.alarm.channelType'),
       filterPlaceholder: t('settings.alarm.channelType'),
       filterOptions: channelTypeOptions,
-      extProps: ['channelExt'],
       columns: [
-        { prop: 'channelName', label: t('settings.alarm.channelName'), minWidth: 230 },
-        { prop: 'channelCode', label: t('settings.alarm.channelCode'), kind: 'code', minWidth: 230 },
+        { prop: 'channelName', label: t('settings.alarm.channelName'), minWidth: 180 },
+        { prop: 'channelCode', label: t('settings.alarm.channelCode'), kind: 'code', minWidth: 180 },
         { prop: 'channelTypeFlag', label: t('settings.alarm.channelType'), kind: 'tag', width: 130 },
-        { prop: 'credentialRef', label: t('settings.alarm.credentialRef'), kind: 'code', minWidth: 230 },
+        { prop: 'credentialRef', label: t('settings.alarm.credentialRef'), kind: 'code', minWidth: 190 },
         { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
         ...commonColumns(),
       ],
@@ -565,10 +561,9 @@
       filterLabel: t('common.enableFlag'),
       filterPlaceholder: t('common.enableFlag'),
       filterOptions: enableOptions,
-      extProps: ['bindExt'],
       columns: [
-        { prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code', minWidth: 170 },
-        { prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 170 },
+        { prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code', minWidth: 140 },
+        { prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 140 },
         { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
         ...commonColumns(),
       ],
@@ -601,15 +596,13 @@
       filterLabel: t('settings.alarm.state'),
       filterPlaceholder: t('settings.alarm.state'),
       filterOptions: ruleStateOptions,
-      extProps: ['stateExt'],
       columns: [
-        { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 160 },
+        { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 130 },
         { prop: 'alarmTargetTypeFlag', label: t('settings.alarm.targetType'), kind: 'tag', width: 110 },
-        { prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code', minWidth: 150 },
+        { prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code', minWidth: 130 },
         { prop: 'stateFlag', label: t('settings.alarm.state'), kind: 'tag', width: 110 },
         { prop: 'triggerCount', label: t('settings.alarm.triggerCount'), width: 110 },
-        { prop: 'lastTriggerTime', label: t('settings.alarm.lastTriggerTime'), kind: 'time', width: 180 },
-        { prop: 'lastNotifyTime', label: t('settings.alarm.lastNotifyTime'), kind: 'time', width: 180 },
+        { prop: 'lastTriggerTime', label: t('settings.alarm.lastTriggerTime'), kind: 'time', width: 165 },
         ...commonColumns(),
       ],
       fields: [],
@@ -627,15 +620,14 @@
       filterLabel: t('settings.alarm.status'),
       filterPlaceholder: t('settings.alarm.status'),
       filterOptions: recordStatusOptions,
-      extProps: ['requestExt', 'responseExt'],
       columns: [
-        { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 150 },
-        { prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 150 },
+        { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 130 },
+        { prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 130 },
         { prop: 'channelTypeFlag', label: t('settings.alarm.channelType'), kind: 'tag', width: 130 },
-        { prop: 'target', label: t('settings.alarm.target'), minWidth: 180 },
+        { prop: 'target', label: t('settings.alarm.target'), minWidth: 160 },
         { prop: 'statusFlag', label: t('settings.alarm.status'), kind: 'tag', width: 110 },
         { prop: 'retryCount', label: t('settings.alarm.retryCount'), width: 100 },
-        { prop: 'errorMessage', label: t('settings.alarm.errorMessage'), minWidth: 220 },
+        { prop: 'errorMessage', label: t('settings.alarm.errorMessage'), minWidth: 180 },
         ...commonColumns(),
       ],
       fields: [],
@@ -645,9 +637,7 @@
   ];
 
   const formVisible = ref(false);
-  const detailVisible = ref(false);
   const editing = ref(false);
-  const detailRow = ref<AlarmEntityRecord | null>(null);
   const formRef = ref<FormInstance>();
   const formModel = reactive<Record<string, any>>({});
   const searchForm = reactive<Record<string, any>>({
@@ -674,11 +664,6 @@
   const dialogTitle = computed(() =>
     editing.value ? `${t('common.edit')} ${activeConfig.value.label}` : `${t('common.add')} ${activeConfig.value.label}`
   );
-  const detailFields = computed(() => [
-    ...activeConfig.value.columns.filter((column) => !activeConfig.value.extProps.includes(column.prop)),
-    { prop: 'creatorName', label: t('common.creatorName') },
-    { prop: 'operatorName', label: t('common.operatorName') },
-  ]);
   const formRules = computed<FormRules>(() => {
     const rules: FormRules = {};
     activeConfig.value.fields
@@ -790,9 +775,20 @@
     formVisible.value = true;
   };
 
+  const detailRouteMap: Record<TabKey, string> = {
+    rule: 'settingsAlarmRuleDetail',
+    notify: 'settingsAlarmNotifyDetail',
+    message: 'settingsAlarmMessageDetail',
+    channel: 'settingsAlarmChannelDetail',
+    bind: 'settingsAlarmBindDetail',
+    state: 'settingsAlarmStateDetail',
+    record: 'settingsAlarmRecordDetail',
+  };
+
   const openDetail = (row: AlarmEntityRecord) => {
-    detailRow.value = row;
-    detailVisible.value = true;
+    router.push({ name: detailRouteMap[activeConfig.value.key], query: { id: String(row.id) } }).catch(() => {
+      // handled globally
+    });
   };
 
   const payload = () => {
@@ -906,29 +902,6 @@
     return String(value);
   };
 
-  const formatDetail = (prop: string) => {
-    const value = detailRow.value?.[prop];
-    const column = activeConfig.value.columns.find((item) => item.prop === prop);
-    if (column?.kind === 'time' || prop.endsWith('Time')) return formatTime(value);
-    if (column?.kind === 'tag') return enumLabel(value);
-    if (value == null || value === '') return '-';
-    return String(value);
-  };
-
-  const extLabel = (prop: string) => {
-    const map: Record<string, string> = {
-      ruleExt: t('settings.alarm.ruleExt'),
-      notifyExt: t('settings.alarm.notifyExt'),
-      messageExt: t('settings.alarm.messageExt'),
-      channelExt: t('settings.alarm.channelExt'),
-      bindExt: t('settings.alarm.bindExt'),
-      stateExt: t('settings.alarm.stateExt'),
-      requestExt: t('settings.alarm.requestExt'),
-      responseExt: t('settings.alarm.responseExt'),
-    };
-    return map[prop] || prop;
-  };
-
   const prettyJson = (value: unknown) => {
     if (value == null || value === '') return '{}';
     if (typeof value === 'string') {
@@ -946,7 +919,6 @@
     () => {
       resetSearchForm(searchForm, { keyword: '', filterValue: '' });
       state.page.current = 1;
-      detailVisible.value = false;
       formVisible.value = false;
       load();
     }
@@ -968,38 +940,20 @@
       border-radius: 4px;
     }
 
+    &__form {
+      :deep(.el-input),
+      :deep(.el-select),
+      :deep(.el-input-number) {
+        width: 100%;
+      }
+    }
+
     &__inline-code {
       padding: 2px 5px;
       border-radius: 4px;
       color: var(--el-text-color-regular);
       background: var(--el-fill-color-light);
       font-size: 12px;
-    }
-
-    &__json-block {
-      margin-top: 12px;
-
-      pre {
-        box-sizing: border-box;
-        max-width: 100%;
-        overflow: auto;
-        margin: 6px 0 0;
-        padding: 12px;
-        border: 1px solid var(--el-border-color-lighter);
-        border-radius: 4px;
-        color: var(--el-text-color-primary);
-        background: var(--el-fill-color-lighter);
-        font-size: 12px;
-        line-height: 1.55;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-    }
-
-    &__json-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--el-text-color-regular);
     }
   }
 </style>

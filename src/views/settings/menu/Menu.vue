@@ -28,17 +28,17 @@
         row-key="id"
         stripe
       >
-        <el-table-column :label="t('settings.menu.menuName')" min-width="240" prop="menuName" />
-        <el-table-column :label="t('settings.menu.menuCode')" min-width="200" prop="menuCode" show-overflow-tooltip />
+        <el-table-column :label="t('settings.menu.menuName')" min-width="220" prop="menuName" />
+        <el-table-column :label="t('settings.menu.menuCode')" min-width="180" prop="menuCode" show-overflow-tooltip />
         <el-table-column :label="t('settings.menu.menuType')" min-width="100" prop="menuTypeFlag" />
         <el-table-column :label="t('settings.menu.menuLevel')" min-width="90" prop="menuLevel" />
         <el-table-column :label="t('settings.menu.menuIndex')" min-width="80" prop="menuIndex" />
-        <el-table-column :label="t('settings.menu.menuUrl')" min-width="180" show-overflow-tooltip>
+        <el-table-column :label="t('settings.menu.menuUrl')" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.menuExt?.content?.url || '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="t('settings.menu.menuIcon')" width="110">
+        <el-table-column :label="t('settings.menu.menuIcon')" width="90">
           <template #default="{ row }">
             <span v-if="row.menuExt?.content?.icon" class="menu-icon-cell">
               <el-icon :size="18">
@@ -60,20 +60,8 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.creatorName || '-' }}</template>
-        </el-table-column>
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
-        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.operatorName || '-' }}</template>
-        </el-table-column>
-        <el-table-column
-          :formatter="timestampColumn"
-          :label="t('common.operationTime')"
-          prop="operateTime"
-          width="180"
-        />
-        <el-table-column :label="t('common.operation')" fixed="right" width="240">
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
+        <el-table-column :label="t('common.operation')" fixed="right" width="200">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>

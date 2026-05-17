@@ -31,7 +31,7 @@
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
         <el-table-column label="Name" min-width="160" prop="name" show-overflow-tooltip />
         <el-table-column label="Type" min-width="150" prop="providerType" show-overflow-tooltip />
-        <el-table-column label="Base URL" min-width="220" prop="baseUrl" show-overflow-tooltip />
+        <el-table-column label="Base URL" min-width="200" prop="baseUrl" show-overflow-tooltip />
         <el-table-column label="Default" width="100">
           <template #default="{ row }">
             <el-tag :type="row.defaultFlag === 'DEFAULT' ? 'success' : 'info'" size="small">
@@ -47,8 +47,11 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
-        <el-table-column :label="$t('common.operation')" fixed="right" width="160">
+        <el-table-column :label="$t('common.operation')" fixed="right" width="210">
           <template #default="{ row }">
+            <el-button :disabled="!row.id" link type="primary" @click="openDetail(row)">{{
+              $t('common.detail')
+            }}</el-button>
             <el-button :disabled="!row.id" link type="primary" @click="openEdit(row)">{{
               $t('common.edit')
             }}</el-button>
@@ -76,6 +79,7 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
+  import { useRouter } from 'vue-router';
 
   import { addAgenticProvider, deleteAgenticProvider, getAgenticProviders, updateAgenticProvider } from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -85,6 +89,7 @@
   import providerTool from './tool/ProviderTool.vue';
   import providerEditForm from './edit/ProviderEditForm.vue';
 
+  const router = useRouter();
   const editRef = ref<InstanceType<typeof providerEditForm>>();
 
   const reactiveData = reactive({
@@ -158,6 +163,11 @@
   };
 
   const openAdd = () => editRef.value?.show();
+  const openDetail = (row: AgenticProvider) => {
+    router.push({ name: 'settingsAgenticProviderDetail', query: { id: String(row.id) } }).catch(() => {
+      // handled globally
+    });
+  };
   const openEdit = (row: AgenticProvider) => editRef.value?.showEdit(row);
 
   const onSave = (form: AgenticProvider, done: () => void) => {

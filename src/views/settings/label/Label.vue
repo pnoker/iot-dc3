@@ -32,12 +32,12 @@
         <el-table-column :label="t('settings.label.labelName')" min-width="160" prop="labelName" />
         <el-table-column
           :label="t('settings.label.labelCode')"
-          min-width="160"
+          min-width="150"
           prop="labelCode"
           show-overflow-tooltip
         />
-        <el-table-column :label="t('settings.common.entityType')" prop="entityTypeFlag" width="120" />
-        <el-table-column :label="t('settings.label.labelColor')" width="140">
+        <el-table-column :label="t('settings.common.entityType')" prop="entityTypeFlag" width="110" />
+        <el-table-column :label="t('settings.label.labelColor')" width="130">
           <template #default="{ row }">
             <span class="label-color">
               <span :style="{ backgroundColor: row.labelColor || '#F4F4F5' }" class="label-color__swatch" />
@@ -56,22 +56,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.remark')" min-width="160" prop="remark" show-overflow-tooltip />
-        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.creatorName || '-' }}</template>
-        </el-table-column>
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
-        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.operatorName || '-' }}</template>
-        </el-table-column>
-        <el-table-column
-          :formatter="timestampColumn"
-          :label="t('common.operationTime')"
-          prop="operateTime"
-          width="180"
-        />
+        <el-table-column :label="t('common.remark')" min-width="180" prop="remark" show-overflow-tooltip />
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
         <el-table-column :label="t('common.operation')" fixed="right" width="180">
           <template #default="{ row }">
+            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
             <el-popconfirm
               :cancel-button-text="t('common.cancel')"

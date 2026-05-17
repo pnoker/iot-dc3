@@ -37,16 +37,16 @@
         row-key="id"
         stripe
       >
-        <el-table-column :label="t('settings.resource.resourceName')" min-width="240" prop="resourceName" />
+        <el-table-column :label="t('settings.resource.resourceName')" min-width="220" prop="resourceName" />
         <el-table-column
           :label="t('settings.resource.resourceCode')"
-          min-width="200"
+          min-width="180"
           prop="resourceCode"
           show-overflow-tooltip
         />
         <el-table-column :label="t('settings.resource.resourceType')" min-width="120" prop="resourceTypeFlag" />
         <el-table-column :label="t('settings.resource.resourceScope')" min-width="100" prop="resourceScopeFlag" />
-        <el-table-column :label="t('settings.resource.entity')" min-width="160">
+        <el-table-column :label="t('settings.resource.entity')" min-width="140">
           <template #default="{ row }">
             <el-button v-if="isEntityLinkable(row)" link type="primary" @click="goEntityDetail(row)">
               {{ formatEntityId(row) }}
@@ -66,20 +66,8 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.creatorName || '-' }}</template>
-        </el-table-column>
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
-        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.operatorName || '-' }}</template>
-        </el-table-column>
-        <el-table-column
-          :formatter="timestampColumn"
-          :label="t('common.operationTime')"
-          prop="operateTime"
-          width="180"
-        />
-        <el-table-column :label="t('common.operation')" fixed="right" width="240">
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
+        <el-table-column :label="t('common.operation')" fixed="right" width="200">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button :disabled="isGroupingNode(row)" link type="primary" @click="openEdit(row)">

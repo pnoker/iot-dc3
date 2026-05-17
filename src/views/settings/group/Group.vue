@@ -32,18 +32,16 @@
         <el-table-column :label="t('settings.group.groupName')" min-width="160" prop="groupName" />
         <el-table-column
           :label="t('settings.group.groupCode')"
-          min-width="160"
+          min-width="150"
           prop="groupCode"
           show-overflow-tooltip
         />
-        <el-table-column :label="t('settings.common.entityType')" prop="groupTypeFlag" width="120" />
-        <el-table-column :label="t('settings.group.parentGroupId')" min-width="160" show-overflow-tooltip>
+        <el-table-column :label="t('settings.common.entityType')" prop="groupTypeFlag" width="110" />
+        <el-table-column :label="t('settings.group.parentGroupId')" min-width="150" show-overflow-tooltip>
           <template #default="{ row }">
             {{ parentName(row.parentGroupId) }}
           </template>
         </el-table-column>
-        <el-table-column :label="t('settings.group.groupLevel')" prop="groupLevel" width="90" />
-        <el-table-column :label="t('settings.group.groupIndex')" prop="groupIndex" width="90" />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
             <el-tag :type="String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0 ? 'success' : 'info'">
@@ -55,22 +53,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.remark')" min-width="160" prop="remark" show-overflow-tooltip />
-        <el-table-column :label="t('common.creatorName')" min-width="110" prop="creatorName" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.creatorName || '-' }}</template>
-        </el-table-column>
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
-        <el-table-column :label="t('common.operatorName')" min-width="110" prop="operatorName" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.operatorName || '-' }}</template>
-        </el-table-column>
-        <el-table-column
-          :formatter="timestampColumn"
-          :label="t('common.operationTime')"
-          prop="operateTime"
-          width="180"
-        />
+        <el-table-column :label="t('common.remark')" min-width="180" prop="remark" show-overflow-tooltip />
+        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
         <el-table-column :label="t('common.operation')" fixed="right" width="180">
           <template #default="{ row }">
+            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
             <el-popconfirm
               :cancel-button-text="t('common.cancel')"

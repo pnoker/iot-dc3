@@ -33,7 +33,7 @@
         <el-table-column label="Label" min-width="160" prop="label" show-overflow-tooltip />
         <el-table-column label="Model" min-width="180" prop="model" show-overflow-tooltip />
         <el-table-column label="Provider" min-width="150" prop="providerName" show-overflow-tooltip />
-        <el-table-column label="Capabilities" min-width="240">
+        <el-table-column label="Capabilities" min-width="210">
           <template #default="{ row }">
             <div class="agentic-tags">
               <el-tag :type="row.stream ? 'success' : 'info'" size="small">Stream</el-tag>
@@ -57,11 +57,12 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Temp" prop="temperature" width="80" />
-        <el-table-column label="Tokens" prop="maxTokens" width="90" />
         <el-table-column :label="$t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
-        <el-table-column :label="$t('common.operation')" fixed="right" width="160">
+        <el-table-column :label="$t('common.operation')" fixed="right" width="210">
           <template #default="{ row }">
+            <el-button :disabled="!row.id" link type="primary" @click="openDetail(row)">{{
+              $t('common.detail')
+            }}</el-button>
             <el-button :disabled="!row.id" link type="primary" @click="openEdit(row)">{{
               $t('common.edit')
             }}</el-button>
@@ -89,6 +90,7 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
+  import { useRouter } from 'vue-router';
 
   import {
     addAgenticModelConfig,
@@ -104,6 +106,7 @@
   import modelConfigTool from './tool/ModelConfigTool.vue';
   import modelConfigEditForm from './edit/ModelConfigEditForm.vue';
 
+  const router = useRouter();
   const editRef = ref<InstanceType<typeof modelConfigEditForm>>();
 
   const reactiveData = reactive({
@@ -176,6 +179,11 @@
   };
 
   const openAdd = () => editRef.value?.show();
+  const openDetail = (row: AgenticModelConfig) => {
+    router.push({ name: 'settingsAgenticDetail', query: { id: String(row.id) } }).catch(() => {
+      // handled globally
+    });
+  };
   const openEdit = (row: AgenticModelConfig) => editRef.value?.showEdit(row);
 
   const onSave = (form: AgenticModelConfig, done: () => void) => {
