@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, test } from '@playwright/test';
+import { expect, type Locator, test } from '@playwright/test';
 
 import {
   clickButtonIfPresent,
@@ -27,6 +27,22 @@ import {
   watchPageHealth,
 } from '../fixtures/app';
 import { interactionPages } from '../fixtures/routes';
+
+async function expectEnableSegmented(container: Locator) {
+  await expect(container.locator('.enable-flag-segmented:visible').first()).toBeVisible();
+  await expect(
+    container
+      .locator('.el-form-item')
+      .filter({ hasText: /Enable/ })
+      .locator('.el-switch')
+  ).toHaveCount(0);
+  await expect(
+    container
+      .locator('.el-form-item')
+      .filter({ hasText: /Enable/ })
+      .locator('.el-select')
+  ).toHaveCount(0);
+}
 
 test.describe('authenticated UI interactions', () => {
   test.beforeEach(async ({ page }) => {
@@ -85,7 +101,11 @@ test.describe('authenticated UI interactions', () => {
         if (pageDef.add) {
           mark = markHealth(health);
           if (await clickButtonIfPresent(page, 'Add')) {
-            await expect(page.locator('.el-dialog:visible').last()).toBeVisible();
+            const dialog = page.locator('.el-dialog:visible').last();
+            await expect(dialog).toBeVisible();
+            if (pageDef.enableForm) {
+              await expectEnableSegmented(dialog);
+            }
             await closeOverlay(page);
             expectHealthy(health, mark);
           }
@@ -112,4 +132,28 @@ test.describe('authenticated UI interactions', () => {
       }
     });
   }
+
+  test('entity edit forms use the common Enable segmented control', async ({ page }) => {
+    const e2eData = await ensureE2eData(page);
+    const health = watchPageHealth(page);
+    const editRoutes: string[] = [];
+
+    if (e2eData.routeIds.deviceId) editRoutes.push(`/device/edit?id=${e2eData.routeIds.deviceId}`);
+    if (e2eData.routeIds.profileId) editRoutes.push(`/profile/edit?id=${e2eData.routeIds.profileId}`);
+    if (e2eData.routeIds.pointId && e2eData.routeIds.pointProfileId) {
+      editRoutes.push(`/point/edit?id=${e2eData.routeIds.pointId}&profileId=${e2eData.routeIds.pointProfileId}`);
+    }
+
+    try {
+      for (const route of editRoutes) {
+        const mark = markHealth(health);
+        await page.goto(`/#${route}`, { waitUntil: 'domcontentloaded' });
+        await waitForAppSettled(page);
+        await expectEnableSegmented(page.locator('body'));
+        expectHealthy(health, mark);
+      }
+    } finally {
+      await e2eData.cleanup();
+    }
+  });
 });

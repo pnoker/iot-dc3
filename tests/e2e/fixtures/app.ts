@@ -127,6 +127,56 @@ export async function apiPost<T = unknown>(
   return { status: response.status, data } as ApiResult<T>;
 }
 
+export async function apiGet<T = unknown>(
+  page: Page,
+  url: string,
+  params: Record<string, string | number | boolean | undefined> = {}
+) {
+  const response = await page.evaluate(
+    async ({ requestUrl, requestParams }) => {
+      const decodeStorage = (key: string) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return undefined;
+        return JSON.parse(atob(raw)).content;
+      };
+      const target = new URL(requestUrl, window.location.origin);
+      Object.entries(requestParams).forEach(([key, value]) => {
+        if (value !== undefined) {
+          target.searchParams.set(key, String(value));
+        }
+      });
+      const targetUrl =
+        target.origin === window.location.origin ? `${target.pathname}${target.search}` : target.toString();
+      const headers: Record<string, string> = {
+        Accept: 'application/json',
+      };
+      const tenant = decodeStorage('X-Auth-Tenant');
+      const login = decodeStorage('X-Auth-Login');
+      const token = decodeStorage('X-Auth-Token');
+      if (tenant) headers['X-Auth-Tenant'] = tenant;
+      if (login) headers['X-Auth-Login'] = login;
+      if (token) headers['X-Auth-Token'] = JSON.stringify(token);
+
+      const response = await fetch(targetUrl, {
+        method: 'GET',
+        headers,
+      });
+      const text = await response.text();
+      return { status: response.status, text };
+    },
+    { requestUrl: url, requestParams: params }
+  );
+
+  let data: unknown;
+  try {
+    data = JSONBigIntStr.parse(response.text);
+  } catch {
+    data = response.text;
+  }
+
+  return { status: response.status, data } as ApiResult<T>;
+}
+
 function idOf(record: unknown) {
   if (!record || typeof record !== 'object' || !('id' in record)) return undefined;
   const id = (record as { id?: unknown }).id;
@@ -138,6 +188,13 @@ async function firstRecord(page: Page, url: string) {
   const payload = response.data as { ok?: boolean; data?: { records?: unknown[] } };
   if (!payload?.ok) return undefined;
   return payload.data?.records?.[0];
+}
+
+async function firstArrayRecord(page: Page, url: string) {
+  const response = await apiGet<unknown[]>(page, url);
+  const payload = response.data as { ok?: boolean; data?: unknown[] };
+  if (!payload?.ok) return undefined;
+  return payload.data?.[0];
 }
 
 async function listByName(page: Page, url: string, nameField: string, name: string) {
@@ -176,7 +233,28 @@ async function createEntity(page: Page, seed: EntitySeed, cleanupStack: Array<()
 }
 
 async function discoverRouteIds(page: Page): Promise<RouteIds> {
-  const [driver, profile, device, point, api, resource, menu, user, role] = await Promise.all([
+  const [
+    driver,
+    profile,
+    device,
+    point,
+    api,
+    resource,
+    menu,
+    group,
+    label,
+    alarmRule,
+    alarmNotify,
+    alarmMessage,
+    alarmChannel,
+    alarmBind,
+    alarmState,
+    alarmRecord,
+    agenticModelConfig,
+    agenticProvider,
+    user,
+    role,
+  ] = await Promise.all([
     firstRecord(page, '/api/v3/manager/driver/list'),
     firstRecord(page, '/api/v3/manager/profile/list'),
     firstRecord(page, '/api/v3/manager/device/list'),
@@ -184,6 +262,17 @@ async function discoverRouteIds(page: Page): Promise<RouteIds> {
     firstRecord(page, '/api/v3/auth/api/list'),
     firstRecord(page, '/api/v3/auth/resource/list'),
     firstRecord(page, '/api/v3/auth/menu/list'),
+    firstRecord(page, '/api/v3/manager/group/list'),
+    firstRecord(page, '/api/v3/manager/label/list'),
+    firstRecord(page, '/api/v3/data/rule/list'),
+    firstRecord(page, '/api/v3/data/notify/list'),
+    firstRecord(page, '/api/v3/data/message/list'),
+    firstRecord(page, '/api/v3/data/notify/channel/list'),
+    firstRecord(page, '/api/v3/data/notify/channel/bind/list'),
+    firstRecord(page, '/api/v3/data/rule/state/list'),
+    firstRecord(page, '/api/v3/data/notify/record/list'),
+    firstArrayRecord(page, '/api/v3/agentic/model/config/list'),
+    firstArrayRecord(page, '/api/v3/agentic/provider/list'),
     firstRecord(page, '/api/v3/auth/user_profile/list'),
     firstRecord(page, '/api/v3/auth/role/list'),
   ]);
@@ -202,6 +291,17 @@ async function discoverRouteIds(page: Page): Promise<RouteIds> {
     apiId: idOf(api),
     resourceId: idOf(resource),
     menuId: idOf(menu),
+    groupId: idOf(group),
+    labelId: idOf(label),
+    alarmRuleId: idOf(alarmRule),
+    alarmNotifyId: idOf(alarmNotify),
+    alarmMessageId: idOf(alarmMessage),
+    alarmChannelId: idOf(alarmChannel),
+    alarmBindId: idOf(alarmBind),
+    alarmStateId: idOf(alarmState),
+    alarmRecordId: idOf(alarmRecord),
+    agenticModelConfigId: idOf(agenticModelConfig),
+    agenticProviderId: idOf(agenticProvider),
     userId: idOf(user),
     roleId: idOf(role),
   };
@@ -417,6 +517,17 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
       apiId,
       resourceId,
       menuId,
+      groupId: discovered.groupId,
+      labelId: discovered.labelId,
+      alarmRuleId: discovered.alarmRuleId,
+      alarmNotifyId: discovered.alarmNotifyId,
+      alarmMessageId: discovered.alarmMessageId,
+      alarmChannelId: discovered.alarmChannelId,
+      alarmBindId: discovered.alarmBindId,
+      alarmStateId: discovered.alarmStateId,
+      alarmRecordId: discovered.alarmRecordId,
+      agenticModelConfigId: discovered.agenticModelConfigId,
+      agenticProviderId: discovered.agenticProviderId,
       userId,
       roleId,
     },
