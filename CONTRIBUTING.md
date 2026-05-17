@@ -31,7 +31,7 @@ For source-run Java processes, load runtime variables from:
 source dc3/env/dev.env.sh
 ```
 
-For Docker Compose interpolation, copy the root template first:
+For Compose interpolation, copy the root template first:
 
 ```bash
 cp .env.example .env
@@ -78,11 +78,11 @@ Before opening a pull request, run the checks that match the touched area:
 
 ```bash
 mvn -s .mvn/settings.xml clean package
-docker compose -f dc3/docker-compose-db.yml config
+podman compose -f dc3/docker-compose-db.yml config
 ```
 
 For documentation-only changes, at least check links, commands, and formatting manually. For container changes, run
-`docker compose config` for every touched compose file.
+`make config STACK=<app|dev|db|optional>` or `podman compose config` for every touched compose file.
 
 ## Release Notes
 

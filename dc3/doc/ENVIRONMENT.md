@@ -6,7 +6,7 @@ This project uses two environment-variable scopes. Keep them separate.
 
 | File                 | Reader                                                          | Scope                                                                                          |
 |----------------------|-----------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| `.env.example`       | Template for repository-root `.env`; read by Docker Compose     | Compose interpolation for `dc3/docker-compose*.yml`, plus documented local source-run defaults |
+| `.env.example`       | Template for repository-root `.env`; read by Compose            | Compose interpolation for `dc3/docker-compose*.yml`, plus documented local source-run defaults |
 | `dc3/env/dev.env`    | IDE EnvFile plugins, `docker --env-file`, or `set -a && source` | Local source-run Java processes                                                                |
 | `dc3/env/dev.env.sh` | Shell via `source dc3/env/dev.env.sh`                           | Local source-run Java processes                                                                |
 
@@ -22,7 +22,7 @@ Run Compose commands from the repository root so Compose can discover `.env`:
 
 ```bash
 make dev-all
-make app-all REGISTRY=aliyun
+make app-all REGISTRY=cn
 podman compose -f dc3/docker-compose-dev.yml config
 ```
 
@@ -89,14 +89,14 @@ want Compose-only variables to appear in the local Java process environment.
 
 ### Shared Compose Defaults
 
-| Variable             | Scope           | Meaning                                                                                                 |
-|----------------------|-----------------|---------------------------------------------------------------------------------------------------------|
-| `DC3_IMAGE_REGISTRY` | Compose         | Image registry namespace used by all DC3 images. Use `registry.cn-beijing.aliyuncs.com/dc3` for Aliyun. |
-| `DC3_IMAGE_TAG`      | Compose         | Image tag shared by application, database, EMQX, and observability images.                              |
-| `DC3_LOG_MAX_SIZE`   | Compose         | Maximum size of a single container log file before rotation.                                            |
-| `DC3_LOG_MAX_FILE`   | Compose         | Number of rotated container log files to keep.                                                          |
-| `DC3_BIND_HOST`      | Compose         | Host address for published ports. Keep `127.0.0.1` for local-only access; use `0.0.0.0` for LAN access. |
-| `APM_AGENT_ENABLE`   | Compose/runtime | Enables or disables the Java APM agent in application containers.                                       |
+| Variable             | Scope           | Meaning                                                                                                             |
+|----------------------|-----------------|---------------------------------------------------------------------------------------------------------------------|
+| `DC3_IMAGE_REGISTRY` | Compose         | Image registry namespace used by all DC3 images. Use `registry.cn-beijing.aliyuncs.com/dc3` for the China registry. |
+| `DC3_IMAGE_TAG`      | Compose         | Image tag shared by application, database, EMQX, and observability images.                                          |
+| `DC3_LOG_MAX_SIZE`   | Compose         | Maximum size of a single container log file before rotation.                                                        |
+| `DC3_LOG_MAX_FILE`   | Compose         | Number of rotated container log files to keep.                                                                      |
+| `DC3_BIND_HOST`      | Compose         | Host address for published ports. Keep `127.0.0.1` for local-only access; use `0.0.0.0` for LAN access.             |
+| `APM_AGENT_ENABLE`   | Compose/runtime | Enables or disables the Java APM agent in application containers.                                                   |
 
 ### Database and RabbitMQ
 

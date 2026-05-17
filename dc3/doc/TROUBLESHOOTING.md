@@ -93,9 +93,9 @@ make package
 make build
 ```
 
-## 10. Aliyun registry variant used unexpectedly
+## 10. China registry variant used unexpectedly
 
-**Cause**: `REGISTRY` was set to `domestic` / `aliyun` / `cn`.
+**Cause**: `REGISTRY` was set to `cn`.
 
 **Resolution**: Use `REGISTRY=global` for Docker Hub images.
 

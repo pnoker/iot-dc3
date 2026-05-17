@@ -18,7 +18,7 @@ Unless stated otherwise, run the commands below from the repository root.
 make dev-db
 
 # or mainland China registry
-make dev-db REGISTRY=domestic
+make dev-db REGISTRY=cn
 ```
 
 This starts PostgreSQL and RabbitMQ.
@@ -28,7 +28,7 @@ This starts PostgreSQL and RabbitMQ.
 ```bash
 make dev-optional
 # or
-make dev-optional REGISTRY=domestic
+make dev-optional REGISTRY=cn
 ```
 
 Typically used for MQTT broker dependencies such as EMQX.
@@ -82,21 +82,21 @@ java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
 java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 ```
 
-## 7. Run via Docker Compose (alternative)
+## 7. Run via Compose (alternative)
 
 ```bash
 # Local dev stack
 make dev
-make dev REGISTRY=domestic
+make dev REGISTRY=cn
 
 # Full local environment (db + optional + dev)
 make dev-all
-make dev-all REGISTRY=domestic
+make dev-all REGISTRY=cn
 
 # Packaged application stack
 make app
-make app REGISTRY=domestic
-make app-all REGISTRY=aliyun
+make app REGISTRY=cn
+make app-all REGISTRY=cn
 ```
 
 ## 8. Useful maintenance commands
@@ -113,6 +113,11 @@ make compose-ps STACK=dev
 
 # Restart
 make compose-restart STACK=dev
+
+# Start only selected services for frontend or API testing
+make dev-db REGISTRY=cn
+make up SERVICES="gateway agentic" REGISTRY=cn
+make logs SERVICES="gateway agentic"
 ```
 
 ## 9. Service default endpoints
