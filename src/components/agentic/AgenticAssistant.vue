@@ -223,11 +223,47 @@
           >
             <div class="agentic-message__main">
               <div class="agentic-message__content">
-                <RenderedAssistantMessage v-if="message.role === 'assistant'" :content="message.content" />
+                <details
+                  v-if="message.role === 'assistant' && hasReasoningPanel(message)"
+                  :open="isReasoningPanelOpen(message)"
+                  class="agentic-reasoning-panel"
+                >
+                  <summary>
+                    <span :class="{ 'is-active': message.streaming }" class="agentic-thinking-pulse" />
+                    <span>{{ t('agentic.detailThinking') }}</span>
+                    <small>{{ reasoningPanelStatus(message) }}</small>
+                  </summary>
+                  <div class="agentic-reasoning-panel__body">
+                    <div v-if="assistantReasoningText(message)" class="agentic-reasoning-panel__text">
+                      {{ assistantReasoningText(message) }}
+                    </div>
+                    <div v-else class="agentic-live-thinking">
+                      <span>{{ t('agentic.thinking') }}</span>
+                      <span aria-hidden="true" class="agentic-thinking-dots">
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                    </div>
+                  </div>
+                </details>
+                <RenderedAssistantMessage
+                  v-if="message.role === 'assistant'"
+                  :charts="message.contentExt?.charts || []"
+                  :content="message.content"
+                />
                 <div v-else class="agentic-text">{{ message.content }}</div>
-                <span v-if="message.streaming && !message.content" class="agentic-cursor">{{
-                  t('agentic.thinking')
-                }}</span>
+                <span
+                  v-if="message.streaming && !message.content && !hasReasoningPanel(message)"
+                  class="agentic-cursor"
+                >
+                  <span>{{ t('agentic.thinking') }}</span>
+                  <span aria-hidden="true" class="agentic-thinking-dots">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                </span>
                 <div
                   v-if="message.role === 'assistant' && !message.streaming && truncatedReason(message)"
                   class="agentic-message__warning"
@@ -833,12 +869,6 @@
         detail: traces.length ? t('agentic.thinkingTraceCollecting') : t('agentic.thinkingWaitingChunk'),
       });
     }
-    if (assistantReasoning(message)) {
-      items.push({
-        label: t('agentic.thinkingReasoningMode'),
-        detail: assistantReasoningText(message) || t('agentic.thinkingReasoningDetail'),
-      });
-    }
     if (tools > 0) {
       items.push({
         label: t('agentic.thinkingToolExec'),
@@ -846,6 +876,21 @@
       });
     }
     return uniqueThinkingItems(items);
+  };
+
+  const hasReasoningPanel = (message: AgenticMessage) => {
+    return Boolean(message.streaming || assistantReasoningText(message));
+  };
+
+  const isReasoningPanelOpen = (message: AgenticMessage) => {
+    return Boolean(message.streaming);
+  };
+
+  const reasoningPanelStatus = (message: AgenticMessage) => {
+    if (message.streaming) {
+      return assistantReasoningText(message) ? t('agentic.statusStreaming') : t('agentic.statusThinking');
+    }
+    return t('agentic.statusDone');
   };
 
   const assistantReasoning = (message: AgenticMessage) => {
@@ -857,7 +902,16 @@
   };
 
   const assistantReasoningText = (message: AgenticMessage) => {
-    return (message.reasoning || message.contentExt?.reasoningContent || '').trim();
+    const directReasoning = [message.reasoning, message.contentExt?.reasoningContent].filter((value): value is string =>
+      Boolean(value)
+    );
+    const traceReasoning = assistantTraceEvents(message)
+      .filter((event) => event.type === 'reasoning')
+      .map((event) => event.detail || event.title)
+      .filter((value): value is string => Boolean(value));
+    return uniqueStrings([...directReasoning, ...traceReasoning])
+      .join('\n')
+      .trim();
   };
 
   const assistantTools = (message: AgenticMessage) => {
@@ -1310,6 +1364,14 @@
     }
   }
 
+  .agentic-message--assistant {
+    justify-content: flex-start;
+
+    .agentic-message__content {
+      width: 100%;
+    }
+  }
+
   .agentic-message__main {
     box-sizing: border-box;
     display: flex;
@@ -1407,8 +1469,152 @@
   }
 
   .agentic-cursor {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: #64748b;
     font-size: 12px;
+  }
+
+  .agentic-reasoning-panel {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 8px;
+    border: 1px solid #dfe7f1;
+    border-radius: 6px;
+    background: #f8fafc;
+
+    summary {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      padding: 0 8px;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      &::after {
+        content: '';
+        width: 6px;
+        height: 6px;
+        margin-left: auto;
+        border-right: 1px solid #94a3b8;
+        border-bottom: 1px solid #94a3b8;
+        transform: rotate(45deg);
+        transition: transform 0.16s ease;
+      }
+
+      small {
+        overflow: hidden;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 500;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    &[open] summary::after {
+      transform: rotate(225deg);
+    }
+  }
+
+  .agentic-reasoning-panel__body {
+    padding: 0 8px 8px 23px;
+  }
+
+  .agentic-reasoning-panel__text {
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  .agentic-live-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+    font-size: 12px;
+  }
+
+  .agentic-thinking-pulse {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #94a3b8;
+
+    &.is-active {
+      background: var(--el-color-primary);
+
+      &::after {
+        position: absolute;
+        inset: -4px;
+        content: '';
+        border: 1px solid var(--el-color-primary);
+        border-radius: inherit;
+        animation: agentic-pulse 1.2s ease-out infinite;
+      }
+    }
+  }
+
+  .agentic-thinking-dots {
+    display: inline-flex;
+    gap: 3px;
+
+    i {
+      display: block;
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: currentcolor;
+      opacity: 0.35;
+      animation: agentic-dot 1s ease-in-out infinite;
+
+      &:nth-child(2) {
+        animation-delay: 0.14s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: 0.28s;
+      }
+    }
+  }
+
+  @keyframes agentic-pulse {
+    from {
+      opacity: 0.45;
+      transform: scale(0.75);
+    }
+
+    to {
+      opacity: 0;
+      transform: scale(1.65);
+    }
+  }
+
+  @keyframes agentic-dot {
+    0%,
+    80%,
+    100% {
+      opacity: 0.28;
+      transform: translateY(0);
+    }
+
+    40% {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
   }
 
   .agentic-details {
