@@ -22,6 +22,37 @@ x-logging: &default-logging
     max-file: "${DC3_LOG_MAX_FILE:-20}"
 
 services:
+  web:
+    # Frontend follows the same DC3_IMAGE_REGISTRY switch as backend services
+    # (so `make app REGISTRY=domestic` retags everything together), but keeps
+    # an independent DC3_WEB_VERSION because the UI ships on its own cadence.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-web:${DC3_WEB_VERSION:-latest}
+    restart: always
+    depends_on:
+      gateway:
+        condition: service_healthy
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_WEB_HTTP_PORT:-8080}:80"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_WEB_HTTPS_PORT:-8443}:443"
+    environment:
+      - APP_API_HOST=${APP_API_HOST:-dc3-gateway}
+      - APP_API_PORT=${APP_API_PORT:-8000}
+    container_name: dc3-web
+    hostname: dc3-web
+    volumes:
+      - nginx:/var/log/nginx
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1/ >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-web
+
   gateway:
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
     restart: always
@@ -34,8 +65,6 @@ services:
         condition: service_healthy
       agentic:
         condition: service_healthy
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
@@ -59,9 +88,6 @@ services:
   auth:
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.5}
     restart: always
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_PORT:-8300}:8300"
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_GRPC_PORT:-9300}:9300"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
@@ -88,9 +114,6 @@ services:
     depends_on:
       auth:
         condition: service_healthy
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_PORT:-8400}:8400"
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_GRPC_PORT:-9400}:9400"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
@@ -119,9 +142,6 @@ services:
         condition: service_healthy
       manager:
         condition: service_healthy
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_PORT:-8500}:8500"
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_GRPC_PORT:-9500}:9500"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
@@ -152,8 +172,6 @@ services:
         condition: service_healthy
       data:
         condition: service_healthy
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AGENTIC_PORT:-8600}:8600"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
@@ -190,6 +208,9 @@ services:
     depends_on:
       manager:
         condition: service_healthy
+    # Device ingress ports — kept exposed because external device simulators
+    # (or real IoT devices) connect in over TCP/UDP. All other backend ports
+    # are intentionally NOT mapped: web is the only user-facing entry point.
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_TCP_PORT:-6270}:6270"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_UDP_PORT:-6271}:6271"
@@ -329,6 +350,7 @@ services:
 
 volumes:
   logs:
+  nginx:
 
 networks:
   dc3net:
