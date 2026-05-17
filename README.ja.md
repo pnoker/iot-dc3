@@ -70,18 +70,17 @@ make dev
 make dev-all
 ```
 
-中国本土向けのイメージレジストリを使う場合は `REGISTRY=domestic` を指定してください。互換エイリアスの `REGISTRY=aliyun` と
-`REGISTRY=cn` も利用できます:
+中国本土向けのイメージレジストリを使う場合は `REGISTRY=cn` を指定してください:
 
 ```bash
-make dev-db REGISTRY=domestic
-make dev-all REGISTRY=domestic
-make app-all REGISTRY=aliyun
-make compose-up STACK=grafana REGISTRY=cn
+make dev-db REGISTRY=cn
+make dev-all REGISTRY=cn
+make app-all REGISTRY=cn
+make compose-up STACK=optional REGISTRY=cn
 make compose-logs STACK=dev REGISTRY=global
 ```
 
-### Docker Compose 環境変数の上書き
+### Compose 環境変数の上書き
 
 公開ポート、イメージタグ、またはオブザーバビリティ設定を変更する前に、まずテンプレートファイルをコピーしてください:
 

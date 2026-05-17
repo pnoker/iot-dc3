@@ -78,18 +78,17 @@ make dev
 make dev-all
 ```
 
-Nếu bạn muốn dùng registry tối ưu cho người dùng ở Trung Quốc đại lục, hãy đặt `REGISTRY=domestic`. Các bí danh tương
-thích `REGISTRY=aliyun` và `REGISTRY=cn` vẫn dùng được:
+Nếu bạn muốn dùng registry tối ưu cho người dùng ở Trung Quốc đại lục, hãy đặt `REGISTRY=cn`:
 
 ```bash
-make dev-db REGISTRY=domestic
-make dev-all REGISTRY=domestic
-make app-all REGISTRY=aliyun
-make compose-up STACK=grafana REGISTRY=cn
+make dev-db REGISTRY=cn
+make dev-all REGISTRY=cn
+make app-all REGISTRY=cn
+make compose-up STACK=optional REGISTRY=cn
 make compose-logs STACK=dev REGISTRY=global
 ```
 
-### Ghi đè biến môi trường cho Docker Compose
+### Ghi đè biến môi trường cho Compose
 
 Trước khi thay đổi cổng publish, tag image hoặc tham số observability, nên sao chép tệp mẫu trước:
 

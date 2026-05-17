@@ -70,17 +70,33 @@ make dev
 make dev-all
 ```
 
-如果你需要使用中国大陆镜像源，可以使用 `REGISTRY=domestic`。兼容别名 `REGISTRY=aliyun` 和 `REGISTRY=cn` 也同样可用：
+如果你需要使用中国大陆镜像源，可以使用 `REGISTRY=cn`：
 
 ```bash
-make dev-db REGISTRY=domestic
-make dev-all REGISTRY=domestic
-make app-all REGISTRY=aliyun
-make compose-up STACK=grafana REGISTRY=cn
+make dev-db REGISTRY=cn
+make dev-all REGISTRY=cn
+make app-all REGISTRY=cn
+make compose-up STACK=optional REGISTRY=cn
 make compose-logs STACK=dev REGISTRY=global
 ```
 
-### Docker Compose 环境变量覆盖
+前端页面测试和接口测试时，可以只启动当前需要的后端服务：
+
+```bash
+# 先启动基础依赖
+make dev-db REGISTRY=cn
+
+# 启动单个服务、多个服务或预设服务组
+make up SERVICES=agentic REGISTRY=cn
+make up SERVICES="gateway agentic" REGISTRY=cn
+make up GROUP=core REGISTRY=cn
+make up GROUP=drivers REGISTRY=cn
+
+# 查看测试服务日志
+make logs SERVICES="gateway agentic"
+```
+
+### Compose 环境变量覆盖
 
 在修改发布端口、镜像版本或观测栈参数前，建议先复制模板文件：
 

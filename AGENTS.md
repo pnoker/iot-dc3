@@ -27,7 +27,7 @@ Core stack:
 - Spring Boot 4.0.6 / Spring Framework 7
 - PostgreSQL, RabbitMQ, optional EMQX, optional Grafana/Elasticsearch stacks
 - Spring gRPC with generated protobuf APIs
-- Docker Compose or Podman Compose, wrapped by the root `Makefile`
+- Compose runtime, wrapped by the root `Makefile` (`COMPOSE=podman compose` by default)
 
 ## Repository Map
 
@@ -83,15 +83,16 @@ The compose files under `dc3/` are the canonical container definitions:
 - `docker-compose-db.yml`
 - `docker-compose-optional.yml` (EMQX + Elasticsearch/Logstash/Kibana/APM + Prometheus/exporters/Grafana)
 
-Registry selection is controlled by environment variables and Make arguments, not by duplicated `*-aliyun.yml` files:
+Registry selection is controlled by environment variables and Make arguments, not by duplicated registry-specific
+compose files:
 
 ```bash
-make dev REGISTRY=aliyun
+make dev REGISTRY=cn
 make app-all REGISTRY=global
 make compose-config STACK=optional REGISTRY=cn
 ```
 
-For container changes, run `docker compose config --quiet` or the corresponding `make compose-config` path for every
+For container changes, run `make config` or the corresponding `podman compose config` path for every
 touched compose file.
 
 ## Architecture Rules
@@ -297,13 +298,13 @@ Run checks proportional to the change:
 - Java/shared behavior: `mvn -s .mvn/settings.xml -q -DskipTests compile`
 - Full package: `mvn -s .mvn/settings.xml clean package`
 - Behaviour change in tested code: `make test`
-- DAL or SQL change: `make test-it` (requires Docker, runs Testcontainers)
+- DAL or SQL change: `make test-it` (requires a Docker-compatible container runtime, runs Testcontainers)
 - gRPC proto change: regenerate stubs and run the matching contract tests
 - Aggregate coverage check: `make coverage` and inspect
   `dc3-coverage/target/site/jacoco-aggregate/index.html`. Coverage
   regressions greater than 1% block the change.
 - Changelog script: `python3 -m py_compile dc3/bin/changelog.py`
-- Compose files: `docker compose -f dc3/<file>.yml config --quiet`
+- Compose files: `podman compose -f dc3/<file>.yml config --quiet`
 - YAML syntax: parse changed YAML after normalizing Maven placeholders such as `@project.artifactId@`
 - Agent or docs changes: check links, command examples, stale filenames, and current workflow names
 
