@@ -10,7 +10,7 @@ commands to devices via MQTT publish.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-mqtt
-- **Version**: 2026.5.5
+- **Version**: 2026.5.17
 - **Driver Name**: MQTT Driver
 
 ## Point Attributes

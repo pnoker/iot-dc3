@@ -10,7 +10,7 @@ from domain model entities.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-api
-- **Version**: 2026.5.5
+- **Version**: 2026.5.17
 
 ## Key Components
 

@@ -1,6 +1,6 @@
 # ✨ What's Changed
 
-### 📌 2026.5.5
+### 📌 2026.5.17
 
 _Generated on 2026-05-09._
 
@@ -272,7 +272,7 @@ _Generated on 2026-05-09._
 - stop tracking .env file from version control (`fbda40ca6`)
 - add .claude/TODO.md to .gitignore (`97bddb3d4`)
 - **env**: update .env and .env.example for clarity and usage instructions (`ab26dce87`)
-- bump version to 2026.5.5 (`605bcc836`)
+- bump version to 2026.5.17 (`605bcc836`)
 - relicense source headers under AGPL 3.0 (`783343ff1`)
 - **data-dashboard**: apply IDE auto-format (`51468e532`)
 - add blank line between constants and ctor in TimeRangeUtil (`7d0588a7f`)

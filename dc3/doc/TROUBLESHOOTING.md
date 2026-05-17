@@ -26,19 +26,7 @@ mvn -version
 
 The build now enforces JDK 21 via `maven-enforcer-plugin`.
 
-## 3. spring-javaformat:validate fails
-
-**Cause**: Code formatting does not match Spring Java Format rules.
-
-**Resolution**:
-
-```bash
-mvn -s .mvn/settings.xml io.spring.javaformat:spring-javaformat-maven-plugin:apply
-```
-
-Then rebuild.
-
-## 4. Ports already in use
+## 3. Ports already in use
 
 **Symptom**: Application fails to start due to occupied ports (8000/8300/8400/8500/8600/9300/9400/9500).
 
@@ -53,7 +41,7 @@ Common overrides:
 - `DC3_MANAGER_PORT`
 - `DC3_DATA_PORT`
 
-## 5. Database connection failures in dev
+## 4. Database connection failures in dev
 
 **Cause**: Postgres container not started / custom .env changed published ports.
 
@@ -66,7 +54,7 @@ make compose-file STACK=db
 
 Confirm the published port matches the application config.
 
-## 6. RabbitMQ connection failures
+## 5. RabbitMQ connection failures
 
 **Cause**: Container not ready / wrong virtual host or credentials.
 
@@ -76,25 +64,25 @@ Confirm the published port matches the application config.
 make compose-logs STACK=db
 ```
 
-## 7. Nacos discovery errors in pre/pro profile
+## 6. Nacos discovery errors in pre/pro profile
 
 **Cause**: Those profiles expect service discovery via Nacos.
 
 **Resolution**: For local source debugging, prefer `dev` profile unless you intentionally test registry behavior.
 
-## 8. Gateway returns 401/403
+## 7. Gateway returns 401/403
 
 **Cause**: Request routed to authenticated endpoints without token.
 
 **Resolution**: Call token APIs first (`/api/v3/auth/token/...`), then pass the token in subsequent requests.
 
-## 9. Driver cannot register
+## 8. Driver cannot register
 
 **Cause**: Manager not running / gRPC target address misconfigured.
 
 **Resolution**: Start services in recommended order: Gateway -> Auth -> Data -> Manager -> Driver.
 
-## 10. Docker image build fails in Makefile
+## 9. Docker image build fails in Makefile
 
 **Cause**: `mvn package` failed inside image build.
 
@@ -105,7 +93,7 @@ make package
 make build
 ```
 
-## 11. Aliyun registry variant used unexpectedly
+## 10. Aliyun registry variant used unexpectedly
 
 **Cause**: `REGISTRY` was set to `domestic` / `aliyun` / `cn`.
 
@@ -115,7 +103,7 @@ make build
 make dev-db REGISTRY=global
 ```
 
-## 12. Want faster debugging in one JVM
+## 11. Want faster debugging in one JVM
 
 Use `dc3-center-single` to combine Auth/Manager/Data into one process.
 
