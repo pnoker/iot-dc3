@@ -22,34 +22,27 @@ jobs:
   build-push:
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    permissions:
+      contents: read
+      actions: write   # for GitHub Actions cache (--cache-to type=gha)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: liberica
-          java-version: 21
-          cache: maven
-          cache-dependency-path: "**/pom.xml"
 
       - name: Extract variables
         id: variables
         run: |
           set -euo pipefail
-          VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
+          # Read project.version from pom.xml without invoking Maven (the
+          # whole build runs inside Docker now; the runner does not need
+          # a JDK at all). iot-dc3's <version> is inherited from <parent>.
+          VERSION=$(awk -F'[<>]' '/<parent>/,/<\/parent>/{if($2=="version") print $3}' pom.xml | head -1)
           SERIES="$VERSION"
           if [[ "$VERSION" == *.*.* ]]; then
             SERIES="${VERSION%.*}"
           fi
           echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "service_series=$SERIES" >> "$GITHUB_OUTPUT"
-
-      - name: Build with Maven
-        run: |
-          set -euo pipefail
-          mvn -U -e -B clean package -DskipTests -P "$PROFILE" --no-transfer-progress
 
       - name: Set QEMU
         uses: docker/setup-qemu-action@v3
@@ -78,29 +71,35 @@ jobs:
           set -euo pipefail
 
           services=(
-            "dc3-gateway:dc3-gateway"
-            "dc3-center-agentic:dc3-center/dc3-center-agentic"
-            "dc3-center-auth:dc3-center/dc3-center-auth"
-            "dc3-center-data:dc3-center/dc3-center-data"
-            "dc3-center-manager:dc3-center/dc3-center-manager"
-            "dc3-center-single:dc3-center/dc3-center-single"
-            "dc3-driver-listening-virtual:dc3-driver/dc3-driver-listening-virtual"
-            "dc3-driver-modbus-tcp:dc3-driver/dc3-driver-modbus-tcp"
-            "dc3-driver-mqtt:dc3-driver/dc3-driver-mqtt"
-            "dc3-driver-opc-da:dc3-driver/dc3-driver-opc-da"
-            "dc3-driver-opc-ua:dc3-driver/dc3-driver-opc-ua"
-            "dc3-driver-plcs7:dc3-driver/dc3-driver-plcs7"
-            "dc3-driver-virtual:dc3-driver/dc3-driver-virtual"
+            dc3-gateway
+            dc3-center-agentic
+            dc3-center-auth
+            dc3-center-data
+            dc3-center-manager
+            dc3-center-single
+            dc3-driver-listening-virtual
+            dc3-driver-modbus-tcp
+            dc3-driver-mqtt
+            dc3-driver-opc-da
+            dc3-driver-opc-ua
+            dc3-driver-plcs7
+            dc3-driver-virtual
           )
 
-          for item in "${services[@]}"; do
-            name="${item%%:*}"
-            path="${item##*:}"
-
+          for name in "${services[@]}"; do
             echo "Building and pushing: $name"
+            # Single root-level Dockerfile defines a target stage per service.
+            # The shared `builder` stage (mvn package) runs ONCE for the
+            # whole reactor; BuildKit reuses it across every target image.
+            # GHA cache (type=gha) persists the builder stage between runs so
+            # subsequent CI invocations only rebuild what actually changed.
             docker buildx build \
               --platform linux/arm64,linux/amd64 \
-              --file "$path/Dockerfile" \
+              --file Dockerfile \
+              --target "$name" \
+              --build-arg PROFILE="$PROFILE" \
+              --cache-from type=gha,scope=dc3-builder \
+              --cache-to type=gha,scope=dc3-builder,mode=max \
               --push \
               --tag "$DOCKER_REGISTRY_DEFAULT/$name:latest" \
               --tag "$DOCKER_REGISTRY_DEFAULT/$name:$SERVICE_SERIES" \
@@ -108,7 +107,7 @@ jobs:
               --tag "$DOCKER_REGISTRY_ALIYUN/$name:latest" \
               --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_SERIES" \
               --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_VERSION" \
-              "$path"
+              .
           done
 
   release:
@@ -124,19 +123,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: liberica
-          java-version: 21
-          cache: maven
-          cache-dependency-path: "**/pom.xml"
-
       - name: Extract variables
         id: variables
         run: |
           set -euo pipefail
-          VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
+          VERSION=$(awk -F'[<>]' '/<parent>/,/<\/parent>/{if($2=="version") print $3}' pom.xml | head -1)
           echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Generate release notes
