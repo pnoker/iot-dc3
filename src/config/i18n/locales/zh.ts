@@ -510,6 +510,8 @@ export default {
       delay: '数据延时',
       collectTime: '采集日期',
       saveTime: '保存日期',
+      noLatestValue: '暂无值',
+      noHistory: '暂无历史',
       confirmDelete: '是否确定删除该位号值? 该操作不可恢复!',
     },
     edit: {

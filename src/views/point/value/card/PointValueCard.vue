@@ -20,8 +20,9 @@
       <div class="things-card-content">
         <div
           :class="{
-            'header-enable': data.interval < 200,
-            'header-disable': data.interval >= 200,
+            'header-enable': delayOk,
+            'header-disable': delaySlow,
+            'header-missing': !hasLatestValue,
           }"
           class="things-card__header"
         >
@@ -35,6 +36,7 @@
             {{ point.pointName }}
           </div>
           <div :title="$t('pointValue.card.rwType')" class="things-card-header-status">
+            <el-tag v-if="!hasLatestValue" effect="plain" type="info">{{ $t('pointValue.card.noLatestValue') }}</el-tag>
             <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">{{ $t('status.readOnly') }}</el-tag>
             <el-tag v-else-if="data.rwFlag === 'W'" effect="plain" type="info">{{ $t('status.writeOnly') }}</el-tag>
             <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">{{ $t('status.readWrite') }}</el-tag>
@@ -44,8 +46,12 @@
           <div class="things-card-body-content">
             <div class="things-card-body-content-column">
               <div class="things-card-body-content-value">
-                <span :title="$t('pointValue.card.processedValue')" class="nowrap-item value" @click="copyValue(data)"
-                  >{{ data.calValue }} {{ unit }}</span
+                <span
+                  :class="{ 'value-missing': !hasLatestValue }"
+                  :title="$t('pointValue.card.processedValue')"
+                  class="nowrap-item value"
+                  @click="copyValue(data)"
+                  >{{ data.calValue }} {{ hasLatestValue ? unit : '' }}</span
                 >
               </div>
               <ul>
@@ -65,25 +71,33 @@
                   <el-icon>
                     <Timer />
                   </el-icon>
-                  {{ $t('pointValue.card.delay') }}: {{ data.interval }} ms
+                  {{ $t('pointValue.card.delay') }}: {{ displayDelay }}
                 </li>
                 <li class="nowrap-item">
                   <el-icon>
                     <Edit />
                   </el-icon>
-                  {{ $t('pointValue.card.collectTime') }}: {{ timestamp(data.createTime) }}
+                  {{ $t('pointValue.card.collectTime') }}: {{ displayTime(data.createTime) }}
                 </li>
                 <li class="nowrap-item">
                   <el-icon>
                     <Sunset />
                   </el-icon>
-                  {{ $t('pointValue.card.saveTime') }}: {{ timestamp(data.createTime) }}
+                  {{ $t('pointValue.card.saveTime') }}: {{ displayTime(data.createTime) }}
                 </li>
               </ul>
             </div>
           </div>
           <div v-if="embedded != ''" class="things-card-body-content-time">
-            <mini-area-chart :data="historyData" :height="80" :tooltip-unit="unit" animate color="#409eff" />
+            <mini-area-chart
+              v-if="hasLatestValue"
+              :data="historyData"
+              :height="80"
+              :tooltip-unit="unit"
+              animate
+              color="#409eff"
+            />
+            <div v-else class="point-value-empty-chart">{{ $t('pointValue.card.noHistory') }}</div>
           </div>
         </div>
         <div v-if="embedded == ''" class="things-card__footer">
@@ -108,7 +122,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref, watch } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
 
@@ -160,8 +174,27 @@
       pointId: data.pointId,
       calValue: data.calValue,
       rawValue: data.rawValue,
+      hasLatestValue: data.hasLatestValue,
     };
     copy(JSON.stringify(content, null, 2), t('pointValue.card.pointValueId'));
+  };
+
+  const hasLatestValue = computed(() => props.data?.hasLatestValue !== false);
+  const delayOk = computed(() => {
+    return hasLatestValue.value && typeof props.data?.interval === 'number' && props.data.interval < 200;
+  });
+  const delaySlow = computed(() => {
+    return hasLatestValue.value && typeof props.data?.interval === 'number' && props.data.interval >= 200;
+  });
+  const displayDelay = computed(() => {
+    return typeof props.data?.interval === 'number' ? `${props.data.interval} ms` : '--';
+  });
+
+  const displayTime = (value: string | null | undefined) => {
+    if (!hasLatestValue.value || !value) {
+      return '--';
+    }
+    return timestamp(value);
   };
 
   // Numeric series fed into MiniAreaChart. BOOL points are coerced to 0/1,
@@ -170,6 +203,10 @@
   const historyData = ref<number[]>([]);
 
   const history = () => {
+    if (!hasLatestValue.value) {
+      historyData.value = [];
+      return;
+    }
     getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
       .then((res) => {
         const pointValueType = (props.point.pointTypeFlag || '').toLowerCase();
@@ -245,6 +282,10 @@
       line-height: 48px;
       text-align: right;
       flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
 
       :deep(.el-tag) {
         vertical-align: middle;
@@ -258,6 +299,10 @@
 
   .header-disable {
     border-bottom: 1px solid #fbc4c4;
+  }
+
+  .header-missing {
+    border-bottom: 1px solid #dcdfe6;
   }
 
   .things-card__body {
@@ -280,6 +325,11 @@
         cursor: pointer;
       }
 
+      .value-missing {
+        color: #909399;
+        animation: none;
+      }
+
       .value-point {
         height: 17px;
       }
@@ -288,6 +338,13 @@
     .things-card-body-content-time {
       display: flex;
       justify-content: center;
+
+      .point-value-empty-chart {
+        height: 80px;
+        line-height: 80px;
+        color: #909399;
+        font-size: 12px;
+      }
     }
   }
 

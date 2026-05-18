@@ -511,6 +511,8 @@ export default {
       delay: 'Data Delay',
       collectTime: 'Collect Time',
       saveTime: 'Save Time',
+      noLatestValue: 'No Value',
+      noHistory: 'No History',
       confirmDelete: 'Are you sure to delete this point value? This action cannot be undone!',
     },
     edit: {

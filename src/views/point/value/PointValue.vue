@@ -136,6 +136,11 @@
 
   const loadPointValueList = (res: any) => {
     reactiveData.listData = res.data.records.map((record: any) => {
+      record.hasLatestValue = record.hasLatestValue !== false;
+      if (!record.hasLatestValue || !record.createTime || !record.operateTime) {
+        record.interval = null;
+        return record;
+      }
       const tempDate1 = new Date(record.createTime);
       const tempDate2 = new Date(record.operateTime);
       record.interval = tempDate2.getTime() - tempDate1.getTime();
