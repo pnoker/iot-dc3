@@ -37,13 +37,13 @@ const alarmMocks = vi.hoisted(() => {
     deleteNotifyChannel: mutate(),
     deleteNotifyChannelBind: mutate(),
     deleteRule: mutate(),
-    getMessageList: list(),
-    getNotifyChannelBindList: list(),
-    getNotifyChannelList: list(),
-    getNotifyList: list(),
-    getNotifyRecordList: list(),
-    getRuleList: list(),
-    getRuleStateList: list(),
+    listMessage: list(),
+    listNotifyChannelBind: list(),
+    listNotifyChannel: list(),
+    listNotify: list(),
+    listNotifyRecord: list(),
+    listRule: list(),
+    listRuleState: list(),
     updateMessage: mutate(),
     updateNotify: mutate(),
     updateNotifyChannel: mutate(),
@@ -142,16 +142,16 @@ describe('AlarmNotify', () => {
     const wrapper = mountAlarmNotify('rule');
     await flushPromises();
 
-    expect(alarmMocks.getRuleList).toHaveBeenCalledTimes(1);
-    expect(alarmMocks.getNotifyList).not.toHaveBeenCalled();
-    expect(alarmMocks.getRuleStateList).not.toHaveBeenCalled();
+    expect(alarmMocks.listRule).toHaveBeenCalledTimes(1);
+    expect(alarmMocks.listNotify).not.toHaveBeenCalled();
+    expect(alarmMocks.listRuleState).not.toHaveBeenCalled();
 
     await wrapper.setProps({ entity: 'notify' });
     await flushPromises();
 
-    expect(alarmMocks.getRuleList).toHaveBeenCalledTimes(1);
-    expect(alarmMocks.getNotifyList).toHaveBeenCalledTimes(1);
-    expect(alarmMocks.getRuleStateList).not.toHaveBeenCalled();
+    expect(alarmMocks.listRule).toHaveBeenCalledTimes(1);
+    expect(alarmMocks.listNotify).toHaveBeenCalledTimes(1);
+    expect(alarmMocks.listRuleState).not.toHaveBeenCalled();
   });
 
   it('maps toolbar search values to the active entity query fields', async () => {
@@ -161,7 +161,7 @@ describe('AlarmNotify', () => {
     await wrapper.find('[data-test="search"]').trigger('click');
     await flushPromises();
 
-    expect(alarmMocks.getRuleList).toHaveBeenLastCalledWith(
+    expect(alarmMocks.listRule).toHaveBeenLastCalledWith(
       expect.objectContaining({
         ruleName: 'Cooling threshold',
         enableFlag: 'ENABLE',
@@ -174,7 +174,7 @@ describe('AlarmNotify', () => {
     const wrapper = mountAlarmNotify('state');
     await flushPromises();
 
-    expect(alarmMocks.getRuleStateList).toHaveBeenCalledTimes(1);
+    expect(alarmMocks.listRuleState).toHaveBeenCalledTimes(1);
     expect(wrapper.text()).not.toContain(i18n.global.t('common.add'));
   });
 });
