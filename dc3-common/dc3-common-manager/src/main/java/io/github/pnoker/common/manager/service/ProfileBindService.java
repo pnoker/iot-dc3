@@ -33,21 +33,21 @@ import java.util.List;
 public interface ProfileBindService extends BaseService<ProfileBindBO, ProfileBindQuery> {
 
     /**
-     * Device ID
+     * Remove all profile bindings for the given device.
      *
      * @param deviceId Device ID
-     * @return
+     * @throws io.github.pnoker.common.exception.DeleteException when removal fails
      */
-    Boolean removeByDeviceId(Long deviceId);
+    void removeByDeviceId(Long deviceId);
 
     /**
-     * Device ID ID
+     * Remove the profile binding for the given device and profile.
      *
      * @param deviceId  Device ID
-     * @param profileId Point ID
-     * @return
+     * @param profileId Profile ID
+     * @throws io.github.pnoker.common.exception.DeleteException when removal fails
      */
-    Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId);
+    void removeByDeviceIdAndProfileId(Long deviceId, Long profileId);
 
     /**
      * Device ID ID

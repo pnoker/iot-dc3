@@ -128,7 +128,7 @@ public class PointValueTool {
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
                 deviceId, pointId);
         try {
-            boolean success = pointValueCommandFacade.read(tenantId, deviceId, pointId);
+            boolean success = pointValueCommandFacade.dispatchRead(tenantId, deviceId, pointId);
             PointCommandResult result = new PointCommandResult(deviceId, pointId, null, success, false, null);
             if (success) {
                 return AgenticToolResult.ok("Read command sent", result);

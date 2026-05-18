@@ -105,7 +105,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public boolean cancelToken(String loginName, String tenantCode) {
+    public boolean tryCancelToken(String loginName, String tenantCode) {
         TenantBO tenantBO = tenantService.selectByCode(tenantCode);
         if (Objects.isNull(tenantBO)) {
             return false;

@@ -82,24 +82,28 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public Boolean removeByDeviceId(Long deviceId) {
+    public void removeByDeviceId(Long deviceId) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
         wrapper.eq(ProfileBindDO::getDeviceId, deviceId);
         if (profileBindManager.count(wrapper) == 0) {
-            return true;
+            return;
         }
-        return profileBindManager.remove(wrapper);
+        if (!profileBindManager.remove(wrapper)) {
+            throw new DeleteException("Failed to remove profile bind by deviceId");
+        }
     }
 
     @Override
-    public Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId) {
+    public void removeByDeviceIdAndProfileId(Long deviceId, Long profileId) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
         wrapper.eq(ProfileBindDO::getDeviceId, deviceId);
         wrapper.eq(ProfileBindDO::getProfileId, profileId);
         if (profileBindManager.count(wrapper) == 0) {
-            return true;
+            return;
         }
-        return profileBindManager.remove(wrapper);
+        if (!profileBindManager.remove(wrapper)) {
+            throw new DeleteException("Failed to remove profile bind by deviceId and profileId");
+        }
     }
 
     @Override

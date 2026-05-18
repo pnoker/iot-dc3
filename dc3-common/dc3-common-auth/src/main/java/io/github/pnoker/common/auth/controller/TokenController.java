@@ -88,7 +88,7 @@ public class TokenController implements BaseController {
     @PostMapping("/cancel")
     public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
-            boolean ok = tokenService.cancelToken(entityVO.getName(), entityVO.getTenant());
+            boolean ok = tokenService.tryCancelToken(entityVO.getName(), entityVO.getTenant());
             return ok ? R.ok(true, "Token cancelled") : R.fail("Cancel token failed");
         });
     }
