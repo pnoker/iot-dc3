@@ -180,7 +180,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public PointAttributeConfigBO getByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId,
-                                                                           Long pointId) {
+                                                                        Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
                 .eq(PointAttributeConfigDO::getAttributeId, attributeId)
                 .eq(PointAttributeConfigDO::getDeviceId, deviceId)

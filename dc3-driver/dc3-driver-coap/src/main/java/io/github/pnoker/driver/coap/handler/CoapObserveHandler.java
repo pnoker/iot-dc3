@@ -38,7 +38,7 @@ public interface CoapObserveHandler {
     /**
      * Called when an error occurs on an observed resource.
      *
-     * @param uri  the observed resource URI
+     * @param uri   the observed resource URI
      * @param error the error that occurred
      */
     void onError(String uri, Exception error);

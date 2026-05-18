@@ -17,8 +17,6 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.driver.coap.client.CoapClientManager;
-import io.github.pnoker.driver.coap.entity.CoapResult;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -31,6 +29,8 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.driver.coap.client.CoapClientManager;
+import io.github.pnoker.driver.coap.entity.CoapResult;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

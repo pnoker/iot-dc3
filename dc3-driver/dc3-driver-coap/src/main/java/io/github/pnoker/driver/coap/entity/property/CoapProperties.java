@@ -66,6 +66,13 @@ public class CoapProperties {
     @NotNull(message = "DTLS config can't be null")
     private Dtls dtls = new Dtls();
 
+    @NoArgsConstructor
+    public enum ModeEnum {
+
+        CLIENT, SERVER, BOTH,
+
+    }
+
     @Getter
     @Setter
     public static class Dtls {
@@ -79,13 +86,6 @@ public class CoapProperties {
         private String identityCertificatePath;
 
         private String identityPrivateKeyPath;
-
-    }
-
-    @NoArgsConstructor
-    public enum ModeEnum {
-
-        CLIENT, SERVER, BOTH,
 
     }
 

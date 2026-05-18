@@ -169,6 +169,23 @@ public class AgenticVisualizationUtil {
                 latest - oldest, min, max, sum / values.size());
     }
 
+    private static Map<String, Object> mapFromRecord(Record source) {
+        Map<String, Object> target = new LinkedHashMap<>();
+        for (RecordComponent component : source.getClass().getRecordComponents()) {
+            target.put(component.getName(), read(source, component));
+        }
+        return target;
+    }
+
+    private static Object read(Record source, RecordComponent component) {
+        try {
+            component.getAccessor().setAccessible(true);
+            return component.getAccessor().invoke(source);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Failed to read visualization field: " + component.getName(), e);
+        }
+    }
+
     public record NumericSeries(List<Map<String, Object>> dataset, NumericSummary summary) {
 
         public NumericSeries {
@@ -198,23 +215,6 @@ public class AgenticVisualizationUtil {
 
     private record NumericStat(Double latest, Double average, Double min, Double max, Double delta, int numericCount,
                                int nonNumericCount) {
-    }
-
-    private static Map<String, Object> mapFromRecord(Record source) {
-        Map<String, Object> target = new LinkedHashMap<>();
-        for (RecordComponent component : source.getClass().getRecordComponents()) {
-            target.put(component.getName(), read(source, component));
-        }
-        return target;
-    }
-
-    private static Object read(Record source, RecordComponent component) {
-        try {
-            component.getAccessor().setAccessible(true);
-            return component.getAccessor().invoke(source);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Failed to read visualization field: " + component.getName(), e);
-        }
     }
 
 }

@@ -2,7 +2,7 @@ name: docs
 
 on:
   push:
-    branches: [release]
+    branches: [ release ]
     paths:
       - docs/**
       - package.json

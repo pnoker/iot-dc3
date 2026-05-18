@@ -89,6 +89,7 @@ venv/
 node_modules/
 .pnpm-store/
 .parcel-cache/
+pnpm-lock.yaml
 
 # ===== VitePress build output =====
 docs/.vitepress/cache/

@@ -106,7 +106,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
 
     @Override
     public void listByProfileIds(GrpcProfileIdsQuery request,
-                                   StreamObserver<GrpcRProfileListDTO> responseObserver) {
+                                 StreamObserver<GrpcRProfileListDTO> responseObserver) {
         GrpcRProfileListDTO.Builder builder = GrpcRProfileListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

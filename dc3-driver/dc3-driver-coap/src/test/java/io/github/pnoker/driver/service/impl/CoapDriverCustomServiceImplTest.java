@@ -17,9 +17,6 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.driver.coap.client.CoapClientManager;
-import io.github.pnoker.driver.coap.entity.CoapResult;
-import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -33,6 +30,8 @@ import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.driver.coap.client.CoapClientManager;
+import io.github.pnoker.driver.coap.entity.CoapResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

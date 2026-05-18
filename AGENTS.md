@@ -146,13 +146,13 @@ cardinality of the result, applied consistently across Service interfaces,
 ServiceImpl, Controller, Local Facade, gRPC Facade, gRPC server, and gRPC
 RPC names in `.proto` files.
 
-| Action                   | Java method     | HTTP path        | gRPC RPC      |
-|--------------------------|-----------------|------------------|---------------|
-| Create one record        | `add(BO)`       | `/add`           | n/a           |
-| Delete by id             | `delete(Long)`  | `/delete`        | n/a           |
-| Update one record        | `update(BO)`    | `/update`        | n/a           |
-| Query single record      | `getXxx(...)`   | `/get_xxx`       | `GetXxx`      |
-| Query multiple records   | `listXxx(...)`  | `/list_xxx`      | `ListXxx`     |
+| Action                 | Java method    | HTTP path   | gRPC RPC  |
+|------------------------|----------------|-------------|-----------|
+| Create one record      | `add(BO)`      | `/add`      | n/a       |
+| Delete by id           | `delete(Long)` | `/delete`   | n/a       |
+| Update one record      | `update(BO)`   | `/update`   | n/a       |
+| Query single record    | `getXxx(...)`  | `/get_xxx`  | `GetXxx`  |
+| Query multiple records | `listXxx(...)` | `/list_xxx` | `ListXxx` |
 
 - The base CRUD methods are inherited from `BaseService<B, Q>`:
   `add`, `delete`, `update`, `getById`, `list(Q)`. Subinterfaces add
@@ -166,6 +166,7 @@ RPC names in `.proto` files.
 - gRPC RPC names use PascalCase and mirror the Java method name.
 
 Special cases follow the same cardinality rule:
+
 - `getStatusByPage(Q)` for status-snapshot lookups whose return type is a
   `Map<Long,String>`, not a `Page` (DeviceStatusService, DriverStatusService).
 - Boolean-returning action methods stay on a try-pattern verb when the
@@ -193,10 +194,10 @@ Keep persistence, business, and web representations deliberately separated.
 - Do not introduce magic flag constants such as `private static final Byte DEFAULT = 1`. Add or reuse a domain enum
   instead, with `@EnumValue`, `ofIndex(...)`, and clear names.
 - Domain enum suffixes follow strict semantics:
-  - `*FlagEnum` for boolean-like 0/1 toggles (`EnableFlagEnum`, `DefaultFlagEnum`, `ExpireFlagEnum`).
-  - `*StatusEnum` for state-machine values with multiple states (`DeviceStatusEnum`, `DriverStatusEnum`,
-    `NotifyRecordStatusEnum`). Do not append `Flag` to a state-machine enum name.
-  - `*TypeEnum` for closed classification sets (`MetadataTypeEnum`, `ResponseEnum`-style code groups).
+    - `*FlagEnum` for boolean-like 0/1 toggles (`EnableFlagEnum`, `DefaultFlagEnum`, `ExpireFlagEnum`).
+    - `*StatusEnum` for state-machine values with multiple states (`DeviceStatusEnum`, `DriverStatusEnum`,
+      `NotifyRecordStatusEnum`). Do not append `Flag` to a state-machine enum name.
+    - `*TypeEnum` for closed classification sets (`MetadataTypeEnum`, `ResponseEnum`-style code groups).
 - Enum constant names use `UPPER_SNAKE_CASE` and stay descriptive — single-letter names like `R`/`W` are not allowed.
   The internal `code` string field on enums uses lowercase tokens (e.g. `"enable"`, `"online"`, `"pending"`) so that
   values are consistent across `*FlagEnum`, `*StatusEnum`, and `*TypeEnum` definitions.
