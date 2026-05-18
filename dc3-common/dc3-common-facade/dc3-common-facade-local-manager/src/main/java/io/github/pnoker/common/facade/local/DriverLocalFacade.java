@@ -74,7 +74,7 @@ public class DriverLocalFacade implements DriverFacade {
     @Override
     public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
         DriverQuery managerQuery = facadeDriverBuilder.toManagerQuery(query);
-        Page<DriverBO> page = driverService.selectByPage(managerQuery);
+        Page<DriverBO> page = driverService.list(managerQuery);
         if (Objects.isNull(page)) {
             return FacadePage.empty();
         }

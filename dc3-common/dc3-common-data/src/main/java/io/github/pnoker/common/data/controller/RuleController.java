@@ -68,7 +68,7 @@ public class RuleController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RuleBO entityBO = ruleBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            ruleService.save(entityBO);
+            ruleService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -77,7 +77,7 @@ public class RuleController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, ruleService.selectById(id));
-            ruleService.remove(id);
+            ruleService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -106,7 +106,7 @@ public class RuleController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RuleQuery query = Objects.isNull(entityQuery) ? new RuleQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<RuleBO> entityPageBO = ruleService.selectByPage(query);
+            Page<RuleBO> entityPageBO = ruleService.list(query);
             return R.ok(ruleBuilder.buildVOPageByBOPage(entityPageBO));
         }));
     }

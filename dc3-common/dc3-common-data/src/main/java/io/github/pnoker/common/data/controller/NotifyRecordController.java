@@ -73,7 +73,7 @@ public class NotifyRecordController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyRecordQuery query = Objects.isNull(entityQuery) ? new NotifyRecordQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<NotifyRecordBO> entityPageBO = notifyRecordService.selectByPage(query);
+            Page<NotifyRecordBO> entityPageBO = notifyRecordService.list(query);
             return R.ok(notifyRecordBuilder.buildVOPageByBOPage(entityPageBO));
         }));
     }

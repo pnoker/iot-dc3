@@ -68,7 +68,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
         DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
 
-        Page<DriverBO> entityPage = driverService.selectByPage(query);
+        Page<DriverBO> entityPage = driverService.list(query);
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

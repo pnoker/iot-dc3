@@ -74,7 +74,7 @@ public class PointLocalFacade implements PointFacade {
     @Override
     public FacadePage<FacadePointBO> selectByPage(FacadePointQuery query) {
         PointQuery managerQuery = facadePointBuilder.toManagerQuery(query);
-        Page<PointBO> page = pointService.selectByPage(managerQuery);
+        Page<PointBO> page = pointService.list(managerQuery);
         if (Objects.isNull(page)) {
             return FacadePage.empty();
         }

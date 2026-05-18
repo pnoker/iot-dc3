@@ -75,7 +75,7 @@ public class MenuController implements BaseController {
             entityBO.setCreatorName(header.getNickName());
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            menuService.save(entityBO);
+            menuService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -83,7 +83,7 @@ public class MenuController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            menuService.remove(id);
+            menuService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         });
     }
@@ -112,7 +112,7 @@ public class MenuController implements BaseController {
     public Mono<R<Page<MenuVO>>> list(@RequestBody(required = false) MenuQuery entityQuery) {
         return async(() -> {
             MenuQuery query = Objects.isNull(entityQuery) ? new MenuQuery() : entityQuery;
-            Page<MenuBO> entityPageBO = menuService.selectByPage(query);
+            Page<MenuBO> entityPageBO = menuService.list(query);
             Page<MenuVO> entityPageVO = menuBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         });

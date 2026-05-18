@@ -72,7 +72,7 @@ public class RuleStateController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RuleStateQuery query = Objects.isNull(entityQuery) ? new RuleStateQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<RuleStateBO> entityPageBO = ruleStateService.selectByPage(query);
+            Page<RuleStateBO> entityPageBO = ruleStateService.list(query);
             return R.ok(ruleStateBuilder.buildVOPageByBOPage(entityPageBO));
         }));
     }

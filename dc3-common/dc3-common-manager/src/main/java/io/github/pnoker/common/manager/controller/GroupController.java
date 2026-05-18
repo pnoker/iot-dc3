@@ -72,7 +72,7 @@ public class GroupController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            groupService.save(entityBO);
+            groupService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -85,7 +85,7 @@ public class GroupController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupService.selectById(id));
-            groupService.remove(id);
+            groupService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -127,7 +127,7 @@ public class GroupController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupQuery query = Objects.isNull(entityQuery) ? new GroupQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<GroupBO> entityPageBO = groupService.selectByPage(query);
+            Page<GroupBO> entityPageBO = groupService.list(query);
             Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

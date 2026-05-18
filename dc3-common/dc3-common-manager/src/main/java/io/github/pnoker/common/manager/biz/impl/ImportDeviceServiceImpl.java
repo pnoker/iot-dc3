@@ -121,7 +121,7 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
                 entityBO.setProfileId(profileId);
                 entityBO.setDeviceId(deviceBO.getId());
                 entityBO.setTenantId(deviceBO.getTenantId());
-                profileBindService.save(entityBO);
+                profileBindService.add(entityBO);
             } catch (Exception e) {
                 log.warn("Skip profile bind during device import, deviceId={}, profileId={}, error={}",
                         deviceBO.getId(), profileId, e.getMessage(), e);

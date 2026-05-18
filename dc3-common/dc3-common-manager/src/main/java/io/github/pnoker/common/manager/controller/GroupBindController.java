@@ -98,7 +98,7 @@ public class GroupBindController implements BaseController {
             GroupBindBO entityBO = groupBindBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             validateBind(tenantId, entityBO);
-            groupBindService.save(entityBO);
+            groupBindService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -111,7 +111,7 @@ public class GroupBindController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupBindService.selectById(id));
-            groupBindService.remove(id);
+            groupBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -154,7 +154,7 @@ public class GroupBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBindQuery query = Objects.isNull(entityQuery) ? new GroupBindQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<GroupBindBO> entityPageBO = groupBindService.selectByPage(query);
+            Page<GroupBindBO> entityPageBO = groupBindService.list(query);
             Page<GroupBindVO> entityPageVO = groupBindBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

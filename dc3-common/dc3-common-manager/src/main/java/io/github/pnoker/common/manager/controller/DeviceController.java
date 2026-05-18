@@ -94,7 +94,7 @@ public class DeviceController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            deviceService.save(entityBO);
+            deviceService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -109,7 +109,7 @@ public class DeviceController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.selectById(id));
-            deviceService.remove(id);
+            deviceService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -186,7 +186,7 @@ public class DeviceController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery query = Objects.isNull(entityQuery) ? new DeviceQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<DeviceBO> entityPageBO = deviceService.selectByPage(query);
+            Page<DeviceBO> entityPageBO = deviceService.list(query);
             Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));
@@ -242,7 +242,7 @@ public class DeviceController implements BaseController {
      * @return
      */
     @GetMapping("/select_by_driver_id")
-    public Mono<R<String>> getDeviceByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<String>> selectByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.selectById(driverId));
             List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.selectByDriverId(driverId));

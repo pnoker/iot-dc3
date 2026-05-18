@@ -69,7 +69,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
         DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
-        Page<DeviceBO> entityPage = deviceService.selectByPage(query);
+        Page<DeviceBO> entityPage = deviceService.list(query);
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

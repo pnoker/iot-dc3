@@ -83,7 +83,7 @@ public class UserLoginController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
             requireTenantMember(tenantId, entityBO.getUserId());
-            userLoginService.save(entityBO);
+            userLoginService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -99,7 +99,7 @@ public class UserLoginController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.selectById(id);
             requireTenantMember(tenantId, entityBO.getUserId());
-            userLoginService.remove(id);
+            userLoginService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -138,7 +138,7 @@ public class UserLoginController implements BaseController {
             UserLoginQuery query = new UserLoginQuery();
             query.setUserPasswordId(id);
             query.setTenantId(tenantId);
-            if (userLoginService.selectByPage(query).getRecords().isEmpty()) {
+            if (userLoginService.list(query).getRecords().isEmpty()) {
                 throw new NotFoundException("Resource does not exist");
             }
             userPasswordService.restPassword(id);
@@ -194,7 +194,7 @@ public class UserLoginController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginQuery query = Objects.isNull(entityQuery) ? new UserLoginQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<UserLoginBO> entityPageBO = userLoginService.selectByPage(query);
+            Page<UserLoginBO> entityPageBO = userLoginService.list(query);
             Page<UserLoginVO> entityPageVO = userLoginBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

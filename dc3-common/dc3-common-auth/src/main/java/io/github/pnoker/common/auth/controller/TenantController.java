@@ -73,7 +73,7 @@ public class TenantController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
         return async(() -> {
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
-            tenantService.save(entityBO);
+            tenantService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         });
     }
@@ -87,7 +87,7 @@ public class TenantController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            tenantService.remove(id);
+            tenantService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         });
     }
@@ -153,7 +153,7 @@ public class TenantController implements BaseController {
     public Mono<R<Page<TenantVO>>> list(@RequestBody(required = false) TenantQuery entityQuery) {
         return async(() -> {
             TenantQuery query = Objects.isNull(entityQuery) ? new TenantQuery() : entityQuery;
-            Page<TenantBO> entityPageBO = tenantService.selectByPage(query);
+            Page<TenantBO> entityPageBO = tenantService.list(query);
             Page<TenantVO> entityPageVO = tenantBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         });

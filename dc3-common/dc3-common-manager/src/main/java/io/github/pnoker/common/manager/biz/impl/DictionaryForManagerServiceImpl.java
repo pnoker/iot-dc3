@@ -76,7 +76,7 @@ public class DictionaryForManagerServiceImpl implements DictionaryForManagerServ
                 .driverName(entityQuery.getLabel())
                 .tenantId(entityQuery.getTenantId())
                 .build();
-        Page<DriverBO> driverPageBO = driverService.selectByPage(driverQuery);
+        Page<DriverBO> driverPageBO = driverService.list(driverQuery);
         return dictionaryBuilder.buildVOPageByDriverBOPage(driverPageBO);
     }
 
@@ -91,7 +91,7 @@ public class DictionaryForManagerServiceImpl implements DictionaryForManagerServ
                 .profileName(entityQuery.getLabel())
                 .tenantId(entityQuery.getTenantId())
                 .build();
-        Page<ProfileBO> profilePageBO = profileService.selectByPage(profileQuery);
+        Page<ProfileBO> profilePageBO = profileService.list(profileQuery);
         return dictionaryBuilder.buildVOPageByProfileBOPage(profilePageBO);
     }
 
@@ -107,7 +107,7 @@ public class DictionaryForManagerServiceImpl implements DictionaryForManagerServ
                 .pointName(entityQuery.getLabel())
                 .tenantId(entityQuery.getTenantId())
                 .build();
-        Page<PointBO> pointPageBO = pointService.selectByPage(pointQuery);
+        Page<PointBO> pointPageBO = pointService.list(pointQuery);
         return dictionaryBuilder.buildVOPageByPointBOPage(pointPageBO);
     }
 
@@ -123,7 +123,7 @@ public class DictionaryForManagerServiceImpl implements DictionaryForManagerServ
                 .pointName(entityQuery.getLabel())
                 .tenantId(entityQuery.getTenantId())
                 .build();
-        Page<PointBO> pointPageBO = pointService.selectByPage(pointQuery);
+        Page<PointBO> pointPageBO = pointService.list(pointQuery);
         return dictionaryBuilder.buildVOPageByPointBOPage(pointPageBO);
     }
 
@@ -138,7 +138,7 @@ public class DictionaryForManagerServiceImpl implements DictionaryForManagerServ
                 .deviceName(entityQuery.getLabel())
                 .tenantId(entityQuery.getTenantId())
                 .build();
-        Page<DeviceBO> devicePageBO = deviceService.selectByPage(deviceQuery);
+        Page<DeviceBO> devicePageBO = deviceService.list(deviceQuery);
         return dictionaryBuilder.buildVOPageByDeviceBOPage(devicePageBO);
     }
 
@@ -154,7 +154,7 @@ public class DictionaryForManagerServiceImpl implements DictionaryForManagerServ
                 .deviceName(entityQuery.getLabel())
                 .tenantId(entityQuery.getTenantId())
                 .build();
-        Page<DeviceBO> devicePageBO = deviceService.selectByPage(deviceQuery);
+        Page<DeviceBO> devicePageBO = deviceService.list(deviceQuery);
         return dictionaryBuilder.buildVOPageByDeviceBOPage(devicePageBO);
     }
 

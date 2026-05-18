@@ -98,7 +98,7 @@ public class LabelBindController implements BaseController {
             LabelBindBO entityBO = labelBindBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             validateBind(tenantId, entityBO);
-            labelBindService.save(entityBO);
+            labelBindService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -111,7 +111,7 @@ public class LabelBindController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, labelBindService.selectById(id));
-            labelBindService.remove(id);
+            labelBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -154,7 +154,7 @@ public class LabelBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LabelBindQuery query = Objects.isNull(entityQuery) ? new LabelBindQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<LabelBindBO> entityPageBO = labelBindService.selectByPage(query);
+            Page<LabelBindBO> entityPageBO = labelBindService.list(query);
             Page<LabelBindVO> entityPageVO = labelBindBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

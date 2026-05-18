@@ -82,7 +82,7 @@ public class DriverAttributeController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            driverAttributeService.save(entityBO);
+            driverAttributeService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -97,7 +97,7 @@ public class DriverAttributeController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverAttributeService.selectById(id));
-            driverAttributeService.remove(id);
+            driverAttributeService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -165,7 +165,7 @@ public class DriverAttributeController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeQuery query = Objects.isNull(entityQuery) ? new DriverAttributeQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<DriverAttributeBO> entityPageBO = driverAttributeService.selectByPage(query);
+            Page<DriverAttributeBO> entityPageBO = driverAttributeService.list(query);
             Page<DriverAttributeVO> entityPageVO = driverAttributeBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

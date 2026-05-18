@@ -94,7 +94,7 @@ public class PointAttributeConfigController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            pointAttributeConfigService.save(entityBO);
+            pointAttributeConfigService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -109,7 +109,7 @@ public class PointAttributeConfigController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointAttributeConfigService.selectById(id));
-            pointAttributeConfigService.remove(id);
+            pointAttributeConfigService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -220,7 +220,7 @@ public class PointAttributeConfigController implements BaseController {
             PointAttributeConfigQuery query = Objects.isNull(entityQuery) ? new PointAttributeConfigQuery()
                     : entityQuery;
             query.setTenantId(tenantId);
-            Page<PointAttributeConfigBO> entityPageBO = pointAttributeConfigService.selectByPage(query);
+            Page<PointAttributeConfigBO> entityPageBO = pointAttributeConfigService.list(query);
             Page<PointAttributeConfigVO> entityPageVO = pointAttributeConfigBuilder
                     .buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);

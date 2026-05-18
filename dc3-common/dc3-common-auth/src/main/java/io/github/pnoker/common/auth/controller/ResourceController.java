@@ -75,7 +75,7 @@ public class ResourceController implements BaseController {
             entityBO.setCreatorName(header.getNickName());
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            resourceService.save(entityBO);
+            resourceService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -83,7 +83,7 @@ public class ResourceController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            resourceService.remove(id);
+            resourceService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         });
     }
@@ -112,7 +112,7 @@ public class ResourceController implements BaseController {
     public Mono<R<Page<ResourceVO>>> list(@RequestBody(required = false) ResourceQuery entityQuery) {
         return async(() -> {
             ResourceQuery query = Objects.isNull(entityQuery) ? new ResourceQuery() : entityQuery;
-            Page<ResourceBO> entityPageBO = resourceService.selectByPage(query);
+            Page<ResourceBO> entityPageBO = resourceService.list(query);
             Page<ResourceVO> entityPageVO = resourceBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         });
