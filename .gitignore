@@ -1,20 +1,17 @@
-*target
-*logs
-dc3/data/
-.idea
-*.iws
-*.iml
-*.ipr
-.vs
-.vscode
-.settings
-.project
-.DS_Store
-.env
-.claude/settings.local.json
-.claude/TODO.md
+# ===== Build artifacts (Maven / Gradle / general) =====
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+dependency-reduced-pom.xml
+.flattened-pom.xml
+release.properties
+buildNumber.properties
 
-# Test artifacts
+# ===== Test artifacts =====
 test-results/
 **/target/test-classes/
 **/target/surefire-reports/
@@ -22,6 +19,83 @@ test-results/
 **/target/site/jacoco*/
 **/target/jacoco*.exec
 
-# Testcontainers state
+# ===== Testcontainers state =====
 .testcontainers/
 **/.testcontainers.properties.bak
+
+# ===== Logs & JVM crash dumps =====
+*.log
+*.log.*
+logs/
+hs_err_pid*.log
+replay_pid*.log
+*.hprof
+core.*
+
+# ===== Environment & secrets =====
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+
+# ===== IntelliJ IDEA =====
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# ===== Eclipse =====
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.apt_generated/
+
+# ===== VS Code / Visual Studio =====
+.vscode/
+.vs/
+*.code-workspace
+
+# ===== Editor temp / swap / backup =====
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.orig
+*.rej
+
+# ===== OS junk =====
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ===== Python (used by docs venv: mkdocs) =====
+__pycache__/
+*.py[cod]
+.venv/
+.venv-*/
+venv/
+
+# ===== Node (in case frontend tooling appears) =====
+node_modules/
+dist/
+.parcel-cache/
+
+# ===== MkDocs build output =====
+/site/
+.cache/
+
+# ===== Project-local data =====
+dc3/data/
+.claude/settings.local.json
+.claude/TODO.md
