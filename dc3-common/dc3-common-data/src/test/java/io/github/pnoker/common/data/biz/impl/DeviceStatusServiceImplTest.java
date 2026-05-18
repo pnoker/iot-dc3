@@ -58,7 +58,7 @@ class DeviceStatusServiceImplTest {
     void selectByPageReturnsEmptyMapForEmptyPage() {
         FacadePage<FacadeDeviceBO> page = new FacadePage<>();
         page.setRecords(List.of());
-        when(deviceFacade.selectByPage(any())).thenReturn(page);
+        when(deviceFacade.listByPage(any())).thenReturn(page);
         assertThat(service.selectByPage(new DeviceQuery())).isEmpty();
     }
 
@@ -66,7 +66,7 @@ class DeviceStatusServiceImplTest {
     void selectByPageDefaultsToOfflineWhenCacheMissing() {
         FacadePage<FacadeDeviceBO> page = new FacadePage<>();
         page.setRecords(List.of(device(10L)));
-        when(deviceFacade.selectByPage(any())).thenReturn(page);
+        when(deviceFacade.listByPage(any())).thenReturn(page);
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L)).thenReturn(null);
         assertThat(service.selectByPage(new DeviceQuery()))
                 .containsEntry(10L, DeviceStatusEnum.OFFLINE.getCode());
@@ -76,7 +76,7 @@ class DeviceStatusServiceImplTest {
     void selectByPageReturnsCachedStatus() {
         FacadePage<FacadeDeviceBO> page = new FacadePage<>();
         page.setRecords(List.of(device(10L)));
-        when(deviceFacade.selectByPage(any())).thenReturn(page);
+        when(deviceFacade.listByPage(any())).thenReturn(page);
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
                 .thenReturn(DeviceStatusEnum.ONLINE.getCode());
         assertThat(service.selectByPage(new DeviceQuery()))
@@ -85,13 +85,13 @@ class DeviceStatusServiceImplTest {
 
     @Test
     void selectByProfileIdReturnsEmptyMapForEmptyDevices() {
-        when(deviceFacade.selectByProfileId(1L, 5L)).thenReturn(List.of());
+        when(deviceFacade.listByProfileId(1L, 5L)).thenReturn(List.of());
         assertThat(service.selectByProfileId(1L, 5L)).isEmpty();
     }
 
     @Test
     void selectByProfileIdMapsAllDevicesToCachedOrOfflineStatus() {
-        when(deviceFacade.selectByProfileId(1L, 5L)).thenReturn(List.of(device(10L), device(11L)));
+        when(deviceFacade.listByProfileId(1L, 5L)).thenReturn(List.of(device(10L), device(11L)));
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
                 .thenReturn(DeviceStatusEnum.ONLINE.getCode());
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 11L)).thenReturn(null);

@@ -69,7 +69,7 @@ class PointLocalFacadeTest {
     @Test
     void selectByIdReturnsNullWhenServiceReturnsNull() {
         when(pointService.selectById(1L)).thenReturn(null);
-        assertThat(facade.selectById(1L)).isNull();
+        assertThat(facade.getById(1L)).isNull();
         verify(facadePointBuilder, never()).toFacadeBO(any());
     }
 
@@ -79,13 +79,13 @@ class PointLocalFacadeTest {
         FacadePointBO mapped = new FacadePointBO();
         when(pointService.selectById(1L)).thenReturn(bo);
         when(facadePointBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.selectById(1L)).isSameAs(mapped);
+        assertThat(facade.getById(1L)).isSameAs(mapped);
     }
 
     @Test
     void selectByIdsReturnsEmptyForNullOrEmptyInput() {
-        assertThat(facade.selectByIds(null)).isEmpty();
-        assertThat(facade.selectByIds(Set.of())).isEmpty();
+        assertThat(facade.listByIds(null)).isEmpty();
+        assertThat(facade.listByIds(Set.of())).isEmpty();
     }
 
     @Test
@@ -94,7 +94,7 @@ class PointLocalFacadeTest {
         FacadePointBO mapped = new FacadePointBO();
         when(pointService.selectByIds(any())).thenReturn(List.of(bo));
         when(facadePointBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.selectByIds(Set.of(1L))).containsExactly(mapped);
+        assertThat(facade.listByIds(Set.of(1L))).containsExactly(mapped);
     }
 
     @Test
@@ -108,7 +108,7 @@ class PointLocalFacadeTest {
         when(pointService.list(any(PointQuery.class))).thenReturn(page);
         when(facadePointBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
-        FacadePage<FacadePointBO> result = facade.selectByPage(query);
+        FacadePage<FacadePointBO> result = facade.listByPage(query);
         assertThat(result.getCurrent()).isEqualTo(3);
         assertThat(result.getSize()).isEqualTo(25);
         assertThat(result.getTotal()).isEqualTo(75);
@@ -120,7 +120,7 @@ class PointLocalFacadeTest {
         FacadePointQuery query = new FacadePointQuery();
         when(facadePointBuilder.toManagerQuery(query)).thenReturn(new PointQuery());
         when(pointService.list(any(PointQuery.class))).thenReturn(null);
-        assertThat(facade.selectByPage(query).getRecords()).isEmpty();
+        assertThat(facade.listByPage(query).getRecords()).isEmpty();
     }
 
     private void injectField(String name, Object value) throws Exception {

@@ -54,13 +54,13 @@ public class ProfileLocalFacade implements ProfileFacade {
     private FacadeProfileBuilder facadeProfileBuilder;
 
     @Override
-    public FacadeProfileBO selectById(Long id) {
+    public FacadeProfileBO getById(Long id) {
         ProfileBO managerBO = profileService.selectById(id);
         return Objects.isNull(managerBO) ? null : facadeProfileBuilder.toFacadeBO(managerBO);
     }
 
     @Override
-    public List<FacadeProfileBO> selectByIds(Collection<Long> ids) {
+    public List<FacadeProfileBO> listByIds(Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -72,7 +72,7 @@ public class ProfileLocalFacade implements ProfileFacade {
     }
 
     @Override
-    public FacadePage<FacadeProfileBO> selectByPage(FacadeProfileQuery query) {
+    public FacadePage<FacadeProfileBO> listByPage(FacadeProfileQuery query) {
         ProfileQuery managerQuery = facadeProfileBuilder.toManagerQuery(query);
         Page<ProfileBO> page = profileService.list(managerQuery);
         if (Objects.isNull(page)) {
@@ -84,7 +84,7 @@ public class ProfileLocalFacade implements ProfileFacade {
     }
 
     @Override
-    public List<FacadeProfileBO> selectByDeviceId(Long deviceId) {
+    public List<FacadeProfileBO> listByDeviceId(Long deviceId) {
         List<ProfileBO> list = profileService.selectByDeviceId(deviceId);
         if (Objects.isNull(list) || list.isEmpty()) {
             return Collections.emptyList();

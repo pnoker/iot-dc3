@@ -54,13 +54,13 @@ public class DriverLocalFacade implements DriverFacade {
     private FacadeDriverBuilder facadeDriverBuilder;
 
     @Override
-    public FacadeDriverBO selectById(Long id) {
+    public FacadeDriverBO getById(Long id) {
         DriverBO managerBO = driverService.selectById(id);
         return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
     }
 
     @Override
-    public List<FacadeDriverBO> selectByIds(Collection<Long> ids) {
+    public List<FacadeDriverBO> listByIds(Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -72,7 +72,7 @@ public class DriverLocalFacade implements DriverFacade {
     }
 
     @Override
-    public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
+    public FacadePage<FacadeDriverBO> listByPage(FacadeDriverQuery query) {
         DriverQuery managerQuery = facadeDriverBuilder.toManagerQuery(query);
         Page<DriverBO> page = driverService.list(managerQuery);
         if (Objects.isNull(page)) {
@@ -84,7 +84,7 @@ public class DriverLocalFacade implements DriverFacade {
     }
 
     @Override
-    public FacadeDriverBO selectByDeviceId(Long deviceId) {
+    public FacadeDriverBO getByDeviceId(Long deviceId) {
         DriverBO managerBO = driverService.selectByDeviceId(deviceId);
         return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
     }

@@ -46,7 +46,7 @@ public class UserLocalFacade implements UserFacade {
     private FacadeUserBuilder facadeUserBuilder;
 
     @Override
-    public FacadeUserBO selectById(Long id) {
+    public FacadeUserBO getById(Long id) {
         UserBO bo = userService.selectById(id);
         return Objects.isNull(bo) ? null : facadeUserBuilder.toFacadeBO(bo);
     }

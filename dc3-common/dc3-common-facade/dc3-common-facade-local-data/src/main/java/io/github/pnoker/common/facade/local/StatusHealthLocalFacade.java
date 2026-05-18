@@ -65,7 +65,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
 
     @Override
     public Map<Long, String> selectDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {
-        List<FacadeDeviceBO> devices = deviceFacade.selectByIds(tenantId, deviceIds);
+        List<FacadeDeviceBO> devices = deviceFacade.listByIds(tenantId, deviceIds);
         Map<Long, String> result = new LinkedHashMap<>();
         devices.forEach(device -> result.put(device.getId(), deviceStatus(device.getId())));
         return result;
@@ -73,7 +73,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
 
     @Override
     public Map<Long, String> selectDeviceStatusesByProfileId(Long tenantId, Long profileId) {
-        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(tenantId, profileId);
+        List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
         Map<Long, String> result = new LinkedHashMap<>();
         devices.forEach(device -> result.put(device.getId(), deviceStatus(device.getId())));
         return result;
@@ -81,7 +81,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
 
     @Override
     public Map<Long, String> selectDriverStatusesByIds(Long tenantId, Collection<Long> driverIds) {
-        List<FacadeDriverBO> drivers = driverFacade.selectByIds(tenantId, driverIds);
+        List<FacadeDriverBO> drivers = driverFacade.listByIds(tenantId, driverIds);
         Map<Long, String> result = new LinkedHashMap<>();
         drivers.forEach(driver -> result.put(driver.getId(), driverStatus(driver.getId())));
         return result;
@@ -89,10 +89,10 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
 
     @Override
     public FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId) {
-        if (Objects.isNull(driverFacade.selectById(tenantId, driverId))) {
+        if (Objects.isNull(driverFacade.getById(tenantId, driverId))) {
             return null;
         }
-        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
+        List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(tenantId, driverId);
         long online = devices.stream()
                 .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(), deviceStatus(device.getId())))
                 .count();

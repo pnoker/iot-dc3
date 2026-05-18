@@ -59,7 +59,7 @@ class TenantLocalFacadeTest {
     @Test
     void selectByCodeReturnsNullWhenTenantMissing() {
         when(tenantService.selectByCode("acme")).thenReturn(null);
-        assertThat(facade.selectByCode("acme")).isNull();
+        assertThat(facade.getByCode("acme")).isNull();
         verify(facadeTenantBuilder, never()).toFacadeBO(any());
     }
 
@@ -70,7 +70,7 @@ class TenantLocalFacadeTest {
         when(tenantService.selectByCode("acme")).thenReturn(bo);
         when(facadeTenantBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
-        assertThat(facade.selectByCode("acme")).isSameAs(mapped);
+        assertThat(facade.getByCode("acme")).isSameAs(mapped);
     }
 
     private void injectField(String name, Object value) throws Exception {

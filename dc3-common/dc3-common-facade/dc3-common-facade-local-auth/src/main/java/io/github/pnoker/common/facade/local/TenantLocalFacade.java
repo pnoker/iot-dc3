@@ -46,7 +46,7 @@ public class TenantLocalFacade implements TenantFacade {
     private FacadeTenantBuilder facadeTenantBuilder;
 
     @Override
-    public FacadeTenantBO selectByCode(String code) {
+    public FacadeTenantBO getByCode(String code) {
         TenantBO bo = tenantService.selectByCode(code);
         return Objects.isNull(bo) ? null : facadeTenantBuilder.toFacadeBO(bo);
     }

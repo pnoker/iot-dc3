@@ -65,19 +65,19 @@ public class DriverGrpcFacade implements DriverFacade {
     private GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadeDriverBO selectById(Long id) {
+    public FacadeDriverBO getById(Long id) {
         GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(id).build();
-        GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectById", driverApiBlockingStub,
+        GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.getById", driverApiBlockingStub,
                 stub -> stub.getByDriverId(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectById");
+            guardOrThrow(response.getResult(), "getById");
             return null;
         }
         return facadeGrpcDriverBuilder.toFacadeBO(response.getData());
     }
 
     @Override
-    public List<FacadeDriverBO> selectByIds(Collection<Long> ids) {
+    public List<FacadeDriverBO> listByIds(Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -87,22 +87,22 @@ public class DriverGrpcFacade implements DriverFacade {
         }
 
         GrpcDriverIdsQuery request = GrpcDriverIdsQuery.newBuilder().addAllDriverIds(driverIds).build();
-        GrpcRDriverListDTO response = grpcFacadeSupport.call("DriverFacade.selectByIds", driverApiBlockingStub,
+        GrpcRDriverListDTO response = grpcFacadeSupport.call("DriverFacade.listByIds", driverApiBlockingStub,
                 stub -> stub.listByDriverIds(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByIds");
+            guardOrThrow(response.getResult(), "listByIds");
             return Collections.emptyList();
         }
         return response.getDataList().stream().map(facadeGrpcDriverBuilder::toFacadeBO).toList();
     }
 
     @Override
-    public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
+    public FacadePage<FacadeDriverBO> listByPage(FacadeDriverQuery query) {
         GrpcPageDriverQuery request = facadeGrpcDriverBuilder.toGrpcPageQuery(query);
-        GrpcRPageDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectByPage", driverApiBlockingStub,
+        GrpcRPageDriverDTO response = grpcFacadeSupport.call("DriverFacade.listByPage", driverApiBlockingStub,
                 stub -> stub.listByPage(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByPage");
+            guardOrThrow(response.getResult(), "listByPage");
             return FacadePage.empty();
         }
 
@@ -114,12 +114,12 @@ public class DriverGrpcFacade implements DriverFacade {
     }
 
     @Override
-    public FacadeDriverBO selectByDeviceId(Long deviceId) {
+    public FacadeDriverBO getByDeviceId(Long deviceId) {
         GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
-        GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectByDeviceId", driverApiBlockingStub,
+        GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.getByDeviceId", driverApiBlockingStub,
                 stub -> stub.getByDeviceId(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByDeviceId");
+            guardOrThrow(response.getResult(), "getByDeviceId");
             return null;
         }
         return facadeGrpcDriverBuilder.toFacadeBO(response.getData());

@@ -47,7 +47,7 @@ public class UserLoginLocalFacade implements UserLoginFacade {
     private FacadeUserLoginBuilder facadeUserLoginBuilder;
 
     @Override
-    public FacadeUserLoginBO selectByName(String name) {
+    public FacadeUserLoginBO getByName(String name) {
         UserLoginBO bo = userLoginService.selectByLoginName(name, false);
         return Objects.isNull(bo) ? null : facadeUserLoginBuilder.toFacadeBO(bo);
     }

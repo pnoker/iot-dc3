@@ -67,7 +67,7 @@ class DriverToolTest {
         DriverTool tool = new DriverTool(driverFacade, Optional.of(statusHealthFacade));
         FacadeDriverBO driver = driver(101L, "Virtual - Edge Acceptance Lab");
         FacadePage<FacadeDriverBO> page = new FacadePage<>(1L, 10L, 1L, 1L, List.of(driver));
-        when(driverFacade.selectByPage(org.mockito.ArgumentMatchers.any(FacadeDriverQuery.class))).thenReturn(page);
+        when(driverFacade.listByPage(org.mockito.ArgumentMatchers.any(FacadeDriverQuery.class))).thenReturn(page);
 
         AgenticToolResult<FacadePage<FacadeDriverBO>> result = tool.searchDrivers(
                 "Virtual - Edge Acceptance Lab", 1, 10, toolContext());
@@ -79,7 +79,7 @@ class DriverToolTest {
                 .containsExactly("Virtual - Edge Acceptance Lab");
 
         ArgumentCaptor<FacadeDriverQuery> captor = forClass(FacadeDriverQuery.class);
-        verify(driverFacade).selectByPage(captor.capture());
+        verify(driverFacade).listByPage(captor.capture());
         assertThat(captor.getValue().getTenantId()).isEqualTo(11L);
         assertThat(captor.getValue().getDriverName()).isEqualTo("Virtual - Edge Acceptance Lab");
         assertThat(captor.getValue().getPage().getCurrent()).isEqualTo(1L);
@@ -100,7 +100,7 @@ class DriverToolTest {
     @Test
     void lookupDriverByIdReturnsNotFoundWithoutFabricatingData() {
         DriverTool tool = new DriverTool(driverFacade, Optional.of(statusHealthFacade));
-        when(driverFacade.selectById(11L, 404L)).thenReturn(null);
+        when(driverFacade.getById(11L, 404L)).thenReturn(null);
 
         AgenticToolResult<FacadeDriverBO> result = tool.lookupDriverById(404L, toolContext());
 

@@ -87,7 +87,7 @@ public class FilterServiceImpl implements FilterService {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        FacadeTenantBO tenant = tenantCache.get(code, key -> Optional.ofNullable(tenantFacade.selectByCode(key)))
+        FacadeTenantBO tenant = tenantCache.get(code, key -> Optional.ofNullable(tenantFacade.getByCode(key)))
                 .orElse(null);
         if (Objects.isNull(tenant) || tenant.getEnableFlag() != EnableFlagEnum.ENABLE) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
@@ -102,7 +102,7 @@ public class FilterServiceImpl implements FilterService {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        FacadeUserLoginBO userLogin = userLoginCache.get(name, key -> Optional.ofNullable(userLoginFacade.selectByName(key)))
+        FacadeUserLoginBO userLogin = userLoginCache.get(name, key -> Optional.ofNullable(userLoginFacade.getByName(key)))
                 .orElse(null);
         if (Objects.isNull(userLogin) || userLogin.getEnableFlag() != EnableFlagEnum.ENABLE) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
@@ -117,7 +117,7 @@ public class FilterServiceImpl implements FilterService {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        FacadeUserBO user = userCache.get(userId, id -> Optional.ofNullable(userFacade.selectById(id)))
+        FacadeUserBO user = userCache.get(userId, id -> Optional.ofNullable(userFacade.getById(id)))
                 .orElse(null);
         if (Objects.isNull(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);

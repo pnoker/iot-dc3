@@ -74,7 +74,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
                 .enableFlag(pageQuery.getEnableFlag())
                 .build();
 
-        FacadePage<FacadeDriverBO> page = driverFacade.selectByPage(facadeQuery);
+        FacadePage<FacadeDriverBO> page = driverFacade.listByPage(facadeQuery);
         if (page.getRecords().isEmpty()) {
             return Map.of();
         }
@@ -106,12 +106,12 @@ public class DriverStatusServiceImpl implements DriverStatusService {
      * when the driver has no devices (preserves legacy "0" signal).
      */
     private List<String> getDeviceStatuses(Long tenantId, Long driverId) {
-        FacadeDriverBO driver = driverFacade.selectById(tenantId, driverId);
+        FacadeDriverBO driver = driverFacade.getById(tenantId, driverId);
         if (Objects.isNull(driver)) {
             return null;
         }
 
-        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
+        List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(tenantId, driverId);
         if (devices.isEmpty()) {
             return null;
         }

@@ -65,7 +65,7 @@ public class DriverTool {
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "lookupDriverById", tenantId, driverId);
-        FacadeDriverBO bo = driverFacade.selectById(tenantId, driverId);
+        FacadeDriverBO bo = driverFacade.getById(tenantId, driverId);
         if (Objects.isNull(bo)) {
             return AgenticToolResult.notFound("Driver not found for ID: " + driverId);
         }
@@ -83,7 +83,7 @@ public class DriverTool {
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid driver IDs provided.");
         }
-        List<FacadeDriverBO> drivers = driverFacade.selectByIds(tenantId, ids);
+        List<FacadeDriverBO> drivers = driverFacade.listByIds(tenantId, ids);
         if (Objects.isNull(drivers) || drivers.isEmpty()) {
             return AgenticToolResult.empty("No drivers found for IDs: " + ids, List.of());
         }
@@ -98,7 +98,7 @@ public class DriverTool {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "lookupDriverByDeviceId", tenantId,
                 deviceId);
-        FacadeDriverBO bo = driverFacade.selectByDeviceId(tenantId, deviceId);
+        FacadeDriverBO bo = driverFacade.getByDeviceId(tenantId, deviceId);
         if (Objects.isNull(bo)) {
             return AgenticToolResult.notFound("No driver found for device ID: " + deviceId);
         }
@@ -121,7 +121,7 @@ public class DriverTool {
         query.setTenantId(tenantId);
         query.setPage(AgenticToolUtil.page(page, size));
 
-        FacadePage<FacadeDriverBO> result = driverFacade.selectByPage(query);
+        FacadePage<FacadeDriverBO> result = driverFacade.listByPage(query);
         if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No drivers found.", result);
         }

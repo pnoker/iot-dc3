@@ -122,7 +122,7 @@ public class OfflineExpiryListener {
         if (Objects.isNull(id))
             return;
 
-        FacadeDriverBO driver = driverFacade.selectById(id);
+        FacadeDriverBO driver = driverFacade.getById(id);
         if (Objects.isNull(driver)) {
             log.debug("Driver {} not found when handling offline expiry", id);
             return;
@@ -164,7 +164,7 @@ public class OfflineExpiryListener {
         if (Objects.isNull(id))
             return;
 
-        FacadeDeviceBO device = deviceFacade.selectById(id);
+        FacadeDeviceBO device = deviceFacade.getById(id);
         if (Objects.isNull(device)) {
             log.debug("Device {} not found when handling offline expiry", id);
             return;

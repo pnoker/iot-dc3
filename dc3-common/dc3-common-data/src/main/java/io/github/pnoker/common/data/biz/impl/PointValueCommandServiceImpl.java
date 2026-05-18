@@ -65,7 +65,7 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
     public void read(Long tenantId, PointValueReadVO entityVO) {
         validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getPointId());
 
-        FacadeDriverBO driver = driverFacade.selectByDeviceId(tenantId, entityVO.getDeviceId());
+        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
         if (Objects.isNull(driver)) {
             return;
         }
@@ -82,7 +82,7 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
     public void write(Long tenantId, PointValueWriteVO entityVO) {
         validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getPointId());
 
-        FacadeDriverBO driver = driverFacade.selectByDeviceId(tenantId, entityVO.getDeviceId());
+        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
         if (Objects.isNull(driver)) {
             return;
         }
@@ -96,12 +96,12 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
     }
 
     private void validateCommandScope(Long tenantId, Long deviceId, Long pointId) {
-        FacadeDeviceBO device = deviceFacade.selectById(tenantId, deviceId);
+        FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
         if (Objects.isNull(device)) {
             throw new NotFoundException("Device does not exist");
         }
 
-        FacadePointBO point = pointFacade.selectById(tenantId, pointId);
+        FacadePointBO point = pointFacade.getById(tenantId, pointId);
         if (Objects.isNull(point)) {
             throw new NotFoundException("Point does not exist");
         }

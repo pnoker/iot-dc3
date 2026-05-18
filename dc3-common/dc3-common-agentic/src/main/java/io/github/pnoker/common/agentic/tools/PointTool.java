@@ -57,7 +57,7 @@ public class PointTool {
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, pointId={}", "lookupPointById", tenantId, pointId);
-        FacadePointBO bo = pointFacade.selectById(tenantId, pointId);
+        FacadePointBO bo = pointFacade.getById(tenantId, pointId);
         if (Objects.isNull(bo)) {
             return AgenticToolResult.notFound("Point not found for ID: " + pointId);
         }
@@ -75,7 +75,7 @@ public class PointTool {
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid point IDs provided.");
         }
-        List<FacadePointBO> points = pointFacade.selectByIds(tenantId, ids);
+        List<FacadePointBO> points = pointFacade.listByIds(tenantId, ids);
         if (Objects.isNull(points) || points.isEmpty()) {
             return AgenticToolResult.empty("No points found for IDs: " + ids, List.of());
         }
@@ -100,7 +100,7 @@ public class PointTool {
         query.setTenantId(tenantId);
         query.setPage(AgenticToolUtil.page(page, size));
 
-        FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
+        FacadePage<FacadePointBO> result = pointFacade.listByPage(query);
         if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No points found.", result);
         }
@@ -123,7 +123,7 @@ public class PointTool {
         query.setTenantId(tenantId);
         query.setPage(AgenticToolUtil.page(page, size));
 
-        FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
+        FacadePage<FacadePointBO> result = pointFacade.listByPage(query);
         if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No points found for device ID: " + deviceId, result);
         }
@@ -146,7 +146,7 @@ public class PointTool {
         query.setTenantId(tenantId);
         query.setPage(AgenticToolUtil.page(page, size));
 
-        FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
+        FacadePage<FacadePointBO> result = pointFacade.listByPage(query);
         if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No points found for profile ID: " + profileId, result);
         }

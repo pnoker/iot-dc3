@@ -63,19 +63,19 @@ public class ProfileGrpcFacade implements ProfileFacade {
     private GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadeProfileBO selectById(Long id) {
+    public FacadeProfileBO getById(Long id) {
         GrpcProfileQuery request = GrpcProfileQuery.newBuilder().setProfileId(id).build();
-        GrpcRProfileDTO response = grpcFacadeSupport.call("ProfileFacade.selectById", profileApiBlockingStub,
+        GrpcRProfileDTO response = grpcFacadeSupport.call("ProfileFacade.getById", profileApiBlockingStub,
                 stub -> stub.getByProfileId(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectById");
+            guardOrThrow(response.getResult(), "getById");
             return null;
         }
         return facadeGrpcProfileBuilder.toFacadeBO(response.getData());
     }
 
     @Override
-    public List<FacadeProfileBO> selectByIds(Collection<Long> ids) {
+    public List<FacadeProfileBO> listByIds(Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -85,21 +85,21 @@ public class ProfileGrpcFacade implements ProfileFacade {
         }
 
         GrpcProfileIdsQuery request = GrpcProfileIdsQuery.newBuilder().addAllProfileIds(profileIds).build();
-        GrpcRProfileListDTO response = grpcFacadeSupport.call("ProfileFacade.selectByIds", profileApiBlockingStub,
+        GrpcRProfileListDTO response = grpcFacadeSupport.call("ProfileFacade.listByIds", profileApiBlockingStub,
                 stub -> stub.listByProfileIds(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByIds");
+            guardOrThrow(response.getResult(), "listByIds");
             return Collections.emptyList();
         }
         return response.getDataList().stream().map(facadeGrpcProfileBuilder::toFacadeBO).toList();
     }
 
     @Override
-    public FacadePage<FacadeProfileBO> selectByPage(FacadeProfileQuery query) {
-        GrpcRPageProfileDTO response = grpcFacadeSupport.call("ProfileFacade.selectByPage", profileApiBlockingStub,
+    public FacadePage<FacadeProfileBO> listByPage(FacadeProfileQuery query) {
+        GrpcRPageProfileDTO response = grpcFacadeSupport.call("ProfileFacade.listByPage", profileApiBlockingStub,
                 stub -> stub.listByPage(facadeGrpcProfileBuilder.toGrpcPageQuery(query)));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByPage");
+            guardOrThrow(response.getResult(), "listByPage");
             return FacadePage.empty();
         }
         GrpcPageProfileDTO pageDTO = response.getData();
@@ -111,12 +111,12 @@ public class ProfileGrpcFacade implements ProfileFacade {
     }
 
     @Override
-    public List<FacadeProfileBO> selectByDeviceId(Long deviceId) {
+    public List<FacadeProfileBO> listByDeviceId(Long deviceId) {
         GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
-        GrpcRProfileListDTO response = grpcFacadeSupport.call("ProfileFacade.selectByDeviceId", profileApiBlockingStub,
+        GrpcRProfileListDTO response = grpcFacadeSupport.call("ProfileFacade.listByDeviceId", profileApiBlockingStub,
                 stub -> stub.listByDeviceId(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByDeviceId");
+            guardOrThrow(response.getResult(), "listByDeviceId");
             return Collections.emptyList();
         }
         return response.getDataList().stream().map(facadeGrpcProfileBuilder::toFacadeBO).toList();

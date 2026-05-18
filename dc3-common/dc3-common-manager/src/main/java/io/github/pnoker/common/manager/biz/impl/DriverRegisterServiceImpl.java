@@ -86,7 +86,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
 
     @Override
     public DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc) {
-        FacadeTenantBO tenant = tenantFacade.selectByCode(entityGrpc.getTenant());
+        FacadeTenantBO tenant = tenantFacade.getByCode(entityGrpc.getTenant());
         if (Objects.isNull(tenant)) {
             throw new ServiceException("Tenant[{}] information is invalid", entityGrpc.getTenant());
         }

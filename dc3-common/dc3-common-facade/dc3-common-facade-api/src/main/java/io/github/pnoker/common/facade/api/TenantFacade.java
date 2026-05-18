@@ -31,6 +31,6 @@ public interface TenantFacade {
     /**
      * @return the tenant, or {@code null} when no tenant carries the given code.
      */
-    FacadeTenantBO selectByCode(String code);
+    FacadeTenantBO getByCode(String code);
 
 }

@@ -43,35 +43,35 @@ public interface PointFacade {
     /**
      * @return the point, or {@code null} when it does not exist.
      */
-    FacadePointBO selectById(Long id);
+    FacadePointBO getById(Long id);
 
     /**
      * Tenant-scoped single lookup. Returns {@code null} when the point is missing or
      * belongs to another tenant.
      */
-    default FacadePointBO selectById(Long tenantId, Long id) {
+    default FacadePointBO getById(Long tenantId, Long id) {
         if (Objects.isNull(tenantId)) {
             return null;
         }
-        FacadePointBO point = selectById(id);
+        FacadePointBO point = getById(id);
         return matchesTenant(tenantId, point) ? point : null;
     }
 
     /**
-     * Bulk lookup. Avoids the N+1 cost of calling {@link #selectById(Long)} in a loop.
+     * Bulk lookup. Avoids the N+1 cost of calling {@link #getById(Long)} in a loop.
      *
      * @return list of resolved points (missing ids are simply omitted; never {@code null}).
      */
-    List<FacadePointBO> selectByIds(Collection<Long> ids);
+    List<FacadePointBO> listByIds(Collection<Long> ids);
 
     /**
      * Tenant-scoped bulk lookup. Missing or cross-tenant points are omitted.
      */
-    default List<FacadePointBO> selectByIds(Long tenantId, Collection<Long> ids) {
+    default List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return selectByIds(ids).stream()
+        return listByIds(ids).stream()
                 .filter(point -> matchesTenant(tenantId, point))
                 .toList();
     }
@@ -79,6 +79,6 @@ public interface PointFacade {
     /**
      * @return a page of points (never {@code null}; empty page when nothing matches).
      */
-    FacadePage<FacadePointBO> selectByPage(FacadePointQuery query);
+    FacadePage<FacadePointBO> listByPage(FacadePointQuery query);
 
 }

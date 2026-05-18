@@ -39,36 +39,36 @@ public interface ProfileFacade {
         return Objects.nonNull(profile) && Objects.equals(tenantId, profile.getTenantId());
     }
 
-    FacadeProfileBO selectById(Long id);
+    FacadeProfileBO getById(Long id);
 
-    default FacadeProfileBO selectById(Long tenantId, Long id) {
+    default FacadeProfileBO getById(Long tenantId, Long id) {
         if (Objects.isNull(tenantId)) {
             return null;
         }
-        FacadeProfileBO profile = selectById(id);
+        FacadeProfileBO profile = getById(id);
         return matchesTenant(tenantId, profile) ? profile : null;
     }
 
-    List<FacadeProfileBO> selectByIds(Collection<Long> ids);
+    List<FacadeProfileBO> listByIds(Collection<Long> ids);
 
-    default List<FacadeProfileBO> selectByIds(Long tenantId, Collection<Long> ids) {
+    default List<FacadeProfileBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return selectByIds(ids).stream()
+        return listByIds(ids).stream()
                 .filter(profile -> matchesTenant(tenantId, profile))
                 .toList();
     }
 
-    FacadePage<FacadeProfileBO> selectByPage(FacadeProfileQuery query);
+    FacadePage<FacadeProfileBO> listByPage(FacadeProfileQuery query);
 
-    List<FacadeProfileBO> selectByDeviceId(Long deviceId);
+    List<FacadeProfileBO> listByDeviceId(Long deviceId);
 
-    default List<FacadeProfileBO> selectByDeviceId(Long tenantId, Long deviceId) {
+    default List<FacadeProfileBO> listByDeviceId(Long tenantId, Long deviceId) {
         if (Objects.isNull(tenantId)) {
             return Collections.emptyList();
         }
-        return selectByDeviceId(deviceId).stream()
+        return listByDeviceId(deviceId).stream()
                 .filter(profile -> matchesTenant(tenantId, profile))
                 .toList();
     }
