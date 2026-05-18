@@ -69,7 +69,7 @@ public class NotifyChannelBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyChannelBindBO entityBO = notifyChannelBindBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            notifyChannelBindService.save(entityBO);
+            notifyChannelBindService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -78,7 +78,7 @@ public class NotifyChannelBindController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, notifyChannelBindService.selectById(id));
-            notifyChannelBindService.remove(id);
+            notifyChannelBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -107,7 +107,7 @@ public class NotifyChannelBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyChannelBindQuery query = Objects.isNull(entityQuery) ? new NotifyChannelBindQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<NotifyChannelBindBO> entityPageBO = notifyChannelBindService.selectByPage(query);
+            Page<NotifyChannelBindBO> entityPageBO = notifyChannelBindService.list(query);
             return R.ok(notifyChannelBindBuilder.buildVOPageByBOPage(entityPageBO));
         }));
     }

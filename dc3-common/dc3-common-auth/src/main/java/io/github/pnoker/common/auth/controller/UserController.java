@@ -77,7 +77,7 @@ public class UserController implements BaseController {
             entityBO.setCreatorName(header.getNickName());
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            userService.save(entityBO);
+            userService.add(entityBO);
             UserBO saved = userService.selectByUserName(entityBO.getUserName(), true);
             TenantBindBO tenantBindBO = new TenantBindBO();
             tenantBindBO.setTenantId(header.getTenantId());
@@ -86,7 +86,7 @@ public class UserController implements BaseController {
             tenantBindBO.setCreatorName(header.getNickName());
             tenantBindBO.setOperatorId(header.getUserId());
             tenantBindBO.setOperatorName(header.getNickName());
-            tenantBindService.save(tenantBindBO);
+            tenantBindService.add(tenantBindBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -96,9 +96,9 @@ public class UserController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenantMember(tenantId, id);
             TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, id);
-            userService.remove(id);
+            userService.delete(id);
             if (Objects.nonNull(tenantBind)) {
-                tenantBindService.remove(tenantBind.getId());
+                tenantBindService.delete(tenantBind.getId());
             }
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -148,7 +148,7 @@ public class UserController implements BaseController {
             // Overwrite whatever the client sent. Tenant scope is a hard
             // boundary, not a filter — a caller cannot reach across tenants.
             query.setTenantId(tenantId);
-            Page<UserBO> entityPageBO = userService.selectByPage(query);
+            Page<UserBO> entityPageBO = userService.list(query);
             Page<UserVO> entityPageVO = userBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

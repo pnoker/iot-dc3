@@ -77,7 +77,7 @@ public class DeviceLocalFacade implements DeviceFacade {
     @Override
     public FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query) {
         DeviceQuery managerQuery = facadeDeviceBuilder.toManagerQuery(query);
-        Page<DeviceBO> page = deviceService.selectByPage(managerQuery);
+        Page<DeviceBO> page = deviceService.list(managerQuery);
         if (Objects.isNull(page)) {
             return FacadePage.empty();
         }

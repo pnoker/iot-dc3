@@ -76,7 +76,7 @@ public class RoleController implements BaseController {
             entityBO.setCreatorName(header.getNickName());
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            roleService.save(entityBO);
+            roleService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -85,7 +85,7 @@ public class RoleController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, roleService.selectById(id));
-            roleService.remove(id);
+            roleService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -117,7 +117,7 @@ public class RoleController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<RoleBO> entityPageBO = roleService.selectByPage(query);
+            Page<RoleBO> entityPageBO = roleService.list(query);
             Page<RoleVO> entityPageVO = roleBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

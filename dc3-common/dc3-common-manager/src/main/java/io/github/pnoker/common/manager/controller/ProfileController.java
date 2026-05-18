@@ -82,7 +82,7 @@ public class ProfileController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            profileService.save(entityBO);
+            profileService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -97,7 +97,7 @@ public class ProfileController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.selectById(id));
-            profileService.remove(id);
+            profileService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -177,7 +177,7 @@ public class ProfileController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ProfileQuery query = Objects.isNull(entityQuery) ? new ProfileQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<ProfileBO> entityPageBO = profileService.selectByPage(query);
+            Page<ProfileBO> entityPageBO = profileService.list(query);
             Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

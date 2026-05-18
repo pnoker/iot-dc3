@@ -67,7 +67,7 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
         PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
 
-        Page<PointBO> entityPage = pointService.selectByPage(query);
+        Page<PointBO> entityPage = pointService.list(query);
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

@@ -100,7 +100,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             driverService.update(driverBO);
         } else {
             log.info("The driver is not registered, perform new addition: {}", JsonUtil.toJsonString(driverBO));
-            driverService.save(driverBO);
+            driverService.add(driverBO);
         }
 
         return driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());

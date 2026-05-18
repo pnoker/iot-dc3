@@ -67,7 +67,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         ProfileQuery query = grpcProfileBuilder.buildQueryByGrpcQuery(request);
-        Page<ProfileBO> entityPage = profileService.selectByPage(query);
+        Page<ProfileBO> entityPage = profileService.list(query);
         if (Objects.isNull(entityPage)) {
             noResource(rBuilder);
         } else {

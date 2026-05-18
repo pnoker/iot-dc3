@@ -67,7 +67,7 @@ public class ApiController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
         return async(() -> {
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
-            apiService.save(entityBO);
+            apiService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         });
     }
@@ -75,7 +75,7 @@ public class ApiController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            apiService.remove(id);
+            apiService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         });
     }
@@ -102,7 +102,7 @@ public class ApiController implements BaseController {
     public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
         return async(() -> {
             ApiQuery query = Objects.isNull(entityQuery) ? new ApiQuery() : entityQuery;
-            Page<ApiBO> entityPageBO = apiService.selectByPage(query);
+            Page<ApiBO> entityPageBO = apiService.list(query);
             Page<ApiVO> entityPageVO = apiBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         });

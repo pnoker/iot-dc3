@@ -68,7 +68,7 @@ public class MessageController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             MessageBO entityBO = messageBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            messageService.save(entityBO);
+            messageService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -77,7 +77,7 @@ public class MessageController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, messageService.selectById(id));
-            messageService.remove(id);
+            messageService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -106,7 +106,7 @@ public class MessageController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             MessageQuery query = Objects.isNull(entityQuery) ? new MessageQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<MessageBO> entityPageBO = messageService.selectByPage(query);
+            Page<MessageBO> entityPageBO = messageService.list(query);
             return R.ok(messageBuilder.buildVOPageByBOPage(entityPageBO));
         }));
     }

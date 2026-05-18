@@ -93,7 +93,7 @@ public class RoleUserBindController implements BaseController {
             RoleUserBindBO entityBO = roleUserBindBuilder.buildBOByVO(entityVO);
             requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
             requireTenantMember(tenantId, entityBO.getUserId());
-            roleUserBindService.save(entityBO);
+            roleUserBindService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -104,7 +104,7 @@ public class RoleUserBindController implements BaseController {
             RoleUserBindBO entityBO = roleUserBindService.selectById(id);
             requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
             requireTenantMember(tenantId, entityBO.getUserId());
-            roleUserBindService.remove(id);
+            roleUserBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
@@ -113,7 +113,7 @@ public class RoleUserBindController implements BaseController {
     public Mono<R<Page<RoleUserBindVO>>> list(@RequestBody(required = false) RoleUserBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleUserBindQuery query = Objects.isNull(entityQuery) ? new RoleUserBindQuery() : entityQuery;
-            Page<RoleUserBindBO> entityPageBO = roleUserBindService.selectByPage(query, tenantId);
+            Page<RoleUserBindBO> entityPageBO = roleUserBindService.list(query, tenantId);
             Page<RoleUserBindVO> entityPageVO = roleUserBindBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));

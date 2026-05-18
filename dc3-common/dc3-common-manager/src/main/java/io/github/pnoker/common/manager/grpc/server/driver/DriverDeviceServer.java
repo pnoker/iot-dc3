@@ -95,7 +95,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
         Page<DeviceBO> entityPage = driverInTenant(query.getTenantId(), query.getDriverId())
-                ? deviceService.selectByPage(query) : null;
+                ? deviceService.list(query) : null;
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

@@ -74,7 +74,7 @@ public class ProfileLocalFacade implements ProfileFacade {
     @Override
     public FacadePage<FacadeProfileBO> selectByPage(FacadeProfileQuery query) {
         ProfileQuery managerQuery = facadeProfileBuilder.toManagerQuery(query);
-        Page<ProfileBO> page = profileService.selectByPage(managerQuery);
+        Page<ProfileBO> page = profileService.list(managerQuery);
         if (Objects.isNull(page)) {
             return FacadePage.empty();
         }
