@@ -28,16 +28,16 @@ export const updateDevice = (device: DeviceForm) =>
   httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/update`, device);
 
 export const getDeviceById = (id: string) =>
-  httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/select_by_id`, { params: { id } });
+  httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/get_by_id`, { params: { id } });
 
 export const getDeviceByIds = (deviceIds: string[]) =>
-  httpPost<R<Record<string, DeviceRecord>>>(`${API_MANAGER_BASE}/device/select_by_ids`, deviceIds);
+  httpPost<R<Record<string, DeviceRecord>>>(`${API_MANAGER_BASE}/device/list_by_ids`, deviceIds);
 
 export const getDeviceByDriverId = (driverId: string) =>
-  httpGet(`${API_MANAGER_BASE}/device/select_by_driver_id`, { params: { driver_id: driverId } });
+  httpGet(`${API_MANAGER_BASE}/device/list_by_driver_id`, { params: { driver_id: driverId } });
 
 export const getDeviceByProfileId = (profileId: string) =>
-  httpGet(`${API_MANAGER_BASE}/device/select_by_profile_id`, { params: { profile_id: profileId } });
+  httpGet(`${API_MANAGER_BASE}/device/list_by_profile_id`, { params: { profile_id: profileId } });
 
 export const getDeviceList = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
@@ -46,10 +46,10 @@ export const getDeviceStatus = (query: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/device/status/list`, query);
 
 export const getDeviceStatusByDriverId = (driverId: string) =>
-  httpGet(`${API_DATA_BASE}/device/status/select_by_driver_id`, { params: { driver_id: driverId } });
+  httpGet(`${API_DATA_BASE}/device/status/list_by_driver_id`, { params: { driver_id: driverId } });
 
 export const getDeviceStatusByProfileId = (profileId: string) =>
-  httpGet(`${API_DATA_BASE}/device/status/select_by_profile_id`, { params: { profile_id: profileId } });
+  httpGet(`${API_DATA_BASE}/device/status/list_by_profile_id`, { params: { profile_id: profileId } });
 
 export const importDeviceTemplate = (device: Record<string, unknown>) =>
   httpPost(`${API_MANAGER_BASE}/device/export/import_template`, device, { responseType: 'blob' });

@@ -19,7 +19,7 @@ import { API_MANAGER_BASE } from '@/config/constant/api';
 import type { Attribute } from '@/config/types';
 
 export const getDriverAttributeByDriverId = (id: string) =>
-  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/driver_attribute/select_by_driver_id`, { params: { driver_id: id } });
+  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/driver_attribute/list_by_driver_id`, { params: { driver_id: id } });
 
 export const getPointAttributeByDriverId = (id: string) =>
-  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/point_attribute/select_by_driver_id`, { params: { driver_id: id } });
+  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/point_attribute/list_by_driver_id`, { params: { driver_id: id } });

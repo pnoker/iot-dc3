@@ -29,13 +29,13 @@ export const updateProfile = (profile: ProfileForm) =>
   httpPost<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/update`, profile);
 
 export const getProfileById = (id: string) =>
-  httpGet<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/select_by_id`, { params: { id } });
+  httpGet<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/get_by_id`, { params: { id } });
 
 export const getProfileByIds = (profileIds: string[]) =>
-  httpPost<R<Record<string, ProfileRecord>>>(`${API_MANAGER_BASE}/profile/select_by_ids`, profileIds);
+  httpPost<R<Record<string, ProfileRecord>>>(`${API_MANAGER_BASE}/profile/list_by_ids`, profileIds);
 
 export const getProfileByDeviceId = (deviceId: string) =>
-  httpGet(`${API_MANAGER_BASE}/profile/select_by_device_id`, { params: { device_id: deviceId } });
+  httpGet(`${API_MANAGER_BASE}/profile/list_by_device_id`, { params: { device_id: deviceId } });
 
 export const getProfileList = <T = R<PageResult<ProfileRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/profile/list`, query);

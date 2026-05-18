@@ -25,9 +25,9 @@ export const deleteMenu = (id: string) => httpPost(`${API_AUTH_BASE}/menu/delete
 
 export const updateMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/update`, menu);
 
-export const getMenuById = (id: string) => httpGet(`${API_AUTH_BASE}/menu/select_by_id`, { params: { id } });
+export const getMenuById = (id: string) => httpGet(`${API_AUTH_BASE}/menu/get_by_id`, { params: { id } });
 
 export const getMenuList = <T = R<PageResult<MenuRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/menu/list`, query);
 
-export const getMenuTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/menu/tree`, query);
+export const getMenuTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/menu/list_tree`, query);

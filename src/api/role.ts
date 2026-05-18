@@ -25,9 +25,9 @@ export const deleteRole = (id: string) => httpPost(`${API_AUTH_BASE}/role/delete
 
 export const updateRole = (role: RoleForm) => httpPost(`${API_AUTH_BASE}/role/update`, role);
 
-export const getRoleById = (id: string) => httpGet(`${API_AUTH_BASE}/role/select_by_id`, { params: { id } });
+export const getRoleById = (id: string) => httpGet(`${API_AUTH_BASE}/role/get_by_id`, { params: { id } });
 
 export const getRoleList = <T = R<PageResult<RoleRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/role/list`, query);
 
-export const getRoleTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/role/tree`, query);
+export const getRoleTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/role/list_tree`, query);

@@ -27,10 +27,10 @@ export const deleteUser = (id: string) =>
 export const updateUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/update`, user);
 
 export const getUserById = (id: string) =>
-  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/select_by_id`, { params: { id } });
+  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/get_by_id`, { params: { id } });
 
 export const getUserByName = (name: string) =>
-  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/select_by_name`, { params: { name } });
+  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/get_by_name`, { params: { name } });
 
 export const getUserList = <T = R<PageResult<UserRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/user_profile/list`, query);

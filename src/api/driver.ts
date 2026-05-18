@@ -20,10 +20,10 @@ import type { PageQuery, PageResult } from '@/config/types';
 import type { DriverRecord } from '@/config/types/manager';
 
 export const getDriverById = (id: string) =>
-  httpGet<R<DriverRecord>>(`${API_MANAGER_BASE}/driver/select_by_id`, { params: { id } });
+  httpGet<R<DriverRecord>>(`${API_MANAGER_BASE}/driver/get_by_id`, { params: { id } });
 
 export const getDriverByIds = (driverIds: string[]) =>
-  httpPost<R<Record<string, DriverRecord>>>(`${API_MANAGER_BASE}/driver/select_by_ids`, driverIds);
+  httpPost<R<Record<string, DriverRecord>>>(`${API_MANAGER_BASE}/driver/list_by_ids`, driverIds);
 
 export const getDriverList = <T = R<PageResult<DriverRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/driver/list`, query);

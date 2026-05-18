@@ -25,7 +25,6 @@ export const deleteApi = (id: string) => httpPost(`${API_AUTH_BASE}/api/delete`,
 
 export const updateApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BASE}/api/update`, api);
 
-export const getApiById = (id: string) =>
-  httpGet<R<ApiRecord>>(`${API_AUTH_BASE}/api/select_by_id`, { params: { id } });
+export const getApiById = (id: string) => httpGet<R<ApiRecord>>(`${API_AUTH_BASE}/api/get_by_id`, { params: { id } });
 
 export const getApiList = (query: PageQuery) => httpPost<R<PageResult<ApiRecord>>>(`${API_AUTH_BASE}/api/list`, query);

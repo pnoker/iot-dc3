@@ -26,7 +26,7 @@ export const deleteLabel = (id: string) => httpPost(`${API_MANAGER_BASE}/label/d
 export const updateLabel = (label: LabelForm) => httpPost(`${API_MANAGER_BASE}/label/update`, label);
 
 export const getLabelById = (id: string) =>
-  httpGet<R<LabelRecord>>(`${API_MANAGER_BASE}/label/select_by_id`, { params: { id } });
+  httpGet<R<LabelRecord>>(`${API_MANAGER_BASE}/label/get_by_id`, { params: { id } });
 
 export const getLabelList = <T = R<PageResult<LabelRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/label/list`, query);

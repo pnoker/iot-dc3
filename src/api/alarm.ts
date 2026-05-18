@@ -40,7 +40,7 @@ const endpoints = {
 const add = <T>(base: string, payload: T) => httpPost(`${base}/add`, payload);
 const update = <T>(base: string, payload: T) => httpPost(`${base}/update`, payload);
 const remove = (base: string, id: string) => httpPost(`${base}/delete`, undefined, { params: { id } });
-const selectById = <T>(base: string, id: string) => httpGet<R<T>>(`${base}/select_by_id`, { params: { id } });
+const selectById = <T>(base: string, id: string) => httpGet<R<T>>(`${base}/get_by_id`, { params: { id } });
 const list = <T>(base: string, query: PageQuery) => httpPost<R<PageResult<T>>>(`${base}/list`, query);
 
 export const addRule = (payload: Partial<RuleRecord>) => add(endpoints.rule, payload);

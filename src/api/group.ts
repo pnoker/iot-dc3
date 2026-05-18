@@ -26,7 +26,7 @@ export const deleteGroup = (id: string) => httpPost(`${API_MANAGER_BASE}/group/d
 export const updateGroup = (group: GroupForm) => httpPost(`${API_MANAGER_BASE}/group/update`, group);
 
 export const getGroupById = (id: string) =>
-  httpGet<R<GroupRecord>>(`${API_MANAGER_BASE}/group/select_by_id`, { params: { id } });
+  httpGet<R<GroupRecord>>(`${API_MANAGER_BASE}/group/get_by_id`, { params: { id } });
 
 export const getGroupList = <T = R<PageResult<GroupRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/group/list`, query);

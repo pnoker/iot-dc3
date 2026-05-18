@@ -26,10 +26,10 @@ export const deletePoint = (id: string) => httpPost(`${API_MANAGER_BASE}/point/d
 export const updatePoint = (point: PointForm) => httpPost<R<PointRecord>>(`${API_MANAGER_BASE}/point/update`, point);
 
 export const getPointById = (id: string) =>
-  httpGet<R<PointRecord>>(`${API_MANAGER_BASE}/point/select_by_id`, { params: { id } });
+  httpGet<R<PointRecord>>(`${API_MANAGER_BASE}/point/get_by_id`, { params: { id } });
 
 export const getPointByIds = (pointIds: string[]) =>
-  httpPost<R<Record<string, PointRecord>>>(`${API_MANAGER_BASE}/point/select_by_ids`, pointIds);
+  httpPost<R<Record<string, PointRecord>>>(`${API_MANAGER_BASE}/point/list_by_ids`, pointIds);
 
 export const getPointList = <T = R<PageResult<PointRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/point/list`, query);
@@ -37,14 +37,14 @@ export const getPointList = <T = R<PageResult<PointRecord>>>(query: PageQuery) =
 export const getPointUnit = (pointIds: string[]) => httpPost(`${API_MANAGER_BASE}/point/unit`, pointIds);
 
 export const getPointByProfileId = (profileId: string) =>
-  httpGet(`${API_MANAGER_BASE}/point/select_by_profile_id`, { params: { profile_id: profileId } });
+  httpGet(`${API_MANAGER_BASE}/point/list_by_profile_id`, { params: { profile_id: profileId } });
 
 export const getPointByDeviceId = (deviceId: string) =>
-  httpGet(`${API_MANAGER_BASE}/point/select_by_device_id`, { params: { device_id: deviceId } });
+  httpGet(`${API_MANAGER_BASE}/point/list_by_device_id`, { params: { device_id: deviceId } });
 
 export const getDeviceByPointId = (pointId: string) =>
   httpGet<R<{ count: number; devices: DeviceRecord[] }>>(
-    `${API_MANAGER_BASE}/point/select_device_statistics_by_point_id`,
+    `${API_MANAGER_BASE}/point/list_device_statistics_by_point_id`,
     { params: { point_id: pointId } }
   );
 
@@ -55,7 +55,7 @@ export const getPointValueList = (pointValue: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/point_value/list`, pointValue);
 
 export const getPointValueHistory = (deviceId: number, pointId: number, count = 100) =>
-  httpGet(`${API_DATA_BASE}/point_value/select_history_by_device_id_and_point_id`, {
+  httpGet(`${API_DATA_BASE}/point_value/list_history_by_device_id_and_point_id`, {
     params: { device_id: deviceId, point_id: pointId, count },
   });
 
