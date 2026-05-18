@@ -110,7 +110,7 @@ public class LabelBindController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, labelBindService.selectById(id));
+            requireTenant(tenantId, labelBindService.getById(id));
             labelBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -125,7 +125,7 @@ public class LabelBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LabelBindBO entityBO = labelBindBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, labelBindService.selectById(entityBO.getId()));
+            requireTenant(tenantId, labelBindService.getById(entityBO.getId()));
             validateBind(tenantId, entityBO);
             labelBindService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
@@ -139,7 +139,7 @@ public class LabelBindController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<LabelBindVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            LabelBindBO entityBO = requireTenant(tenantId, labelBindService.selectById(id));
+            LabelBindBO entityBO = requireTenant(tenantId, labelBindService.getById(id));
             LabelBindVO entityVO = labelBindBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -162,7 +162,7 @@ public class LabelBindController implements BaseController {
 
     private void validateBind(Long tenantId, LabelBindBO entityBO) {
         EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
-        LabelBO labelBO = requireTenant(tenantId, labelService.selectById(entityBO.getLabelId()));
+        LabelBO labelBO = requireTenant(tenantId, labelService.getById(entityBO.getLabelId()));
         if (!Objects.equals(labelBO.getEntityTypeFlag(), entityTypeFlag)) {
             throw new NotFoundException("Resource does not exist");
         }
@@ -171,10 +171,10 @@ public class LabelBindController implements BaseController {
 
     private void requireEntityTenant(Long tenantId, EntityTypeFlagEnum entityTypeFlag, Long entityId) {
         switch (entityTypeFlag) {
-            case DRIVER -> requireTenant(tenantId, driverService.selectById(entityId));
-            case PROFILE -> requireTenant(tenantId, profileService.selectById(entityId));
-            case POINT -> requireTenant(tenantId, pointService.selectById(entityId));
-            case DEVICE -> requireTenant(tenantId, deviceService.selectById(entityId));
+            case DRIVER -> requireTenant(tenantId, driverService.getById(entityId));
+            case PROFILE -> requireTenant(tenantId, profileService.getById(entityId));
+            case POINT -> requireTenant(tenantId, pointService.getById(entityId));
+            case DEVICE -> requireTenant(tenantId, deviceService.getById(entityId));
             default -> throw new NotFoundException("Resource does not exist");
         }
     }

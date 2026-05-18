@@ -116,7 +116,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverBO selectById(Long id) {
+    public DriverBO getById(Long id) {
         DriverDO entityDO = getDOById(id, true);
         return driverBuilder.buildBOByDO(entityDO);
     }
@@ -175,7 +175,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public DriverBO selectByDeviceId(Long deviceId) {
         DeviceDO entityDO = deviceManager.getById(deviceId);
-        return selectById(entityDO.getDriverId());
+        return getById(entityDO.getDriverId());
     }
 
     /**

@@ -91,7 +91,7 @@ public class RoleUserBindController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleUserBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleUserBindBO entityBO = roleUserBindBuilder.buildBOByVO(entityVO);
-            requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
+            requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
             requireTenantMember(tenantId, entityBO.getUserId());
             roleUserBindService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
@@ -101,8 +101,8 @@ public class RoleUserBindController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            RoleUserBindBO entityBO = roleUserBindService.selectById(id);
-            requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
+            RoleUserBindBO entityBO = roleUserBindService.getById(id);
+            requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
             requireTenantMember(tenantId, entityBO.getUserId());
             roleUserBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -133,7 +133,7 @@ public class RoleUserBindController implements BaseController {
     @GetMapping("/list_user_by_role")
     public Mono<R<List<UserVO>>> listUserByRole(@NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, roleService.selectById(roleId));
+            requireTenant(tenantId, roleService.getById(roleId));
             List<UserBO> entityBOList = roleUserBindService.listUserByRoleId(roleId)
                     .stream()
                     .filter(user -> Objects.nonNull(tenantBindService.selectByTenantIdAndUserId(tenantId, user.getId())))

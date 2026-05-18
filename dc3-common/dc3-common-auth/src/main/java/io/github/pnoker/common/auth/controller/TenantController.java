@@ -120,7 +120,7 @@ public class TenantController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<TenantVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            TenantBO entityBO = tenantService.selectById(id);
+            TenantBO entityBO = tenantService.getById(id);
             TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         });

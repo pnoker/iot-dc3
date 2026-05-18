@@ -52,12 +52,12 @@ public interface BaseService<B, Q> {
     void update(B entityBO);
 
     /**
-     * Select entity by primary key
+     * Get entity by primary key
      *
      * @param id Entity ID to query
      * @return Business object of the entity
      */
-    B selectById(Long id);
+    B getById(Long id);
 
     /**
      * List entities with pagination

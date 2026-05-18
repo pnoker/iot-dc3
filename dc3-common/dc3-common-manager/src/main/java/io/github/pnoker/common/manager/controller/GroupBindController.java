@@ -110,7 +110,7 @@ public class GroupBindController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, groupBindService.selectById(id));
+            requireTenant(tenantId, groupBindService.getById(id));
             groupBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -125,7 +125,7 @@ public class GroupBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBindBO entityBO = groupBindBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, groupBindService.selectById(entityBO.getId()));
+            requireTenant(tenantId, groupBindService.getById(entityBO.getId()));
             validateBind(tenantId, entityBO);
             groupBindService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
@@ -139,7 +139,7 @@ public class GroupBindController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<GroupBindVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            GroupBindBO entityBO = requireTenant(tenantId, groupBindService.selectById(id));
+            GroupBindBO entityBO = requireTenant(tenantId, groupBindService.getById(id));
             GroupBindVO entityVO = groupBindBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -162,7 +162,7 @@ public class GroupBindController implements BaseController {
 
     private void validateBind(Long tenantId, GroupBindBO entityBO) {
         EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
-        GroupBO groupBO = requireTenant(tenantId, groupService.selectById(entityBO.getGroupId()));
+        GroupBO groupBO = requireTenant(tenantId, groupService.getById(entityBO.getGroupId()));
         if (!Objects.equals(groupBO.getGroupTypeFlag(), entityTypeFlag)) {
             throw new NotFoundException("Resource does not exist");
         }
@@ -171,10 +171,10 @@ public class GroupBindController implements BaseController {
 
     private void requireEntityTenant(Long tenantId, EntityTypeFlagEnum entityTypeFlag, Long entityId) {
         switch (entityTypeFlag) {
-            case DRIVER -> requireTenant(tenantId, driverService.selectById(entityId));
-            case PROFILE -> requireTenant(tenantId, profileService.selectById(entityId));
-            case POINT -> requireTenant(tenantId, pointService.selectById(entityId));
-            case DEVICE -> requireTenant(tenantId, deviceService.selectById(entityId));
+            case DRIVER -> requireTenant(tenantId, driverService.getById(entityId));
+            case PROFILE -> requireTenant(tenantId, profileService.getById(entityId));
+            case POINT -> requireTenant(tenantId, pointService.getById(entityId));
+            case DEVICE -> requireTenant(tenantId, deviceService.getById(entityId));
             default -> throw new NotFoundException("Resource does not exist");
         }
     }

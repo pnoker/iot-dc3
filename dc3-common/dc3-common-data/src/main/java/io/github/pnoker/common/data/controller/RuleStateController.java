@@ -62,7 +62,7 @@ public class RuleStateController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<RuleStateVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            RuleStateBO entityBO = requireTenant(tenantId, ruleStateService.selectById(id));
+            RuleStateBO entityBO = requireTenant(tenantId, ruleStateService.getById(id));
             return R.ok(ruleStateBuilder.buildVOByBO(entityBO));
         }));
     }

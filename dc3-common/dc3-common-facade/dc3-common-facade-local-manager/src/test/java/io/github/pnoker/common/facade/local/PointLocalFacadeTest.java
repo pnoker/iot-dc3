@@ -68,7 +68,7 @@ class PointLocalFacadeTest {
 
     @Test
     void selectByIdReturnsNullWhenServiceReturnsNull() {
-        when(pointService.selectById(1L)).thenReturn(null);
+        when(pointService.getById(1L)).thenReturn(null);
         assertThat(facade.getById(1L)).isNull();
         verify(facadePointBuilder, never()).toFacadeBO(any());
     }
@@ -77,7 +77,7 @@ class PointLocalFacadeTest {
     void selectByIdMapsThroughBuilder() {
         PointBO bo = new PointBO();
         FacadePointBO mapped = new FacadePointBO();
-        when(pointService.selectById(1L)).thenReturn(bo);
+        when(pointService.getById(1L)).thenReturn(bo);
         when(facadePointBuilder.toFacadeBO(bo)).thenReturn(mapped);
         assertThat(facade.getById(1L)).isSameAs(mapped);
     }

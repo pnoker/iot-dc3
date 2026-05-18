@@ -55,7 +55,7 @@ public class ProfileLocalFacade implements ProfileFacade {
 
     @Override
     public FacadeProfileBO getById(Long id) {
-        ProfileBO managerBO = profileService.selectById(id);
+        ProfileBO managerBO = profileService.getById(id);
         return Objects.isNull(managerBO) ? null : facadeProfileBuilder.toFacadeBO(managerBO);
     }
 

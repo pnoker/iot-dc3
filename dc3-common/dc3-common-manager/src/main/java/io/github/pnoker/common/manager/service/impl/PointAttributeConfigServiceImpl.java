@@ -173,7 +173,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     @Override
-    public PointAttributeConfigBO selectById(Long id) {
+    public PointAttributeConfigBO getById(Long id) {
         PointAttributeConfigDO entityDO = getDOById(id, true);
         return pointAttributeConfigBuilder.buildBOByDO(entityDO);
     }

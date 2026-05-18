@@ -104,7 +104,7 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public NotifyBO selectById(Long id) {
+    public NotifyBO getById(Long id) {
         NotifyDO entityDO = getDOById(id, true);
         return notifyBuilder.buildBOByDO(entityDO);
     }

@@ -103,7 +103,7 @@ public class DriverAttributeConfigController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, driverAttributeConfigService.selectById(id));
+            requireTenant(tenantId, driverAttributeConfigService.getById(id));
             driverAttributeConfigService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -120,7 +120,7 @@ public class DriverAttributeConfigController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, driverAttributeConfigService.selectById(entityBO.getId()));
+            requireTenant(tenantId, driverAttributeConfigService.getById(entityBO.getId()));
             driverAttributeConfigService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -135,7 +135,7 @@ public class DriverAttributeConfigController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<DriverAttributeConfigVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            DriverAttributeConfigBO entityBO = requireTenant(tenantId, driverAttributeConfigService.selectById(id));
+            DriverAttributeConfigBO entityBO = requireTenant(tenantId, driverAttributeConfigService.getById(id));
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -172,7 +172,7 @@ public class DriverAttributeConfigController implements BaseController {
     public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.selectById(deviceId));
+            requireTenant(tenantId, deviceService.getById(deviceId));
             List<DriverAttributeConfigBO> entityBOList = filterTenant(tenantId, driverAttributeConfigService.selectByDeviceId(deviceId));
             List<DriverAttributeConfigVO> entityVOList = driverAttributeConfigBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
@@ -200,8 +200,8 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     private void requireDriverConfigRelations(Long tenantId, Long deviceId, Long attributeId) {
-        DeviceBO deviceBO = requireTenant(tenantId, deviceService.selectById(deviceId));
-        DriverAttributeBO attributeBO = requireTenant(tenantId, driverAttributeService.selectById(attributeId));
+        DeviceBO deviceBO = requireTenant(tenantId, deviceService.getById(deviceId));
+        DriverAttributeBO attributeBO = requireTenant(tenantId, driverAttributeService.getById(attributeId));
         if (!Objects.equals(deviceBO.getDriverId(), attributeBO.getDriverId())) {
             throw new NotFoundException("Resource does not exist");
         }

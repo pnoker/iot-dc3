@@ -187,7 +187,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceBO entityBO = deviceService.selectById(request.getDeviceId());
+        DeviceBO entityBO = deviceService.getById(request.getDeviceId());
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

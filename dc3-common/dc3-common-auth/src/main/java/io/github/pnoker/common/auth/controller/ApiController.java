@@ -92,7 +92,7 @@ public class ApiController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<ApiVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            ApiBO entityBO = apiService.selectById(id);
+            ApiBO entityBO = apiService.getById(id);
             ApiVO entityVO = apiBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         });

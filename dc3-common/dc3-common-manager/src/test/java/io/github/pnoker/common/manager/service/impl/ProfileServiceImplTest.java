@@ -168,7 +168,7 @@ class ProfileServiceImplTest {
     @Test
     void selectByIdRejectsUnknownId() {
         when(profileManager.getById(99L)).thenReturn(null);
-        assertThatThrownBy(() -> service.selectById(99L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.getById(99L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test

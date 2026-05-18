@@ -58,7 +58,7 @@ class UserLocalFacadeTest {
 
     @Test
     void selectByIdReturnsNullWhenServiceReturnsNull() {
-        when(userService.selectById(1L)).thenReturn(null);
+        when(userService.getById(1L)).thenReturn(null);
         assertThat(facade.getById(1L)).isNull();
         verify(facadeUserBuilder, never()).toFacadeBO(any());
     }
@@ -67,7 +67,7 @@ class UserLocalFacadeTest {
     void selectByIdMapsThroughBuilderWhenServiceReturnsValue() {
         UserBO user = new UserBO();
         FacadeUserBO mapped = new FacadeUserBO();
-        when(userService.selectById(1L)).thenReturn(user);
+        when(userService.getById(1L)).thenReturn(user);
         when(facadeUserBuilder.toFacadeBO(user)).thenReturn(mapped);
 
         assertThat(facade.getById(1L)).isSameAs(mapped);

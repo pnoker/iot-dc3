@@ -108,7 +108,7 @@ public class DeviceController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.selectById(id));
+            requireTenant(tenantId, deviceService.getById(id));
             deviceService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -123,7 +123,7 @@ public class DeviceController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, deviceService.selectById(entityBO.getId()));
+            requireTenant(tenantId, deviceService.getById(entityBO.getId()));
             deviceService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -138,7 +138,7 @@ public class DeviceController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<DeviceVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            DeviceBO entityBO = requireTenant(tenantId, deviceService.selectById(id));
+            DeviceBO entityBO = requireTenant(tenantId, deviceService.getById(id));
             DeviceVO entityVO = deviceBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -244,7 +244,7 @@ public class DeviceController implements BaseController {
     @GetMapping("/select_by_driver_id")
     public Mono<R<String>> selectByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, driverService.selectById(driverId));
+            requireTenant(tenantId, driverService.getById(driverId));
             List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.selectByDriverId(driverId));
             return R.ok(String.valueOf(deviceBOList.size()));
         }));

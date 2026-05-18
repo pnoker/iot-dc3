@@ -108,7 +108,7 @@ public class PointAttributeConfigController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, pointAttributeConfigService.selectById(id));
+            requireTenant(tenantId, pointAttributeConfigService.getById(id));
             pointAttributeConfigService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -125,7 +125,7 @@ public class PointAttributeConfigController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, pointAttributeConfigService.selectById(entityBO.getId()));
+            requireTenant(tenantId, pointAttributeConfigService.getById(entityBO.getId()));
             pointAttributeConfigService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -140,7 +140,7 @@ public class PointAttributeConfigController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<PointAttributeConfigVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            PointAttributeConfigBO entityBO = requireTenant(tenantId, pointAttributeConfigService.selectById(id));
+            PointAttributeConfigBO entityBO = requireTenant(tenantId, pointAttributeConfigService.getById(id));
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -199,7 +199,7 @@ public class PointAttributeConfigController implements BaseController {
     public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.selectById(deviceId));
+            requireTenant(tenantId, deviceService.getById(deviceId));
             List<PointAttributeConfigBO> entityBOList = filterTenant(tenantId,
                     pointAttributeConfigService.selectByDeviceId(deviceId));
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
@@ -228,14 +228,14 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     private void requirePointConfigRelations(Long tenantId, Long deviceId, Long pointId, Long attributeId) {
-        DeviceBO deviceBO = requireTenant(tenantId, deviceService.selectById(deviceId));
-        PointBO pointBO = requireTenant(tenantId, pointService.selectById(pointId));
+        DeviceBO deviceBO = requireTenant(tenantId, deviceService.getById(deviceId));
+        PointBO pointBO = requireTenant(tenantId, pointService.getById(pointId));
         if (Objects.isNull(deviceBO.getProfileIds()) || !deviceBO.getProfileIds().contains(pointBO.getProfileId())) {
             throw new NotFoundException("Resource does not exist");
         }
 
         if (Objects.nonNull(attributeId)) {
-            PointAttributeBO attributeBO = requireTenant(tenantId, pointAttributeService.selectById(attributeId));
+            PointAttributeBO attributeBO = requireTenant(tenantId, pointAttributeService.getById(attributeId));
             if (!Objects.equals(deviceBO.getDriverId(), attributeBO.getDriverId())) {
                 throw new NotFoundException("Resource does not exist");
             }

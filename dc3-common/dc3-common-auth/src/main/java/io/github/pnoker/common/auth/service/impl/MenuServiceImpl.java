@@ -122,7 +122,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public MenuBO selectById(Long id) {
+    public MenuBO getById(Long id) {
         MenuDO entityDO = getDOById(id, true);
         return menuBuilder.buildBOByDO(entityDO);
     }

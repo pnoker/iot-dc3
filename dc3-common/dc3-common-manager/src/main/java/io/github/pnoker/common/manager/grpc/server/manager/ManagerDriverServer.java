@@ -155,7 +155,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DriverBO driverBO = driverService.selectById(request.getDriverId());
+        DriverBO driverBO = driverService.getById(request.getDriverId());
         if (Objects.isNull(driverBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

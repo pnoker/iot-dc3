@@ -102,7 +102,7 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-    public RuleBO selectById(Long id) {
+    public RuleBO getById(Long id) {
         RuleDO entityDO = getDOById(id, true);
         return ruleBuilder.buildBOByDO(entityDO);
     }

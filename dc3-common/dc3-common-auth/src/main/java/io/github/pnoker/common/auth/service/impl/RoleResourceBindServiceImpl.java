@@ -122,7 +122,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public RoleResourceBindBO selectById(Long id) {
+    public RoleResourceBindBO getById(Long id) {
         RoleResourceBindDO entityDO = getDOById(id, true);
         return roleResourceBindBuilder.buildBOByDO(entityDO);
     }

@@ -121,7 +121,7 @@ class DeviceServiceImplTest {
 
     @Test
     void saveSucceedsForUniqueDeviceWithMatchingTenantDriver() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(deviceBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(deviceManager.save(doRow)).thenReturn(true);
@@ -132,7 +132,7 @@ class DeviceServiceImplTest {
 
     @Test
     void saveRejectsWhenDriverMissing() {
-        when(driverService.selectById(7L)).thenReturn(null);
+        when(driverService.getById(7L)).thenReturn(null);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
@@ -140,13 +140,13 @@ class DeviceServiceImplTest {
     void saveRejectsWhenDriverBelongsToOtherTenant() {
         DriverBO otherTenant = new DriverBO();
         otherTenant.setTenantId(999L);
-        when(driverService.selectById(7L)).thenReturn(otherTenant);
+        when(driverService.getById(7L)).thenReturn(otherTenant);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void saveRejectsDuplicateDeviceName() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(deviceManager, never()).save(any(DeviceDO.class));
@@ -154,7 +154,7 @@ class DeviceServiceImplTest {
 
     @Test
     void saveThrowsAddExceptionWhenManagerReturnsFalse() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(deviceBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(deviceManager.save(doRow)).thenReturn(false);

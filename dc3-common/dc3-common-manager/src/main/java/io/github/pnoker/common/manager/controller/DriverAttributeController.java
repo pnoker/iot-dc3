@@ -96,7 +96,7 @@ public class DriverAttributeController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, driverAttributeService.selectById(id));
+            requireTenant(tenantId, driverAttributeService.getById(id));
             driverAttributeService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -113,7 +113,7 @@ public class DriverAttributeController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, driverAttributeService.selectById(entityBO.getId()));
+            requireTenant(tenantId, driverAttributeService.getById(entityBO.getId()));
             driverAttributeService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -128,7 +128,7 @@ public class DriverAttributeController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<DriverAttributeVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            DriverAttributeBO entityBO = requireTenant(tenantId, driverAttributeService.selectById(id));
+            DriverAttributeBO entityBO = requireTenant(tenantId, driverAttributeService.getById(id));
             DriverAttributeVO entityVO = driverAttributeBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -144,7 +144,7 @@ public class DriverAttributeController implements BaseController {
     public Mono<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
-                requireTenant(tenantId, driverService.selectById(driverId));
+                requireTenant(tenantId, driverService.getById(driverId));
                 List<DriverAttributeBO> entityBOList = filterTenant(tenantId, driverAttributeService.selectByDriverId(driverId));
                 List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);

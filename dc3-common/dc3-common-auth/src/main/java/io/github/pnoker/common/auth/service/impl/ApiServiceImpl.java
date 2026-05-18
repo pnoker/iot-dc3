@@ -93,7 +93,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public ApiBO selectById(Long id) {
+    public ApiBO getById(Long id) {
         ApiDO entityDO = getDOById(id, true);
         return apiBuilder.buildBOByDO(entityDO);
     }

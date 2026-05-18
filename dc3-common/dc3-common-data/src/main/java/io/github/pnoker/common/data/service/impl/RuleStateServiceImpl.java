@@ -91,7 +91,7 @@ public class RuleStateServiceImpl implements RuleStateService {
     }
 
     @Override
-    public RuleStateBO selectById(Long id) {
+    public RuleStateBO getById(Long id) {
         RuleStateDO entityDO = getDOById(id, true);
         return ruleStateBuilder.buildBOByDO(entityDO);
     }

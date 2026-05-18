@@ -85,7 +85,7 @@ public class NotifyRecordServiceImpl implements NotifyRecordService {
     }
 
     @Override
-    public NotifyRecordBO selectById(Long id) {
+    public NotifyRecordBO getById(Long id) {
         NotifyRecordDO entityDO = getDOById(id, true);
         return notifyRecordBuilder.buildBOByDO(entityDO);
     }

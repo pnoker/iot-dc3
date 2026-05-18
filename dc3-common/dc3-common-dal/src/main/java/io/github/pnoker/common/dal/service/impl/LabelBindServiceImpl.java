@@ -91,7 +91,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    public LabelBindBO selectById(Long id) {
+    public LabelBindBO getById(Long id) {
         LabelBindDO entityDO = getDOById(id, true);
         return labelBindBuilder.buildBOByDO(entityDO);
     }

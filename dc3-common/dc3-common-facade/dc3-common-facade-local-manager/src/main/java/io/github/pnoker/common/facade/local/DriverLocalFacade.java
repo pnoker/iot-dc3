@@ -55,7 +55,7 @@ public class DriverLocalFacade implements DriverFacade {
 
     @Override
     public FacadeDriverBO getById(Long id) {
-        DriverBO managerBO = driverService.selectById(id);
+        DriverBO managerBO = driverService.getById(id);
         return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
     }
 

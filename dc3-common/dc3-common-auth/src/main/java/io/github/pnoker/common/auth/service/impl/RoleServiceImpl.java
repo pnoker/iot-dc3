@@ -109,7 +109,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleBO selectById(Long id) {
+    public RoleBO getById(Long id) {
         RoleDO entityDO = getDOById(id, true);
         return roleBuilder.buildBOByDO(entityDO);
     }

@@ -97,7 +97,7 @@ public class UserLoginController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            UserLoginBO entityBO = userLoginService.selectById(id);
+            UserLoginBO entityBO = userLoginService.getById(id);
             requireTenantMember(tenantId, entityBO.getUserId());
             userLoginService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -118,7 +118,7 @@ public class UserLoginController implements BaseController {
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserLoginVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
-            UserLoginBO current = userLoginService.selectById(entityBO.getId());
+            UserLoginBO current = userLoginService.getById(entityBO.getId());
             requireTenantMember(tenantId, current.getUserId());
             requireTenantMember(tenantId, entityBO.getUserId());
             userLoginService.update(entityBO);
@@ -155,7 +155,7 @@ public class UserLoginController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<UserLoginVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            UserLoginBO entityBO = userLoginService.selectById(id);
+            UserLoginBO entityBO = userLoginService.getById(id);
             requireTenantMember(tenantId, entityBO.getUserId());
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);

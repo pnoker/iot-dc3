@@ -85,7 +85,7 @@ class DriverAttributeServiceImplTest {
 
     @Test
     void saveSucceedsForUniqueAttribute() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(driverAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(driverAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(driverAttributeManager.save(doRow)).thenReturn(true);
@@ -94,7 +94,7 @@ class DriverAttributeServiceImplTest {
 
     @Test
     void saveRejectsWhenDriverMissing() {
-        when(driverService.selectById(7L)).thenReturn(null);
+        when(driverService.getById(7L)).thenReturn(null);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
@@ -102,20 +102,20 @@ class DriverAttributeServiceImplTest {
     void saveRejectsWhenDriverBelongsToOtherTenant() {
         DriverBO otherTenant = new DriverBO();
         otherTenant.setTenantId(999L);
-        when(driverService.selectById(7L)).thenReturn(otherTenant);
+        when(driverService.getById(7L)).thenReturn(otherTenant);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void saveRejectsDuplicate() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(driverAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
     }
 
     @Test
     void saveThrowsAddExceptionWhenManagerReturnsFalse() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(driverAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(driverAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(driverAttributeManager.save(doRow)).thenReturn(false);
@@ -147,7 +147,7 @@ class DriverAttributeServiceImplTest {
     @Test
     void updateThrowsUpdateExceptionWhenManagerReturnsFalse() {
         when(driverAttributeManager.getById(1L)).thenReturn(doRow);
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(driverAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(driverAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(driverAttributeManager.updateById(doRow)).thenReturn(false);
@@ -163,7 +163,7 @@ class DriverAttributeServiceImplTest {
 
     @Test
     void saveBatchValidatesTenantPerEntry() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(driverAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(driverAttributeManager.saveBatch(any())).thenReturn(true);
         assertThatNoException().isThrownBy(() -> service.saveBatch(List.of(bo)));
@@ -171,7 +171,7 @@ class DriverAttributeServiceImplTest {
 
     @Test
     void saveBatchThrowsAddExceptionWhenManagerReturnsFalse() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(driverAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(driverAttributeManager.saveBatch(any())).thenReturn(false);
         assertThatThrownBy(() -> service.saveBatch(List.of(bo))).isInstanceOf(AddException.class);
@@ -185,7 +185,7 @@ class DriverAttributeServiceImplTest {
 
     @Test
     void updateBatchThrowsWhenManagerReturnsFalse() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(driverAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(driverAttributeManager.updateBatchById(any())).thenReturn(false);
         assertThatThrownBy(() -> service.updateBatch(List.of(bo))).isInstanceOf(UpdateException.class);

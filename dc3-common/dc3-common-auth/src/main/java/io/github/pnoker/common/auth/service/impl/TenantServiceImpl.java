@@ -92,7 +92,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public TenantBO selectById(Long id) {
+    public TenantBO getById(Long id) {
         TenantDO entityDO = getDOById(id, true);
         return tenantBuilder.buildBOByDO(entityDO);
     }

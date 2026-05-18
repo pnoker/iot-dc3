@@ -102,7 +102,7 @@ public class MenuController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<MenuVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            MenuBO entityBO = menuService.selectById(id);
+            MenuBO entityBO = menuService.getById(id);
             MenuVO entityVO = menuBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         });

@@ -54,7 +54,7 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
         GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        UserBO entityBO = userService.selectById(request.getId());
+        UserBO entityBO = userService.getById(request.getId());
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
