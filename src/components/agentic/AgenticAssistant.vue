@@ -229,11 +229,16 @@
                   class="agentic-reasoning-panel"
                 >
                   <summary>
-                    <el-icon :class="{ 'is-active': message.streaming }" class="agentic-thinking-pulse"
-                      ><Loading
-                    /></el-icon>
-                    <span>{{ t('agentic.detailThinking') }}</span>
-                    <small>{{ reasoningPanelStatus(message) }}</small>
+                    <el-icon
+                      :class="{ 'is-active': message.streaming, 'is-done': !message.streaming }"
+                      class="agentic-thinking-pulse"
+                    >
+                      <CircleCheck v-if="!message.streaming" />
+                      <Loading v-else />
+                    </el-icon>
+                    <span :class="{ 'is-shimmer': message.streaming }" class="agentic-thinking-label"
+                      >{{ t('agentic.detailThinking') }}&ensp;{{ reasoningPanelStatus(message) }}</span
+                    >
                   </summary>
                   <div class="agentic-reasoning-panel__body">
                     <div v-if="assistantReasoningText(message)" class="agentic-reasoning-panel__text">
@@ -484,6 +489,8 @@
     Setting,
     VideoPause,
     Warning,
+    Loading,
+    CircleCheck,
   } from '@element-plus/icons-vue';
   import { ElMessage, ElMessageBox } from 'element-plus';
   import { storeToRefs } from 'pinia';
@@ -1556,7 +1563,38 @@
 
     &.is-active {
       color: var(--el-color-primary);
-      animation: agentic-spin 1s linear infinite;
+      animation: agentic-spin 2s linear infinite;
+    }
+
+    &.is-done {
+      color: var(--el-color-success);
+    }
+  }
+
+  .agentic-thinking-label {
+    position: relative;
+
+    &.is-shimmer {
+      overflow: hidden;
+
+      &::after {
+        position: absolute;
+        inset: -2px -4px;
+        pointer-events: none;
+        content: '';
+        background: linear-gradient(
+          120deg,
+          transparent 0%,
+          transparent 25%,
+          rgba(255, 255, 255, 0.9) 45%,
+          #fff 50%,
+          rgba(255, 255, 255, 0.9) 55%,
+          transparent 75%,
+          transparent 100%
+        );
+        background-size: 200% 100%;
+        animation: agentic-shimmer 3s ease-in-out infinite;
+      }
     }
   }
 
@@ -1602,6 +1640,16 @@
 
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  @keyframes agentic-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+
+    to {
+      background-position: -100% 0;
     }
   }
 
