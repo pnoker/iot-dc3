@@ -2,7 +2,7 @@
 
 IoT DC3 的整体分层与运行时数据流。
 
-![iot-dc3-architecture](../assets/images/architecture-cn.png)
+![iot-dc3-architecture](/images/architecture-cn.png)
 
 ## 分层概览
 

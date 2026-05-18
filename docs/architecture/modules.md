@@ -30,7 +30,7 @@ iot-dc3 (root pom)
 |----------------------|------------------------------------------|
 | dc3-common-constant  | Enums, constants, value objects          |
 | dc3-common-exception | Custom exception hierarchy (24+ classes) |
-| dc3-common-public    | R<T> wrapper, utility classes            |
+| dc3-common-public    | `R<T>` wrapper, utility classes          |
 | dc3-common-model     | BO/VO/DTO entity definitions             |
 | dc3-common-web       | BaseController, WebFlux config           |
 | dc3-common-log       | Request/response logging filter          |

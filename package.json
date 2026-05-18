@@ -1,0 +1,15 @@
+{
+  "name": "iot-dc3-docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "VitePress documentation site for IoT DC3",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.5.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

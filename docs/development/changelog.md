@@ -1,1 +1,1 @@
---8<-- "dc3/doc/CHANGE.md"
+<!--@include: ../../dc3/doc/CHANGE.md-->

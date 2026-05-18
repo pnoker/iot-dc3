@@ -15,7 +15,7 @@
 | [`CHANGE.md`](./CHANGE.md) | 版本变更日志，由 `dc3/bin/changelog.py` 写入，docker-ci 拼入 release body |
 | [`USAGE.md`](./USAGE.md) | 镜像使用说明，docker-ci 拼入 release body |
 
-文档站里的 [变更日志](../../docs/development/changelog.md) 与 [镜像与部署](../../docs/guide/usage.md) 通过 mkdocs snippets 直接引用上述源文件，保持单一信源。
+文档站里的 [变更日志](../../docs/development/changelog.md) 与 [镜像与部署](../../docs/guide/usage.md) 通过 VitePress 的 `<!--@include:-->` 语法直接引用上述源文件，保持单一信源。
 
 ## 已迁移到文档站的旧路径对照
 

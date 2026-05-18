@@ -1,1 +1,1 @@
---8<-- "dc3/doc/USAGE.md"
+<!--@include: ../../dc3/doc/USAGE.md-->
