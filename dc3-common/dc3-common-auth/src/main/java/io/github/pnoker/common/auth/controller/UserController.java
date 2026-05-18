@@ -116,8 +116,8 @@ public class UserController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_id")
-    public Mono<R<UserVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<UserVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenantMember(tenantId, id);
             UserBO entityBO = userService.getById(id);
@@ -126,7 +126,7 @@ public class UserController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_name")
+    @GetMapping("/get_by_name")
     public Mono<R<UserVO>> getByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO entityBO = userService.getByUserName(name, false);

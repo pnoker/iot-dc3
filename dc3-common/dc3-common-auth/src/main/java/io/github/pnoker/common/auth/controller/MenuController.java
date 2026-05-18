@@ -99,8 +99,8 @@ public class MenuController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_id")
-    public Mono<R<MenuVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<MenuVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             MenuBO entityBO = menuService.getById(id);
             MenuVO entityVO = menuBuilder.buildVOByBO(entityBO);
@@ -118,8 +118,8 @@ public class MenuController implements BaseController {
         });
     }
 
-    @PostMapping("/tree")
-    public Mono<R<List<MenuTreeVO>>> tree(@RequestBody(required = false) MenuQuery entityQuery) {
+    @PostMapping("/list_tree")
+    public Mono<R<List<MenuTreeVO>>> listTree(@RequestBody(required = false) MenuQuery entityQuery) {
         return async(() -> {
             List<MenuTreeBO> entityBOList = menuService.listTree(entityQuery);
             List<MenuTreeVO> entityVOList = new ArrayList<>(entityBOList.size());

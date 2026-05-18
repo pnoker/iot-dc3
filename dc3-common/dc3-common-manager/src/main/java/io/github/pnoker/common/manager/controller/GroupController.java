@@ -109,8 +109,8 @@ public class GroupController implements BaseController {
      * @param id ID
      * @return GroupVO {@link GroupVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<GroupVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<GroupVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBO entityBO = requireTenant(tenantId, groupService.getById(id));
             GroupVO entityVO = groupBuilder.buildVOByBO(entityBO);

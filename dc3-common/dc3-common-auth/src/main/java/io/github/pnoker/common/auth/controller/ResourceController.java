@@ -99,8 +99,8 @@ public class ResourceController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_id")
-    public Mono<R<ResourceVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<ResourceVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             ResourceBO entityBO = resourceService.getById(id);
             ResourceVO entityVO = resourceBuilder.buildVOByBO(entityBO);
@@ -118,8 +118,8 @@ public class ResourceController implements BaseController {
         });
     }
 
-    @PostMapping("/tree")
-    public Mono<R<List<ResourceTreeVO>>> tree(@RequestBody(required = false) ResourceQuery entityQuery) {
+    @PostMapping("/list_tree")
+    public Mono<R<List<ResourceTreeVO>>> listTree(@RequestBody(required = false) ResourceQuery entityQuery) {
         return async(() -> {
             List<ResourceTreeBO> entityBOList = resourceService.listTree(entityQuery);
             List<ResourceTreeVO> entityVOList = new ArrayList<>(entityBOList.size());

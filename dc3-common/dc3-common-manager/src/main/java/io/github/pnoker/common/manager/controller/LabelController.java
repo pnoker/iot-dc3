@@ -109,8 +109,8 @@ public class LabelController implements BaseController {
      * @param id ID
      * @return LabelVO {@link LabelVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<LabelVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<LabelVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LabelBO entityBO = requireTenant(tenantId, labelService.getById(id));
             LabelVO entityVO = labelBuilder.buildVOByBO(entityBO);

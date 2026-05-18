@@ -117,8 +117,8 @@ public class TenantController implements BaseController {
      * @param id ID
      * @return TenantVO {@link TenantVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<TenantVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<TenantVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             TenantBO entityBO = tenantService.getById(id);
             TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
@@ -132,7 +132,7 @@ public class TenantController implements BaseController {
      * @param code TenantCode
      * @return {@link TenantVO}
      */
-    @GetMapping("/select_by_code")
+    @GetMapping("/get_by_code")
     public Mono<R<TenantVO>> getByCode(@NotNull @RequestParam(value = "code") String code) {
         return async(() -> {
             TenantBO select = tenantService.getByCode(code);

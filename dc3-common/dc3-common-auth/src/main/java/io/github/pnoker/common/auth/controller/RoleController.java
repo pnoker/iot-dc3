@@ -103,8 +103,8 @@ public class RoleController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_id")
-    public Mono<R<RoleVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<RoleVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleBO entityBO = requireTenant(tenantId, roleService.getById(id));
             RoleVO entityVO = roleBuilder.buildVOByBO(entityBO);
@@ -123,8 +123,8 @@ public class RoleController implements BaseController {
         }));
     }
 
-    @PostMapping("/tree")
-    public Mono<R<List<RoleTreeVO>>> tree(@RequestBody(required = false) RoleQuery entityQuery) {
+    @PostMapping("/list_tree")
+    public Mono<R<List<RoleTreeVO>>> listTree(@RequestBody(required = false) RoleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
             query.setTenantId(tenantId);

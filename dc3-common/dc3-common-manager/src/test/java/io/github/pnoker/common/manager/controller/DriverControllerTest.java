@@ -173,7 +173,7 @@ class DriverControllerTest {
         when(driverService.getById(1L)).thenReturn(bo);
         when(driverBuilder.buildVOByBO(bo)).thenReturn(vo);
 
-        StepVerifier.create(withTenantContext(controller.selectById(1L)))
+        StepVerifier.create(withTenantContext(controller.getById(1L)))
                 .assertNext(envelope -> assertThat(envelope.getData()).isSameAs(vo))
                 .verifyComplete();
     }
@@ -185,7 +185,7 @@ class DriverControllerTest {
         bo.setTenantId(999L);
         when(driverService.getById(1L)).thenReturn(bo);
 
-        StepVerifier.create(withTenantContext(controller.selectById(1L)))
+        StepVerifier.create(withTenantContext(controller.getById(1L)))
                 .expectError(NotFoundException.class)
                 .verify();
     }

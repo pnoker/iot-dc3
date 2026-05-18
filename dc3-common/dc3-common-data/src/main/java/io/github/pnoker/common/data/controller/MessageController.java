@@ -93,8 +93,8 @@ public class MessageController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_id")
-    public Mono<R<MessageVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<MessageVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             MessageBO entityBO = requireTenant(tenantId, messageService.getById(id));
             return R.ok(messageBuilder.buildVOByBO(entityBO));

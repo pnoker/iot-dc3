@@ -125,8 +125,8 @@ public class DriverAttributeController implements BaseController {
      * @param id ID
      * @return DriverAttributeVO {@link DriverAttributeVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<DriverAttributeVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<DriverAttributeVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeBO entityBO = requireTenant(tenantId, driverAttributeService.getById(id));
             DriverAttributeVO entityVO = driverAttributeBuilder.buildVOByBO(entityBO);
@@ -140,7 +140,7 @@ public class DriverAttributeController implements BaseController {
      * @param id ID
      * @return DriverAttribute
      */
-    @GetMapping("/select_by_driver_id")
+    @GetMapping("/list_by_driver_id")
     public Mono<R<List<DriverAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {

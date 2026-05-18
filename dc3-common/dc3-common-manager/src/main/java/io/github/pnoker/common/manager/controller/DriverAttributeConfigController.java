@@ -132,8 +132,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @param id ID
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<DriverAttributeConfigVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<DriverAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeConfigBO entityBO = requireTenant(tenantId, driverAttributeConfigService.getById(id));
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -148,8 +148,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @param deviceId    Device ID
      * @return DriverConfig
      */
-    @GetMapping("/select_by_device_id_and_attribute_id")
-    public Mono<R<DriverAttributeConfigVO>> selectByDeviceIdAndAttributeId(
+    @GetMapping("/get_by_device_id_and_attribute_id")
+    public Mono<R<DriverAttributeConfigVO>> getByDeviceIdAndAttributeId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
             @NotNull @RequestParam(value = "attribute_id") Long attributeId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -168,7 +168,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @param deviceId Device ID
      * @return DriverConfig
      */
-    @GetMapping("/select_by_device_id")
+    @GetMapping("/list_by_device_id")
     public Mono<R<List<DriverAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

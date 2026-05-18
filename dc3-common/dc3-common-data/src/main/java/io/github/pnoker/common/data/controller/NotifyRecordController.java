@@ -60,8 +60,8 @@ public class NotifyRecordController implements BaseController {
         this.notifyRecordService = notifyRecordService;
     }
 
-    @GetMapping("/select_by_id")
-    public Mono<R<NotifyRecordVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<NotifyRecordVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyRecordBO entityBO = requireTenant(tenantId, notifyRecordService.getById(id));
             return R.ok(notifyRecordBuilder.buildVOByBO(entityBO));

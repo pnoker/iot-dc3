@@ -152,8 +152,8 @@ public class UserLoginController implements BaseController {
      * @param id ID
      * @return UserLoginVO {@link UserLoginVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<UserLoginVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<UserLoginVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.getById(id);
             requireTenantMember(tenantId, entityBO.getUserId());
@@ -168,7 +168,7 @@ public class UserLoginController implements BaseController {
      * @param name Name
      * @return {@link UserLoginBO}
      */
-    @GetMapping("/select_by_name")
+    @GetMapping("/get_by_name")
     public Mono<R<UserLoginVO>> getByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.getByLoginName(name, false);

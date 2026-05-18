@@ -103,7 +103,7 @@ public class PointValueController implements BaseController {
      * @param pointId  Point ID
      * @return List of String, where each String is the historical value for the point
      */
-    @GetMapping("/select_history_by_device_id_and_point_id")
+    @GetMapping("/list_history_by_device_id_and_point_id")
     public Mono<R<List<String>>> history(@NotNull @RequestParam(name = "device_id") Long deviceId,
                                          @NotNull @RequestParam(name = "point_id") Long pointId,
                                          @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
