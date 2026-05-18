@@ -55,31 +55,31 @@ class DeviceStatusServiceImplTest {
     }
 
     @Test
-    void selectByPageReturnsEmptyMapForEmptyPage() {
+    void getStatusByPageReturnsEmptyMapForEmptyPage() {
         FacadePage<FacadeDeviceBO> page = new FacadePage<>();
         page.setRecords(List.of());
         when(deviceFacade.listByPage(any())).thenReturn(page);
-        assertThat(service.selectByPage(new DeviceQuery())).isEmpty();
+        assertThat(service.getStatusByPage(new DeviceQuery())).isEmpty();
     }
 
     @Test
-    void selectByPageDefaultsToOfflineWhenCacheMissing() {
+    void getStatusByPageDefaultsToOfflineWhenCacheMissing() {
         FacadePage<FacadeDeviceBO> page = new FacadePage<>();
         page.setRecords(List.of(device(10L)));
         when(deviceFacade.listByPage(any())).thenReturn(page);
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L)).thenReturn(null);
-        assertThat(service.selectByPage(new DeviceQuery()))
+        assertThat(service.getStatusByPage(new DeviceQuery()))
                 .containsEntry(10L, DeviceStatusEnum.OFFLINE.getCode());
     }
 
     @Test
-    void selectByPageReturnsCachedStatus() {
+    void getStatusByPageReturnsCachedStatus() {
         FacadePage<FacadeDeviceBO> page = new FacadePage<>();
         page.setRecords(List.of(device(10L)));
         when(deviceFacade.listByPage(any())).thenReturn(page);
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
                 .thenReturn(DeviceStatusEnum.ONLINE.getCode());
-        assertThat(service.selectByPage(new DeviceQuery()))
+        assertThat(service.getStatusByPage(new DeviceQuery()))
                 .containsEntry(10L, DeviceStatusEnum.ONLINE.getCode());
     }
 

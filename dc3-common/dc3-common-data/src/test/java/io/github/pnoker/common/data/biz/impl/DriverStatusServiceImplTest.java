@@ -67,31 +67,31 @@ class DriverStatusServiceImplTest {
     }
 
     @Test
-    void selectByPageReturnsEmptyMapForEmptyPage() {
+    void getStatusByPageReturnsEmptyMapForEmptyPage() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
         page.setRecords(List.of());
         when(driverFacade.listByPage(any())).thenReturn(page);
-        assertThat(service.selectByPage(new DriverQuery())).isEmpty();
+        assertThat(service.getStatusByPage(new DriverQuery())).isEmpty();
     }
 
     @Test
-    void selectByPageDefaultsToOfflineWhenCacheMissing() {
+    void getStatusByPageDefaultsToOfflineWhenCacheMissing() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
         page.setRecords(List.of(driver(1L)));
         when(driverFacade.listByPage(any())).thenReturn(page);
         when(localCacheService.getKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + 1L)).thenReturn(null);
-        assertThat(service.selectByPage(new DriverQuery()))
+        assertThat(service.getStatusByPage(new DriverQuery()))
                 .containsEntry(1L, DriverStatusEnum.OFFLINE.getCode());
     }
 
     @Test
-    void selectByPageReturnsCachedStatus() {
+    void getStatusByPageReturnsCachedStatus() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
         page.setRecords(List.of(driver(1L)));
         when(driverFacade.listByPage(any())).thenReturn(page);
         when(localCacheService.getKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + 1L))
                 .thenReturn(DriverStatusEnum.ONLINE.getCode());
-        assertThat(service.selectByPage(new DriverQuery()))
+        assertThat(service.getStatusByPage(new DriverQuery()))
                 .containsEntry(1L, DriverStatusEnum.ONLINE.getCode());
     }
 

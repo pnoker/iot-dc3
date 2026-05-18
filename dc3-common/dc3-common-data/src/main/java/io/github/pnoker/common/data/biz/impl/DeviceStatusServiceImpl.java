@@ -55,7 +55,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     private LocalCacheService localCacheService;
 
     @Override
-    public Map<Long, String> selectByPage(DeviceQuery pageQuery) {
+    public Map<Long, String> getStatusByPage(DeviceQuery pageQuery) {
         FacadeDeviceQuery facadeQuery = FacadeDeviceQuery.builder()
                 .page(pageQuery.getPage())
                 .deviceName(pageQuery.getDeviceName())
