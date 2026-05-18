@@ -37,7 +37,7 @@ public interface DeviceStatusService {
      * @return Map Long:String, where Long is the device ID and String is the device
      * status
      */
-    Map<Long, String> selectByPage(DeviceQuery deviceQuery);
+    Map<Long, String> getStatusByPage(DeviceQuery deviceQuery);
 
     /**
      * Query device status by profile ID

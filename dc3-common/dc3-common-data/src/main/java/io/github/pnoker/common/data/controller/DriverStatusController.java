@@ -64,7 +64,7 @@ public class DriverStatusController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Map<Long, String> statuses = driverStatusService.selectByPage(query);
+            Map<Long, String> statuses = driverStatusService.getStatusByPage(query);
             return R.ok(statuses);
         }));
     }

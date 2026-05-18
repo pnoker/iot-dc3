@@ -64,7 +64,7 @@ public class DeviceStatusController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery query = Objects.isNull(deviceQuery) ? new DeviceQuery() : deviceQuery;
             query.setTenantId(tenantId);
-            Map<Long, String> statuses = deviceStatusService.selectByPage(query);
+            Map<Long, String> statuses = deviceStatusService.getStatusByPage(query);
             return R.ok(statuses);
         }));
     }
@@ -81,7 +81,7 @@ public class DeviceStatusController implements BaseController {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
             deviceQuery.setTenantId(tenantId);
-            Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
+            Map<Long, String> statuses = deviceStatusService.getStatusByPage(deviceQuery);
             return R.ok(statuses);
         }));
     }
@@ -99,7 +99,7 @@ public class DeviceStatusController implements BaseController {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setProfileId(profileId);
             deviceQuery.setTenantId(tenantId);
-            Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
+            Map<Long, String> statuses = deviceStatusService.getStatusByPage(deviceQuery);
             return R.ok(statuses);
         }));
     }

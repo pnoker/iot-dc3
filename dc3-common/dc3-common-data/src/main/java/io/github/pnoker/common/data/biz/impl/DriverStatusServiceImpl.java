@@ -62,7 +62,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     private LocalCacheService localCacheService;
 
     @Override
-    public Map<Long, String> selectByPage(DriverQuery pageQuery) {
+    public Map<Long, String> getStatusByPage(DriverQuery pageQuery) {
         FacadeDriverQuery facadeQuery = FacadeDriverQuery.builder()
                 .page(pageQuery.getPage())
                 .driverName(pageQuery.getDriverName())

@@ -37,7 +37,7 @@ public interface DriverStatusService {
      * @return Map Long:String, where Long is the driver ID and String is the driver
      * status
      */
-    Map<Long, String> selectByPage(DriverQuery driverQuery);
+    Map<Long, String> getStatusByPage(DriverQuery driverQuery);
 
     /**
      * Count of currently online devices under the driver.
