@@ -80,14 +80,14 @@ public class MqttReceiveHandler {
                             messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos());
                     return;
                 }
-                MqttScheduleJob.MESSAGE_COUNT.getAndIncrement();
+                MqttScheduleJob.recordMessage();
                 MqttMessage mqttMessage = MqttMessage.builder().header(messageHeader).payload(payload).build();
                 log.debug("Mqtt inbound, From: {}, Qos: {}, Payload: {}", messageHeader.getMqttReceivedTopic(),
                         messageHeader.getMqttReceivedQos(), payload);
 
                 // Determine whether to process data in batch based on transmission speed
                 Integer batchSpeed = mqttProperties.getBatch().getSpeed();
-                if (MqttScheduleJob.MESSAGE_SPEED.get() < batchSpeed) {
+                if (MqttScheduleJob.getMessageSpeed() < batchSpeed) {
                     virtualThreadExecutor.execute(() -> receiveSingle(mqttMessage));
                 } else {
                     // Save message to batch schedule for processing

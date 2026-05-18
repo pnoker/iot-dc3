@@ -65,23 +65,18 @@ public class PointValueReceiver {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
-            PointValueJob.VALUE_COUNT.getAndIncrement();
+            PointValueJob.recordPointValue();
             log.debug("Receive point value from: {}, {}", message.getMessageProperties().getReceivedRoutingKey(),
                     JsonUtil.toJsonString(pointValueBO));
 
             // Judge whether to process data in batch according to the data transmission
             // speed
-            if (PointValueJob.VALUE_SPEED.get() < pointBatchProperties.getSpeed()) {
+            if (PointValueJob.getValueSpeed() < pointBatchProperties.getSpeed()) {
                 // Save point value to Redis & PostgreSQL
                 pointValueService.save(pointValueBO);
             } else {
                 // Save point value to schedule
-                PointValueJob.VALUE_LOCK.writeLock().lock();
-                try {
-                    PointValueJob.addPointValues(pointValueBO);
-                } finally {
-                    PointValueJob.VALUE_LOCK.writeLock().unlock();
-                }
+                PointValueJob.addPointValues(pointValueBO);
             }
             RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
