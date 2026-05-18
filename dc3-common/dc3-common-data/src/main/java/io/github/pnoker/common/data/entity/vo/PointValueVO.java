@@ -72,6 +72,11 @@ public class PointValueVO implements Serializable {
     private Double numValue;
 
     /**
+     * Whether the latest-value query returned a real sampled value.
+     */
+    private Boolean hasLatestValue = Boolean.TRUE;
+
+    /**
      * Driver ID
      */
     private Long driverId;

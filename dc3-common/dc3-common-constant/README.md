@@ -20,7 +20,7 @@ and enumeration types used across services, drivers, and common modules.
 |-------------------|-----------------------------------------------------------|
 | `AuthConstant`    | Auth service name, URL prefixes                           |
 | `ManagerConstant` | Manager service name (`dc3-center-manager`), URL prefixes |
-| `DataConstant`    | Data service name, URL prefixes                           |
+| `DataConstant`    | Data service name, URL prefixes, point value API constants |
 | `DriverConstant`  | Driver service name helpers                               |
 
 ### RabbitMQ Constants

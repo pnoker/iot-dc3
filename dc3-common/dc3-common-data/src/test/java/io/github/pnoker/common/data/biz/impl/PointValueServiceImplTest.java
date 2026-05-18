@@ -17,9 +17,12 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.cache.PointValueLocalCacheService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RepositoryException;
@@ -27,6 +30,7 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +43,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -249,6 +254,61 @@ class PointValueServiceImplTest {
                     .isInstanceOf(RepositoryException.class)
                     .hasMessageContaining("at least one");
         }
+    }
+
+    @Test
+    void latestReturnsPlaceholderForBoundPointWithoutValue() {
+        Pages pages = new Pages();
+        pages.setCurrent(1);
+        pages.setSize(10);
+
+        PointValueQuery query = new PointValueQuery();
+        query.setPage(pages);
+        query.setTenantId(1L);
+        query.setDeviceId(10L);
+
+        FacadePointBO pointWithValue = stubPoint(1L, 5L);
+        pointWithValue.setId(20L);
+        FacadePointBO pointWithoutValue = stubPoint(1L, 5L);
+        pointWithoutValue.setId(21L);
+
+        PointValueBO cached = PointValueBO.builder()
+                .tenantId(1L)
+                .deviceId(10L)
+                .pointId(20L)
+                .rawValue("42")
+                .calValue("42")
+                .build();
+
+        when(deviceFacade.getById(1L, 10L)).thenReturn(stubDevice(1L, 5L));
+        when(pointFacade.listByPage(any())).thenReturn(new FacadePage<>(1, 10, 2, 1,
+                List.of(pointWithValue, pointWithoutValue)));
+        when(pointValueLocalCacheService.selectLatestPointValue(1L, 10L, List.of(20L, 21L)))
+                .thenReturn(Map.of(20L, cached));
+
+        try (MockedStatic<RepositoryStrategyFactory> factory =
+                     Mockito.mockStatic(RepositoryStrategyFactory.class)) {
+            factory.when(RepositoryStrategyFactory::get).thenReturn(List.of(repositoryService));
+
+            Page<PointValueBO> result = service.latest(query);
+
+            assertThat(result.getTotal()).isEqualTo(2);
+            assertThat(result.getRecords()).hasSize(2);
+            assertThat(result.getRecords().get(0)).isSameAs(cached);
+            assertThat(result.getRecords().get(0).getHasLatestValue()).isTrue();
+            PointValueBO placeholder = result.getRecords().get(1);
+            assertThat(placeholder.getTenantId()).isEqualTo(1L);
+            assertThat(placeholder.getDeviceId()).isEqualTo(10L);
+            assertThat(placeholder.getPointId()).isEqualTo(21L);
+            assertThat(placeholder.getRawValue()).isEqualTo(DataConstant.PointValue.NO_LATEST_VALUE);
+            assertThat(placeholder.getCalValue()).isEqualTo(DataConstant.PointValue.NO_LATEST_VALUE);
+            assertThat(placeholder.getHasLatestValue()).isFalse();
+            assertThat(placeholder.getCreateTime()).isNull();
+            assertThat(placeholder.getOperateTime()).isNull();
+        }
+
+        verify(repositoryService, never()).selectLatestPointValue(1L, 10L, 20L);
+        verify(repositoryService).selectLatestPointValue(1L, 10L, 21L);
     }
 
     @Test
