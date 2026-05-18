@@ -125,8 +125,8 @@ public class ProfileController implements BaseController {
      * @param id ID
      * @return ProfileVO {@link ProfileVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<ProfileVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<ProfileVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ProfileBO entityBO = requireTenant(tenantId, profileService.getById(id));
             ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
@@ -140,7 +140,7 @@ public class ProfileController implements BaseController {
      * @param profileIds ID
      * @return Map(ID, ProfileVO)
      */
-    @PostMapping("/select_by_ids")
+    @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, ProfileVO>>> listByIds(@RequestBody Set<Long> profileIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.listByIds(profileIds));
@@ -156,7 +156,7 @@ public class ProfileController implements BaseController {
      * @param deviceId Device ID
      * @return Profile
      */
-    @GetMapping("/select_by_device_id")
+    @GetMapping("/list_by_device_id")
     public Mono<R<List<ProfileVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));

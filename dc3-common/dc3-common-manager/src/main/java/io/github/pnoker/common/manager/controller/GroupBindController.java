@@ -136,8 +136,8 @@ public class GroupBindController implements BaseController {
      * @param id ID
      * @return GroupBindVO {@link GroupBindVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<GroupBindVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<GroupBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBindBO entityBO = requireTenant(tenantId, groupBindService.getById(id));
             GroupBindVO entityVO = groupBindBuilder.buildVOByBO(entityBO);

@@ -136,8 +136,8 @@ public class LabelBindController implements BaseController {
      * @param id ID
      * @return LabelBindVO {@link LabelBindVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<LabelBindVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<LabelBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LabelBindBO entityBO = requireTenant(tenantId, labelBindService.getById(id));
             LabelBindVO entityVO = labelBindBuilder.buildVOByBO(entityBO);

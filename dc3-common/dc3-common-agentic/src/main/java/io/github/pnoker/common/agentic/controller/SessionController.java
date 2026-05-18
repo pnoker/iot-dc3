@@ -73,7 +73,7 @@ public class SessionController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_conversation_id")
+    @GetMapping("/get_by_conversation_id")
     public Mono<R<SessionVO>> get(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.getByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(),

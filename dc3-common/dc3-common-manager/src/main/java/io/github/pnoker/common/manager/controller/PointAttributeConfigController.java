@@ -137,8 +137,8 @@ public class PointAttributeConfigController implements BaseController {
      * @param id ID
      * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
      */
-    @GetMapping("/select_by_id")
-    public Mono<R<PointAttributeConfigVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<PointAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointAttributeConfigBO entityBO = requireTenant(tenantId, pointAttributeConfigService.getById(id));
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -154,7 +154,7 @@ public class PointAttributeConfigController implements BaseController {
      * @param pointId     Point ID
      * @return PointConfig
      */
-    @GetMapping("/select_by_attribute_id_and_device_id_and_point_id")
+    @GetMapping("/get_by_attribute_id_and_device_id_and_point_id")
     public Mono<R<PointAttributeConfigVO>> getByAttributeIdAndDeviceIdAndPointId(
             @NotNull @RequestParam(value = "attribute_id") Long attributeId,
             @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -176,7 +176,7 @@ public class PointAttributeConfigController implements BaseController {
      * @param pointId  Point ID
      * @return PointConfig
      */
-    @GetMapping("/select_by_device_id_and_point_id")
+    @GetMapping("/list_by_device_id_and_point_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceIdAndPointId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
             @NotNull @RequestParam(value = "point_id") Long pointId) {
@@ -195,7 +195,7 @@ public class PointAttributeConfigController implements BaseController {
      * @param deviceId Device ID
      * @return PointConfig
      */
-    @GetMapping("/select_by_device_id")
+    @GetMapping("/list_by_device_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

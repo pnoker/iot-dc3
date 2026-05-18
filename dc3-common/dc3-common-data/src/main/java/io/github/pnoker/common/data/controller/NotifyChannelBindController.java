@@ -94,8 +94,8 @@ public class NotifyChannelBindController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_id")
-    public Mono<R<NotifyChannelBindVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<NotifyChannelBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyChannelBindBO entityBO = requireTenant(tenantId, notifyChannelBindService.getById(id));
             return R.ok(notifyChannelBindBuilder.buildVOByBO(entityBO));

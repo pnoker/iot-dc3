@@ -75,7 +75,7 @@ public class DeviceStatusController implements BaseController {
      * @param driverId Driver ID
      * @return Map String:String
      */
-    @GetMapping("/select_by_driver_id")
+    @GetMapping("/list_by_driver_id")
     public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
@@ -92,7 +92,7 @@ public class DeviceStatusController implements BaseController {
      * @param profileId Profile ID
      * @return Map String:String
      */
-    @GetMapping("/select_by_profile_id")
+    @GetMapping("/list_by_profile_id")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
             @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

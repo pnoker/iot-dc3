@@ -93,8 +93,8 @@ public class NotifyController implements BaseController {
         }));
     }
 
-    @GetMapping("/select_by_id")
-    public Mono<R<NotifyVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
+    @GetMapping("/get_by_id")
+    public Mono<R<NotifyVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyBO entityBO = requireTenant(tenantId, notifyService.getById(id));
             return R.ok(notifyBuilder.buildVOByBO(entityBO));
