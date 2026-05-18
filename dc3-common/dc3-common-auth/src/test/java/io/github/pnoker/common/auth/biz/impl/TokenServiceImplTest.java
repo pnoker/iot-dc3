@@ -127,7 +127,7 @@ class TokenServiceImplTest {
         when(tenantService.selectByCode(TENANT_CODE)).thenReturn(tenant);
         when(userLoginService.selectByLoginName(LOGIN, false)).thenReturn(userLogin);
         when(tenantBindService.selectByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(bind);
-        when(userPasswordService.selectById(PASSWORD_ID)).thenReturn(password);
+        when(userPasswordService.getById(PASSWORD_ID)).thenReturn(password);
 
         String md5 = DecodeUtil.md5(LOGIN_PASSWORD, SALT);
         String token = tokenService.generateToken(LOGIN, SALT, md5, TENANT_CODE);
@@ -167,7 +167,7 @@ class TokenServiceImplTest {
         when(tenantService.selectByCode(TENANT_CODE)).thenReturn(tenant);
         when(userLoginService.selectByLoginName(LOGIN, false)).thenReturn(userLogin);
         when(tenantBindService.selectByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(bind);
-        when(userPasswordService.selectById(PASSWORD_ID)).thenReturn(null);
+        when(userPasswordService.getById(PASSWORD_ID)).thenReturn(null);
         assertThatThrownBy(() -> tokenService.generateToken(LOGIN, SALT, "anything", TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
     }
@@ -177,7 +177,7 @@ class TokenServiceImplTest {
         when(tenantService.selectByCode(TENANT_CODE)).thenReturn(tenant);
         when(userLoginService.selectByLoginName(LOGIN, false)).thenReturn(userLogin);
         when(tenantBindService.selectByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(bind);
-        when(userPasswordService.selectById(PASSWORD_ID)).thenReturn(password);
+        when(userPasswordService.getById(PASSWORD_ID)).thenReturn(password);
         assertThatThrownBy(() -> tokenService.generateToken(LOGIN, "", "anything", TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
     }
@@ -187,7 +187,7 @@ class TokenServiceImplTest {
         when(tenantService.selectByCode(TENANT_CODE)).thenReturn(tenant);
         when(userLoginService.selectByLoginName(LOGIN, false)).thenReturn(userLogin);
         when(tenantBindService.selectByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(bind);
-        when(userPasswordService.selectById(PASSWORD_ID)).thenReturn(password);
+        when(userPasswordService.getById(PASSWORD_ID)).thenReturn(password);
         assertThatThrownBy(() -> tokenService.generateToken(LOGIN, SALT, "wrong-md5", TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
     }

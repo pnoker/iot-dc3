@@ -97,7 +97,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public UserLoginBO selectById(Long id) {
+    public UserLoginBO getById(Long id) {
         UserLoginDO entityDO = getDOById(id, true);
         return userLoginBuilder.buildBOByDO(entityDO);
     }

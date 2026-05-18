@@ -96,7 +96,7 @@ public class ProfileController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, profileService.selectById(id));
+            requireTenant(tenantId, profileService.getById(id));
             profileService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -113,7 +113,7 @@ public class ProfileController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, profileService.selectById(entityBO.getId()));
+            requireTenant(tenantId, profileService.getById(entityBO.getId()));
             profileService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -128,7 +128,7 @@ public class ProfileController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<ProfileVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            ProfileBO entityBO = requireTenant(tenantId, profileService.selectById(id));
+            ProfileBO entityBO = requireTenant(tenantId, profileService.getById(id));
             ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -159,7 +159,7 @@ public class ProfileController implements BaseController {
     @GetMapping("/select_by_device_id")
     public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.selectById(deviceId));
+            requireTenant(tenantId, deviceService.getById(deviceId));
             List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.selectByDeviceId(deviceId));
             List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);

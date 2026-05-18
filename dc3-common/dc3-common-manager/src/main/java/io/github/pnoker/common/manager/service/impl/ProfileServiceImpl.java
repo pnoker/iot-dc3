@@ -135,7 +135,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileBO selectById(Long id) {
+    public ProfileBO getById(Long id) {
         ProfileDO entityDO = getDOById(id, true);
         return profileBuilder.buildBOByDO(entityDO);
     }

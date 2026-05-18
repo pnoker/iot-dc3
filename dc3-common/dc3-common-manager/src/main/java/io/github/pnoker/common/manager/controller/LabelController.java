@@ -84,7 +84,7 @@ public class LabelController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, labelService.selectById(id));
+            requireTenant(tenantId, labelService.getById(id));
             labelService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -99,7 +99,7 @@ public class LabelController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, labelService.selectById(entityBO.getId()));
+            requireTenant(tenantId, labelService.getById(entityBO.getId()));
             labelService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -112,7 +112,7 @@ public class LabelController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<LabelVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            LabelBO entityBO = requireTenant(tenantId, labelService.selectById(id));
+            LabelBO entityBO = requireTenant(tenantId, labelService.getById(id));
             LabelVO entityVO = labelBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));

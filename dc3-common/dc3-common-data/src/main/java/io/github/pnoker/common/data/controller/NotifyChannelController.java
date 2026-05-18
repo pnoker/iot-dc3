@@ -77,7 +77,7 @@ public class NotifyChannelController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, notifyChannelService.selectById(id));
+            requireTenant(tenantId, notifyChannelService.getById(id));
             notifyChannelService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -88,7 +88,7 @@ public class NotifyChannelController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyChannelBO entityBO = notifyChannelBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, notifyChannelService.selectById(entityBO.getId()));
+            requireTenant(tenantId, notifyChannelService.getById(entityBO.getId()));
             notifyChannelService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -97,7 +97,7 @@ public class NotifyChannelController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<NotifyChannelVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            NotifyChannelBO entityBO = requireTenant(tenantId, notifyChannelService.selectById(id));
+            NotifyChannelBO entityBO = requireTenant(tenantId, notifyChannelService.getById(id));
             return R.ok(notifyChannelBuilder.buildVOByBO(entityBO));
         }));
     }

@@ -68,7 +68,7 @@ class DeviceLocalFacadeTest {
 
     @Test
     void selectByIdReturnsNullWhenServiceReturnsNull() {
-        when(deviceService.selectById(1L)).thenReturn(null);
+        when(deviceService.getById(1L)).thenReturn(null);
         assertThat(facade.getById(1L)).isNull();
         verify(facadeDeviceBuilder, never()).toFacadeBO(any());
     }
@@ -77,7 +77,7 @@ class DeviceLocalFacadeTest {
     void selectByIdMapsThroughBuilder() {
         DeviceBO source = new DeviceBO();
         FacadeDeviceBO mapped = new FacadeDeviceBO();
-        when(deviceService.selectById(1L)).thenReturn(source);
+        when(deviceService.getById(1L)).thenReturn(source);
         when(facadeDeviceBuilder.toFacadeBO(source)).thenReturn(mapped);
         assertThat(facade.getById(1L)).isSameAs(mapped);
     }

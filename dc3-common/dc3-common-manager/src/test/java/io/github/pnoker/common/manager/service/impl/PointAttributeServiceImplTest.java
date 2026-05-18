@@ -85,7 +85,7 @@ class PointAttributeServiceImplTest {
 
     @Test
     void saveSucceedsForUniqueAttribute() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(pointAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(pointAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointAttributeManager.save(doRow)).thenReturn(true);
@@ -94,7 +94,7 @@ class PointAttributeServiceImplTest {
 
     @Test
     void saveRejectsWhenDriverMissing() {
-        when(driverService.selectById(7L)).thenReturn(null);
+        when(driverService.getById(7L)).thenReturn(null);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
@@ -102,20 +102,20 @@ class PointAttributeServiceImplTest {
     void saveRejectsWhenDriverBelongsToOtherTenant() {
         DriverBO other = new DriverBO();
         other.setTenantId(999L);
-        when(driverService.selectById(7L)).thenReturn(other);
+        when(driverService.getById(7L)).thenReturn(other);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void saveRejectsDuplicate() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(pointAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
     }
 
     @Test
     void saveThrowsAddExceptionWhenManagerReturnsFalse() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(pointAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(pointAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointAttributeManager.save(doRow)).thenReturn(false);
@@ -147,7 +147,7 @@ class PointAttributeServiceImplTest {
     @Test
     void updateThrowsUpdateExceptionWhenManagerReturnsFalse() {
         when(pointAttributeManager.getById(1L)).thenReturn(doRow);
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(pointAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(pointAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointAttributeManager.updateById(doRow)).thenReturn(false);
@@ -163,7 +163,7 @@ class PointAttributeServiceImplTest {
 
     @Test
     void saveBatchThrowsWhenManagerReturnsFalse() {
-        when(driverService.selectById(7L)).thenReturn(driver);
+        when(driverService.getById(7L)).thenReturn(driver);
         when(pointAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointAttributeManager.saveBatch(any())).thenReturn(false);
         assertThatThrownBy(() -> service.saveBatch(List.of(bo))).isInstanceOf(AddException.class);

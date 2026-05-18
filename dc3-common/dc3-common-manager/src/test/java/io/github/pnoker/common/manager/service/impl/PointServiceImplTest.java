@@ -116,7 +116,7 @@ class PointServiceImplTest {
 
     @Test
     void saveSucceedsAndPublishesAddEvent() {
-        when(profileService.selectById(5L)).thenReturn(profile);
+        when(profileService.getById(5L)).thenReturn(profile);
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(pointBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointManager.save(doRow)).thenReturn(true);
@@ -128,7 +128,7 @@ class PointServiceImplTest {
 
     @Test
     void saveRejectsWhenProfileMissing() {
-        when(profileService.selectById(5L)).thenReturn(null);
+        when(profileService.getById(5L)).thenReturn(null);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
@@ -136,13 +136,13 @@ class PointServiceImplTest {
     void saveRejectsWhenProfileBelongsToOtherTenant() {
         ProfileBO otherTenant = new ProfileBO();
         otherTenant.setTenantId(999L);
-        when(profileService.selectById(5L)).thenReturn(otherTenant);
+        when(profileService.getById(5L)).thenReturn(otherTenant);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void saveRejectsDuplicate() {
-        when(profileService.selectById(5L)).thenReturn(profile);
+        when(profileService.getById(5L)).thenReturn(profile);
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(pointManager, never()).save(any(PointDO.class));
@@ -150,7 +150,7 @@ class PointServiceImplTest {
 
     @Test
     void saveThrowsAddExceptionWhenManagerReturnsFalse() {
-        when(profileService.selectById(5L)).thenReturn(profile);
+        when(profileService.getById(5L)).thenReturn(profile);
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(pointBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointManager.save(doRow)).thenReturn(false);
@@ -201,7 +201,7 @@ class PointServiceImplTest {
     @Test
     void updateRejectsDuplicateAcrossDifferentRow() {
         when(pointManager.getById(1L)).thenReturn(doRow);
-        when(profileService.selectById(5L)).thenReturn(profile);
+        when(profileService.getById(5L)).thenReturn(profile);
         PointDO other = new PointDO();
         other.setId(2L);
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(other);
@@ -211,7 +211,7 @@ class PointServiceImplTest {
     @Test
     void updateThrowsUpdateExceptionWhenManagerReturnsFalse() {
         when(pointManager.getById(1L)).thenReturn(doRow);
-        when(profileService.selectById(5L)).thenReturn(profile);
+        when(profileService.getById(5L)).thenReturn(profile);
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(pointBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointManager.updateById(doRow)).thenReturn(false);

@@ -102,7 +102,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public ResourceBO selectById(Long id) {
+    public ResourceBO getById(Long id) {
         ResourceDO entityDO = getDOById(id, true);
         return resourceBuilder.buildBOByDO(entityDO);
     }

@@ -120,7 +120,7 @@ public class UserController implements BaseController {
     public Mono<R<UserVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenantMember(tenantId, id);
-            UserBO entityBO = userService.selectById(id);
+            UserBO entityBO = userService.getById(id);
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));

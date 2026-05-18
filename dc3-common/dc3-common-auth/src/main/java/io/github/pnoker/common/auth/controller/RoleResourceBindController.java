@@ -92,7 +92,7 @@ public class RoleResourceBindController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleResourceBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleResourceBindBO entityBO = roleResourceBindBuilder.buildBOByVO(entityVO);
-            requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
+            requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
             roleResourceBindService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
@@ -101,8 +101,8 @@ public class RoleResourceBindController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            RoleResourceBindBO entityBO = roleResourceBindService.selectById(id);
-            requireTenant(tenantId, roleService.selectById(entityBO.getRoleId()));
+            RoleResourceBindBO entityBO = roleResourceBindService.getById(id);
+            requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
             roleResourceBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -121,7 +121,7 @@ public class RoleResourceBindController implements BaseController {
     @GetMapping("/list_resource_by_role")
     public Mono<R<List<ResourceVO>>> listResourceByRole(@NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, roleService.selectById(roleId));
+            requireTenant(tenantId, roleService.getById(roleId));
             List<ResourceBO> entityBOList = roleResourceBindService.listResourceByRoleId(roleId);
             List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);

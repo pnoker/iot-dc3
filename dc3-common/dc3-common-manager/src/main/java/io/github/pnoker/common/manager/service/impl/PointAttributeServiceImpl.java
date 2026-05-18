@@ -105,7 +105,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    public PointAttributeBO selectById(Long id) {
+    public PointAttributeBO getById(Long id) {
         PointAttributeDO entityDO = getDOById(id, true);
         return pointAttributeBuilder.buildBOByDO(entityDO);
     }
@@ -219,7 +219,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     private void validateTenantRelations(PointAttributeBO entityBO) {
-        DriverBO driverBO = driverService.selectById(entityBO.getDriverId());
+        DriverBO driverBO = driverService.getById(entityBO.getDriverId());
         if (Objects.isNull(driverBO) || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }

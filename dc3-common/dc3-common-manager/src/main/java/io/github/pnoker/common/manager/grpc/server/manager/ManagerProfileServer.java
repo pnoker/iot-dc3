@@ -91,7 +91,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
         GrpcRProfileDTO.Builder builder = GrpcRProfileDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        ProfileBO profile = profileService.selectById(request.getProfileId());
+        ProfileBO profile = profileService.getById(request.getProfileId());
         if (Objects.isNull(profile)) {
             noResource(rBuilder);
         } else {

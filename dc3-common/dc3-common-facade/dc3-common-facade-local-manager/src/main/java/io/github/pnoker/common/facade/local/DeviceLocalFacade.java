@@ -58,7 +58,7 @@ public class DeviceLocalFacade implements DeviceFacade {
 
     @Override
     public FacadeDeviceBO getById(Long id) {
-        DeviceBO managerBO = deviceService.selectById(id);
+        DeviceBO managerBO = deviceService.getById(id);
         return Objects.isNull(managerBO) ? null : facadeDeviceBuilder.toFacadeBO(managerBO);
     }
 

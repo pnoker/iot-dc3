@@ -84,7 +84,7 @@ public class RoleController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, roleService.selectById(id));
+            requireTenant(tenantId, roleService.getById(id));
             roleService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -97,7 +97,7 @@ public class RoleController implements BaseController {
             entityBO.setTenantId(header.getTenantId());
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            requireTenant(header.getTenantId(), roleService.selectById(entityBO.getId()));
+            requireTenant(header.getTenantId(), roleService.getById(entityBO.getId()));
             roleService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -106,7 +106,7 @@ public class RoleController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<RoleVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            RoleBO entityBO = requireTenant(tenantId, roleService.selectById(id));
+            RoleBO entityBO = requireTenant(tenantId, roleService.getById(id));
             RoleVO entityVO = roleBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));

@@ -179,13 +179,13 @@ class TenantServiceImplTest {
     void selectByIdReturnsBoForKnownId() {
         when(tenantManager.getById(1L)).thenReturn(doRow);
         when(tenantBuilder.buildBOByDO(doRow)).thenReturn(bo);
-        assertThat(service.selectById(1L)).isSameAs(bo);
+        assertThat(service.getById(1L)).isSameAs(bo);
     }
 
     @Test
     void selectByIdRejectsUnknownId() {
         when(tenantManager.getById(99L)).thenReturn(null);
-        assertThatThrownBy(() -> service.selectById(99L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.getById(99L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test

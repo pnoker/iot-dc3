@@ -123,7 +123,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupBO selectById(Long id) {
+    public GroupBO getById(Long id) {
         GroupDO entityDO = getDOById(id, true);
         return groupBuilder.buildBOByDO(entityDO);
     }

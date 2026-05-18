@@ -109,7 +109,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     @Override
-    public DriverAttributeBO selectById(Long id) {
+    public DriverAttributeBO getById(Long id) {
         DriverAttributeDO entityDO = getDOById(id, true);
         return driverAttributeBuilder.buildBOByDO(entityDO);
     }
@@ -218,7 +218,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     private void validateTenantRelations(DriverAttributeBO entityBO) {
-        DriverBO driverBO = driverService.selectById(entityBO.getDriverId());
+        DriverBO driverBO = driverService.getById(entityBO.getDriverId());
         if (Objects.isNull(driverBO) || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }

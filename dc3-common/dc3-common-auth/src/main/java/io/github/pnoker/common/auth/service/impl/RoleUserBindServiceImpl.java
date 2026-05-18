@@ -113,7 +113,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public RoleUserBindBO selectById(Long id) {
+    public RoleUserBindBO getById(Long id) {
         RoleUserBindDO entityDO = getDOById(id, true);
         return roleUserBindBuilder.buildBOByDO(entityDO);
     }

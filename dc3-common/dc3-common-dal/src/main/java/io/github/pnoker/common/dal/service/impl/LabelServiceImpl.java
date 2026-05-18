@@ -109,7 +109,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public LabelBO selectById(Long id) {
+    public LabelBO getById(Long id) {
         LabelDO entityDO = getDOById(id, false);
         return labelBuilder.buildBOByDO(entityDO);
     }

@@ -91,7 +91,7 @@ public class GroupBindServiceImpl implements GroupBindService {
     }
 
     @Override
-    public GroupBindBO selectById(Long id) {
+    public GroupBindBO getById(Long id) {
         GroupBindDO entityDO = getDOById(id, true);
         return groupBindBuilder.buildBOByDO(entityDO);
     }

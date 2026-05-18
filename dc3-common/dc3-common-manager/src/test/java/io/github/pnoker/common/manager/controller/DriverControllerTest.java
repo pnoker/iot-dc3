@@ -109,7 +109,7 @@ class DriverControllerTest {
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         bo.setTenantId(TENANT_ID);
-        when(driverService.selectById(1L)).thenReturn(bo);
+        when(driverService.getById(1L)).thenReturn(bo);
 
         StepVerifier.create(withTenantContext(controller.delete(1L)))
                 .assertNext(envelope -> assertThat(envelope.isOk()).isTrue())
@@ -122,7 +122,7 @@ class DriverControllerTest {
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         bo.setTenantId(999L);
-        when(driverService.selectById(1L)).thenReturn(bo);
+        when(driverService.getById(1L)).thenReturn(bo);
 
         StepVerifier.create(withTenantContext(controller.delete(1L)))
                 .expectErrorMatches(throwable -> throwable instanceof NotFoundException)
@@ -138,7 +138,7 @@ class DriverControllerTest {
         bo.setId(1L);
         bo.setTenantId(TENANT_ID);
         when(driverBuilder.buildBOByVO(vo)).thenReturn(bo);
-        when(driverService.selectById(1L)).thenReturn(bo);
+        when(driverService.getById(1L)).thenReturn(bo);
 
         StepVerifier.create(withTenantContext(controller.update(vo)))
                 .assertNext(envelope -> assertThat(envelope.isOk()).isTrue())
@@ -156,7 +156,7 @@ class DriverControllerTest {
         existing.setId(1L);
         existing.setTenantId(999L);
         when(driverBuilder.buildBOByVO(vo)).thenReturn(bo);
-        when(driverService.selectById(1L)).thenReturn(existing);
+        when(driverService.getById(1L)).thenReturn(existing);
 
         StepVerifier.create(withTenantContext(controller.update(vo)))
                 .expectError(NotFoundException.class)
@@ -170,7 +170,7 @@ class DriverControllerTest {
         bo.setId(1L);
         bo.setTenantId(TENANT_ID);
         DriverVO vo = new DriverVO();
-        when(driverService.selectById(1L)).thenReturn(bo);
+        when(driverService.getById(1L)).thenReturn(bo);
         when(driverBuilder.buildVOByBO(bo)).thenReturn(vo);
 
         StepVerifier.create(withTenantContext(controller.selectById(1L)))
@@ -183,7 +183,7 @@ class DriverControllerTest {
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         bo.setTenantId(999L);
-        when(driverService.selectById(1L)).thenReturn(bo);
+        when(driverService.getById(1L)).thenReturn(bo);
 
         StepVerifier.create(withTenantContext(controller.selectById(1L)))
                 .expectError(NotFoundException.class)

@@ -68,7 +68,7 @@ class DriverLocalFacadeTest {
 
     @Test
     void selectByIdReturnsNullWhenServiceReturnsNull() {
-        when(driverService.selectById(1L)).thenReturn(null);
+        when(driverService.getById(1L)).thenReturn(null);
         assertThat(facade.getById(1L)).isNull();
         verify(facadeDriverBuilder, never()).toFacadeBO(any());
     }
@@ -77,7 +77,7 @@ class DriverLocalFacadeTest {
     void selectByIdMapsThroughBuilder() {
         DriverBO bo = new DriverBO();
         FacadeDriverBO mapped = new FacadeDriverBO();
-        when(driverService.selectById(1L)).thenReturn(bo);
+        when(driverService.getById(1L)).thenReturn(bo);
         when(facadeDriverBuilder.toFacadeBO(bo)).thenReturn(mapped);
         assertThat(facade.getById(1L)).isSameAs(mapped);
     }

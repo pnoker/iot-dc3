@@ -55,7 +55,7 @@ public class PointLocalFacade implements PointFacade {
 
     @Override
     public FacadePointBO getById(Long id) {
-        PointBO managerBO = pointService.selectById(id);
+        PointBO managerBO = pointService.getById(id);
         return Objects.isNull(managerBO) ? null : facadePointBuilder.toFacadeBO(managerBO);
     }
 

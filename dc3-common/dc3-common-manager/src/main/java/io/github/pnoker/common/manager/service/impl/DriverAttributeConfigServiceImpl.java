@@ -154,7 +154,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     @Override
-    public DriverAttributeConfigBO selectById(Long id) {
+    public DriverAttributeConfigBO getById(Long id) {
         DriverAttributeConfigDO entityDO = getDOById(id, true);
         return driverAttributeConfigBuilder.buildBOByDO(entityDO);
     }

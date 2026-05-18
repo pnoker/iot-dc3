@@ -90,7 +90,7 @@ public class TokenServiceImpl implements TokenService {
         if (Objects.isNull(tenantBindBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
+        UserPasswordBO userPasswordBO = userPasswordService.getById(userLogin.getUserPasswordId());
         if (Objects.isNull(userPasswordBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }

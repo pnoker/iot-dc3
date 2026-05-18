@@ -102,7 +102,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public MessageBO selectById(Long id) {
+    public MessageBO getById(Long id) {
         MessageDO entityDO = getDOById(id, true);
         return messageBuilder.buildBOByDO(entityDO);
     }

@@ -203,7 +203,7 @@ public class DeviceServiceImpl implements DeviceService {
             throw new UpdateException("The device update failed");
         }
 
-        DeviceBO deviceBO = selectById(entityBO.getId());
+        DeviceBO deviceBO = getById(entityBO.getId());
         deviceBO.setProfileIds(CollectionUtils.isEmpty(newProfileIds) ? oldProfileIds : newProfileIds);
         entityBO.setDeviceName(deviceBO.getDeviceName());
 
@@ -214,7 +214,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public DeviceBO selectById(Long id) {
+    public DeviceBO getById(Long id) {
         DeviceDO entityDO = getDOById(id, true);
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
         entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
@@ -537,7 +537,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     private void validateTenantRelations(DeviceBO entityBO) {
         Long tenantId = entityBO.getTenantId();
-        DriverBO driverBO = driverService.selectById(entityBO.getDriverId());
+        DriverBO driverBO = driverService.getById(entityBO.getDriverId());
         if (Objects.isNull(driverBO) || !Objects.equals(tenantId, driverBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }

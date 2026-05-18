@@ -122,7 +122,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public ProfileBindBO selectById(Long id) {
+    public ProfileBindBO getById(Long id) {
         ProfileBindDO entityDO = getDOById(id, true);
         return profileBindBuilder.buildBOByDO(entityDO);
     }

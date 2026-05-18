@@ -164,7 +164,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public PointBO selectById(Long id) {
+    public PointBO getById(Long id) {
         PointDO entityDO = getDOById(id, true);
         return pointBuilder.buildBOByDO(entityDO);
     }
@@ -233,7 +233,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public DeviceByPointBO selectPointStatisticsWithDevice(Long pointId) {
-        PointBO pointBO = selectById(pointId);
+        PointBO pointBO = getById(pointId);
         Set<Long> deviceIds = new HashSet<>();
 
         profileBindService.selectDeviceIdsByProfileId(pointBO.getProfileId()).forEach(deviceId -> {
@@ -369,7 +369,7 @@ public class PointServiceImpl implements PointService {
     }
 
     private void validateTenantRelations(PointBO entityBO) {
-        ProfileBO profileBO = profileService.selectById(entityBO.getProfileId());
+        ProfileBO profileBO = profileService.getById(entityBO.getProfileId());
         if (Objects.isNull(profileBO) || !Objects.equals(entityBO.getTenantId(), profileBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }

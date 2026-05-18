@@ -92,7 +92,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public UserPasswordBO selectById(Long id) {
+    public UserPasswordBO getById(Long id) {
         UserPasswordDO entityDO = getDOById(id, true);
         return userPasswordBuilder.buildBOByDO(entityDO);
     }
@@ -109,7 +109,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     public void restPassword(Long id) {
-        UserPasswordBO userPasswordBO = selectById(id);
+        UserPasswordBO userPasswordBO = getById(id);
         if (Objects.nonNull(userPasswordBO)) {
             userPasswordBO.setLoginPassword(AlgorithmConstant.DEFAULT_PASSWORD);
             update(userPasswordBO);

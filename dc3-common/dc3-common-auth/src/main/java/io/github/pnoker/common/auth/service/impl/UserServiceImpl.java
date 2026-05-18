@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserBO selectById(Long id) {
+    public UserBO getById(Long id) {
         UserDO entityDO = getDOById(id, true);
         return userBuilder.buildBOByDO(entityDO);
     }

@@ -102,7 +102,7 @@ public class ResourceController implements BaseController {
     @GetMapping("/select_by_id")
     public Mono<R<ResourceVO>> selectById(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            ResourceBO entityBO = resourceService.selectById(id);
+            ResourceBO entityBO = resourceService.getById(id);
             ResourceVO entityVO = resourceBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         });

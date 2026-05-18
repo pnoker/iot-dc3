@@ -102,7 +102,7 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
     }
 
     @Override
-    public NotifyChannelBO selectById(Long id) {
+    public NotifyChannelBO getById(Long id) {
         NotifyChannelDO entityDO = getDOById(id, true);
         return notifyChannelBuilder.buildBOByDO(entityDO);
     }

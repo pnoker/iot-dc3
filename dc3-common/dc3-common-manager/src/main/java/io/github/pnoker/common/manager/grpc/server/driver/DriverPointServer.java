@@ -212,7 +212,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
 
     private DriverBO selectDriver(Long driverId) {
         try {
-            return driverService.selectById(driverId);
+            return driverService.getById(driverId);
         } catch (Exception e) {
             return null;
         }
@@ -220,7 +220,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
 
     private DeviceBO selectDevice(Long deviceId) {
         try {
-            return deviceService.selectById(deviceId);
+            return deviceService.getById(deviceId);
         } catch (Exception e) {
             return null;
         }
@@ -228,7 +228,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
 
     private PointBO selectPoint(Long pointId) {
         try {
-            return pointService.selectById(pointId);
+            return pointService.getById(pointId);
         } catch (Exception e) {
             return null;
         }

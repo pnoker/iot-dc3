@@ -95,7 +95,7 @@ class ManagerDriverServerTest {
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         GrpcDriverDTO dto = GrpcDriverDTO.newBuilder().build();
-        when(driverService.selectById(1L)).thenReturn(bo);
+        when(driverService.getById(1L)).thenReturn(bo);
         when(grpcDriverBuilder.buildGrpcDTOByBO(bo)).thenReturn(dto);
 
         GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(1L).build());
@@ -105,7 +105,7 @@ class ManagerDriverServerTest {
 
     @Test
     void selectByDriverIdReturnsNoResourceWhenMissing() {
-        when(driverService.selectById(99L)).thenReturn(null);
+        when(driverService.getById(99L)).thenReturn(null);
         GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
