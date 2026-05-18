@@ -43,12 +43,12 @@ public class GrowthVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private List<Long> driver;
+    private List<Long> driverDailyCounts;
 
-    private List<Long> device;
+    private List<Long> deviceDailyCounts;
 
-    private List<Long> point;
+    private List<Long> pointDailyCounts;
 
-    private List<Long> profile;
+    private List<Long> profileDailyCounts;
 
 }

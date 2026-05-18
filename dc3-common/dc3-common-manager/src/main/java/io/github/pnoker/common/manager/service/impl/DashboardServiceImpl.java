@@ -251,10 +251,10 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime to = today.plusDays(1).atStartOfDay();
 
         GrowthVO out = new GrowthVO();
-        out.setDriver(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_driver", from, to), today, clamped));
-        out.setDevice(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_device", from, to), today, clamped));
-        out.setPoint(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_point", from, to), today, clamped));
-        out.setProfile(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_profile", from, to), today, clamped));
+        out.setDriverDailyCounts(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_driver", from, to), today, clamped));
+        out.setDeviceDailyCounts(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_device", from, to), today, clamped));
+        out.setPointDailyCounts(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_point", from, to), today, clamped));
+        out.setProfileDailyCounts(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_profile", from, to), today, clamped));
         return out;
     }
 
