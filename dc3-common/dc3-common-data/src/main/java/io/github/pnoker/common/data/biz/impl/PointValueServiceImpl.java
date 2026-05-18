@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.cache.PointValueLocalCacheService;
@@ -155,9 +156,12 @@ public class PointValueServiceImpl implements PointValueService {
         RepositoryService repositoryService = getFirstRepositoryService();
         List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
             PointValueBO value = pointValueBOMap.get(id);
-            return Objects.isNull(value)
-                    ? repositoryService.selectLatestPointValue(tenantId, entityQuery.getDeviceId(), id) : value;
-        }).filter(Objects::nonNull).toList();
+            if (Objects.isNull(value)) {
+                value = repositoryService.selectLatestPointValue(tenantId, entityQuery.getDeviceId(), id);
+            }
+            return Objects.isNull(value) ? noLatestPointValue(tenantId, entityQuery.getDeviceId(), id)
+                    : latestPointValue(value);
+        }).toList();
 
         entityPageBO.setCurrent(page.getCurrent())
                 .setSize(page.getSize())
@@ -256,6 +260,22 @@ public class PointValueServiceImpl implements PointValueService {
 
     private boolean isValidId(Long id) {
         return Objects.nonNull(id) && id > 0;
+    }
+
+    private PointValueBO noLatestPointValue(Long tenantId, Long deviceId, Long pointId) {
+        return PointValueBO.builder()
+                .tenantId(tenantId)
+                .deviceId(deviceId)
+                .pointId(pointId)
+                .rawValue(DataConstant.PointValue.NO_LATEST_VALUE)
+                .calValue(DataConstant.PointValue.NO_LATEST_VALUE)
+                .hasLatestValue(false)
+                .build();
+    }
+
+    private PointValueBO latestPointValue(PointValueBO pointValueBO) {
+        pointValueBO.setHasLatestValue(true);
+        return pointValueBO;
     }
 
     /**

@@ -80,6 +80,12 @@ public class PointValueBO implements Serializable {
     private Double numValue;
 
     /**
+     * Whether the latest-value query returned a real sampled value.
+     */
+    @Builder.Default
+    private Boolean hasLatestValue = Boolean.TRUE;
+
+    /**
      * Driver ID that collected the data
      */
     private Long driverId;

@@ -78,6 +78,26 @@ public class DataConstant {
 
     public static final String RABBITMQ_CLUSTER_URL_PREFIX = "/rabbitmq/cluster";
 
+    /**
+     * Point value API constants.
+     *
+     * @author pnoker
+     * @version 2026.5.19
+     * @since 2016.10.1
+     */
+    public static class PointValue {
+
+        /**
+         * Placeholder for a bound point that has no latest sample yet.
+         */
+        public static final String NO_LATEST_VALUE = "NaN";
+
+        private PointValue() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
     private DataConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
