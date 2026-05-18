@@ -423,7 +423,7 @@ exports[`API wrapper contracts > alarm > deleteRule maps to its transport contra
 exports[`API wrapper contracts > alarm > getMessageById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/message/select_by_id",
+    "api/v3/data/message/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -434,26 +434,10 @@ exports[`API wrapper contracts > alarm > getMessageById maps to its transport co
 }
 `;
 
-exports[`API wrapper contracts > alarm > getMessageList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/message/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
 exports[`API wrapper contracts > alarm > getNotifyById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/notify/select_by_id",
+    "api/v3/data/notify/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -467,7 +451,7 @@ exports[`API wrapper contracts > alarm > getNotifyById maps to its transport con
 exports[`API wrapper contracts > alarm > getNotifyChannelBindById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/notify/channel/bind/select_by_id",
+    "api/v3/data/notify/channel/bind/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -475,29 +459,13 @@ exports[`API wrapper contracts > alarm > getNotifyChannelBindById maps to its tr
     },
   ],
   "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alarm > getNotifyChannelBindList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/notify/channel/bind/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
 }
 `;
 
 exports[`API wrapper contracts > alarm > getNotifyChannelById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/notify/channel/select_by_id",
+    "api/v3/data/notify/channel/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -505,45 +473,13 @@ exports[`API wrapper contracts > alarm > getNotifyChannelById maps to its transp
     },
   ],
   "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alarm > getNotifyChannelList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/notify/channel/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > alarm > getNotifyList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/notify/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
 }
 `;
 
 exports[`API wrapper contracts > alarm > getNotifyRecordById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/notify/record/select_by_id",
+    "api/v3/data/notify/record/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -551,29 +487,13 @@ exports[`API wrapper contracts > alarm > getNotifyRecordById maps to its transpo
     },
   ],
   "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alarm > getNotifyRecordList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/notify/record/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
 }
 `;
 
 exports[`API wrapper contracts > alarm > getRuleById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/rule/select_by_id",
+    "api/v3/data/rule/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -581,29 +501,13 @@ exports[`API wrapper contracts > alarm > getRuleById maps to its transport contr
     },
   ],
   "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alarm > getRuleList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/rule/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
 }
 `;
 
 exports[`API wrapper contracts > alarm > getRuleStateById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/rule/state/select_by_id",
+    "api/v3/data/rule/state/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -611,22 +515,6 @@ exports[`API wrapper contracts > alarm > getRuleStateById maps to its transport 
     },
   ],
   "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alarm > getRuleStateList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/rule/state/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
 }
 `;
 
@@ -643,25 +531,95 @@ exports[`API wrapper contracts > alarm > has every export covered by the contrac
   "deleteNotifyChannelBind",
   "deleteRule",
   "getMessageById",
-  "getMessageList",
   "getNotifyById",
   "getNotifyChannelBindById",
-  "getNotifyChannelBindList",
   "getNotifyChannelById",
-  "getNotifyChannelList",
-  "getNotifyList",
   "getNotifyRecordById",
-  "getNotifyRecordList",
   "getRuleById",
-  "getRuleList",
   "getRuleStateById",
-  "getRuleStateList",
+  "listMessage",
+  "listNotify",
+  "listNotifyChannel",
+  "listNotifyChannelBind",
+  "listNotifyRecord",
+  "listRule",
+  "listRuleState",
   "updateMessage",
   "updateNotify",
   "updateNotifyChannel",
   "updateNotifyChannelBind",
   "updateRule",
 ]
+`;
+
+exports[`API wrapper contracts > alarm > listMessage maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/message/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > listNotify maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > listNotifyChannel maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > listNotifyChannelBind maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/channel/bind/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > listNotifyRecord maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/notify/record/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > listRule maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alarm > listRuleState maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/rule/state/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > alarm > updateMessage maps to its transport contract 1`] = `
@@ -1009,7 +967,7 @@ exports[`API wrapper contracts > api > deleteApi maps to its transport contract 
 exports[`API wrapper contracts > api > getApiById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/auth/api/select_by_id",
+    "api/v3/auth/api/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -1020,30 +978,24 @@ exports[`API wrapper contracts > api > getApiById maps to its transport contract
 }
 `;
 
-exports[`API wrapper contracts > api > getApiList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/api/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
 exports[`API wrapper contracts > api > has every export covered by the contract matrix 1`] = `
 [
   "addApi",
   "deleteApi",
   "getApiById",
-  "getApiList",
+  "listApi",
   "updateApi",
 ]
+`;
+
+exports[`API wrapper contracts > api > listApi maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/api/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > api > updateApi maps to its transport contract 1`] = `
@@ -1060,39 +1012,39 @@ exports[`API wrapper contracts > api > updateApi maps to its transport contract 
 }
 `;
 
-exports[`API wrapper contracts > attribute > getDriverAttributeByDriverId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/driver_attribute/select_by_driver_id",
-    {
-      "params": {
-        "driver_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > attribute > getPointAttributeByDriverId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/point_attribute/select_by_driver_id",
-    {
-      "params": {
-        "driver_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > attribute > has every export covered by the contract matrix 1`] = `
 [
-  "getDriverAttributeByDriverId",
-  "getPointAttributeByDriverId",
+  "listDriverAttributeByDriverId",
+  "listPointAttributeByDriverId",
 ]
+`;
+
+exports[`API wrapper contracts > attribute > listDriverAttributeByDriverId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/driver_attribute/list_by_driver_id",
+    {
+      "params": {
+        "driver_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > attribute > listPointAttributeByDriverId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/point_attribute/list_by_driver_id",
+    {
+      "params": {
+        "driver_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
 `;
 
 exports[`API wrapper contracts > device > addDevice maps to its transport contract 1`] = `
@@ -1124,24 +1076,10 @@ exports[`API wrapper contracts > device > deleteDevice maps to its transport con
 }
 `;
 
-exports[`API wrapper contracts > device > getDeviceByDriverId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/device/select_by_driver_id",
-    {
-      "params": {
-        "driver_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > device > getDeviceById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/device/select_by_id",
+    "api/v3/manager/device/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -1152,46 +1090,17 @@ exports[`API wrapper contracts > device > getDeviceById maps to its transport co
 }
 `;
 
-exports[`API wrapper contracts > device > getDeviceByIds maps to its transport contract 1`] = `
+exports[`API wrapper contracts > device > getDeviceCountByDriverId maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/device/select_by_ids",
-    [
-      "id-1",
-      "id-2",
-    ],
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > device > getDeviceByProfileId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/device/select_by_profile_id",
+    "api/v3/manager/device/get_count_by_driver_id",
     {
       "params": {
-        "profile_id": "id-1",
+        "driver_id": "id-1",
       },
     },
   ],
   "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > device > getDeviceList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/device/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
 }
 `;
 
@@ -1209,48 +1118,20 @@ exports[`API wrapper contracts > device > getDeviceStatus maps to its transport 
 }
 `;
 
-exports[`API wrapper contracts > device > getDeviceStatusByDriverId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/device/status/select_by_driver_id",
-    {
-      "params": {
-        "driver_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > device > getDeviceStatusByProfileId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/device/status/select_by_profile_id",
-    {
-      "params": {
-        "profile_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > device > has every export covered by the contract matrix 1`] = `
 [
   "addDevice",
   "deleteDevice",
-  "getDeviceByDriverId",
   "getDeviceById",
-  "getDeviceByIds",
-  "getDeviceByProfileId",
-  "getDeviceList",
+  "getDeviceCountByDriverId",
   "getDeviceStatus",
-  "getDeviceStatusByDriverId",
-  "getDeviceStatusByProfileId",
   "importDevice",
   "importDeviceTemplate",
+  "listDevice",
+  "listDeviceByIds",
+  "listDeviceByProfileId",
+  "listDeviceStatusByDriverId",
+  "listDeviceStatusByProfileId",
   "updateDevice",
 ]
 `;
@@ -1289,6 +1170,71 @@ exports[`API wrapper contracts > device > importDeviceTemplate maps to its trans
     },
   ],
   "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > device > listDevice maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/device/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > device > listDeviceByIds maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/device/list_by_ids",
+    [
+      "id-1",
+      "id-2",
+    ],
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > device > listDeviceByProfileId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/device/list_by_profile_id",
+    {
+      "params": {
+        "profile_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > device > listDeviceStatusByDriverId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/device/status/list_by_driver_id",
+    {
+      "params": {
+        "driver_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > device > listDeviceStatusByProfileId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/device/status/list_by_profile_id",
+    {
+      "params": {
+        "profile_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
 }
 `;
 
@@ -1382,7 +1328,7 @@ exports[`API wrapper contracts > dictionary > has every export covered by the co
 exports[`API wrapper contracts > driver > getDriverById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/driver/select_by_id",
+    "api/v3/manager/driver/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -1390,35 +1336,6 @@ exports[`API wrapper contracts > driver > getDriverById maps to its transport co
     },
   ],
   "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > driver > getDriverByIds maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/driver/select_by_ids",
-    [
-      "id-1",
-      "id-2",
-    ],
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > driver > getDriverList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/driver/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
 }
 `;
 
@@ -1439,10 +1356,33 @@ exports[`API wrapper contracts > driver > getDriverStatus maps to its transport 
 exports[`API wrapper contracts > driver > has every export covered by the contract matrix 1`] = `
 [
   "getDriverById",
-  "getDriverByIds",
-  "getDriverList",
   "getDriverStatus",
+  "listDriver",
+  "listDriverByIds",
 ]
+`;
+
+exports[`API wrapper contracts > driver > listDriver maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/driver/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > driver > listDriverByIds maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/driver/list_by_ids",
+    [
+      "id-1",
+      "id-2",
+    ],
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > group > addGroup maps to its transport contract 1`] = `
@@ -1477,7 +1417,7 @@ exports[`API wrapper contracts > group > deleteGroup maps to its transport contr
 exports[`API wrapper contracts > group > getGroupById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/group/select_by_id",
+    "api/v3/manager/group/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -1488,30 +1428,24 @@ exports[`API wrapper contracts > group > getGroupById maps to its transport cont
 }
 `;
 
-exports[`API wrapper contracts > group > getGroupList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/group/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
 exports[`API wrapper contracts > group > has every export covered by the contract matrix 1`] = `
 [
   "addGroup",
   "deleteGroup",
   "getGroupById",
-  "getGroupList",
+  "listGroup",
   "updateGroup",
 ]
+`;
+
+exports[`API wrapper contracts > group > listGroup maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/group/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > group > updateGroup maps to its transport contract 1`] = `
@@ -1556,24 +1490,10 @@ exports[`API wrapper contracts > info > addPointInfo maps to its transport contr
 }
 `;
 
-exports[`API wrapper contracts > info > getDriverInfoByDeviceId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/driver_attribute_config/select_by_device_id",
-    {
-      "params": {
-        "device_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > info > getDriverInfoByDeviceIdAndAttributeId maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/driver_attribute_config/select_by_device_id_and_attribute_id",
+    "api/v3/manager/driver_attribute_config/get_by_device_id_and_attribute_id",
     {
       "params": {
         "attribute_id": "attribute-1",
@@ -1585,10 +1505,23 @@ exports[`API wrapper contracts > info > getDriverInfoByDeviceIdAndAttributeId ma
 }
 `;
 
-exports[`API wrapper contracts > info > getPointInfoByDeviceId maps to its transport contract 1`] = `
+exports[`API wrapper contracts > info > has every export covered by the contract matrix 1`] = `
+[
+  "addDriverInfo",
+  "addPointInfo",
+  "getDriverInfoByDeviceIdAndAttributeId",
+  "listDriverInfoByDeviceId",
+  "listPointInfoByDeviceId",
+  "listPointInfoByDeviceIdAndPointId",
+  "updateDriverInfo",
+  "updatePointInfo",
+]
+`;
+
+exports[`API wrapper contracts > info > listDriverInfoByDeviceId maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/point_attribute_config/select_by_device_id",
+    "api/v3/manager/driver_attribute_config/list_by_device_id",
     {
       "params": {
         "device_id": "id-1",
@@ -1599,14 +1532,13 @@ exports[`API wrapper contracts > info > getPointInfoByDeviceId maps to its trans
 }
 `;
 
-exports[`API wrapper contracts > info > getPointInfoByDeviceIdAndPointId maps to its transport contract 1`] = `
+exports[`API wrapper contracts > info > listPointInfoByDeviceId maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/point_attribute_config/select_by_device_id_and_point_id",
+    "api/v3/manager/point_attribute_config/list_by_device_id",
     {
       "params": {
-        "device_id": "device-1",
-        "point_id": "point-1",
+        "device_id": "id-1",
       },
     },
   ],
@@ -1614,17 +1546,19 @@ exports[`API wrapper contracts > info > getPointInfoByDeviceIdAndPointId maps to
 }
 `;
 
-exports[`API wrapper contracts > info > has every export covered by the contract matrix 1`] = `
-[
-  "addDriverInfo",
-  "addPointInfo",
-  "getDriverInfoByDeviceId",
-  "getDriverInfoByDeviceIdAndAttributeId",
-  "getPointInfoByDeviceId",
-  "getPointInfoByDeviceIdAndPointId",
-  "updateDriverInfo",
-  "updatePointInfo",
-]
+exports[`API wrapper contracts > info > listPointInfoByDeviceIdAndPointId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/point_attribute_config/list_by_device_id_and_point_id",
+    {
+      "params": {
+        "device_id": "id-1",
+        "point_id": undefined,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
 `;
 
 exports[`API wrapper contracts > info > updateDriverInfo maps to its transport contract 1`] = `
@@ -1687,7 +1621,7 @@ exports[`API wrapper contracts > label > deleteLabel maps to its transport contr
 exports[`API wrapper contracts > label > getLabelById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/label/select_by_id",
+    "api/v3/manager/label/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -1698,30 +1632,24 @@ exports[`API wrapper contracts > label > getLabelById maps to its transport cont
 }
 `;
 
-exports[`API wrapper contracts > label > getLabelList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/label/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
 exports[`API wrapper contracts > label > has every export covered by the contract matrix 1`] = `
 [
   "addLabel",
   "deleteLabel",
   "getLabelById",
-  "getLabelList",
+  "listLabel",
   "updateLabel",
 ]
+`;
+
+exports[`API wrapper contracts > label > listLabel maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/label/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > label > updateLabel maps to its transport contract 1`] = `
@@ -1770,7 +1698,7 @@ exports[`API wrapper contracts > menu > deleteMenu maps to its transport contrac
 exports[`API wrapper contracts > menu > getMenuById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/auth/menu/select_by_id",
+    "api/v3/auth/menu/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -1781,47 +1709,41 @@ exports[`API wrapper contracts > menu > getMenuById maps to its transport contra
 }
 `;
 
-exports[`API wrapper contracts > menu > getMenuList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/menu/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > menu > getMenuTree maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/menu/tree",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
 exports[`API wrapper contracts > menu > has every export covered by the contract matrix 1`] = `
 [
   "addMenu",
   "deleteMenu",
   "getMenuById",
-  "getMenuList",
-  "getMenuTree",
+  "listMenu",
+  "listMenuTree",
   "updateMenu",
 ]
+`;
+
+exports[`API wrapper contracts > menu > listMenu maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/menu/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > menu > listMenuTree maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/menu/list_tree",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > menu > updateMenu maps to its transport contract 1`] = `
@@ -1867,38 +1789,10 @@ exports[`API wrapper contracts > point > deletePoint maps to its transport contr
 }
 `;
 
-exports[`API wrapper contracts > point > getDeviceByPointId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/point/select_device_statistics_by_point_id",
-    {
-      "params": {
-        "point_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > point > getPointByDeviceId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/point/select_by_device_id",
-    {
-      "params": {
-        "device_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > point > getPointById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/point/select_by_id",
+    "api/v3/manager/point/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -1912,41 +1806,11 @@ exports[`API wrapper contracts > point > getPointById maps to its transport cont
 exports[`API wrapper contracts > point > getPointByIds maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/point/select_by_ids",
+    "api/v3/manager/point/list_by_ids",
     [
       "id-1",
       "id-2",
     ],
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > point > getPointByProfileId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/point/select_by_profile_id",
-    {
-      "params": {
-        "profile_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > point > getPointList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/point/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
   ],
   "transport": "httpPost",
 }
@@ -1968,7 +1832,7 @@ exports[`API wrapper contracts > point > getPointUnit maps to its transport cont
 exports[`API wrapper contracts > point > getPointValueHistory maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/point_value/select_history_by_device_id_and_point_id",
+    "api/v3/data/point_value/list_history_by_device_id_and_point_id",
     {
       "params": {
         "count": 30,
@@ -1991,40 +1855,86 @@ exports[`API wrapper contracts > point > getPointValueLatest maps to its transpo
 }
 `;
 
-exports[`API wrapper contracts > point > getPointValueList maps to its transport contract 1`] = `
+exports[`API wrapper contracts > point > has every export covered by the contract matrix 1`] = `
+[
+  "addPoint",
+  "deletePoint",
+  "getPointById",
+  "getPointByIds",
+  "getPointUnit",
+  "getPointValueHistory",
+  "getPointValueLatest",
+  "listDeviceByPointId",
+  "listPoint",
+  "listPointByDeviceId",
+  "listPointByProfileId",
+  "listPointValue",
+  "readPointValue",
+  "updatePoint",
+  "writePointValue",
+]
+`;
+
+exports[`API wrapper contracts > point > listDeviceByPointId maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/point_value/list",
+    "api/v3/manager/point/list_device_statistics_by_point_id",
     {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
+      "params": {
+        "point_id": "id-1",
       },
     },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > point > listPoint maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/point/list",
+    undefined,
   ],
   "transport": "httpPost",
 }
 `;
 
-exports[`API wrapper contracts > point > has every export covered by the contract matrix 1`] = `
-[
-  "addPoint",
-  "deletePoint",
-  "getDeviceByPointId",
-  "getPointByDeviceId",
-  "getPointById",
-  "getPointByIds",
-  "getPointByProfileId",
-  "getPointList",
-  "getPointUnit",
-  "getPointValueHistory",
-  "getPointValueLatest",
-  "getPointValueList",
-  "readPointValue",
-  "updatePoint",
-  "writePointValue",
-]
+exports[`API wrapper contracts > point > listPointByDeviceId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/point/list_by_device_id",
+    {
+      "params": {
+        "device_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > point > listPointByProfileId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/point/list_by_profile_id",
+    {
+      "params": {
+        "profile_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > point > listPointValue maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/point_value/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > point > readPointValue maps to its transport contract 1`] = `
@@ -2098,24 +2008,10 @@ exports[`API wrapper contracts > profile > deleteProfile maps to its transport c
 }
 `;
 
-exports[`API wrapper contracts > profile > getProfileByDeviceId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/profile/select_by_device_id",
-    {
-      "params": {
-        "device_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > profile > getProfileById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/profile/select_by_id",
+    "api/v3/manager/profile/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -2126,10 +2022,46 @@ exports[`API wrapper contracts > profile > getProfileById maps to its transport 
 }
 `;
 
-exports[`API wrapper contracts > profile > getProfileByIds maps to its transport contract 1`] = `
+exports[`API wrapper contracts > profile > has every export covered by the contract matrix 1`] = `
+[
+  "addProfile",
+  "deleteProfile",
+  "getProfileById",
+  "listProfile",
+  "listProfileByDeviceId",
+  "listProfileByIds",
+  "updateProfile",
+]
+`;
+
+exports[`API wrapper contracts > profile > listProfile maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/profile/select_by_ids",
+    "api/v3/manager/profile/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > profile > listProfileByDeviceId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/profile/list_by_device_id",
+    {
+      "params": {
+        "device_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > profile > listProfileByIds maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/profile/list_by_ids",
     [
       "id-1",
       "id-2",
@@ -2137,34 +2069,6 @@ exports[`API wrapper contracts > profile > getProfileByIds maps to its transport
   ],
   "transport": "httpPost",
 }
-`;
-
-exports[`API wrapper contracts > profile > getProfileList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/profile/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > profile > has every export covered by the contract matrix 1`] = `
-[
-  "addProfile",
-  "deleteProfile",
-  "getProfileByDeviceId",
-  "getProfileById",
-  "getProfileByIds",
-  "getProfileList",
-  "updateProfile",
-]
 `;
 
 exports[`API wrapper contracts > profile > updateProfile maps to its transport contract 1`] = `
@@ -2213,7 +2117,7 @@ exports[`API wrapper contracts > resource > deleteResource maps to its transport
 exports[`API wrapper contracts > resource > getResourceById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/auth/resource/select_by_id",
+    "api/v3/auth/resource/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -2224,47 +2128,41 @@ exports[`API wrapper contracts > resource > getResourceById maps to its transpor
 }
 `;
 
-exports[`API wrapper contracts > resource > getResourceList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/resource/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > resource > getResourceTree maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/resource/tree",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
 exports[`API wrapper contracts > resource > has every export covered by the contract matrix 1`] = `
 [
   "addResource",
   "deleteResource",
   "getResourceById",
-  "getResourceList",
-  "getResourceTree",
+  "listResource",
+  "listResourceTree",
   "updateResource",
 ]
+`;
+
+exports[`API wrapper contracts > resource > listResource maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/resource/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > resource > listResourceTree maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/resource/list_tree",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > resource > updateResource maps to its transport contract 1`] = `
@@ -2313,7 +2211,7 @@ exports[`API wrapper contracts > role > deleteRole maps to its transport contrac
 exports[`API wrapper contracts > role > getRoleById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/auth/role/select_by_id",
+    "api/v3/auth/role/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -2324,47 +2222,41 @@ exports[`API wrapper contracts > role > getRoleById maps to its transport contra
 }
 `;
 
-exports[`API wrapper contracts > role > getRoleList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/role/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > role > getRoleTree maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/role/tree",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
 exports[`API wrapper contracts > role > has every export covered by the contract matrix 1`] = `
 [
   "addRole",
   "deleteRole",
   "getRoleById",
-  "getRoleList",
-  "getRoleTree",
+  "listRole",
+  "listRoleTree",
   "updateRole",
 ]
+`;
+
+exports[`API wrapper contracts > role > listRole maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/role/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > role > listRoleTree maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/role/list_tree",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > role > updateRole maps to its transport contract 1`] = `
@@ -2870,7 +2762,7 @@ exports[`API wrapper contracts > user > deleteUser maps to its transport contrac
 exports[`API wrapper contracts > user > getUserById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/auth/user_profile/select_by_id",
+    "api/v3/auth/user_profile/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -2884,7 +2776,7 @@ exports[`API wrapper contracts > user > getUserById maps to its transport contra
 exports[`API wrapper contracts > user > getUserByName maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/auth/user_profile/select_by_name",
+    "api/v3/auth/user_profile/get_by_name",
     {
       "params": {
         "name": "id-1",
@@ -2895,31 +2787,25 @@ exports[`API wrapper contracts > user > getUserByName maps to its transport cont
 }
 `;
 
-exports[`API wrapper contracts > user > getUserList maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/user_profile/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
 exports[`API wrapper contracts > user > has every export covered by the contract matrix 1`] = `
 [
   "addUser",
   "deleteUser",
   "getUserById",
   "getUserByName",
-  "getUserList",
+  "listUser",
   "updateUser",
 ]
+`;
+
+exports[`API wrapper contracts > user > listUser maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/user_profile/list",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > user > updateUser maps to its transport contract 1`] = `
