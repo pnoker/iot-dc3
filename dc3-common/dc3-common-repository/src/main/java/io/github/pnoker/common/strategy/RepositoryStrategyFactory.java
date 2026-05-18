@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RepositoryStrategyFactory {
 
     // Map to store repository services with name as key
-    private static final Map<String, RepositoryService> repositoryServiceMap = new ConcurrentHashMap<>();
+    private static final Map<String, RepositoryService> REPOSITORY_SERVICE_MAP = new ConcurrentHashMap<>();
 
     // Private constructor to prevent instantiation
     private RepositoryStrategyFactory() {
@@ -51,7 +51,7 @@ public class RepositoryStrategyFactory {
      * @return List of all repository services
      */
     public static List<RepositoryService> get() {
-        return new ArrayList<>(repositoryServiceMap.values());
+        return new ArrayList<>(REPOSITORY_SERVICE_MAP.values());
     }
 
     /**
@@ -65,7 +65,7 @@ public class RepositoryStrategyFactory {
         if (Objects.isNull(key)) {
             return null;
         }
-        return repositoryServiceMap.get(key);
+        return REPOSITORY_SERVICE_MAP.get(key);
     }
 
     /**
@@ -90,7 +90,7 @@ public class RepositoryStrategyFactory {
         if (Objects.isNull(key)) {
             throw new IllegalArgumentException("Repository strategy name must not be blank");
         }
-        repositoryServiceMap.put(key, service);
+        REPOSITORY_SERVICE_MAP.put(key, service);
     }
 
     /**
@@ -103,14 +103,14 @@ public class RepositoryStrategyFactory {
         if (Objects.isNull(key)) {
             return;
         }
-        repositoryServiceMap.remove(key);
+        REPOSITORY_SERVICE_MAP.remove(key);
     }
 
     /**
      * Clear all registered repository services.
      */
     public static void clear() {
-        repositoryServiceMap.clear();
+        REPOSITORY_SERVICE_MAP.clear();
     }
 
     private static String repositoryKey(String name) {

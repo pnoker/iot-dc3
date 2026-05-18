@@ -106,7 +106,7 @@ class ListeningVirtualDriverCustomServiceImplTest {
 
     @AfterEach
     void cleanChannelMap() {
-        NettyTcpServer.deviceChannelMap.clear();
+        NettyTcpServer.DEVICE_CHANNEL_MAP.clear();
     }
 
     @Test
@@ -159,7 +159,7 @@ class ListeningVirtualDriverCustomServiceImplTest {
         DeviceBO device = device(900L);
         PointBO point = point(2L);
         Channel channel = org.mockito.Mockito.mock(Channel.class);
-        NettyTcpServer.deviceChannelMap.put(900L, channel);
+        NettyTcpServer.DEVICE_CHANNEL_MAP.put(900L, channel);
 
         Boolean ok = service.write(null, null, device, point,
                 WritePointValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());

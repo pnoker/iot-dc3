@@ -50,13 +50,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @ConditionalOnBean(MqttReceiveService.class)
 public class MqttScheduleJob extends QuartzJobBean {
 
-    public static final ReentrantReadWriteLock messageLock = new ReentrantReadWriteLock();
+    public static final ReentrantReadWriteLock MESSAGE_LOCK = new ReentrantReadWriteLock();
 
-    public static final AtomicLong messageCount = new AtomicLong(0);
+    public static final AtomicLong MESSAGE_COUNT = new AtomicLong(0);
 
-    public static final AtomicLong messageSpeed = new AtomicLong(0);
+    public static final AtomicLong MESSAGE_SPEED = new AtomicLong(0);
 
-    private static final List<MqttMessage> mqttMessages = new ArrayList<>();
+    private static final List<MqttMessage> MQTT_MESSAGES = new ArrayList<>();
 
     @Resource
     private MqttProperties mqttProperties;
@@ -73,11 +73,11 @@ public class MqttScheduleJob extends QuartzJobBean {
      * @return message size
      */
     public static int getMqttMessagesSize() {
-        messageLock.readLock().lock();
+        MESSAGE_LOCK.readLock().lock();
         try {
-            return mqttMessages.size();
+            return MQTT_MESSAGES.size();
         } finally {
-            messageLock.readLock().unlock();
+            MESSAGE_LOCK.readLock().unlock();
         }
     }
 
@@ -85,11 +85,11 @@ public class MqttScheduleJob extends QuartzJobBean {
      * Clear MqttMessage list
      */
     public static void clearMqttMessages() {
-        messageLock.writeLock().lock();
+        MESSAGE_LOCK.writeLock().lock();
         try {
-            mqttMessages.clear();
+            MQTT_MESSAGES.clear();
         } finally {
-            messageLock.writeLock().unlock();
+            MESSAGE_LOCK.writeLock().unlock();
         }
     }
 
@@ -99,11 +99,11 @@ public class MqttScheduleJob extends QuartzJobBean {
      * @param mqttMessage MqttMessage
      */
     public static void addMqttMessages(MqttMessage mqttMessage) {
-        messageLock.writeLock().lock();
+        MESSAGE_LOCK.writeLock().lock();
         try {
-            mqttMessages.add(mqttMessage);
+            MQTT_MESSAGES.add(mqttMessage);
         } finally {
-            messageLock.writeLock().unlock();
+            MESSAGE_LOCK.writeLock().unlock();
         }
     }
 
@@ -118,8 +118,8 @@ public class MqttScheduleJob extends QuartzJobBean {
         // Calculate MQTT message receive rate
         Integer interval = mqttProperties.getBatch().getInterval();
         Integer batchSpeed = mqttProperties.getBatch().getSpeed();
-        long speed = messageCount.getAndSet(0) / interval;
-        messageSpeed.set(speed);
+        long speed = MESSAGE_COUNT.getAndSet(0) / interval;
+        MESSAGE_SPEED.set(speed);
         if (speed >= batchSpeed) {
             log.debug("Mqtt message receiver speed: {} /s, value size: {}, interval: {}", speed, getMqttMessagesSize(),
                     interval);
@@ -128,15 +128,15 @@ public class MqttScheduleJob extends QuartzJobBean {
         // Process a private snapshot outside the lock so inbound MQTT threads are not
         // blocked by downstream parsing or publishing.
         List<MqttMessage> snapshot;
-        messageLock.writeLock().lock();
+        MESSAGE_LOCK.writeLock().lock();
         try {
-            if (mqttMessages.isEmpty()) {
+            if (MQTT_MESSAGES.isEmpty()) {
                 return;
             }
-            snapshot = new ArrayList<>(mqttMessages);
-            mqttMessages.clear();
+            snapshot = new ArrayList<>(MQTT_MESSAGES);
+            MQTT_MESSAGES.clear();
         } finally {
-            messageLock.writeLock().unlock();
+            MESSAGE_LOCK.writeLock().unlock();
         }
 
         virtualThreadExecutor.execute(() -> receiveBatch(snapshot));

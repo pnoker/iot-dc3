@@ -103,7 +103,7 @@ public class NettyServerHandler {
         }
 
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
-        NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
+        NettyTcpServer.DEVICE_CHANNEL_MAP.put(deviceId, context.channel());
 
         Map<Long, Map<String, AttributeBO>> pointConfigMap = deviceMetadata.getPointConfig(deviceId);
         if (Objects.isNull(pointConfigMap)) {
