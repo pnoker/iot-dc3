@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusFlagEnum;
+import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -92,7 +92,7 @@ public class WebhookNotifyChannelAdapter implements NotifyChannelAdapter {
             if (response.isSuccessful()) {
                 return NotifySendResult.success(target, response.code(), response.message(), responsePayload);
             }
-            return new NotifySendResult(NotifyRecordStatusFlagEnum.FAILED, target, response.code(), response.message(),
+            return new NotifySendResult(NotifyRecordStatusEnum.FAILED, target, response.code(), response.message(),
                     null, responsePayload, response.message());
         } catch (IOException e) {
             return NotifySendResult.failed(target, e.getMessage());

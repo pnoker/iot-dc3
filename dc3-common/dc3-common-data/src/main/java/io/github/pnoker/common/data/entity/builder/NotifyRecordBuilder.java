@@ -25,7 +25,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.NotifyRecordRequestExt;
 import io.github.pnoker.common.entity.ext.NotifyRecordResponseExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusFlagEnum;
+import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -68,7 +68,7 @@ public interface NotifyRecordBuilder {
         NotifyChannelTypeFlagEnum channelTypeFlag = entityBO.getChannelTypeFlag();
         Optional.ofNullable(channelTypeFlag).ifPresent(value -> entityDO.setChannelTypeFlag(value.getIndex()));
 
-        NotifyRecordStatusFlagEnum statusFlag = entityBO.getStatusFlag();
+        NotifyRecordStatusEnum statusFlag = entityBO.getStatusFlag();
         Optional.ofNullable(statusFlag).ifPresent(value -> entityDO.setStatusFlag(value.getIndex()));
     }
 
@@ -106,7 +106,7 @@ public interface NotifyRecordBuilder {
         entityBO.setChannelTypeFlag(NotifyChannelTypeFlagEnum.ofIndex(channelTypeFlag));
 
         Byte statusFlag = entityDO.getStatusFlag();
-        entityBO.setStatusFlag(NotifyRecordStatusFlagEnum.ofIndex(statusFlag));
+        entityBO.setStatusFlag(NotifyRecordStatusEnum.ofIndex(statusFlag));
     }
 
     List<NotifyRecordBO> buildBOListByDOList(List<NotifyRecordDO> entityDOList);

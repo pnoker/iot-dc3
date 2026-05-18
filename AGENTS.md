@@ -158,6 +158,14 @@ Keep persistence, business, and web representations deliberately separated.
   with the enum index, preferably centralized in a builder or helper.
 - Do not introduce magic flag constants such as `private static final Byte DEFAULT = 1`. Add or reuse a domain enum
   instead, with `@EnumValue`, `ofIndex(...)`, and clear names.
+- Domain enum suffixes follow strict semantics:
+  - `*FlagEnum` for boolean-like 0/1 toggles (`EnableFlagEnum`, `DefaultFlagEnum`, `ExpireFlagEnum`).
+  - `*StatusEnum` for state-machine values with multiple states (`DeviceStatusEnum`, `DriverStatusEnum`,
+    `NotifyRecordStatusEnum`). Do not append `Flag` to a state-machine enum name.
+  - `*TypeEnum` for closed classification sets (`MetadataTypeEnum`, `ResponseEnum`-style code groups).
+- Enum constant names use `UPPER_SNAKE_CASE` and stay descriptive — single-letter names like `R`/`W` are not allowed.
+  The internal `code` string field on enums uses lowercase tokens (e.g. `"enable"`, `"online"`, `"pending"`) so that
+  values are consistent across `*FlagEnum`, `*StatusEnum`, and `*TypeEnum` definitions.
 - Do not expose secrets in `VO` classes, and exclude secret-bearing fields such as `apiKey`, `password`, `secret`,
   `token`, and credentials from Lombok `@ToString`.
 

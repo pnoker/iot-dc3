@@ -33,7 +33,7 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum NotifyRecordStatusFlagEnum {
+public enum NotifyRecordStatusEnum {
 
     PENDING((byte) 0, "pending", "Pending"),
 
@@ -53,21 +53,21 @@ public enum NotifyRecordStatusFlagEnum {
 
     private final String remark;
 
-    public static NotifyRecordStatusFlagEnum ofIndex(Byte index) {
-        Optional<NotifyRecordStatusFlagEnum> any = Arrays.stream(NotifyRecordStatusFlagEnum.values())
+    public static NotifyRecordStatusEnum ofIndex(Byte index) {
+        Optional<NotifyRecordStatusEnum> any = Arrays.stream(NotifyRecordStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static NotifyRecordStatusFlagEnum ofCode(String code) {
-        Optional<NotifyRecordStatusFlagEnum> any = Arrays.stream(NotifyRecordStatusFlagEnum.values())
+    public static NotifyRecordStatusEnum ofCode(String code) {
+        Optional<NotifyRecordStatusEnum> any = Arrays.stream(NotifyRecordStatusEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static NotifyRecordStatusFlagEnum ofName(String name) {
+    public static NotifyRecordStatusEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

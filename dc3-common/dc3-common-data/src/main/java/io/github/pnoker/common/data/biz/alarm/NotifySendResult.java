@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.enums.NotifyRecordStatusFlagEnum;
+import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +40,7 @@ import java.util.Map;
 @ToString
 public class NotifySendResult {
 
-    private NotifyRecordStatusFlagEnum statusFlag;
+    private NotifyRecordStatusEnum statusFlag;
 
     private String target;
 
@@ -56,17 +56,17 @@ public class NotifySendResult {
 
     public static NotifySendResult success(String target, Integer statusCode, String statusMessage,
                                            Map<String, Object> responsePayload) {
-        return new NotifySendResult(NotifyRecordStatusFlagEnum.SUCCESS, target, statusCode, statusMessage, null,
+        return new NotifySendResult(NotifyRecordStatusEnum.SUCCESS, target, statusCode, statusMessage, null,
                 responsePayload, null);
     }
 
     public static NotifySendResult failed(String target, String errorMessage) {
-        return new NotifySendResult(NotifyRecordStatusFlagEnum.FAILED, target, null, null, null, Map.of(),
+        return new NotifySendResult(NotifyRecordStatusEnum.FAILED, target, null, null, null, Map.of(),
                 errorMessage);
     }
 
     public static NotifySendResult skipped(String target, String reason) {
-        return new NotifySendResult(NotifyRecordStatusFlagEnum.SKIPPED, target, null, null, null, Map.of(), reason);
+        return new NotifySendResult(NotifyRecordStatusEnum.SKIPPED, target, null, null, null, Map.of(), reason);
     }
 
 }
