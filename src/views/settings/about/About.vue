@@ -28,12 +28,10 @@
         <el-descriptions-item :label="t('settings.about.version')">v{{ version }}</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.license')">AGPL-3.0</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.docs')">
-          <el-link href="https://iotdc3.com" target="_blank" type="primary">iotdc3.com</el-link>
+          <external-link href="https://iotdc3.com">iotdc3.com</external-link>
         </el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.repo')">
-          <el-link href="https://github.com/pnoker/iot-dc3" target="_blank" type="primary">
-            github.com/pnoker/iot-dc3
-          </el-link>
+          <external-link href="https://github.com/pnoker/iot-dc3">github.com/pnoker/iot-dc3</external-link>
         </el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.copyright')">
           © 2016-present the IoT DC3 original author or authors
@@ -53,16 +51,16 @@
         <span class="about__title">{{ t('settings.about.architectureTitle') }}</span>
       </template>
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="Driver Layer">
+        <el-descriptions-item :label="t('settings.about.architectureLabels.driver')">
           {{ t('settings.about.architecture.driver') }}
         </el-descriptions-item>
-        <el-descriptions-item label="Data Layer">
+        <el-descriptions-item :label="t('settings.about.architectureLabels.data')">
           {{ t('settings.about.architecture.data') }}
         </el-descriptions-item>
-        <el-descriptions-item label="Management Layer">
+        <el-descriptions-item :label="t('settings.about.architectureLabels.management')">
           {{ t('settings.about.architecture.management') }}
         </el-descriptions-item>
-        <el-descriptions-item label="Application Layer">
+        <el-descriptions-item :label="t('settings.about.architectureLabels.application')">
           {{ t('settings.about.architecture.application') }}
         </el-descriptions-item>
       </el-descriptions>
@@ -82,14 +80,9 @@
         <span class="about__title">{{ t('settings.about.licenseTitle') }}</span>
       </template>
       <p class="about__intro">{{ t('settings.about.licenseDetail') }}</p>
-      <el-link
-        class="about__license-link"
-        href="https://www.gnu.org/licenses/agpl-3.0.html"
-        target="_blank"
-        type="primary"
-      >
+      <external-link class="about__license-link" href="https://www.gnu.org/licenses/agpl-3.0.html">
         AGPL-3.0 Full Text
-      </el-link>
+      </external-link>
     </el-card>
   </div>
 </template>

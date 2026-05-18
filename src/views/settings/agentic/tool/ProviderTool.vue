@@ -26,11 +26,16 @@
     @current-change="$emit('current-change', $event)"
   >
     <template #filters>
-      <el-form-item label="Name" prop="name">
-        <el-input v-model="formData.name" clearable placeholder="Provider name" />
+      <el-form-item :label="$t('settings.agentic.providerName')" prop="name">
+        <el-input v-model="formData.name" clearable :placeholder="$t('settings.agentic.providerNamePlaceholder')" />
       </el-form-item>
-      <el-form-item label="Type" prop="providerType">
-        <el-select v-model="formData.providerType" clearable placeholder="All types" style="width: 100%">
+      <el-form-item :label="$t('settings.agentic.providerType')" prop="providerType">
+        <el-select
+          v-model="formData.providerType"
+          clearable
+          :placeholder="$t('settings.agentic.providerTypeAllPlaceholder')"
+          style="width: 100%"
+        >
           <el-option v-for="pt in providerTypes" :key="pt.value" :label="pt.label" :value="pt.value" />
         </el-select>
       </el-form-item>
@@ -59,10 +64,9 @@
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
-  const providerTypes = [
-    { label: 'OpenAI Compatible', value: 'OPENAI_COMPATIBLE' },
-    { label: 'Anthropic', value: 'ANTHROPIC' },
-  ];
+  import { AGENTIC_PROVIDER_TYPES } from '../providerTypes';
+
+  const providerTypes = AGENTIC_PROVIDER_TYPES;
 
   defineProps<{
     page: Record<string, any>;

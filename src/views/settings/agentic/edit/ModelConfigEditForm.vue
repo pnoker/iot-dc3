@@ -21,43 +21,47 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
-    :title="isEdit ? 'Edit Model' : 'Add Model'"
+    :title="isEdit ? $t('settings.agentic.editModel') : $t('settings.agentic.addModel')"
     class="things-dialog"
     draggable
     @closed="onClosed"
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-      <el-form-item label="Model" prop="model">
-        <el-input v-model="form.model" clearable placeholder="gpt-4o-mini" />
+      <el-form-item :label="$t('settings.agentic.model')" prop="model">
+        <el-input v-model="form.model" clearable :placeholder="$t('settings.agentic.modelPlaceholder')" />
       </el-form-item>
-      <el-form-item label="Label" prop="label">
-        <el-input v-model="form.label" clearable placeholder="GPT-4o Mini" />
+      <el-form-item :label="$t('settings.agentic.label')" prop="label">
+        <el-input v-model="form.label" clearable :placeholder="$t('settings.agentic.labelPlaceholder')" />
       </el-form-item>
-      <el-form-item label="Provider" prop="providerId">
-        <el-select v-model="form.providerId" placeholder="Select a provider" style="width: 100%">
+      <el-form-item :label="$t('settings.agentic.provider')" prop="providerId">
+        <el-select
+          v-model="form.providerId"
+          :placeholder="$t('settings.agentic.providerPlaceholder')"
+          style="width: 100%"
+        >
           <el-option v-for="p in props.providers" :key="p.id" :label="p.name" :value="p.id!" />
         </el-select>
       </el-form-item>
-      <el-form-item label="Capabilities">
+      <el-form-item :label="$t('settings.agentic.capabilities')">
         <div class="agentic-form-flags">
-          <el-checkbox v-model="form.stream">Stream</el-checkbox>
-          <el-checkbox v-model="form.toolCall">Tools</el-checkbox>
-          <el-checkbox v-model="form.vision">Vision</el-checkbox>
-          <el-checkbox v-model="form.reasoning">Reasoning</el-checkbox>
+          <el-checkbox v-model="form.stream">{{ $t('agentic.capStream') }}</el-checkbox>
+          <el-checkbox v-model="form.toolCall">{{ $t('agentic.capTools') }}</el-checkbox>
+          <el-checkbox v-model="form.vision">{{ $t('agentic.capVision') }}</el-checkbox>
+          <el-checkbox v-model="form.reasoning">{{ $t('agentic.capReasoning') }}</el-checkbox>
         </div>
       </el-form-item>
-      <el-form-item label="Temperature">
+      <el-form-item :label="$t('settings.agentic.temperature')">
         <el-slider v-model="form.temperature" :max="2" :min="0" :step="0.1" />
       </el-form-item>
-      <el-form-item label="Max Tokens" prop="maxTokens">
+      <el-form-item :label="$t('settings.agentic.maxTokens')" prop="maxTokens">
         <el-input-number v-model="form.maxTokens" :min="1" :step="256" controls-position="right" />
       </el-form-item>
-      <el-form-item label="Default">
+      <el-form-item :label="$t('settings.agentic.default')">
         <el-switch
           v-model="form.defaultFlag"
-          active-text="Yes"
+          :active-text="$t('common.yes')"
           active-value="DEFAULT"
-          inactive-text="No"
+          :inactive-text="$t('common.no')"
           inactive-value="NOT_DEFAULT"
         />
       </el-form-item>
@@ -79,7 +83,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { computed, reactive, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import type { FormInstance, FormRules } from 'element-plus';
 
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
@@ -97,6 +102,7 @@
   const isEdit = ref(false);
   const submitting = ref(false);
   const formRef = ref<FormInstance>();
+  const { t } = useI18n();
 
   const initialForm = (): AgenticModelConfig => ({
     model: '',
@@ -115,11 +121,11 @@
 
   const form = reactive<AgenticModelConfig>(initialForm());
 
-  const rules: FormRules = {
-    model: [{ required: true, message: 'Model is required', trigger: 'blur' }],
-    providerId: [{ required: true, message: 'Provider is required', trigger: 'change' }],
-    maxTokens: [{ required: true, message: 'Max tokens is required', trigger: 'blur' }],
-  };
+  const rules = computed<FormRules>(() => ({
+    model: [{ required: true, message: t('settings.agentic.modelRequired'), trigger: 'blur' }],
+    providerId: [{ required: true, message: t('settings.agentic.providerRequired'), trigger: 'change' }],
+    maxTokens: [{ required: true, message: t('settings.agentic.maxTokensRequired'), trigger: 'blur' }],
+  }));
 
   const show = () => {
     isEdit.value = false;

@@ -1,0 +1,353 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import type { FormInstance, FormRules } from 'element-plus';
+import { computed, reactive, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+
+import type { AlarmEntityRecord, Order, PageQuery } from '@/config/types';
+import { timestamp } from '@/utils/dateUtil';
+import { failMessage, successMessage } from '@/utils/notificationUtil';
+import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+
+import {
+  ALARM_DETAIL_ROUTE_MAP,
+  createAlarmEntityConfigs,
+  type AlarmColumnConfig,
+  type AlarmEntityConfig,
+  type AlarmTabKey,
+} from './alarmEntityConfig';
+
+export interface AlarmEntityPageProps {
+  entity: AlarmTabKey;
+}
+
+export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
+  const { t } = useI18n();
+  const router = useRouter();
+  const { configs, enableFilterOptions } = createAlarmEntityConfigs((key) => t(key));
+
+  const formVisible = ref(false);
+  const editing = ref(false);
+  const formRef = ref<FormInstance>();
+  const setFormRef = (instance: unknown) => {
+    formRef.value = (instance || undefined) as FormInstance | undefined;
+  };
+  const formModel = reactive<Record<string, any>>({});
+  const searchForm = reactive<Record<string, any>>({
+    keyword: '',
+    filterValue: '',
+  });
+
+  const state = reactive({
+    loading: false,
+    saving: false,
+    rows: [] as AlarmEntityRecord[],
+    page: {
+      total: 0,
+      size: 12,
+      current: 1,
+      orders: [{ column: 'create_time', asc: false }] as Order[],
+    },
+  });
+
+  const defaultConfig = configs[0] as AlarmEntityConfig;
+  const activeConfig = computed<AlarmEntityConfig>(
+    () => configs.find((config) => config.key === props.entity) || defaultConfig
+  );
+  const dialogTitle = computed(() =>
+    editing.value ? `${t('common.edit')} ${activeConfig.value.label}` : `${t('common.add')} ${activeConfig.value.label}`
+  );
+  const formRules = computed<FormRules>(() => {
+    const rules: FormRules = {};
+    activeConfig.value.fields
+      .filter((field) => field.required)
+      .forEach((field) => {
+        rules[field.prop] = [{ required: true, message: t('settings.alarm.required'), trigger: 'blur' }];
+      });
+    return rules;
+  });
+
+  const query = (): PageQuery => {
+    const config = activeConfig.value;
+    const params = cleanSearchParams(searchForm);
+    const result: PageQuery = {
+      page: {
+        current: state.page.current,
+        size: state.page.size,
+        orders: state.page.orders,
+      },
+    };
+    if (config.searchProp && params.keyword) {
+      result[config.searchProp] = String(params.keyword).trim();
+    }
+    if (config.filterProp && params.filterValue) {
+      result[config.filterProp] = params.filterValue;
+    }
+    return result;
+  };
+
+  const load = () => {
+    state.loading = true;
+    activeConfig.value
+      .list(query())
+      .then((res: R) => {
+        const page = res.data || {};
+        state.rows = page.records || [];
+        state.page.total = Number(page.total || 0);
+      })
+      .catch(() => {
+        // handled globally
+      })
+      .finally(() => {
+        state.loading = false;
+      });
+  };
+
+  const search = (params: Record<string, any>) => {
+    Object.assign(searchForm, params || {});
+    state.page.current = 1;
+    load();
+  };
+
+  const reset = () => {
+    resetSearchForm(searchForm, { keyword: '', filterValue: '' });
+    state.page.current = 1;
+    load();
+  };
+
+  const sort = () => {
+    const currentOrder = state.page.orders[0];
+    const asc = currentOrder ? !currentOrder.asc : true;
+    state.page.orders = [{ column: 'create_time', asc }];
+    load();
+  };
+
+  const sizeChange = (size: number) => {
+    state.page.size = size;
+    state.page.current = 1;
+    load();
+  };
+
+  const currentChange = (current: number) => {
+    state.page.current = current;
+    load();
+  };
+
+  const prettyJson = (value: unknown) => {
+    if (value == null || value === '') return '{}';
+    if (typeof value === 'string') {
+      try {
+        return JSON.stringify(JSON.parse(value), null, 2);
+      } catch {
+        return value;
+      }
+    }
+    return JSON.stringify(value, null, 2);
+  };
+
+  const assignForm = (value: Record<string, unknown>) => {
+    Object.keys(formModel).forEach((key) => delete formModel[key]);
+    Object.assign(formModel, value);
+    activeConfig.value.fields
+      .filter((field) => field.kind === 'json')
+      .forEach((field) => {
+        formModel[field.prop] = prettyJson(formModel[field.prop]);
+      });
+  };
+
+  const openAdd = () => {
+    editing.value = false;
+    assignForm(activeConfig.value.defaultForm());
+    formVisible.value = true;
+  };
+
+  const resetForm = () => {
+    if (!editing.value) {
+      assignForm(activeConfig.value.defaultForm());
+    }
+    formRef.value?.clearValidate();
+  };
+
+  const openEdit = (row: AlarmEntityRecord) => {
+    editing.value = true;
+    const value = activeConfig.value.defaultForm();
+    value.id = row.id;
+    if (row.version) value.version = row.version;
+    activeConfig.value.fields.forEach((field) => {
+      value[field.prop] = row[field.prop] ?? value[field.prop];
+    });
+    assignForm(value);
+    formVisible.value = true;
+  };
+
+  const openDetail = (row: AlarmEntityRecord) => {
+    router.push({ name: ALARM_DETAIL_ROUTE_MAP[activeConfig.value.key], query: { id: String(row.id) } }).catch(() => {
+      // handled globally
+    });
+  };
+
+  const payload = () => {
+    const result: Record<string, unknown> = {};
+    if (formModel.id) result.id = formModel.id;
+    if (formModel.version) result.version = formModel.version;
+    activeConfig.value.fields.forEach((field) => {
+      const value = formModel[field.prop];
+      if (field.kind === 'json') {
+        result[field.prop] = value ? JSON.parse(value) : undefined;
+      } else if (field.kind === 'number') {
+        result[field.prop] = value === '' || value == null ? undefined : Number(value);
+      } else {
+        result[field.prop] = value;
+      }
+    });
+    return result;
+  };
+
+  const submit = () => {
+    const addRequest = activeConfig.value.add;
+    const updateRequest = activeConfig.value.update;
+    if (!addRequest || !updateRequest) return;
+    formRef.value?.validate((valid) => {
+      if (!valid) return;
+      let data: Record<string, unknown>;
+      try {
+        data = payload();
+      } catch (error) {
+        failMessage(t('settings.alarm.invalidJson'), undefined, error);
+        return;
+      }
+      state.saving = true;
+      const request = editing.value ? updateRequest(data) : addRequest(data);
+      request
+        .then(() => {
+          successMessage();
+          formVisible.value = false;
+          load();
+        })
+        .catch(() => {
+          // handled globally
+        })
+        .finally(() => {
+          state.saving = false;
+        });
+    });
+  };
+
+  const remove = (id: string) => {
+    const removeRequest = activeConfig.value.remove;
+    if (!removeRequest) return;
+    removeRequest(id)
+      .then(() => {
+        successMessage();
+        load();
+      })
+      .catch(() => {
+        // handled globally
+      });
+  };
+
+  const formatTime = (value: unknown) => {
+    if (!value) return '-';
+    return timestamp(String(value)) || '-';
+  };
+
+  const enumLabel = (value: unknown) => {
+    const text = String(value || '');
+    const map: Record<string, string> = {
+      ENABLE: t('common.enable'),
+      DISABLE: t('common.disable'),
+      AUTO: t('settings.alarm.auto'),
+      MANUAL: t('settings.alarm.manual'),
+      POINT: t('settings.alarm.point'),
+      DEVICE: t('settings.alarm.device'),
+      DRIVER: t('settings.alarm.driver'),
+      NORMAL: t('settings.alarm.normal'),
+      FIRING: t('settings.alarm.firing'),
+      RECOVERED: t('settings.alarm.recovered'),
+      PENDING: t('settings.alarm.pending'),
+      SUCCESS: t('settings.alarm.success'),
+      FAILED: t('settings.alarm.failed'),
+      RETRYING: t('settings.alarm.retrying'),
+      SKIPPED: t('settings.alarm.skipped'),
+      P0: 'P0',
+      P1: 'P1',
+      P2: 'P2',
+      P3: 'P3',
+      FEISHU_BOT: 'Feishu Bot',
+      WEBHOOK: 'Webhook',
+      EMAIL: 'Email',
+    };
+    return map[text] || text || '-';
+  };
+
+  const tagType = (value: unknown, prop: string) => {
+    const text = String(value || '');
+    if (text === 'ENABLE' || text === 'SUCCESS' || text === 'NORMAL' || text === 'AUTO') return 'success';
+    if (text === 'DISABLE' || text === 'FAILED' || text === 'FIRING') return 'danger';
+    if (text === 'PENDING' || text === 'RETRYING' || text === 'RECOVERED' || prop === 'channelTypeFlag')
+      return 'warning';
+    return 'info';
+  };
+
+  const formatCell = (row: AlarmEntityRecord, column: AlarmColumnConfig) => {
+    const value = row[column.prop];
+    if (column.kind === 'time') return formatTime(value);
+    if (column.kind === 'tag') return enumLabel(value);
+    if (value == null || value === '') return '-';
+    return String(value);
+  };
+
+  watch(
+    () => props.entity,
+    () => {
+      resetSearchForm(searchForm, { keyword: '', filterValue: '' });
+      state.page.current = 1;
+      formVisible.value = false;
+      load();
+    }
+  );
+
+  load();
+
+  return {
+    t,
+    enableFilterOptions,
+    formVisible,
+    setFormRef,
+    formModel,
+    searchForm,
+    state,
+    activeConfig,
+    dialogTitle,
+    formRules,
+    load,
+    search,
+    reset,
+    sort,
+    sizeChange,
+    currentChange,
+    openAdd,
+    resetForm,
+    openEdit,
+    openDetail,
+    submit,
+    remove,
+    tagType,
+    formatCell,
+  };
+};

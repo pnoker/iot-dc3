@@ -29,21 +29,27 @@
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column label="Name" min-width="160" prop="name" show-overflow-tooltip />
-        <el-table-column label="Type" min-width="150" prop="providerType" show-overflow-tooltip />
-        <el-table-column label="Base URL" min-width="200" prop="baseUrl" show-overflow-tooltip />
-        <el-table-column label="Default" width="100">
+        <el-table-column
+          :label="$t('settings.agentic.providerName')"
+          min-width="160"
+          prop="name"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          :label="$t('settings.agentic.providerType')"
+          min-width="150"
+          prop="providerType"
+          show-overflow-tooltip
+        />
+        <el-table-column :label="$t('settings.agentic.baseUrl')" min-width="200" prop="baseUrl" show-overflow-tooltip />
+        <el-table-column :label="$t('settings.agentic.default')" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.defaultFlag === 'DEFAULT' ? 'success' : 'info'" size="small">
-              {{ row.defaultFlag === 'DEFAULT' ? $t('common.yes') : $t('common.no') }}
-            </el-tag>
+            <default-tag :value="row.defaultFlag" size="small" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.enable')" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.enableFlag === 'ENABLE' ? 'success' : 'info'" size="small">
-              {{ row.enableFlag === 'ENABLE' ? $t('common.enable') : $t('common.disable') }}
-            </el-tag>
+            <enable-tag :value="row.enableFlag" size="small" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
@@ -58,7 +64,7 @@
             <el-popconfirm
               :cancel-button-text="$t('common.cancel')"
               :confirm-button-text="$t('common.confirm')"
-              :title="`Delete provider ${row.name}?`"
+              :title="$t('settings.agentic.confirmDeleteProvider', { name: row.name })"
               @confirm="remove(row)"
             >
               <template #reference>
@@ -78,11 +84,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { ref } from 'vue';
   import { useRouter } from 'vue-router';
 
   import { addAgenticProvider, deleteAgenticProvider, getAgenticProviders, updateAgenticProvider } from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
+  import DefaultTag from '@/components/tag/DefaultTag.vue';
+  import EnableTag from '@/components/tag/EnableTag.vue';
+  import { usePagedList } from '@/composables/usePagedList';
   import type { AgenticProvider } from '@/config/types';
   import { successMessage } from '@/utils/notificationUtil';
 
@@ -92,75 +101,47 @@
   const router = useRouter();
   const editRef = ref<InstanceType<typeof providerEditForm>>();
 
-  const reactiveData = reactive({
-    loading: false,
-    listData: [] as AgenticProvider[],
-    allData: [] as AgenticProvider[],
-    query: {} as Record<string, any>,
-    order: false,
-    page: {
-      total: 0,
-      size: 12,
-      current: 1,
-      orders: [] as { column: string; asc: boolean }[],
+  interface ProviderQuery {
+    name?: string;
+    providerType?: string;
+    enableFlag?: string;
+  }
+
+  const {
+    state: reactiveData,
+    setAllData,
+    search,
+    reset,
+    sort,
+    sizeChange,
+    currentChange,
+    withLoading,
+  } = usePagedList<AgenticProvider, ProviderQuery>({
+    filter: (rows, query) => {
+      let filtered = rows;
+      if (query.name) {
+        const name = String(query.name).toLowerCase();
+        filtered = filtered.filter((row) => row.name.toLowerCase().includes(name));
+      }
+      if (query.providerType) {
+        const providerType = String(query.providerType).toLowerCase();
+        filtered = filtered.filter((row) => row.providerType.toLowerCase().includes(providerType));
+      }
+      if (query.enableFlag) {
+        filtered = filtered.filter((row) => row.enableFlag === query.enableFlag);
+      }
+      return filtered;
     },
+    sortValue: (row) => row.createTime,
   });
 
-  const load = async () => {
-    reactiveData.loading = true;
-    try {
+  const load = () =>
+    withLoading(async () => {
       const response = await getAgenticProviders();
-      reactiveData.allData = response.data || [];
-      applyFilters();
-    } finally {
-      reactiveData.loading = false;
-    }
-  };
-
-  const applyFilters = () => {
-    let filtered = [...reactiveData.allData];
-    const q = reactiveData.query;
-    if (q.name) {
-      const n = String(q.name).toLowerCase();
-      filtered = filtered.filter((r) => r.name.toLowerCase().includes(n));
-    }
-    if (q.providerType) {
-      const t = String(q.providerType).toLowerCase();
-      filtered = filtered.filter((r) => r.providerType.toLowerCase().includes(t));
-    }
-    if (q.enableFlag) {
-      filtered = filtered.filter((r) => r.enableFlag === q.enableFlag);
-    }
-    reactiveData.page.total = filtered.length;
-    const start = (reactiveData.page.current - 1) * reactiveData.page.size;
-    reactiveData.listData = filtered.slice(start, start + reactiveData.page.size);
-  };
-
-  const search = (params: Record<string, any>) => {
-    reactiveData.query = params || {};
-    reactiveData.page.current = 1;
-    applyFilters();
-  };
-
-  const reset = () => {
-    reactiveData.query = {};
-    reactiveData.page.current = 1;
-    applyFilters();
-  };
+      setAllData(response.data || []);
+    });
 
   const refresh = () => load();
-
-  const sort = () => {
-    reactiveData.order = !reactiveData.order;
-    reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
-    reactiveData.allData.sort((a: Record<string, any>, b: Record<string, any>) => {
-      const aTime = a.createTime || '';
-      const bTime = b.createTime || '';
-      const cmp = aTime.localeCompare(bTime);
-      return reactiveData.order ? cmp : -cmp;
-    });
-    applyFilters();
-  };
 
   const openAdd = () => editRef.value?.show();
   const openDetail = (row: AgenticProvider) => {
@@ -189,17 +170,6 @@
         load();
       })
       .catch(() => {});
-  };
-
-  const sizeChange = (size: number) => {
-    reactiveData.page.size = size;
-    reactiveData.page.current = 1;
-    applyFilters();
-  };
-
-  const currentChange = (current: number) => {
-    reactiveData.page.current = current;
-    applyFilters();
   };
 
   load();

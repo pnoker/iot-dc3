@@ -21,20 +21,20 @@
         <el-tab-pane :label="$t('nav.settingsAgenticProviderDetail')" name="detail">
           <detail-card>
             <el-descriptions :column="2" border>
-              <el-descriptions-item label="Name">{{ reactiveData.data.name || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="Type">{{ reactiveData.data.providerType || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="Base URL" :span="2">
+              <el-descriptions-item :label="$t('settings.agentic.providerName')">
+                {{ reactiveData.data.name || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.agentic.providerType')">
+                {{ reactiveData.data.providerType || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.agentic.baseUrl')" :span="2">
                 {{ reactiveData.data.baseUrl || '-' }}
               </el-descriptions-item>
-              <el-descriptions-item label="Default">
-                <el-tag :type="reactiveData.data.defaultFlag === 'DEFAULT' ? 'success' : 'info'">
-                  {{ reactiveData.data.defaultFlag === 'DEFAULT' ? $t('common.yes') : $t('common.no') }}
-                </el-tag>
+              <el-descriptions-item :label="$t('settings.agentic.default')">
+                <default-tag :value="reactiveData.data.defaultFlag" />
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.enable')">
-                <el-tag :type="reactiveData.data.enableFlag === 'ENABLE' ? 'success' : 'info'">
-                  {{ reactiveData.data.enableFlag === 'ENABLE' ? $t('common.enable') : $t('common.disable') }}
-                </el-tag>
+                <enable-tag :value="reactiveData.data.enableFlag" />
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.remark')" :span="2">
                 {{ reactiveData.data.remark || '-' }}
@@ -54,6 +54,8 @@
   import { getAgenticProviders } from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
+  import DefaultTag from '@/components/tag/DefaultTag.vue';
+  import EnableTag from '@/components/tag/EnableTag.vue';
   import type { AgenticProvider } from '@/config/types';
 
   const route = useRoute();

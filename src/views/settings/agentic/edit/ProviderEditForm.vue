@@ -21,32 +21,42 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
-    :title="isEdit ? 'Edit Provider' : 'Add Provider'"
+    :title="isEdit ? $t('settings.agentic.editProvider') : $t('settings.agentic.addProvider')"
     class="things-dialog"
     draggable
     @closed="onClosed"
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-      <el-form-item label="Name" prop="name">
-        <el-input v-model="form.name" clearable placeholder="My Provider" />
+      <el-form-item :label="$t('settings.agentic.providerName')" prop="name">
+        <el-input v-model="form.name" clearable :placeholder="$t('settings.agentic.providerNamePlaceholder')" />
       </el-form-item>
-      <el-form-item label="Type" prop="providerType">
-        <el-select v-model="form.providerType" placeholder="Select a provider type" style="width: 100%">
+      <el-form-item :label="$t('settings.agentic.providerType')" prop="providerType">
+        <el-select
+          v-model="form.providerType"
+          :placeholder="$t('settings.agentic.providerTypePlaceholder')"
+          style="width: 100%"
+        >
           <el-option v-for="pt in providerTypes" :key="pt.value" :label="pt.label" :value="pt.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="Base URL" prop="baseUrl">
-        <el-input v-model="form.baseUrl" clearable placeholder="https://api.openai.com" />
+      <el-form-item :label="$t('settings.agentic.baseUrl')" prop="baseUrl">
+        <el-input v-model="form.baseUrl" clearable :placeholder="$t('settings.agentic.baseUrlPlaceholder')" />
       </el-form-item>
-      <el-form-item label="API Key" prop="apiKey">
-        <el-input v-model="form.apiKey" clearable placeholder="sk-..." show-password type="password" />
+      <el-form-item :label="$t('settings.agentic.apiKey')" prop="apiKey">
+        <el-input
+          v-model="form.apiKey"
+          clearable
+          :placeholder="$t('settings.agentic.apiKeyPlaceholder')"
+          show-password
+          type="password"
+        />
       </el-form-item>
-      <el-form-item label="Default">
+      <el-form-item :label="$t('settings.agentic.default')">
         <el-switch
           v-model="form.defaultFlag"
-          active-text="Yes"
+          :active-text="$t('common.yes')"
           active-value="DEFAULT"
-          inactive-text="No"
+          :inactive-text="$t('common.no')"
           inactive-value="NOT_DEFAULT"
         />
       </el-form-item>
@@ -68,16 +78,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { computed, reactive, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import type { FormInstance, FormRules } from 'element-plus';
 
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import type { AgenticProvider } from '@/config/types';
 
-  const providerTypes = [
-    { label: 'OpenAI Compatible', value: 'OPENAI_COMPATIBLE' },
-    { label: 'Anthropic', value: 'ANTHROPIC' },
-  ];
+  import { AGENTIC_PROVIDER_TYPES } from '../providerTypes';
+
+  const providerTypes = AGENTIC_PROVIDER_TYPES;
 
   const emit = defineEmits<{
     (e: 'save', form: AgenticProvider & { apiKey?: string }, done: () => void): void;
@@ -87,6 +97,7 @@
   const isEdit = ref(false);
   const submitting = ref(false);
   const formRef = ref<FormInstance>();
+  const { t } = useI18n();
 
   const initialForm = (): AgenticProvider & { apiKey?: string } => ({
     name: '',
@@ -100,10 +111,10 @@
 
   const form = reactive(initialForm());
 
-  const rules: FormRules = {
-    name: [{ required: true, message: 'Name is required', trigger: 'blur' }],
-    baseUrl: [{ required: true, message: 'Base URL is required', trigger: 'blur' }],
-  };
+  const rules = computed<FormRules>(() => ({
+    name: [{ required: true, message: t('settings.agentic.nameRequired'), trigger: 'blur' }],
+    baseUrl: [{ required: true, message: t('settings.agentic.baseUrlRequired'), trigger: 'blur' }],
+  }));
 
   const show = () => {
     isEdit.value = false;

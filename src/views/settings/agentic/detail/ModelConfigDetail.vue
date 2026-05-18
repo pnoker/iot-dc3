@@ -21,32 +21,44 @@
         <el-tab-pane :label="$t('nav.settingsAgenticDetail')" name="detail">
           <detail-card>
             <el-descriptions :column="2" border>
-              <el-descriptions-item label="Label">{{ reactiveData.data.label || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="Model">{{ reactiveData.data.model || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="Provider">{{ reactiveData.data.providerName || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="Provider ID">{{ reactiveData.data.providerId || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="Capabilities" :span="2">
+              <el-descriptions-item :label="$t('settings.agentic.label')">
+                {{ reactiveData.data.label || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.agentic.model')">
+                {{ reactiveData.data.model || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.agentic.provider')">
+                {{ reactiveData.data.providerName || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.agentic.providerId')">
+                {{ reactiveData.data.providerId || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.agentic.capabilities')" :span="2">
                 <div class="agentic-tags">
-                  <el-tag :type="reactiveData.data.stream ? 'success' : 'info'" size="small">Stream</el-tag>
-                  <el-tag :type="reactiveData.data.toolCall ? 'success' : 'info'" size="small">Tools</el-tag>
-                  <el-tag :type="reactiveData.data.vision ? 'success' : 'info'" size="small">Vision</el-tag>
-                  <el-tag :type="reactiveData.data.reasoning ? 'success' : 'info'" size="small">Reasoning</el-tag>
+                  <el-tag :type="reactiveData.data.stream ? 'success' : 'info'" size="small">
+                    {{ $t('agentic.capStream') }}
+                  </el-tag>
+                  <el-tag :type="reactiveData.data.toolCall ? 'success' : 'info'" size="small">
+                    {{ $t('agentic.capTools') }}
+                  </el-tag>
+                  <el-tag :type="reactiveData.data.vision ? 'success' : 'info'" size="small">
+                    {{ $t('agentic.capVision') }}
+                  </el-tag>
+                  <el-tag :type="reactiveData.data.reasoning ? 'success' : 'info'" size="small">
+                    {{ $t('agentic.capReasoning') }}
+                  </el-tag>
                 </div>
               </el-descriptions-item>
-              <el-descriptions-item label="Default">
-                <el-tag :type="reactiveData.data.defaultFlag === 'DEFAULT' ? 'success' : 'info'">
-                  {{ reactiveData.data.defaultFlag === 'DEFAULT' ? $t('common.yes') : $t('common.no') }}
-                </el-tag>
+              <el-descriptions-item :label="$t('settings.agentic.default')">
+                <default-tag :value="reactiveData.data.defaultFlag" />
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.enable')">
-                <el-tag :type="reactiveData.data.enableFlag === 'ENABLE' ? 'success' : 'info'">
-                  {{ reactiveData.data.enableFlag === 'ENABLE' ? $t('common.enable') : $t('common.disable') }}
-                </el-tag>
+                <enable-tag :value="reactiveData.data.enableFlag" />
               </el-descriptions-item>
-              <el-descriptions-item label="Temperature">
+              <el-descriptions-item :label="$t('settings.agentic.temperature')">
                 {{ reactiveData.data.temperature ?? '-' }}
               </el-descriptions-item>
-              <el-descriptions-item label="Max Tokens">
+              <el-descriptions-item :label="$t('settings.agentic.maxTokens')">
                 {{ reactiveData.data.maxTokens ?? '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.remark')" :span="2">
@@ -73,6 +85,8 @@
   import { getAgenticModelConfigs } from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
+  import DefaultTag from '@/components/tag/DefaultTag.vue';
+  import EnableTag from '@/components/tag/EnableTag.vue';
   import type { AgenticModelConfig } from '@/config/types';
   import { timestamp } from '@/utils/dateUtil';
 

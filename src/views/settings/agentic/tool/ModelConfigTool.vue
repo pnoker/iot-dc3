@@ -26,11 +26,16 @@
     @current-change="$emit('current-change', $event)"
   >
     <template #filters>
-      <el-form-item label="Model" prop="model">
-        <el-input v-model="formData.model" clearable placeholder="gpt-4o-mini" />
+      <el-form-item :label="$t('settings.agentic.model')" prop="model">
+        <el-input v-model="formData.model" clearable :placeholder="$t('settings.agentic.modelPlaceholder')" />
       </el-form-item>
-      <el-form-item label="Provider" prop="providerId">
-        <el-select v-model="formData.providerId" clearable placeholder="All providers" style="width: 100%">
+      <el-form-item :label="$t('settings.agentic.provider')" prop="providerId">
+        <el-select
+          v-model="formData.providerId"
+          clearable
+          :placeholder="$t('settings.agentic.providerAllPlaceholder')"
+          style="width: 100%"
+        >
           <el-option v-for="p in providers" :key="p.id" :label="p.name" :value="p.id!" />
         </el-select>
       </el-form-item>

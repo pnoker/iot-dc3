@@ -18,7 +18,7 @@
   <div>
     <model-config-tool
       :page="reactiveData.page"
-      :providers="reactiveData.providers"
+      :providers="providers"
       @add="openAdd"
       @refresh="refresh"
       @reset="reset"
@@ -30,31 +30,32 @@
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column label="Label" min-width="160" prop="label" show-overflow-tooltip />
-        <el-table-column label="Model" min-width="180" prop="model" show-overflow-tooltip />
-        <el-table-column label="Provider" min-width="150" prop="providerName" show-overflow-tooltip />
-        <el-table-column label="Capabilities" min-width="210">
+        <el-table-column :label="$t('settings.agentic.label')" min-width="160" prop="label" show-overflow-tooltip />
+        <el-table-column :label="$t('settings.agentic.model')" min-width="180" prop="model" show-overflow-tooltip />
+        <el-table-column
+          :label="$t('settings.agentic.provider')"
+          min-width="150"
+          prop="providerName"
+          show-overflow-tooltip
+        />
+        <el-table-column :label="$t('settings.agentic.capabilities')" min-width="210">
           <template #default="{ row }">
             <div class="agentic-tags">
-              <el-tag :type="row.stream ? 'success' : 'info'" size="small">Stream</el-tag>
-              <el-tag :type="row.toolCall ? 'success' : 'info'" size="small">Tools</el-tag>
-              <el-tag :type="row.vision ? 'success' : 'info'" size="small">Vision</el-tag>
-              <el-tag :type="row.reasoning ? 'success' : 'info'" size="small">Reasoning</el-tag>
+              <el-tag :type="row.stream ? 'success' : 'info'" size="small">{{ $t('agentic.capStream') }}</el-tag>
+              <el-tag :type="row.toolCall ? 'success' : 'info'" size="small">{{ $t('agentic.capTools') }}</el-tag>
+              <el-tag :type="row.vision ? 'success' : 'info'" size="small">{{ $t('agentic.capVision') }}</el-tag>
+              <el-tag :type="row.reasoning ? 'success' : 'info'" size="small">{{ $t('agentic.capReasoning') }}</el-tag>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Default" width="100">
+        <el-table-column :label="$t('settings.agentic.default')" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.defaultFlag === 'DEFAULT' ? 'success' : 'info'" size="small">
-              {{ row.defaultFlag === 'DEFAULT' ? $t('common.yes') : $t('common.no') }}
-            </el-tag>
+            <default-tag :value="row.defaultFlag" size="small" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.enable')" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.enableFlag === 'ENABLE' ? 'success' : 'info'" size="small">
-              {{ row.enableFlag === 'ENABLE' ? $t('common.enable') : $t('common.disable') }}
-            </el-tag>
+            <enable-tag :value="row.enableFlag" size="small" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
@@ -69,7 +70,7 @@
             <el-popconfirm
               :cancel-button-text="$t('common.cancel')"
               :confirm-button-text="$t('common.confirm')"
-              :title="`Delete model ${row.model}?`"
+              :title="$t('settings.agentic.confirmDeleteModel', { name: row.model })"
               @confirm="remove(row)"
             >
               <template #reference>
@@ -84,12 +85,12 @@
       </el-table>
     </blank-card>
 
-    <model-config-edit-form ref="editRef" :providers="reactiveData.providers" @save="onSave" />
+    <model-config-edit-form ref="editRef" :providers="providers" @save="onSave" />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { ref } from 'vue';
   import { useRouter } from 'vue-router';
 
   import {
@@ -100,6 +101,9 @@
     updateAgenticModelConfig,
   } from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
+  import DefaultTag from '@/components/tag/DefaultTag.vue';
+  import EnableTag from '@/components/tag/EnableTag.vue';
+  import { usePagedList } from '@/composables/usePagedList';
   import type { AgenticModelConfig, AgenticProvider } from '@/config/types';
   import { successMessage } from '@/utils/notificationUtil';
 
@@ -108,75 +112,49 @@
 
   const router = useRouter();
   const editRef = ref<InstanceType<typeof modelConfigEditForm>>();
+  const providers = ref<AgenticProvider[]>([]);
 
-  const reactiveData = reactive({
-    loading: false,
-    listData: [] as AgenticModelConfig[],
-    allData: [] as AgenticModelConfig[],
-    providers: [] as AgenticProvider[],
-    query: {} as Record<string, any>,
-    order: false,
-    page: {
-      total: 0,
-      size: 12,
-      current: 1,
-      orders: [] as { column: string; asc: boolean }[],
+  interface ModelConfigQuery {
+    model?: string;
+    providerId?: string | number;
+    enableFlag?: string;
+  }
+
+  const {
+    state: reactiveData,
+    setAllData,
+    search,
+    reset,
+    sort,
+    sizeChange,
+    currentChange,
+    withLoading,
+  } = usePagedList<AgenticModelConfig, ModelConfigQuery>({
+    filter: (rows, query) => {
+      let filtered = rows;
+      if (query.model) {
+        const model = String(query.model).toLowerCase();
+        filtered = filtered.filter((row) => row.model.toLowerCase().includes(model));
+      }
+      if (query.providerId) {
+        filtered = filtered.filter((row) => String(row.providerId) === String(query.providerId));
+      }
+      if (query.enableFlag) {
+        filtered = filtered.filter((row) => row.enableFlag === query.enableFlag);
+      }
+      return filtered;
     },
+    sortValue: (row) => row.createTime,
   });
 
-  const load = async () => {
-    reactiveData.loading = true;
-    try {
+  const load = () =>
+    withLoading(async () => {
       const [configResponse, providerResponse] = await Promise.all([getAgenticModelConfigs(), getAgenticProviders()]);
-      reactiveData.allData = configResponse.data || [];
-      reactiveData.providers = providerResponse.data || [];
-      applyFilters();
-    } finally {
-      reactiveData.loading = false;
-    }
-  };
-
-  const applyFilters = () => {
-    let filtered = [...reactiveData.allData];
-    const q = reactiveData.query;
-    if (q.model) {
-      const m = String(q.model).toLowerCase();
-      filtered = filtered.filter((r) => r.model.toLowerCase().includes(m));
-    }
-    if (q.providerId) {
-      filtered = filtered.filter((r) => String(r.providerId) === String(q.providerId));
-    }
-    if (q.enableFlag) {
-      filtered = filtered.filter((r) => r.enableFlag === q.enableFlag);
-    }
-    reactiveData.page.total = filtered.length;
-    const start = (reactiveData.page.current - 1) * reactiveData.page.size;
-    reactiveData.listData = filtered.slice(start, start + reactiveData.page.size);
-  };
-
-  const search = (params: Record<string, any>) => {
-    reactiveData.query = params || {};
-    reactiveData.page.current = 1;
-    applyFilters();
-  };
-
-  const reset = () => {
-    reactiveData.query = {};
-    reactiveData.page.current = 1;
-    applyFilters();
-  };
+      providers.value = providerResponse.data || [];
+      setAllData(configResponse.data || []);
+    });
 
   const refresh = () => load();
-
-  const sort = () => {
-    reactiveData.order = !reactiveData.order;
-    reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
-    reactiveData.allData.sort((a, b) => {
-      const cmp = (a.createTime || '').localeCompare(b.createTime || '');
-      return reactiveData.order ? cmp : -cmp;
-    });
-    applyFilters();
-  };
 
   const openAdd = () => editRef.value?.show();
   const openDetail = (row: AgenticModelConfig) => {
@@ -205,17 +183,6 @@
         load();
       })
       .catch(() => {});
-  };
-
-  const sizeChange = (size: number) => {
-    reactiveData.page.size = size;
-    reactiveData.page.current = 1;
-    applyFilters();
-  };
-
-  const currentChange = (current: number) => {
-    reactiveData.page.current = current;
-    applyFilters();
   };
 
   load();

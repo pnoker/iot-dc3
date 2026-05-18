@@ -56,6 +56,18 @@
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
 
+  import {
+    SETTINGS_ALARM_CHILDREN,
+    SETTINGS_EVENT_CHILDREN,
+    SETTINGS_FALLBACK_ICON,
+    SETTINGS_FALLBACK_SIDEBAR,
+    SETTINGS_MODEL_CHILDREN,
+    SETTINGS_TITLE_KEYS,
+    type SettingsNavNode,
+    getSettingsActiveName,
+    getSettingsDefaultOpeneds,
+    getSettingsRouteName,
+  } from '@/config/settingsNav';
   import { useMenuStore } from '@/store';
   import { resolveMenuTitle } from '@/utils/menuUtil';
 
@@ -77,87 +89,40 @@
     children?: SidebarItem[];
   }
 
+  const toSidebarItem = (node: SettingsNavNode): SidebarItem => ({
+    name: node.name,
+    title: t(node.titleKey),
+    icon: node.icon,
+    children: node.children?.map(toSidebarItem),
+  });
+
+  const fallbackItems = (): SidebarItem[] => SETTINGS_FALLBACK_SIDEBAR.map(toSidebarItem);
+
   // Static fallback shown when the menu API is unreachable or still loading.
   // `icon` holds the globally-registered element-plus icon component name.
   const modelGroup = (children?: SidebarItem[]): SidebarItem => ({
     name: 'settingsModel',
     title: t('nav.settingsModel'),
-    icon: 'Cpu',
-    children: children?.length
-      ? children
-      : [
-          { name: 'settingsAgentic', title: t('nav.settingsAgentic'), icon: 'ChatDotRound' },
-          { name: 'settingsAgenticProvider', title: t('nav.settingsAgenticProvider'), icon: 'ChatLineSquare' },
-        ],
+    icon: SETTINGS_FALLBACK_ICON.settingsModel,
+    children: children?.length ? children : SETTINGS_MODEL_CHILDREN.map(toSidebarItem),
   });
 
   const alarmGroup = (children?: SidebarItem[]): SidebarItem => ({
     name: 'settingsAlarm',
     title: t('nav.settingsAlarm'),
-    icon: 'AlarmClock',
-    children: children?.length
-      ? children
-      : [
-          { name: 'settingsAlarmRule', title: t('nav.settingsAlarmRule'), icon: 'SetUp' },
-          { name: 'settingsAlarmNotify', title: t('nav.settingsAlarmNotify'), icon: 'Bell' },
-          { name: 'settingsAlarmMessage', title: t('nav.settingsAlarmMessage'), icon: 'Message' },
-          { name: 'settingsAlarmChannel', title: t('nav.settingsAlarmChannel'), icon: 'Connection' },
-          { name: 'settingsAlarmBind', title: t('nav.settingsAlarmBind'), icon: 'Link' },
-          { name: 'settingsAlarmState', title: t('nav.settingsAlarmState'), icon: 'Monitor' },
-          { name: 'settingsAlarmRecord', title: t('nav.settingsAlarmRecord'), icon: 'DocumentChecked' },
-        ],
+    icon: SETTINGS_FALLBACK_ICON.settingsAlarm,
+    children: children?.length ? children : SETTINGS_ALARM_CHILDREN.map(toSidebarItem),
   });
 
-  const fallback: SidebarItem[] = [
-    { name: 'settingsUser', title: t('nav.settingsUser'), icon: 'User' },
-    { name: 'settingsRole', title: t('nav.settingsRole'), icon: 'UserFilled' },
-    { name: 'settingsResource', title: t('nav.settingsResource'), icon: 'Key' },
-    { name: 'settingsApi', title: t('nav.settingsApi'), icon: 'Link' },
-    { name: 'settingsMenu', title: t('nav.settingsMenu'), icon: 'Menu' },
-    { name: 'settingsGroup', title: t('nav.settingsGroup'), icon: 'Grid' },
-    { name: 'settingsLabel', title: t('nav.settingsLabel'), icon: 'CollectionTag' },
-    alarmGroup(),
-    modelGroup(),
-    {
-      name: 'settingsEvent',
-      title: t('nav.settingsEvent'),
-      icon: 'Bell',
-      children: [
-        { name: 'settingsEvent', title: t('nav.settingsEventOverview'), icon: 'DataLine' },
-        { name: 'settingsDriverEvent', title: t('nav.settingsDriverEvent'), icon: 'Promotion' },
-        { name: 'settingsDeviceEvent', title: t('nav.settingsDeviceEvent'), icon: 'Management' },
-      ],
-    },
-  ];
-
-  const SETTINGS_TITLE_KEYS: Record<string, string> = {
-    settingsUser: 'nav.settingsUser',
-    settingsRole: 'nav.settingsRole',
-    settingsResource: 'nav.settingsResource',
-    settingsApi: 'nav.settingsApi',
-    settingsMenu: 'nav.settingsMenu',
-    settingsGroup: 'nav.settingsGroup',
-    settingsLabel: 'nav.settingsLabel',
-    settingsAlarm: 'nav.settingsAlarm',
-    settingsAlarmRule: 'nav.settingsAlarmRule',
-    settingsAlarmNotify: 'nav.settingsAlarmNotify',
-    settingsAlarmMessage: 'nav.settingsAlarmMessage',
-    settingsAlarmChannel: 'nav.settingsAlarmChannel',
-    settingsAlarmBind: 'nav.settingsAlarmBind',
-    settingsAlarmState: 'nav.settingsAlarmState',
-    settingsAlarmRecord: 'nav.settingsAlarmRecord',
-    settingsModel: 'nav.settingsModel',
-    settingsAgentic: 'nav.settingsAgentic',
-    settingsAgenticProvider: 'nav.settingsAgenticProvider',
-    settingsEvent: 'nav.settingsEvent',
-    settingsEventOverview: 'nav.settingsEventOverview',
-    settingsDeviceEvent: 'nav.settingsDeviceEvent',
-    settingsDriverEvent: 'nav.settingsDriverEvent',
-    settingsAbout: 'nav.settingsAbout',
-  };
+  const eventGroup = (children?: SidebarItem[]): SidebarItem => ({
+    name: 'settingsEvent',
+    title: t('nav.settingsEvent'),
+    icon: SETTINGS_FALLBACK_ICON.settingsEvent,
+    children: children?.length ? children : SETTINGS_EVENT_CHILDREN.map(toSidebarItem),
+  });
 
   const menuTitle = (node: any) => {
-    const titleKey = SETTINGS_TITLE_KEYS[node.menuCode];
+    const titleKey = node.menuCode === 'settingsEvent' ? 'nav.settingsEvent' : SETTINGS_TITLE_KEYS[node.menuCode];
     return titleKey ? t(titleKey) : resolveMenuTitle(node);
   };
 
@@ -176,7 +141,7 @@
   const sidebarItems = computed<SidebarItem[]>(() => {
     const settings = menuStore.findByCode('settings');
     const children = settings?.children || [];
-    if (!children.length) return fallback;
+    if (!children.length) return fallbackItems();
     const items = children
       .slice()
       .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
@@ -195,6 +160,7 @@
     ]);
     ensureAlarmGroup(items);
     ensureModelGroup(items);
+    ensureEventGroup(items);
     return items;
   });
 
@@ -218,7 +184,7 @@
 
   const ensureModelGroup = (items: SidebarItem[]) => {
     const extracted: SidebarItem[] = [];
-    for (const name of ['settingsAgentic', 'settingsAgenticProvider']) {
+    for (const name of SETTINGS_MODEL_CHILDREN.map((item) => item.name)) {
       const index = items.findIndex((item) => item.name === name);
       if (index >= 0) {
         const removed = items.splice(index, 1)[0];
@@ -234,7 +200,7 @@
           extracted.find((item) => item.name === 'settingsAgentic') || {
             name: 'settingsAgentic',
             title: t('nav.settingsAgentic'),
-            icon: 'ChatDotRound',
+            icon: SETTINGS_FALLBACK_ICON.settingsAgentic,
           }
         );
       }
@@ -243,7 +209,7 @@
           extracted.find((item) => item.name === 'settingsAgenticProvider') || {
             name: 'settingsAgenticProvider',
             title: t('nav.settingsAgenticProvider'),
-            icon: 'ChatLineSquare',
+            icon: SETTINGS_FALLBACK_ICON.settingsAgenticProvider,
           }
         );
       }
@@ -254,15 +220,7 @@
   };
 
   const ensureAlarmGroup = (items: SidebarItem[]) => {
-    const alarmChildNames = [
-      'settingsAlarmRule',
-      'settingsAlarmNotify',
-      'settingsAlarmMessage',
-      'settingsAlarmChannel',
-      'settingsAlarmBind',
-      'settingsAlarmState',
-      'settingsAlarmRecord',
-    ];
+    const alarmChildNames = SETTINGS_ALARM_CHILDREN.map((item) => item.name);
     const extracted: SidebarItem[] = [];
     for (const name of alarmChildNames) {
       const index = items.findIndex((item) => item.name === name);
@@ -281,46 +239,37 @@
     insertBefore(items, alarmGroup(extracted), ['settingsModel', 'settingsEvent', 'settingsAbout']);
   };
 
-  const ACTIVE_ALIAS: Record<string, string> = {
-    settingsModel: 'settingsAgentic',
-    settingsAgenticDetail: 'settingsAgentic',
-    settingsAgenticProviderDetail: 'settingsAgenticProvider',
-    settingsAlarm: 'settingsAlarmRule',
-    settingsAlarmRuleDetail: 'settingsAlarmRule',
-    settingsAlarmNotifyDetail: 'settingsAlarmNotify',
-    settingsAlarmMessageDetail: 'settingsAlarmMessage',
-    settingsAlarmChannelDetail: 'settingsAlarmChannel',
-    settingsAlarmBindDetail: 'settingsAlarmBind',
-    settingsAlarmStateDetail: 'settingsAlarmState',
-    settingsAlarmRecordDetail: 'settingsAlarmRecord',
-    settingsGroupDetail: 'settingsGroup',
-    settingsLabelDetail: 'settingsLabel',
+  const ensureEventGroup = (items: SidebarItem[]) => {
+    const eventChildNames = SETTINGS_EVENT_CHILDREN.map((item) => item.name);
+    const extracted: SidebarItem[] = [];
+    for (const name of eventChildNames) {
+      const index = items.findIndex((item) => item.name === name);
+      if (index >= 0) {
+        const removed = items.splice(index, 1)[0];
+        if (removed) extracted.push(removed);
+      }
+    }
+
+    const event = items.find((item) => item.name === 'settingsEvent');
+    if (event) {
+      event.children = event.children?.length ? event.children : eventGroup(extracted).children;
+      return;
+    }
+
+    insertBefore(items, eventGroup(extracted), ['settingsAbout']);
   };
 
   const activeMenu = computed(() => {
     const name = String(route.name || 'settingsUser');
-    return ACTIVE_ALIAS[name] || name;
+    return getSettingsActiveName(name);
   });
 
   const defaultOpeneds = computed(() => {
-    const name = activeMenu.value;
-    if (name.startsWith('settingsAlarm')) return ['settingsAlarm'];
-    if (name.startsWith('settingsAgentic') || name === 'settingsModel') return ['settingsModel'];
-    if (name === 'settingsEvent' || name === 'settingsDeviceEvent' || name === 'settingsDriverEvent') {
-      return ['settingsEvent'];
-    }
-    return [];
+    return getSettingsDefaultOpeneds(activeMenu.value);
   });
 
-  // Map API-tree menuCodes that don't match a vue-router route name.
-  const ROUTE_ALIAS: Record<string, string> = {
-    settingsEventOverview: 'settingsEvent',
-    settingsAlarm: 'settingsAlarmRule',
-    settingsModel: 'settingsAgentic',
-  };
-
   const onSelect = (name: string) => {
-    router.push({ name: ROUTE_ALIAS[name] || name });
+    router.push({ name: getSettingsRouteName(name) });
   };
 </script>
 

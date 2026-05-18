@@ -229,7 +229,9 @@
                   class="agentic-reasoning-panel"
                 >
                   <summary>
-                    <span :class="{ 'is-active': message.streaming }" class="agentic-thinking-pulse" />
+                    <el-icon :class="{ 'is-active': message.streaming }" class="agentic-thinking-pulse"
+                      ><Loading
+                    /></el-icon>
                     <span>{{ t('agentic.detailThinking') }}</span>
                     <small>{{ reasoningPanelStatus(message) }}</small>
                   </summary>
@@ -1548,23 +1550,13 @@
   }
 
   .agentic-thinking-pulse {
-    position: relative;
-    width: 8px;
-    height: 8px;
-    border-radius: 999px;
-    background: #94a3b8;
+    font-size: 14px;
+    color: #94a3b8;
+    vertical-align: middle;
 
     &.is-active {
-      background: var(--el-color-primary);
-
-      &::after {
-        position: absolute;
-        inset: -4px;
-        content: '';
-        border: 1px solid var(--el-color-primary);
-        border-radius: inherit;
-        animation: agentic-pulse 1.2s ease-out infinite;
-      }
+      color: var(--el-color-primary);
+      animation: agentic-spin 1s linear infinite;
     }
   }
 
@@ -1600,6 +1592,16 @@
     to {
       opacity: 0;
       transform: scale(1.65);
+    }
+  }
+
+  @keyframes agentic-spin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
     }
   }
 

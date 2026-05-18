@@ -33,6 +33,8 @@ export interface AgenticProvider {
   defaultFlag?: string;
   enableFlag?: string;
   remark?: string;
+  createTime?: string;
+  operateTime?: string;
 }
 
 export interface AgenticModelConfig extends AgenticModel {
