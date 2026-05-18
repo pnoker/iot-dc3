@@ -22,7 +22,7 @@
   "engines": {
     "node": ">=22.0.0"
   },
-  "packageManager": "pnpm@11.1.2",
+  "packageManager": "pnpm@11.1.3",
   "type": "module",
   "scripts": {
     "prepare": "husky",
@@ -86,7 +86,7 @@
     "@tauri-apps/cli": "^2.11.2",
     "@types/js-cookie": "^3.0.6",
     "@types/json-bigint": "^1.0.4",
-    "@types/node": "^25.8.0",
+    "@types/node": "^25.9.0",
     "@types/nprogress": "^0.2.3",
     "@typescript-eslint/eslint-plugin": "^8.59.3",
     "@typescript-eslint/parser": "^8.59.3",
@@ -111,7 +111,7 @@
     "vite": "^8.0.13",
     "vitest": "^4.1.6",
     "vue-eslint-parser": "^10.4.0",
-    "vue-tsc": "^3.2.9"
+    "vue-tsc": "^3.3.0"
   },
   "lint-staged": {
     "*.{vue,js,mjs,cjs,ts,jsx,tsx}": [
