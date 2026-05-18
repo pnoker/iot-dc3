@@ -80,7 +80,7 @@ class PointValueToolTest {
         assertThat(result.data().pendingConfirmation()).isTrue();
         assertThat(result.data().actionId()).isEqualTo("action-1");
         verify(actionService).createWritePointValueAction("conv-1", 10L, 20L, "42", header);
-        verify(pointValueCommandFacade, never()).write(anyLong(), anyLong(), anyLong(), anyString());
+        verify(pointValueCommandFacade, never()).dispatchWrite(anyLong(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -111,7 +111,7 @@ class PointValueToolTest {
 
     @Test
     void readPointValueSendsReadCommandThroughPointValueCommandFacade() {
-        when(pointValueCommandFacade.read(1L, 10L, 20L)).thenReturn(true);
+        when(pointValueCommandFacade.dispatchRead(1L, 10L, 20L)).thenReturn(true);
 
         AgenticToolResult<PointValueTool.PointCommandResult> result = tool.readPointValue(10L, 20L,
                 toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header)));
@@ -120,7 +120,7 @@ class PointValueToolTest {
         assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
         assertThat(result.data().sent()).isTrue();
         assertThat(result.data().pendingConfirmation()).isFalse();
-        verify(pointValueCommandFacade).read(1L, 10L, 20L);
+        verify(pointValueCommandFacade).dispatchRead(1L, 10L, 20L);
     }
 
     private ToolContext toolContext(Map<String, Object> values) {

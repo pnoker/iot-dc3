@@ -51,7 +51,7 @@ class PointValueCommandLocalFacadeTest {
 
     @Test
     void readPopulatesDeviceAndPointIdAndReturnsTrue() {
-        boolean result = facade.read(1L, 10L, 20L);
+        boolean result = facade.dispatchRead(1L, 10L, 20L);
         assertThat(result).isTrue();
 
         ArgumentCaptor<PointValueReadVO> captor = ArgumentCaptor.forClass(PointValueReadVO.class);
@@ -63,7 +63,7 @@ class PointValueCommandLocalFacadeTest {
 
     @Test
     void writePopulatesDeviceIdPointIdAndValueAndReturnsTrue() {
-        boolean result = facade.write(1L, 10L, 20L, "42");
+        boolean result = facade.dispatchWrite(1L, 10L, 20L, "42");
         assertThat(result).isTrue();
 
         ArgumentCaptor<PointValueWriteVO> captor = ArgumentCaptor.forClass(PointValueWriteVO.class);

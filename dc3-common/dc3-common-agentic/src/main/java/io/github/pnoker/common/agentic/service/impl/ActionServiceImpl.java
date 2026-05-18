@@ -95,7 +95,8 @@ public class ActionServiceImpl implements ActionService {
         try {
             if (ACTION_WRITE_POINT_VALUE.equals(action.getActionType())) {
                 Map<String, Object> payload = action.getPayload();
-                boolean success = pointValueCommandFacade.write(header.getTenantId(), longValue(payload.get("deviceId")),
+                boolean success = pointValueCommandFacade.dispatchWrite(header.getTenantId(),
+                        longValue(payload.get("deviceId")),
                         longValue(payload.get("pointId")), Objects.toString(payload.get("value"), ""));
                 action.setStatus(success ? AgenticActionStatusEnum.EXECUTED.getIndex()
                         : AgenticActionStatusEnum.FAILED.getIndex());

@@ -50,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -125,14 +126,14 @@ class DeviceServiceImplTest {
         when(deviceBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(deviceManager.save(doRow)).thenReturn(true);
 
-        assertThatNoException().isThrownBy(() -> service.save(bo));
+        assertThatNoException().isThrownBy(() -> service.add(bo));
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
     }
 
     @Test
     void saveRejectsWhenDriverMissing() {
         when(driverService.selectById(7L)).thenReturn(null);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -140,14 +141,14 @@ class DeviceServiceImplTest {
         DriverBO otherTenant = new DriverBO();
         otherTenant.setTenantId(999L);
         when(driverService.selectById(7L)).thenReturn(otherTenant);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void saveRejectsDuplicateDeviceName() {
         when(driverService.selectById(7L)).thenReturn(driver);
         when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(DuplicateException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(deviceManager, never()).save(any(DeviceDO.class));
     }
 
@@ -157,29 +158,29 @@ class DeviceServiceImplTest {
         when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(deviceBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(deviceManager.save(doRow)).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(deviceManager.getById(1L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void removeRollsBackWhenProfileBindRemovalFails() {
         when(deviceManager.getById(1L)).thenReturn(doRow);
-        when(profileBindService.removeByDeviceId(1L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(DeleteException.class);
+        doThrow(new DeleteException("Failed to remove profile bind"))
+                .when(profileBindService).removeByDeviceId(1L);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(DeleteException.class);
         verify(deviceManager, never()).removeById(any(Long.class));
     }
 
     @Test
     void removeRollsBackWhenManagerRemoveReturnsFalse() {
         when(deviceManager.getById(1L)).thenReturn(doRow);
-        when(profileBindService.removeByDeviceId(1L)).thenReturn(true);
         when(deviceManager.removeById(1L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(DeleteException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(DeleteException.class);
     }
 
     @Test

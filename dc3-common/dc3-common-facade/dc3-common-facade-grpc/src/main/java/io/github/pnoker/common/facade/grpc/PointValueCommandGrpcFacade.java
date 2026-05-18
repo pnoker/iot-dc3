@@ -50,26 +50,26 @@ public class PointValueCommandGrpcFacade implements PointValueCommandFacade {
     private GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public boolean read(Long tenantId, Long deviceId, Long pointId) {
+    public boolean dispatchRead(Long tenantId, Long deviceId, Long pointId) {
         GrpcPointValueCommandQuery request = GrpcPointValueCommandQuery.newBuilder()
                 .setTenantId(Objects.requireNonNull(tenantId, "tenantId"))
                 .setDeviceId(deviceId)
                 .setPointId(pointId)
                 .build();
-        GrpcRBoolean response = grpcFacadeSupport.call("PointValueCommandFacade.read", pointValueApiBlockingStub,
+        GrpcRBoolean response = grpcFacadeSupport.call("PointValueCommandFacade.dispatchRead", pointValueApiBlockingStub,
                 stub -> stub.readCommand(request));
         return response.getResult().getOk() && response.getData();
     }
 
     @Override
-    public boolean write(Long tenantId, Long deviceId, Long pointId, String value) {
+    public boolean dispatchWrite(Long tenantId, Long deviceId, Long pointId, String value) {
         GrpcPointValueWriteCommand request = GrpcPointValueWriteCommand.newBuilder()
                 .setTenantId(Objects.requireNonNull(tenantId, "tenantId"))
                 .setDeviceId(deviceId)
                 .setPointId(pointId)
                 .setValue(value)
                 .build();
-        GrpcRBoolean response = grpcFacadeSupport.call("PointValueCommandFacade.write", pointValueApiBlockingStub,
+        GrpcRBoolean response = grpcFacadeSupport.call("PointValueCommandFacade.dispatchWrite", pointValueApiBlockingStub,
                 stub -> stub.writeCommand(request));
         return response.getResult().getOk() && response.getData();
     }

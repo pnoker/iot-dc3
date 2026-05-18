@@ -159,9 +159,7 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceDO entityDO = getDOById(id, true);
 
         //
-        if (!profileBindService.removeByDeviceId(id)) {
-            throw new DeleteException("Failed to remove profile bind");
-        }
+        profileBindService.removeByDeviceId(id);
 
         if (!deviceManager.removeById(id)) {
             throw new DeleteException("Failed to remove device");

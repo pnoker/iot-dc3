@@ -77,13 +77,13 @@ class ProfileBindServiceImplTest {
         when(profileBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(profileBindBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(profileBindManager.save(doRow)).thenReturn(true);
-        assertThatNoException().isThrownBy(() -> service.save(bo));
+        assertThatNoException().isThrownBy(() -> service.add(bo));
     }
 
     @Test
     void saveRejectsDuplicate() {
         when(profileBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(DuplicateException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(profileBindManager, never()).save(any(ProfileBindDO.class));
     }
 
@@ -92,26 +92,26 @@ class ProfileBindServiceImplTest {
         when(profileBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(profileBindBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(profileBindManager.save(doRow)).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(profileBindManager.getById(1L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void removeThrowsDeleteExceptionWhenManagerReturnsFalse() {
         when(profileBindManager.getById(1L)).thenReturn(doRow);
         when(profileBindManager.removeById(1L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(DeleteException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(DeleteException.class);
     }
 
     @Test
-    void removeByDeviceIdReturnsTrueWhenNoBinding() {
+    void removeByDeviceIdNoOpsWhenNoBinding() {
         when(profileBindManager.count(any(LambdaQueryWrapper.class))).thenReturn(0L);
-        assertThat(service.removeByDeviceId(99L)).isTrue();
+        service.removeByDeviceId(99L);
         verify(profileBindManager, never()).remove(any(LambdaQueryWrapper.class));
     }
 
@@ -119,13 +119,22 @@ class ProfileBindServiceImplTest {
     void removeByDeviceIdDelegatesToManagerWhenBindingsExist() {
         when(profileBindManager.count(any(LambdaQueryWrapper.class))).thenReturn(2L);
         when(profileBindManager.remove(any(LambdaQueryWrapper.class))).thenReturn(true);
-        assertThat(service.removeByDeviceId(10L)).isTrue();
+        service.removeByDeviceId(10L);
+        verify(profileBindManager).remove(any(LambdaQueryWrapper.class));
     }
 
     @Test
-    void removeByDeviceIdAndProfileIdReturnsTrueWhenNoBinding() {
+    void removeByDeviceIdThrowsWhenManagerRemoveReturnsFalse() {
+        when(profileBindManager.count(any(LambdaQueryWrapper.class))).thenReturn(2L);
+        when(profileBindManager.remove(any(LambdaQueryWrapper.class))).thenReturn(false);
+        assertThatThrownBy(() -> service.removeByDeviceId(10L)).isInstanceOf(DeleteException.class);
+    }
+
+    @Test
+    void removeByDeviceIdAndProfileIdNoOpsWhenNoBinding() {
         when(profileBindManager.count(any(LambdaQueryWrapper.class))).thenReturn(0L);
-        assertThat(service.removeByDeviceIdAndProfileId(10L, 5L)).isTrue();
+        service.removeByDeviceIdAndProfileId(10L, 5L);
+        verify(profileBindManager, never()).remove(any(LambdaQueryWrapper.class));
     }
 
     @Test
