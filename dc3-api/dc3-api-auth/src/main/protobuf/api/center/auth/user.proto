@@ -31,7 +31,7 @@ option java_multiple_files = true;
 // Service interface defining user-related RPC calls
 service UserApi {
   // Query user information by user ID
-  rpc SelectById (GrpcIdQuery) returns (GrpcRUserDTO);
+  rpc GetById (GrpcIdQuery) returns (GrpcRUserDTO);
 }
 
 // Request message for querying by user ID

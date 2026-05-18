@@ -33,13 +33,13 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to profile/template management
 service ProfileApi {
   // Paginated query for profile/template information
-  rpc SelectByPage (GrpcPageProfileQuery) returns (GrpcRPageProfileDTO);
+  rpc ListByPage (GrpcPageProfileQuery) returns (GrpcRPageProfileDTO);
   // Query single profile/template information by Profile ID
-  rpc SelectByProfileId (GrpcProfileQuery) returns (GrpcRProfileDTO);
+  rpc GetByProfileId (GrpcProfileQuery) returns (GrpcRProfileDTO);
   // Batch query profile/template information by Profile IDs
-  rpc SelectByProfileIds (GrpcProfileIdsQuery) returns (GrpcRProfileListDTO);
+  rpc ListByProfileIds (GrpcProfileIdsQuery) returns (GrpcRProfileListDTO);
   // Query profiles/templates bound to a Device ID
-  rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRProfileListDTO);
+  rpc ListByDeviceId (GrpcDeviceQuery) returns (GrpcRProfileListDTO);
 }
 
 // Response wrapper for paginated profile query

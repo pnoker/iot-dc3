@@ -34,9 +34,9 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to driver devices
 service DeviceApi {
   // Query devices with pagination
-  rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
+  rpc ListByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
   // Query device by device ID
-  rpc SelectById (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
+  rpc GetById (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
 }
 
 // Response wrapper for paged device query

@@ -31,7 +31,7 @@ option java_multiple_files = true;
 // Service interface defining tenant-related RPC calls
 service TenantApi {
   // Query tenant information by tenant code
-  rpc SelectByCode (GrpcCodeQuery) returns (GrpcRTenantDTO);
+  rpc GetByCode (GrpcCodeQuery) returns (GrpcRTenantDTO);
 }
 
 // Request message for querying by tenant code
