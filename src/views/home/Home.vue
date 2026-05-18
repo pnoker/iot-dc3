@@ -270,9 +270,9 @@
     try {
       const res = await dailyGrowth(7);
       const data: DailyGrowthSummary = res.data;
-      state.driverSparkline = toNumberArray(data.driver ?? []);
-      state.deviceSparkline = toNumberArray(data.device ?? []);
-      state.pointSparkline = toNumberArray(data.point ?? []);
+      state.driverSparkline = toNumberArray(data.driverDailyCounts ?? []);
+      state.deviceSparkline = toNumberArray(data.deviceDailyCounts ?? []);
+      state.pointSparkline = toNumberArray(data.pointDailyCounts ?? []);
     } catch {
       // handled globally
     }

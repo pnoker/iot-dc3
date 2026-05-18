@@ -207,7 +207,8 @@ export interface AlertStatsSummary {
 }
 
 export interface DailyGrowthSummary {
-  driver: number[];
-  device: number[];
-  point: number[];
+  driverDailyCounts: number[];
+  deviceDailyCounts: number[];
+  pointDailyCounts: number[];
+  profileDailyCounts: number[];
 }
