@@ -109,7 +109,7 @@ class DriverLocalFacadeTest {
     void selectByPageReturnsEmptyWhenServiceReturnsNullPage() {
         FacadeDriverQuery query = new FacadeDriverQuery();
         when(facadeDriverBuilder.toManagerQuery(query)).thenReturn(new DriverQuery());
-        when(driverService.selectByPage(any(DriverQuery.class))).thenReturn(null);
+        when(driverService.list(any(DriverQuery.class))).thenReturn(null);
         assertThat(facade.selectByPage(query).getRecords()).isEmpty();
     }
 
@@ -121,7 +121,7 @@ class DriverLocalFacadeTest {
         FacadeDriverBO mapped = new FacadeDriverBO();
         Page<DriverBO> page = new Page<>(1, 10, 50);
         page.setRecords(List.of(bo));
-        when(driverService.selectByPage(any(DriverQuery.class))).thenReturn(page);
+        when(driverService.list(any(DriverQuery.class))).thenReturn(page);
         when(facadeDriverBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
         FacadePage<FacadeDriverBO> result = facade.selectByPage(query);

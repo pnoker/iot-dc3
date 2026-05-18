@@ -217,7 +217,7 @@ class DriverControllerTest {
         incoming.setTenantId(999L); // attempt to read other tenant; controller must override.
         Page<DriverBO> bos = new Page<>();
         Page<DriverVO> vos = new Page<>();
-        when(driverService.selectByPage(any(DriverQuery.class))).thenReturn(bos);
+        when(driverService.list(any(DriverQuery.class))).thenReturn(bos);
         when(driverBuilder.buildVOPageByBOPage(bos)).thenReturn(vos);
 
         StepVerifier.create(withTenantContext(controller.list(incoming)))
@@ -233,7 +233,7 @@ class DriverControllerTest {
     void listAcceptsNullEntityQuery() {
         Page<DriverBO> bos = new Page<>();
         Page<DriverVO> vos = new Page<>();
-        when(driverService.selectByPage(any(DriverQuery.class))).thenReturn(bos);
+        when(driverService.list(any(DriverQuery.class))).thenReturn(bos);
         when(driverBuilder.buildVOPageByBOPage(bos)).thenReturn(vos);
 
         StepVerifier.<R<Page<DriverVO>>>create(withTenantContext(controller.list(null)))
