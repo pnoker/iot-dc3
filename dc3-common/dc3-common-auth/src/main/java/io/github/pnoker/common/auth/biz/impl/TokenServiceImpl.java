@@ -68,7 +68,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateSalt(String loginName, String tenantCode) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
+        TenantBO tenantBO = tenantService.getByCode(tenantCode);
         if (Objects.isNull(tenantBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
@@ -77,15 +77,15 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken(String loginName, String salt, String password, String tenantCode) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
+        TenantBO tenantBO = tenantService.getByCode(tenantCode);
         if (Objects.isNull(tenantBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
+        UserLoginBO userLogin = userLoginService.getByLoginName(loginName, false);
         if (Objects.isNull(userLogin)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(),
+        TenantBindBO tenantBindBO = tenantBindService.getByTenantIdAndUserId(tenantBO.getId(),
                 userLogin.getUserId());
         if (Objects.isNull(tenantBindBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
@@ -106,11 +106,11 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public boolean tryCancelToken(String loginName, String tenantCode) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
+        TenantBO tenantBO = tenantService.getByCode(tenantCode);
         if (Objects.isNull(tenantBO)) {
             return false;
         }
-        UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
+        UserLoginBO userLogin = userLoginService.getByLoginName(loginName, false);
         if (Objects.isNull(userLogin)) {
             return false;
         }
@@ -122,7 +122,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public TokenValid checkValid(String loginName, String salt, String token, String tenantCode) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
+        TenantBO tenantBO = tenantService.getByCode(tenantCode);
         if (Objects.isNull(tenantBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
@@ -132,8 +132,8 @@ public class TokenServiceImpl implements TokenService {
             return tokenValid;
         }
 
-        UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
-        if (Objects.isNull(userLogin) || Objects.isNull(tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(),
+        UserLoginBO userLogin = userLoginService.getByLoginName(loginName, false);
+        if (Objects.isNull(userLogin) || Objects.isNull(tenantBindService.getByTenantIdAndUserId(tenantBO.getId(),
                 userLogin.getUserId()))) {
             return tokenValid;
         }

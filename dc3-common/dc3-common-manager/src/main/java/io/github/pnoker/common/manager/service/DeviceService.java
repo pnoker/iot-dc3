@@ -41,7 +41,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * @param tenantId Tenant ID
      * @return {@link DeviceBO}
      */
-    DeviceBO selectByName(String name, Long tenantId);
+    DeviceBO getByName(String name, Long tenantId);
 
     /**
      * Name TenantId
@@ -50,7 +50,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * @param tenantId Tenant ID
      * @return {@link DeviceBO}
      */
-    DeviceBO selectByCode(String code, Long tenantId);
+    DeviceBO getByCode(String code, Long tenantId);
 
     /**
      * Driver ID

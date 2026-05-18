@@ -128,7 +128,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
+    public ProfileBindBO getByDeviceIdAndProfileId(Long deviceId, Long profileId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
                 .eq(ProfileBindDO::getDeviceId, deviceId)
                 .eq(ProfileBindDO::getProfileId, profileId)

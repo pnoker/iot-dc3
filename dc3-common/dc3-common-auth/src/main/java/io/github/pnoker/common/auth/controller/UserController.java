@@ -78,7 +78,7 @@ public class UserController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             userService.add(entityBO);
-            UserBO saved = userService.selectByUserName(entityBO.getUserName(), true);
+            UserBO saved = userService.getByUserName(entityBO.getUserName(), true);
             TenantBindBO tenantBindBO = new TenantBindBO();
             tenantBindBO.setTenantId(header.getTenantId());
             tenantBindBO.setUserId(saved.getId());
@@ -95,7 +95,7 @@ public class UserController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenantMember(tenantId, id);
-            TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, id);
+            TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, id);
             userService.delete(id);
             if (Objects.nonNull(tenantBind)) {
                 tenantBindService.delete(tenantBind.getId());
@@ -127,9 +127,9 @@ public class UserController implements BaseController {
     }
 
     @GetMapping("/select_by_name")
-    public Mono<R<UserVO>> selectByName(@NotNull @RequestParam(value = "name") String name) {
+    public Mono<R<UserVO>> getByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            UserBO entityBO = userService.selectByUserName(name, false);
+            UserBO entityBO = userService.getByUserName(name, false);
             // Both "not found" and "wrong tenant" return the same 404 so the
             // response shape does not reveal whether a user name exists.
             if (Objects.isNull(entityBO)) {
@@ -155,7 +155,7 @@ public class UserController implements BaseController {
     }
 
     private void requireTenantMember(Long tenantId, Long userId) {
-        TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, userId);
+        TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, userId);
         if (Objects.isNull(tenantBind)) {
             throw new NotFoundException("Resource does not exist");
         }

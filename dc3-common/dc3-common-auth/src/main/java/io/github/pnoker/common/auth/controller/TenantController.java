@@ -133,9 +133,9 @@ public class TenantController implements BaseController {
      * @return {@link TenantVO}
      */
     @GetMapping("/select_by_code")
-    public Mono<R<TenantVO>> selectByCode(@NotNull @RequestParam(value = "code") String code) {
+    public Mono<R<TenantVO>> getByCode(@NotNull @RequestParam(value = "code") String code) {
         return async(() -> {
-            TenantBO select = tenantService.selectByCode(code);
+            TenantBO select = tenantService.getByCode(code);
             if (Objects.nonNull(select)) {
                 return R.ok(tenantBuilder.buildVOByBO(select));
             }

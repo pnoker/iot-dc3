@@ -129,7 +129,7 @@ class TenantBindServiceImplTest {
     void selectByTenantIdAndUserIdReturnsBoFromDal() {
         when(tenantBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(tenantBindBuilder.buildBOByDO(doRow)).thenReturn(bo);
-        assertThat(service.selectByTenantIdAndUserId(1L, 7L)).isSameAs(bo);
+        assertThat(service.getByTenantIdAndUserId(1L, 7L)).isSameAs(bo);
     }
 
     // The happy-path of listUserIdsByTenantId requires mybatis-plus lambda metadata
@@ -140,7 +140,7 @@ class TenantBindServiceImplTest {
     void selectByTenantIdAndUserIdReturnsNullWhenMissing() {
         when(tenantBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(tenantBindBuilder.buildBOByDO(null)).thenReturn(null);
-        assertThat(service.selectByTenantIdAndUserId(1L, 7L)).isNull();
+        assertThat(service.getByTenantIdAndUserId(1L, 7L)).isNull();
     }
 
     @Test

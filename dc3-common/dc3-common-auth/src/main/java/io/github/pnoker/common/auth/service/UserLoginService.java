@@ -37,7 +37,7 @@ public interface UserLoginService extends BaseService<UserLoginBO, UserLoginQuer
      * @param throwException Throw Exception
      * @return User
      */
-    UserLoginBO selectByLoginName(String loginName, boolean throwException);
+    UserLoginBO getByLoginName(String loginName, boolean throwException);
 
     /**
      * Name

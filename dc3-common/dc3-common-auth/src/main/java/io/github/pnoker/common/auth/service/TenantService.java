@@ -36,6 +36,6 @@ public interface TenantService extends BaseService<TenantBO, TenantQuery> {
      * @param code TenantCode
      * @return {@link TenantBO}
      */
-    TenantBO selectByCode(String code);
+    TenantBO getByCode(String code);
 
 }

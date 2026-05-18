@@ -59,7 +59,7 @@ class UserLoginLocalFacadeTest {
 
     @Test
     void selectByNameReturnsNullWhenServiceReturnsNull() {
-        when(userLoginService.selectByLoginName(eq("alice"), eq(false))).thenReturn(null);
+        when(userLoginService.getByLoginName(eq("alice"), eq(false))).thenReturn(null);
         assertThat(facade.getByName("alice")).isNull();
         verify(facadeUserLoginBuilder, never()).toFacadeBO(any());
     }
@@ -68,13 +68,13 @@ class UserLoginLocalFacadeTest {
     void selectByNameDelegatesToServiceWithExplicitFalseFlag() {
         UserLoginBO bo = new UserLoginBO();
         FacadeUserLoginBO mapped = new FacadeUserLoginBO();
-        when(userLoginService.selectByLoginName(eq("alice"), eq(false))).thenReturn(bo);
+        when(userLoginService.getByLoginName(eq("alice"), eq(false))).thenReturn(bo);
         when(facadeUserLoginBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
         assertThat(facade.getByName("alice")).isSameAs(mapped);
         // Boolean argument is the soft-delete-include flag; local facade pins it to false to
         // match grpc UserLoginServer's contract.
-        verify(userLoginService).selectByLoginName("alice", false);
+        verify(userLoginService).getByLoginName("alice", false);
     }
 
     private void injectField(String name, Object value) throws Exception {

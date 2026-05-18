@@ -54,7 +54,7 @@ public class TenantServer extends TenantApiGrpc.TenantApiImplBase {
         GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        TenantBO entityBO = tenantService.selectByCode(request.getCode());
+        TenantBO entityBO = tenantService.getByCode(request.getCode());
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

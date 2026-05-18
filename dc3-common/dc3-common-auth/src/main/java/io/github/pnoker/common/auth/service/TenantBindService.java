@@ -39,7 +39,7 @@ public interface TenantBindService extends BaseService<TenantBindBO, TenantBindQ
      * @param userId   User ID
      * @return TenantBind
      */
-    TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId);
+    TenantBindBO getByTenantIdAndUserId(Long tenantId, Long userId);
 
     /**
      * List active user IDs bound to the given tenant.

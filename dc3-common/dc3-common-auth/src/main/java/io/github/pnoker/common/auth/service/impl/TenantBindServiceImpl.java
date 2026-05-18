@@ -99,7 +99,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId) {
+    public TenantBindBO getByTenantIdAndUserId(Long tenantId, Long userId) {
         LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
         wrapper.eq(TenantBindDO::getTenantId, tenantId);
         wrapper.eq(TenantBindDO::getUserId, userId);
