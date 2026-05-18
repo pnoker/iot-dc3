@@ -75,6 +75,36 @@ only), but new code should prefer the return style.
 Vite is configured with `envDir: './src/config/env'`, so dotenv files are **not** at the repo root. The env-var prefix
 is `APP_`.
 
+### 4. API verb convention: `get*` for single, `list*` for multi
+
+Matches the backend convention documented in `iot-dc3/AGENTS.md`. The verb on
+every API function and HTTP path reflects the cardinality of the response.
+
+```ts
+// ✅ single record -> get*, /get_*
+export const getDeviceById = (id: string) =>
+  httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/get_by_id`, { params: { id } });
+
+// ✅ collection -> list*, /list_*
+export const listDevice = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
+
+export const listDeviceByDriverId = (driverId: string) =>
+  httpGet(`${API_MANAGER_BASE}/device/list_by_driver_id`, { params: { driver_id: driverId } });
+
+// ❌ Not allowed in src/api/**
+//   getDeviceList, getDriverByIds, /select_by_id, /tree
+```
+
+- Function names: `getXxx` returns a single record, `listXxx` returns a
+  collection (list, page or map). `addXxx`/`deleteXxx`/`updateXxx` are for
+  the corresponding mutations.
+- HTTP paths use snake_case and mirror the function name (`/get_by_id`,
+  `/list_by_driver_id`, `/list`, `/list_tree`). `/select_*` paths are no
+  longer accepted.
+- Use `getXxxCountByYyy` when the endpoint returns a single count value
+  rather than a list (the backend exposes `/get_count_by_*`).
+
 ## Project Layout
 
 ```
