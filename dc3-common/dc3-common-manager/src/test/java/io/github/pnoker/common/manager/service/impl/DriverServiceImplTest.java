@@ -173,34 +173,34 @@ class DriverServiceImplTest {
     }
 
     @Test
-    void selectByIdRejectsUnknownId() {
+    void getByIdRejectsUnknownId() {
         when(driverManager.getById(99L)).thenReturn(null);
         assertThatThrownBy(() -> service.getById(99L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    void selectByIdsReturnsEmptyForNullOrEmpty() {
+    void listByIdsReturnsEmptyForNullOrEmpty() {
         assertThat(service.listByIds(null)).isEmpty();
         assertThat(service.listByIds(Set.of())).isEmpty();
         verify(driverManager, never()).listByIds(any());
     }
 
     @Test
-    void selectByIdsDelegatesToManager() {
+    void listByIdsDelegatesToManager() {
         when(driverManager.listByIds(Set.of(1L, 2L))).thenReturn(List.of(doRow));
         when(driverBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
         assertThat(service.listByIds(Set.of(1L, 2L))).containsExactly(bo);
     }
 
     @Test
-    void selectByProfileIdReturnsEmptyWhenNoDeviceBound() {
+    void listByProfileIdReturnsEmptyWhenNoDeviceBound() {
         when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of());
         assertThat(service.listByProfileId(5L)).isEmpty();
         verify(deviceManager, never()).listByIds(any());
     }
 
     @Test
-    void selectByProfileIdGathersDriverIdsFromDevices() {
+    void listByProfileIdGathersDriverIdsFromDevices() {
         DeviceDO d1 = new DeviceDO();
         d1.setId(10L);
         d1.setDriverId(1L);

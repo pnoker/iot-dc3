@@ -152,10 +152,10 @@ public class DriverController implements BaseController {
      * @param serviceName Driver service name
      * @return Driver
      */
-    @GetMapping("/select_by_service_name")
-    public Mono<R<DriverVO>> selectByServiceName(@NotNull @RequestParam(value = "service_name") String serviceName) {
+    @GetMapping("/get_by_service_name")
+    public Mono<R<DriverVO>> getByServiceName(@NotNull @RequestParam(value = "service_name") String serviceName) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            DriverBO entityBO = driverService.selectByServiceName(serviceName, tenantId);
+            DriverBO entityBO = driverService.getByServiceName(serviceName, tenantId);
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));

@@ -153,7 +153,7 @@ class ProfileBindServiceImplTest {
     }
 
     @Test
-    void selectByIdRejectsUnknownId() {
+    void getByIdRejectsUnknownId() {
         when(profileBindManager.getById(1L)).thenReturn(null);
         assertThatThrownBy(() -> service.getById(1L)).isInstanceOf(NotFoundException.class);
     }

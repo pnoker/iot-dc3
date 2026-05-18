@@ -58,14 +58,14 @@ class UserLoginLocalFacadeTest {
     }
 
     @Test
-    void selectByNameReturnsNullWhenServiceReturnsNull() {
+    void getByNameReturnsNullWhenServiceReturnsNull() {
         when(userLoginService.getByLoginName(eq("alice"), eq(false))).thenReturn(null);
         assertThat(facade.getByName("alice")).isNull();
         verify(facadeUserLoginBuilder, never()).toFacadeBO(any());
     }
 
     @Test
-    void selectByNameDelegatesToServiceWithExplicitFalseFlag() {
+    void getByNameDelegatesToServiceWithExplicitFalseFlag() {
         UserLoginBO bo = new UserLoginBO();
         FacadeUserLoginBO mapped = new FacadeUserLoginBO();
         when(userLoginService.getByLoginName(eq("alice"), eq(false))).thenReturn(bo);

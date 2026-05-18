@@ -40,7 +40,7 @@ public interface DriverService extends BaseService<DriverBO, DriverQuery> {
      * @param tenantId    Tenant ID
      * @return Driver
      */
-    DriverBO selectByServiceName(String serviceName, Long tenantId);
+    DriverBO getByServiceName(String serviceName, Long tenantId);
 
     /**
      * ID

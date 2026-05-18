@@ -104,7 +104,7 @@ class DriverRegisterServiceImplTest {
     void registerDriverInsertsWhenNotPreviouslyRegistered() {
         when(tenantFacade.getByCode("default")).thenReturn(tenant);
         when(grpcDriverBuilder.buildBOByGrpcDTO(any(GrpcDriverDTO.class))).thenReturn(driverBO);
-        when(driverService.selectByServiceName(eq("dc3-driver-modbus-tcp"), eq(100L)))
+        when(driverService.getByServiceName(eq("dc3-driver-modbus-tcp"), eq(100L)))
                 .thenReturn(null, driverBO);
 
         DriverBO result = service.registerDriver(request);
@@ -122,7 +122,7 @@ class DriverRegisterServiceImplTest {
         existing.setServiceName("dc3-driver-modbus-tcp");
         when(tenantFacade.getByCode("default")).thenReturn(tenant);
         when(grpcDriverBuilder.buildBOByGrpcDTO(any(GrpcDriverDTO.class))).thenReturn(driverBO);
-        when(driverService.selectByServiceName(eq("dc3-driver-modbus-tcp"), eq(100L)))
+        when(driverService.getByServiceName(eq("dc3-driver-modbus-tcp"), eq(100L)))
                 .thenReturn(existing, driverBO);
 
         service.registerDriver(request);

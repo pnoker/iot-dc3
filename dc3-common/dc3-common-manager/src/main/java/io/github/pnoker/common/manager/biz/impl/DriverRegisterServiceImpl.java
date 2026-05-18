@@ -93,7 +93,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
 
         DriverBO driverBO = grpcDriverBuilder.buildBOByGrpcDTO(entityGrpc.getDriver());
         Objects.requireNonNull(driverBO).setTenantId(tenant.getId());
-        DriverBO entityBO = driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
+        DriverBO entityBO = driverService.getByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
         if (Objects.nonNull(entityBO)) {
             log.info("The driver has been registered, perform update: {}", JsonUtil.toJsonString(driverBO));
             driverBO.setId(entityBO.getId());
@@ -103,7 +103,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             driverService.add(driverBO);
         }
 
-        return driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
+        return driverService.getByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
     }
 
     @Override
