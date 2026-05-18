@@ -166,32 +166,32 @@ class ProfileServiceImplTest {
     }
 
     @Test
-    void selectByIdRejectsUnknownId() {
+    void getByIdRejectsUnknownId() {
         when(profileManager.getById(99L)).thenReturn(null);
         assertThatThrownBy(() -> service.getById(99L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    void selectByIdsReturnsEmptyForBlankInput() {
+    void listByIdsReturnsEmptyForBlankInput() {
         assertThat(service.listByIds(null)).isEmpty();
         assertThat(service.listByIds(Set.of())).isEmpty();
     }
 
     @Test
-    void selectByIdsDelegatesToManager() {
+    void listByIdsDelegatesToManager() {
         when(profileManager.listByIds(Set.of(1L))).thenReturn(List.of(doRow));
         when(profileBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
         assertThat(service.listByIds(Set.of(1L))).containsExactly(bo);
     }
 
     @Test
-    void selectByDeviceIdReturnsEmptyWhenDeviceMissing() {
+    void listByDeviceIdReturnsEmptyWhenDeviceMissing() {
         when(deviceMapper.selectById(99L)).thenReturn(null);
         assertThat(service.listByDeviceId(99L)).isEmpty();
     }
 
     @Test
-    void selectByNameAndTypeReturnsBoFromDal() {
+    void getByNameAndTypeReturnsBoFromDal() {
         when(profileManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(profileBuilder.buildBOByDO(doRow)).thenReturn(bo);
         assertThat(service.selectByNameAndType(100L, "DefaultProfile",

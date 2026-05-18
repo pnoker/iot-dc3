@@ -67,14 +67,14 @@ class PointLocalFacadeTest {
     }
 
     @Test
-    void selectByIdReturnsNullWhenServiceReturnsNull() {
+    void getByIdReturnsNullWhenServiceReturnsNull() {
         when(pointService.getById(1L)).thenReturn(null);
         assertThat(facade.getById(1L)).isNull();
         verify(facadePointBuilder, never()).toFacadeBO(any());
     }
 
     @Test
-    void selectByIdMapsThroughBuilder() {
+    void getByIdMapsThroughBuilder() {
         PointBO bo = new PointBO();
         FacadePointBO mapped = new FacadePointBO();
         when(pointService.getById(1L)).thenReturn(bo);
@@ -83,13 +83,13 @@ class PointLocalFacadeTest {
     }
 
     @Test
-    void selectByIdsReturnsEmptyForNullOrEmptyInput() {
+    void listByIdsReturnsEmptyForNullOrEmptyInput() {
         assertThat(facade.listByIds(null)).isEmpty();
         assertThat(facade.listByIds(Set.of())).isEmpty();
     }
 
     @Test
-    void selectByIdsMapsEachThroughBuilder() {
+    void listByIdsMapsEachThroughBuilder() {
         PointBO bo = new PointBO();
         FacadePointBO mapped = new FacadePointBO();
         when(pointService.listByIds(any())).thenReturn(List.of(bo));
@@ -98,7 +98,7 @@ class PointLocalFacadeTest {
     }
 
     @Test
-    void selectByPageMapsRecordsAndPaginationMeta() {
+    void listByPageMapsRecordsAndPaginationMeta() {
         FacadePointQuery query = new FacadePointQuery();
         when(facadePointBuilder.toManagerQuery(query)).thenReturn(new PointQuery());
         PointBO bo = new PointBO();
@@ -116,7 +116,7 @@ class PointLocalFacadeTest {
     }
 
     @Test
-    void selectByPageReturnsEmptyWhenServiceReturnsNullPage() {
+    void listByPageReturnsEmptyWhenServiceReturnsNullPage() {
         FacadePointQuery query = new FacadePointQuery();
         when(facadePointBuilder.toManagerQuery(query)).thenReturn(new PointQuery());
         when(pointService.list(any(PointQuery.class))).thenReturn(null);

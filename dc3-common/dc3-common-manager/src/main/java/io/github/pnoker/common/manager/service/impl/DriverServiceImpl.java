@@ -140,7 +140,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverBO selectByServiceName(String serviceName, Long tenantId) {
+    public DriverBO getByServiceName(String serviceName, Long tenantId) {
         LambdaQueryChainWrapper<DriverDO> wrapper = driverManager.lambdaQuery()
                 .eq(DriverDO::getServiceName, serviceName)
                 .eq(DriverDO::getTenantId, tenantId)

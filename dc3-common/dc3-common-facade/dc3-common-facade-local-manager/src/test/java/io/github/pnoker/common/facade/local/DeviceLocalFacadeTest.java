@@ -67,14 +67,14 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByIdReturnsNullWhenServiceReturnsNull() {
+    void getByIdReturnsNullWhenServiceReturnsNull() {
         when(deviceService.getById(1L)).thenReturn(null);
         assertThat(facade.getById(1L)).isNull();
         verify(facadeDeviceBuilder, never()).toFacadeBO(any());
     }
 
     @Test
-    void selectByIdMapsThroughBuilder() {
+    void getByIdMapsThroughBuilder() {
         DeviceBO source = new DeviceBO();
         FacadeDeviceBO mapped = new FacadeDeviceBO();
         when(deviceService.getById(1L)).thenReturn(source);
@@ -83,14 +83,14 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByIdsReturnsEmptyForNullOrEmptyInput() {
+    void listByIdsReturnsEmptyForNullOrEmptyInput() {
         assertThat(facade.listByIds(null)).isEmpty();
         assertThat(facade.listByIds(Set.of())).isEmpty();
         verify(deviceService, never()).listByIds(any());
     }
 
     @Test
-    void selectByIdsReturnsEmptyWhenServiceReturnsNullOrEmpty() {
+    void listByIdsReturnsEmptyWhenServiceReturnsNullOrEmpty() {
         when(deviceService.listByIds(any())).thenReturn(null);
         assertThat(facade.listByIds(Set.of(1L))).isEmpty();
 
@@ -99,7 +99,7 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByIdsMapsEachThroughBuilder() {
+    void listByIdsMapsEachThroughBuilder() {
         DeviceBO bo1 = new DeviceBO();
         DeviceBO bo2 = new DeviceBO();
         FacadeDeviceBO mapped1 = new FacadeDeviceBO();
@@ -112,7 +112,7 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByPageReturnsEmptyWhenServiceReturnsNullPage() {
+    void listByPageReturnsEmptyWhenServiceReturnsNullPage() {
         FacadeDeviceQuery query = new FacadeDeviceQuery();
         when(facadeDeviceBuilder.toManagerQuery(query)).thenReturn(new DeviceQuery());
         when(deviceService.list(any(DeviceQuery.class))).thenReturn(null);
@@ -123,7 +123,7 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByPageMapsRecordsAndCarriesPaginationMeta() {
+    void listByPageMapsRecordsAndCarriesPaginationMeta() {
         FacadeDeviceQuery query = new FacadeDeviceQuery();
         when(facadeDeviceBuilder.toManagerQuery(query)).thenReturn(new DeviceQuery());
 
@@ -142,7 +142,7 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByProfileIdMapsResults() {
+    void listByProfileIdMapsResults() {
         DeviceBO bo = new DeviceBO();
         FacadeDeviceBO mapped = new FacadeDeviceBO();
         when(deviceService.listByProfileId(5L)).thenReturn(List.of(bo));
@@ -151,7 +151,7 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByProfileIdReturnsEmptyWhenServiceReturnsNullOrEmpty() {
+    void listByProfileIdReturnsEmptyWhenServiceReturnsNullOrEmpty() {
         when(deviceService.listByProfileId(5L)).thenReturn(null);
         assertThat(facade.listByProfileId(5L)).isEmpty();
         when(deviceService.listByProfileId(5L)).thenReturn(List.of());
@@ -159,7 +159,7 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByDriverIdMapsResults() {
+    void listByDriverIdMapsResults() {
         DeviceBO bo = new DeviceBO();
         FacadeDeviceBO mapped = new FacadeDeviceBO();
         when(deviceService.listByDriverId(9L)).thenReturn(List.of(bo));
@@ -168,7 +168,7 @@ class DeviceLocalFacadeTest {
     }
 
     @Test
-    void selectByDriverIdReturnsEmptyWhenServiceReturnsNullOrEmpty() {
+    void listByDriverIdReturnsEmptyWhenServiceReturnsNullOrEmpty() {
         when(deviceService.listByDriverId(9L)).thenReturn(null);
         assertThat(facade.listByDriverId(9L)).isEmpty();
         when(deviceService.listByDriverId(9L)).thenReturn(List.of());

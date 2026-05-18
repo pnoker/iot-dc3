@@ -67,14 +67,14 @@ class DriverLocalFacadeTest {
     }
 
     @Test
-    void selectByIdReturnsNullWhenServiceReturnsNull() {
+    void getByIdReturnsNullWhenServiceReturnsNull() {
         when(driverService.getById(1L)).thenReturn(null);
         assertThat(facade.getById(1L)).isNull();
         verify(facadeDriverBuilder, never()).toFacadeBO(any());
     }
 
     @Test
-    void selectByIdMapsThroughBuilder() {
+    void getByIdMapsThroughBuilder() {
         DriverBO bo = new DriverBO();
         FacadeDriverBO mapped = new FacadeDriverBO();
         when(driverService.getById(1L)).thenReturn(bo);
@@ -83,13 +83,13 @@ class DriverLocalFacadeTest {
     }
 
     @Test
-    void selectByIdsReturnsEmptyForNullOrEmptyInput() {
+    void listByIdsReturnsEmptyForNullOrEmptyInput() {
         assertThat(facade.listByIds(null)).isEmpty();
         assertThat(facade.listByIds(Set.of())).isEmpty();
     }
 
     @Test
-    void selectByIdsReturnsEmptyWhenServiceReturnsNullOrEmpty() {
+    void listByIdsReturnsEmptyWhenServiceReturnsNullOrEmpty() {
         when(driverService.listByIds(any())).thenReturn(null);
         assertThat(facade.listByIds(Set.of(1L))).isEmpty();
         when(driverService.listByIds(any())).thenReturn(List.of());
@@ -97,7 +97,7 @@ class DriverLocalFacadeTest {
     }
 
     @Test
-    void selectByIdsMapsEachThroughBuilder() {
+    void listByIdsMapsEachThroughBuilder() {
         DriverBO bo = new DriverBO();
         FacadeDriverBO mapped = new FacadeDriverBO();
         when(driverService.listByIds(any())).thenReturn(List.of(bo));
@@ -106,7 +106,7 @@ class DriverLocalFacadeTest {
     }
 
     @Test
-    void selectByPageReturnsEmptyWhenServiceReturnsNullPage() {
+    void listByPageReturnsEmptyWhenServiceReturnsNullPage() {
         FacadeDriverQuery query = new FacadeDriverQuery();
         when(facadeDriverBuilder.toManagerQuery(query)).thenReturn(new DriverQuery());
         when(driverService.list(any(DriverQuery.class))).thenReturn(null);
@@ -114,7 +114,7 @@ class DriverLocalFacadeTest {
     }
 
     @Test
-    void selectByPageMapsRecordsAndPaginationMeta() {
+    void listByPageMapsRecordsAndPaginationMeta() {
         FacadeDriverQuery query = new FacadeDriverQuery();
         when(facadeDriverBuilder.toManagerQuery(query)).thenReturn(new DriverQuery());
         DriverBO bo = new DriverBO();
@@ -132,13 +132,13 @@ class DriverLocalFacadeTest {
     }
 
     @Test
-    void selectByDeviceIdReturnsNullWhenServiceReturnsNull() {
+    void listByDeviceIdReturnsNullWhenServiceReturnsNull() {
         when(driverService.listByDeviceId(7L)).thenReturn(null);
         assertThat(facade.getByDeviceId(7L)).isNull();
     }
 
     @Test
-    void selectByDeviceIdMapsThroughBuilder() {
+    void listByDeviceIdMapsThroughBuilder() {
         DriverBO bo = new DriverBO();
         FacadeDriverBO mapped = new FacadeDriverBO();
         when(driverService.listByDeviceId(7L)).thenReturn(bo);

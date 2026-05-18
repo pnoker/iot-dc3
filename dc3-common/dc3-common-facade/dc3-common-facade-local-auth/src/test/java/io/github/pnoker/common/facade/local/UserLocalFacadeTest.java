@@ -57,14 +57,14 @@ class UserLocalFacadeTest {
     }
 
     @Test
-    void selectByIdReturnsNullWhenServiceReturnsNull() {
+    void getByIdReturnsNullWhenServiceReturnsNull() {
         when(userService.getById(1L)).thenReturn(null);
         assertThat(facade.getById(1L)).isNull();
         verify(facadeUserBuilder, never()).toFacadeBO(any());
     }
 
     @Test
-    void selectByIdMapsThroughBuilderWhenServiceReturnsValue() {
+    void getByIdMapsThroughBuilderWhenServiceReturnsValue() {
         UserBO user = new UserBO();
         FacadeUserBO mapped = new FacadeUserBO();
         when(userService.getById(1L)).thenReturn(user);

@@ -176,34 +176,34 @@ class TenantServiceImplTest {
     }
 
     @Test
-    void selectByIdReturnsBoForKnownId() {
+    void getByIdReturnsBoForKnownId() {
         when(tenantManager.getById(1L)).thenReturn(doRow);
         when(tenantBuilder.buildBOByDO(doRow)).thenReturn(bo);
         assertThat(service.getById(1L)).isSameAs(bo);
     }
 
     @Test
-    void selectByIdRejectsUnknownId() {
+    void getByIdRejectsUnknownId() {
         when(tenantManager.getById(99L)).thenReturn(null);
         assertThatThrownBy(() -> service.getById(99L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    void selectByCodeFiltersOnEnabledTenants() {
+    void getByCodeFiltersOnEnabledTenants() {
         when(tenantManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(tenantBuilder.buildBOByDO(doRow)).thenReturn(bo);
         assertThat(service.getByCode("acme")).isSameAs(bo);
     }
 
     @Test
-    void selectByCodeReturnsNullWhenNoMatch() {
+    void getByCodeReturnsNullWhenNoMatch() {
         when(tenantManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(tenantBuilder.buildBOByDO(null)).thenReturn(null);
         assertThat(service.getByCode("missing")).isNull();
     }
 
     @Test
-    void selectByPageInjectsDefaultPagesWhenMissing() {
+    void listByPageInjectsDefaultPagesWhenMissing() {
         TenantQuery query = new TenantQuery();
         Page<TenantDO> doPage = new Page<>(1, 10);
         when(tenantManager.page(any(Page.class), any(LambdaQueryWrapper.class))).thenReturn(doPage);
@@ -217,7 +217,7 @@ class TenantServiceImplTest {
     }
 
     @Test
-    void selectByPagePreservesProvidedPagination() {
+    void listByPagePreservesProvidedPagination() {
         TenantQuery query = new TenantQuery();
         Pages pages = new Pages();
         pages.setCurrent(2);

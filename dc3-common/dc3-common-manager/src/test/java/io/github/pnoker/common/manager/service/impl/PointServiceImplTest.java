@@ -219,13 +219,13 @@ class PointServiceImplTest {
     }
 
     @Test
-    void selectByIdsReturnsEmptyForBlankInput() {
+    void listByIdsReturnsEmptyForBlankInput() {
         assertThat(service.listByIds(null)).isEmpty();
         assertThat(service.listByIds(Set.of())).isEmpty();
     }
 
     @Test
-    void selectByIdsDelegatesToManager() {
+    void listByIdsDelegatesToManager() {
         when(pointManager.listByIds(Set.of(1L))).thenReturn(List.of(doRow));
         when(pointBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
         assertThat(service.listByIds(Set.of(1L))).containsExactly(bo);
@@ -245,7 +245,7 @@ class PointServiceImplTest {
     }
 
     @Test
-    void selectByDeviceIdReturnsEmptyWhenDeviceMissing() {
+    void listByDeviceIdReturnsEmptyWhenDeviceMissing() {
         when(deviceMapper.selectById(eq(99L))).thenReturn(null);
         assertThat(service.listByDeviceId(99L)).isEmpty();
     }

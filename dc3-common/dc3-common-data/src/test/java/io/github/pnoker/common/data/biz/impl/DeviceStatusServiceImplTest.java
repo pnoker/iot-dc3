@@ -84,13 +84,13 @@ class DeviceStatusServiceImplTest {
     }
 
     @Test
-    void selectByProfileIdReturnsEmptyMapForEmptyDevices() {
+    void listByProfileIdReturnsEmptyMapForEmptyDevices() {
         when(deviceFacade.listByProfileId(1L, 5L)).thenReturn(List.of());
         assertThat(service.listByProfileId(1L, 5L)).isEmpty();
     }
 
     @Test
-    void selectByProfileIdMapsAllDevicesToCachedOrOfflineStatus() {
+    void listByProfileIdMapsAllDevicesToCachedOrOfflineStatus() {
         when(deviceFacade.listByProfileId(1L, 5L)).thenReturn(List.of(device(10L), device(11L)));
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
                 .thenReturn(DeviceStatusEnum.ONLINE.getCode());

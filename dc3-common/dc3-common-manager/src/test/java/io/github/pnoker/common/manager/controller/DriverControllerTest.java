@@ -165,7 +165,7 @@ class DriverControllerTest {
     }
 
     @Test
-    void selectByIdReturnsBoForOwnedRow() {
+    void getByIdReturnsBoForOwnedRow() {
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         bo.setTenantId(TENANT_ID);
@@ -179,7 +179,7 @@ class DriverControllerTest {
     }
 
     @Test
-    void selectByIdRejectsCrossTenantRow() {
+    void getByIdRejectsCrossTenantRow() {
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         bo.setTenantId(999L);
@@ -191,7 +191,7 @@ class DriverControllerTest {
     }
 
     @Test
-    void selectByIdsFiltersForOwnedDrivers() {
+    void listByIdsFiltersForOwnedDrivers() {
         DriverBO own = new DriverBO();
         own.setId(1L);
         own.setTenantId(TENANT_ID);
@@ -242,15 +242,15 @@ class DriverControllerTest {
     }
 
     @Test
-    void selectByServiceNameDelegatesWithTenantScope() {
+    void getByServiceNameDelegatesWithTenantScope() {
         DriverBO bo = new DriverBO();
         DriverVO vo = new DriverVO();
-        when(driverService.selectByServiceName("dc3-driver-modbus-tcp", TENANT_ID)).thenReturn(bo);
+        when(driverService.getByServiceName("dc3-driver-modbus-tcp", TENANT_ID)).thenReturn(bo);
         when(driverBuilder.buildVOByBO(bo)).thenReturn(vo);
 
-        StepVerifier.create(withTenantContext(controller.selectByServiceName("dc3-driver-modbus-tcp")))
+        StepVerifier.create(withTenantContext(controller.getByServiceName("dc3-driver-modbus-tcp")))
                 .assertNext(envelope -> assertThat(envelope.getData()).isSameAs(vo))
                 .verifyComplete();
-        verify(driverService).selectByServiceName(eq("dc3-driver-modbus-tcp"), eq(TENANT_ID));
+        verify(driverService).getByServiceName(eq("dc3-driver-modbus-tcp"), eq(TENANT_ID));
     }
 }

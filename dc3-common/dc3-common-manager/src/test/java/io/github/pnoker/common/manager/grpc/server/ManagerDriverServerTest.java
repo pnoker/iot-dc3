@@ -91,7 +91,7 @@ class ManagerDriverServerTest {
     }
 
     @Test
-    void selectByDriverIdReturnsOkEnvelopeWithMappedData() {
+    void listByDriverIdReturnsOkEnvelopeWithMappedData() {
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         GrpcDriverDTO dto = GrpcDriverDTO.newBuilder().build();
@@ -104,7 +104,7 @@ class ManagerDriverServerTest {
     }
 
     @Test
-    void selectByDriverIdReturnsNoResourceWhenMissing() {
+    void listByDriverIdReturnsNoResourceWhenMissing() {
         when(driverService.getById(99L)).thenReturn(null);
         GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
@@ -143,7 +143,7 @@ class ManagerDriverServerTest {
     }
 
     @Test
-    void selectByPageReturnsNoResourceWhenServiceReturnsNull() {
+    void listByPageReturnsNoResourceWhenServiceReturnsNull() {
         when(driverService.list(org.mockito.ArgumentMatchers.any())).thenReturn(null);
         when(grpcDriverBuilder.buildQueryByGrpcQuery(org.mockito.ArgumentMatchers.any())).thenReturn(null);
         var response = stub.listByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
@@ -152,7 +152,7 @@ class ManagerDriverServerTest {
     }
 
     @Test
-    void selectByPageReturnsOkWithPageMetadata() {
+    void listByPageReturnsOkWithPageMetadata() {
         Page<DriverBO> page = new Page<>(2, 10);
         page.setTotal(25);
         page.setRecords(List.of(new DriverBO()));
