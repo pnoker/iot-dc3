@@ -87,7 +87,7 @@ public class PointClient {
     public PointBO selectById(Long id) {
         GrpcPointQuery.Builder query = GrpcPointQuery.newBuilder();
         query.setDriverId(driverMetadata.getDriver().getId()).setPointId(id);
-        GrpcRPointDTO rPointDTO = pointApiBlockingStub.selectById(query.build());
+        GrpcRPointDTO rPointDTO = pointApiBlockingStub.getById(query.build());
         if (!rPointDTO.getResult().getOk()) {
             log.error("Point doesn't exist: {}", id);
             return null;
@@ -103,7 +103,7 @@ public class PointClient {
         query.setTenantId(driverMetadata.getDriver().getTenantId())
                 .setDriverId(driverMetadata.getDriver().getId())
                 .setPage(page);
-        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.selectByPage(query.build());
+        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.listByPage(query.build());
         if (!rPagePointDTO.getResult().getOk()) {
             throw new ServiceException("Failed to fetch point list");
         }

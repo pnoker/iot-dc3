@@ -68,7 +68,7 @@ public class DriverGrpcFacade implements DriverFacade {
     public FacadeDriverBO selectById(Long id) {
         GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(id).build();
         GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectById", driverApiBlockingStub,
-                stub -> stub.selectByDriverId(request));
+                stub -> stub.getByDriverId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectById");
             return null;
@@ -88,7 +88,7 @@ public class DriverGrpcFacade implements DriverFacade {
 
         GrpcDriverIdsQuery request = GrpcDriverIdsQuery.newBuilder().addAllDriverIds(driverIds).build();
         GrpcRDriverListDTO response = grpcFacadeSupport.call("DriverFacade.selectByIds", driverApiBlockingStub,
-                stub -> stub.selectByDriverIds(request));
+                stub -> stub.listByDriverIds(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByIds");
             return Collections.emptyList();
@@ -100,7 +100,7 @@ public class DriverGrpcFacade implements DriverFacade {
     public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
         GrpcPageDriverQuery request = facadeGrpcDriverBuilder.toGrpcPageQuery(query);
         GrpcRPageDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectByPage", driverApiBlockingStub,
-                stub -> stub.selectByPage(request));
+                stub -> stub.listByPage(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByPage");
             return FacadePage.empty();
@@ -117,7 +117,7 @@ public class DriverGrpcFacade implements DriverFacade {
     public FacadeDriverBO selectByDeviceId(Long deviceId) {
         GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
         GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.selectByDeviceId", driverApiBlockingStub,
-                stub -> stub.selectByDeviceId(request));
+                stub -> stub.getByDeviceId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByDeviceId");
             return null;

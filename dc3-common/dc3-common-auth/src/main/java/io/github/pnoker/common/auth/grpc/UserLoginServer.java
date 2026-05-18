@@ -50,7 +50,7 @@ public class UserLoginServer extends UserLoginApiGrpc.UserLoginApiImplBase {
     private UserLoginService userLoginService;
 
     @Override
-    public void selectByName(GrpcNameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {
+    public void getByName(GrpcNameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {
         GrpcRUserLoginDTO.Builder builder = GrpcRUserLoginDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

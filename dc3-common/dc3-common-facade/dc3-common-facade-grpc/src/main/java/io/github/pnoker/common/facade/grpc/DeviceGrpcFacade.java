@@ -72,7 +72,7 @@ public class DeviceGrpcFacade implements DeviceFacade {
     public FacadeDeviceBO selectById(Long id) {
         GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(id).build();
         GrpcRDeviceDTO response = grpcFacadeSupport.call("DeviceFacade.selectById", deviceApiBlockingStub,
-                stub -> stub.selectByDeviceId(request));
+                stub -> stub.getByDeviceId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectById");
             return null;
@@ -92,7 +92,7 @@ public class DeviceGrpcFacade implements DeviceFacade {
 
         GrpcDeviceIdsQuery request = GrpcDeviceIdsQuery.newBuilder().addAllDeviceIds(deviceIds).build();
         GrpcRDeviceListDTO response = grpcFacadeSupport.call("DeviceFacade.selectByIds", deviceApiBlockingStub,
-                stub -> stub.selectByDeviceIds(request));
+                stub -> stub.listByDeviceIds(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByIds");
             return Collections.emptyList();
@@ -104,7 +104,7 @@ public class DeviceGrpcFacade implements DeviceFacade {
     public FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query) {
         GrpcPageDeviceQuery request = facadeGrpcDeviceBuilder.toGrpcPageQuery(query);
         GrpcRPageDeviceDTO response = grpcFacadeSupport.call("DeviceFacade.selectByPage", deviceApiBlockingStub,
-                stub -> stub.selectByPage(request));
+                stub -> stub.listByPage(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByPage");
             return FacadePage.empty();
@@ -121,7 +121,7 @@ public class DeviceGrpcFacade implements DeviceFacade {
     public List<FacadeDeviceBO> selectByProfileId(Long profileId) {
         GrpcProfileQuery request = GrpcProfileQuery.newBuilder().setProfileId(profileId).build();
         GrpcRDeviceListDTO response = grpcFacadeSupport.call("DeviceFacade.selectByProfileId", deviceApiBlockingStub,
-                stub -> stub.selectByProfileId(request));
+                stub -> stub.listByProfileId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByProfileId");
             return Collections.emptyList();
@@ -133,7 +133,7 @@ public class DeviceGrpcFacade implements DeviceFacade {
     public List<FacadeDeviceBO> selectByDriverId(Long driverId) {
         GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(driverId).build();
         GrpcRDeviceListDTO response = grpcFacadeSupport.call("DeviceFacade.selectByDriverId", deviceApiBlockingStub,
-                stub -> stub.selectByDriverId(request));
+                stub -> stub.listByDriverId(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByDriverId");
             return Collections.emptyList();

@@ -62,7 +62,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     private ProfileService profileService;
 
     @Override
-    public void selectByPage(GrpcPageProfileQuery request, StreamObserver<GrpcRPageProfileDTO> responseObserver) {
+    public void listByPage(GrpcPageProfileQuery request, StreamObserver<GrpcRPageProfileDTO> responseObserver) {
         GrpcRPageProfileDTO.Builder builder = GrpcRPageProfileDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -87,7 +87,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     }
 
     @Override
-    public void selectByProfileId(GrpcProfileQuery request, StreamObserver<GrpcRProfileDTO> responseObserver) {
+    public void getByProfileId(GrpcProfileQuery request, StreamObserver<GrpcRProfileDTO> responseObserver) {
         GrpcRProfileDTO.Builder builder = GrpcRProfileDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -105,7 +105,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     }
 
     @Override
-    public void selectByProfileIds(GrpcProfileIdsQuery request,
+    public void listByProfileIds(GrpcProfileIdsQuery request,
                                    StreamObserver<GrpcRProfileListDTO> responseObserver) {
         GrpcRProfileListDTO.Builder builder = GrpcRProfileListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
@@ -124,7 +124,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     }
 
     @Override
-    public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRProfileListDTO> responseObserver) {
+    public void listByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRProfileListDTO> responseObserver) {
         GrpcRProfileListDTO.Builder builder = GrpcRProfileListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

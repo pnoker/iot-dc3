@@ -98,7 +98,7 @@ class ManagerDriverServerTest {
         when(driverService.selectById(1L)).thenReturn(bo);
         when(grpcDriverBuilder.buildGrpcDTOByBO(bo)).thenReturn(dto);
 
-        GrpcRDriverDTO response = stub.selectByDriverId(GrpcDriverQuery.newBuilder().setDriverId(1L).build());
+        GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(1L).build());
         assertThat(response.getResult().getOk()).isTrue();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.OK.getCode());
     }
@@ -106,7 +106,7 @@ class ManagerDriverServerTest {
     @Test
     void selectByDriverIdReturnsNoResourceWhenMissing() {
         when(driverService.selectById(99L)).thenReturn(null);
-        GrpcRDriverDTO response = stub.selectByDriverId(GrpcDriverQuery.newBuilder().setDriverId(99L).build());
+        GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
     }
@@ -118,7 +118,7 @@ class ManagerDriverServerTest {
         when(driverService.selectByIds(Set.of(1L))).thenReturn(List.of(bo));
         when(grpcDriverBuilder.buildGrpcDTOByBO(bo)).thenReturn(GrpcDriverDTO.newBuilder().build());
 
-        GrpcRDriverListDTO response = stub.selectByDriverIds(
+        GrpcRDriverListDTO response = stub.listByDriverIds(
                 GrpcDriverIdsQuery.newBuilder().addDriverIds(1L).build());
         assertThat(response.getResult().getOk()).isTrue();
         assertThat(response.getDataCount()).isEqualTo(1);
@@ -127,7 +127,7 @@ class ManagerDriverServerTest {
     @Test
     void selectByDriverIdsReturnsNoResourceForEmptyList() {
         when(driverService.selectByIds(eq(Set.of(99L)))).thenReturn(List.of());
-        GrpcRDriverListDTO response = stub.selectByDriverIds(
+        GrpcRDriverListDTO response = stub.listByDriverIds(
                 GrpcDriverIdsQuery.newBuilder().addDriverIds(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
@@ -136,7 +136,7 @@ class ManagerDriverServerTest {
     @Test
     void selectByDriverIdsReturnsNoResourceForNullSelection() {
         when(driverService.selectByIds(Set.of(99L))).thenReturn(null);
-        GrpcRDriverListDTO response = stub.selectByDriverIds(
+        GrpcRDriverListDTO response = stub.listByDriverIds(
                 GrpcDriverIdsQuery.newBuilder().addDriverIds(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
@@ -146,7 +146,7 @@ class ManagerDriverServerTest {
     void selectByPageReturnsNoResourceWhenServiceReturnsNull() {
         when(driverService.list(org.mockito.ArgumentMatchers.any())).thenReturn(null);
         when(grpcDriverBuilder.buildQueryByGrpcQuery(org.mockito.ArgumentMatchers.any())).thenReturn(null);
-        var response = stub.selectByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
+        var response = stub.listByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
         assertThat(response.getResult().getOk()).isFalse();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
     }
@@ -161,7 +161,7 @@ class ManagerDriverServerTest {
         when(grpcDriverBuilder.buildGrpcDTOByBO(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(GrpcDriverDTO.newBuilder().build());
 
-        var response = stub.selectByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
+        var response = stub.listByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
         assertThat(response.getResult().getOk()).isTrue();
         assertThat(response.getData().getPage().getCurrent()).isEqualTo(2L);
         assertThat(response.getData().getPage().getSize()).isEqualTo(10L);

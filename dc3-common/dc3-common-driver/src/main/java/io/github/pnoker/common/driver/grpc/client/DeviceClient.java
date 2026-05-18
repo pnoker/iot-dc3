@@ -104,7 +104,7 @@ public class DeviceClient {
     public DeviceBO selectById(Long id) {
         GrpcDeviceQuery.Builder query = GrpcDeviceQuery.newBuilder();
         query.setDriverId(driverMetadata.getDriver().getId()).setDeviceId(id);
-        GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectById(query.build());
+        GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.getById(query.build());
         if (!rDeviceDTO.getResult().getOk()) {
             log.error("Device doesn't exist: {}", id);
             return null;
@@ -121,7 +121,7 @@ public class DeviceClient {
         query.setTenantId(driverMetadata.getDriver().getTenantId())
                 .setDriverId(driverMetadata.getDriver().getId())
                 .setPage(page);
-        GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.selectByPage(query.build());
+        GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.listByPage(query.build());
         if (!rPageDeviceDTO.getResult().getOk()) {
             throw new ServiceException("Failed to fetch device list");
         }
