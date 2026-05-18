@@ -79,21 +79,20 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# ===== Python (used by docs venv: mkdocs) =====
+# ===== Python =====
 __pycache__/
 *.py[cod]
 .venv/
-.venv-*/
 venv/
 
-# ===== Node (in case frontend tooling appears) =====
+# ===== Node / pnpm =====
 node_modules/
-dist/
+.pnpm-store/
 .parcel-cache/
 
-# ===== MkDocs build output =====
-/site/
-.cache/
+# ===== VitePress build output =====
+docs/.vitepress/cache/
+docs/.vitepress/dist/
 
 # ===== Project-local data =====
 dc3/data/

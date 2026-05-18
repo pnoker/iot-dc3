@@ -5,12 +5,14 @@ on:
     branches: [release]
     paths:
       - docs/**
-      - mkdocs.yml
-      - requirements-docs.txt
+      - package.json
+      - pnpm-lock.yaml
       - .github/workflows/docs.yml
       - CONTRIBUTING.md
       - CODE_OF_CONDUCT.md
       - SECURITY.md
+      - dc3/doc/CHANGE.md
+      - dc3/doc/USAGE.md
   workflow_dispatch:
 
 permissions:
@@ -31,23 +33,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          python-version: "3.11"
-          cache: pip
-          cache-dependency-path: requirements-docs.txt
+          version: 9
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
       - name: Install dependencies
-        run: pip install -r requirements-docs.txt
+        run: pnpm install --frozen-lockfile
 
-      - name: Build site
-        run: mkdocs build --strict --site-dir ./site
+      - name: Build with VitePress
+        run: pnpm docs:build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./site
+          path: docs/.vitepress/dist
 
   deploy:
     needs: build
