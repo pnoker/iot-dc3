@@ -34,7 +34,7 @@ export const listDeviceByIds = (deviceIds: string[]) =>
   httpPost<R<Record<string, DeviceRecord>>>(`${API_MANAGER_BASE}/device/list_by_ids`, deviceIds);
 
 export const getDeviceCountByDriverId = (driverId: string) =>
-  httpGet(`${API_MANAGER_BASE}/device/list_by_driver_id`, { params: { driver_id: driverId } });
+  httpGet(`${API_MANAGER_BASE}/device/get_count_by_driver_id`, { params: { driver_id: driverId } });
 
 export const listDeviceByProfileId = (profileId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/list_by_profile_id`, { params: { profile_id: profileId } });
