@@ -72,27 +72,27 @@ class MqttScheduleJobTest {
         injectField(job, "mqttReceiveService", mqttReceiveService);
         injectField(job, "virtualThreadExecutor", executor);
 
-        MqttScheduleJob.messageCount.set(0);
-        MqttScheduleJob.messageSpeed.set(0);
+        MqttScheduleJob.MESSAGE_COUNT.set(0);
+        MqttScheduleJob.MESSAGE_SPEED.set(0);
         MqttScheduleJob.clearMqttMessages();
     }
 
     @AfterEach
     void tearDown() {
         executor.shutdownNow();
-        MqttScheduleJob.messageCount.set(0);
-        MqttScheduleJob.messageSpeed.set(0);
+        MqttScheduleJob.MESSAGE_COUNT.set(0);
+        MqttScheduleJob.MESSAGE_SPEED.set(0);
         MqttScheduleJob.clearMqttMessages();
     }
 
     @Test
     void executeRotatesMessageCountIntoPerSecondSpeed() throws Exception {
-        MqttScheduleJob.messageCount.set(50);
+        MqttScheduleJob.MESSAGE_COUNT.set(50);
 
         job.executeInternal(jobExecutionContext);
 
-        assertThat(MqttScheduleJob.messageSpeed.get()).isEqualTo(10);
-        assertThat(MqttScheduleJob.messageCount.get()).isZero();
+        assertThat(MqttScheduleJob.MESSAGE_SPEED.get()).isEqualTo(10);
+        assertThat(MqttScheduleJob.MESSAGE_COUNT.get()).isZero();
     }
 
     @Test
