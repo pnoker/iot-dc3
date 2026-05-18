@@ -70,7 +70,7 @@ class DictionaryForManagerServiceImplTest {
     void driverDictionaryProjectsLabelOntoDriverNameQuery() {
         Page<DriverBO> sourcePage = new Page<>();
         Page<DictionaryBO> mappedPage = new Page<>();
-        when(driverService.selectByPage(any(DriverQuery.class))).thenReturn(sourcePage);
+        when(driverService.list(any(DriverQuery.class))).thenReturn(sourcePage);
         when(dictionaryBuilder.buildVOPageByDriverBOPage(sourcePage)).thenReturn(mappedPage);
 
         DictionaryQuery query = new DictionaryQuery();
@@ -89,7 +89,7 @@ class DictionaryForManagerServiceImplTest {
     void profileDictionaryProjectsLabelOntoProfileNameQuery() {
         Page<ProfileBO> sourcePage = new Page<>();
         Page<DictionaryBO> mappedPage = new Page<>();
-        when(profileService.selectByPage(any(ProfileQuery.class))).thenReturn(sourcePage);
+        when(profileService.list(any(ProfileQuery.class))).thenReturn(sourcePage);
         when(dictionaryBuilder.buildVOPageByProfileBOPage(sourcePage)).thenReturn(mappedPage);
 
         DictionaryQuery query = new DictionaryQuery();
@@ -105,7 +105,7 @@ class DictionaryForManagerServiceImplTest {
     void pointDictionaryForProfileMapsParentIdToProfileId() {
         Page<PointBO> sourcePage = new Page<>();
         Page<DictionaryBO> mappedPage = new Page<>();
-        when(pointService.selectByPage(any(PointQuery.class))).thenReturn(sourcePage);
+        when(pointService.list(any(PointQuery.class))).thenReturn(sourcePage);
         when(dictionaryBuilder.buildVOPageByPointBOPage(sourcePage)).thenReturn(mappedPage);
 
         DictionaryQuery query = new DictionaryQuery();
@@ -123,7 +123,7 @@ class DictionaryForManagerServiceImplTest {
     void pointDictionaryForDeviceMapsParentIdToDeviceId() {
         Page<PointBO> sourcePage = new Page<>();
         Page<DictionaryBO> mappedPage = new Page<>();
-        when(pointService.selectByPage(any(PointQuery.class))).thenReturn(sourcePage);
+        when(pointService.list(any(PointQuery.class))).thenReturn(sourcePage);
         when(dictionaryBuilder.buildVOPageByPointBOPage(sourcePage)).thenReturn(mappedPage);
 
         DictionaryQuery query = new DictionaryQuery();
@@ -141,7 +141,7 @@ class DictionaryForManagerServiceImplTest {
     void deviceDictionaryProjectsLabelOntoDeviceName() {
         Page<DeviceBO> sourcePage = new Page<>();
         Page<DictionaryBO> mappedPage = new Page<>();
-        when(deviceService.selectByPage(any(DeviceQuery.class))).thenReturn(sourcePage);
+        when(deviceService.list(any(DeviceQuery.class))).thenReturn(sourcePage);
         when(dictionaryBuilder.buildVOPageByDeviceBOPage(sourcePage)).thenReturn(mappedPage);
 
         DictionaryQuery query = new DictionaryQuery();
@@ -158,7 +158,7 @@ class DictionaryForManagerServiceImplTest {
     void deviceDictionaryForDriverProjectsParentIdOntoDriverId() {
         Page<DeviceBO> sourcePage = new Page<>();
         Page<DictionaryBO> mappedPage = new Page<>();
-        when(deviceService.selectByPage(any(DeviceQuery.class))).thenReturn(sourcePage);
+        when(deviceService.list(any(DeviceQuery.class))).thenReturn(sourcePage);
         when(dictionaryBuilder.buildVOPageByDeviceBOPage(sourcePage)).thenReturn(mappedPage);
 
         DictionaryQuery query = new DictionaryQuery();

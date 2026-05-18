@@ -115,7 +115,7 @@ class DeviceLocalFacadeTest {
     void selectByPageReturnsEmptyWhenServiceReturnsNullPage() {
         FacadeDeviceQuery query = new FacadeDeviceQuery();
         when(facadeDeviceBuilder.toManagerQuery(query)).thenReturn(new DeviceQuery());
-        when(deviceService.selectByPage(any(DeviceQuery.class))).thenReturn(null);
+        when(deviceService.list(any(DeviceQuery.class))).thenReturn(null);
 
         FacadePage<FacadeDeviceBO> page = facade.selectByPage(query);
         assertThat(page).isNotNull();
@@ -131,7 +131,7 @@ class DeviceLocalFacadeTest {
         FacadeDeviceBO mapped = new FacadeDeviceBO();
         Page<DeviceBO> page = new Page<>(2, 20, 100);
         page.setRecords(List.of(bo));
-        when(deviceService.selectByPage(any(DeviceQuery.class))).thenReturn(page);
+        when(deviceService.list(any(DeviceQuery.class))).thenReturn(page);
         when(facadeDeviceBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
         FacadePage<FacadeDeviceBO> result = facade.selectByPage(query);

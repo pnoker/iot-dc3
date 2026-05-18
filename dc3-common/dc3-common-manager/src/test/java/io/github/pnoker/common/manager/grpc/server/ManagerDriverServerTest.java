@@ -144,7 +144,7 @@ class ManagerDriverServerTest {
 
     @Test
     void selectByPageReturnsNoResourceWhenServiceReturnsNull() {
-        when(driverService.selectByPage(org.mockito.ArgumentMatchers.any())).thenReturn(null);
+        when(driverService.list(org.mockito.ArgumentMatchers.any())).thenReturn(null);
         when(grpcDriverBuilder.buildQueryByGrpcQuery(org.mockito.ArgumentMatchers.any())).thenReturn(null);
         var response = stub.selectByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
         assertThat(response.getResult().getOk()).isFalse();
@@ -156,7 +156,7 @@ class ManagerDriverServerTest {
         Page<DriverBO> page = new Page<>(2, 10);
         page.setTotal(25);
         page.setRecords(List.of(new DriverBO()));
-        when(driverService.selectByPage(org.mockito.ArgumentMatchers.any())).thenReturn(page);
+        when(driverService.list(org.mockito.ArgumentMatchers.any())).thenReturn(page);
         when(grpcDriverBuilder.buildQueryByGrpcQuery(org.mockito.ArgumentMatchers.any())).thenReturn(null);
         when(grpcDriverBuilder.buildGrpcDTOByBO(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(GrpcDriverDTO.newBuilder().build());

@@ -105,7 +105,7 @@ class PointLocalFacadeTest {
         FacadePointBO mapped = new FacadePointBO();
         Page<PointBO> page = new Page<>(3, 25, 75);
         page.setRecords(List.of(bo));
-        when(pointService.selectByPage(any(PointQuery.class))).thenReturn(page);
+        when(pointService.list(any(PointQuery.class))).thenReturn(page);
         when(facadePointBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
         FacadePage<FacadePointBO> result = facade.selectByPage(query);
@@ -119,7 +119,7 @@ class PointLocalFacadeTest {
     void selectByPageReturnsEmptyWhenServiceReturnsNullPage() {
         FacadePointQuery query = new FacadePointQuery();
         when(facadePointBuilder.toManagerQuery(query)).thenReturn(new PointQuery());
-        when(pointService.selectByPage(any(PointQuery.class))).thenReturn(null);
+        when(pointService.list(any(PointQuery.class))).thenReturn(null);
         assertThat(facade.selectByPage(query).getRecords()).isEmpty();
     }
 

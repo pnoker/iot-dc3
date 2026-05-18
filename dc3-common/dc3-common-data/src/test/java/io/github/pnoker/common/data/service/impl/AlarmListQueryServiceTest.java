@@ -90,11 +90,11 @@ class AlarmListQueryServiceTest {
 
     @Test
     void alarmListQueriesAllowMissingOptionalFilters() {
-        assertThatCode(() -> ruleService.selectByPage(new RuleQuery())).doesNotThrowAnyException();
-        assertThatCode(() -> notifyService.selectByPage(new NotifyQuery())).doesNotThrowAnyException();
-        assertThatCode(() -> messageService.selectByPage(new MessageQuery())).doesNotThrowAnyException();
-        assertThatCode(() -> notifyChannelService.selectByPage(new NotifyChannelQuery())).doesNotThrowAnyException();
-        assertThatCode(() -> notifyChannelBindService.selectByPage(new NotifyChannelBindQuery()))
+        assertThatCode(() -> ruleService.list(new RuleQuery())).doesNotThrowAnyException();
+        assertThatCode(() -> notifyService.list(new NotifyQuery())).doesNotThrowAnyException();
+        assertThatCode(() -> messageService.list(new MessageQuery())).doesNotThrowAnyException();
+        assertThatCode(() -> notifyChannelService.list(new NotifyChannelQuery())).doesNotThrowAnyException();
+        assertThatCode(() -> notifyChannelBindService.list(new NotifyChannelBindQuery()))
                 .doesNotThrowAnyException();
     }
 
