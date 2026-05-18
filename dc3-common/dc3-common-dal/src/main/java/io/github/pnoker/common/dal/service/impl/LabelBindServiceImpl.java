@@ -59,7 +59,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     private LabelBindManager labelBindManager;
 
     @Override
-    public void save(LabelBindBO entityBO) {
+    public void add(LabelBindBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         LabelBindDO entityDO = labelBindBuilder.buildDOByBO(entityBO);
@@ -69,7 +69,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!labelBindManager.removeById(id)) {
@@ -97,7 +97,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    public Page<LabelBindBO> selectByPage(LabelBindQuery entityQuery) {
+    public Page<LabelBindBO> list(LabelBindQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

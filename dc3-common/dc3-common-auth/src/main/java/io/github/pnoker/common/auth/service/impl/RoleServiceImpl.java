@@ -70,7 +70,7 @@ public class RoleServiceImpl implements RoleService {
     private RoleManager roleManager;
 
     @Override
-    public void save(RoleBO entityBO) {
+    public void add(RoleBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
@@ -80,7 +80,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         //
@@ -115,7 +115,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Page<RoleBO> selectByPage(RoleQuery entityQuery) {
+    public Page<RoleBO> list(RoleQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

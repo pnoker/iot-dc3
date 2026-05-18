@@ -61,7 +61,7 @@ public class ApiServiceImpl implements ApiService {
     private ApiManager apiManager;
 
     @Override
-    public void save(ApiBO entityBO) {
+    public void add(ApiBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
@@ -71,7 +71,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!apiManager.removeById(id)) {
@@ -99,7 +99,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Page<ApiBO> selectByPage(ApiQuery entityQuery) {
+    public Page<ApiBO> list(ApiQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

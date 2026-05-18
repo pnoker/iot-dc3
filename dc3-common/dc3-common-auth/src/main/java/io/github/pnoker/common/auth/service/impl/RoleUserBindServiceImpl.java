@@ -81,7 +81,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     private UserManager userManager;
 
     @Override
-    public void save(RoleUserBindBO entityBO) {
+    public void add(RoleUserBindBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         RoleUserBindDO entityDO = roleUserBindBuilder.buildDOByBO(entityBO);
@@ -91,7 +91,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!roleUserBindManager.removeById(id)) {
@@ -119,12 +119,12 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery) {
-        return selectByPage(entityQuery, null);
+    public Page<RoleUserBindBO> list(RoleUserBindQuery entityQuery) {
+        return list(entityQuery, null);
     }
 
     @Override
-    public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery, Long tenantId) {
+    public Page<RoleUserBindBO> list(RoleUserBindQuery entityQuery, Long tenantId) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

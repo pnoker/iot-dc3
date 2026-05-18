@@ -76,7 +76,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(MenuBO entityBO) {
+    public void add(MenuBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
@@ -88,7 +88,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         //
@@ -128,7 +128,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public Page<MenuBO> selectByPage(MenuQuery entityQuery) {
+    public Page<MenuBO> list(MenuQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

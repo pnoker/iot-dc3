@@ -61,7 +61,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     private TenantBindManager tenantBindManager;
 
     @Override
-    public void save(TenantBindBO entityBO) {
+    public void add(TenantBindBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
@@ -71,7 +71,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!tenantBindManager.removeById(id)) {
@@ -120,7 +120,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public Page<TenantBindBO> selectByPage(TenantBindQuery entityQuery) {
+    public Page<TenantBindBO> list(TenantBindQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

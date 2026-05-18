@@ -59,7 +59,7 @@ public class RuleStateServiceImpl implements RuleStateService {
     private RuleStateManager ruleStateManager;
 
     @Override
-    public void save(RuleStateBO entityBO) {
+    public void add(RuleStateBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         RuleStateDO entityDO = ruleStateBuilder.buildDOByBO(entityBO);
@@ -69,7 +69,7 @@ public class RuleStateServiceImpl implements RuleStateService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!ruleStateManager.removeById(id)) {
@@ -97,7 +97,7 @@ public class RuleStateServiceImpl implements RuleStateService {
     }
 
     @Override
-    public Page<RuleStateBO> selectByPage(RuleStateQuery entityQuery) {
+    public Page<RuleStateBO> list(RuleStateQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

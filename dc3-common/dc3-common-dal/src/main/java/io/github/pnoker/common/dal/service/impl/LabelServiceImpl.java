@@ -67,7 +67,7 @@ public class LabelServiceImpl implements LabelService {
     private LabelBindManager labelBindManager;
 
     @Override
-    public void save(LabelBO entityBO) {
+    public void add(LabelBO entityBO) {
         validateEntityType(entityBO.getEntityTypeFlag());
         checkDuplicate(entityBO, false, true);
 
@@ -78,7 +78,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         // Before deleting a label, check whether it is already bound to any entity.
@@ -115,7 +115,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public Page<LabelBO> selectByPage(LabelQuery entityQuery) {
+    public Page<LabelBO> list(LabelQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

@@ -78,7 +78,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     private DriverAttributeManager driverAttributeManager;
 
     @Override
-    public void save(DriverAttributeConfigBO entityBO) {
+    public void add(DriverAttributeConfigBO entityBO) {
         validateTenantRelations(entityBO);
 
         if (checkDuplicate(entityBO, false)) {
@@ -115,7 +115,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         DriverAttributeConfigDO entityDO = getDOById(id, true);
 
         if (!driverAttributeConfigManager.removeById(id)) {
@@ -186,7 +186,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     @Override
-    public Page<DriverAttributeConfigBO> selectByPage(DriverAttributeConfigQuery entityQuery) {
+    public Page<DriverAttributeConfigBO> list(DriverAttributeConfigQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

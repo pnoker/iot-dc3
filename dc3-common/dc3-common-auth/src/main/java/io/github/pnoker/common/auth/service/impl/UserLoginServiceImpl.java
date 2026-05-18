@@ -65,7 +65,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     private TenantBindService tenantBindService;
 
     @Override
-    public void save(UserLoginBO entityBO) {
+    public void add(UserLoginBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
@@ -75,7 +75,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!userLoginManager.removeById(id)) {
@@ -103,7 +103,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public Page<UserLoginBO> selectByPage(UserLoginQuery entityQuery) {
+    public Page<UserLoginBO> list(UserLoginQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

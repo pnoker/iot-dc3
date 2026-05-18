@@ -63,7 +63,7 @@ public class RuleServiceImpl implements RuleService {
     private RuleManager ruleManager;
 
     @Override
-    public void save(RuleBO entityBO) {
+    public void add(RuleBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
@@ -73,7 +73,7 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         // Alarm ruleAlarm rule
@@ -108,7 +108,7 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-    public Page<RuleBO> selectByPage(RuleQuery entityQuery) {
+    public Page<RuleBO> list(RuleQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

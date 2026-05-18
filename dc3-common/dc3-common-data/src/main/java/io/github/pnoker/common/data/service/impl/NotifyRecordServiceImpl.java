@@ -57,7 +57,7 @@ public class NotifyRecordServiceImpl implements NotifyRecordService {
     private NotifyRecordManager notifyRecordManager;
 
     @Override
-    public void save(NotifyRecordBO entityBO) {
+    public void add(NotifyRecordBO entityBO) {
         NotifyRecordDO entityDO = notifyRecordBuilder.buildDOByBO(entityBO);
         if (!notifyRecordManager.save(entityDO)) {
             throw new AddException("Failed to create notify record");
@@ -65,7 +65,7 @@ public class NotifyRecordServiceImpl implements NotifyRecordService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!notifyRecordManager.removeById(id)) {
@@ -91,7 +91,7 @@ public class NotifyRecordServiceImpl implements NotifyRecordService {
     }
 
     @Override
-    public Page<NotifyRecordBO> selectByPage(NotifyRecordQuery entityQuery) {
+    public Page<NotifyRecordBO> list(NotifyRecordQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
