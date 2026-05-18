@@ -241,8 +241,8 @@ public class DeviceController implements BaseController {
      * @param driverId
      * @return
      */
-    @GetMapping("/list_by_driver_id")
-    public Mono<R<String>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    @GetMapping("/get_count_by_driver_id")
+    public Mono<R<String>> getCountByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.getById(driverId));
             List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.listByDriverId(driverId));
