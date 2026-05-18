@@ -139,6 +139,40 @@ stub configuration instead of ad hoc channel construction.
 - Use grouped validation annotations consistently.
 - Keep validation and exception messages in English.
 
+### CRUD Verb Convention
+
+The verb on every CRUD-shaped method and HTTP path must reflect the
+cardinality of the result, applied consistently across Service interfaces,
+ServiceImpl, Controller, Local Facade, gRPC Facade, gRPC server, and gRPC
+RPC names in `.proto` files.
+
+| Action                   | Java method     | HTTP path        | gRPC RPC      |
+|--------------------------|-----------------|------------------|---------------|
+| Create one record        | `add(BO)`       | `/add`           | n/a           |
+| Delete by id             | `delete(Long)`  | `/delete`        | n/a           |
+| Update one record        | `update(BO)`    | `/update`        | n/a           |
+| Query single record      | `getXxx(...)`   | `/get_xxx`       | `GetXxx`      |
+| Query multiple records   | `listXxx(...)`  | `/list_xxx`      | `ListXxx`     |
+
+- The base CRUD methods are inherited from `BaseService<B, Q>`:
+  `add`, `delete`, `update`, `getById`, `list(Q)`. Subinterfaces add
+  `getByXxx`/`listByXxx` only with extra cardinality-matching verbs.
+- `select*` is reserved for raw MyBatis Mapper calls inside `*ManagerImpl`
+  classes, never on Service/Controller/Facade APIs.
+- `remove*` is reserved for MyBatis-Plus inherited Manager methods
+  (`removeById`, `remove(wrapper)`); business deletion uses `delete*`.
+- `find*`, `query*`, `fetch*` are not used as primary CRUD verbs.
+- HTTP paths use lowercase snake_case and mirror the Java method name.
+- gRPC RPC names use PascalCase and mirror the Java method name.
+
+Special cases follow the same cardinality rule:
+- `getStatusByPage(Q)` for status-snapshot lookups whose return type is a
+  `Map<Long,String>`, not a `Page` (DeviceStatusService, DriverStatusService).
+- Boolean-returning action methods stay on a try-pattern verb when the
+  failure outcome is a normal result, e.g. `tryCancelToken(...)`.
+- Single-record dispatch facades use `dispatch*` to avoid noun-verb
+  ambiguity (`PointValueCommandFacade.dispatchRead/dispatchWrite`).
+
 ### Domain Modeling
 
 Keep persistence, business, and web representations deliberately separated.
