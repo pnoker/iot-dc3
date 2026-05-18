@@ -15,33 +15,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.constant.service;
+package io.github.pnoker.common.data.entity.vo.dashboard;
 
-import io.github.pnoker.common.constant.common.BaseConstant;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
- * Alarm service constants.
+ * Dashboard count summary for the current day.
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2016.10.1
+ * @since 2026.5.18
  */
-public class AlarmConstant {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class TodayStatsVO implements Serializable {
 
-    public static final String MATCH_TYPE_FIRING = "FIRING";
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    public static final String MATCH_TYPE_RECOVERY = "RECOVERY";
+    private long today;
 
-    public static final String EXT_RULE_EVENT = "ALARM_RULE_EVENT";
+    private long yesterday;
 
-    public static final String EXT_RULE_STATE = "ALARM_RULE_STATE";
+    private long total;
 
-    public static final String EXT_NOTIFY_RECORD_REQUEST = "ALARM_NOTIFY_RECORD_REQUEST";
-
-    public static final String EXT_NOTIFY_RECORD_RESPONSE = "ALARM_NOTIFY_RECORD_RESPONSE";
-
-    private AlarmConstant() {
-        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
-    }
+    private long percentChange;
 
 }

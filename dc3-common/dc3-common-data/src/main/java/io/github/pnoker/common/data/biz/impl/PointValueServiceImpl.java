@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.cache.PointValueLocalCacheService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
@@ -66,6 +67,9 @@ public class PointValueServiceImpl implements PointValueService {
     @Resource
     private PointValueLocalCacheService pointValueLocalCacheService;
 
+    @Resource
+    private AlarmRuleTriggerService alarmRuleTriggerService;
+
     @Override
     public void save(PointValueBO pointValueBO) {
         if (Objects.isNull(pointValueBO)) {
@@ -80,6 +84,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
         pointValueBO.setOperateTime(LocalDateTimeUtil.now());
         savePointValueToRepository(pointValueBO);
+        alarmRuleTriggerService.processPointValue(pointValueBO);
     }
 
     @Override
@@ -99,6 +104,7 @@ public class PointValueServiceImpl implements PointValueService {
         }).collect(Collectors.groupingBy(PointValueBO::getDeviceId));
 
         group.forEach(this::savePointValuesToRepository);
+        pointValueBOList.forEach(alarmRuleTriggerService::processPointValue);
     }
 
     @Override

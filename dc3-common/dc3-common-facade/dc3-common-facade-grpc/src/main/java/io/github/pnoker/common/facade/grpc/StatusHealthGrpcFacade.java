@@ -30,6 +30,7 @@ import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +86,7 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
     }
 
     @Override
-    public Map<String, String> getDriverDeviceStatusSummary(Long tenantId, Long driverId) {
+    public FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId) {
         GrpcDriverStatusQuery request = GrpcDriverStatusQuery.newBuilder()
                 .setTenantId(Objects.requireNonNullElse(tenantId, 0L))
                 .setDriverId(Objects.requireNonNullElse(driverId, 0L))
@@ -94,9 +95,9 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
                 statusHealthApiBlockingStub, stub -> stub.driverDeviceStatusSummary(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "getDriverDeviceStatusSummary");
-            return Collections.emptyMap();
+            return null;
         }
-        return response.getDataMap();
+        return FacadeDriverDeviceStatusSummaryBO.fromMap(response.getDataMap());
     }
 
     @Override

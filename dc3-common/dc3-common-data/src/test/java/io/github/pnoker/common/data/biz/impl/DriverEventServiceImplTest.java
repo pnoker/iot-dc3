@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.DriverEventManager;
 import io.github.pnoker.common.data.entity.model.DriverEventDO;
@@ -34,6 +35,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -47,6 +50,9 @@ class DriverEventServiceImplTest {
 
     @Mock
     private DriverEventManager driverEventManager;
+
+    @Mock
+    private AlarmRuleTriggerService alarmRuleTriggerService;
 
     @InjectMocks
     private DriverEventServiceImpl service;
@@ -65,7 +71,7 @@ class DriverEventServiceImplTest {
         DriverEventDTO dto = new DriverEventDTO();
         dto.setContent(JsonUtil.toJsonString(payload));
         service.heartbeatEvent(dto);
-        verifyNoInteractions(localCacheService, driverEventManager);
+        verifyNoInteractions(localCacheService, driverEventManager, alarmRuleTriggerService);
     }
 
     @Test
@@ -78,10 +84,16 @@ class DriverEventServiceImplTest {
                 org.mockito.ArgumentMatchers.eq(45L),
                 org.mockito.ArgumentMatchers.<java.util.concurrent.TimeUnit>any());
         verify(driverEventManager, never()).save(any(DriverEventDO.class));
+        verify(alarmRuleTriggerService, never()).processDriverEvent(any(), any(), any(), any());
     }
 
     @Test
     void heartbeatPersistsAlarmOnOnlineToOfflineFlip() {
+        doAnswer(invocation -> {
+            DriverEventDO event = invocation.getArgument(0);
+            event.setId(201L);
+            return true;
+        }).when(driverEventManager).save(any(DriverEventDO.class));
         when(localCacheService.getKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + 7L))
                 .thenReturn(DriverStatusEnum.ONLINE.getCode());
         service.heartbeatEvent(heartbeatPayload(DriverStatusEnum.OFFLINE));
@@ -90,6 +102,8 @@ class DriverEventServiceImplTest {
         verify(driverEventManager).save(captor.capture());
         assertThat(captor.getValue().getEventTypeFlag()).isEqualTo(DriverEventTypeEnum.ALARM.getIndex());
         assertThat(captor.getValue().getDriverId()).isEqualTo(7L);
+        verify(alarmRuleTriggerService).processDriverEvent(any(DriverEventDTO.DriverStatus.class),
+                eq(DriverEventTypeEnum.ALARM), eq("driver-state-flip"), eq(201L));
     }
 
     @Test
@@ -99,6 +113,7 @@ class DriverEventServiceImplTest {
         // OFFLINE -> FAULT is within the unavailable family — no derived ALARM
         service.heartbeatEvent(heartbeatPayload(DriverStatusEnum.FAULT));
         verify(driverEventManager, never()).save(any(DriverEventDO.class));
+        verify(alarmRuleTriggerService, never()).processDriverEvent(any(), any(), any(), any());
     }
 
     @Test
@@ -107,11 +122,16 @@ class DriverEventServiceImplTest {
         DriverEventDTO dto = new DriverEventDTO();
         dto.setContent(JsonUtil.toJsonString(payload));
         service.alarmEvent(dto);
-        verifyNoInteractions(driverEventManager);
+        verifyNoInteractions(driverEventManager, alarmRuleTriggerService);
     }
 
     @Test
     void alarmEventPersistsRowWithSuppliedTenant() {
+        doAnswer(invocation -> {
+            DriverEventDO event = invocation.getArgument(0);
+            event.setId(202L);
+            return true;
+        }).when(driverEventManager).save(any(DriverEventDO.class));
         DriverEventDTO.DriverStatus payload = new DriverEventDTO.DriverStatus(7L, DriverStatusEnum.OFFLINE);
         payload.setTenantId(1L);
         payload.setMessage("network down");
@@ -124,5 +144,7 @@ class DriverEventServiceImplTest {
         verify(driverEventManager).save(captor.capture());
         assertThat(captor.getValue().getEventTypeFlag()).isEqualTo(DriverEventTypeEnum.ALARM.getIndex());
         assertThat(captor.getValue().getTenantId()).isEqualTo(1L);
+        verify(alarmRuleTriggerService).processDriverEvent(any(DriverEventDTO.DriverStatus.class),
+                eq(DriverEventTypeEnum.ALARM), eq("driver-alarm"), eq(202L));
     }
 }

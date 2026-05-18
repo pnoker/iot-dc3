@@ -17,16 +17,16 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * Rule runtime state Ext.
+ * Rule alarm event Ext.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,7 +36,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RuleStateExt extends BaseExt {
+public class RuleAlarmEventExt extends BaseExt {
 
     /**
      * Extended content.
@@ -50,39 +50,49 @@ public class RuleStateExt extends BaseExt {
     public static class Content {
 
         /**
-         * Rule code at the time the state was updated.
+         * Rule ID at the time the event was created.
+         */
+        private Long ruleId;
+
+        /**
+         * Rule code at the time the event was created.
          */
         private String ruleCode;
 
         /**
-         * Alarm severity at the time the state was updated.
+         * Rule name at the time the event was created.
+         */
+        private String ruleName;
+
+        /**
+         * Target type evaluated by the rule.
+         */
+        private AlarmTargetTypeFlagEnum targetType;
+
+        /**
+         * Target entity ID evaluated by the rule.
+         */
+        private Long entityId;
+
+        /**
+         * Alarm severity at the time the event was created.
          */
         private String severity;
 
         /**
-         * Alarm event type at the time the state was updated.
+         * Business event type produced by the rule.
          */
         private String eventType;
 
         /**
-         * Rule labels at the time the state was updated.
-         */
-        private List<String> labels;
-
-        /**
-         * Latest normalized fact snapshot.
-         */
-        private Map<String, Object> lastFact;
-
-        /**
-         * Rule match type at the time the state was updated.
+         * Runtime match type, for example FIRING or RECOVERY.
          */
         private String matchType;
 
         /**
-         * Runtime metadata that is not part of the matching key.
+         * Normalized fact values used by the rule match.
          */
-        private Map<String, Object> metadata;
+        private Map<String, Object> values;
 
     }
 

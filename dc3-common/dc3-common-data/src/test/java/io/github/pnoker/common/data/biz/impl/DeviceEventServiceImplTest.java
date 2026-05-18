@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.DeviceEventManager;
 import io.github.pnoker.common.data.entity.model.DeviceEventDO;
@@ -34,6 +35,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -47,6 +50,9 @@ class DeviceEventServiceImplTest {
 
     @Mock
     private DeviceEventManager deviceEventManager;
+
+    @Mock
+    private AlarmRuleTriggerService alarmRuleTriggerService;
 
     @InjectMocks
     private DeviceEventServiceImpl service;
@@ -65,7 +71,7 @@ class DeviceEventServiceImplTest {
         DeviceEventDTO dto = new DeviceEventDTO();
         dto.setContent(JsonUtil.toJsonString(payload));
         service.heartbeatEvent(dto);
-        verifyNoInteractions(localCacheService, deviceEventManager);
+        verifyNoInteractions(localCacheService, deviceEventManager, alarmRuleTriggerService);
     }
 
     @Test
@@ -79,10 +85,16 @@ class DeviceEventServiceImplTest {
                 org.mockito.ArgumentMatchers.anyLong(),
                 org.mockito.ArgumentMatchers.<java.util.concurrent.TimeUnit>any());
         verify(deviceEventManager, never()).save(any(DeviceEventDO.class));
+        verify(alarmRuleTriggerService, never()).processDeviceEvent(any(), any(), any(), any());
     }
 
     @Test
     void heartbeatPersistsAlarmOnOnlineToOfflineFlip() {
+        doAnswer(invocation -> {
+            DeviceEventDO event = invocation.getArgument(0);
+            event.setId(101L);
+            return true;
+        }).when(deviceEventManager).save(any(DeviceEventDO.class));
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
                 .thenReturn(DeviceStatusEnum.ONLINE.getCode());
         service.heartbeatEvent(heartbeatPayload(DeviceStatusEnum.OFFLINE));
@@ -92,6 +104,8 @@ class DeviceEventServiceImplTest {
         assertThat(captor.getValue().getDeviceId()).isEqualTo(10L);
         assertThat(captor.getValue().getEventTypeFlag()).isEqualTo(DeviceEventTypeEnum.ALARM.getIndex());
         assertThat(captor.getValue().getTenantId()).isEqualTo(1L);
+        verify(alarmRuleTriggerService).processDeviceEvent(any(DeviceEventDTO.DeviceStatus.class),
+                eq(DeviceEventTypeEnum.ALARM), eq("device-state-flip"), eq(101L));
     }
 
     @Test
@@ -101,18 +115,31 @@ class DeviceEventServiceImplTest {
         // ONLINE -> MAINTAIN is within the "available" family — no derived ALARM
         service.heartbeatEvent(heartbeatPayload(DeviceStatusEnum.MAINTAIN));
         verify(deviceEventManager, never()).save(any(DeviceEventDO.class));
+        verify(alarmRuleTriggerService, never()).processDeviceEvent(any(), any(), any(), any());
     }
 
     @Test
     void heartbeatPersistsAlarmOnUnavailableFlip() {
+        doAnswer(invocation -> {
+            DeviceEventDO event = invocation.getArgument(0);
+            event.setId(102L);
+            return true;
+        }).when(deviceEventManager).save(any(DeviceEventDO.class));
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
                 .thenReturn(DeviceStatusEnum.OFFLINE.getCode());
         service.heartbeatEvent(heartbeatPayload(DeviceStatusEnum.ONLINE));
         verify(deviceEventManager).save(any(DeviceEventDO.class));
+        verify(alarmRuleTriggerService).processDeviceEvent(any(DeviceEventDTO.DeviceStatus.class),
+                eq(DeviceEventTypeEnum.ALARM), eq("device-state-flip"), eq(102L));
     }
 
     @Test
     void alarmEventPersistsRowEvenWhenMessageIsBlank() {
+        doAnswer(invocation -> {
+            DeviceEventDO event = invocation.getArgument(0);
+            event.setId(103L);
+            return true;
+        }).when(deviceEventManager).save(any(DeviceEventDO.class));
         DeviceEventDTO.DeviceStatus payload = new DeviceEventDTO.DeviceStatus(10L, DeviceStatusEnum.OFFLINE);
         payload.setTenantId(1L);
         payload.setMessage(null);
@@ -125,6 +152,8 @@ class DeviceEventServiceImplTest {
         verify(deviceEventManager).save(captor.capture());
         assertThat(captor.getValue().getEventTypeFlag()).isEqualTo(DeviceEventTypeEnum.ALARM.getIndex());
         assertThat(captor.getValue().getTenantId()).isEqualTo(1L);
+        verify(alarmRuleTriggerService).processDeviceEvent(any(DeviceEventDTO.DeviceStatus.class),
+                eq(DeviceEventTypeEnum.ALARM), eq("device-alarm"), eq(103L));
     }
 
     @Test
@@ -133,6 +162,6 @@ class DeviceEventServiceImplTest {
         DeviceEventDTO dto = new DeviceEventDTO();
         dto.setContent(JsonUtil.toJsonString(payload));
         service.alarmEvent(dto);
-        verifyNoInteractions(deviceEventManager);
+        verifyNoInteractions(deviceEventManager, alarmRuleTriggerService);
     }
 }

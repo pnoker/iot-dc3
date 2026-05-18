@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DeviceEventService;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.DeviceEventManager;
 import io.github.pnoker.common.data.entity.model.DeviceEventDO;
@@ -53,6 +54,9 @@ public class DeviceEventServiceImpl implements DeviceEventService {
 
     @Resource
     private DeviceEventManager deviceEventManager;
+
+    @Resource
+    private AlarmRuleTriggerService alarmRuleTriggerService;
 
     /**
      * Flip between the online family (ONLINE / MAINTAIN) and the unavailable family
@@ -93,7 +97,9 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         // list.
         if (Objects.nonNull(prev) && !Objects.equals(prev, current) && isFlip(prev, current)) {
             String message = String.format("Device status changed: %s -> %s", prev, current);
-            persist(payload, DeviceEventTypeEnum.ALARM, "device-state-flip", message);
+            DeviceEventDO event = persist(payload, DeviceEventTypeEnum.ALARM, "device-state-flip", message);
+            alarmRuleTriggerService.processDeviceEvent(payload, DeviceEventTypeEnum.ALARM, "device-state-flip",
+                    event.getId());
         }
     }
 
@@ -106,11 +112,12 @@ public class DeviceEventServiceImpl implements DeviceEventService {
             return;
         }
         String msg = Objects.nonNull(payload.getMessage()) ? payload.getMessage() : entityDTO.getContent();
-        persist(payload, DeviceEventTypeEnum.ALARM, "device-alarm", msg);
+        DeviceEventDO event = persist(payload, DeviceEventTypeEnum.ALARM, "device-alarm", msg);
+        alarmRuleTriggerService.processDeviceEvent(payload, DeviceEventTypeEnum.ALARM, "device-alarm", event.getId());
     }
 
-    private void persist(DeviceEventDTO.DeviceStatus payload, DeviceEventTypeEnum type, String extType,
-                         String extContent) {
+    private DeviceEventDO persist(DeviceEventDTO.DeviceStatus payload, DeviceEventTypeEnum type, String extType,
+                                  String extContent) {
         DeviceEventDO entity = new DeviceEventDO();
         entity.setDeviceId(payload.getDeviceId());
         entity.setPointId(0L);
@@ -120,6 +127,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(Objects.nonNull(payload.getTenantId()) ? payload.getTenantId() : 0L);
         deviceEventManager.save(entity);
+        return entity;
     }
 
 }

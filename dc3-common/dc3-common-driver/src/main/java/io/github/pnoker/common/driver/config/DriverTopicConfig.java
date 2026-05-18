@@ -24,13 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * RabbitMQ configuration that declares the driver-specific metadata and command queues
@@ -65,11 +63,10 @@ public class DriverTopicConfig {
      */
     @Bean
     Queue metadataQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 30 seconds: 30 * 1000 = 30000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient(), true, false, true,
-                arguments);
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient())
+                .autoDelete()
+                .ttl(30000)
+                .build();
     }
 
     /**
@@ -94,11 +91,9 @@ public class DriverTopicConfig {
      */
     @Bean
     Queue deviceCommandQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 30 seconds: 30 * 1000 = 30000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX + driverProperties.getService(), true, false, false,
-                arguments);
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX + driverProperties.getService())
+                .ttl(30000)
+                .build();
     }
 
     /**

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.facade.api;
 
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 
 import java.util.Collection;
@@ -37,7 +38,7 @@ public interface StatusHealthFacade {
 
     Map<Long, String> selectDriverStatusesByIds(Long tenantId, Collection<Long> driverIds);
 
-    Map<String, String> getDriverDeviceStatusSummary(Long tenantId, Long driverId);
+    FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId);
 
     FacadeSystemHealthBO systemHealth(Long tenantId);
 

@@ -25,8 +25,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /**
  * User-context tools exposed to the LLM via Spring AI @Tool.
  *
@@ -40,14 +38,15 @@ public class UserTool {
 
     @Tool(description = "Get the current user profile. Returns only user ID, username, and nickname.")
     @AgenticToolMetadata(domain = "user", title = "Read current user profile")
-    public AgenticToolResult<Map<String, Object>> getCurrentUserProfile(ToolContext toolContext) {
+    public AgenticToolResult<CurrentUserProfile> getCurrentUserProfile(ToolContext toolContext) {
         RequestHeader.UserHeader header = AgenticToolContextUtil.requireUserHeader(toolContext);
         Long userId = AgenticToolContextUtil.requireUserId(toolContext);
         log.debug("Agentic tool invoked, tool={}, userId={}", "getCurrentUserProfile", userId);
-        return AgenticToolResult.ok("Current user profile loaded", Map.of(
-                "userId", userId,
-                "username", header.getUserName(),
-                "nickname", header.getNickName()));
+        return AgenticToolResult.ok("Current user profile loaded",
+                new CurrentUserProfile(userId, header.getUserName(), header.getNickName()));
+    }
+
+    public record CurrentUserProfile(Long userId, String username, String nickname) {
     }
 
 }

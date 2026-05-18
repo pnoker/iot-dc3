@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.cache.PointValueLocalCacheService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
@@ -62,6 +63,9 @@ class PointValueServiceImplTest {
 
     @Mock
     private RepositoryService repositoryService;
+
+    @Mock
+    private AlarmRuleTriggerService alarmRuleTriggerService;
 
     @InjectMocks
     private PointValueServiceImpl service;
@@ -119,6 +123,7 @@ class PointValueServiceImplTest {
             assertThat(pv.getOperateTime()).isNotNull();
             verify(pointValueLocalCacheService).savePointValue(pv);
             verify(repositoryService).savePointValue(pv);
+            verify(alarmRuleTriggerService).processPointValue(pv);
         }
     }
 
@@ -150,6 +155,7 @@ class PointValueServiceImplTest {
             // 250 entries -> 100 + 100 + 50 = 3 chunks
             verify(repositoryService, times(3)).savePointValues(any());
             verify(pointValueLocalCacheService).savePointValue(eqLong(10L), any());
+            verify(alarmRuleTriggerService, times(250)).processPointValue(any(PointValueBO.class));
         }
     }
 

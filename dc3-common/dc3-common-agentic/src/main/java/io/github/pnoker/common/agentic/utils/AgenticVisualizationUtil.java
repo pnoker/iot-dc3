@@ -20,6 +20,7 @@ import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 
+import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,11 +59,7 @@ public class AgenticVisualizationUtil {
             if (Objects.isNull(value)) {
                 continue;
             }
-            Map<String, Object> row = new LinkedHashMap<>();
-            row.put(FIELD_INDEX, rendered);
-            row.put(FIELD_VALUE, value);
-            row.put(FIELD_SERIES, FIELD_VALUE);
-            dataset.add(row);
+            dataset.add(mapFromRecord(new NumericPoint(rendered, value, FIELD_VALUE)));
             numericValues.add(value);
             rendered++;
         }
@@ -82,8 +79,9 @@ public class AgenticVisualizationUtil {
         spec.setDataset(List.copyOf(Objects.requireNonNullElse(dataset, List.of())));
         spec.setEncode(Objects.requireNonNullElseGet(encode,
                 () -> AgenticVisualizationSpec.Encode.xy(FIELD_INDEX, FIELD_VALUE)));
-        spec.setScale(Map.of("x", AgenticConstant.Visualization.Scale.LINEAR,
-                "y", AgenticConstant.Visualization.Scale.LINEAR));
+        spec.setScale(mapFromRecord(new Scale(
+                AgenticConstant.Visualization.Scale.LINEAR,
+                AgenticConstant.Visualization.Scale.LINEAR)));
         spec.setMeta(Map.copyOf(Objects.requireNonNullElse(meta, Map.of())));
         spec.setAnnotations(List.copyOf(Objects.requireNonNullElse(annotations, List.of())));
         return spec;
@@ -111,26 +109,21 @@ public class AgenticVisualizationUtil {
     }
 
     public static Map<String, Object> pointHistoryMeta(Long deviceId, Long pointId, String valueSource) {
-        Map<String, Object> meta = new LinkedHashMap<>();
-        meta.put("deviceId", deviceId);
-        meta.put("pointId", pointId);
-        meta.put("valueSource", valueSource);
-        return meta;
+        return mapFromRecord(new PointHistoryMeta(deviceId, pointId, valueSource));
     }
 
     public static Map<String, Object> statRow(NumericSummary summary) {
         if (Objects.isNull(summary) || summary.numericCount() < 1) {
             return Map.of();
         }
-        Map<String, Object> row = new LinkedHashMap<>();
-        row.put("latest", summary.latest());
-        row.put("average", summary.average());
-        row.put("min", summary.min());
-        row.put("max", summary.max());
-        row.put("delta", summary.delta());
-        row.put("numericCount", summary.numericCount());
-        row.put("nonNumericCount", summary.nonNumericCount());
-        return row;
+        return mapFromRecord(new NumericStat(
+                summary.latest(),
+                summary.average(),
+                summary.min(),
+                summary.max(),
+                summary.delta(),
+                summary.numericCount(),
+                summary.nonNumericCount()));
     }
 
     private static Double parseNumericValue(String raw) {
@@ -192,6 +185,36 @@ public class AgenticVisualizationUtil {
             return new NumericSummary(totalCount, 0, Math.max(totalCount, 0), null, null, null, null, null, null);
         }
 
+    }
+
+    private record NumericPoint(int index, Double value, String series) {
+    }
+
+    private record Scale(String x, String y) {
+    }
+
+    private record PointHistoryMeta(Long deviceId, Long pointId, String valueSource) {
+    }
+
+    private record NumericStat(Double latest, Double average, Double min, Double max, Double delta, int numericCount,
+                               int nonNumericCount) {
+    }
+
+    private static Map<String, Object> mapFromRecord(Record source) {
+        Map<String, Object> target = new LinkedHashMap<>();
+        for (RecordComponent component : source.getClass().getRecordComponents()) {
+            target.put(component.getName(), read(source, component));
+        }
+        return target;
+    }
+
+    private static Object read(Record source, RecordComponent component) {
+        try {
+            component.getAccessor().setAccessible(true);
+            return component.getAccessor().invoke(source);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Failed to read visualization field: " + component.getName(), e);
+        }
     }
 
 }
