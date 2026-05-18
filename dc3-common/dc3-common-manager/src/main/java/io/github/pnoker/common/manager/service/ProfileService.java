@@ -42,7 +42,7 @@ public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
      * @param type     Profile type {@link ProfileTypeFlagEnum}
      * @return ProfileBO
      */
-    ProfileBO selectByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type);
+    ProfileBO getByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type);
 
     /**
      * Query profiles by device ID

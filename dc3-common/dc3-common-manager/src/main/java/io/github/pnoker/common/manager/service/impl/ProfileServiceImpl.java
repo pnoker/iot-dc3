@@ -141,7 +141,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileBO selectByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type) {
+    public ProfileBO getByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type) {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, name);
         wrapper.eq(ProfileDO::getProfileTypeFlag, type);

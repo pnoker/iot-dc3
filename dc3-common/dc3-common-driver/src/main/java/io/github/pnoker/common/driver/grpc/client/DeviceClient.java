@@ -101,7 +101,7 @@ public class DeviceClient {
      * @param id Device ID
      * @return DeviceBO
      */
-    public DeviceBO selectById(Long id) {
+    public DeviceBO getById(Long id) {
         GrpcDeviceQuery.Builder query = GrpcDeviceQuery.newBuilder();
         query.setDriverId(driverMetadata.getDriver().getId()).setDeviceId(id);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.getById(query.build());

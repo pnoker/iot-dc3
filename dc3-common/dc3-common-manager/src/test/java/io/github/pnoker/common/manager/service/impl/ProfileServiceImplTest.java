@@ -194,7 +194,7 @@ class ProfileServiceImplTest {
     void getByNameAndTypeReturnsBoFromDal() {
         when(profileManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(profileBuilder.buildBOByDO(doRow)).thenReturn(bo);
-        assertThat(service.selectByNameAndType(100L, "DefaultProfile",
+        assertThat(service.getByNameAndType(100L, "DefaultProfile",
                 io.github.pnoker.common.enums.ProfileTypeFlagEnum.SYSTEM)).isSameAs(bo);
     }
 }

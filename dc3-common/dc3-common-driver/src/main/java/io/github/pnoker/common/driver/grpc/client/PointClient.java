@@ -84,7 +84,7 @@ public class PointClient {
      * @param id Point ID
      * @return PointDTO
      */
-    public PointBO selectById(Long id) {
+    public PointBO getById(Long id) {
         GrpcPointQuery.Builder query = GrpcPointQuery.newBuilder();
         query.setDriverId(driverMetadata.getDriver().getId()).setPointId(id);
         GrpcRPointDTO rPointDTO = pointApiBlockingStub.getById(query.build());

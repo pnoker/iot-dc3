@@ -126,7 +126,7 @@ class TenantBindServiceImplTest {
     }
 
     @Test
-    void selectByTenantIdAndUserIdReturnsBoFromDal() {
+    void getByTenantIdAndUserIdReturnsBoFromDal() {
         when(tenantBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(tenantBindBuilder.buildBOByDO(doRow)).thenReturn(bo);
         assertThat(service.getByTenantIdAndUserId(1L, 7L)).isSameAs(bo);
@@ -137,7 +137,7 @@ class TenantBindServiceImplTest {
     // Testcontainers PG slice test introduced in a later stage.
 
     @Test
-    void selectByTenantIdAndUserIdReturnsNullWhenMissing() {
+    void getByTenantIdAndUserIdReturnsNullWhenMissing() {
         when(tenantBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(tenantBindBuilder.buildBOByDO(null)).thenReturn(null);
         assertThat(service.getByTenantIdAndUserId(1L, 7L)).isNull();
