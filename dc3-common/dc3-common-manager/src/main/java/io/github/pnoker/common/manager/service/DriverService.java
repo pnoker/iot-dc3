@@ -48,7 +48,7 @@ public interface DriverService extends BaseService<DriverBO, DriverQuery> {
      * @param profileId ID
      * @return Driver
      */
-    List<DriverBO> selectByProfileId(Long profileId);
+    List<DriverBO> listByProfileId(Long profileId);
 
     /**
      * Point ID
@@ -64,7 +64,7 @@ public interface DriverService extends BaseService<DriverBO, DriverQuery> {
      * @param deviceId Device ID
      * @return Driver
      */
-    DriverBO selectByDeviceId(Long deviceId);
+    DriverBO listByDeviceId(Long deviceId);
 
     /**
      * Driver ID
@@ -72,6 +72,6 @@ public interface DriverService extends BaseService<DriverBO, DriverQuery> {
      * @param ids Driver ID
      * @return Driver
      */
-    List<DriverBO> selectByIds(Set<Long> ids);
+    List<DriverBO> listByIds(Set<Long> ids);
 
 }

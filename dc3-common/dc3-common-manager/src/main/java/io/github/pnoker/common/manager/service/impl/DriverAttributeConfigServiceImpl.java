@@ -170,7 +170,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     @Override
-    public List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId) {
+    public List<DriverAttributeConfigBO> listByAttributeId(Long attributeId) {
         LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
                 .eq(DriverAttributeConfigDO::getAttributeId, attributeId);
         List<DriverAttributeConfigDO> entityDO = wrapper.list();
@@ -178,7 +178,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     @Override
-    public List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId) {
+    public List<DriverAttributeConfigBO> listByDeviceId(Long deviceId) {
         LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
                 .eq(DriverAttributeConfigDO::getDeviceId, deviceId);
         List<DriverAttributeConfigDO> entityDO = wrapper.list();

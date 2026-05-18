@@ -151,9 +151,9 @@ public class DeviceController implements BaseController {
      * @return Map(ID, DeviceVO)
      */
     @PostMapping("/select_by_ids")
-    public Mono<R<Map<Long, DeviceVO>>> selectByIds(@RequestBody List<Long> deviceIds) {
+    public Mono<R<Map<Long, DeviceVO>>> listByIds(@RequestBody List<Long> deviceIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.selectByIds(deviceIds));
+            List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.listByIds(deviceIds));
             Map<Long, DeviceVO> deviceMap = entityBOList.stream()
                     .collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
@@ -167,9 +167,9 @@ public class DeviceController implements BaseController {
      * @return Device array
      */
     @GetMapping("/select_by_profile_id")
-    public Mono<R<List<DeviceVO>>> selectByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
+    public Mono<R<List<DeviceVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.selectByProfileId(profileId));
+            List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.listByProfileId(profileId));
             List<DeviceVO> entityVOList = deviceBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));
@@ -242,10 +242,10 @@ public class DeviceController implements BaseController {
      * @return
      */
     @GetMapping("/select_by_driver_id")
-    public Mono<R<String>> selectByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<String>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.getById(driverId));
-            List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.selectByDriverId(driverId));
+            List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.listByDriverId(driverId));
             return R.ok(String.valueOf(deviceBOList.size()));
         }));
     }

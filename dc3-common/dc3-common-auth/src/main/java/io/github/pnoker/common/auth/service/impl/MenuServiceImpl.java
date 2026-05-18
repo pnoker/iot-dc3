@@ -154,7 +154,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<MenuTreeBO> selectTree(MenuQuery entityQuery) {
+    public List<MenuTreeBO> listTree(MenuQuery entityQuery) {
         MenuQuery effective = Objects.requireNonNullElseGet(entityQuery, MenuQuery::new);
         List<MenuDO> rows = menuManager.list(fuzzyQuery(effective));
         return assembleTree(rows);

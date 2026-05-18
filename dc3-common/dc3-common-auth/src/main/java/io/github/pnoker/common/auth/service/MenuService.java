@@ -40,6 +40,6 @@ public interface MenuService extends BaseService<MenuBO, MenuQuery> {
      * @param entityQuery filter conditions; null disables filtering
      * @return tree roots
      */
-    List<MenuTreeBO> selectTree(MenuQuery entityQuery);
+    List<MenuTreeBO> listTree(MenuQuery entityQuery);
 
 }

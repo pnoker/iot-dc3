@@ -94,7 +94,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
             builder.addAllPointAttributes(grpcPointAttributeDTOList);
 
             //
-            List<Long> idList = deviceService.selectIdsByDriverId(entityBO.getId());
+            List<Long> idList = deviceService.listIdsByDriverId(entityBO.getId());
             builder.addAllDeviceIds(idList);
 
             rBuilder.setOk(true);

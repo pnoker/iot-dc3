@@ -39,7 +39,7 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      * @param deviceId Device ID
      * @return DriverConfig
      */
-    List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId);
+    List<DriverAttributeConfigBO> listByDeviceId(Long deviceId);
 
     /**
      * ID
@@ -47,7 +47,7 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      * @param attributeId ID
      * @return DriverConfig
      */
-    List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId);
+    List<DriverAttributeConfigBO> listByAttributeId(Long attributeId);
 
     /**
      * ID Device ID

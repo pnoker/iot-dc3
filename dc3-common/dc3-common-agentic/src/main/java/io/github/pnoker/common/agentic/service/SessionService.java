@@ -83,6 +83,6 @@ public interface SessionService {
      * @param query query parameters
      * @return paginated results
      */
-    Page<SessionBO> selectByPage(SessionQuery query);
+    Page<SessionBO> listByPage(SessionQuery query);
 
 }

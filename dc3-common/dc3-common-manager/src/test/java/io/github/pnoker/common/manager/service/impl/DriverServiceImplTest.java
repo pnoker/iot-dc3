@@ -180,8 +180,8 @@ class DriverServiceImplTest {
 
     @Test
     void selectByIdsReturnsEmptyForNullOrEmpty() {
-        assertThat(service.selectByIds(null)).isEmpty();
-        assertThat(service.selectByIds(Set.of())).isEmpty();
+        assertThat(service.listByIds(null)).isEmpty();
+        assertThat(service.listByIds(Set.of())).isEmpty();
         verify(driverManager, never()).listByIds(any());
     }
 
@@ -189,13 +189,13 @@ class DriverServiceImplTest {
     void selectByIdsDelegatesToManager() {
         when(driverManager.listByIds(Set.of(1L, 2L))).thenReturn(List.of(doRow));
         when(driverBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
-        assertThat(service.selectByIds(Set.of(1L, 2L))).containsExactly(bo);
+        assertThat(service.listByIds(Set.of(1L, 2L))).containsExactly(bo);
     }
 
     @Test
     void selectByProfileIdReturnsEmptyWhenNoDeviceBound() {
-        when(profileBindService.selectDeviceIdsByProfileId(5L)).thenReturn(List.of());
-        assertThat(service.selectByProfileId(5L)).isEmpty();
+        when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of());
+        assertThat(service.listByProfileId(5L)).isEmpty();
         verify(deviceManager, never()).listByIds(any());
     }
 
@@ -207,11 +207,11 @@ class DriverServiceImplTest {
         DeviceDO d2 = new DeviceDO();
         d2.setId(11L);
         d2.setDriverId(1L);
-        when(profileBindService.selectDeviceIdsByProfileId(5L)).thenReturn(List.of(10L, 11L));
+        when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of(10L, 11L));
         when(deviceManager.listByIds(List.of(10L, 11L))).thenReturn(List.of(d1, d2));
         when(driverManager.listByIds(Set.of(1L))).thenReturn(List.of(doRow));
         when(driverBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
 
-        assertThat(service.selectByProfileId(5L)).containsExactly(bo);
+        assertThat(service.listByProfileId(5L)).containsExactly(bo);
     }
 }

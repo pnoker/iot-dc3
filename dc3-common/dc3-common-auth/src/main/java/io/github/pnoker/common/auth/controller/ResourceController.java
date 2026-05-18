@@ -121,7 +121,7 @@ public class ResourceController implements BaseController {
     @PostMapping("/tree")
     public Mono<R<List<ResourceTreeVO>>> tree(@RequestBody(required = false) ResourceQuery entityQuery) {
         return async(() -> {
-            List<ResourceTreeBO> entityBOList = resourceService.selectTree(entityQuery);
+            List<ResourceTreeBO> entityBOList = resourceService.listTree(entityQuery);
             List<ResourceTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
             for (ResourceTreeBO node : entityBOList) {
                 entityVOList.add(toTreeVO(node));

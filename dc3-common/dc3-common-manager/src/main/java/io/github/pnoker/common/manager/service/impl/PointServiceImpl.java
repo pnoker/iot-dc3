@@ -119,7 +119,7 @@ public class PointServiceImpl implements PointService {
         //
         metadataEventPublisher.publishEvent(
                 new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD));
-        List<Long> deviceIds = profileBindService.selectDeviceIdsByProfileId(entityDO.getProfileId());
+        List<Long> deviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
         deviceIds.forEach(entityId -> metadataEventPublisher
                 .publishEvent(new MetadataEvent(this, entityId, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE)));
     }
@@ -136,7 +136,7 @@ public class PointServiceImpl implements PointService {
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
                 MetadataOperateTypeEnum.DELETE);
         metadataEventPublisher.publishEvent(metadataEvent);
-        List<Long> deviceIds = profileBindService.selectDeviceIdsByProfileId(entityDO.getProfileId());
+        List<Long> deviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
         deviceIds.forEach(entityId -> metadataEventPublisher
                 .publishEvent(new MetadataEvent(this, entityId, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE)));
     }
@@ -170,7 +170,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<PointBO> selectByIds(Set<Long> ids) {
+    public List<PointBO> listByIds(Set<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -179,7 +179,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<PointBO> selectByDeviceId(Long deviceId) {
+    public List<PointBO> listByDeviceId(Long deviceId) {
         DeviceDO deviceDO = deviceMapper.selectById(deviceId);
         if (Objects.isNull(deviceDO)) {
             return Collections.emptyList();
@@ -196,7 +196,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<PointBO> selectByProfileId(Long profileId) {
+    public List<PointBO> listByProfileId(Long profileId) {
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, profileId);
         List<PointDO> entityDOList = wrapper.list();
         return pointBuilder.buildBOListByDOList(entityDOList);
@@ -232,12 +232,12 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public DeviceByPointBO selectPointStatisticsWithDevice(Long pointId) {
+    public DeviceByPointBO getPointStatisticsWithDevice(Long pointId) {
         PointBO pointBO = getById(pointId);
         Set<Long> deviceIds = new HashSet<>();
 
-        profileBindService.selectDeviceIdsByProfileId(pointBO.getProfileId()).forEach(deviceId -> {
-            List<PointAttributeConfigDO> dos = selectByDeviceIdAndPointId(deviceId, pointId);
+        profileBindService.listDeviceIdsByProfileId(pointBO.getProfileId()).forEach(deviceId -> {
+            List<PointAttributeConfigDO> dos = listByDeviceIdAndPointId(deviceId, pointId);
             if (!dos.isEmpty()) {
                 deviceIds.add(deviceId);
             }
@@ -256,7 +256,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public Long selectPointByDeviceId(Long deviceId) {
+    public Long getPointByDeviceId(Long deviceId) {
         List<ProfileBindDO> bindDOList = profileBindManager
                 .list(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
         if (CollectionUtils.isEmpty(bindDOList)) {
@@ -271,7 +271,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId) {
+    public PointConfigByDeviceBO getPointConfigByDeviceId(Long deviceId) {
         PointConfigByDeviceBO pointConfigByDeviceBO = new PointConfigByDeviceBO();
         List<ProfileBindDO> bindDOList = profileBindManager
                 .list(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
@@ -397,7 +397,7 @@ public class PointServiceImpl implements PointService {
      * @param pointId  Point ID
      * @return PointConfig Array
      */
-    private List<PointAttributeConfigDO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+    private List<PointAttributeConfigDO> listByDeviceIdAndPointId(Long deviceId, Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
                 .eq(PointAttributeConfigDO::getDeviceId, deviceId)
                 .eq(PointAttributeConfigDO::getPointId, pointId);

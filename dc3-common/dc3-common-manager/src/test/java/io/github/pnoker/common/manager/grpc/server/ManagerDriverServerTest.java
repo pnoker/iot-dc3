@@ -115,7 +115,7 @@ class ManagerDriverServerTest {
     void selectByDriverIdsReturnsOkForNonEmptyList() {
         DriverBO bo = new DriverBO();
         bo.setId(1L);
-        when(driverService.selectByIds(Set.of(1L))).thenReturn(List.of(bo));
+        when(driverService.listByIds(Set.of(1L))).thenReturn(List.of(bo));
         when(grpcDriverBuilder.buildGrpcDTOByBO(bo)).thenReturn(GrpcDriverDTO.newBuilder().build());
 
         GrpcRDriverListDTO response = stub.listByDriverIds(
@@ -126,7 +126,7 @@ class ManagerDriverServerTest {
 
     @Test
     void selectByDriverIdsReturnsNoResourceForEmptyList() {
-        when(driverService.selectByIds(eq(Set.of(99L)))).thenReturn(List.of());
+        when(driverService.listByIds(eq(Set.of(99L)))).thenReturn(List.of());
         GrpcRDriverListDTO response = stub.listByDriverIds(
                 GrpcDriverIdsQuery.newBuilder().addDriverIds(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
@@ -135,7 +135,7 @@ class ManagerDriverServerTest {
 
     @Test
     void selectByDriverIdsReturnsNoResourceForNullSelection() {
-        when(driverService.selectByIds(Set.of(99L))).thenReturn(null);
+        when(driverService.listByIds(Set.of(99L))).thenReturn(null);
         GrpcRDriverListDTO response = stub.listByDriverIds(
                 GrpcDriverIdsQuery.newBuilder().addDriverIds(99L).build());
         assertThat(response.getResult().getOk()).isFalse();

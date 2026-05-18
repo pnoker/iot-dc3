@@ -66,7 +66,7 @@ public class SessionController implements BaseController {
             SessionQuery scopedQuery = Objects.isNull(query) ? new SessionQuery() : query;
             scopedQuery.setTenantId(header.getTenantId());
             scopedQuery.setUserId(header.getUserId());
-            Page<SessionBO> page = sessionService.selectByPage(scopedQuery);
+            Page<SessionBO> page = sessionService.listByPage(scopedQuery);
             Page<SessionVO> voPage = sessionBuilder.buildVOPageByBOPage(page);
             voPage.getRecords().forEach(session -> sanitizeSession(header, session));
             return R.ok(voPage);

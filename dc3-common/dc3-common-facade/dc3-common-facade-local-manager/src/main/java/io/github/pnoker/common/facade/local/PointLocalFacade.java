@@ -64,7 +64,7 @@ public class PointLocalFacade implements PointFacade {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        List<PointBO> list = pointService.selectByIds(new HashSet<>(ids));
+        List<PointBO> list = pointService.listByIds(new HashSet<>(ids));
         if (Objects.isNull(list) || list.isEmpty()) {
             return Collections.emptyList();
         }

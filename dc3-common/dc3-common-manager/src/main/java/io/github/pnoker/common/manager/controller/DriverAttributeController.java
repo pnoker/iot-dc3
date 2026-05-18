@@ -141,11 +141,11 @@ public class DriverAttributeController implements BaseController {
      * @return DriverAttribute
      */
     @GetMapping("/select_by_driver_id")
-    public Mono<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<List<DriverAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
                 requireTenant(tenantId, driverService.getById(driverId));
-                List<DriverAttributeBO> entityBOList = filterTenant(tenantId, driverAttributeService.selectByDriverId(driverId));
+                List<DriverAttributeBO> entityBOList = filterTenant(tenantId, driverAttributeService.listByDriverId(driverId));
                 List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
             } catch (NotFoundException ne) {

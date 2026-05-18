@@ -161,7 +161,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public List<ResourceTreeBO> selectTree(ResourceQuery entityQuery) {
+    public List<ResourceTreeBO> listTree(ResourceQuery entityQuery) {
         ResourceQuery effective = Objects.requireNonNullElseGet(entityQuery, ResourceQuery::new);
         LambdaQueryWrapper<ResourceDO> wrapper = fuzzyQuery(effective);
         // Load everything that matches, then assemble in memory by parent_resource_id.

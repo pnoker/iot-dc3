@@ -47,6 +47,6 @@ public interface DeviceStatusService {
      * @return Map Long:String, where Long is the device ID and String is the device
      * status
      */
-    Map<Long, String> selectByProfileId(Long tenantId, Long profileId);
+    Map<Long, String> listByProfileId(Long tenantId, Long profileId);
 
 }

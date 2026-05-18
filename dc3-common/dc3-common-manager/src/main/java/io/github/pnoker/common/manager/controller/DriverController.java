@@ -137,9 +137,9 @@ public class DriverController implements BaseController {
      * @return Map(ID, DriverVO)
      */
     @PostMapping("/select_by_ids")
-    public Mono<R<Map<Long, DriverVO>>> selectByIds(@RequestBody Set<Long> driverIds) {
+    public Mono<R<Map<Long, DriverVO>>> listByIds(@RequestBody Set<Long> driverIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            List<DriverBO> entityBOList = filterTenant(tenantId, driverService.selectByIds(driverIds));
+            List<DriverBO> entityBOList = filterTenant(tenantId, driverService.listByIds(driverIds));
             Map<Long, DriverVO> driverMap = entityBOList.stream()
                     .collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
             return R.ok(driverMap);

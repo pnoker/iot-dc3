@@ -115,7 +115,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     @Override
-    public DriverAttributeBO selectByNameAndDriverId(String name, Long driverId) {
+    public DriverAttributeBO getByNameAndDriverId(String name, Long driverId) {
         LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery()
                 .eq(DriverAttributeDO::getAttributeCode, name)
                 .eq(DriverAttributeDO::getDriverId, driverId)
@@ -125,7 +125,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     @Override
-    public List<DriverAttributeBO> selectByDriverId(Long driverId) {
+    public List<DriverAttributeBO> listByDriverId(Long driverId) {
         LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery()
                 .eq(DriverAttributeDO::getDriverId, driverId);
         List<DriverAttributeDO> entityDO = wrapper.list();

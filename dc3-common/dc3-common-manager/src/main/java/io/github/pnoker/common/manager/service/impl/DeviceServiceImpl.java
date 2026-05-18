@@ -185,7 +185,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         List<Long> newProfileIds = entityBO.getProfileIds();
-        List<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
+        List<Long> oldProfileIds = profileBindService.listProfileIdsByDeviceId(entityBO.getId());
 
         //
         ArrayList<Long> addIds = new ArrayList<>(newProfileIds);
@@ -217,7 +217,7 @@ public class DeviceServiceImpl implements DeviceService {
     public DeviceBO getById(Long id) {
         DeviceDO entityDO = getDOById(id, true);
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
+        entityBO.setProfileIds(profileBindService.listProfileIdsByDeviceId(id));
         return entityBO;
     }
 
@@ -229,7 +229,7 @@ public class DeviceServiceImpl implements DeviceService {
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO entityDO = deviceManager.getOne(wrapper);
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(entityDO.getId()));
+        entityBO.setProfileIds(profileBindService.listProfileIdsByDeviceId(entityDO.getId()));
         return entityBO;
     }
 
@@ -241,42 +241,42 @@ public class DeviceServiceImpl implements DeviceService {
                 .last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO entityDO = wrapper.one();
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(entityDO.getId()));
+        entityBO.setProfileIds(profileBindService.listProfileIdsByDeviceId(entityDO.getId()));
         return entityBO;
     }
 
     @Override
-    public List<DeviceBO> selectByDriverId(Long driverId) {
+    public List<DeviceBO> listByDriverId(Long driverId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDriverId, driverId);
         List<DeviceDO> entityDOList = deviceManager.list(wrapper);
         List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOList);
         deviceBOList
-                .forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+                .forEach(device -> device.setProfileIds(profileBindService.listProfileIdsByDeviceId(device.getId())));
         return deviceBOList;
     }
 
     @Override
-    public List<Long> selectIdsByDriverId(Long driverId) {
+    public List<Long> listIdsByDriverId(Long driverId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDriverId, driverId).select(DeviceDO::getId);
         return deviceManager.list(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
     @Override
-    public List<DeviceBO> selectByProfileId(Long profileId) {
-        return selectByIds(profileBindService.selectDeviceIdsByProfileId(profileId));
+    public List<DeviceBO> listByProfileId(Long profileId) {
+        return listByIds(profileBindService.listDeviceIdsByProfileId(profileId));
     }
 
     @Override
-    public List<DeviceBO> selectByIds(List<Long> ids) {
+    public List<DeviceBO> listByIds(List<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
         List<DeviceDO> entityDOList = deviceManager.listByIds(ids);
         List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOList);
         deviceBOList
-                .forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+                .forEach(device -> device.setProfileIds(profileBindService.listProfileIdsByDeviceId(device.getId())));
         return deviceBOList;
     }
 
@@ -289,7 +289,7 @@ public class DeviceServiceImpl implements DeviceService {
                 fuzzyQuery(entityQuery), entityQuery.getProfileId());
         Page<DeviceBO> entityPageBO = deviceBuilder.buildBOPageByDOPage(entityPageDO);
         entityPageBO.getRecords()
-                .forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+                .forEach(device -> device.setProfileIds(profileBindService.listProfileIdsByDeviceId(device.getId())));
         return entityPageBO;
     }
 
@@ -300,11 +300,11 @@ public class DeviceServiceImpl implements DeviceService {
         List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds()).stream()
                 .filter(pointBO -> Objects.equals(entityBO.getTenantId(), pointBO.getTenantId()))
                 .toList();
-        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.selectByDriverId(entityBO.getDriverId())
+        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.listByDriverId(entityBO.getDriverId())
                 .stream()
                 .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
                 .toList();
-        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.selectByDriverId(entityBO.getDriverId())
+        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.listByDriverId(entityBO.getDriverId())
                 .stream()
                 .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
                 .toList();
@@ -350,11 +350,11 @@ public class DeviceServiceImpl implements DeviceService {
     public Path generateImportTemplate(DeviceBO entityBO) {
         validateTenantRelations(entityBO);
 
-        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.selectByDriverId(entityBO.getDriverId())
+        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.listByDriverId(entityBO.getDriverId())
                 .stream()
                 .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
                 .toList();
-        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.selectByDriverId(entityBO.getDriverId())
+        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.listByDriverId(entityBO.getDriverId())
                 .stream()
                 .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
                 .toList();
@@ -551,7 +551,7 @@ public class DeviceServiceImpl implements DeviceService {
             throw new NotFoundException("Resource does not exist");
         }
 
-        List<ProfileBO> profileBOList = profileService.selectByIds(profileIds);
+        List<ProfileBO> profileBOList = profileService.listByIds(profileIds);
         if (profileBOList.size() != profileIds.size() || profileBOList.stream()
                 .anyMatch(profileBO -> !Objects.equals(tenantId, profileBO.getTenantId()))) {
             throw new NotFoundException("Resource does not exist");

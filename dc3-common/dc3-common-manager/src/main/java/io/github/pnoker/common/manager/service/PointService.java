@@ -42,7 +42,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @param profileId Point ID
      * @return Point
      */
-    List<PointBO> selectByProfileId(Long profileId);
+    List<PointBO> listByProfileId(Long profileId);
 
     /**
      * Device ID
@@ -50,7 +50,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @param deviceId Device ID
      * @return Point
      */
-    List<PointBO> selectByDeviceId(Long deviceId);
+    List<PointBO> listByDeviceId(Long deviceId);
 
     /**
      * ID
@@ -66,7 +66,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @param ids Point ID
      * @return Point
      */
-    List<PointBO> selectByIds(Set<Long> ids);
+    List<PointBO> listByIds(Set<Long> ids);
 
     /**
      * @param pointIds Point ID
@@ -78,18 +78,18 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @param pointId id
      * @return {@link Set}<{@link Long}>
      */
-    DeviceByPointBO selectPointStatisticsWithDevice(Long pointId);
+    DeviceByPointBO getPointStatisticsWithDevice(Long pointId);
 
     /**
      * @param deviceId
      * @return
      */
-    Long selectPointByDeviceId(Long deviceId);
+    Long getPointByDeviceId(Long deviceId);
 
     /**
      * @param deviceId
      * @return
      */
-    PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId);
+    PointConfigByDeviceBO getPointConfigByDeviceId(Long deviceId);
 
 }

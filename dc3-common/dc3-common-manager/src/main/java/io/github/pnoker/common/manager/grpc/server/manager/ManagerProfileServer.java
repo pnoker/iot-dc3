@@ -110,7 +110,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
         GrpcRProfileListDTO.Builder builder = GrpcRProfileListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<ProfileBO> profiles = profileService.selectByIds(new HashSet<>(request.getProfileIdsList()));
+        List<ProfileBO> profiles = profileService.listByIds(new HashSet<>(request.getProfileIdsList()));
         if (CollectionUtils.isEmpty(profiles)) {
             noResource(rBuilder);
         } else {
@@ -128,7 +128,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
         GrpcRProfileListDTO.Builder builder = GrpcRProfileListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<ProfileBO> profiles = profileService.selectByDeviceId(request.getDeviceId());
+        List<ProfileBO> profiles = profileService.listByDeviceId(request.getDeviceId());
         if (CollectionUtils.isEmpty(profiles)) {
             noResource(rBuilder);
         } else {

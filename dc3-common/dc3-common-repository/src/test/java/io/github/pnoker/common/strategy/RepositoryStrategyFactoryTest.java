@@ -147,7 +147,7 @@ class RepositoryStrategyFactoryTest {
         }
 
         @Override
-        public List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
+        public List<String> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
             return List.of();
         }
 
@@ -157,12 +157,12 @@ class RepositoryStrategyFactoryTest {
         }
 
         @Override
-        public List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds) {
+        public List<PointValueBO> listLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds) {
             return List.of();
         }
 
         @Override
-        public Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery) {
+        public Page<PointValueBO> listPagePointValue(PointValueQuery entityQuery) {
             return new Page<>();
         }
     }

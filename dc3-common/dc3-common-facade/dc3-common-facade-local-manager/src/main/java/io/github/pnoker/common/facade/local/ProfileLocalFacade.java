@@ -64,7 +64,7 @@ public class ProfileLocalFacade implements ProfileFacade {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        List<ProfileBO> list = profileService.selectByIds(new HashSet<>(ids));
+        List<ProfileBO> list = profileService.listByIds(new HashSet<>(ids));
         if (Objects.isNull(list) || list.isEmpty()) {
             return Collections.emptyList();
         }
@@ -85,7 +85,7 @@ public class ProfileLocalFacade implements ProfileFacade {
 
     @Override
     public List<FacadeProfileBO> listByDeviceId(Long deviceId) {
-        List<ProfileBO> list = profileService.selectByDeviceId(deviceId);
+        List<ProfileBO> list = profileService.listByDeviceId(deviceId);
         if (Objects.isNull(list) || list.isEmpty()) {
             return Collections.emptyList();
         }

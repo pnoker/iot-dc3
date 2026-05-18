@@ -39,6 +39,6 @@ public interface ResourceService extends BaseService<ResourceBO, ResourceQuery> 
      * @param entityQuery filter conditions; null disables filtering
      * @return tree roots, children nested under each parent
      */
-    List<ResourceTreeBO> selectTree(ResourceQuery entityQuery);
+    List<ResourceTreeBO> listTree(ResourceQuery entityQuery);
 
 }

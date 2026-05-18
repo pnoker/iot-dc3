@@ -40,6 +40,6 @@ public interface RoleService extends BaseService<RoleBO, RoleQuery> {
      * @param entityQuery optional filters (tenantId is populated by the controller)
      * @return root nodes, each node carrying its children
      */
-    List<RoleTreeBO> selectTree(RoleQuery entityQuery);
+    List<RoleTreeBO> listTree(RoleQuery entityQuery);
 
 }

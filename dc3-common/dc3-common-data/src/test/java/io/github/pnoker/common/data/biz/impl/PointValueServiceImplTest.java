@@ -189,13 +189,13 @@ class PointValueServiceImplTest {
             when(pointFacade.getById(1L, 3L)).thenReturn(point);
 
             service.history(1L, 2L, 3L, 0);
-            verify(repositoryService).selectHistoryPointValue(1L, 2L, 3L, 100);
+            verify(repositoryService).listHistoryPointValue(1L, 2L, 3L, 100);
 
             service.history(1L, 2L, 3L, 1000);
-            verify(repositoryService).selectHistoryPointValue(1L, 2L, 3L, 500);
+            verify(repositoryService).listHistoryPointValue(1L, 2L, 3L, 500);
 
             service.history(1L, 2L, 3L, 250);
-            verify(repositoryService).selectHistoryPointValue(1L, 2L, 3L, 250);
+            verify(repositoryService).listHistoryPointValue(1L, 2L, 3L, 250);
         }
     }
 
@@ -267,7 +267,7 @@ class PointValueServiceImplTest {
                      Mockito.mockStatic(RepositoryStrategyFactory.class)) {
             factory.when(RepositoryStrategyFactory::get).thenReturn(List.of(repositoryService));
             service.page(query);
-            verify(repositoryService).selectPagePointValue(query);
+            verify(repositoryService).listPagePointValue(query);
         }
     }
 }

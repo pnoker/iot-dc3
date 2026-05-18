@@ -75,7 +75,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     @Override
-    public Map<Long, String> selectByProfileId(Long tenantId, Long profileId) {
+    public Map<Long, String> listByProfileId(Long tenantId, Long profileId) {
         List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
         if (devices.isEmpty()) {
             return Map.of();
