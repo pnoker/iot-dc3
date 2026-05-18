@@ -50,7 +50,7 @@ import io.github.pnoker.common.entity.ext.NotifyRecordRequestExt;
 import io.github.pnoker.common.entity.ext.NotifyRecordResponseExt;
 import io.github.pnoker.common.entity.ext.RuleStateExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusFlagEnum;
+import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
 import io.github.pnoker.common.enums.RuleStateFlagEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -174,7 +174,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                     .orElseGet(() -> NotifySendResult.failed(channel.getCredentialRef(), "Notify channel adapter is missing"));
             NotifyRecordBO record = persistRecord(match, notify, message, bind, channel, payload, variables, result);
             records.add(record);
-            if (NotifyRecordStatusFlagEnum.SUCCESS.equals(result.getStatusFlag())) {
+            if (NotifyRecordStatusEnum.SUCCESS.equals(result.getStatusFlag())) {
                 state.setLastNotifyTime(LocalDateTime.now());
                 persistState(state);
             }

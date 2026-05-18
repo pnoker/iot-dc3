@@ -22,7 +22,7 @@ import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.NotifyRecordRequestExt;
 import io.github.pnoker.common.entity.ext.NotifyRecordResponseExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusFlagEnum;
+import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,7 +57,7 @@ public class NotifyRecordBO extends BaseBO implements TenantOwned {
 
     private String target;
 
-    private NotifyRecordStatusFlagEnum statusFlag;
+    private NotifyRecordStatusEnum statusFlag;
 
     private NotifyRecordRequestExt requestExt;
 

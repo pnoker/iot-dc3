@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.entity.query;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusFlagEnum;
+import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -68,6 +68,6 @@ public class NotifyRecordQuery implements Serializable {
 
     private String target;
 
-    private NotifyRecordStatusFlagEnum statusFlag;
+    private NotifyRecordStatusEnum statusFlag;
 
 }
