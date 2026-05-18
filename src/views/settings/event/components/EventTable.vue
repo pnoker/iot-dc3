@@ -158,8 +158,8 @@
   import { useRoute } from 'vue-router';
 
   import { alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getDriverByIds } from '@/api/driver';
+  import { listDeviceByIds } from '@/api/device';
+  import { listDriverByIds } from '@/api/driver';
   import { timestampColumn } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -249,7 +249,7 @@
     const ids = Array.from(new Set(batch.map((r) => String(r.sourceId)).filter((id) => id && !nameMap[id])));
     if (ids.length === 0) return;
     try {
-      const res: any = props.source === 'device' ? await getDeviceByIds(ids) : await getDriverByIds(ids);
+      const res: any = props.source === 'device' ? await listDeviceByIds(ids) : await listDriverByIds(ids);
       const data = res?.data || {};
       for (const id of ids) {
         const item = data[id];

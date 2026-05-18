@@ -18,7 +18,7 @@ import { defineComponent, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { getApiList } from '@/api/api';
+import { listApi } from '@/api/api';
 import { timestampColumn } from '@/utils/dateUtil';
 
 import type { Order } from '@/config/types';
@@ -54,7 +54,7 @@ export default defineComponent({
 
     const load = () => {
       reactiveData.loading = true;
-      getApiList({ page: reactiveData.page, ...reactiveData.query })
+      listApi({ page: reactiveData.page, ...reactiveData.query })
         .then((res: any) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];

@@ -27,7 +27,7 @@ export const updateMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/up
 
 export const getMenuById = (id: string) => httpGet(`${API_AUTH_BASE}/menu/get_by_id`, { params: { id } });
 
-export const getMenuList = <T = R<PageResult<MenuRecord>>>(query: PageQuery) =>
+export const listMenu = <T = R<PageResult<MenuRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/menu/list`, query);
 
-export const getMenuTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/menu/list_tree`, query);
+export const listMenuTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/menu/list_tree`, query);

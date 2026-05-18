@@ -18,7 +18,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { addUser, deleteUser, getUserList, updateUser } from '@/api/user';
+import { addUser, deleteUser, listUser, updateUser } from '@/api/user';
 import { addRoleUserBind, deleteRoleUserBind } from '@/api/roleUserBind';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
@@ -60,7 +60,7 @@ export default defineComponent({
 
     const load = () => {
       reactiveData.loading = true;
-      getUserList({ page: reactiveData.page, ...reactiveData.query })
+      listUser({ page: reactiveData.page, ...reactiveData.query })
         .then((res: any) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];

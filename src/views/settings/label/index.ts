@@ -18,7 +18,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { addLabel, deleteLabel, getLabelList, updateLabel } from '@/api/label';
+import { addLabel, deleteLabel, listLabel, updateLabel } from '@/api/label';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
@@ -56,7 +56,7 @@ export default defineComponent({
 
     const load = () => {
       reactiveData.loading = true;
-      getLabelList({ page: reactiveData.page, ...reactiveData.query })
+      listLabel({ page: reactiveData.page, ...reactiveData.query })
         .then((res: any) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];

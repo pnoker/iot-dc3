@@ -18,7 +18,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { addGroup, deleteGroup, getGroupList, updateGroup } from '@/api/group';
+import { addGroup, deleteGroup, listGroup, updateGroup } from '@/api/group';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
@@ -58,7 +58,7 @@ export default defineComponent({
     const parentNameMap = reactive<Record<string, string>>({});
 
     const loadOptions = () => {
-      getGroupList({ page: { current: 1, size: 5000, orders: [{ column: 'group_index', asc: true }] } })
+      listGroup({ page: { current: 1, size: 5000, orders: [{ column: 'group_index', asc: true }] } })
         .then((res: any) => {
           const records = (res.data?.records || []) as GroupRecord[];
           reactiveData.groupOptions = records;
@@ -74,7 +74,7 @@ export default defineComponent({
 
     const load = () => {
       reactiveData.loading = true;
-      getGroupList({ page: reactiveData.page, ...reactiveData.query })
+      listGroup({ page: reactiveData.page, ...reactiveData.query })
         .then((res: any) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];

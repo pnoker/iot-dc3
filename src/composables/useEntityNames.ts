@@ -16,10 +16,10 @@
 
 import { reactive } from 'vue';
 
-import { getDeviceByIds } from '@/api/device';
-import { getDriverByIds } from '@/api/driver';
+import { listDeviceByIds } from '@/api/device';
+import { listDriverByIds } from '@/api/driver';
 import { getPointByIds } from '@/api/point';
-import { getProfileByIds } from '@/api/profile';
+import { listProfileByIds } from '@/api/profile';
 
 /**
  * Cross-component reactive cache for entity id → display name lookups.
@@ -29,7 +29,7 @@ import { getProfileByIds } from '@/api/profile';
  *   1. **Cache is process-wide.** Opening FlappingSources after SilentSources
  *      already resolved a device id doesn't re-issue the batch request.
  *   2. **Inflight dedup.** Two cards mounting simultaneously won't fire two
- *      identical getDeviceByIds calls for the same missing ids — the second
+ *      identical listDeviceByIds calls for the same missing ids — the second
  *      one sees ids marked inflight and waits for the first to land.
  *
  * Errors are swallowed silently (the axios response interceptor already
@@ -59,9 +59,9 @@ const inflight: Record<EntityKind, Set<string>> = {
 };
 
 const fetchers: Record<EntityKind, (ids: string[]) => Promise<BatchResponse>> = {
-  device: (ids) => getDeviceByIds(ids) as Promise<BatchResponse>,
-  driver: (ids) => getDriverByIds(ids) as Promise<BatchResponse>,
-  profile: (ids) => getProfileByIds(ids) as Promise<BatchResponse>,
+  device: (ids) => listDeviceByIds(ids) as Promise<BatchResponse>,
+  driver: (ids) => listDriverByIds(ids) as Promise<BatchResponse>,
+  profile: (ids) => listProfileByIds(ids) as Promise<BatchResponse>,
   point: (ids) => getPointByIds(ids) as Promise<BatchResponse>,
 };
 

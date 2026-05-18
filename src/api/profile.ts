@@ -31,11 +31,11 @@ export const updateProfile = (profile: ProfileForm) =>
 export const getProfileById = (id: string) =>
   httpGet<R<ProfileRecord>>(`${API_MANAGER_BASE}/profile/get_by_id`, { params: { id } });
 
-export const getProfileByIds = (profileIds: string[]) =>
+export const listProfileByIds = (profileIds: string[]) =>
   httpPost<R<Record<string, ProfileRecord>>>(`${API_MANAGER_BASE}/profile/list_by_ids`, profileIds);
 
-export const getProfileByDeviceId = (deviceId: string) =>
+export const listProfileByDeviceId = (deviceId: string) =>
   httpGet(`${API_MANAGER_BASE}/profile/list_by_device_id`, { params: { device_id: deviceId } });
 
-export const getProfileList = <T = R<PageResult<ProfileRecord>>>(query: PageQuery) =>
+export const listProfile = <T = R<PageResult<ProfileRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/profile/list`, query);

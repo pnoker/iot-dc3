@@ -27,7 +27,7 @@ export const updateRole = (role: RoleForm) => httpPost(`${API_AUTH_BASE}/role/up
 
 export const getRoleById = (id: string) => httpGet(`${API_AUTH_BASE}/role/get_by_id`, { params: { id } });
 
-export const getRoleList = <T = R<PageResult<RoleRecord>>>(query: PageQuery) =>
+export const listRole = <T = R<PageResult<RoleRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/role/list`, query);
 
-export const getRoleTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/role/list_tree`, query);
+export const listRoleTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/role/list_tree`, query);

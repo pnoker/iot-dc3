@@ -30,25 +30,25 @@ export const updateDevice = (device: DeviceForm) =>
 export const getDeviceById = (id: string) =>
   httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/get_by_id`, { params: { id } });
 
-export const getDeviceByIds = (deviceIds: string[]) =>
+export const listDeviceByIds = (deviceIds: string[]) =>
   httpPost<R<Record<string, DeviceRecord>>>(`${API_MANAGER_BASE}/device/list_by_ids`, deviceIds);
 
-export const getDeviceByDriverId = (driverId: string) =>
+export const getDeviceCountByDriverId = (driverId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/list_by_driver_id`, { params: { driver_id: driverId } });
 
-export const getDeviceByProfileId = (profileId: string) =>
+export const listDeviceByProfileId = (profileId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/list_by_profile_id`, { params: { profile_id: profileId } });
 
-export const getDeviceList = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
+export const listDevice = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
 
 export const getDeviceStatus = (query: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/device/status/list`, query);
 
-export const getDeviceStatusByDriverId = (driverId: string) =>
+export const listDeviceStatusByDriverId = (driverId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/list_by_driver_id`, { params: { driver_id: driverId } });
 
-export const getDeviceStatusByProfileId = (profileId: string) =>
+export const listDeviceStatusByProfileId = (profileId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/list_by_profile_id`, { params: { profile_id: profileId } });
 
 export const importDeviceTemplate = (device: Record<string, unknown>) =>

@@ -18,12 +18,12 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { getApiList } from '@/api/api';
-import { addResource, deleteResource, getResourceTree, updateResource } from '@/api/resource';
-import { getDriverByIds } from '@/api/driver';
-import { getDeviceByIds } from '@/api/device';
+import { listApi } from '@/api/api';
+import { addResource, deleteResource, listResourceTree, updateResource } from '@/api/resource';
+import { listDriverByIds } from '@/api/driver';
+import { listDeviceByIds } from '@/api/device';
 import { getPointByIds } from '@/api/point';
-import { getProfileByIds } from '@/api/profile';
+import { listProfileByIds } from '@/api/profile';
 import { useMenuStore } from '@/store';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
@@ -155,13 +155,13 @@ export default defineComponent({
       const promises: Promise<void>[] = [];
       if (driverIds.length)
         promises.push(
-          getDriverByIds(driverIds)
+          listDriverByIds(driverIds)
             .then((r) => fill(driverIds, r, 'driverName'))
             .catch(() => {})
         );
       if (deviceIds.length)
         promises.push(
-          getDeviceByIds(deviceIds)
+          listDeviceByIds(deviceIds)
             .then((r) => fill(deviceIds, r, 'deviceName'))
             .catch(() => {})
         );
@@ -173,7 +173,7 @@ export default defineComponent({
         );
       if (profileIds.length)
         promises.push(
-          getProfileByIds(profileIds)
+          listProfileByIds(profileIds)
             .then((r) => fill(profileIds, r, 'profileName'))
             .catch(() => {})
         );
@@ -182,7 +182,7 @@ export default defineComponent({
       // tenant) and resolve from that map.
       if (apiIds.length)
         promises.push(
-          getApiList({ page: { size: 1000, current: 1 } })
+          listApi({ page: { size: 1000, current: 1 } })
             .then((r: any) => {
               const records = (r.data?.records as any[]) || [];
               const byId = new Map(records.map((a) => [String(a.id), a.apiName]));
@@ -211,7 +211,7 @@ export default defineComponent({
         // names — fetchTree is idempotent and skips the network if already
         // loaded (Layout mounts it on startup, so this is usually a no-op).
         await menuStore.fetchTree();
-        const res: any = await getResourceTree(reactiveData.query);
+        const res: any = await listResourceTree(reactiveData.query);
         const tree = res.data || [];
         reactiveData.listData = tree;
         reactiveData.page.total = tree.length;

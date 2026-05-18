@@ -16,7 +16,7 @@
 
 import { defineStore } from 'pinia';
 
-import { getMenuTree } from '@/api/menu';
+import { listMenuTree } from '@/api/menu';
 
 export interface MenuNode {
   id: number | string;
@@ -106,7 +106,7 @@ export const useMenuStore = defineStore('menu', {
       if (this.loading) return;
       this.loading = true;
       try {
-        const res: any = await getMenuTree({});
+        const res: any = await listMenuTree({});
         this.tree = Array.isArray(res?.data) ? res.data : [];
         this.loaded = true;
       } catch {

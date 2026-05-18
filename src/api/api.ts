@@ -27,4 +27,4 @@ export const updateApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BA
 
 export const getApiById = (id: string) => httpGet<R<ApiRecord>>(`${API_AUTH_BASE}/api/get_by_id`, { params: { id } });
 
-export const getApiList = (query: PageQuery) => httpPost<R<PageResult<ApiRecord>>>(`${API_AUTH_BASE}/api/list`, query);
+export const listApi = (query: PageQuery) => httpPost<R<PageResult<ApiRecord>>>(`${API_AUTH_BASE}/api/list`, query);

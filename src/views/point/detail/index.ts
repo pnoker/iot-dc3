@@ -19,10 +19,10 @@ import { defineComponent, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '@/config/router';
 
-import { getDeviceStatusByDriverId } from '@/api/device';
-import { getProfileByIds } from '@/api/profile';
-import { getDriverByIds } from '@/api/driver';
-import { getDeviceByPointId, getPointById } from '@/api/point';
+import { listDeviceStatusByDriverId } from '@/api/device';
+import { listProfileByIds } from '@/api/profile';
+import { listDriverByIds } from '@/api/driver';
+import { listDeviceByPointId, getPointById } from '@/api/point';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';
@@ -63,7 +63,7 @@ export default defineComponent({
     };
 
     const device = () => {
-      getDeviceByPointId(reactiveData.id)
+      listDeviceByPointId(reactiveData.id)
         .then((res) => {
           reactiveData.listDeviceData = res.data?.devices || [];
 
@@ -72,7 +72,7 @@ export default defineComponent({
             Boolean
           );
           if (driverIds.length > 0) {
-            getDriverByIds(driverIds)
+            listDriverByIds(driverIds)
               .then((res) => {
                 reactiveData.driverTable = res.data;
               })
@@ -80,7 +80,7 @@ export default defineComponent({
                 // nothing to do
               });
 
-            Promise.all(driverIds.map((driverId) => getDeviceStatusByDriverId(driverId)))
+            Promise.all(driverIds.map((driverId) => listDeviceStatusByDriverId(driverId)))
               .then((resList) => {
                 reactiveData.statusTable = resList.reduce<Record<string, any>>((pre, cur) => {
                   return { ...pre, ...(cur.data || {}) };
@@ -104,7 +104,7 @@ export default defineComponent({
             )
           ).filter(Boolean);
           if (profileIds.length > 0) {
-            getProfileByIds(profileIds)
+            listProfileByIds(profileIds)
               .then((res) => {
                 reactiveData.profileTable = res.data;
               })

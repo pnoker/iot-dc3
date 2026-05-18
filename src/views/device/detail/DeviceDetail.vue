@@ -59,7 +59,7 @@
   import router from '@/config/router';
 
   import { getDriverById } from '@/api/driver';
-  import { getProfileByDeviceId, getProfileByIds } from '@/api/profile';
+  import { listProfileByDeviceId, listProfileByIds } from '@/api/profile';
   import { getDeviceById } from '@/api/device';
 
   import baseCard from '@/components/card/base/BaseCard.vue';
@@ -122,13 +122,13 @@
   };
 
   const profiles = () => {
-    getProfileByDeviceId(reactiveData.id)
+    listProfileByDeviceId(reactiveData.id)
       .then((res) => {
         reactiveData.listProfileData = res.data;
 
         // profile
         const profileIds = Array.from(new Set(reactiveData.listProfileData.map((pointValue) => pointValue.id)));
-        getProfileByIds(profileIds)
+        listProfileByIds(profileIds)
           .then((res) => {
             reactiveData.profileTable = res.data;
           })

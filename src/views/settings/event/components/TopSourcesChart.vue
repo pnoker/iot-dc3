@@ -30,8 +30,8 @@
   import { Chart } from '@antv/g2';
 
   import { alertTopSources } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getDriverByIds } from '@/api/driver';
+  import { listDeviceByIds } from '@/api/device';
+  import { listDriverByIds } from '@/api/driver';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   const props = defineProps<{ days?: number; limit?: number }>();
@@ -76,7 +76,7 @@
       const jobs: Promise<void>[] = [];
       if (devIds.length) {
         jobs.push(
-          getDeviceByIds(devIds)
+          listDeviceByIds(devIds)
             .then((r: any) => {
               const d = r?.data || {};
               for (const id of devIds) {
@@ -88,7 +88,7 @@
       }
       if (drvIds.length) {
         jobs.push(
-          getDriverByIds(drvIds)
+          listDriverByIds(drvIds)
             .then((r: any) => {
               const d = r?.data || {};
               for (const id of drvIds) {

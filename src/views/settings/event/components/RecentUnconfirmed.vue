@@ -53,8 +53,8 @@
   import { onMounted, reactive, ref } from 'vue';
 
   import { alertPage } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getDriverByIds } from '@/api/driver';
+  import { listDeviceByIds } from '@/api/device';
+  import { listDriverByIds } from '@/api/driver';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   interface Row {
@@ -98,7 +98,7 @@
     const jobs: Promise<void>[] = [];
     if (devIds.length) {
       jobs.push(
-        getDeviceByIds(devIds)
+        listDeviceByIds(devIds)
           .then((r: { data?: Record<string, { deviceName?: string }> }) => {
             const d = r?.data || {};
             for (const id of devIds) {
@@ -110,7 +110,7 @@
     }
     if (drvIds.length) {
       jobs.push(
-        getDriverByIds(drvIds)
+        listDriverByIds(drvIds)
           .then((r: { data?: Record<string, { driverName?: string }> }) => {
             const d = r?.data || {};
             for (const id of drvIds) {

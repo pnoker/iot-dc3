@@ -18,7 +18,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { addRole, deleteRole, getRoleList, getRoleTree, updateRole } from '@/api/role';
+import { addRole, deleteRole, listRole, listRoleTree, updateRole } from '@/api/role';
 import { addRoleResourceBind, deleteRoleResourceBind } from '@/api/roleResourceBind';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
@@ -60,7 +60,7 @@ export default defineComponent({
     });
 
     const loadTree = () => {
-      getRoleTree()
+      listRoleTree()
         .then((res: any) => {
           reactiveData.roleTreeData = (res.data as any[]) || [];
         })
@@ -71,7 +71,7 @@ export default defineComponent({
 
     const load = () => {
       reactiveData.loading = true;
-      getRoleList({ page: reactiveData.page, ...reactiveData.query })
+      listRole({ page: reactiveData.page, ...reactiveData.query })
         .then((res: any) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];

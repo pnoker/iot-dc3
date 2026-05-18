@@ -72,7 +72,7 @@
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
 
-  import { getGroupById, getGroupList } from '@/api/group';
+  import { getGroupById, listGroup } from '@/api/group';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
   import { timestamp } from '@/utils/dateUtil';
@@ -102,7 +102,7 @@
   };
 
   const loadParents = () => {
-    getGroupList({ page: { current: 1, size: 5000 } })
+    listGroup({ page: { current: 1, size: 5000 } })
       .then((res: any) => {
         const records = res.data?.records || [];
         records.forEach((row: Record<string, any>) => {

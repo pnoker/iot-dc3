@@ -23,12 +23,12 @@ import router from '@/config/router';
 
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
 import { getDeviceById, updateDevice } from '@/api/device';
-import { getDriverAttributeByDriverId, getPointAttributeByDriverId } from '@/api/attribute';
+import { listDriverAttributeByDriverId, listPointAttributeByDriverId } from '@/api/attribute';
 import {
   addDriverInfo,
   addPointInfo,
-  getDriverInfoByDeviceId,
-  getPointInfoByDeviceId,
+  listDriverInfoByDeviceId,
+  listPointInfoByDeviceId,
   updateDriverInfo,
   updatePointInfo,
 } from '@/api/info';
@@ -40,8 +40,8 @@ import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue'
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue';
 import { isNull } from '@/utils/validationUtil';
 import { getDriverById } from '@/api/driver';
-import { getProfileByIds } from '@/api/profile';
-import { getPointByDeviceId } from '@/api/point';
+import { listProfileByIds } from '@/api/profile';
+import { listPointByDeviceId } from '@/api/point';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
 
@@ -270,7 +270,7 @@ export default defineComponent({
             } as Dictionary);
           });
 
-          getProfileByIds(reactiveData.deviceFormData.profileIds).then((res) => {
+          listProfileByIds(reactiveData.deviceFormData.profileIds).then((res) => {
             const profiles = res.data;
             for (const key in profiles) {
               const profile = profiles[key];
@@ -294,7 +294,7 @@ export default defineComponent({
         return;
       }
 
-      getDriverAttributeByDriverId(driverId)
+      listDriverAttributeByDriverId(driverId)
         .then((res) => {
           reactiveData.driverAttributes = res.data;
           reactiveData.driverAttributeTable = reactiveData.driverAttributes.reduce(
@@ -318,7 +318,7 @@ export default defineComponent({
           // nothing to do
         });
 
-      getPointAttributeByDriverId(driverId)
+      listPointAttributeByDriverId(driverId)
         .then((res) => {
           reactiveData.pointAttributes = res.data;
           reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce(
@@ -340,7 +340,7 @@ export default defineComponent({
     };
 
     const driverInfo = () => {
-      getDriverInfoByDeviceId(reactiveData.id)
+      listDriverInfoByDeviceId(reactiveData.id)
         .then((res) => {
           const formData: AttributeFormData = reactiveData.driverFormData;
           res.data.forEach((info: { attributeId: string | number; id: any; configValue: any }) => {
@@ -360,7 +360,7 @@ export default defineComponent({
     };
 
     const pointInfo = () => {
-      getPointByDeviceId(reactiveData.id)
+      listPointByDeviceId(reactiveData.id)
         .then((res) => {
           reactiveData.pointInfoData = res.data.map((point: { id: any; pointName: any }) => {
             const pointInfo: Record<string, any> = {
@@ -375,7 +375,7 @@ export default defineComponent({
             return pointInfo;
           });
 
-          getPointInfoByDeviceId(reactiveData.id)
+          listPointInfoByDeviceId(reactiveData.id)
             .then((res) => {
               res.data.forEach((info: { pointId: any; attributeId: string | number; id: any; configValue: any }) => {
                 reactiveData.pointInfoData.forEach((pointInfo) => {

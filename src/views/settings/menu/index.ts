@@ -19,7 +19,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { Menu as MenuIcon } from '@element-plus/icons-vue';
 
-import { addMenu, deleteMenu, getMenuTree, updateMenu } from '@/api/menu';
+import { addMenu, deleteMenu, listMenuTree, updateMenu } from '@/api/menu';
 import { resolveIcon } from '@/config/constant/icons';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
@@ -55,7 +55,7 @@ export default defineComponent({
 
     const load = () => {
       reactiveData.loading = true;
-      getMenuTree(reactiveData.query)
+      listMenuTree(reactiveData.query)
         .then((res: any) => {
           const tree = res.data || [];
           reactiveData.listData = tree;

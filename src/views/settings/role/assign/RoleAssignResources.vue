@@ -93,7 +93,7 @@
   import { Search } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
 
-  import { getResourceTree } from '@/api/resource';
+  import { listResourceTree } from '@/api/resource';
   import { getResourceListByRoleId, getRoleResourceList } from '@/api/roleResourceBind';
 
   interface ResourceNode {
@@ -277,7 +277,7 @@
     reactiveData.loading = true;
     try {
       const [treeRes, ownRes, bindsRes] = await Promise.all([
-        getResourceTree({}) as Promise<any>,
+        listResourceTree({}) as Promise<any>,
         getResourceListByRoleId(reactiveData.role.id) as Promise<any>,
         getRoleResourceList({ page: { size: 1000, current: 1 }, roleId: reactiveData.role.id }) as Promise<any>,
       ]);

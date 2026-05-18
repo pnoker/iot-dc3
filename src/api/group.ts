@@ -28,5 +28,5 @@ export const updateGroup = (group: GroupForm) => httpPost(`${API_MANAGER_BASE}/g
 export const getGroupById = (id: string) =>
   httpGet<R<GroupRecord>>(`${API_MANAGER_BASE}/group/get_by_id`, { params: { id } });
 
-export const getGroupList = <T = R<PageResult<GroupRecord>>>(query: PageQuery) =>
+export const listGroup = <T = R<PageResult<GroupRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/group/list`, query);

@@ -29,7 +29,7 @@ export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attribut
     params: { device_id: deviceId, attribute_id: attributeId },
   });
 
-export const getDriverInfoByDeviceId = (deviceId: string) =>
+export const listDriverInfoByDeviceId = (deviceId: string) =>
   httpGet(`${API_MANAGER_BASE}/driver_attribute_config/list_by_device_id`, { params: { device_id: deviceId } });
 
 export const addPointInfo = (pointInfo: PointInfoForm) =>
@@ -38,10 +38,10 @@ export const addPointInfo = (pointInfo: PointInfoForm) =>
 export const updatePointInfo = (pointInfo: PointInfoForm) =>
   httpPost(`${API_MANAGER_BASE}/point_attribute_config/update`, pointInfo);
 
-export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: string) =>
+export const listPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: string) =>
   httpGet(`${API_MANAGER_BASE}/point_attribute_config/list_by_device_id_and_point_id`, {
     params: { device_id: deviceId, point_id: pointId },
   });
 
-export const getPointInfoByDeviceId = (deviceId: string) =>
+export const listPointInfoByDeviceId = (deviceId: string) =>
   httpGet(`${API_MANAGER_BASE}/point_attribute_config/list_by_device_id`, { params: { device_id: deviceId } });

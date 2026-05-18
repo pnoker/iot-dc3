@@ -51,10 +51,10 @@
   import { Chart } from '@antv/g2';
 
   import { deviceStats, driverStats, statsTop } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getDriverByIds } from '@/api/driver';
+  import { listDeviceByIds } from '@/api/device';
+  import { listDriverByIds } from '@/api/driver';
   import { getPointByIds } from '@/api/point';
-  import { getProfileByIds } from '@/api/profile';
+  import { listProfileByIds } from '@/api/profile';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
@@ -146,10 +146,10 @@
     if (missing.length === 0) return;
     try {
       let res: any;
-      if (kind === 'device') res = await getDeviceByIds(missing);
+      if (kind === 'device') res = await listDeviceByIds(missing);
       else if (kind === 'point') res = await getPointByIds(missing);
-      else if (kind === 'driver') res = await getDriverByIds(missing);
-      else res = await getProfileByIds(missing);
+      else if (kind === 'driver') res = await listDriverByIds(missing);
+      else res = await listProfileByIds(missing);
       const data = res?.data || {};
       for (const id of missing) {
         const item = data[id];

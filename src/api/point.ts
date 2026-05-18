@@ -31,18 +31,18 @@ export const getPointById = (id: string) =>
 export const getPointByIds = (pointIds: string[]) =>
   httpPost<R<Record<string, PointRecord>>>(`${API_MANAGER_BASE}/point/list_by_ids`, pointIds);
 
-export const getPointList = <T = R<PageResult<PointRecord>>>(query: PageQuery) =>
+export const listPoint = <T = R<PageResult<PointRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/point/list`, query);
 
 export const getPointUnit = (pointIds: string[]) => httpPost(`${API_MANAGER_BASE}/point/unit`, pointIds);
 
-export const getPointByProfileId = (profileId: string) =>
+export const listPointByProfileId = (profileId: string) =>
   httpGet(`${API_MANAGER_BASE}/point/list_by_profile_id`, { params: { profile_id: profileId } });
 
-export const getPointByDeviceId = (deviceId: string) =>
+export const listPointByDeviceId = (deviceId: string) =>
   httpGet(`${API_MANAGER_BASE}/point/list_by_device_id`, { params: { device_id: deviceId } });
 
-export const getDeviceByPointId = (pointId: string) =>
+export const listDeviceByPointId = (pointId: string) =>
   httpGet<R<{ count: number; devices: DeviceRecord[] }>>(
     `${API_MANAGER_BASE}/point/list_device_statistics_by_point_id`,
     { params: { point_id: pointId } }
@@ -51,7 +51,7 @@ export const getDeviceByPointId = (pointId: string) =>
 export const getPointValueLatest = (pointValue: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/point_value/latest`, pointValue);
 
-export const getPointValueList = (pointValue: Record<string, unknown>) =>
+export const listPointValue = (pointValue: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/point_value/list`, pointValue);
 
 export const getPointValueHistory = (deviceId: number, pointId: number, count = 100) =>

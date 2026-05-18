@@ -119,7 +119,7 @@
   import type { TabsPaneContext } from 'element-plus';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { getResourceById, getResourceTree } from '@/api/resource';
+  import { getResourceById, listResourceTree } from '@/api/resource';
   import { getRoleListByResourceId } from '@/api/roleResourceBind';
   import { timestamp } from '@/utils/dateUtil';
 
@@ -185,7 +185,7 @@
   const loadChildren = () => {
     if (!reactiveData.id || reactiveData.childrenLoaded) return;
     reactiveData.childrenLoading = true;
-    getResourceTree({})
+    listResourceTree({})
       .then((res: any) => {
         const tree = (res.data as any[]) || [];
         const node = findNode(tree, reactiveData.id);

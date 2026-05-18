@@ -46,7 +46,7 @@
 <script lang="ts" setup>
   import { computed, reactive } from 'vue';
 
-  import { getDriverList, getDriverStatus } from '@/api/driver';
+  import { listDriver, getDriverStatus } from '@/api/driver';
 
   import type { Order } from '@/config/types';
 
@@ -91,7 +91,7 @@
   const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
 
   const list = () => {
-    const listPromise = getDriverList<DriverListResponse>({
+    const listPromise = listDriver<DriverListResponse>({
       page: reactiveData.page,
       ...reactiveData.query,
     })

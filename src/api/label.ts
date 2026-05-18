@@ -28,5 +28,5 @@ export const updateLabel = (label: LabelForm) => httpPost(`${API_MANAGER_BASE}/l
 export const getLabelById = (id: string) =>
   httpGet<R<LabelRecord>>(`${API_MANAGER_BASE}/label/get_by_id`, { params: { id } });
 
-export const getLabelList = <T = R<PageResult<LabelRecord>>>(query: PageQuery) =>
+export const listLabel = <T = R<PageResult<LabelRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/label/list`, query);

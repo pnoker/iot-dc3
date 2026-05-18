@@ -52,8 +52,8 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive } from 'vue';
-  import { getPointByIds, getPointUnit, getPointValueLatest, getPointValueList } from '@/api/point';
-  import { getDeviceByIds } from '@/api/device';
+  import { getPointByIds, getPointUnit, getPointValueLatest, listPointValue } from '@/api/point';
+  import { listDeviceByIds } from '@/api/device';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -118,7 +118,7 @@
           reactiveData.loading = false;
         });
     } else {
-      getPointValueList({
+      listPointValue({
         page: reactiveData.page,
         ...reactiveData.query,
       })
@@ -146,7 +146,7 @@
     // device
     const deviceIds = Array.from(new Set(reactiveData.listData.map((pointValue) => pointValue.deviceId)));
     if (deviceIds.length > 0) {
-      getDeviceByIds(deviceIds)
+      listDeviceByIds(deviceIds)
         .then((res) => {
           reactiveData.deviceTable = res.data;
         })

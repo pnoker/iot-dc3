@@ -107,10 +107,10 @@
   import { useRouter } from 'vue-router';
   import { Bell, List, Management, Promotion, TrendCharts, Warning } from '@element-plus/icons-vue';
 
-  import { getDeviceList } from '@/api/device';
-  import { getPointList } from '@/api/point';
-  import { getProfileList } from '@/api/profile';
-  import { getDriverList } from '@/api/driver';
+  import { listDevice } from '@/api/device';
+  import { listPoint } from '@/api/point';
+  import { listProfile } from '@/api/profile';
+  import { listDriver } from '@/api/driver';
   import { alertStats, dailyGrowth, statsTimeseries, statsToday } from '@/api/dashboard';
   import type {
     AlertStatsSummary,
@@ -212,10 +212,10 @@
 
   const loadTotals = async () => {
     const [driverRes, deviceRes, pointRes, profileRes] = await Promise.allSettled([
-      getDriverList<ListPageResponse>({ page: emptyPage }),
-      getDeviceList<ListPageResponse>({ page: emptyPage }),
-      getPointList<ListPageResponse>({ page: emptyPage }),
-      getProfileList<ListPageResponse>({ page: emptyPage }),
+      listDriver<ListPageResponse>({ page: emptyPage }),
+      listDevice<ListPageResponse>({ page: emptyPage }),
+      listPoint<ListPageResponse>({ page: emptyPage }),
+      listProfile<ListPageResponse>({ page: emptyPage }),
     ]);
 
     state.driverCount = getSettledTotal(driverRes);

@@ -60,8 +60,8 @@
 <script lang="ts" setup>
   import { computed, reactive, ref } from 'vue';
 
-  import { addPoint, deletePoint, getPointList, updatePoint } from '@/api/point';
-  import { getProfileByIds } from '@/api/profile';
+  import { addPoint, deletePoint, listPoint, updatePoint } from '@/api/point';
+  import { listProfileByIds } from '@/api/profile';
 
   import type { Order } from '@/config/types';
 
@@ -151,7 +151,7 @@
     const query = withFixedQuery(reactiveData.query);
     reactiveData.query = query;
 
-    getPointList<PointListResponse>({
+    listPoint<PointListResponse>({
       page: reactiveData.page,
       ...query,
     })
@@ -166,7 +166,7 @@
           return;
         }
 
-        getProfileByIds(profileIds)
+        listProfileByIds(profileIds)
           .then((profileRes: LookupTableResponse) => {
             reactiveData.profileTable = profileRes.data as Record<string, Record<string, any>>;
           })

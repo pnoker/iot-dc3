@@ -28,7 +28,7 @@ export const updateResource = (resource: ResourceForm) => httpPost(`${API_AUTH_B
 
 export const getResourceById = (id: string) => httpGet(`${API_AUTH_BASE}/resource/get_by_id`, { params: { id } });
 
-export const getResourceList = <T = R<PageResult<ResourceRecord>>>(query: PageQuery) =>
+export const listResource = <T = R<PageResult<ResourceRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/resource/list`, query);
 
-export const getResourceTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/resource/list_tree`, query);
+export const listResourceTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/resource/list_tree`, query);

@@ -55,7 +55,7 @@
 <script lang="ts" setup>
   import { computed, reactive, ref } from 'vue';
 
-  import { addProfile, deleteProfile, getProfileList, updateProfile } from '@/api/profile';
+  import { addProfile, deleteProfile, listProfile, updateProfile } from '@/api/profile';
 
   import type { Order } from '@/config/types';
 
@@ -126,7 +126,7 @@
     const query = withFixedQuery(reactiveData.query);
     reactiveData.query = query;
 
-    getProfileList<ProfileListResponse>({
+    listProfile<ProfileListResponse>({
       page: reactiveData.page,
       ...query,
     })

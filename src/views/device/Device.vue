@@ -80,13 +80,13 @@
   import {
     addDevice,
     deleteDevice,
-    getDeviceList,
+    listDevice,
     getDeviceStatus,
     importDevice,
     importDeviceTemplate,
     updateDevice,
   } from '@/api/device';
-  import { getDriverByIds } from '@/api/driver';
+  import { listDriverByIds } from '@/api/driver';
 
   import type { Order } from '@/config/types';
 
@@ -174,7 +174,7 @@
     const query = withFixedQuery(reactiveData.query);
     reactiveData.query = query;
 
-    getDeviceList<DeviceListResponse>({
+    listDevice<DeviceListResponse>({
       page: reactiveData.page,
       ...query,
     })
@@ -189,7 +189,7 @@
           return;
         }
 
-        getDriverByIds(driverIds)
+        listDriverByIds(driverIds)
           .then((driverRes: LookupTableResponse) => {
             reactiveData.driverTable = driverRes.data as Record<string, Record<string, any>>;
           })
