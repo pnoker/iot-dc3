@@ -43,7 +43,7 @@ public interface RoleUserBindService extends BaseService<RoleUserBindBO, RoleUse
      * @param tenantId    Tenant ID, null means no tenant filtering
      * @return Paginated bindings
      */
-    Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery, Long tenantId);
+    Page<RoleUserBindBO> list(RoleUserBindQuery entityQuery, Long tenantId);
 
     /**
      * Tenantid id

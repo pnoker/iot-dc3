@@ -58,7 +58,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     private UserPasswordManager userPasswordManager;
 
     @Override
-    public void save(UserPasswordBO entityBO) {
+    public void add(UserPasswordBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
@@ -69,7 +69,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!userPasswordManager.removeById(id)) {
@@ -98,7 +98,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public Page<UserPasswordBO> selectByPage(UserPasswordQuery entityQuery) {
+    public Page<UserPasswordBO> list(UserPasswordQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

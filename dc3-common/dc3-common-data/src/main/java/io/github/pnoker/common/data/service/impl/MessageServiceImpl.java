@@ -63,7 +63,7 @@ public class MessageServiceImpl implements MessageService {
     private MessageManager messageManager;
 
     @Override
-    public void save(MessageBO entityBO) {
+    public void add(MessageBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         MessageDO entityDO = messageBuilder.buildDOByBO(entityBO);
@@ -73,7 +73,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         //
@@ -108,7 +108,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Page<MessageBO> selectByPage(MessageQuery entityQuery) {
+    public Page<MessageBO> list(MessageQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

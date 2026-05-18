@@ -107,7 +107,7 @@ public class PointServiceImpl implements PointService {
     private DeviceMapper deviceMapper;
 
     @Override
-    public void save(PointBO entityBO) {
+    public void add(PointBO entityBO) {
         validateTenantRelations(entityBO);
         checkDuplicate(entityBO, false, true);
 
@@ -125,7 +125,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         PointDO entityDO = getDOById(id, true);
 
         if (!pointManager.removeById(id)) {
@@ -213,7 +213,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public Page<PointBO> selectByPage(PointQuery entityQuery) {
+    public Page<PointBO> list(PointQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

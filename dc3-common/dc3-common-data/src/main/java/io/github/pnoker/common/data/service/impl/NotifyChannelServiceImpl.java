@@ -65,7 +65,7 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
     private NotifyChannelBindManager notifyChannelBindManager;
 
     @Override
-    public void save(NotifyChannelBO entityBO) {
+    public void add(NotifyChannelBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         NotifyChannelDO entityDO = notifyChannelBuilder.buildDOByBO(entityBO);
@@ -75,7 +75,7 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         long count = notifyChannelBindManager.lambdaQuery().eq(NotifyChannelBindDO::getChannelId, id).count();
@@ -108,7 +108,7 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
     }
 
     @Override
-    public Page<NotifyChannelBO> selectByPage(NotifyChannelQuery entityQuery) {
+    public Page<NotifyChannelBO> list(NotifyChannelQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

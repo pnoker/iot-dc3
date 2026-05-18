@@ -68,7 +68,7 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
     private NotifyChannelManager notifyChannelManager;
 
     @Override
-    public void save(NotifyChannelBindBO entityBO) {
+    public void add(NotifyChannelBindBO entityBO) {
         requireReferences(entityBO);
         checkDuplicate(entityBO, false, true);
 
@@ -79,7 +79,7 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!notifyChannelBindManager.removeById(id)) {
@@ -108,7 +108,7 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
     }
 
     @Override
-    public Page<NotifyChannelBindBO> selectByPage(NotifyChannelBindQuery entityQuery) {
+    public Page<NotifyChannelBindBO> list(NotifyChannelBindQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

@@ -31,18 +31,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public interface BaseService<B, Q> {
 
     /**
-     * Save entity to database
+     * Add entity to database
      *
-     * @param entityBO Business object to save
+     * @param entityBO Business object to add
      */
-    void save(B entityBO);
+    void add(B entityBO);
 
     /**
-     * Remove entity by ID
+     * Delete entity by ID
      *
-     * @param id Entity ID to remove
+     * @param id Entity ID to delete
      */
-    void remove(Long id);
+    void delete(Long id);
 
     /**
      * Update existing entity
@@ -60,11 +60,11 @@ public interface BaseService<B, Q> {
     B selectById(Long id);
 
     /**
-     * Select entities with pagination
+     * List entities with pagination
      *
      * @param entityQuery Query object with pagination parameters
      * @return Paginated result of business objects
      */
-    Page<B> selectByPage(Q entityQuery);
+    Page<B> list(Q entityQuery);
 
 }

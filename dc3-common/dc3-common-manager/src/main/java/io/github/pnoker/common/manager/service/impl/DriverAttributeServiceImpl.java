@@ -68,7 +68,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     private DriverService driverService;
 
     @Override
-    public void save(DriverAttributeBO entityBO) {
+    public void add(DriverAttributeBO entityBO) {
         validateTenantRelations(entityBO);
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException("Failed to create driver attribute: driver attribute has been duplicated");
@@ -81,7 +81,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!driverAttributeManager.removeById(id)) {
@@ -171,7 +171,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     @Override
-    public Page<DriverAttributeBO> selectByPage(DriverAttributeQuery entityQuery) {
+    public Page<DriverAttributeBO> list(DriverAttributeQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

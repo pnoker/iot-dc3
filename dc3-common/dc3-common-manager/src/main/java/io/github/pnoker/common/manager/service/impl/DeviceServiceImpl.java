@@ -132,7 +132,7 @@ public class DeviceServiceImpl implements DeviceService {
     private MetadataEventPublisher metadataEventPublisher;
 
     @Override
-    public void save(DeviceBO entityBO) {
+    public void add(DeviceBO entityBO) {
         validateTenantRelations(entityBO);
 
         boolean duplicate = checkDuplicate(entityBO, false);
@@ -155,7 +155,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     @Transactional
-    public void remove(Long id) {
+    public void delete(Long id) {
         DeviceDO entityDO = getDOById(id, true);
 
         //
@@ -283,7 +283,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public Page<DeviceBO> selectByPage(DeviceQuery entityQuery) {
+    public Page<DeviceBO> list(DeviceQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -528,7 +528,7 @@ public class DeviceServiceImpl implements DeviceService {
                 entityBO.setProfileId(profileId);
                 entityBO.setDeviceId(entityDO.getId());
                 entityBO.setTenantId(entityDO.getTenantId());
-                profileBindService.save(entityBO);
+                profileBindService.add(entityBO);
             } catch (Exception e) {
                 log.warn("Skip profile bind during device save, deviceId={}, profileId={}, error={}",
                         entityDO.getId(), profileId, e.getMessage(), e);

@@ -68,7 +68,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     private DriverService driverService;
 
     @Override
-    public void save(PointAttributeBO entityBO) {
+    public void add(PointAttributeBO entityBO) {
         validateTenantRelations(entityBO);
         checkDuplicate(entityBO, false, true);
 
@@ -79,7 +79,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!pointAttributeManager.removeById(id)) {
@@ -167,7 +167,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    public Page<PointAttributeBO> selectByPage(PointAttributeQuery entityQuery) {
+    public Page<PointAttributeBO> list(PointAttributeQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

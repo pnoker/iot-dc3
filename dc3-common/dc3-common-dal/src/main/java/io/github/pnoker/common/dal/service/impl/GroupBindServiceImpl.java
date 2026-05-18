@@ -59,7 +59,7 @@ public class GroupBindServiceImpl implements GroupBindService {
     private GroupBindManager groupBindManager;
 
     @Override
-    public void save(GroupBindBO entityBO) {
+    public void add(GroupBindBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         GroupBindDO entityDO = groupBindBuilder.buildDOByBO(entityBO);
@@ -69,7 +69,7 @@ public class GroupBindServiceImpl implements GroupBindService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!groupBindManager.removeById(id)) {
@@ -97,7 +97,7 @@ public class GroupBindServiceImpl implements GroupBindService {
     }
 
     @Override
-    public Page<GroupBindBO> selectByPage(GroupBindQuery entityQuery) {
+    public Page<GroupBindBO> list(GroupBindQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

@@ -73,7 +73,7 @@ public class GroupServiceImpl implements GroupService {
     private GroupBindManager groupBindManager;
 
     @Override
-    public void save(GroupBO entityBO) {
+    public void add(GroupBO entityBO) {
         validateGroupType(entityBO.getGroupTypeFlag());
         validateParent(entityBO);
         checkDuplicate(entityBO, false, true);
@@ -85,7 +85,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         // Before deleting a group, check whether it has any child groups associated.
@@ -129,7 +129,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<GroupBO> selectByPage(GroupQuery entityQuery) {
+    public Page<GroupBO> list(GroupQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

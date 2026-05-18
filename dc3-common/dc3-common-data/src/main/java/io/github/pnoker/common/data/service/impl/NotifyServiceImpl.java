@@ -67,7 +67,7 @@ public class NotifyServiceImpl implements NotifyService {
     private NotifyChannelBindManager notifyChannelBindManager;
 
     @Override
-    public void save(NotifyBO entityBO) {
+    public void add(NotifyBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         NotifyDO entityDO = notifyBuilder.buildDOByBO(entityBO);
@@ -77,7 +77,7 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         long count = notifyChannelBindManager.lambdaQuery().eq(NotifyChannelBindDO::getNotifyId, id).count();
@@ -110,7 +110,7 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public Page<NotifyBO> selectByPage(NotifyQuery entityQuery) {
+    public Page<NotifyBO> list(NotifyQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

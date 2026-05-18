@@ -97,7 +97,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     private ProfileBindManager profileBindManager;
 
     @Override
-    public void save(PointAttributeConfigBO entityBO) {
+    public void add(PointAttributeConfigBO entityBO) {
         validateTenantRelations(entityBO);
 
         if (checkDuplicate(entityBO, false)) {
@@ -134,7 +134,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         PointAttributeConfigDO entityDO = getDOById(id, true);
 
         if (!pointAttributeConfigManager.removeById(id)) {
@@ -223,7 +223,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     @Override
-    public Page<PointAttributeConfigBO> selectByPage(PointAttributeConfigQuery entityQuery) {
+    public Page<PointAttributeConfigBO> list(PointAttributeConfigQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

@@ -86,7 +86,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private RoleUserBindManager roleUserBindManager;
 
     @Override
-    public void save(RoleResourceBindBO entityBO) {
+    public void add(RoleResourceBindBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException("Failed to create role resource bind: role resource bind has been duplicated");
         }
@@ -98,7 +98,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!roleResourceBindManager.removeById(id)) {
@@ -128,12 +128,12 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery) {
-        return selectByPage(entityQuery, null);
+    public Page<RoleResourceBindBO> list(RoleResourceBindQuery entityQuery) {
+        return list(entityQuery, null);
     }
 
     @Override
-    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery, Long tenantId) {
+    public Page<RoleResourceBindBO> list(RoleResourceBindQuery entityQuery, Long tenantId) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

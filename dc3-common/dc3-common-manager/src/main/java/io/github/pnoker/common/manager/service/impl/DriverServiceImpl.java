@@ -81,7 +81,7 @@ public class DriverServiceImpl implements DriverService {
     private ProfileBindService profileBindService;
 
     @Override
-    public void save(DriverBO entityBO) {
+    public void add(DriverBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
@@ -91,7 +91,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!driverManager.removeById(id)) {
@@ -122,7 +122,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public Page<DriverBO> selectByPage(DriverQuery entityQuery) {
+    public Page<DriverBO> list(DriverQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

@@ -61,7 +61,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     private ProfileBindManager profileBindManager;
 
     @Override
-    public void save(ProfileBindBO entityBO) {
+    public void add(ProfileBindBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException("Failed to create profile bind: profile bind has been duplicated");
         }
@@ -73,7 +73,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!profileBindManager.removeById(id)) {
@@ -150,7 +150,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public Page<ProfileBindBO> selectByPage(ProfileBindQuery entityQuery) {
+    public Page<ProfileBindBO> list(ProfileBindQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

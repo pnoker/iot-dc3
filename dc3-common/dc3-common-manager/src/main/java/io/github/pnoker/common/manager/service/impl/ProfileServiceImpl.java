@@ -89,7 +89,7 @@ public class ProfileServiceImpl implements ProfileService {
     private DeviceMapper deviceMapper;
 
     @Override
-    public void save(ProfileBO entityBO) {
+    public void add(ProfileBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException("Failed to create profile: profile has been duplicated");
         }
@@ -101,7 +101,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         //
@@ -178,7 +178,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Page<ProfileBO> selectByPage(ProfileQuery entityQuery) {
+    public Page<ProfileBO> list(ProfileQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

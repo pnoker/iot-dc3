@@ -66,7 +66,7 @@ public class ResourceServiceImpl implements ResourceService {
     private ResourceManager resourceManager;
 
     @Override
-    public void save(ResourceBO entityBO) {
+    public void add(ResourceBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException("Failed to create resource: resource has been duplicated");
         }
@@ -78,7 +78,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!resourceManager.removeById(id)) {
@@ -108,7 +108,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Page<ResourceBO> selectByPage(ResourceQuery entityQuery) {
+    public Page<ResourceBO> list(ResourceQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

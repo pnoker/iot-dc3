@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
     private TenantBindService tenantBindService;
 
     @Override
-    public void save(UserBO entityBO) {
+    public void add(UserBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         // When phone number is present, check whether it is already occupied.
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         getDOById(id, true);
 
         if (!userManager.removeById(id)) {
@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserBO> selectByPage(UserQuery entityQuery) {
+    public Page<UserBO> list(UserQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
