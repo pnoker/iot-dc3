@@ -171,7 +171,7 @@
     settingsModel: 'nav.settingsModel',
     settingsAgentic: 'nav.settingsAgentic',
     settingsAgenticProvider: 'nav.settingsAgenticProvider',
-    settingsEvent: 'nav.settingsEvent',
+    settingsEvent: 'nav.settingsEventOverview',
     settingsDeviceEvent: 'nav.settingsDeviceEvent',
     settingsDriverEvent: 'nav.settingsDriverEvent',
     settingsAbout: 'nav.settingsAbout',
@@ -274,6 +274,7 @@
       modelParent,
       { path: '/settings/agentic/provider', titleKey: 'nav.settingsAgenticProvider', code: 'settingsAgenticProvider' },
     ],
+    settingsEvent: [eventParent],
     settingsDeviceEvent: [eventParent],
     settingsDriverEvent: [eventParent],
   };
@@ -350,6 +351,7 @@
     if (!name || name === 'home') return items;
 
     const title = nameMap[name] ? t(nameMap[name]) : name;
+    const leafCode = name === 'settingsEvent' ? 'settingsEventOverview' : name;
     if (name.startsWith('driver')) {
       items.push({ path: '/driver', title: t('nav.driver'), icon: iconForCode('driver') });
     } else if (name.startsWith('device')) {
@@ -366,8 +368,8 @@
     }
     if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
       const last = items[items.length - 1];
-      if (!last || last.path !== route.path) {
-        items.push({ path: route.path, title, icon: iconForCode(name) });
+      if (!last || last.path !== route.path || last.title !== title) {
+        items.push({ path: route.path, title, icon: iconForCode(leafCode) });
       }
     }
     return items;

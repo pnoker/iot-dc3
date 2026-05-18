@@ -931,9 +931,7 @@
   @use '@/styles/things-dialog.scss';
 
   .alarm-notify {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    min-width: 0;
 
     &__table {
       margin-top: 1px;
