@@ -65,7 +65,7 @@ class MetadataEventListenerTest {
 
     @Test
     void deviceEventNotifiesOwningDriverViaRabbit() {
-        when(driverService.selectByDeviceId(10L)).thenReturn(driver);
+        when(driverService.listByDeviceId(10L)).thenReturn(driver);
 
         listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE));
@@ -109,7 +109,7 @@ class MetadataEventListenerTest {
 
     @Test
     void serviceFailureIsSwallowedSilently() {
-        when(driverService.selectByDeviceId(10L)).thenThrow(new RuntimeException("downstream offline"));
+        when(driverService.listByDeviceId(10L)).thenThrow(new RuntimeException("downstream offline"));
 
         listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.DELETE));

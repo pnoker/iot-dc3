@@ -104,7 +104,7 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
         GrpcRPointListDTO.Builder builder = GrpcRPointListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<PointBO> entityBOList = pointService.selectByIds(new HashSet<>(request.getPointIdsList()));
+        List<PointBO> entityBOList = pointService.listByIds(new HashSet<>(request.getPointIdsList()));
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

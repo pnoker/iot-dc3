@@ -105,7 +105,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DriverBO entityDO = driverService.selectByDeviceId(request.getDeviceId());
+        DriverBO entityDO = driverService.listByDeviceId(request.getDeviceId());
         if (Objects.isNull(entityDO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -128,7 +128,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcRDriverListDTO.Builder builder = GrpcRDriverListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DriverBO> entityBOList = driverService.selectByIds(new HashSet<>(request.getDriverIdsList()));
+        List<DriverBO> entityBOList = driverService.listByIds(new HashSet<>(request.getDriverIdsList()));
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

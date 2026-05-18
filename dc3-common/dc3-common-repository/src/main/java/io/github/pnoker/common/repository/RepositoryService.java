@@ -65,7 +65,7 @@ public interface RepositoryService {
      * @param count    Count
      * @return History Value Array
      */
-    List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count);
+    List<String> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count);
 
     /**
      * Query latest PointValue within the tenant scope.
@@ -85,7 +85,7 @@ public interface RepositoryService {
      * @param pointIds Point ID list
      * @return PointValueBO Array
      */
-    List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds);
+    List<PointValueBO> listLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds);
 
     /**
      * Page query PointValue
@@ -93,6 +93,6 @@ public interface RepositoryService {
      * @param entityQuery Entry of Query
      * @return Entity of BO Page
      */
-    Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery);
+    Page<PointValueBO> listPagePointValue(PointValueQuery entityQuery);
 
 }

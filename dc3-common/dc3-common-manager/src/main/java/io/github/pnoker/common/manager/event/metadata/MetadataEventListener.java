@@ -59,7 +59,7 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
             MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
             MetadataEventDTO entityDTO = new MetadataEventDTO(id, metadataType, metadataEvent.getOperateType());
             if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-                DriverBO entityBO = driverService.selectByDeviceId(id);
+                DriverBO entityBO = driverService.listByDeviceId(id);
                 notifyDriver(entityBO.getServiceName(), entityDTO);
             } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
                 List<DriverBO> entityBOList = driverService.selectByPointId(id);

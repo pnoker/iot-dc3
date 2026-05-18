@@ -39,7 +39,7 @@ public interface DriverAttributeService extends BaseService<DriverAttributeBO, D
      * @param driverId Driver ID
      * @return Array
      */
-    List<DriverAttributeBO> selectByDriverId(Long driverId);
+    List<DriverAttributeBO> listByDriverId(Long driverId);
 
     /**
      * Code Driver ID
@@ -48,7 +48,7 @@ public interface DriverAttributeService extends BaseService<DriverAttributeBO, D
      * @param driverId Driver ID
      * @return DriverAttribute
      */
-    DriverAttributeBO selectByNameAndDriverId(String name, Long driverId);
+    DriverAttributeBO getByNameAndDriverId(String name, Long driverId);
 
     /**
      * Bulk insert. Use during driver registration so attribute changes don't degenerate

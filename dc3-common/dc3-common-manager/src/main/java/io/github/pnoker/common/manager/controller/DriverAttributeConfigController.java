@@ -169,11 +169,11 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig
      */
     @GetMapping("/select_by_device_id")
-    public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(
+    public Mono<R<List<DriverAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
-            List<DriverAttributeConfigBO> entityBOList = filterTenant(tenantId, driverAttributeConfigService.selectByDeviceId(deviceId));
+            List<DriverAttributeConfigBO> entityBOList = filterTenant(tenantId, driverAttributeConfigService.listByDeviceId(deviceId));
             List<DriverAttributeConfigVO> entityVOList = driverAttributeConfigBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));

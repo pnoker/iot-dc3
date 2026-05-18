@@ -141,11 +141,11 @@ public class PointAttributeController implements BaseController {
      * @return Array
      */
     @GetMapping("/select_by_driver_id")
-    public Mono<R<List<PointAttributeVO>>> selectByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<List<PointAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
                 requireTenant(tenantId, driverService.getById(driverId));
-                List<PointAttributeBO> entityBOList = filterTenant(tenantId, pointAttributeService.selectByDriverId(driverId));
+                List<PointAttributeBO> entityBOList = filterTenant(tenantId, pointAttributeService.listByDriverId(driverId));
                 List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
             } catch (NotFoundException ne) {

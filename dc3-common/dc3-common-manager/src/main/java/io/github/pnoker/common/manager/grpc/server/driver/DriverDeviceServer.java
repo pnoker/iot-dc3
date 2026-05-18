@@ -180,18 +180,18 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         builder.setDevice(entityGrpcDTO);
 
         //
-        List<PointBO> pointBOList = pointService.selectByDeviceId(entityBO.getId());
+        List<PointBO> pointBOList = pointService.listByDeviceId(entityBO.getId());
         CollectionOptional.ofNullable(pointBOList)
                 .ifPresent(value -> builder.addAllPointIds(value.stream().map(PointBO::getId).toList()));
 
         List<DriverAttributeConfigBO> driverAttributeConfigBOList = driverAttributeConfigService
-                .selectByDeviceId(entityBO.getId());
+                .listByDeviceId(entityBO.getId());
         CollectionOptional.ofNullable(driverAttributeConfigBOList)
                 .ifPresent(value -> builder
                         .addAllDriverConfigs(value.stream().map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
 
         List<PointAttributeConfigBO> pointAttributeConfigBOList = pointAttributeConfigService
-                .selectByDeviceId(entityBO.getId());
+                .listByDeviceId(entityBO.getId());
         CollectionOptional.ofNullable(pointAttributeConfigBOList)
                 .ifPresent(value -> builder
                         .addAllPointConfigs(value.stream().map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO).toList()));

@@ -152,7 +152,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public Page<SessionBO> selectByPage(SessionQuery query) {
+    public Page<SessionBO> listByPage(SessionQuery query) {
         if (Objects.isNull(query)) {
             query = new SessionQuery();
         }

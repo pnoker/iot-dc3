@@ -90,9 +90,9 @@ class DriverLocalFacadeTest {
 
     @Test
     void selectByIdsReturnsEmptyWhenServiceReturnsNullOrEmpty() {
-        when(driverService.selectByIds(any())).thenReturn(null);
+        when(driverService.listByIds(any())).thenReturn(null);
         assertThat(facade.listByIds(Set.of(1L))).isEmpty();
-        when(driverService.selectByIds(any())).thenReturn(List.of());
+        when(driverService.listByIds(any())).thenReturn(List.of());
         assertThat(facade.listByIds(Set.of(1L))).isEmpty();
     }
 
@@ -100,7 +100,7 @@ class DriverLocalFacadeTest {
     void selectByIdsMapsEachThroughBuilder() {
         DriverBO bo = new DriverBO();
         FacadeDriverBO mapped = new FacadeDriverBO();
-        when(driverService.selectByIds(any())).thenReturn(List.of(bo));
+        when(driverService.listByIds(any())).thenReturn(List.of(bo));
         when(facadeDriverBuilder.toFacadeBO(bo)).thenReturn(mapped);
         assertThat(facade.listByIds(Set.of(1L))).containsExactly(mapped);
     }
@@ -133,7 +133,7 @@ class DriverLocalFacadeTest {
 
     @Test
     void selectByDeviceIdReturnsNullWhenServiceReturnsNull() {
-        when(driverService.selectByDeviceId(7L)).thenReturn(null);
+        when(driverService.listByDeviceId(7L)).thenReturn(null);
         assertThat(facade.getByDeviceId(7L)).isNull();
     }
 
@@ -141,7 +141,7 @@ class DriverLocalFacadeTest {
     void selectByDeviceIdMapsThroughBuilder() {
         DriverBO bo = new DriverBO();
         FacadeDriverBO mapped = new FacadeDriverBO();
-        when(driverService.selectByDeviceId(7L)).thenReturn(bo);
+        when(driverService.listByDeviceId(7L)).thenReturn(bo);
         when(facadeDriverBuilder.toFacadeBO(bo)).thenReturn(mapped);
         assertThat(facade.getByDeviceId(7L)).isSameAs(mapped);
     }

@@ -152,7 +152,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<ProfileBO> selectByIds(Set<Long> ids) {
+    public List<ProfileBO> listByIds(Set<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -161,7 +161,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<ProfileBO> selectByDeviceId(Long deviceId) {
+    public List<ProfileBO> listByDeviceId(Long deviceId) {
         DeviceDO deviceDO = deviceMapper.selectById(deviceId);
         if (Objects.isNull(deviceDO)) {
             return Collections.emptyList();
@@ -171,7 +171,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .eq(ProfileBindDO::getDeviceId, deviceId);
         List<ProfileBindDO> entityDOList = wrapper.list();
         Set<Long> profileIds = entityDOList.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
-        return selectByIds(profileIds)
+        return listByIds(profileIds)
                 .stream()
                 .filter(profile -> Objects.equals(deviceDO.getTenantId(), profile.getTenantId()))
                 .toList();

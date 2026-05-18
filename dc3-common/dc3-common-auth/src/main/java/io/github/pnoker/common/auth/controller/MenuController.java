@@ -121,7 +121,7 @@ public class MenuController implements BaseController {
     @PostMapping("/tree")
     public Mono<R<List<MenuTreeVO>>> tree(@RequestBody(required = false) MenuQuery entityQuery) {
         return async(() -> {
-            List<MenuTreeBO> entityBOList = menuService.selectTree(entityQuery);
+            List<MenuTreeBO> entityBOList = menuService.listTree(entityQuery);
             List<MenuTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
             for (MenuTreeBO node : entityBOList) {
                 entityVOList.add(toTreeVO(node));

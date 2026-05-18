@@ -39,7 +39,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * @param deviceId Device ID
      * @return PointConfig
      */
-    List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
+    List<PointAttributeConfigBO> listByDeviceId(Long deviceId);
 
     /**
      * ID
@@ -47,7 +47,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * @param attributeId ID
      * @return PointConfig
      */
-    List<PointAttributeConfigBO> selectByAttributeId(Long attributeId);
+    List<PointAttributeConfigBO> listByAttributeId(Long attributeId);
 
     /**
      * Device ID Point ID
@@ -56,7 +56,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * @param pointId  Point ID
      * @return PointConfig
      */
-    List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
+    List<PointAttributeConfigBO> listByDeviceIdAndPointId(Long deviceId, Long pointId);
 
     /**
      * ID Device ID Point ID
@@ -66,7 +66,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * @param pointId     Point ID
      * @return PointConfig
      */
-    PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
+    PointAttributeConfigBO getByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
 
     /**
      * @param entityBO {@link PointAttributeConfigBO}

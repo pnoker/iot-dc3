@@ -120,7 +120,7 @@ class PointServiceImplTest {
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(pointBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointManager.save(doRow)).thenReturn(true);
-        when(profileBindService.selectDeviceIdsByProfileId(5L)).thenReturn(List.of());
+        when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of());
 
         assertThatNoException().isThrownBy(() -> service.add(bo));
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
@@ -174,7 +174,7 @@ class PointServiceImplTest {
     void removeSucceedsAndPublishesEvents() {
         when(pointManager.getById(1L)).thenReturn(doRow);
         when(pointManager.removeById(1L)).thenReturn(true);
-        when(profileBindService.selectDeviceIdsByProfileId(5L)).thenReturn(List.of(10L, 11L));
+        when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of(10L, 11L));
         assertThatNoException().isThrownBy(() -> service.delete(1L));
         // 1 DELETE for the point itself + 2 UPDATE for affected devices
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
@@ -220,15 +220,15 @@ class PointServiceImplTest {
 
     @Test
     void selectByIdsReturnsEmptyForBlankInput() {
-        assertThat(service.selectByIds(null)).isEmpty();
-        assertThat(service.selectByIds(Set.of())).isEmpty();
+        assertThat(service.listByIds(null)).isEmpty();
+        assertThat(service.listByIds(Set.of())).isEmpty();
     }
 
     @Test
     void selectByIdsDelegatesToManager() {
         when(pointManager.listByIds(Set.of(1L))).thenReturn(List.of(doRow));
         when(pointBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
-        assertThat(service.selectByIds(Set.of(1L))).containsExactly(bo);
+        assertThat(service.listByIds(Set.of(1L))).containsExactly(bo);
     }
 
     @Test
@@ -247,6 +247,6 @@ class PointServiceImplTest {
     @Test
     void selectByDeviceIdReturnsEmptyWhenDeviceMissing() {
         when(deviceMapper.selectById(eq(99L))).thenReturn(null);
-        assertThat(service.selectByDeviceId(99L)).isEmpty();
+        assertThat(service.listByDeviceId(99L)).isEmpty();
     }
 }

@@ -173,21 +173,21 @@ class ProfileServiceImplTest {
 
     @Test
     void selectByIdsReturnsEmptyForBlankInput() {
-        assertThat(service.selectByIds(null)).isEmpty();
-        assertThat(service.selectByIds(Set.of())).isEmpty();
+        assertThat(service.listByIds(null)).isEmpty();
+        assertThat(service.listByIds(Set.of())).isEmpty();
     }
 
     @Test
     void selectByIdsDelegatesToManager() {
         when(profileManager.listByIds(Set.of(1L))).thenReturn(List.of(doRow));
         when(profileBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
-        assertThat(service.selectByIds(Set.of(1L))).containsExactly(bo);
+        assertThat(service.listByIds(Set.of(1L))).containsExactly(bo);
     }
 
     @Test
     void selectByDeviceIdReturnsEmptyWhenDeviceMissing() {
         when(deviceMapper.selectById(99L)).thenReturn(null);
-        assertThat(service.selectByDeviceId(99L)).isEmpty();
+        assertThat(service.listByDeviceId(99L)).isEmpty();
     }
 
     @Test

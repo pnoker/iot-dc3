@@ -40,7 +40,7 @@ public interface PointAttributeService extends BaseService<PointAttributeBO, Poi
      * @param driverId Driver ID
      * @return PointAttribute
      */
-    PointAttributeBO selectByNameAndDriverId(String name, Long driverId);
+    PointAttributeBO getByNameAndDriverId(String name, Long driverId);
 
     /**
      * Driver ID
@@ -48,7 +48,7 @@ public interface PointAttributeService extends BaseService<PointAttributeBO, Poi
      * @param driverId Driver ID
      * @return Array
      */
-    List<PointAttributeBO> selectByDriverId(Long driverId);
+    List<PointAttributeBO> listByDriverId(Long driverId);
 
     /**
      * Bulk insert. Use during driver registration so attribute changes don't degenerate

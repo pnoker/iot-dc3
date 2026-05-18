@@ -179,7 +179,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     @Override
-    public PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId,
+    public PointAttributeConfigBO getByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId,
                                                                            Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
                 .eq(PointAttributeConfigDO::getAttributeId, attributeId)
@@ -191,7 +191,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     @Override
-    public List<PointAttributeConfigBO> selectByAttributeId(Long attributeId) {
+    public List<PointAttributeConfigBO> listByAttributeId(Long attributeId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
                 .eq(PointAttributeConfigDO::getAttributeId, attributeId);
         List<PointAttributeConfigDO> entityDO = wrapper.list();
@@ -199,8 +199,8 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     @Override
-    public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
-        List<PointBO> pointBOList = pointService.selectByDeviceId(deviceId);
+    public List<PointAttributeConfigBO> listByDeviceId(Long deviceId) {
+        List<PointBO> pointBOList = pointService.listByDeviceId(deviceId);
         Set<Long> pointIds = pointBOList.stream().map(PointBO::getId).collect(Collectors.toSet());
         if (CollectionUtils.isEmpty(pointIds)) {
             return Collections.emptyList();
@@ -214,7 +214,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     @Override
-    public List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+    public List<PointAttributeConfigBO> listByDeviceIdAndPointId(Long deviceId, Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
                 .eq(PointAttributeConfigDO::getDeviceId, deviceId)
                 .eq(PointAttributeConfigDO::getPointId, pointId);

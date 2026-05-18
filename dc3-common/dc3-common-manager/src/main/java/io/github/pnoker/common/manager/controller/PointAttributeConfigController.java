@@ -155,14 +155,14 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @GetMapping("/select_by_attribute_id_and_device_id_and_point_id")
-    public Mono<R<PointAttributeConfigVO>> selectByAttributeIdAndDeviceIdAndPointId(
+    public Mono<R<PointAttributeConfigVO>> getByAttributeIdAndDeviceIdAndPointId(
             @NotNull @RequestParam(value = "attribute_id") Long attributeId,
             @NotNull @RequestParam(value = "device_id") Long deviceId,
             @NotNull @RequestParam(value = "point_id") Long pointId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requirePointConfigRelations(tenantId, deviceId, pointId, attributeId);
             PointAttributeConfigBO entityBO = pointAttributeConfigService
-                    .selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
+                    .getByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
             requireTenant(tenantId, entityBO);
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
@@ -177,13 +177,13 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @GetMapping("/select_by_device_id_and_point_id")
-    public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceIdAndPointId(
+    public Mono<R<List<PointAttributeConfigVO>>> listByDeviceIdAndPointId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
             @NotNull @RequestParam(value = "point_id") Long pointId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requirePointConfigRelations(tenantId, deviceId, pointId, null);
             List<PointAttributeConfigBO> entityBOList = filterTenant(tenantId,
-                    pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId));
+                    pointAttributeConfigService.listByDeviceIdAndPointId(deviceId, pointId));
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));
@@ -196,12 +196,12 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @GetMapping("/select_by_device_id")
-    public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceId(
+    public Mono<R<List<PointAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<PointAttributeConfigBO> entityBOList = filterTenant(tenantId,
-                    pointAttributeConfigService.selectByDeviceId(deviceId));
+                    pointAttributeConfigService.listByDeviceId(deviceId));
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));

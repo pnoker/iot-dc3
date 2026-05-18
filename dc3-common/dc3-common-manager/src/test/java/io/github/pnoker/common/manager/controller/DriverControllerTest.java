@@ -200,10 +200,10 @@ class DriverControllerTest {
         foreign.setTenantId(999L);
         DriverVO vo = new DriverVO();
         vo.setId(1L);
-        when(driverService.selectByIds(Set.of(1L, 2L))).thenReturn(List.of(own, foreign));
+        when(driverService.listByIds(Set.of(1L, 2L))).thenReturn(List.of(own, foreign));
         when(driverBuilder.buildVOByBO(own)).thenReturn(vo);
 
-        StepVerifier.create(withTenantContext(controller.selectByIds(Set.of(1L, 2L))))
+        StepVerifier.create(withTenantContext(controller.listByIds(Set.of(1L, 2L))))
                 .assertNext(envelope -> {
                     assertThat(envelope.getData()).hasSize(1).containsKey(1L);
                     assertThat(envelope.getData().get(1L)).isSameAs(vo);

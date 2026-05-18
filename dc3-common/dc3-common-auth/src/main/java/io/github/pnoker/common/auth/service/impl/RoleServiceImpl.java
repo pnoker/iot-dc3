@@ -124,7 +124,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<RoleTreeBO> selectTree(RoleQuery entityQuery) {
+    public List<RoleTreeBO> listTree(RoleQuery entityQuery) {
         RoleQuery effective = Objects.requireNonNullElseGet(entityQuery, RoleQuery::new);
         List<RoleDO> rows = roleManager.list(fuzzyQuery(effective));
         return assembleTree(rows);

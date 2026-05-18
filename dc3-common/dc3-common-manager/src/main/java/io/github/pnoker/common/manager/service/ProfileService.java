@@ -50,7 +50,7 @@ public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
      * @param deviceId Device ID
      * @return ProfileBO list
      */
-    List<ProfileBO> selectByDeviceId(Long deviceId);
+    List<ProfileBO> listByDeviceId(Long deviceId);
 
     /**
      * Query profiles by a set of profile IDs
@@ -58,6 +58,6 @@ public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
      * @param ids Profile ID set
      * @return ProfileBO list
      */
-    List<ProfileBO> selectByIds(Set<Long> ids);
+    List<ProfileBO> listByIds(Set<Long> ids);
 
 }

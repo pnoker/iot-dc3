@@ -131,7 +131,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<DriverBO> selectByIds(Set<Long> ids) {
+    public List<DriverBO> listByIds(Set<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -150,15 +150,15 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<DriverBO> selectByProfileId(Long profileId) {
-        List<Long> ids = profileBindService.selectDeviceIdsByProfileId(profileId);
+    public List<DriverBO> listByProfileId(Long profileId) {
+        List<Long> ids = profileBindService.listDeviceIdsByProfileId(profileId);
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
 
         List<DeviceDO> deviceDOList = deviceManager.listByIds(ids);
         Set<Long> driverIds = deviceDOList.stream().map(DeviceDO::getDriverId).collect(Collectors.toSet());
-        List<DriverBO> entityDOList = selectByIds(driverIds);
+        List<DriverBO> entityDOList = listByIds(driverIds);
         if (CollectionUtils.isEmpty(entityDOList)) {
             return Collections.emptyList();
         }
@@ -169,11 +169,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public List<DriverBO> selectByPointId(Long pointId) {
         PointDO entityDO = pointManager.getById(pointId);
-        return selectByProfileId(entityDO.getProfileId());
+        return listByProfileId(entityDO.getProfileId());
     }
 
     @Override
-    public DriverBO selectByDeviceId(Long deviceId) {
+    public DriverBO listByDeviceId(Long deviceId) {
         DeviceDO entityDO = deviceManager.getById(deviceId);
         return getById(entityDO.getDriverId());
     }

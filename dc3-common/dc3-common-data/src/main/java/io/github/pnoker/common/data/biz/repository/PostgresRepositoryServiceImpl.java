@@ -76,7 +76,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
+    public List<String> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
         LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
         wrapper.eq(PointValueDO::getTenantId, tenantId);
         wrapper.eq(PointValueDO::getDeviceId, deviceId);
@@ -105,14 +105,14 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds) {
+    public List<PointValueBO> listLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds) {
         throw new UnsupportedOperationException(
                 "selectLatestPointValues is not implemented; callers should use selectLatestPointValue in a loop "
                         + "or the PointValueLocalCacheService batch API until a real batch query is wired up.");
     }
 
     @Override
-    public Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery) {
+    public Page<PointValueBO> listPagePointValue(PointValueQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }

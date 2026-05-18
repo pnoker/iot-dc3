@@ -58,7 +58,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * @param driverId Driver ID
      * @return {@link DeviceBO}
      */
-    List<DeviceBO> selectByDriverId(Long driverId);
+    List<DeviceBO> listByDriverId(Long driverId);
 
     /**
      * Driver ID Device ID
@@ -66,7 +66,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * @param driverId Driver ID
      * @return {@link DeviceBO}
      */
-    List<Long> selectIdsByDriverId(Long driverId);
+    List<Long> listIdsByDriverId(Long driverId);
 
     /**
      * ID
@@ -74,7 +74,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * @param profileId ID
      * @return {@link DeviceBO}
      */
-    List<DeviceBO> selectByProfileId(Long profileId);
+    List<DeviceBO> listByProfileId(Long profileId);
 
     /**
      * Device ID
@@ -82,7 +82,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * @param ids Device ID
      * @return {@link DeviceBO}
      */
-    List<DeviceBO> selectByIds(List<Long> ids);
+    List<DeviceBO> listByIds(List<Long> ids);
 
     /**
      * @param entityBO      {@link DeviceBO}

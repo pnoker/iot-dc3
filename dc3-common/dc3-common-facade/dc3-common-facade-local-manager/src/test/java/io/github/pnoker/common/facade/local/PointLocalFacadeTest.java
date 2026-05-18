@@ -92,7 +92,7 @@ class PointLocalFacadeTest {
     void selectByIdsMapsEachThroughBuilder() {
         PointBO bo = new PointBO();
         FacadePointBO mapped = new FacadePointBO();
-        when(pointService.selectByIds(any())).thenReturn(List.of(bo));
+        when(pointService.listByIds(any())).thenReturn(List.of(bo));
         when(facadePointBuilder.toFacadeBO(bo)).thenReturn(mapped);
         assertThat(facade.listByIds(Set.of(1L))).containsExactly(mapped);
     }

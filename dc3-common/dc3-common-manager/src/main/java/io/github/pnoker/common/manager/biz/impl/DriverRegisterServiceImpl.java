@@ -113,7 +113,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                 .collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode,
                         grpcDriverAttributeBuilder::buildBOByGrpcDTO));
 
-        Map<String, DriverAttributeBO> oldDriverAttributeMap = driverAttributeService.selectByDriverId(entityBO.getId())
+        Map<String, DriverAttributeBO> oldDriverAttributeMap = driverAttributeService.listByDriverId(entityBO.getId())
                 .stream()
                 .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
                 .collect(Collectors.toMap(DriverAttributeBO::getAttributeCode, Function.identity()));
@@ -146,7 +146,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         driverAttributeService.updateBatch(toUpdate);
         driverAttributeService.removeByIds(toRemoveIds);
 
-        return driverAttributeService.selectByDriverId(entityBO.getId()).stream()
+        return driverAttributeService.listByDriverId(entityBO.getId()).stream()
                 .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
                 .toList();
     }
@@ -158,7 +158,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                 .collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode,
                         grpcPointAttributeBuilder::buildBOByGrpcDTO));
 
-        Map<String, PointAttributeBO> oldPointAttributeMap = pointAttributeService.selectByDriverId(entityBO.getId())
+        Map<String, PointAttributeBO> oldPointAttributeMap = pointAttributeService.listByDriverId(entityBO.getId())
                 .stream()
                 .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
                 .collect(Collectors.toMap(PointAttributeBO::getAttributeCode, Function.identity()));
@@ -190,7 +190,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         pointAttributeService.updateBatch(pointToUpdate);
         pointAttributeService.removeByIds(pointToRemoveIds);
 
-        return pointAttributeService.selectByDriverId(entityBO.getId()).stream()
+        return pointAttributeService.listByDriverId(entityBO.getId()).stream()
                 .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
                 .toList();
     }

@@ -141,9 +141,9 @@ public class ProfileController implements BaseController {
      * @return Map(ID, ProfileVO)
      */
     @PostMapping("/select_by_ids")
-    public Mono<R<Map<Long, ProfileVO>>> selectByIds(@RequestBody Set<Long> profileIds) {
+    public Mono<R<Map<Long, ProfileVO>>> listByIds(@RequestBody Set<Long> profileIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.selectByIds(profileIds));
+            List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.listByIds(profileIds));
             Map<Long, ProfileVO> deviceMap = entityBOList.stream()
                     .collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
@@ -157,10 +157,10 @@ public class ProfileController implements BaseController {
      * @return Profile
      */
     @GetMapping("/select_by_device_id")
-    public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<List<ProfileVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
-            List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.selectByDeviceId(deviceId));
+            List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.listByDeviceId(deviceId));
             List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));

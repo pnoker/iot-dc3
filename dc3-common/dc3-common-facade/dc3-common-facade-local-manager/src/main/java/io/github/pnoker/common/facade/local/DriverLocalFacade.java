@@ -64,7 +64,7 @@ public class DriverLocalFacade implements DriverFacade {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        List<DriverBO> list = driverService.selectByIds(new HashSet<>(ids));
+        List<DriverBO> list = driverService.listByIds(new HashSet<>(ids));
         if (Objects.isNull(list) || list.isEmpty()) {
             return Collections.emptyList();
         }
@@ -85,7 +85,7 @@ public class DriverLocalFacade implements DriverFacade {
 
     @Override
     public FacadeDriverBO getByDeviceId(Long deviceId) {
-        DriverBO managerBO = driverService.selectByDeviceId(deviceId);
+        DriverBO managerBO = driverService.listByDeviceId(deviceId);
         return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
     }
 

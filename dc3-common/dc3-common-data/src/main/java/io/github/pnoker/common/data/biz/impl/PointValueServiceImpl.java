@@ -121,7 +121,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         RepositoryService repositoryService = getFirstRepositoryService();
-        return repositoryService.selectHistoryPointValue(tenantId, deviceId, pointId, count);
+        return repositoryService.listHistoryPointValue(tenantId, deviceId, pointId, count);
     }
 
     @Override
@@ -183,7 +183,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         RepositoryService repositoryService = getFirstRepositoryService();
-        return repositoryService.selectPagePointValue(entityQuery);
+        return repositoryService.listPagePointValue(entityQuery);
     }
 
     /**

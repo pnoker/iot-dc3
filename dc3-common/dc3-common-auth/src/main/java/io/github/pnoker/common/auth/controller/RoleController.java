@@ -128,7 +128,7 @@ public class RoleController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
             query.setTenantId(tenantId);
-            List<RoleTreeBO> entityBOList = roleService.selectTree(query);
+            List<RoleTreeBO> entityBOList = roleService.listTree(query);
             List<RoleTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
             for (RoleTreeBO node : entityBOList) {
                 entityVOList.add(toTreeVO(node));
