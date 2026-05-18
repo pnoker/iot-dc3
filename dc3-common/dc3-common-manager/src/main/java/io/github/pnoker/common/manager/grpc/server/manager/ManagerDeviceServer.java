@@ -63,7 +63,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     private DeviceService deviceService;
 
     @Override
-    public void selectByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
+    public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -102,7 +102,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByDriverId(GrpcDriverQuery driver, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
+    public void listByDriverId(GrpcDriverQuery driver, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -129,7 +129,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByProfileId(GrpcProfileQuery request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
+    public void listByProfileId(GrpcProfileQuery request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -156,7 +156,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByDeviceIds(GrpcDeviceIdsQuery request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
+    public void listByDeviceIds(GrpcDeviceIdsQuery request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -183,7 +183,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
+    public void getByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

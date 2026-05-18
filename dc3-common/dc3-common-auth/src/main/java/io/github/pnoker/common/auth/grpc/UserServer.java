@@ -50,7 +50,7 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
     private UserService userService;
 
     @Override
-    public void selectById(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
+    public void getById(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
         GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

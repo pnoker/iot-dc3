@@ -62,7 +62,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
     private DriverService driverService;
 
     @Override
-    public void selectByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
+    public void listByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
         GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -101,7 +101,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
     }
 
     @Override
-    public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
+    public void getByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -124,7 +124,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
     }
 
     @Override
-    public void selectByDriverIds(GrpcDriverIdsQuery request, StreamObserver<GrpcRDriverListDTO> responseObserver) {
+    public void listByDriverIds(GrpcDriverIdsQuery request, StreamObserver<GrpcRDriverListDTO> responseObserver) {
         GrpcRDriverListDTO.Builder builder = GrpcRDriverListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -151,7 +151,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
     }
 
     @Override
-    public void selectByDriverId(GrpcDriverQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
+    public void getByDriverId(GrpcDriverQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

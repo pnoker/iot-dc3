@@ -72,7 +72,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
     private DeviceService deviceService;
 
     @Override
-    public void selectByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
+    public void listByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
         GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -111,7 +111,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
     }
 
     @Override
-    public void selectById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
+    public void getById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
         GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

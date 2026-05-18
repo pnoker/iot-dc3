@@ -67,7 +67,7 @@ public class PointGrpcFacade implements PointFacade {
     public FacadePointBO selectById(Long id) {
         GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).build();
         GrpcRPointDTO response = grpcFacadeSupport.call("PointFacade.selectById", pointApiBlockingStub,
-                stub -> stub.selectById(request));
+                stub -> stub.getById(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectById");
             return null;
@@ -87,7 +87,7 @@ public class PointGrpcFacade implements PointFacade {
 
         GrpcPointIdsQuery request = GrpcPointIdsQuery.newBuilder().addAllPointIds(pointIds).build();
         GrpcRPointListDTO response = grpcFacadeSupport.call("PointFacade.selectByIds", pointApiBlockingStub,
-                stub -> stub.selectByIds(request));
+                stub -> stub.listByIds(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByIds");
             return Collections.emptyList();
@@ -99,7 +99,7 @@ public class PointGrpcFacade implements PointFacade {
     public FacadePage<FacadePointBO> selectByPage(FacadePointQuery query) {
         GrpcPagePointQuery request = facadeGrpcPointBuilder.toGrpcPageQuery(query);
         GrpcRPagePointDTO response = grpcFacadeSupport.call("PointFacade.selectByPage", pointApiBlockingStub,
-                stub -> stub.selectByPage(request));
+                stub -> stub.listByPage(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectByPage");
             return FacadePage.empty();

@@ -50,7 +50,7 @@ public class TenantServer extends TenantApiGrpc.TenantApiImplBase {
     private TenantService tenantService;
 
     @Override
-    public void selectByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
+    public void getByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
         GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

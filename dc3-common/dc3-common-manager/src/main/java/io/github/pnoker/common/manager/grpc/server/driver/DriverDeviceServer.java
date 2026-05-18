@@ -88,7 +88,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     private PointAttributeConfigService pointAttributeConfigService;
 
     @Override
-    public void selectByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
+    public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
@@ -128,7 +128,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectById(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
+    public void getById(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 

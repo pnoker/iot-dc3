@@ -54,7 +54,7 @@ public class UserGrpcFacade implements UserFacade {
     public FacadeUserBO selectById(Long id) {
         GrpcIdQuery request = GrpcIdQuery.newBuilder().setId(id).build();
         GrpcRUserDTO response = grpcFacadeSupport.call("UserFacade.selectById", userApiBlockingStub,
-                stub -> stub.selectById(request));
+                stub -> stub.getById(request));
         if (!response.getResult().getOk()) {
             guardOrThrow(response.getResult(), "selectById");
             return null;
