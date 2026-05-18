@@ -3,7 +3,7 @@
 从源码到运行，一站式本地开发流程。
 
 !!! note "运行目录"
-    除非特别说明，下文命令都在仓库根目录执行。
+除非特别说明，下文命令都在仓库根目录执行。
 
 ## 前置依赖
 
@@ -46,7 +46,8 @@ source dc3/env/dev.env.sh
 
 ## 4. 在 JetBrains IDEA 中运行
 
-IDEA 运行配置可使用 `dc3/env/dev.env` 配合 EnvFile 插件，或将其键值对粘贴到运行配置的环境变量中。仅在需要时按服务覆盖：`SERVER_PORT`、`GRPC_SERVER_PORT`、`TCP_PORT`、`UDP_PORT`、`POSTGRES_SCHEMA`。
+IDEA 运行配置可使用 `dc3/env/dev.env` 配合 EnvFile 插件，或将其键值对粘贴到运行配置的环境变量中。仅在需要时按服务覆盖：
+`SERVER_PORT`、`GRPC_SERVER_PORT`、`TCP_PORT`、`UDP_PORT`、`POSTGRES_SCHEMA`。
 
 详情见 [环境变量 § JetBrains IDEA](environment.md)。
 
@@ -118,7 +119,7 @@ make logs SERVICES="gateway agentic"
 
 ## 9. 默认服务端口
 
-| 服务            | HTTP | gRPC |
+| 服务             | HTTP | gRPC |
 |----------------|------|------|
 | Gateway        | 8000 | -    |
 | Auth Center    | 8300 | 9300 |

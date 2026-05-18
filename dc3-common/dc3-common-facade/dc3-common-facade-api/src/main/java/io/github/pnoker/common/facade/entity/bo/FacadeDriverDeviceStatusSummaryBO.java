@@ -43,17 +43,12 @@ import java.util.Objects;
 @ToString
 public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
 
+    public static final String DRIVER_ID = "driverId";
+    public static final String TOTAL = "total";
+    public static final String ONLINE = "online";
+    public static final String OFFLINE = "offline";
     @Serial
     private static final long serialVersionUID = 1L;
-
-    public static final String DRIVER_ID = "driverId";
-
-    public static final String TOTAL = "total";
-
-    public static final String ONLINE = "online";
-
-    public static final String OFFLINE = "offline";
-
     private Long driverId;
 
     private int total;
@@ -73,15 +68,6 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
                 parseInt(source.get(OFFLINE)));
     }
 
-    public Map<String, String> toMap() {
-        Map<String, String> target = new LinkedHashMap<>();
-        target.put(DRIVER_ID, Objects.toString(driverId, ""));
-        target.put(TOTAL, String.valueOf(total));
-        target.put(ONLINE, String.valueOf(online));
-        target.put(OFFLINE, String.valueOf(offline));
-        return target;
-    }
-
     private static Long parseLong(String value) {
         if (Objects.isNull(value) || value.isBlank()) {
             return null;
@@ -94,6 +80,15 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
             return 0;
         }
         return Integer.parseInt(value);
+    }
+
+    public Map<String, String> toMap() {
+        Map<String, String> target = new LinkedHashMap<>();
+        target.put(DRIVER_ID, Objects.toString(driverId, ""));
+        target.put(TOTAL, String.valueOf(total));
+        target.put(ONLINE, String.valueOf(online));
+        target.put(OFFLINE, String.valueOf(offline));
+        return target;
     }
 
 }

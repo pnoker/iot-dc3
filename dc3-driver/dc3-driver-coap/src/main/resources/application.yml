@@ -55,7 +55,8 @@ dc3:
         attribute-code: contentFormat
         attribute-type-flag: STRING
         default-value: json
-        remark: Content format: json, text, cbor, octet-stream
+        remark:
+          Content format: json, text, cbor, octet-stream
 
 spring:
   application:

@@ -17,9 +17,9 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.driver.coap.entity.CoapMessage;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.driver.coap.entity.CoapMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

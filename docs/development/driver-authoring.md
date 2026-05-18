@@ -1,7 +1,8 @@
 # Authoring a New Driver
 
 This guide walks you through creating a new device driver from scratch using
-[`dc3-driver-virtual`](https://github.com/pnoker/iot-dc3/tree/release/dc3-driver/dc3-driver-virtual) as a template. Drivers connect the
+[`dc3-driver-virtual`](https://github.com/pnoker/iot-dc3/tree/release/dc3-driver/dc3-driver-virtual) as a template.
+Drivers connect the
 DC3 platform to physical devices via a specific protocol (Modbus, OPC, MQTT, S7, …) and are
 the southbound I/O layer of the system.
 
@@ -51,7 +52,8 @@ module without filtering duplicate fully qualified class names.
 
 ## Step 2 — Wire into the parent POM
 
-Add your module to [`dc3-driver/pom.xml`](https://github.com/pnoker/iot-dc3/blob/release/dc3-driver/pom.xml) `<modules>`:
+Add your module to [`dc3-driver/pom.xml`](https://github.com/pnoker/iot-dc3/blob/release/dc3-driver/pom.xml)
+`<modules>`:
 
 ```xml
 <modules>
