@@ -21,6 +21,7 @@ export default defineConfig({
       { text: '首页', link: '/' },
       { text: '快速开始', link: '/quickstart/' },
       { text: '使用指南', link: '/guide/' },
+      { text: '操作手册', link: '/operation/' },
       { text: '架构', link: '/architecture/' },
       { text: '开发', link: '/development/' },
       { text: '模块', link: '/modules/' },
@@ -52,6 +53,18 @@ export default defineConfig({
             { text: '镜像与部署', link: '/guide/usage' },
             { text: '日志规范', link: '/guide/logging' },
             { text: '故障排查', link: '/guide/troubleshooting' }
+          ]
+        }
+      ],
+      '/operation/': [
+        {
+          text: '操作手册',
+          items: [
+            { text: '概览', link: '/operation/' },
+            { text: '驱动', link: '/operation/driver' },
+            { text: '模板', link: '/operation/template' },
+            { text: '设备', link: '/operation/device' },
+            { text: '数据', link: '/operation/data' }
           ]
         }
       ],
