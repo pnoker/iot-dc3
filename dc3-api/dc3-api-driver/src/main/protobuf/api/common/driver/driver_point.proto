@@ -34,9 +34,9 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to driver points
 service PointApi {
   // Query points with pagination
-  rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
+  rpc ListByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
   // Query point by point ID
-  rpc SelectById (GrpcPointQuery) returns (GrpcRPointDTO);
+  rpc GetById (GrpcPointQuery) returns (GrpcRPointDTO);
 }
 
 // Response wrapper for paged point query

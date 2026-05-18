@@ -31,7 +31,7 @@ option java_multiple_files = true;
 // Service interface defining user login-related RPC calls
 service UserLoginApi {
   // Query user login information by login name
-  rpc SelectByName (GrpcNameQuery) returns (GrpcRUserLoginDTO);
+  rpc GetByName (GrpcNameQuery) returns (GrpcRUserLoginDTO);
 }
 
 // Request message for querying by name

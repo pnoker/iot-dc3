@@ -34,11 +34,11 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to point management
 service PointApi {
   // Paginated query for point information
-  rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
+  rpc ListByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
   // Query single point information by point ID
-  rpc SelectById (GrpcPointQuery) returns (GrpcRPointDTO);
+  rpc GetById (GrpcPointQuery) returns (GrpcRPointDTO);
   // Batch query point information by point IDs
-  rpc SelectByIds (GrpcPointIdsQuery) returns (GrpcRPointListDTO);
+  rpc ListByIds (GrpcPointIdsQuery) returns (GrpcRPointListDTO);
 }
 
 // Response wrapper for paginated point query

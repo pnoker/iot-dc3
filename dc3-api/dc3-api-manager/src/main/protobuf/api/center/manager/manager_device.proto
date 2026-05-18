@@ -34,15 +34,15 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to device management
 service DeviceApi {
   // Paginated query for device information
-  rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
+  rpc ListByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
   // Query device list by Profile ID
-  rpc SelectByProfileId (GrpcProfileQuery) returns (GrpcRDeviceListDTO);
+  rpc ListByProfileId (GrpcProfileQuery) returns (GrpcRDeviceListDTO);
   // Query device list by Driver ID
-  rpc SelectByDriverId (GrpcDriverQuery) returns (GrpcRDeviceListDTO);
+  rpc ListByDriverId (GrpcDriverQuery) returns (GrpcRDeviceListDTO);
   // Query single device information by Device ID
-  rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
+  rpc GetByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
   // Batch query device information by Device IDs
-  rpc SelectByDeviceIds (GrpcDeviceIdsQuery) returns (GrpcRDeviceListDTO);
+  rpc ListByDeviceIds (GrpcDeviceIdsQuery) returns (GrpcRDeviceListDTO);
 }
 
 // Response wrapper for paginated device query

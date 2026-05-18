@@ -34,13 +34,13 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to driver management
 service DriverApi {
   // Paginated query for driver information
-  rpc SelectByPage (GrpcPageDriverQuery) returns (GrpcRPageDriverDTO);
+  rpc ListByPage (GrpcPageDriverQuery) returns (GrpcRPageDriverDTO);
   // Query driver information by Driver ID
-  rpc SelectByDriverId (GrpcDriverQuery) returns (GrpcRDriverDTO);
+  rpc GetByDriverId (GrpcDriverQuery) returns (GrpcRDriverDTO);
   // Batch query driver information by Driver IDs
-  rpc SelectByDriverIds (GrpcDriverIdsQuery) returns (GrpcRDriverListDTO);
+  rpc ListByDriverIds (GrpcDriverIdsQuery) returns (GrpcRDriverListDTO);
   // Query associated driver information by Device ID
-  rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDriverDTO);
+  rpc GetByDeviceId (GrpcDeviceQuery) returns (GrpcRDriverDTO);
 }
 
 // Response wrapper for paginated driver query
