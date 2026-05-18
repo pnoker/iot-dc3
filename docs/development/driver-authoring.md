@@ -1,11 +1,11 @@
 # Authoring a New Driver
 
 This guide walks you through creating a new device driver from scratch using
-[`dc3-driver-virtual`](../../dc3-driver/dc3-driver-virtual) as a template. Drivers connect the
+[`dc3-driver-virtual`](https://github.com/pnoker/iot-dc3/tree/release/dc3-driver/dc3-driver-virtual) as a template. Drivers connect the
 DC3 platform to physical devices via a specific protocol (Modbus, OPC, MQTT, S7, …) and are
 the southbound I/O layer of the system.
 
-If you only want to *use* an existing driver, see [QUICKSTART.md](./QUICKSTART.md) instead.
+If you only want to *use* an existing driver, see [快速开始](../quickstart/index.md) instead.
 
 Unless stated otherwise, run commands from the repository root.
 
@@ -30,7 +30,7 @@ plumbing — your driver only implements the protocol-specific parts.
 
 - Java 21 + Maven 3.9+
 - A running `dc3-center-manager`, `dc3-center-data`, `dc3-center-auth`, RabbitMQ, and
-  Postgres. Easiest: `make dev-all`. See [QUICKSTART.md](./QUICKSTART.md).
+  Postgres. Easiest: `make dev-all`. See [快速开始](../quickstart/index.md).
 - Familiarity with whichever device protocol your driver implements.
 
 ## Step 1 — Create the module
@@ -51,7 +51,7 @@ module without filtering duplicate fully qualified class names.
 
 ## Step 2 — Wire into the parent POM
 
-Add your module to [`dc3-driver/pom.xml`](../../dc3-driver/pom.xml) `<modules>`:
+Add your module to [`dc3-driver/pom.xml`](https://github.com/pnoker/iot-dc3/blob/release/dc3-driver/pom.xml) `<modules>`:
 
 ```xml
 <modules>
@@ -154,7 +154,7 @@ logging:
 You'll also typically copy `application-dev.yml` / `-pre.yml` / `-pro.yml` from
 `dc3-driver-virtual` and adjust the schedule cron. **Never hardcode `localhost`** —
 everything goes through `${ENV:default}` placeholders. See
-[`dc3/env/dev.env.sh`](../env/dev.env.sh) for the env-var contract.
+[`dc3/env/dev.env.sh`](https://github.com/pnoker/iot-dc3/blob/release/dc3/env/dev.env.sh) for the env-var contract.
 
 ### Attribute types
 
@@ -253,7 +253,7 @@ Three identifiers participate in driver routing:
   identifier used as the suffix on RabbitMQ command queues (`dc3.q.command.driver.<service>`)
   and routing keys (`dc3.r.command.driver.<service>`). See
   [
-  `RabbitConstant`](../../dc3-common/dc3-common-constant/src/main/java/io/github/pnoker/common/constant/driver/RabbitConstant.java).
+  `RabbitConstant`](https://github.com/pnoker/iot-dc3/blob/release/dc3-common/dc3-common-constant/src/main/java/io/github/pnoker/common/constant/driver/RabbitConstant.java).
 - **`spring.application.name`** (`@project.artifactId@`) — controls log filenames and
   Actuator metadata. Has no routing implication.
 
@@ -316,11 +316,11 @@ and bind **Points**.
 ## Reference
 
 - SDK base interface: [
-  `DriverCustomService.java`](../../dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverCustomService.java)
+  `DriverCustomService.java`](https://github.com/pnoker/iot-dc3/blob/release/dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverCustomService.java)
 - Sender service: [
-  `DriverSenderService.java`](../../dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverSenderService.java)
+  `DriverSenderService.java`](https://github.com/pnoker/iot-dc3/blob/release/dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverSenderService.java)
 - Working examples: `dc3-driver-virtual` (simplest), `dc3-driver-modbus-tcp` (TCP polling),
   `dc3-driver-mqtt` (push-style subscriber), `dc3-driver-listening-virtual` (push-style
   template), `dc3-driver-opc-ua` (subscription model).
-- Architecture overview: [`MODULES.md`](./MODULES.md)
-- Troubleshooting: [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md)
+- Architecture overview: [模块与依赖](../architecture/modules.md)
+- Troubleshooting: [故障排查](../guide/troubleshooting.md)
