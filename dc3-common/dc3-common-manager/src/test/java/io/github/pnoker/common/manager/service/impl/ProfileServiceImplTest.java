@@ -95,14 +95,14 @@ class ProfileServiceImplTest {
         when(profileManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(profileBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(profileManager.save(doRow)).thenReturn(true);
-        assertThatNoException().isThrownBy(() -> service.save(bo));
+        assertThatNoException().isThrownBy(() -> service.add(bo));
         verify(profileManager).save(doRow);
     }
 
     @Test
     void saveRejectsDuplicate() {
         when(profileManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(DuplicateException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(profileManager, never()).save(any(ProfileDO.class));
     }
 
@@ -111,13 +111,13 @@ class ProfileServiceImplTest {
         when(profileManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(profileBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(profileManager.save(doRow)).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(profileManager.getById(1L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test

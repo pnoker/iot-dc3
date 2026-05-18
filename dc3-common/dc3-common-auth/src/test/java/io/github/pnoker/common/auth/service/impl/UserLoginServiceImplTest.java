@@ -100,13 +100,13 @@ class UserLoginServiceImplTest {
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(userLoginBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(userLoginManager.save(doRow)).thenReturn(true);
-        assertThatNoException().isThrownBy(() -> service.save(bo));
+        assertThatNoException().isThrownBy(() -> service.add(bo));
     }
 
     @Test
     void saveRejectsDuplicateLoginName() {
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(DuplicateException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(userLoginManager, never()).save(any());
     }
 
@@ -115,20 +115,20 @@ class UserLoginServiceImplTest {
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(userLoginBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(userLoginManager.save(doRow)).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(userLoginManager.getById(7L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(7L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.delete(7L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void removeThrowsDeleteExceptionWhenManagerReturnsFalse() {
         when(userLoginManager.getById(7L)).thenReturn(doRow);
         when(userLoginManager.removeById(7L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(7L)).isInstanceOf(DeleteException.class);
+        assertThatThrownBy(() -> service.delete(7L)).isInstanceOf(DeleteException.class);
     }
 
     @Test

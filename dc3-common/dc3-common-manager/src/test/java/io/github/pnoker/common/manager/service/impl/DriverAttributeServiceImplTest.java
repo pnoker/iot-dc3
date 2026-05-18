@@ -89,13 +89,13 @@ class DriverAttributeServiceImplTest {
         when(driverAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(driverAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(driverAttributeManager.save(doRow)).thenReturn(true);
-        assertThatNoException().isThrownBy(() -> service.save(bo));
+        assertThatNoException().isThrownBy(() -> service.add(bo));
     }
 
     @Test
     void saveRejectsWhenDriverMissing() {
         when(driverService.selectById(7L)).thenReturn(null);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -103,14 +103,14 @@ class DriverAttributeServiceImplTest {
         DriverBO otherTenant = new DriverBO();
         otherTenant.setTenantId(999L);
         when(driverService.selectById(7L)).thenReturn(otherTenant);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void saveRejectsDuplicate() {
         when(driverService.selectById(7L)).thenReturn(driver);
         when(driverAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(DuplicateException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
     }
 
     @Test
@@ -119,20 +119,20 @@ class DriverAttributeServiceImplTest {
         when(driverAttributeManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(driverAttributeBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(driverAttributeManager.save(doRow)).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(driverAttributeManager.getById(1L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void removeThrowsDeleteExceptionWhenManagerReturnsFalse() {
         when(driverAttributeManager.getById(1L)).thenReturn(doRow);
         when(driverAttributeManager.removeById(1L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(DeleteException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(DeleteException.class);
     }
 
     @Test

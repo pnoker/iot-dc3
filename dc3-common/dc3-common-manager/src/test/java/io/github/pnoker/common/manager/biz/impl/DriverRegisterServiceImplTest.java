@@ -96,7 +96,7 @@ class DriverRegisterServiceImplTest {
         assertThatThrownBy(() -> service.registerDriver(request))
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("Tenant");
-        verify(driverService, never()).save(any(DriverBO.class));
+        verify(driverService, never()).add(any(DriverBO.class));
         verify(driverService, never()).update(any(DriverBO.class));
     }
 
@@ -111,7 +111,7 @@ class DriverRegisterServiceImplTest {
 
         assertThat(result).isSameAs(driverBO);
         assertThat(driverBO.getTenantId()).isEqualTo(100L);
-        verify(driverService).save(driverBO);
+        verify(driverService).add(driverBO);
         verify(driverService, never()).update(any(DriverBO.class));
     }
 
@@ -128,7 +128,7 @@ class DriverRegisterServiceImplTest {
         service.registerDriver(request);
 
         verify(driverService).update(driverBO);
-        verify(driverService, never()).save(any(DriverBO.class));
+        verify(driverService, never()).add(any(DriverBO.class));
         assertThat(driverBO.getId()).isEqualTo(42L);
     }
 }

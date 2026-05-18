@@ -92,7 +92,7 @@ class DriverControllerTest {
                 .verifyComplete();
 
         ArgumentCaptor<DriverBO> captor = ArgumentCaptor.forClass(DriverBO.class);
-        verify(driverService).save(captor.capture());
+        verify(driverService).add(captor.capture());
         assertThat(captor.getValue().getTenantId()).isEqualTo(TENANT_ID);
     }
 
@@ -101,7 +101,7 @@ class DriverControllerTest {
         StepVerifier.create(withMissingHeader(controller.add(new DriverVO())))
                 .expectError()
                 .verify();
-        verify(driverService, never()).save(any(DriverBO.class));
+        verify(driverService, never()).add(any(DriverBO.class));
     }
 
     @Test
@@ -114,7 +114,7 @@ class DriverControllerTest {
         StepVerifier.create(withTenantContext(controller.delete(1L)))
                 .assertNext(envelope -> assertThat(envelope.isOk()).isTrue())
                 .verifyComplete();
-        verify(driverService).remove(1L);
+        verify(driverService).delete(1L);
     }
 
     @Test
@@ -127,7 +127,7 @@ class DriverControllerTest {
         StepVerifier.create(withTenantContext(controller.delete(1L)))
                 .expectErrorMatches(throwable -> throwable instanceof NotFoundException)
                 .verify();
-        verify(driverService, never()).remove(any(Long.class));
+        verify(driverService, never()).delete(any(Long.class));
     }
 
     @Test
@@ -225,7 +225,7 @@ class DriverControllerTest {
                 .verifyComplete();
 
         ArgumentCaptor<DriverQuery> captor = ArgumentCaptor.forClass(DriverQuery.class);
-        verify(driverService).selectByPage(captor.capture());
+        verify(driverService).list(captor.capture());
         assertThat(captor.getValue().getTenantId()).isEqualTo(TENANT_ID);
     }
 

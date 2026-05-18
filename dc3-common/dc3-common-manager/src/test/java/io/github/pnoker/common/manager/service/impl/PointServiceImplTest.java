@@ -122,14 +122,14 @@ class PointServiceImplTest {
         when(pointManager.save(doRow)).thenReturn(true);
         when(profileBindService.selectDeviceIdsByProfileId(5L)).thenReturn(List.of());
 
-        assertThatNoException().isThrownBy(() -> service.save(bo));
+        assertThatNoException().isThrownBy(() -> service.add(bo));
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
     }
 
     @Test
     void saveRejectsWhenProfileMissing() {
         when(profileService.selectById(5L)).thenReturn(null);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -137,14 +137,14 @@ class PointServiceImplTest {
         ProfileBO otherTenant = new ProfileBO();
         otherTenant.setTenantId(999L);
         when(profileService.selectById(5L)).thenReturn(otherTenant);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void saveRejectsDuplicate() {
         when(profileService.selectById(5L)).thenReturn(profile);
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(DuplicateException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(pointManager, never()).save(any(PointDO.class));
     }
 
@@ -154,20 +154,20 @@ class PointServiceImplTest {
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(pointBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointManager.save(doRow)).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(pointManager.getById(1L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void removeThrowsDeleteExceptionWhenManagerReturnsFalse() {
         when(pointManager.getById(1L)).thenReturn(doRow);
         when(pointManager.removeById(1L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(DeleteException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(DeleteException.class);
     }
 
     @Test
@@ -175,7 +175,7 @@ class PointServiceImplTest {
         when(pointManager.getById(1L)).thenReturn(doRow);
         when(pointManager.removeById(1L)).thenReturn(true);
         when(profileBindService.selectDeviceIdsByProfileId(5L)).thenReturn(List.of(10L, 11L));
-        assertThatNoException().isThrownBy(() -> service.remove(1L));
+        assertThatNoException().isThrownBy(() -> service.delete(1L));
         // 1 DELETE for the point itself + 2 UPDATE for affected devices
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
     }

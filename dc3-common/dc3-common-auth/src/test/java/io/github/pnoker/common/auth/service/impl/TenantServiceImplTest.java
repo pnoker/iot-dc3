@@ -99,14 +99,14 @@ class TenantServiceImplTest {
         when(tenantBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(tenantManager.save(doRow)).thenReturn(true);
 
-        assertThatNoException().isThrownBy(() -> service.save(bo));
+        assertThatNoException().isThrownBy(() -> service.add(bo));
         verify(tenantManager).save(doRow);
     }
 
     @Test
     void saveRejectsDuplicate() {
         when(tenantManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo))
+        assertThatThrownBy(() -> service.add(bo))
                 .isInstanceOf(DuplicateException.class)
                 .hasMessageContaining("Tenant has been duplicated");
         verify(tenantManager, never()).save(any());
@@ -117,21 +117,21 @@ class TenantServiceImplTest {
         when(tenantManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(tenantBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(tenantManager.save(doRow)).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeSucceedsForExistingId() {
         when(tenantManager.getById(1L)).thenReturn(doRow);
         when(tenantManager.removeById(1L)).thenReturn(true);
-        assertThatNoException().isThrownBy(() -> service.remove(1L));
+        assertThatNoException().isThrownBy(() -> service.delete(1L));
         verify(tenantManager).removeById(1L);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(tenantManager.getById(99L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(99L))
+        assertThatThrownBy(() -> service.delete(99L))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -139,7 +139,7 @@ class TenantServiceImplTest {
     void removeThrowsDeleteExceptionWhenManagerReturnsFalse() {
         when(tenantManager.getById(1L)).thenReturn(doRow);
         when(tenantManager.removeById(1L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(1L)).isInstanceOf(DeleteException.class);
+        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(DeleteException.class);
     }
 
     @Test
@@ -210,7 +210,7 @@ class TenantServiceImplTest {
         Page<TenantBO> boPage = new Page<>(1, 10);
         when(tenantBuilder.buildBOPageByDOPage(doPage)).thenReturn(boPage);
 
-        Page<TenantBO> result = service.selectByPage(query);
+        Page<TenantBO> result = service.list(query);
 
         assertThat(query.getPage()).isNotNull();
         assertThat(result).isSameAs(boPage);
@@ -228,7 +228,7 @@ class TenantServiceImplTest {
         Page<TenantBO> boPage = new Page<>(2, 50);
         when(tenantBuilder.buildBOPageByDOPage(doPage)).thenReturn(boPage);
 
-        assertThat(service.selectByPage(query)).isSameAs(boPage);
+        assertThat(service.list(query)).isSameAs(boPage);
         assertThat(query.getPage()).isSameAs(pages);
     }
 }
