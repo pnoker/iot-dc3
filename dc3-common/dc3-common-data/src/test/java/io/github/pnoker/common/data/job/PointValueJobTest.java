@@ -72,25 +72,25 @@ class PointValueJobTest {
         injectField(job, "pointValueService", pointValueService);
         injectField(job, "virtualThreadExecutor", executor);
 
-        PointValueJob.VALUE_COUNT.set(0);
-        PointValueJob.VALUE_SPEED.set(0);
+        PointValueJob.resetMetrics();
         PointValueJob.clearPointValues();
     }
 
     @AfterEach
     void tearDown() {
         executor.shutdownNow();
-        PointValueJob.VALUE_COUNT.set(0);
-        PointValueJob.VALUE_SPEED.set(0);
+        PointValueJob.resetMetrics();
         PointValueJob.clearPointValues();
     }
 
     @Test
     void executeRotatesValueCountIntoSpeed() throws Exception {
-        PointValueJob.VALUE_COUNT.set(50);
+        for (int i = 0; i < 50; i++) {
+            PointValueJob.recordPointValue();
+        }
         job.executeInternal(jobExecutionContext);
-        assertThat(PointValueJob.VALUE_SPEED.get()).isEqualTo(50);
-        assertThat(PointValueJob.VALUE_COUNT.get()).isEqualTo(0);
+        assertThat(PointValueJob.getValueSpeed()).isEqualTo(10);
+        assertThat(PointValueJob.getValueCount()).isEqualTo(0);
     }
 
     @Test

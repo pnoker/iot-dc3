@@ -59,7 +59,19 @@ public class NettyTcpServer {
      * sending data back to specific devices when needed.
      * </p>
      */
-    public static final Map<Long, Channel> DEVICE_CHANNEL_MAP = new ConcurrentHashMap<>(16);
+    private static final Map<Long, Channel> DEVICE_CHANNEL_MAP = new ConcurrentHashMap<>(16);
+
+    public static void registerDeviceChannel(Long deviceId, Channel channel) {
+        DEVICE_CHANNEL_MAP.put(deviceId, channel);
+    }
+
+    public static Channel getDeviceChannel(Long deviceId) {
+        return DEVICE_CHANNEL_MAP.get(deviceId);
+    }
+
+    public static void clearDeviceChannels() {
+        DEVICE_CHANNEL_MAP.clear();
+    }
 
     /**
      * Starts the TCP server on the specified port.

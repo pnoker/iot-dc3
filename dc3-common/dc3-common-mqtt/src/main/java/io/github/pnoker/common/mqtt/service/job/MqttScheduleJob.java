@@ -50,11 +50,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @ConditionalOnBean(MqttReceiveService.class)
 public class MqttScheduleJob extends QuartzJobBean {
 
-    public static final ReentrantReadWriteLock MESSAGE_LOCK = new ReentrantReadWriteLock();
+    private static final ReentrantReadWriteLock MESSAGE_LOCK = new ReentrantReadWriteLock();
 
-    public static final AtomicLong MESSAGE_COUNT = new AtomicLong(0);
+    private static final AtomicLong MESSAGE_COUNT = new AtomicLong(0);
 
-    public static final AtomicLong MESSAGE_SPEED = new AtomicLong(0);
+    private static final AtomicLong MESSAGE_SPEED = new AtomicLong(0);
 
     private static final List<MqttMessage> MQTT_MESSAGES = new ArrayList<>();
 
@@ -105,6 +105,23 @@ public class MqttScheduleJob extends QuartzJobBean {
         } finally {
             MESSAGE_LOCK.writeLock().unlock();
         }
+    }
+
+    public static void recordMessage() {
+        MESSAGE_COUNT.getAndIncrement();
+    }
+
+    public static long getMessageCount() {
+        return MESSAGE_COUNT.get();
+    }
+
+    public static long getMessageSpeed() {
+        return MESSAGE_SPEED.get();
+    }
+
+    public static void resetMetrics() {
+        MESSAGE_COUNT.set(0);
+        MESSAGE_SPEED.set(0);
     }
 
     /**

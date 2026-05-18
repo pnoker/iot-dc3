@@ -172,7 +172,7 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                          PointBO point, WritePointValue writePointValue) {
         Long deviceId = device.getId();
-        Channel channel = NettyTcpServer.DEVICE_CHANNEL_MAP.get(deviceId);
+        Channel channel = NettyTcpServer.getDeviceChannel(deviceId);
         if (Objects.nonNull(channel)) {
             log.debug("Driver point write requested, protocol=tcp, deviceId={}, pointId={}, valueLength={}", deviceId,
                     point.getId(), Objects.toString(writePointValue.getValue(), "").length());

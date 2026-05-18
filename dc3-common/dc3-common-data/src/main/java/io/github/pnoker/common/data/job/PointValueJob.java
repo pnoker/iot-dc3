@@ -42,11 +42,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class PointValueJob extends QuartzJobBean {
 
-    public static final ReentrantReadWriteLock VALUE_LOCK = new ReentrantReadWriteLock();
+    private static final ReentrantReadWriteLock VALUE_LOCK = new ReentrantReadWriteLock();
 
-    public static final AtomicLong VALUE_COUNT = new AtomicLong(0);
+    private static final AtomicLong VALUE_COUNT = new AtomicLong(0);
 
-    public static final AtomicLong VALUE_SPEED = new AtomicLong(0);
+    private static final AtomicLong VALUE_SPEED = new AtomicLong(0);
 
     private static final List<PointValueBO> POINT_VALUE_LIST = new ArrayList<>();
 
@@ -68,14 +68,24 @@ public class PointValueJob extends QuartzJobBean {
      * @return Point Value Size
      */
     public static int getPointValuesSize() {
-        return POINT_VALUE_LIST.size();
+        VALUE_LOCK.readLock().lock();
+        try {
+            return POINT_VALUE_LIST.size();
+        } finally {
+            VALUE_LOCK.readLock().unlock();
+        }
     }
 
     /**
      * PointValue
      */
     public static void clearPointValues() {
-        POINT_VALUE_LIST.clear();
+        VALUE_LOCK.writeLock().lock();
+        try {
+            POINT_VALUE_LIST.clear();
+        } finally {
+            VALUE_LOCK.writeLock().unlock();
+        }
     }
 
     /**
@@ -84,15 +94,36 @@ public class PointValueJob extends QuartzJobBean {
      * @param pointValueBO PointValue
      */
     public static void addPointValues(PointValueBO pointValueBO) {
-        POINT_VALUE_LIST.add(pointValueBO);
+        VALUE_LOCK.writeLock().lock();
+        try {
+            POINT_VALUE_LIST.add(pointValueBO);
+        } finally {
+            VALUE_LOCK.writeLock().unlock();
+        }
+    }
+
+    public static void recordPointValue() {
+        VALUE_COUNT.getAndIncrement();
+    }
+
+    public static long getValueCount() {
+        return VALUE_COUNT.get();
+    }
+
+    public static long getValueSpeed() {
+        return VALUE_SPEED.get();
+    }
+
+    public static void resetMetrics() {
+        VALUE_COUNT.set(0);
+        VALUE_SPEED.set(0);
     }
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         // Statistical point value receive rate
-        long speed = VALUE_COUNT.getAndSet(0);
+        long speed = VALUE_COUNT.getAndSet(0) / pointBatchProperties.getInterval();
         VALUE_SPEED.set(speed);
-        speed /= pointBatchProperties.getInterval();
         if (speed >= pointBatchProperties.getSpeed()) {
             log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, getPointValuesSize(),
                     pointBatchProperties.getInterval());

@@ -67,15 +67,13 @@ class PointValueReceiverTest {
         props.setDeliveryTag(7L);
         message = new Message(new byte[0], props);
         // Reset shared state used by the rate-throttling branch
-        PointValueJob.VALUE_COUNT.set(0);
-        PointValueJob.VALUE_SPEED.set(0);
+        PointValueJob.resetMetrics();
         PointValueJob.clearPointValues();
     }
 
     @AfterEach
     void resetSharedState() {
-        PointValueJob.VALUE_COUNT.set(0);
-        PointValueJob.VALUE_SPEED.set(0);
+        PointValueJob.resetMetrics();
         PointValueJob.clearPointValues();
     }
 
@@ -104,12 +102,12 @@ class PointValueReceiverTest {
         verify(channel).basicAck(eq(7L), eq(false));
         // Counter is incremented per message — pinned so the job-side rate calculation
         // stays accurate.
-        assertThat(PointValueJob.VALUE_COUNT.get()).isEqualTo(1);
+        assertThat(PointValueJob.getValueCount()).isEqualTo(1);
     }
 
     @Test
     void aboveSpeedThresholdBuffersToScheduleAndAcks() throws Exception {
-        PointValueJob.VALUE_SPEED.set(1000);
+        properties.setSpeed(0);
         PointValueBO bo = PointValueBO.builder().deviceId(10L).pointId(20L).rawValue("v").build();
         receiver.pointValueReceive(channel, message, bo);
         verify(pointValueService, never()).save(any(PointValueBO.class));
