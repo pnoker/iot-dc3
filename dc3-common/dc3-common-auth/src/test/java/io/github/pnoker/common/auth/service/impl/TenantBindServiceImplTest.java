@@ -94,13 +94,13 @@ class TenantBindServiceImplTest {
         when(tenantBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(tenantBindBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(tenantBindManager.save(doRow)).thenReturn(true);
-        assertThatNoException().isThrownBy(() -> service.save(bo));
+        assertThatNoException().isThrownBy(() -> service.add(bo));
     }
 
     @Test
     void saveRejectsDuplicateBinding() {
         when(tenantBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(DuplicateException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(tenantBindManager, never()).save(any());
     }
 
@@ -109,20 +109,20 @@ class TenantBindServiceImplTest {
         when(tenantBindManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(tenantBindBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(tenantBindManager.save(doRow)).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(tenantBindManager.getById(5L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(5L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.delete(5L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void removeThrowsDeleteExceptionWhenManagerReturnsFalse() {
         when(tenantBindManager.getById(5L)).thenReturn(doRow);
         when(tenantBindManager.removeById(5L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(5L)).isInstanceOf(DeleteException.class);
+        assertThatThrownBy(() -> service.delete(5L)).isInstanceOf(DeleteException.class);
     }
 
     @Test

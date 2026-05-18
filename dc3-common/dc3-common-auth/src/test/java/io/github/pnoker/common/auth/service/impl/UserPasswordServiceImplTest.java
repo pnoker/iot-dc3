@@ -96,7 +96,7 @@ class UserPasswordServiceImplTest {
         when(userPasswordBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(userPasswordManager.save(doRow)).thenReturn(true);
 
-        service.save(bo);
+        service.add(bo);
 
         ArgumentCaptor<UserPasswordDO> captor = ArgumentCaptor.forClass(UserPasswordDO.class);
         verify(userPasswordManager).save(captor.capture());
@@ -107,7 +107,7 @@ class UserPasswordServiceImplTest {
     @Test
     void saveRejectsDuplicate() {
         when(userPasswordManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(DuplicateException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
     }
 
     @Test
@@ -115,20 +115,20 @@ class UserPasswordServiceImplTest {
         when(userPasswordManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(userPasswordBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(userPasswordManager.save(any(UserPasswordDO.class))).thenReturn(false);
-        assertThatThrownBy(() -> service.save(bo)).isInstanceOf(AddException.class);
+        assertThatThrownBy(() -> service.add(bo)).isInstanceOf(AddException.class);
     }
 
     @Test
     void removeRejectsUnknownId() {
         when(userPasswordManager.getById(9L)).thenReturn(null);
-        assertThatThrownBy(() -> service.remove(9L)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.delete(9L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void removeThrowsDeleteExceptionWhenManagerReturnsFalse() {
         when(userPasswordManager.getById(9L)).thenReturn(doRow);
         when(userPasswordManager.removeById(9L)).thenReturn(false);
-        assertThatThrownBy(() -> service.remove(9L)).isInstanceOf(DeleteException.class);
+        assertThatThrownBy(() -> service.delete(9L)).isInstanceOf(DeleteException.class);
     }
 
     @Test

@@ -80,7 +80,7 @@ class DictionaryForManagerServiceImplTest {
         assertThat(query.getPage()).isNotNull();
 
         ArgumentCaptor<DriverQuery> captor = ArgumentCaptor.forClass(DriverQuery.class);
-        verify(driverService).selectByPage(captor.capture());
+        verify(driverService).list(captor.capture());
         assertThat(captor.getValue().getDriverName()).isEqualTo("Modbus");
         assertThat(captor.getValue().getTenantId()).isEqualTo(100L);
     }
@@ -97,7 +97,7 @@ class DictionaryForManagerServiceImplTest {
         assertThat(service.profileDictionary(query)).isSameAs(mappedPage);
 
         ArgumentCaptor<ProfileQuery> captor = ArgumentCaptor.forClass(ProfileQuery.class);
-        verify(profileService).selectByPage(captor.capture());
+        verify(profileService).list(captor.capture());
         assertThat(captor.getValue().getProfileName()).isEqualTo("Default");
     }
 
@@ -114,7 +114,7 @@ class DictionaryForManagerServiceImplTest {
         assertThat(service.pointDictionaryForProfile(query)).isSameAs(mappedPage);
 
         ArgumentCaptor<PointQuery> captor = ArgumentCaptor.forClass(PointQuery.class);
-        verify(pointService).selectByPage(captor.capture());
+        verify(pointService).list(captor.capture());
         assertThat(captor.getValue().getProfileId()).isEqualTo(5L);
         assertThat(captor.getValue().getDeviceId()).isNull();
     }
@@ -132,7 +132,7 @@ class DictionaryForManagerServiceImplTest {
         assertThat(service.pointDictionaryForDevice(query)).isSameAs(mappedPage);
 
         ArgumentCaptor<PointQuery> captor = ArgumentCaptor.forClass(PointQuery.class);
-        verify(pointService).selectByPage(captor.capture());
+        verify(pointService).list(captor.capture());
         assertThat(captor.getValue().getDeviceId()).isEqualTo(11L);
         assertThat(captor.getValue().getProfileId()).isNull();
     }
@@ -149,7 +149,7 @@ class DictionaryForManagerServiceImplTest {
         assertThat(service.deviceDictionary(query)).isSameAs(mappedPage);
 
         ArgumentCaptor<DeviceQuery> captor = ArgumentCaptor.forClass(DeviceQuery.class);
-        verify(deviceService).selectByPage(captor.capture());
+        verify(deviceService).list(captor.capture());
         assertThat(captor.getValue().getDeviceName()).isEqualTo("Boiler");
         assertThat(captor.getValue().getDriverId()).isNull();
     }
@@ -166,7 +166,7 @@ class DictionaryForManagerServiceImplTest {
         assertThat(service.deviceDictionaryForDriver(query)).isSameAs(mappedPage);
 
         ArgumentCaptor<DeviceQuery> captor = ArgumentCaptor.forClass(DeviceQuery.class);
-        verify(deviceService).selectByPage(captor.capture());
+        verify(deviceService).list(captor.capture());
         assertThat(captor.getValue().getDriverId()).isEqualTo(7L);
     }
 }
