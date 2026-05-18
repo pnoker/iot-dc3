@@ -76,16 +76,16 @@ public class UserServiceImpl implements UserService {
 
         // When phone number is present, check whether it is already occupied.
         if (StringUtils.isNotEmpty(entityBO.getPhone())) {
-            UserBO selectByPhone = getByPhone(entityBO.getPhone(), false);
-            if (Objects.nonNull(selectByPhone)) {
+            UserBO existingByPhone = getByPhone(entityBO.getPhone(), false);
+            if (Objects.nonNull(existingByPhone)) {
                 throw new DuplicateException("The user already exists with phone: {}", entityBO.getPhone());
             }
         }
 
         // When email is present, check whether it is already occupied.
         if (StringUtils.isNotEmpty(entityBO.getEmail())) {
-            UserBO selectByEmail = getByEmail(entityBO.getEmail(), false);
-            if (Objects.nonNull(selectByEmail)) {
+            UserBO existingByEmail = getByEmail(entityBO.getEmail(), false);
+            if (Objects.nonNull(existingByEmail)) {
                 throw new DuplicateException("The user already exists with email: {}", entityBO.getEmail());
             }
         }
@@ -107,15 +107,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void update(UserBO entityBO) {
-        UserDO selectById = getDOById(entityBO.getId(), true);
+        UserDO existingDO = getDOById(entityBO.getId(), true);
 
         checkDuplicate(entityBO, true, true);
 
         // Check whether phone number is updated.
         if (StringUtils.isNotEmpty(entityBO.getPhone())) {
-            if (!entityBO.getPhone().equals(selectById.getPhone())) {
-                UserBO selectByPhone = getByPhone(entityBO.getPhone(), false);
-                if (Objects.nonNull(selectByPhone)) {
+            if (!entityBO.getPhone().equals(existingDO.getPhone())) {
+                UserBO existingByPhone = getByPhone(entityBO.getPhone(), false);
+                if (Objects.nonNull(existingByPhone)) {
                     throw new DuplicateException("The user already exists with phone {}", entityBO.getPhone());
                 }
             }
@@ -123,9 +123,9 @@ public class UserServiceImpl implements UserService {
 
         // Check whether email is updated.
         if (StringUtils.isNotEmpty(entityBO.getEmail())) {
-            if (!entityBO.getEmail().equals(selectById.getEmail())) {
-                UserBO selectByEmail = getByEmail(entityBO.getEmail(), false);
-                if (Objects.nonNull(selectByEmail)) {
+            if (!entityBO.getEmail().equals(existingDO.getEmail())) {
+                UserBO existingByEmail = getByEmail(entityBO.getEmail(), false);
+                if (Objects.nonNull(existingByEmail)) {
                     throw new DuplicateException("The user already exists with email {}", entityBO.getEmail());
                 }
             }

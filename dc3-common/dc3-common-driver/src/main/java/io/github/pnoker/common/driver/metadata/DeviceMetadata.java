@@ -82,7 +82,7 @@ public final class DeviceMetadata {
                         (key, value, cause) -> log.info("Remove key={}, value={} cache, reason is: {}", key, value, cause))
                 .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> {
                     log.info("Load device metadata by id: {}", key);
-                    DeviceBO deviceBO = deviceClient.selectById(key);
+                    DeviceBO deviceBO = deviceClient.getById(key);
                     log.info("Cache device metadata: {}", JsonUtil.toJsonString(deviceBO));
                     return deviceBO;
                 }, executor));
@@ -117,7 +117,7 @@ public final class DeviceMetadata {
      * @param id device identifier
      */
     public void loadCache(long id) {
-        CompletableFuture<DeviceBO> future = CompletableFuture.supplyAsync(() -> deviceClient.selectById(id));
+        CompletableFuture<DeviceBO> future = CompletableFuture.supplyAsync(() -> deviceClient.getById(id));
         cache.put(id, future);
     }
 

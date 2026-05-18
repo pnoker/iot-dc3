@@ -68,7 +68,7 @@ public final class PointMetadata {
                         (key, value, cause) -> log.info("Remove key={}, value={} cache, reason is: {}", key, value, cause))
                 .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> {
                     log.info("Load point metadata by id: {}", key);
-                    PointBO pointBO = this.pointClient.selectById(key);
+                    PointBO pointBO = this.pointClient.getById(key);
                     log.info("Cache point metadata: {}", JsonUtil.toJsonString(pointBO));
                     return pointBO;
                 }, executor));
@@ -103,7 +103,7 @@ public final class PointMetadata {
      * @param id point identifier
      */
     public void loadCache(long id) {
-        CompletableFuture<PointBO> future = CompletableFuture.supplyAsync(() -> pointClient.selectById(id));
+        CompletableFuture<PointBO> future = CompletableFuture.supplyAsync(() -> pointClient.getById(id));
         cache.put(id, future);
     }
 

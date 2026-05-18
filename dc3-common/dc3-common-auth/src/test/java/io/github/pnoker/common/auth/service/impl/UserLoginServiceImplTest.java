@@ -132,26 +132,26 @@ class UserLoginServiceImplTest {
     }
 
     @Test
-    void selectByLoginNameThrowsEmptyExceptionForBlankWhenAsked() {
+    void getByLoginNameThrowsEmptyExceptionForBlankWhenAsked() {
         assertThatThrownBy(() -> service.getByLoginName("", true))
                 .isInstanceOf(EmptyException.class);
     }
 
     @Test
-    void selectByLoginNameReturnsNullForBlankWhenSilent() {
+    void getByLoginNameReturnsNullForBlankWhenSilent() {
         assertThat(service.getByLoginName(null, false)).isNull();
         assertThat(service.getByLoginName("", false)).isNull();
     }
 
     @Test
-    void selectByLoginNameThrowsNotFoundWhenAskedAndMissing() {
+    void getByLoginNameThrowsNotFoundWhenAskedAndMissing() {
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         assertThatThrownBy(() -> service.getByLoginName("missing", true))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    void selectByLoginNameReturnsBoForExistingEnabledLogin() {
+    void getByLoginNameReturnsBoForExistingEnabledLogin() {
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(userLoginBuilder.buildBOByDO(doRow)).thenReturn(bo);
         assertThat(service.getByLoginName("alice", false)).isSameAs(bo);
