@@ -54,36 +54,36 @@ public interface DeviceFacade {
      *
      * @return the device, or {@code null} when the device does not exist.
      */
-    FacadeDeviceBO selectById(Long id);
+    FacadeDeviceBO getById(Long id);
 
     /**
      * Tenant-scoped single lookup. Returns {@code null} when the device is missing or
      * belongs to another tenant.
      */
-    default FacadeDeviceBO selectById(Long tenantId, Long id) {
+    default FacadeDeviceBO getById(Long tenantId, Long id) {
         if (Objects.isNull(tenantId)) {
             return null;
         }
-        FacadeDeviceBO device = selectById(id);
+        FacadeDeviceBO device = getById(id);
         return matchesTenant(tenantId, device) ? device : null;
     }
 
     /**
-     * Bulk lookup. Avoids the N+1 cost of calling {@link #selectById(Long)} in a loop.
+     * Bulk lookup. Avoids the N+1 cost of calling {@link #getById(Long)} in a loop.
      *
      * @return list of resolved devices (missing ids are simply omitted; never {@code
      * null}).
      */
-    List<FacadeDeviceBO> selectByIds(Collection<Long> ids);
+    List<FacadeDeviceBO> listByIds(Collection<Long> ids);
 
     /**
      * Tenant-scoped bulk lookup. Missing or cross-tenant devices are omitted.
      */
-    default List<FacadeDeviceBO> selectByIds(Long tenantId, Collection<Long> ids) {
+    default List<FacadeDeviceBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return selectByIds(ids).stream()
+        return listByIds(ids).stream()
                 .filter(device -> matchesTenant(tenantId, device))
                 .toList();
     }
@@ -93,23 +93,23 @@ public interface DeviceFacade {
      *
      * @return a page of devices (never {@code null}; empty page when nothing matches).
      */
-    FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query);
+    FacadePage<FacadeDeviceBO> listByPage(FacadeDeviceQuery query);
 
     /**
      * List devices attached to a given profile.
      *
      * @return an immutable list (never {@code null}; empty when nothing matches).
      */
-    List<FacadeDeviceBO> selectByProfileId(Long profileId);
+    List<FacadeDeviceBO> listByProfileId(Long profileId);
 
     /**
      * Tenant-scoped lookup by profile. Cross-tenant devices are omitted.
      */
-    default List<FacadeDeviceBO> selectByProfileId(Long tenantId, Long profileId) {
+    default List<FacadeDeviceBO> listByProfileId(Long tenantId, Long profileId) {
         if (Objects.isNull(tenantId)) {
             return Collections.emptyList();
         }
-        return selectByProfileId(profileId).stream()
+        return listByProfileId(profileId).stream()
                 .filter(device -> matchesTenant(tenantId, device))
                 .toList();
     }
@@ -119,16 +119,16 @@ public interface DeviceFacade {
      *
      * @return an immutable list (never {@code null}; empty when nothing matches).
      */
-    List<FacadeDeviceBO> selectByDriverId(Long driverId);
+    List<FacadeDeviceBO> listByDriverId(Long driverId);
 
     /**
      * Tenant-scoped lookup by driver. Cross-tenant devices are omitted.
      */
-    default List<FacadeDeviceBO> selectByDriverId(Long tenantId, Long driverId) {
+    default List<FacadeDeviceBO> listByDriverId(Long tenantId, Long driverId) {
         if (Objects.isNull(tenantId)) {
             return Collections.emptyList();
         }
-        return selectByDriverId(driverId).stream()
+        return listByDriverId(driverId).stream()
                 .filter(device -> matchesTenant(tenantId, device))
                 .toList();
     }

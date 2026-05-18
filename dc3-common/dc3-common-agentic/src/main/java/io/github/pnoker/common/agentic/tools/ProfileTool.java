@@ -66,7 +66,7 @@ public class ProfileTool {
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
         }
-        FacadeProfileBO profile = facade.selectById(tenantId, profileId);
+        FacadeProfileBO profile = facade.getById(tenantId, profileId);
         if (Objects.isNull(profile)) {
             return AgenticToolResult.notFound("Profile not found for ID: " + profileId);
         }
@@ -88,7 +88,7 @@ public class ProfileTool {
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid profile IDs provided.");
         }
-        List<FacadeProfileBO> profiles = facade.selectByIds(tenantId, ids);
+        List<FacadeProfileBO> profiles = facade.listByIds(tenantId, ids);
         if (Objects.isNull(profiles) || profiles.isEmpty()) {
             return AgenticToolResult.empty("No profiles found for IDs: " + ids, List.of());
         }
@@ -119,7 +119,7 @@ public class ProfileTool {
         query.setProfileCode(profileCode);
         query.setProfileTypeFlag(parseProfileType(profileType));
         query.setPage(AgenticToolUtil.page(page, size));
-        FacadePage<FacadeProfileBO> result = facade.selectByPage(query);
+        FacadePage<FacadeProfileBO> result = facade.listByPage(query);
         if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No profiles found.", result);
         }
@@ -138,7 +138,7 @@ public class ProfileTool {
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
         }
-        List<FacadeProfileBO> profiles = facade.selectByDeviceId(tenantId, deviceId);
+        List<FacadeProfileBO> profiles = facade.listByDeviceId(tenantId, deviceId);
         if (Objects.isNull(profiles) || profiles.isEmpty()) {
             return AgenticToolResult.empty("No profiles found for device ID: " + deviceId, List.of());
         }

@@ -143,11 +143,11 @@ public class SystemHealthServiceImpl implements SystemHealthService {
 
     private Map<String, String> probeCenter() {
         Map<String, String> out = new LinkedHashMap<>();
-        out.put("auth", probe(() -> Objects.nonNull(tenantFacade.selectByCode("default"))));
+        out.put("auth", probe(() -> Objects.nonNull(tenantFacade.getByCode("default"))));
         out.put("data", UP); // reaching this code == data is up
         out.put("manager", probe(() -> {
             FacadeDriverQuery q = FacadeDriverQuery.builder().page(firstPage(1)).build();
-            return Objects.nonNull(driverFacade.selectByPage(q));
+            return Objects.nonNull(driverFacade.listByPage(q));
         }));
         return out;
     }
@@ -172,7 +172,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
         CompletableFuture<List<FacadeDriverBO>> future = CompletableFuture.supplyAsync(() -> {
             FacadeDriverQuery q = FacadeDriverQuery.builder().page(firstPage(1000)).tenantId(tenantId).build();
-            FacadePage<FacadeDriverBO> page = driverFacade.selectByPage(q);
+            FacadePage<FacadeDriverBO> page = driverFacade.listByPage(q);
             return Objects.nonNull(page) ? page.getRecords() : List.<FacadeDriverBO>of();
         });
         List<FacadeDriverBO> drivers;
@@ -201,7 +201,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
         CompletableFuture<List<FacadeDeviceBO>> future = CompletableFuture.supplyAsync(() -> {
             FacadeDeviceQuery q = FacadeDeviceQuery.builder().page(firstPage(5000)).tenantId(tenantId).build();
-            FacadePage<FacadeDeviceBO> page = deviceFacade.selectByPage(q);
+            FacadePage<FacadeDeviceBO> page = deviceFacade.listByPage(q);
             return Objects.nonNull(page) ? page.getRecords() : List.<FacadeDeviceBO>of();
         });
         List<FacadeDeviceBO> devices;

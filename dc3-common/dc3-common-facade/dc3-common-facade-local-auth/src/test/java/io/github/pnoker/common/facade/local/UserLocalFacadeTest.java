@@ -59,7 +59,7 @@ class UserLocalFacadeTest {
     @Test
     void selectByIdReturnsNullWhenServiceReturnsNull() {
         when(userService.selectById(1L)).thenReturn(null);
-        assertThat(facade.selectById(1L)).isNull();
+        assertThat(facade.getById(1L)).isNull();
         verify(facadeUserBuilder, never()).toFacadeBO(any());
     }
 
@@ -70,7 +70,7 @@ class UserLocalFacadeTest {
         when(userService.selectById(1L)).thenReturn(user);
         when(facadeUserBuilder.toFacadeBO(user)).thenReturn(mapped);
 
-        assertThat(facade.selectById(1L)).isSameAs(mapped);
+        assertThat(facade.getById(1L)).isSameAs(mapped);
     }
 
     private void injectField(String name, Object value) throws Exception {

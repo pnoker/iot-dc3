@@ -92,7 +92,7 @@ class DriverRegisterServiceImplTest {
 
     @Test
     void registerDriverRejectsUnknownTenant() {
-        when(tenantFacade.selectByCode("default")).thenReturn(null);
+        when(tenantFacade.getByCode("default")).thenReturn(null);
         assertThatThrownBy(() -> service.registerDriver(request))
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("Tenant");
@@ -102,7 +102,7 @@ class DriverRegisterServiceImplTest {
 
     @Test
     void registerDriverInsertsWhenNotPreviouslyRegistered() {
-        when(tenantFacade.selectByCode("default")).thenReturn(tenant);
+        when(tenantFacade.getByCode("default")).thenReturn(tenant);
         when(grpcDriverBuilder.buildBOByGrpcDTO(any(GrpcDriverDTO.class))).thenReturn(driverBO);
         when(driverService.selectByServiceName(eq("dc3-driver-modbus-tcp"), eq(100L)))
                 .thenReturn(null, driverBO);
@@ -120,7 +120,7 @@ class DriverRegisterServiceImplTest {
         DriverBO existing = new DriverBO();
         existing.setId(42L);
         existing.setServiceName("dc3-driver-modbus-tcp");
-        when(tenantFacade.selectByCode("default")).thenReturn(tenant);
+        when(tenantFacade.getByCode("default")).thenReturn(tenant);
         when(grpcDriverBuilder.buildBOByGrpcDTO(any(GrpcDriverDTO.class))).thenReturn(driverBO);
         when(driverService.selectByServiceName(eq("dc3-driver-modbus-tcp"), eq(100L)))
                 .thenReturn(existing, driverBO);

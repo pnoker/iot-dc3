@@ -74,7 +74,7 @@ class OfflineExpiryListenerTest {
     void driverExpiryPersistsOfflineEventAndTriggersRules() throws Exception {
         FacadeDriverBO driver = new FacadeDriverBO();
         driver.setTenantId(1L);
-        when(driverFacade.selectById(7L)).thenReturn(driver);
+        when(driverFacade.getById(7L)).thenReturn(driver);
         doAnswer(invocation -> {
             DriverEventDO event = invocation.getArgument(0);
             event.setId(701L);
@@ -101,7 +101,7 @@ class OfflineExpiryListenerTest {
         FacadeDeviceBO device = new FacadeDeviceBO();
         device.setTenantId(1L);
         device.setDriverId(2L);
-        when(deviceFacade.selectById(10L)).thenReturn(device);
+        when(deviceFacade.getById(10L)).thenReturn(device);
         doAnswer(invocation -> {
             DeviceEventDO event = invocation.getArgument(0);
             event.setId(801L);

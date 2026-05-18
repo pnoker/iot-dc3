@@ -45,36 +45,36 @@ public interface DriverFacade {
     /**
      * @return the driver, or {@code null} when it does not exist.
      */
-    FacadeDriverBO selectById(Long id);
+    FacadeDriverBO getById(Long id);
 
     /**
      * Tenant-scoped single lookup. Returns {@code null} when the driver is missing or
      * belongs to another tenant.
      */
-    default FacadeDriverBO selectById(Long tenantId, Long id) {
+    default FacadeDriverBO getById(Long tenantId, Long id) {
         if (Objects.isNull(tenantId)) {
             return null;
         }
-        FacadeDriverBO driver = selectById(id);
+        FacadeDriverBO driver = getById(id);
         return matchesTenant(tenantId, driver) ? driver : null;
     }
 
     /**
-     * Bulk lookup. Avoids the N+1 cost of calling {@link #selectById(Long)} in a loop.
+     * Bulk lookup. Avoids the N+1 cost of calling {@link #getById(Long)} in a loop.
      *
      * @return list of resolved drivers (missing ids are simply omitted; never {@code
      * null}).
      */
-    List<FacadeDriverBO> selectByIds(Collection<Long> ids);
+    List<FacadeDriverBO> listByIds(Collection<Long> ids);
 
     /**
      * Tenant-scoped bulk lookup. Missing or cross-tenant drivers are omitted.
      */
-    default List<FacadeDriverBO> selectByIds(Long tenantId, Collection<Long> ids) {
+    default List<FacadeDriverBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return selectByIds(ids).stream()
+        return listByIds(ids).stream()
                 .filter(driver -> matchesTenant(tenantId, driver))
                 .toList();
     }
@@ -82,24 +82,24 @@ public interface DriverFacade {
     /**
      * @return a page of drivers (never {@code null}; empty page when nothing matches).
      */
-    FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query);
+    FacadePage<FacadeDriverBO> listByPage(FacadeDriverQuery query);
 
     /**
      * Resolve the driver that owns a given device.
      *
      * @return the driver, or {@code null} when the device has no bound driver.
      */
-    FacadeDriverBO selectByDeviceId(Long deviceId);
+    FacadeDriverBO getByDeviceId(Long deviceId);
 
     /**
      * Tenant-scoped owner lookup. Returns {@code null} when the owning driver is missing
      * or belongs to another tenant.
      */
-    default FacadeDriverBO selectByDeviceId(Long tenantId, Long deviceId) {
+    default FacadeDriverBO getByDeviceId(Long tenantId, Long deviceId) {
         if (Objects.isNull(tenantId)) {
             return null;
         }
-        FacadeDriverBO driver = selectByDeviceId(deviceId);
+        FacadeDriverBO driver = getByDeviceId(deviceId);
         return matchesTenant(tenantId, driver) ? driver : null;
     }
 

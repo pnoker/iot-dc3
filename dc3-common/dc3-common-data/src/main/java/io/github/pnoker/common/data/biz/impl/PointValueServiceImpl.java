@@ -142,7 +142,7 @@ public class PointValueServiceImpl implements PointValueService {
                 .enableFlag(entityQuery.getEnableFlag())
                 .build();
 
-        FacadePage<FacadePointBO> page = pointFacade.selectByPage(facadeQuery);
+        FacadePage<FacadePointBO> page = pointFacade.listByPage(facadeQuery);
         List<Long> pointIds = page.getRecords().stream().map(FacadePointBO::getId).toList();
 
         if (pointIds.isEmpty()) {
@@ -234,7 +234,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         FacadeDeviceBO device = null;
         if (isValidId(deviceId)) {
-            device = deviceFacade.selectById(tenantId, deviceId);
+            device = deviceFacade.getById(tenantId, deviceId);
             if (Objects.isNull(device)) {
                 throw new NotFoundException("Device does not exist");
             }
@@ -242,7 +242,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         FacadePointBO point = null;
         if (isValidId(pointId)) {
-            point = pointFacade.selectById(tenantId, pointId);
+            point = pointFacade.getById(tenantId, pointId);
             if (Objects.isNull(point)) {
                 throw new NotFoundException("Point does not exist");
             }

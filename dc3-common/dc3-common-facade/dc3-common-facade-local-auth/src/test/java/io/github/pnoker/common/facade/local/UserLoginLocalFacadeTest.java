@@ -60,7 +60,7 @@ class UserLoginLocalFacadeTest {
     @Test
     void selectByNameReturnsNullWhenServiceReturnsNull() {
         when(userLoginService.selectByLoginName(eq("alice"), eq(false))).thenReturn(null);
-        assertThat(facade.selectByName("alice")).isNull();
+        assertThat(facade.getByName("alice")).isNull();
         verify(facadeUserLoginBuilder, never()).toFacadeBO(any());
     }
 
@@ -71,7 +71,7 @@ class UserLoginLocalFacadeTest {
         when(userLoginService.selectByLoginName(eq("alice"), eq(false))).thenReturn(bo);
         when(facadeUserLoginBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
-        assertThat(facade.selectByName("alice")).isSameAs(mapped);
+        assertThat(facade.getByName("alice")).isSameAs(mapped);
         // Boolean argument is the soft-delete-include flag; local facade pins it to false to
         // match grpc UserLoginServer's contract.
         verify(userLoginService).selectByLoginName("alice", false);

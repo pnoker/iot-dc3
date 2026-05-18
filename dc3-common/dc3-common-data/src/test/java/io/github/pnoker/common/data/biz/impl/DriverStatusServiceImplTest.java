@@ -70,7 +70,7 @@ class DriverStatusServiceImplTest {
     void selectByPageReturnsEmptyMapForEmptyPage() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
         page.setRecords(List.of());
-        when(driverFacade.selectByPage(any())).thenReturn(page);
+        when(driverFacade.listByPage(any())).thenReturn(page);
         assertThat(service.selectByPage(new DriverQuery())).isEmpty();
     }
 
@@ -78,7 +78,7 @@ class DriverStatusServiceImplTest {
     void selectByPageDefaultsToOfflineWhenCacheMissing() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
         page.setRecords(List.of(driver(1L)));
-        when(driverFacade.selectByPage(any())).thenReturn(page);
+        when(driverFacade.listByPage(any())).thenReturn(page);
         when(localCacheService.getKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + 1L)).thenReturn(null);
         assertThat(service.selectByPage(new DriverQuery()))
                 .containsEntry(1L, DriverStatusEnum.OFFLINE.getCode());
@@ -88,7 +88,7 @@ class DriverStatusServiceImplTest {
     void selectByPageReturnsCachedStatus() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
         page.setRecords(List.of(driver(1L)));
-        when(driverFacade.selectByPage(any())).thenReturn(page);
+        when(driverFacade.listByPage(any())).thenReturn(page);
         when(localCacheService.getKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + 1L))
                 .thenReturn(DriverStatusEnum.ONLINE.getCode());
         assertThat(service.selectByPage(new DriverQuery()))
@@ -97,21 +97,21 @@ class DriverStatusServiceImplTest {
 
     @Test
     void getDeviceOnlineByDriverIdReturnsZeroWhenDriverMissing() {
-        when(driverFacade.selectById(1L, 7L)).thenReturn(null);
+        when(driverFacade.getById(1L, 7L)).thenReturn(null);
         assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo("0");
     }
 
     @Test
     void getDeviceOnlineByDriverIdReturnsZeroWhenNoDevices() {
-        when(driverFacade.selectById(1L, 7L)).thenReturn(driver(7L));
-        when(deviceFacade.selectByDriverId(1L, 7L)).thenReturn(List.of());
+        when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
+        when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of());
         assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo("0");
     }
 
     @Test
     void getDeviceOnlineByDriverIdCountsOnlineDevices() {
-        when(driverFacade.selectById(1L, 7L)).thenReturn(driver(7L));
-        when(deviceFacade.selectByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L)));
+        when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
+        when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L)));
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
                 .thenReturn(DeviceStatusEnum.ONLINE.getCode());
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 11L))
@@ -121,16 +121,16 @@ class DriverStatusServiceImplTest {
 
     @Test
     void getDeviceOnlineByDriverIdTreatsMissingCacheAsOffline() {
-        when(driverFacade.selectById(1L, 7L)).thenReturn(driver(7L));
-        when(deviceFacade.selectByDriverId(1L, 7L)).thenReturn(List.of(device(10L)));
+        when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
+        when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L)));
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L)).thenReturn(null);
         assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo("0");
     }
 
     @Test
     void getDeviceOfflineByDriverIdCountsOfflineAndMissingDevices() {
-        when(driverFacade.selectById(1L, 7L)).thenReturn(driver(7L));
-        when(deviceFacade.selectByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L), device(12L)));
+        when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
+        when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L), device(12L)));
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
                 .thenReturn(DeviceStatusEnum.ONLINE.getCode());
         when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 11L))

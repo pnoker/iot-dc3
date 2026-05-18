@@ -51,12 +51,12 @@ public class UserLoginGrpcFacade implements UserLoginFacade {
     private GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadeUserLoginBO selectByName(String name) {
+    public FacadeUserLoginBO getByName(String name) {
         GrpcNameQuery request = GrpcNameQuery.newBuilder().setName(name).build();
-        GrpcRUserLoginDTO response = grpcFacadeSupport.call("UserLoginFacade.selectByName", userLoginApiBlockingStub,
+        GrpcRUserLoginDTO response = grpcFacadeSupport.call("UserLoginFacade.getByName", userLoginApiBlockingStub,
                 stub -> stub.getByName(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "selectByName");
+            guardOrThrow(response.getResult(), "getByName");
             return null;
         }
         return facadeGrpcUserLoginBuilder.toFacadeBO(response.getData());

@@ -72,7 +72,7 @@ class DeviceToolTest {
     void searchDevicesUsesTenantScopedQueryAndReturnsStructuredPage() {
         FacadeDeviceBO device = device(201L, "Edge Gateway A1", 101L);
         FacadePage<FacadeDeviceBO> page = new FacadePage<>(1L, 20L, 1L, 1L, List.of(device));
-        when(deviceFacade.selectByPage(org.mockito.ArgumentMatchers.any(FacadeDeviceQuery.class))).thenReturn(page);
+        when(deviceFacade.listByPage(org.mockito.ArgumentMatchers.any(FacadeDeviceQuery.class))).thenReturn(page);
 
         AgenticToolResult<FacadePage<FacadeDeviceBO>> result = tool.searchDevices(
                 "Edge Gateway", "edge-gateway-a1", 101L, 1, 20, toolContext());
@@ -83,7 +83,7 @@ class DeviceToolTest {
                 .containsExactly("Edge Gateway A1");
 
         ArgumentCaptor<FacadeDeviceQuery> captor = forClass(FacadeDeviceQuery.class);
-        org.mockito.Mockito.verify(deviceFacade).selectByPage(captor.capture());
+        org.mockito.Mockito.verify(deviceFacade).listByPage(captor.capture());
         assertThat(captor.getValue().getTenantId()).isEqualTo(11L);
         assertThat(captor.getValue().getDeviceName()).isEqualTo("Edge Gateway");
         assertThat(captor.getValue().getDeviceCode()).isEqualTo("edge-gateway-a1");
@@ -103,8 +103,8 @@ class DeviceToolTest {
                 .numValue(23.7D)
                 .createTime(1_780_000_000L)
                 .build();
-        when(deviceFacade.selectById(11L, 201L)).thenReturn(device);
-        when(pointFacade.selectByPage(org.mockito.ArgumentMatchers.any(FacadePointQuery.class)))
+        when(deviceFacade.getById(11L, 201L)).thenReturn(device);
+        when(pointFacade.listByPage(org.mockito.ArgumentMatchers.any(FacadePointQuery.class)))
                 .thenReturn(new FacadePage<>(1L, 5L, 1L, 1L, List.of(temperature)));
         when(pointValueFacade.lastValue(11L, 201L, 301L)).thenReturn(latestValue);
 
@@ -119,7 +119,7 @@ class DeviceToolTest {
         assertThat(result.data().points().get(0).value().getValue()).isEqualTo("23.7");
 
         ArgumentCaptor<FacadePointQuery> captor = forClass(FacadePointQuery.class);
-        org.mockito.Mockito.verify(pointFacade).selectByPage(captor.capture());
+        org.mockito.Mockito.verify(pointFacade).listByPage(captor.capture());
         assertThat(captor.getValue().getTenantId()).isEqualTo(11L);
         assertThat(captor.getValue().getDeviceId()).isEqualTo(201L);
         assertThat(captor.getValue().getPage().getSize()).isEqualTo(5L);

@@ -31,6 +31,6 @@ public interface UserFacade {
     /**
      * @return the user, or {@code null} when the id does not match any user.
      */
-    FacadeUserBO selectById(Long id);
+    FacadeUserBO getById(Long id);
 
 }

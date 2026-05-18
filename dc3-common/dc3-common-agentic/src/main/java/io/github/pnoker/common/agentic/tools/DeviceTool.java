@@ -77,7 +77,7 @@ public class DeviceTool {
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "lookupDeviceById", tenantId, deviceId);
-        FacadeDeviceBO bo = deviceFacade.selectById(tenantId, deviceId);
+        FacadeDeviceBO bo = deviceFacade.getById(tenantId, deviceId);
         if (Objects.isNull(bo)) {
             return AgenticToolResult.notFound("Device not found for ID: " + deviceId);
         }
@@ -95,7 +95,7 @@ public class DeviceTool {
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid device IDs provided.");
         }
-        List<FacadeDeviceBO> devices = deviceFacade.selectByIds(tenantId, ids);
+        List<FacadeDeviceBO> devices = deviceFacade.listByIds(tenantId, ids);
         if (Objects.isNull(devices) || devices.isEmpty()) {
             return AgenticToolResult.empty("No devices found for IDs: " + ids, List.of());
         }
@@ -123,7 +123,7 @@ public class DeviceTool {
         query.setTenantId(tenantId);
         query.setPage(AgenticToolUtil.page(page, size));
 
-        FacadePage<FacadeDeviceBO> result = deviceFacade.selectByPage(query);
+        FacadePage<FacadeDeviceBO> result = deviceFacade.listByPage(query);
         if (!AgenticToolUtil.hasRecords(result)) {
             return AgenticToolResult.empty("No devices found.", result);
         }
@@ -138,7 +138,7 @@ public class DeviceTool {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, driverId={}", "listDevicesByDriverId", tenantId,
                 driverId);
-        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
+        List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(tenantId, driverId);
         if (Objects.isNull(devices) || devices.isEmpty()) {
             return AgenticToolResult.empty("No devices found for driver ID: " + driverId, List.of());
         }
@@ -153,7 +153,7 @@ public class DeviceTool {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "listDevicesByProfileId", tenantId,
                 profileId);
-        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(tenantId, profileId);
+        List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
         if (Objects.isNull(devices) || devices.isEmpty()) {
             return AgenticToolResult.empty("No devices found for profile ID: " + profileId, List.of());
         }
@@ -171,7 +171,7 @@ public class DeviceTool {
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, limit={}",
                 "getDeviceLatestPointValues", tenantId, deviceId, size);
         try {
-            FacadeDeviceBO device = deviceFacade.selectById(tenantId, deviceId);
+            FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
             if (Objects.isNull(device)) {
                 return AgenticToolResult.notFound("Device not found for ID: " + deviceId);
             }
@@ -180,7 +180,7 @@ public class DeviceTool {
             query.setTenantId(tenantId);
             query.setDeviceId(deviceId);
             query.setPage(AgenticToolUtil.page(1, size));
-            FacadePage<FacadePointBO> points = pointFacade.selectByPage(query);
+            FacadePage<FacadePointBO> points = pointFacade.listByPage(query);
             if (!AgenticToolUtil.hasRecords(points)) {
                 return AgenticToolResult.empty("No points found for device " + deviceId,
                         new DeviceLatestPointValues(device, List.of()));

@@ -185,8 +185,8 @@ class PointValueServiceImplTest {
             factory.when(RepositoryStrategyFactory::get).thenReturn(List.of(repositoryService));
             FacadeDeviceBO device = stubDevice(1L, 5L);
             FacadePointBO point = stubPoint(1L, 5L);
-            when(deviceFacade.selectById(1L, 2L)).thenReturn(device);
-            when(pointFacade.selectById(1L, 3L)).thenReturn(point);
+            when(deviceFacade.getById(1L, 2L)).thenReturn(device);
+            when(pointFacade.getById(1L, 3L)).thenReturn(point);
 
             service.history(1L, 2L, 3L, 0);
             verify(repositoryService).selectHistoryPointValue(1L, 2L, 3L, 100);
@@ -201,7 +201,7 @@ class PointValueServiceImplTest {
 
     @Test
     void historyRejectsCrossTenantDevice() {
-        when(deviceFacade.selectById(1L, 2L)).thenReturn(null);
+        when(deviceFacade.getById(1L, 2L)).thenReturn(null);
         try (MockedStatic<RepositoryStrategyFactory> factory =
                      Mockito.mockStatic(RepositoryStrategyFactory.class)) {
             factory.when(RepositoryStrategyFactory::get).thenReturn(List.of(repositoryService));
@@ -215,8 +215,8 @@ class PointValueServiceImplTest {
     void historyRejectsPointThatDoesNotBelongToDeviceProfile() {
         FacadeDeviceBO device = stubDevice(1L, 5L);
         FacadePointBO point = stubPoint(1L, 99L); // profileId mismatch
-        when(deviceFacade.selectById(1L, 2L)).thenReturn(device);
-        when(pointFacade.selectById(1L, 3L)).thenReturn(point);
+        when(deviceFacade.getById(1L, 2L)).thenReturn(device);
+        when(pointFacade.getById(1L, 3L)).thenReturn(point);
 
         try (MockedStatic<RepositoryStrategyFactory> factory =
                      Mockito.mockStatic(RepositoryStrategyFactory.class)) {
@@ -255,8 +255,8 @@ class PointValueServiceImplTest {
     void pageDelegatesToRepositoryService() {
         FacadeDeviceBO device = stubDevice(1L, 5L);
         FacadePointBO point = stubPoint(1L, 5L);
-        when(deviceFacade.selectById(1L, 2L)).thenReturn(device);
-        when(pointFacade.selectById(1L, 3L)).thenReturn(point);
+        when(deviceFacade.getById(1L, 2L)).thenReturn(device);
+        when(pointFacade.getById(1L, 3L)).thenReturn(point);
 
         PointValueQuery query = new PointValueQuery();
         query.setTenantId(1L);

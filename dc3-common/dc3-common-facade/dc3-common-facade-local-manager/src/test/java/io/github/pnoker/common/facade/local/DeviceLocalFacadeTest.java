@@ -69,7 +69,7 @@ class DeviceLocalFacadeTest {
     @Test
     void selectByIdReturnsNullWhenServiceReturnsNull() {
         when(deviceService.selectById(1L)).thenReturn(null);
-        assertThat(facade.selectById(1L)).isNull();
+        assertThat(facade.getById(1L)).isNull();
         verify(facadeDeviceBuilder, never()).toFacadeBO(any());
     }
 
@@ -79,23 +79,23 @@ class DeviceLocalFacadeTest {
         FacadeDeviceBO mapped = new FacadeDeviceBO();
         when(deviceService.selectById(1L)).thenReturn(source);
         when(facadeDeviceBuilder.toFacadeBO(source)).thenReturn(mapped);
-        assertThat(facade.selectById(1L)).isSameAs(mapped);
+        assertThat(facade.getById(1L)).isSameAs(mapped);
     }
 
     @Test
     void selectByIdsReturnsEmptyForNullOrEmptyInput() {
-        assertThat(facade.selectByIds(null)).isEmpty();
-        assertThat(facade.selectByIds(Set.of())).isEmpty();
+        assertThat(facade.listByIds(null)).isEmpty();
+        assertThat(facade.listByIds(Set.of())).isEmpty();
         verify(deviceService, never()).selectByIds(any());
     }
 
     @Test
     void selectByIdsReturnsEmptyWhenServiceReturnsNullOrEmpty() {
         when(deviceService.selectByIds(any())).thenReturn(null);
-        assertThat(facade.selectByIds(Set.of(1L))).isEmpty();
+        assertThat(facade.listByIds(Set.of(1L))).isEmpty();
 
         when(deviceService.selectByIds(any())).thenReturn(List.of());
-        assertThat(facade.selectByIds(Set.of(1L))).isEmpty();
+        assertThat(facade.listByIds(Set.of(1L))).isEmpty();
     }
 
     @Test
@@ -108,7 +108,7 @@ class DeviceLocalFacadeTest {
         when(facadeDeviceBuilder.toFacadeBO(bo1)).thenReturn(mapped1);
         when(facadeDeviceBuilder.toFacadeBO(bo2)).thenReturn(mapped2);
 
-        assertThat(facade.selectByIds(Set.of(1L, 2L))).containsExactly(mapped1, mapped2);
+        assertThat(facade.listByIds(Set.of(1L, 2L))).containsExactly(mapped1, mapped2);
     }
 
     @Test
@@ -117,7 +117,7 @@ class DeviceLocalFacadeTest {
         when(facadeDeviceBuilder.toManagerQuery(query)).thenReturn(new DeviceQuery());
         when(deviceService.list(any(DeviceQuery.class))).thenReturn(null);
 
-        FacadePage<FacadeDeviceBO> page = facade.selectByPage(query);
+        FacadePage<FacadeDeviceBO> page = facade.listByPage(query);
         assertThat(page).isNotNull();
         assertThat(page.getRecords()).isEmpty();
     }
@@ -134,7 +134,7 @@ class DeviceLocalFacadeTest {
         when(deviceService.list(any(DeviceQuery.class))).thenReturn(page);
         when(facadeDeviceBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
-        FacadePage<FacadeDeviceBO> result = facade.selectByPage(query);
+        FacadePage<FacadeDeviceBO> result = facade.listByPage(query);
         assertThat(result.getCurrent()).isEqualTo(2);
         assertThat(result.getSize()).isEqualTo(20);
         assertThat(result.getTotal()).isEqualTo(100);
@@ -147,15 +147,15 @@ class DeviceLocalFacadeTest {
         FacadeDeviceBO mapped = new FacadeDeviceBO();
         when(deviceService.selectByProfileId(5L)).thenReturn(List.of(bo));
         when(facadeDeviceBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.selectByProfileId(5L)).containsExactly(mapped);
+        assertThat(facade.listByProfileId(5L)).containsExactly(mapped);
     }
 
     @Test
     void selectByProfileIdReturnsEmptyWhenServiceReturnsNullOrEmpty() {
         when(deviceService.selectByProfileId(5L)).thenReturn(null);
-        assertThat(facade.selectByProfileId(5L)).isEmpty();
+        assertThat(facade.listByProfileId(5L)).isEmpty();
         when(deviceService.selectByProfileId(5L)).thenReturn(List.of());
-        assertThat(facade.selectByProfileId(5L)).isEmpty();
+        assertThat(facade.listByProfileId(5L)).isEmpty();
     }
 
     @Test
@@ -164,15 +164,15 @@ class DeviceLocalFacadeTest {
         FacadeDeviceBO mapped = new FacadeDeviceBO();
         when(deviceService.selectByDriverId(9L)).thenReturn(List.of(bo));
         when(facadeDeviceBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.selectByDriverId(9L)).containsExactly(mapped);
+        assertThat(facade.listByDriverId(9L)).containsExactly(mapped);
     }
 
     @Test
     void selectByDriverIdReturnsEmptyWhenServiceReturnsNullOrEmpty() {
         when(deviceService.selectByDriverId(9L)).thenReturn(null);
-        assertThat(facade.selectByDriverId(9L)).isEmpty();
+        assertThat(facade.listByDriverId(9L)).isEmpty();
         when(deviceService.selectByDriverId(9L)).thenReturn(List.of());
-        assertThat(facade.selectByDriverId(9L)).isEmpty();
+        assertThat(facade.listByDriverId(9L)).isEmpty();
     }
 
     private void injectField(String name, Object value) throws Exception {

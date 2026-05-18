@@ -78,7 +78,7 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
 
     @Override
     public void deviceStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcRStatusMap> responseObserver) {
-        List<FacadeDeviceBO> devices = deviceFacade.selectByIds(request.getTenantId(), request.getIdsList());
+        List<FacadeDeviceBO> devices = deviceFacade.listByIds(request.getTenantId(), request.getIdsList());
         Map<Long, String> statuses = new LinkedHashMap<>();
         devices.forEach(device -> statuses.put(device.getId(), deviceStatus(device.getId())));
         responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
@@ -88,7 +88,7 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
     @Override
     public void deviceStatusesByProfileId(GrpcProfileStatusQuery request,
                                           StreamObserver<GrpcRStatusMap> responseObserver) {
-        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(request.getTenantId(), request.getProfileId());
+        List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(request.getTenantId(), request.getProfileId());
         Map<Long, String> statuses = new LinkedHashMap<>();
         devices.forEach(device -> statuses.put(device.getId(), deviceStatus(device.getId())));
         responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
@@ -97,7 +97,7 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
 
     @Override
     public void driverStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcRStatusMap> responseObserver) {
-        List<FacadeDriverBO> drivers = driverFacade.selectByIds(request.getTenantId(), request.getIdsList());
+        List<FacadeDriverBO> drivers = driverFacade.listByIds(request.getTenantId(), request.getIdsList());
         Map<Long, String> statuses = new LinkedHashMap<>();
         drivers.forEach(driver -> statuses.put(driver.getId(), driverStatus(driver.getId())));
         responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
@@ -107,13 +107,13 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
     @Override
     public void driverDeviceStatusSummary(GrpcDriverStatusQuery request,
                                           StreamObserver<GrpcRStringMap> responseObserver) {
-        FacadeDriverBO driver = driverFacade.selectById(request.getTenantId(), request.getDriverId());
+        FacadeDriverBO driver = driverFacade.getById(request.getTenantId(), request.getDriverId());
         if (Objects.isNull(driver)) {
             responseObserver.onNext(GrpcRStringMap.newBuilder().setResult(noResource()).build());
             responseObserver.onCompleted();
             return;
         }
-        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(request.getTenantId(), request.getDriverId());
+        List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(request.getTenantId(), request.getDriverId());
         long online = devices.stream()
                 .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(), deviceStatus(device.getId())))
                 .count();

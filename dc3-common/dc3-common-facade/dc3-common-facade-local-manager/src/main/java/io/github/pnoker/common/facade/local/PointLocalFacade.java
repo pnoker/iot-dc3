@@ -54,13 +54,13 @@ public class PointLocalFacade implements PointFacade {
     private FacadePointBuilder facadePointBuilder;
 
     @Override
-    public FacadePointBO selectById(Long id) {
+    public FacadePointBO getById(Long id) {
         PointBO managerBO = pointService.selectById(id);
         return Objects.isNull(managerBO) ? null : facadePointBuilder.toFacadeBO(managerBO);
     }
 
     @Override
-    public List<FacadePointBO> selectByIds(Collection<Long> ids) {
+    public List<FacadePointBO> listByIds(Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -72,7 +72,7 @@ public class PointLocalFacade implements PointFacade {
     }
 
     @Override
-    public FacadePage<FacadePointBO> selectByPage(FacadePointQuery query) {
+    public FacadePage<FacadePointBO> listByPage(FacadePointQuery query) {
         PointQuery managerQuery = facadePointBuilder.toManagerQuery(query);
         Page<PointBO> page = pointService.list(managerQuery);
         if (Objects.isNull(page)) {

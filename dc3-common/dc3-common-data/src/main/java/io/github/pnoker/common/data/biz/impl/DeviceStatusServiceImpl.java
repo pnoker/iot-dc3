@@ -66,7 +66,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
                 .enableFlag(pageQuery.getEnableFlag())
                 .build();
 
-        FacadePage<FacadeDeviceBO> page = deviceFacade.selectByPage(facadeQuery);
+        FacadePage<FacadeDeviceBO> page = deviceFacade.listByPage(facadeQuery);
         if (page.getRecords().isEmpty()) {
             return Map.of();
         }
@@ -76,7 +76,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public Map<Long, String> selectByProfileId(Long tenantId, Long profileId) {
-        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(tenantId, profileId);
+        List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
         if (devices.isEmpty()) {
             return Map.of();
         }

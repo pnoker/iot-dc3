@@ -82,9 +82,9 @@ class PointValueCommandServiceImplTest {
 
     @Test
     void readPublishesReadCommandToOwningDriver() {
-        when(deviceFacade.selectById(1L, 10L)).thenReturn(device);
-        when(pointFacade.selectById(1L, 20L)).thenReturn(point);
-        when(driverFacade.selectByDeviceId(1L, 10L)).thenReturn(driver);
+        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
+        when(pointFacade.getById(1L, 20L)).thenReturn(point);
+        when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
 
         PointValueReadVO vo = new PointValueReadVO();
         vo.setDeviceId(10L);
@@ -99,9 +99,9 @@ class PointValueCommandServiceImplTest {
 
     @Test
     void readSilentlyDropsCommandWhenDriverUnknown() {
-        when(deviceFacade.selectById(1L, 10L)).thenReturn(device);
-        when(pointFacade.selectById(1L, 20L)).thenReturn(point);
-        when(driverFacade.selectByDeviceId(1L, 10L)).thenReturn(null);
+        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
+        when(pointFacade.getById(1L, 20L)).thenReturn(point);
+        when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(null);
 
         PointValueReadVO vo = new PointValueReadVO();
         vo.setDeviceId(10L);
@@ -113,7 +113,7 @@ class PointValueCommandServiceImplTest {
 
     @Test
     void readRejectsUnknownDevice() {
-        when(deviceFacade.selectById(1L, 99L)).thenReturn(null);
+        when(deviceFacade.getById(1L, 99L)).thenReturn(null);
         PointValueReadVO vo = new PointValueReadVO();
         vo.setDeviceId(99L);
         vo.setPointId(20L);
@@ -124,8 +124,8 @@ class PointValueCommandServiceImplTest {
 
     @Test
     void readRejectsUnknownPoint() {
-        when(deviceFacade.selectById(1L, 10L)).thenReturn(device);
-        when(pointFacade.selectById(1L, 99L)).thenReturn(null);
+        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
+        when(pointFacade.getById(1L, 99L)).thenReturn(null);
         PointValueReadVO vo = new PointValueReadVO();
         vo.setDeviceId(10L);
         vo.setPointId(99L);
@@ -138,8 +138,8 @@ class PointValueCommandServiceImplTest {
     void readRejectsCrossProfileBindingAsUnauthorized() {
         FacadeDeviceBO mismatchedDevice = new FacadeDeviceBO();
         mismatchedDevice.setProfileIds(List.of(99L));
-        when(deviceFacade.selectById(1L, 10L)).thenReturn(mismatchedDevice);
-        when(pointFacade.selectById(1L, 20L)).thenReturn(point);
+        when(deviceFacade.getById(1L, 10L)).thenReturn(mismatchedDevice);
+        when(pointFacade.getById(1L, 20L)).thenReturn(point);
         PointValueReadVO vo = new PointValueReadVO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
@@ -150,8 +150,8 @@ class PointValueCommandServiceImplTest {
     void readRejectsDeviceWithoutAnyProfileBinding() {
         FacadeDeviceBO bareDevice = new FacadeDeviceBO();
         bareDevice.setProfileIds(null);
-        when(deviceFacade.selectById(1L, 10L)).thenReturn(bareDevice);
-        when(pointFacade.selectById(1L, 20L)).thenReturn(point);
+        when(deviceFacade.getById(1L, 10L)).thenReturn(bareDevice);
+        when(pointFacade.getById(1L, 20L)).thenReturn(point);
         PointValueReadVO vo = new PointValueReadVO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
@@ -160,9 +160,9 @@ class PointValueCommandServiceImplTest {
 
     @Test
     void writePublishesWriteCommandToOwningDriver() {
-        when(deviceFacade.selectById(1L, 10L)).thenReturn(device);
-        when(pointFacade.selectById(1L, 20L)).thenReturn(point);
-        when(driverFacade.selectByDeviceId(1L, 10L)).thenReturn(driver);
+        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
+        when(pointFacade.getById(1L, 20L)).thenReturn(point);
+        when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
 
         PointValueWriteVO vo = new PointValueWriteVO();
         vo.setDeviceId(10L);
@@ -178,9 +178,9 @@ class PointValueCommandServiceImplTest {
 
     @Test
     void writeSilentlyDropsCommandWhenDriverUnknown() {
-        when(deviceFacade.selectById(1L, 10L)).thenReturn(device);
-        when(pointFacade.selectById(1L, 20L)).thenReturn(point);
-        when(driverFacade.selectByDeviceId(1L, 10L)).thenReturn(null);
+        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
+        when(pointFacade.getById(1L, 20L)).thenReturn(point);
+        when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(null);
         PointValueWriteVO vo = new PointValueWriteVO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
@@ -192,7 +192,7 @@ class PointValueCommandServiceImplTest {
 
     @Test
     void writeRejectsUnknownDevice() {
-        when(deviceFacade.selectById(1L, 99L)).thenReturn(null);
+        when(deviceFacade.getById(1L, 99L)).thenReturn(null);
         PointValueWriteVO vo = new PointValueWriteVO();
         vo.setDeviceId(99L);
         vo.setPointId(20L);
