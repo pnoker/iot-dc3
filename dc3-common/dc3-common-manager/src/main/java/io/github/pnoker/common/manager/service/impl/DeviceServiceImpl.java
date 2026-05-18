@@ -222,7 +222,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public DeviceBO selectByName(String name, Long tenantId) {
+    public DeviceBO getByName(String name, Long tenantId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDeviceName, name);
         wrapper.eq(DeviceDO::getTenantId, tenantId);
@@ -234,7 +234,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public DeviceBO selectByCode(String code, Long tenantId) {
+    public DeviceBO getByCode(String code, Long tenantId) {
         LambdaQueryChainWrapper<DeviceDO> wrapper = deviceManager.lambdaQuery()
                 .eq(DeviceDO::getDeviceCode, code)
                 .eq(DeviceDO::getTenantId, tenantId)

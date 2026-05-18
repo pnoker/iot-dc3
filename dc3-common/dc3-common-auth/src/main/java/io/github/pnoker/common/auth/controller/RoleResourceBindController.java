@@ -148,7 +148,7 @@ public class RoleResourceBindController implements BaseController {
     }
 
     private void requireTenantMember(Long tenantId, Long userId) {
-        TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, userId);
+        TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, userId);
         if (Objects.isNull(tenantBind)) {
             throw new NotFoundException("Resource does not exist");
         }

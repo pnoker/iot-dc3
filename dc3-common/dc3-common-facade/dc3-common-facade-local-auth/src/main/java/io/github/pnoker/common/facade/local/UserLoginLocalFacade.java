@@ -30,7 +30,7 @@ import java.util.Objects;
 
 /**
  * In-process {@link UserLoginFacade}. Matches {@code UserLoginServer} which also calls
- * {@code selectByLoginName(name, false)}.
+ * {@code getByLoginName(name, false)}.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -48,7 +48,7 @@ public class UserLoginLocalFacade implements UserLoginFacade {
 
     @Override
     public FacadeUserLoginBO getByName(String name) {
-        UserLoginBO bo = userLoginService.selectByLoginName(name, false);
+        UserLoginBO bo = userLoginService.getByLoginName(name, false);
         return Objects.isNull(bo) ? null : facadeUserLoginBuilder.toFacadeBO(bo);
     }
 

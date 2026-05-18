@@ -38,7 +38,7 @@ public interface UserService extends BaseService<UserBO, UserQuery> {
      * @return {@link UserBO} or {@code null} when not found and {@code throwException} is
      * false
      */
-    UserBO selectByUserName(String userName, boolean throwException);
+    UserBO getByUserName(String userName, boolean throwException);
 
     /**
      * Get user by phone number.
@@ -48,7 +48,7 @@ public interface UserService extends BaseService<UserBO, UserQuery> {
      * @return {@link UserBO} or {@code null} when not found and {@code throwException} is
      * false
      */
-    UserBO selectByPhone(String phone, boolean throwException);
+    UserBO getByPhone(String phone, boolean throwException);
 
     /**
      * Get user by email.
@@ -58,6 +58,6 @@ public interface UserService extends BaseService<UserBO, UserQuery> {
      * @return {@link UserBO} or {@code null} when not found and {@code throwException} is
      * false
      */
-    UserBO selectByEmail(String email, boolean throwException);
+    UserBO getByEmail(String email, boolean throwException);
 
 }

@@ -98,7 +98,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public TenantBO selectByCode(String code) {
+    public TenantBO getByCode(String code) {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
         wrapper.eq(TenantDO::getTenantCode, code);
         wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);

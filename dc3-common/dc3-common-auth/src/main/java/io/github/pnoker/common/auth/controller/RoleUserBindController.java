@@ -136,7 +136,7 @@ public class RoleUserBindController implements BaseController {
             requireTenant(tenantId, roleService.getById(roleId));
             List<UserBO> entityBOList = roleUserBindService.listUserByRoleId(roleId)
                     .stream()
-                    .filter(user -> Objects.nonNull(tenantBindService.selectByTenantIdAndUserId(tenantId, user.getId())))
+                    .filter(user -> Objects.nonNull(tenantBindService.getByTenantIdAndUserId(tenantId, user.getId())))
                     .toList();
             List<UserVO> entityVOList = userBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
@@ -144,7 +144,7 @@ public class RoleUserBindController implements BaseController {
     }
 
     private void requireTenantMember(Long tenantId, Long userId) {
-        TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, userId);
+        TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, userId);
         if (Objects.isNull(tenantBind)) {
             throw new NotFoundException("Resource does not exist");
         }

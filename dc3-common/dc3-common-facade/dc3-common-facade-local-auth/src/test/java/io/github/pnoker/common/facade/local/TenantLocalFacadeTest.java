@@ -58,7 +58,7 @@ class TenantLocalFacadeTest {
 
     @Test
     void selectByCodeReturnsNullWhenTenantMissing() {
-        when(tenantService.selectByCode("acme")).thenReturn(null);
+        when(tenantService.getByCode("acme")).thenReturn(null);
         assertThat(facade.getByCode("acme")).isNull();
         verify(facadeTenantBuilder, never()).toFacadeBO(any());
     }
@@ -67,7 +67,7 @@ class TenantLocalFacadeTest {
     void selectByCodeMapsThroughBuilderWhenTenantExists() {
         TenantBO bo = new TenantBO();
         FacadeTenantBO mapped = new FacadeTenantBO();
-        when(tenantService.selectByCode("acme")).thenReturn(bo);
+        when(tenantService.getByCode("acme")).thenReturn(bo);
         when(facadeTenantBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
         assertThat(facade.getByCode("acme")).isSameAs(mapped);

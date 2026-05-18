@@ -192,14 +192,14 @@ class TenantServiceImplTest {
     void selectByCodeFiltersOnEnabledTenants() {
         when(tenantManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(tenantBuilder.buildBOByDO(doRow)).thenReturn(bo);
-        assertThat(service.selectByCode("acme")).isSameAs(bo);
+        assertThat(service.getByCode("acme")).isSameAs(bo);
     }
 
     @Test
     void selectByCodeReturnsNullWhenNoMatch() {
         when(tenantManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(tenantBuilder.buildBOByDO(null)).thenReturn(null);
-        assertThat(service.selectByCode("missing")).isNull();
+        assertThat(service.getByCode("missing")).isNull();
     }
 
     @Test

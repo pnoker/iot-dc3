@@ -54,7 +54,7 @@ public class UserLoginServer extends UserLoginApiGrpc.UserLoginApiImplBase {
         GrpcRUserLoginDTO.Builder builder = GrpcRUserLoginDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        UserLoginBO entityBO = userLoginService.selectByLoginName(request.getName(), false);
+        UserLoginBO entityBO = userLoginService.getByLoginName(request.getName(), false);
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

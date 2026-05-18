@@ -113,7 +113,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public UserLoginBO selectByLoginName(String loginName, boolean throwException) {
+    public UserLoginBO getByLoginName(String loginName, boolean throwException) {
         if (StringUtils.isEmpty(loginName)) {
             if (throwException) {
                 throw new EmptyException("The login name is empty");
@@ -137,7 +137,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     public boolean checkLoginNameValid(String loginName) {
-        UserLoginBO userLogin = selectByLoginName(loginName, false);
+        UserLoginBO userLogin = getByLoginName(loginName, false);
         if (Objects.nonNull(userLogin)) {
             return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
         }

@@ -169,9 +169,9 @@ public class UserLoginController implements BaseController {
      * @return {@link UserLoginBO}
      */
     @GetMapping("/select_by_name")
-    public Mono<R<UserLoginVO>> selectByName(@NotNull @RequestParam(value = "name") String name) {
+    public Mono<R<UserLoginVO>> getByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            UserLoginBO entityBO = userLoginService.selectByLoginName(name, false);
+            UserLoginBO entityBO = userLoginService.getByLoginName(name, false);
             // Both "not found" and "wrong tenant" return the same 404 so the
             // response shape does not reveal whether a login name exists.
             if (Objects.isNull(entityBO)) {
@@ -217,7 +217,7 @@ public class UserLoginController implements BaseController {
     }
 
     private void requireTenantMember(Long tenantId, Long userId) {
-        TenantBindBO tenantBind = tenantBindService.selectByTenantIdAndUserId(tenantId, userId);
+        TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, userId);
         if (Objects.isNull(tenantBind)) {
             throw new NotFoundException("Resource does not exist");
         }

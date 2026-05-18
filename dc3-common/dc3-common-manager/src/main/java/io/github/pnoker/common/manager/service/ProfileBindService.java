@@ -56,7 +56,7 @@ public interface ProfileBindService extends BaseService<ProfileBindBO, ProfileBi
      * @param profileId Point ID
      * @return ProfileBind
      */
-    ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
+    ProfileBindBO getByDeviceIdAndProfileId(Long deviceId, Long profileId);
 
     /**
      * ID Device ID
