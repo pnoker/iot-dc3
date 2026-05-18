@@ -27,6 +27,7 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 import jakarta.annotation.Resource;
@@ -87,21 +88,16 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     }
 
     @Override
-    public Map<String, String> getDriverDeviceStatusSummary(Long tenantId, Long driverId) {
+    public FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId) {
         if (Objects.isNull(driverFacade.selectById(tenantId, driverId))) {
-            return Map.of();
+            return null;
         }
         List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(tenantId, driverId);
         long online = devices.stream()
                 .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(), deviceStatus(device.getId())))
                 .count();
-        long offline = Math.max(0, devices.size() - online);
-        Map<String, String> result = new LinkedHashMap<>();
-        result.put("driverId", Objects.toString(driverId, ""));
-        result.put("total", String.valueOf(devices.size()));
-        result.put("online", String.valueOf(online));
-        result.put("offline", String.valueOf(offline));
-        return result;
+        int offline = (int) Math.max(0, devices.size() - online);
+        return new FacadeDriverDeviceStatusSummaryBO(driverId, devices.size(), (int) online, offline);
     }
 
     @Override

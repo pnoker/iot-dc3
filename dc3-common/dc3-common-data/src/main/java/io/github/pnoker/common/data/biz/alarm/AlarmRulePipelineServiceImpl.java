@@ -37,15 +37,20 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
 
     private final RuleNotificationService ruleNotificationService;
 
-    public AlarmRulePipelineServiceImpl(RuleEngine ruleEngine, RuleNotificationService ruleNotificationService) {
+    private final AlarmEventRecordService alarmEventRecordService;
+
+    public AlarmRulePipelineServiceImpl(RuleEngine ruleEngine, RuleNotificationService ruleNotificationService,
+                                        AlarmEventRecordService alarmEventRecordService) {
         this.ruleEngine = ruleEngine;
         this.ruleNotificationService = ruleNotificationService;
+        this.alarmEventRecordService = alarmEventRecordService;
     }
 
     @Override
     public List<NotifyRecordBO> process(RuleFact fact) {
         List<NotifyRecordBO> records = new ArrayList<>();
         for (RuleMatch match : ruleEngine.evaluate(fact)) {
+            alarmEventRecordService.ensureEvent(match);
             records.addAll(ruleNotificationService.notify(match));
         }
         return records;

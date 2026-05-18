@@ -23,13 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Topic Config
@@ -54,10 +52,9 @@ public class DataTopicConfig {
 
     @Bean
     Queue driverEventQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 30 seconds: 30 * 1000 = 30000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DRIVER_EVENT, true, false, false, arguments);
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DRIVER_EVENT)
+                .ttl(30000)
+                .build();
     }
 
     @Bean
@@ -71,10 +68,9 @@ public class DataTopicConfig {
 
     @Bean
     Queue deviceEventQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 30 seconds: 30 * 1000 = 30000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, false, arguments);
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DEVICE_EVENT)
+                .ttl(30000)
+                .build();
     }
 
     @Bean
@@ -88,10 +84,9 @@ public class DataTopicConfig {
 
     @Bean
     Queue pointValueQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 7 days: 7 * 24 * 60 * 60 * 1000 = 604800000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 604800000L);
-        return new Queue(RabbitConstant.QUEUE_POINT_VALUE, true, false, false, arguments);
+        return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_VALUE)
+                .ttl(604800000)
+                .build();
     }
 
     @Bean

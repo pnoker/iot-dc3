@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.Test;
 
@@ -108,6 +109,7 @@ class AlarmExtContractTest {
                 "ALARM",
                 List.of("temperature", "line-a"),
                 Map.of("pointId", 1001L, "numValue", 86.5),
+                "FIRING",
                 Map.of("dedupKey", "tenant:rule:point"));
 
         RuleStateExt.Content parsed = JsonUtil.parseObject(
@@ -116,7 +118,29 @@ class AlarmExtContractTest {
         assertThat(parsed.getRuleCode()).isEqualTo("temperature-high");
         assertThat(parsed.getLabels()).containsExactly("temperature", "line-a");
         assertThat(parsed.getLastFact()).containsEntry("pointId", 1001);
+        assertThat(parsed.getMatchType()).isEqualTo("FIRING");
         assertThat(parsed.getMetadata()).containsEntry("dedupKey", "tenant:rule:point");
+    }
+
+    @Test
+    void ruleAlarmEventContentRoundTripsAsStructuredSnapshot() {
+        RuleAlarmEventExt.Content content = new RuleAlarmEventExt.Content(
+                1L,
+                "temperature-high",
+                "Temperature High",
+                AlarmTargetTypeFlagEnum.POINT,
+                1001L,
+                "P1",
+                "temperature_high",
+                "FIRING",
+                Map.of("deviceId", 10L, "numValue", 86.5));
+
+        RuleAlarmEventExt.Content parsed = JsonUtil.parseObject(
+                JsonUtil.toJsonString(content), RuleAlarmEventExt.Content.class);
+
+        assertThat(parsed.getRuleCode()).isEqualTo("temperature-high");
+        assertThat(parsed.getTargetType()).isEqualTo(AlarmTargetTypeFlagEnum.POINT);
+        assertThat(parsed.getValues()).containsEntry("deviceId", 10);
     }
 
     @Test

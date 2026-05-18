@@ -48,7 +48,6 @@ import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.entity.ext.NotifyExt;
 import io.github.pnoker.common.entity.ext.NotifyRecordRequestExt;
 import io.github.pnoker.common.entity.ext.NotifyRecordResponseExt;
-import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.entity.ext.RuleStateExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyRecordStatusFlagEnum;
@@ -61,7 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -135,7 +133,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         }
 
         RuleBO rule = match.getRule();
-        Map<String, Object> variables = variables(match);
+        Map<String, Object> variables = RuleMatchVariables.of(match);
         NotifyBO notify = loadNotify(rule.getNotifyId());
         RuleStateBO state = persistRuleState(match, notify, variables);
         if (Objects.isNull(notify)) {
@@ -284,7 +282,8 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                 match.getEventType(),
                 match.getLabels(),
                 Objects.requireNonNullElse(match.getFact().getValues(), Map.of()),
-                Map.of("matchType", match.getMatchType())));
+                match.getMatchType(),
+                Map.of()));
         return ext;
     }
 
@@ -363,45 +362,6 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                 result.getStatusMessage(),
                 Objects.requireNonNullElse(result.getResponsePayload(), Map.of())));
         return ext;
-    }
-
-    private Map<String, Object> variables(RuleMatch match) {
-        RuleBO rule = match.getRule();
-        RuleFact fact = match.getFact();
-        Map<String, Object> variables = new LinkedHashMap<>();
-        variables.put("tenantId", fact.getTenantId());
-        variables.put("ruleId", rule.getId());
-        variables.put("ruleCode", rule.getRuleCode());
-        variables.put("ruleName", rule.getRuleName());
-        variables.put("entityId", fact.getEntityId());
-        variables.put("alarmTargetType", rule.getAlarmTargetTypeFlag().getCode());
-        variables.put("eventId", fact.getEventId());
-        variables.put("factTime", fact.getFactTime());
-        variables.put("triggerTime", fact.getFactTime());
-        variables.put("matchType", match.getMatchType());
-        variables.put("severity", match.getSeverity());
-        variables.put("eventType", match.getEventType());
-        variables.put("labels", match.getLabels());
-        Map<String, Object> factValues = Objects.requireNonNullElse(fact.getValues(), Map.of());
-        variables.put("values", factValues);
-        variables.putAll(factValues);
-        enrichRuleConditionVariables(rule, variables);
-        return variables;
-    }
-
-    private void enrichRuleConditionVariables(RuleBO rule, Map<String, Object> variables) {
-        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())
-                || Objects.isNull(rule.getRuleExt().getContent().getCondition())) {
-            return;
-        }
-        RuleExt.Condition condition = rule.getRuleExt().getContent().getCondition();
-        variables.putIfAbsent("value", variables.get(condition.getField()));
-        variables.putIfAbsent("point", variables.getOrDefault("pointName", rule.getEntityId()));
-        variables.putIfAbsent("device", variables.getOrDefault("deviceName", rule.getEntityId()));
-        variables.putIfAbsent("threshold", condition.getThreshold());
-        variables.putIfAbsent("low", condition.getLow());
-        variables.putIfAbsent("high", condition.getHigh());
-        variables.putIfAbsent("unit", condition.getUnit());
     }
 
 }

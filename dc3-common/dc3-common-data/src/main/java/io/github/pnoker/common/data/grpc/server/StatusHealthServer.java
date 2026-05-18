@@ -38,6 +38,7 @@ import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -116,12 +117,12 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
         long online = devices.stream()
                 .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(), deviceStatus(device.getId())))
                 .count();
-        Map<String, String> summary = new LinkedHashMap<>();
-        summary.put("driverId", String.valueOf(request.getDriverId()));
-        summary.put("total", String.valueOf(devices.size()));
-        summary.put("online", String.valueOf(online));
-        summary.put("offline", String.valueOf(Math.max(0, devices.size() - online)));
-        responseObserver.onNext(GrpcRStringMap.newBuilder().setResult(ok()).putAllData(summary).build());
+        FacadeDriverDeviceStatusSummaryBO summary = new FacadeDriverDeviceStatusSummaryBO(
+                request.getDriverId(),
+                devices.size(),
+                (int) online,
+                (int) Math.max(0, devices.size() - online));
+        responseObserver.onNext(GrpcRStringMap.newBuilder().setResult(ok()).putAllData(summary.toMap()).build());
         responseObserver.onCompleted();
     }
 

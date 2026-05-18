@@ -30,9 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -71,22 +69,16 @@ public class DashboardController implements BaseController {
     }
 
     @GetMapping("/stats/today")
-    public Mono<R<Map<String, Object>>> today() {
+    public Mono<R<TodayStatsVO>> today() {
         return getTenantId().flatMap(tenantId -> async(() -> {
             long today = dashboardService.countToday(tenantId);
             long yesterday = dashboardService.countYesterday(tenantId);
             long total = dashboardService.countTotal(tenantId);
-            Map<String, Object> out = new HashMap<>();
-            out.put("today", today);
-            out.put("yesterday", yesterday);
-            out.put("total", total);
             // Convenience delta for the UI: +12% (positive) / -3% (negative) / 0.
-            if (yesterday > 0) {
-                out.put("percentChange", Math.round(((double) (today - yesterday) * 100.0) / yesterday));
-            } else {
-                out.put("percentChange", today > 0 ? 100 : 0);
-            }
-            return R.ok(out);
+            long percentChange = yesterday > 0
+                    ? Math.round(((double) (today - yesterday) * 100.0) / yesterday)
+                    : today > 0 ? 100 : 0;
+            return R.ok(new TodayStatsVO(today, yesterday, total, percentChange));
         }));
     }
 

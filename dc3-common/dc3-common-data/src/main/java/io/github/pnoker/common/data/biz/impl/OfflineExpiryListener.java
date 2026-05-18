@@ -18,11 +18,14 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.DeviceEventManager;
 import io.github.pnoker.common.data.dal.DriverEventManager;
 import io.github.pnoker.common.data.entity.model.DeviceEventDO;
 import io.github.pnoker.common.data.entity.model.DriverEventDO;
+import io.github.pnoker.common.entity.dto.DeviceEventDTO;
+import io.github.pnoker.common.entity.dto.DriverEventDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.DeviceEventTypeEnum;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
@@ -76,6 +79,9 @@ public class OfflineExpiryListener {
     @Resource
     private DeviceEventManager deviceEventManager;
 
+    @Resource
+    private AlarmRuleTriggerService alarmRuleTriggerService;
+
     private static Long parseIdSuffix(String key, String prefix) {
         try {
             return Long.parseLong(key.substring(prefix.length()));
@@ -122,18 +128,24 @@ public class OfflineExpiryListener {
             return;
         }
 
+        String message = String.format("Driver heartbeat timed out (last=%s); marked OFFLINE", lastStatus);
         DriverEventDO entity = new DriverEventDO();
         entity.setDriverId(id);
         entity.setEventTypeFlag(DriverEventTypeEnum.ALARM.getIndex());
         entity.setEventExt(JsonExt.builder()
                 .type("driver-offline")
-                .content(String.format("Driver heartbeat timed out (last=%s); marked OFFLINE", lastStatus))
+                .content(message)
                 .version(1)
                 .build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(Objects.nonNull(driver.getTenantId()) ? driver.getTenantId() : 0L);
         driverEventManager.save(entity);
+        DriverEventDTO.DriverStatus payload = new DriverEventDTO.DriverStatus(id, DriverStatusEnum.OFFLINE);
+        payload.setTenantId(driver.getTenantId());
+        payload.setMessage(message);
+        alarmRuleTriggerService.processDriverEvent(payload, DriverEventTypeEnum.ALARM, "driver-offline",
+                entity.getId());
 
         // Deliberately do NOT re-seed the cache. The previous version wrote
         // OFFLINE back with a 1-day TTL so the dashboard "saw" the state,
@@ -158,19 +170,26 @@ public class OfflineExpiryListener {
             return;
         }
 
+        String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", lastStatus);
         DeviceEventDO entity = new DeviceEventDO();
         entity.setDeviceId(id);
         entity.setPointId(0L);
         entity.setEventTypeFlag(DeviceEventTypeEnum.ALARM.getIndex());
         entity.setEventExt(JsonExt.builder()
                 .type("device-offline")
-                .content(String.format("Device heartbeat timed out (last=%s); marked OFFLINE", lastStatus))
+                .content(message)
                 .version(1)
                 .build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(Objects.nonNull(device.getTenantId()) ? device.getTenantId() : 0L);
         deviceEventManager.save(entity);
+        DeviceEventDTO.DeviceStatus payload = new DeviceEventDTO.DeviceStatus(id, DeviceStatusEnum.OFFLINE);
+        payload.setTenantId(device.getTenantId());
+        payload.setDriverId(device.getDriverId());
+        payload.setMessage(message);
+        alarmRuleTriggerService.processDeviceEvent(payload, DeviceEventTypeEnum.ALARM, "device-offline",
+                entity.getId());
 
         // See handleDriverExpiry — don't re-seed: the previous OFFLINE
         // re-seed with a 1-day TTL turned every subsequent heartbeat into

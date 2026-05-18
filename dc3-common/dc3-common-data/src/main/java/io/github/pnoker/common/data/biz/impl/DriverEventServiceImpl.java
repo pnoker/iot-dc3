@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DriverEventService;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.DriverEventManager;
 import io.github.pnoker.common.data.entity.model.DriverEventDO;
@@ -63,6 +64,9 @@ public class DriverEventServiceImpl implements DriverEventService {
     @Resource
     private DriverEventManager driverEventManager;
 
+    @Resource
+    private AlarmRuleTriggerService alarmRuleTriggerService;
+
     private static boolean isFlip(String prev, String current) {
         return online(prev) != online(current);
     }
@@ -93,7 +97,9 @@ public class DriverEventServiceImpl implements DriverEventService {
         // when the TTL elapses without a fresh heartbeat.
         if (Objects.nonNull(prev) && !Objects.equals(prev, current) && isFlip(prev, current)) {
             String message = String.format("Driver status changed: %s -> %s", prev, current);
-            persist(payload, DriverEventTypeEnum.ALARM, "driver-state-flip", message);
+            DriverEventDO event = persist(payload, DriverEventTypeEnum.ALARM, "driver-state-flip", message);
+            alarmRuleTriggerService.processDriverEvent(payload, DriverEventTypeEnum.ALARM, "driver-state-flip",
+                    event.getId());
         }
     }
 
@@ -106,11 +112,12 @@ public class DriverEventServiceImpl implements DriverEventService {
             return;
         }
         String msg = Objects.nonNull(payload.getMessage()) ? payload.getMessage() : entityDTO.getContent();
-        persist(payload, DriverEventTypeEnum.ALARM, "driver-alarm", msg);
+        DriverEventDO event = persist(payload, DriverEventTypeEnum.ALARM, "driver-alarm", msg);
+        alarmRuleTriggerService.processDriverEvent(payload, DriverEventTypeEnum.ALARM, "driver-alarm", event.getId());
     }
 
-    private void persist(DriverEventDTO.DriverStatus payload, DriverEventTypeEnum type, String extType,
-                         String extContent) {
+    private DriverEventDO persist(DriverEventDTO.DriverStatus payload, DriverEventTypeEnum type, String extType,
+                                  String extContent) {
         DriverEventDO entity = new DriverEventDO();
         entity.setDriverId(payload.getDriverId());
         entity.setEventTypeFlag(type.getIndex());
@@ -119,6 +126,7 @@ public class DriverEventServiceImpl implements DriverEventService {
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(Objects.nonNull(payload.getTenantId()) ? payload.getTenantId() : 0L);
         driverEventManager.save(entity);
+        return entity;
     }
 
 }

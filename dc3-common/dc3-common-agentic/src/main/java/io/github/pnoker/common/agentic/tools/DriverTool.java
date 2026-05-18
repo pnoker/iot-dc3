@@ -24,6 +24,7 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 import lombok.extern.slf4j.Slf4j;
@@ -151,7 +152,7 @@ public class DriverTool {
 
     @Tool(description = "Get the online/offline device count summary under a driver.")
     @AgenticToolMetadata(domain = "driver", title = "Get driver device status summary")
-    public AgenticToolResult<Map<String, String>> getDriverDeviceStatusSummary(
+    public AgenticToolResult<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummary(
             @ToolParam(description = "The driver ID") Long driverId,
             ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
@@ -161,10 +162,10 @@ public class DriverTool {
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
-        Map<String, String> summary = facade.getDriverDeviceStatusSummary(tenantId, driverId);
-        if (AgenticToolUtil.isEmpty(summary)) {
+        FacadeDriverDeviceStatusSummaryBO summary = facade.getDriverDeviceStatusSummary(tenantId, driverId);
+        if (Objects.isNull(summary)) {
             return AgenticToolResult.empty("No driver device status summary found for driver ID: " + driverId,
-                    Map.of());
+                    null);
         }
         return AgenticToolResult.ok("Driver device status summary loaded", summary);
     }

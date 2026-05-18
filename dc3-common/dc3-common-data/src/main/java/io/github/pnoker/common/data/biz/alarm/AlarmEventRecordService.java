@@ -15,33 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.constant.service;
-
-import io.github.pnoker.common.constant.common.BaseConstant;
+package io.github.pnoker.common.data.biz.alarm;
 
 /**
- * Alarm service constants.
+ * Persists alert-event rows for rule matches so rule alarms are visible in the
+ * existing event overview and can be linked from notification records.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public class AlarmConstant {
+public interface AlarmEventRecordService {
 
-    public static final String MATCH_TYPE_FIRING = "FIRING";
-
-    public static final String MATCH_TYPE_RECOVERY = "RECOVERY";
-
-    public static final String EXT_RULE_EVENT = "ALARM_RULE_EVENT";
-
-    public static final String EXT_RULE_STATE = "ALARM_RULE_STATE";
-
-    public static final String EXT_NOTIFY_RECORD_REQUEST = "ALARM_NOTIFY_RECORD_REQUEST";
-
-    public static final String EXT_NOTIFY_RECORD_RESPONSE = "ALARM_NOTIFY_RECORD_RESPONSE";
-
-    private AlarmConstant() {
-        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
-    }
+    /**
+     * Ensure the match has an event id. Existing event ids are reused; new rows are
+     * created only for firing matches that do not already reference a runtime event.
+     *
+     * @param match rule match
+     */
+    void ensureEvent(RuleMatch match);
 
 }

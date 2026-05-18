@@ -44,23 +44,22 @@ class SystemAndContextToolTest {
 
     @Test
     void tenantToolReturnsOnlyBackendTenantContext() {
-        AgenticToolResult<Map<String, Long>> result = new TenantTool().getCurrentTenantInfo(toolContext());
+        AgenticToolResult<TenantTool.CurrentTenantContext> result = new TenantTool().getCurrentTenantInfo(toolContext());
 
         assertThat(result.success()).isTrue();
         assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
-        assertThat(result.data()).containsEntry("tenantId", 11L);
+        assertThat(result.data().tenantId()).isEqualTo(11L);
     }
 
     @Test
     void userToolReturnsCurrentBackendUserProfile() {
-        AgenticToolResult<Map<String, Object>> result = new UserTool().getCurrentUserProfile(toolContext());
+        AgenticToolResult<UserTool.CurrentUserProfile> result = new UserTool().getCurrentUserProfile(toolContext());
 
         assertThat(result.success()).isTrue();
         assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
-        assertThat(result.data())
-                .containsEntry("userId", 22L)
-                .containsEntry("username", "ops.engineer")
-                .containsEntry("nickname", "Ops Engineer");
+        assertThat(result.data().userId()).isEqualTo(22L);
+        assertThat(result.data().username()).isEqualTo("ops.engineer");
+        assertThat(result.data().nickname()).isEqualTo("Ops Engineer");
     }
 
     @Test
