@@ -35,8 +35,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class HmacAuthProperties {
 
     /**
-     * Shared HMAC secret. Blank disables request-header signing.
+     * Shared HMAC secret. Defaults to {@code "io.github.pnoker.dc3"} so that
+     * request-header signing is enabled out of the box.
      */
-    private String secret = "";
+    private String secret = "io.github.pnoker.dc3";
 
 }

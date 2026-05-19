@@ -68,7 +68,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -91,7 +91,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -117,7 +117,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -145,7 +145,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -175,7 +175,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
       - AGENTIC_FALLBACK_OPENAI_BASE_URL=${AGENTIC_FALLBACK_OPENAI_BASE_URL:-https://api.openai.com}
       - AGENTIC_FALLBACK_OPENAI_API_KEY=${AGENTIC_FALLBACK_OPENAI_API_KEY:-}
       - AGENTIC_FALLBACK_OPENAI_MODEL=${AGENTIC_FALLBACK_OPENAI_MODEL:-gpt-4o}
@@ -217,7 +217,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -237,7 +237,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -257,7 +257,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -277,7 +277,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -297,7 +297,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -317,7 +317,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -337,7 +337,7 @@ services:
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:
