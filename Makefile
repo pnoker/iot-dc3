@@ -37,9 +37,11 @@ GROUP_SERVICES_core := $(GROUP_SERVICES_center) gateway
 GROUP_SERVICES_drivers := listening-virtual modbus-tcp mqtt opc-da opc-ua plcs7 virtual
 SELECTED_SERVICES := $(strip $(SERVICES) $(GROUP_SERVICES_$(GROUP)))
 
-MVN_SETTINGS := .mvn/settings.xml
-MVN := mvn -s $(MVN_SETTINGS)
-MVN_SUB := mvn -s ../$(MVN_SETTINGS)
+MVN_SETTINGS ?=
+MVN_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s $(MVN_SETTINGS),)
+MVN_SUB_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s ../$(MVN_SETTINGS),)
+MVN := mvn $(MVN_SETTINGS_ARG)
+MVN_SUB := mvn $(MVN_SUB_SETTINGS_ARG)
 
 CHANGE_FILE ?= dc3/doc/CHANGE.md
 FROM ?=
@@ -116,7 +118,7 @@ test-it:
 	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify
 
 test-e2e:
-	DC3_E2E=true $(MVN) -B -Dmaven.test.skip=false -pl dc3-e2e -am -Pe2e verify
+	DC3_E2E=true $(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true -pl dc3-e2e -am -Pe2e verify
 
 coverage:
 	$(MVN) -B -Dmaven.test.skip=false -pl dc3-coverage -am verify
