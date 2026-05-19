@@ -80,7 +80,7 @@ export const useAuthStore = defineStore('auth', () => {
         tenant: form.tenant,
         name: form.name,
         salt: salt,
-        password: md5.hex(md5.hex(form.password) + salt),
+        password: md5.hex(form.password),
       };
 
       const tokenRes = await generateToken(loginWithPassword);
