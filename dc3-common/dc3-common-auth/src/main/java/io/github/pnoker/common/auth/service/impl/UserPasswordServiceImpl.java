@@ -36,6 +36,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import io.github.pnoker.common.utils.PasswordUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         checkDuplicate(entityBO, false, true);
 
         UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
-        entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
+        String prehashed = DecodeUtil.md5(entityDO.getLoginPassword());
+        entityDO.setLoginPassword(PasswordUtil.encode(prehashed));
         if (!userPasswordManager.save(entityDO)) {
             throw new AddException("Failed to create user password");
         }
@@ -84,7 +86,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         checkDuplicate(entityBO, true, true);
 
         UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
-        entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
+        String prehashed = DecodeUtil.md5(entityDO.getLoginPassword());
+        entityDO.setLoginPassword(PasswordUtil.encode(prehashed));
         entityDO.setOperateTime(null);
         if (!userPasswordManager.updateById(entityDO)) {
             throw new UpdateException("The user password update failed");

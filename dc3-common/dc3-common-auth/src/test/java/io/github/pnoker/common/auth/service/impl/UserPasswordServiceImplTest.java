@@ -29,6 +29,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.DecodeUtil;
+import io.github.pnoker.common.utils.PasswordUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,8 +101,9 @@ class UserPasswordServiceImplTest {
 
         ArgumentCaptor<UserPasswordDO> captor = ArgumentCaptor.forClass(UserPasswordDO.class);
         verify(userPasswordManager).save(captor.capture());
-        assertThat(captor.getValue().getLoginPassword())
-                .isEqualTo(DecodeUtil.md5("secret"));
+        String stored = captor.getValue().getLoginPassword();
+        assertThat(stored).startsWith("$2a$");
+        assertThat(PasswordUtil.verify(DecodeUtil.md5("secret"), stored)).isTrue();
     }
 
     @Test
@@ -142,8 +144,9 @@ class UserPasswordServiceImplTest {
 
         ArgumentCaptor<UserPasswordDO> captor = ArgumentCaptor.forClass(UserPasswordDO.class);
         verify(userPasswordManager).updateById(captor.capture());
-        assertThat(captor.getValue().getLoginPassword())
-                .isEqualTo(DecodeUtil.md5("secret"));
+        String stored = captor.getValue().getLoginPassword();
+        assertThat(stored).startsWith("$2a$");
+        assertThat(PasswordUtil.verify(DecodeUtil.md5("secret"), stored)).isTrue();
     }
 
     @Test

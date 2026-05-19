@@ -30,8 +30,8 @@ import io.github.pnoker.common.auth.service.UserLoginService;
 import io.github.pnoker.common.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
+import io.github.pnoker.common.utils.PasswordUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -97,8 +97,9 @@ public class TokenServiceImpl implements TokenService {
         if (StringUtils.isEmpty(salt)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        String md5Password = DecodeUtil.md5(userPasswordBO.getLoginPassword(), salt);
-        if (!md5Password.equals(password)) {
+
+        String storedHash = userPasswordBO.getLoginPassword();
+        if (!PasswordUtil.verify(password, storedHash)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
         return KeyUtil.generateToken(loginName, salt, tenantBO.getId());
