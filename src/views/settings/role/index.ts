@@ -24,6 +24,7 @@ import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
 import type { Order } from '@/config/types';
+import type { RoleForm, RoleRecord } from '@/config/types/auth';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import roleTool from './tool/RoleTool.vue';
@@ -47,9 +48,9 @@ export default defineComponent({
 
     const reactiveData = reactive({
       loading: false,
-      listData: [] as any[],
-      roleTreeData: [] as any[],
-      query: {} as Record<string, any>,
+      listData: [] as RoleRecord[],
+      roleTreeData: [] as RoleRecord[],
+      query: {} as Record<string, unknown>,
       order: false,
       page: {
         total: 0,
@@ -61,8 +62,8 @@ export default defineComponent({
 
     const loadTree = () => {
       listRoleTree()
-        .then((res: any) => {
-          reactiveData.roleTreeData = (res.data as any[]) || [];
+        .then((res) => {
+          reactiveData.roleTreeData = (res.data as RoleRecord[]) || [];
         })
         .catch(() => {
           // handled globally
@@ -72,7 +73,7 @@ export default defineComponent({
     const load = () => {
       reactiveData.loading = true;
       listRole({ page: reactiveData.page, ...reactiveData.query })
-        .then((res: any) => {
+        .then((res) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];
           reactiveData.page.total = data.total || 0;
@@ -85,7 +86,7 @@ export default defineComponent({
         });
     };
 
-    const search = (params: any) => {
+    const search = (params: Record<string, unknown>) => {
       reactiveData.query = params || {};
       reactiveData.page.current = 1;
       load();
@@ -106,15 +107,15 @@ export default defineComponent({
     };
 
     const openAdd = () => editRef.value?.show();
-    const openEdit = (row: any) => editRef.value?.showEdit(row);
-    const openAssignResources = (row: any) => assignRef.value?.show(row);
-    const openDetail = (row: any) => {
+    const openEdit = (row: RoleRecord) => editRef.value?.showEdit(row);
+    const openAssignResources = (row: RoleRecord) => assignRef.value?.show(row);
+    const openDetail = (row: RoleRecord) => {
       router.push({ name: 'settingsRoleDetail', query: { id: String(row.id) } }).catch(() => {
         // handled globally
       });
     };
 
-    const onAdd = (form: any, done: () => void) => {
+    const onAdd = (form: RoleForm, done: () => void) => {
       addRole(form)
         .then(() => {
           successMessage();
@@ -127,7 +128,7 @@ export default defineComponent({
         });
     };
 
-    const onUpdate = (form: any, done: () => void) => {
+    const onUpdate = (form: RoleForm, done: () => void) => {
       updateRole(form)
         .then(() => {
           successMessage();

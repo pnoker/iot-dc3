@@ -46,7 +46,7 @@ jobs:
         run: pnpm run lint:check
 
       - name: Type Check
-        run: pnpm run type-check
+        run: pnpm run check
 
       - name: Guardrails
         run: pnpm run test:guard

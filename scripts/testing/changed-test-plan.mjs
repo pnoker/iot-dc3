@@ -94,13 +94,7 @@ const rules = [
       /^\.github\/workflows\//,
     ],
     tests: [/^tests\/guardrails\//, /^tests\/README\.md$/, /^docs\/frontend-testing-guardrails\.md$/],
-    commands: [
-      'pnpm run lint:check',
-      'pnpm run type-check',
-      'pnpm run test:guard',
-      'pnpm run test:ci',
-      'pnpm run build',
-    ],
+    commands: ['pnpm run lint:check', 'pnpm run check', 'pnpm run test:guard', 'pnpm run test:ci', 'pnpm run build'],
     reason: 'Tooling changes can break every layer and need the full local quality gate.',
   },
 ];

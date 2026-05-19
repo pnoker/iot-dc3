@@ -201,12 +201,12 @@ const buildFetchHeaders = (): HeadersInit => {
 
   const tenant = getStorage(AUTH_HEADERS.TENANT);
   if (!isNull(tenant)) {
-    headers[AUTH_HEADERS.TENANT] = tenant;
+    headers[AUTH_HEADERS.TENANT] = String(tenant);
   }
 
   const login = getStorage(AUTH_HEADERS.LOGIN);
   if (!isNull(login)) {
-    headers[AUTH_HEADERS.LOGIN] = login;
+    headers[AUTH_HEADERS.LOGIN] = String(login);
   }
 
   const token = getStorage(AUTH_HEADERS.TOKEN);

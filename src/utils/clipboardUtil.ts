@@ -24,9 +24,8 @@ import { ElMessage } from 'element-plus';
  * @param message Custom message
  * @returns {Promise<boolean>} Whether copy was successful
  */
-export const setCopyContent = async (content: any, detail: any, message: any): Promise<boolean> => {
-  // Convert content to string for clipboard
-  const textContent = String(content);
+export const setCopyContent = async (content: unknown, detail?: boolean, message?: string): Promise<boolean> => {
+  const textContent = String(content ?? '');
 
   // Try modern Clipboard API first (preferred, non-deprecated)
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -47,7 +46,7 @@ export const setCopyContent = async (content: any, detail: any, message: any): P
 /**
  * Fallback copy method using execCommand
  */
-const fallbackCopy = (content: string, detail: any, message: any): boolean => {
+const fallbackCopy = (content: string, detail?: boolean, message?: string): boolean => {
   const input = document.createElement('input');
   input.setAttribute('id', 'copy-id-input');
   input.setAttribute('value', content);
@@ -74,7 +73,7 @@ const fallbackCopy = (content: string, detail: any, message: any): boolean => {
 /**
  * Show success message
  */
-const showSuccessMessage = (content: string, detail: any, message: any): void => {
+const showSuccessMessage = (content: string, detail?: boolean, message?: string): void => {
   let tip = 'Copied to clipboard!';
   if (detail) {
     if (message) {

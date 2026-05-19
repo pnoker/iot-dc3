@@ -14,79 +14,41 @@
  * limitations under the License.
  */
 
-/**
- * Check if string is a URL
- *
- * @param url String to check
- * @returns {boolean} Whether string is a URL
- */
-export function isUrl(url: any) {
+export function isUrl(url: string): boolean {
   return /^https?:\/\/.*/.test(url);
 }
 
-/**
- * Check if string is an email
- *
- * @param email String to check
- * @returns {boolean} Whether string is an email
- */
-export function isEmail(email: any) {
+export function isEmail(email: string): boolean {
   return /^([a-zA-Z0-9_.-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(email);
 }
 
-/**
- * Check if string is a phone number
- *
- * @param phone String to check
- * @returns {boolean} Whether string is a phone number
- */
-export function isPhone(phone: any) {
+export function isPhone(phone: string): boolean {
   return /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(phone);
 }
 
-/**
- * Check if value is a number
- *
- * @param num Value to check
- * @param type Type check (1: positive integer, 2: non-negative integer)
- * @returns {boolean} Whether value is a number
- */
-export function isNum(num: any, type: any) {
+export function isNum(num: unknown, type: number): boolean {
   let regName = /^[^\d.]/g;
   if (type == 1) {
-    if (!regName.test(num)) return false;
+    if (!regName.test(String(num))) return false;
   } else if (type == 2) {
     regName = /^[^\d]/g;
-    if (!regName.test(num)) return false;
+    if (!regName.test(String(num))) return false;
   }
   return true;
 }
 
-/**
- * Check if value is a decimal number
- *
- * @param num Value to check
- * @param type Type check (1: positive, 2: non-negative)
- * @returns {boolean} Whether value is a decimal number
- */
-export function isNumord(num: any, type: any) {
+export function isNumord(num: unknown, type: number): boolean {
   let regName = /^[^\d.]/g;
   if (type == 1) {
-    if (!regName.test(num)) return false;
+    if (!regName.test(String(num))) return false;
   } else if (type == 2) {
     regName = /^[^\d.]/g;
-    if (!regName.test(num)) return false;
+    if (!regName.test(String(num))) return false;
   }
   return true;
 }
 
-/**
- * Check if value is null or empty
- *
- * @param val Value to check
- * @returns {boolean} Whether value is null or empty
- */
-export function isNull(val: any) {
+export function isNull(val: unknown): boolean {
   if (typeof val == 'boolean') return false;
   if (typeof val == 'number') return false;
   if (val instanceof Array) {

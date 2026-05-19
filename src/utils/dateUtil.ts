@@ -42,25 +42,18 @@ export const timestampColumn = (_row: unknown, _col: unknown, cellValue: unknown
  * @param date Date object or string
  * @returns {string} Formatted date string
  */
-export function dateFormat(date: any): string {
-  let format = 'yyyy-MM-dd hh:mm:ss';
-  if (date !== 'Invalid Date') {
-    const o: Record<string, any> = {
-      'M+': date.getMonth() + 1,
-      'd+': date.getDate(),
-      'h+': date.getHours(),
-      'm+': date.getMinutes(),
-      's+': date.getSeconds(),
-      'q+': Math.floor((date.getMonth() + 3) / 3),
-      S: date.getMilliseconds(),
-    };
-    if (/(y+)/.test(format)) format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
-    for (const k in o)
-      if (new RegExp('(' + k + ')').test(format))
-        format = format.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).substr(String(o[k]).length));
-    return format;
-  }
-  return '';
+export function dateFormat(date: Date): string {
+  if (date.toString() === 'Invalid Date') return '';
+
+  const pad = (n: number, len = 2) => String(n).padStart(len, '0');
+  const y = date.getFullYear();
+  const M = date.getMonth() + 1;
+  const d = date.getDate();
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const s = date.getSeconds();
+
+  return `${y}-${pad(M)}-${pad(d)} ${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
 /**
@@ -70,8 +63,18 @@ export function dateFormat(date: any): string {
  * @param date2 Second date
  * @returns {{leave1: number, hours: number, seconds: number, leave2: number, leave3: number, minutes: number, days: number}}
  */
-export const calcDate = (date1: any, date2: any): any => {
-  const date3 = date2 - date1;
+interface DateDiff {
+  leave1: number;
+  leave2: number;
+  leave3: number;
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
+export const calcDate = (date1: Date, date2: Date): DateDiff => {
+  const date3 = date2.getTime() - date1.getTime();
 
   const days = Math.floor(date3 / (24 * 3600 * 1000));
 
@@ -87,9 +90,9 @@ export const calcDate = (date1: any, date2: any): any => {
     leave1,
     leave2,
     leave3,
-    days: days,
-    hours: hours,
-    minutes: minutes,
-    seconds: seconds,
+    days,
+    hours,
+    minutes,
+    seconds,
   };
 };

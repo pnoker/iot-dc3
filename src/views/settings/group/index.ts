@@ -23,7 +23,7 @@ import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
 import type { Order } from '@/config/types';
-import type { GroupRecord } from '@/config/types/manager';
+import type { GroupForm, GroupRecord } from '@/config/types/manager';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import groupTool from './tool/GroupTool.vue';
@@ -45,7 +45,7 @@ export default defineComponent({
       loading: false,
       listData: [] as GroupRecord[],
       groupOptions: [] as GroupRecord[],
-      query: {} as Record<string, any>,
+      query: {} as Record<string, unknown>,
       order: false,
       page: {
         total: 0,
@@ -59,7 +59,7 @@ export default defineComponent({
 
     const loadOptions = () => {
       listGroup({ page: { current: 1, size: 5000, orders: [{ column: 'group_index', asc: true }] } })
-        .then((res: any) => {
+        .then((res) => {
           const records = (res.data?.records || []) as GroupRecord[];
           reactiveData.groupOptions = records;
           Object.keys(parentNameMap).forEach((key) => delete parentNameMap[key]);
@@ -75,7 +75,7 @@ export default defineComponent({
     const load = () => {
       reactiveData.loading = true;
       listGroup({ page: reactiveData.page, ...reactiveData.query })
-        .then((res: any) => {
+        .then((res) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];
           reactiveData.page.total = data.total || 0;
@@ -93,7 +93,7 @@ export default defineComponent({
       return parentNameMap[String(id)] || String(id);
     };
 
-    const search = (params: any) => {
+    const search = (params: Record<string, unknown>) => {
       reactiveData.query = params || {};
       reactiveData.page.current = 1;
       load();
@@ -124,7 +124,7 @@ export default defineComponent({
     };
     const openEdit = (row: GroupRecord) => editRef.value?.showEdit(row);
 
-    const onAdd = (form: any, done: () => void) => {
+    const onAdd = (form: GroupForm, done: () => void) => {
       addGroup(form)
         .then(() => {
           successMessage();
@@ -136,7 +136,7 @@ export default defineComponent({
         });
     };
 
-    const onUpdate = (form: any, done: () => void) => {
+    const onUpdate = (form: GroupForm, done: () => void) => {
       updateGroup(form)
         .then(() => {
           successMessage();

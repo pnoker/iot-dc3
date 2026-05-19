@@ -24,6 +24,7 @@ import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
 import type { Order } from '@/config/types';
+import type { UserForm, UserRecord } from '@/config/types/auth';
 
 import userTool from './tool/UserTool.vue';
 import userEditForm from './edit/UserEditForm.vue';
@@ -47,8 +48,8 @@ export default defineComponent({
 
     const reactiveData = reactive({
       loading: false,
-      listData: [] as any[],
-      query: {} as Record<string, any>,
+      listData: [] as UserRecord[],
+      query: {} as Record<string, unknown>,
       order: false,
       page: {
         total: 0,
@@ -61,7 +62,7 @@ export default defineComponent({
     const load = () => {
       reactiveData.loading = true;
       listUser({ page: reactiveData.page, ...reactiveData.query })
-        .then((res: any) => {
+        .then((res) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];
           reactiveData.page.total = data.total || 0;
@@ -74,7 +75,7 @@ export default defineComponent({
         });
     };
 
-    const search = (params: any) => {
+    const search = (params: Record<string, unknown>) => {
       reactiveData.query = params || {};
       reactiveData.page.current = 1;
       load();
@@ -95,15 +96,15 @@ export default defineComponent({
     };
 
     const openAdd = () => editRef.value?.show();
-    const openEdit = (row: any) => editRef.value?.showEdit(row);
-    const openAssignRoles = (row: any) => assignRef.value?.show(row);
-    const openDetail = (row: any) => {
+    const openEdit = (row: UserRecord) => editRef.value?.showEdit(row);
+    const openAssignRoles = (row: UserRecord) => assignRef.value?.show(row);
+    const openDetail = (row: UserRecord) => {
       router.push({ name: 'settingsUserDetail', query: { id: String(row.id) } }).catch(() => {
         // handled globally
       });
     };
 
-    const onAdd = (form: any, done: () => void) => {
+    const onAdd = (form: UserForm, done: () => void) => {
       addUser(form)
         .then(() => {
           successMessage();
@@ -115,7 +116,7 @@ export default defineComponent({
         });
     };
 
-    const onUpdate = (form: any, done: () => void) => {
+    const onUpdate = (form: UserForm, done: () => void) => {
       updateUser(form)
         .then(() => {
           successMessage();

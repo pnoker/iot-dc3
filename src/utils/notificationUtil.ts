@@ -43,7 +43,7 @@ export const successMessage = (message?: string, title: string = 'Success') => {
  * @param title Notification title
  * @param error Error object for debugging
  */
-export const warnMessage = (message?: string, title = 'Warning', error?: any) => {
+export const warnMessage = (message?: string, title = 'Warning', error?: unknown) => {
   if (isNull(message)) {
     message = 'Operation warning!';
   }
@@ -67,7 +67,7 @@ export const warnMessage = (message?: string, title = 'Warning', error?: any) =>
  * @param title Notification title
  * @param error Error object for debugging
  */
-export const failMessage = (message?: string, title = 'Error', error?: any) => {
+export const failMessage = (message?: string, title = 'Error', error?: unknown) => {
   if (isNull(message)) {
     message = 'Operation failed!';
   }

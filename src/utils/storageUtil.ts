@@ -36,7 +36,7 @@ export const getCookies = (key: string) => {
  * @param value Value to store
  * @returns Cookie set result
  */
-export const setCookies = (key: string, value: any) => {
+export const setCookies = (key: string, value: unknown) => {
   return Cookies.set(key, encode(JSON.stringify(value)));
 };
 
@@ -57,32 +57,29 @@ export const removeCookies = (key: string) => {
  * @param isSession Whether to use Session Storage (default: Local Storage)
  * @returns Storage value
  */
-export const getStorage = (key: string, isSession?: boolean) => {
-  let obj: any, content: any;
+export const getStorage = (key: string, isSession?: boolean): unknown => {
+  let obj: string | null;
   if (isSession) obj = window.sessionStorage.getItem(key);
   else obj = window.localStorage.getItem(key);
   if (isNull(obj)) return;
 
+  let parsed: { dataType: string; content: unknown };
   try {
-    obj = JSON.parse(decode(obj));
+    parsed = JSON.parse(decode(obj!));
   } catch {
     return obj;
   }
 
-  if (obj.dataType === 'string') {
-    content = obj.content;
-  } else if (obj.dataType === 'number') {
-    content = Number(obj.content);
-  } else if (obj.dataType === 'boolean') {
-    if (obj.content === 'true') {
-      content = true;
-    } else {
-      content = false;
-    }
-  } else if (obj.dataType === 'object') {
-    content = obj.content;
+  if (parsed.dataType === 'string') {
+    return parsed.content as string;
+  } else if (parsed.dataType === 'number') {
+    return Number(parsed.content);
+  } else if (parsed.dataType === 'boolean') {
+    return parsed.content === 'true';
+  } else if (parsed.dataType === 'object') {
+    return parsed.content;
   }
-  return content;
+  return parsed.content;
 };
 
 /**
@@ -92,7 +89,7 @@ export const getStorage = (key: string, isSession?: boolean) => {
  * @param value Value to store
  * @param isSession Whether to use Session Storage (default: Local Storage)
  */
-export const setStorage = (key: string, value: any, isSession?: boolean) => {
+export const setStorage = (key: string, value: unknown, isSession?: boolean) => {
   const obj = {
     dataType: typeof value,
     content: value,
@@ -121,7 +118,7 @@ export const removeStorage = (key: string, isSession?: boolean) => {
  * @returns Array of storage items
  */
 export const getAllStorage = (isSession?: boolean) => {
-  const list = [] as Array<{ name: string | null; content: any }>;
+  const list = [] as Array<{ name: string | null; content: unknown }>;
   if (isSession) {
     for (let i = 0; i < window.sessionStorage.length; i++) {
       list.push({

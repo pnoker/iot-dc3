@@ -74,7 +74,7 @@ describe('AI coding guardrails', () => {
     expect(packageJson.scripts).toEqual(
       expect.objectContaining({
         'lint:check': expect.any(String),
-        'type-check': expect.any(String),
+        check: expect.any(String),
         test: expect.any(String),
         'test:unit': expect.any(String),
         'test:api': expect.any(String),
