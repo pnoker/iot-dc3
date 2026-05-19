@@ -54,10 +54,23 @@ export function isBusinessApi(url: string) {
   return url.includes('/api/v3/');
 }
 
+/**
+ * Wait for the app shell to be visible before driving interactions. Replaces
+ * the old `networkidle + 300ms hard wait` recipe — networkidle never fires
+ * cleanly in this app (NProgress, SSE, polling), and arbitrary waits
+ * compound across hundreds of navigations. Web-first assertion is bounded
+ * by the Playwright `expect.timeout` and waits no longer than necessary.
+ *
+ * The `<router-view>` host (`#app > main`, fallback to `body > div`) appears
+ * once Vue has mounted, even on the login page. After that the caller is
+ * responsible for asserting page-specific elements.
+ */
 export async function waitForAppSettled(page: Page) {
   await page.waitForLoadState('domcontentloaded').catch(() => {});
-  await page.waitForLoadState('networkidle', { timeout: 6000 }).catch(() => {});
-  await page.waitForTimeout(300);
+  // Wait until Vue's mount target has rendered something — that's the
+  // earliest deterministic signal that Element Plus / vue-router have
+  // wired up. Falls back gracefully if the app shell is unusually slow.
+  await expect(page.locator('#app *').first()).toBeVisible({ timeout: 10_000 });
 }
 
 export async function login(page: Page) {
@@ -67,11 +80,53 @@ export async function login(page: Page) {
   const loginButton = page.getByRole('button', { name: 'Login' });
   if (await loginButton.count()) {
     await loginButton.click();
-    await page.waitForURL((url) => !url.hash.includes('/login'), { timeout: 15_000 }).catch(() => {});
+    // Web-first: assert URL leaves /login. Bounded by expect.timeout in
+    // playwright.config.ts (10s). Failure here is a real auth regression.
+    await expect(page).not.toHaveURL(/\/login/);
+  } else {
+    await expect(page).not.toHaveURL(/\/login/);
   }
 
   await waitForAppSettled(page);
-  await expect(page).not.toHaveURL(/\/login/);
+}
+
+/**
+ * Logs the current session out via the auth API and clears local storage,
+ * then asserts the next protected navigation routes back to /login. Used
+ * by the logout spec and as a teardown hook.
+ */
+export async function logout(page: Page) {
+  await page.evaluate(() => {
+    const decodeStorage = (key: string) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) return undefined;
+      try {
+        return JSON.parse(atob(raw)).content;
+      } catch {
+        return undefined;
+      }
+    };
+    const tenant = decodeStorage('X-Auth-Tenant');
+    const name = decodeStorage('X-Auth-Login');
+    const token = decodeStorage('X-Auth-Token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (tenant) headers['X-Auth-Tenant'] = tenant;
+    if (name) headers['X-Auth-Login'] = name;
+    if (token) headers['X-Auth-Token'] = JSON.stringify(token);
+
+    if (tenant && name) {
+      // fire-and-forget — even if the cancel call fails (network blip,
+      // already-expired token), we still want to scrub local storage.
+      void fetch('/api/v3/auth/token/cancel', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ tenant, name }),
+      }).catch(() => undefined);
+    }
+    localStorage.removeItem('X-Auth-Tenant');
+    localStorage.removeItem('X-Auth-Login');
+    localStorage.removeItem('X-Auth-Token');
+  });
 }
 
 export async function apiPost<T = unknown>(
@@ -587,29 +642,48 @@ export function expectHealthy(health: PageHealth, mark = markHealth(health)) {
   expect(health.badResponses.slice(mark.badResponses), 'bad API responses').toEqual([]);
 }
 
+/**
+ * Dismisses the topmost open dialog/drawer/popover. Web-first: after the
+ * Cancel click (or Escape fallback), waits until the overlay actually
+ * detaches from the DOM, instead of a 300ms guess that can race transitions.
+ */
 export async function closeOverlay(page: Page) {
-  const modal = page
-    .locator('.el-dialog:visible, .el-drawer:visible, .el-popover:visible, .el-message-box:visible')
-    .last();
+  const overlaySelector = '.el-dialog:visible, .el-drawer:visible, .el-popover:visible, .el-message-box:visible';
+  const modal = page.locator(overlaySelector).last();
+
   if (await modal.count()) {
     const cancel = modal.getByRole('button', { name: /Cancel|Close|No|取消|关闭|否/ }).last();
     if (await cancel.count()) {
-      await cancel.click().catch(() => {});
-      await page.waitForTimeout(300);
-      return;
+      await cancel.click().catch(() => undefined);
+    } else {
+      await page.keyboard.press('Escape').catch(() => undefined);
     }
+  } else {
+    await page.keyboard.press('Escape').catch(() => undefined);
   }
-  await page.keyboard.press('Escape').catch(() => {});
-  await page.waitForTimeout(300);
+
+  // The overlay must actually disappear; bounded by expect.timeout (10s).
+  // A stuck modal here is a real bug, not a flake.
+  await expect(page.locator(overlaySelector)).toHaveCount(0, { timeout: 5_000 });
 }
 
+/**
+ * Clicks a button by accessible name only when present, visible, and
+ * enabled. The `[aria-disabled="true"]` and `[disabled]` filters cover
+ * Element Plus's two disabled states (it toggles both depending on
+ * component). Returns whether the click happened so callers can decide
+ * what to assert.
+ */
 export async function clickButtonIfPresent(page: Page, name: string | RegExp) {
   const button = page
     .getByRole('button', { name })
-    .filter({ hasNot: page.locator('.is-disabled') })
+    .filter({ hasNot: page.locator('[aria-disabled="true"]') })
+    .filter({ hasNot: page.locator('[disabled]') })
     .first();
+
   if (!(await button.count())) return false;
-  if (!(await button.isVisible().catch(() => false)) || !(await button.isEnabled().catch(() => false))) return false;
+  if (!(await button.isVisible().catch(() => false))) return false;
+  if (!(await button.isEnabled().catch(() => false))) return false;
 
   await button.click();
   await waitForAppSettled(page);

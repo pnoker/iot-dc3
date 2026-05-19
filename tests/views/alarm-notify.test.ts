@@ -17,9 +17,12 @@
 import { flushPromises, mount } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createMemoryHistory, createRouter } from 'vue-router';
 
 import i18n from '@/config/i18n';
 import AlarmNotify from '@/views/settings/alarm/AlarmNotify.vue';
+
+import { createElButtonStub, createElFormStub, layoutStubs } from '../setup/stubs/element-plus';
 
 const alarmMocks = vi.hoisted(() => {
   const listResponse = { data: { records: [{ id: 'alarm-row-1', ruleName: 'Cooling threshold' }], total: 1 } };
@@ -81,59 +84,40 @@ const ToolCardStub = defineComponent({
   },
 });
 
-const ElButtonStub = defineComponent({
-  name: 'ElButton',
-  props: ['type'],
-  emits: ['click'],
-  setup(props, { emit, slots }) {
-    return () =>
-      h(
-        'button',
-        {
-          class: [`el-button-stub`, props.type ? `is-${props.type}` : ''],
-          type: 'button',
-          onClick: (event: MouseEvent) => emit('click', event),
-        },
-        slots.default?.()
-      );
-  },
-});
+function makeTestRouter() {
+  const noop = defineComponent({ render: () => null });
+  return createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { name: 'home', path: '/', component: noop },
+      { name: 'alarm-rule', path: '/alarm/rule', component: noop },
+      { name: 'alarm-notify', path: '/alarm/notify', component: noop },
+      { name: 'alarm-state', path: '/alarm/state', component: noop },
+    ],
+  });
+}
 
 function mountAlarmNotify(entity: 'rule' | 'notify' | 'state' = 'rule') {
+  const { ElForm } = createElFormStub();
   return mount(AlarmNotify, {
     props: { entity },
     global: {
-      plugins: [i18n],
+      plugins: [i18n, makeTestRouter()],
       directives: {
-        loading: vi.fn(),
+        loading: () => undefined,
       },
       stubs: {
+        ...layoutStubs,
         BlankCard: { template: '<section class="blank-card-stub"><slot /></section>' },
-        ElCol: { template: '<div><slot /></div>' },
-        ElDescriptions: { template: '<section><slot /></section>' },
-        ElDescriptionsItem: { template: '<div><slot /></div>' },
-        ElDialog: { template: '<section><slot /><slot name="footer" /></section>' },
-        ElDrawer: { template: '<section><slot /></section>' },
-        ElEmpty: { template: '<div />' },
-        ElForm: { template: '<form><slot /></form>' },
-        ElFormItem: { template: '<label><slot /></label>' },
-        ElInput: { template: '<input />' },
-        ElInputNumber: { template: '<input />' },
-        ElOption: { template: '<option />' },
-        ElPopconfirm: { template: '<span><slot name="reference" /></span>' },
-        ElRow: { template: '<div><slot /></div>' },
-        ElSelect: { template: '<select><slot /></select>' },
-        ElTable: { template: '<section><slot /></section>' },
-        ElTableColumn: { template: '<span />' },
-        ElTag: { template: '<span><slot /></span>' },
+        ElForm,
         ToolCard: ToolCardStub,
-        ElButton: ElButtonStub,
+        ElButton: createElButtonStub(),
       },
     },
   });
 }
 
-describe('AlarmNotify', () => {
+describe('AlarmNotify view', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

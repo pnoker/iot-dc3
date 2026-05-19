@@ -87,6 +87,11 @@ describe('agentic store', () => {
     });
 
     const store = useAgenticStore();
+    // Direct field assignment instead of `bootstrap()` — going through the
+    // public action would force four mocked API calls (sessions / models /
+    // attachments / pending actions) per test for values orthogonal to the
+    // streaming-reasoning behaviour under test. The store is plain refs so
+    // assignment is well-defined; no derivation logic is being bypassed.
     store.models = [
       {
         model: 'deepseek-v4-pro',

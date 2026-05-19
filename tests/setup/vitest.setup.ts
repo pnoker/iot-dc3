@@ -14,13 +14,47 @@
  * limitations under the License.
  */
 
-import { afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 
 class ResizeObserverMock {
   observe = vi.fn();
   unobserve = vi.fn();
   disconnect = vi.fn();
 }
+
+// Promote Vue template warnings to test failures so silent regressions
+// (typo'd refs, missing props, deprecated lifecycle hooks) surface in CI
+// instead of disappearing into the console buffer. Set
+// VITEST_ALLOW_VUE_WARN=1 locally to opt out of the strict check while
+// debugging a noisy test.
+const STRICT_VUE_WARN = process.env.VITEST_ALLOW_VUE_WARN !== '1';
+
+// Patterns that we deliberately tolerate — usually third-party stubs that
+// emit unavoidable warnings under happy-dom. Keep this list short; prefer
+// fixing the underlying issue.
+const VUE_WARN_ALLOWLIST: RegExp[] = [/\[Vue warn\]: Failed setting prop "modelValue"/];
+
+const originalWarn = console.warn;
+const originalError = console.error;
+
+beforeEach(() => {
+  if (!STRICT_VUE_WARN) return;
+
+  console.warn = (...args: unknown[]) => {
+    const msg = args.map((a) => (typeof a === 'string' ? a : '')).join(' ');
+    if (msg.startsWith('[Vue warn]') && !VUE_WARN_ALLOWLIST.some((re) => re.test(msg))) {
+      throw new Error(`Unexpected Vue warning: ${msg}`);
+    }
+    originalWarn(...args);
+  };
+  console.error = (...args: unknown[]) => {
+    const msg = args.map((a) => (typeof a === 'string' ? a : '')).join(' ');
+    if (msg.startsWith('[Vue warn]') && !VUE_WARN_ALLOWLIST.some((re) => re.test(msg))) {
+      throw new Error(`Unexpected Vue error: ${msg}`);
+    }
+    originalError(...args);
+  };
+});
 
 Object.defineProperty(window, 'ResizeObserver', {
   configurable: true,
@@ -65,4 +99,6 @@ afterEach(() => {
   document.body.innerHTML = '';
   localStorage.clear();
   sessionStorage.clear();
+  console.warn = originalWarn;
+  console.error = originalError;
 });

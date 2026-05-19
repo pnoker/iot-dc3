@@ -1,0 +1,230 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { expect, test, type Page } from '@playwright/test';
+
+import {
+  apiPost,
+  clickButtonIfPresent,
+  ensureE2eData,
+  expectHealthy,
+  login,
+  markHealth,
+  waitForAppSettled,
+  watchPageHealth,
+} from '../fixtures/app';
+
+/**
+ * Destructive delete regression — previously only covered by the standalone
+ * browser-sweep runner. The flow is the same on every list page:
+ *
+ *   seed an entity via API → search by its unique name → click the row's
+ *   Delete button → confirm in the popconfirm → verify the entity no longer
+ *   appears in the list API.
+ *
+ * Each case carries its own seed payload; the per-page list/add URLs are
+ * inlined here so the spec reads top-to-bottom without bouncing through
+ * fixtures.
+ */
+
+interface DeleteCase {
+  name: string;
+  route: string;
+  placeholder: string;
+  listUrl: string;
+  addUrl: string;
+  nameField: string;
+  // Seed payload — needs the dependency ids that ensureE2eData(page) seeds
+  // for us (driver / profile / api). We pass that bag in at runtime.
+  seed: (uniqueName: string, deps: { driverId: string; profileId: string; apiId: string }) => Record<string, unknown>;
+}
+
+const deleteCases: DeleteCase[] = [
+  {
+    name: 'Profile',
+    route: '/profile',
+    placeholder: 'Enter profile name',
+    listUrl: '/api/v3/manager/profile/list',
+    addUrl: '/api/v3/manager/profile/add',
+    nameField: 'profileName',
+    seed: (n) => ({ profileName: n, profileCode: n, enableFlag: 'ENABLE', remark: 'e2e destructive' }),
+  },
+  {
+    name: 'Device',
+    route: '/device',
+    placeholder: 'Enter device name',
+    listUrl: '/api/v3/manager/device/list',
+    addUrl: '/api/v3/manager/device/add',
+    nameField: 'deviceName',
+    seed: (n, deps) => ({
+      deviceName: n,
+      deviceCode: n,
+      driverId: deps.driverId,
+      profileIds: [deps.profileId],
+      enableFlag: 'ENABLE',
+      remark: 'e2e destructive',
+    }),
+  },
+  {
+    name: 'Settings Role',
+    route: '/settings/role',
+    placeholder: 'Enter role name',
+    listUrl: '/api/v3/auth/role/list',
+    addUrl: '/api/v3/auth/role/add',
+    nameField: 'roleName',
+    seed: (n) => ({
+      parentRoleId: 0,
+      roleName: n,
+      // Role code must be ALL_CAPS by backend convention.
+      roleCode: n.toUpperCase().replace(/-/g, '_'),
+      enableFlag: 'ENABLE',
+      remark: 'e2e destructive',
+    }),
+  },
+  {
+    name: 'Settings Resource',
+    route: '/settings/resource',
+    placeholder: 'Enter resource name',
+    listUrl: '/api/v3/auth/resource/list',
+    addUrl: '/api/v3/auth/resource/add',
+    nameField: 'resourceName',
+    seed: (n, deps) => ({
+      parentResourceId: 0,
+      resourceName: n,
+      resourceCode: n,
+      resourceTypeFlag: 'API',
+      resourceScopeFlag: 'LIST',
+      entityId: deps.apiId,
+      enableFlag: 'ENABLE',
+      remark: 'e2e destructive',
+    }),
+  },
+  {
+    name: 'Settings Group',
+    route: '/settings/group',
+    placeholder: 'Enter group name',
+    listUrl: '/api/v3/manager/group/list',
+    addUrl: '/api/v3/manager/group/add',
+    nameField: 'groupName',
+    seed: (n) => ({
+      parentGroupId: 0,
+      groupName: n,
+      groupCode: n,
+      groupTypeFlag: 'DEVICE',
+      enableFlag: 'ENABLE',
+      remark: 'e2e destructive',
+    }),
+  },
+  {
+    name: 'Settings Label',
+    route: '/settings/label',
+    placeholder: 'Enter label name',
+    listUrl: '/api/v3/manager/label/list',
+    addUrl: '/api/v3/manager/label/add',
+    nameField: 'labelName',
+    seed: (n) => ({ labelName: n, labelCode: n, enableFlag: 'ENABLE', remark: 'e2e destructive' }),
+  },
+];
+
+function uniqueName() {
+  return `e2e_del_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+async function listCount(page: Page, listUrl: string, nameField: string, name: string) {
+  const response = await apiPost<{ records?: unknown[]; total?: number }>(page, listUrl, {
+    page: { current: 1, size: 1 },
+    [nameField]: name,
+  });
+  if (!response.data?.ok) return -1;
+  return response.data.data?.records?.length ?? 0;
+}
+
+test.describe('destructive UI delete', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  for (const testCase of deleteCases) {
+    test(`${testCase.name}: search, delete via UI, and verify removal`, async ({ page }) => {
+      const e2eData = await ensureE2eData(page);
+      const health = watchPageHealth(page);
+
+      const deps = {
+        driverId: e2eData.routeIds.driverId ?? '',
+        profileId: e2eData.routeIds.profileId ?? '',
+        apiId: e2eData.routeIds.apiId ?? '',
+      };
+      // The cases that need a dependency assert it exists — better to fail
+      // here with a clear message than to send a half-empty add payload.
+      if (testCase.name === 'Device') {
+        expect(deps.driverId, 'driverId from ensureE2eData').toBeTruthy();
+        expect(deps.profileId, 'profileId from ensureE2eData').toBeTruthy();
+      }
+      if (testCase.name === 'Settings Resource') {
+        expect(deps.apiId, 'apiId from ensureE2eData').toBeTruthy();
+      }
+
+      try {
+        const name = uniqueName();
+        const seed = await apiPost(page, testCase.addUrl, testCase.seed(name, deps));
+        expect(seed.data?.ok, `${testCase.name} seed`).toBe(true);
+
+        // Confirm the seed actually shows up in the list — protects
+        // against silent backend acceptance that doesn't materialise.
+        await expect
+          .poll(() => listCount(page, testCase.listUrl, testCase.nameField, name), {
+            message: `${testCase.name} should be findable after seed`,
+            timeout: 10_000,
+          })
+          .toBe(1);
+
+        await page.goto(`/#${testCase.route}`, { waitUntil: 'domcontentloaded' });
+        await waitForAppSettled(page);
+
+        await page.getByPlaceholder(testCase.placeholder).first().fill(name);
+
+        const searchMark = markHealth(health);
+        await clickButtonIfPresent(page, 'Search');
+        expectHealthy(health, searchMark);
+
+        // The seeded row must be visible — exact-text match avoids
+        // catching unrelated rows that merely contain a substring.
+        await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
+
+        const deleteMark = markHealth(health);
+        await page.getByRole('button', { name: 'Delete' }).first().click();
+        // Element Plus popconfirm renders Yes/Confirm in the active
+        // locale — match both English and Chinese variants.
+        await page
+          .getByRole('button', { name: /^(Yes|Confirm|确定|确认)$/ })
+          .last()
+          .click();
+        await waitForAppSettled(page);
+        expectHealthy(health, deleteMark);
+
+        // Final source-of-truth check — list API confirms the row is gone.
+        await expect
+          .poll(() => listCount(page, testCase.listUrl, testCase.nameField, name), {
+            message: `${testCase.name} must be absent after UI delete`,
+            timeout: 10_000,
+          })
+          .toBe(0);
+      } finally {
+        await e2eData.cleanup();
+      }
+    });
+  }
+});

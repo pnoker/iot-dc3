@@ -15,65 +15,17 @@
  */
 
 import { mount } from '@vue/test-utils';
-import { defineComponent, h } from 'vue';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import i18n from '@/config/i18n';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
 
-const formValidate = vi.fn(() => Promise.resolve());
-const formResetFields = vi.fn();
-
-const ElFormStub = defineComponent({
-  name: 'ElForm',
-  props: ['model', 'rules', 'inline'],
-  setup(_, { expose, slots }) {
-    expose({
-      validate: formValidate,
-      resetFields: formResetFields,
-    });
-    return () => h('form', { class: 'el-form-stub' }, slots.default?.());
-  },
-});
-
-const ElButtonStub = defineComponent({
-  name: 'ElButton',
-  props: ['icon', 'plain', 'type', 'circle'],
-  emits: ['click'],
-  setup(props, { emit, slots }) {
-    return () =>
-      h(
-        'button',
-        {
-          type: 'button',
-          class: ['el-button-stub', props.circle ? 'is-circle' : ''],
-          'data-icon': typeof props.icon === 'object' && props.icon ? (props.icon as { name?: string }).name : '',
-          onClick: (event: MouseEvent) => emit('click', event),
-        },
-        slots.default?.()
-      );
-  },
-});
-
-const ElPaginationStub = defineComponent({
-  name: 'ElPagination',
-  props: ['currentPage', 'pageSize', 'pageSizes', 'total'],
-  emits: ['size-change', 'current-change'],
-  setup(props, { emit }) {
-    return () =>
-      h('div', { class: 'el-pagination-stub' }, [
-        h('span', `${props.currentPage}/${props.pageSize}/${props.total}`),
-        h('button', { type: 'button', onClick: () => emit('size-change', 24) }, 'size'),
-        h('button', { type: 'button', onClick: () => emit('current-change', 3) }, 'page'),
-      ]);
-  },
-});
+import { createElButtonStub, createElFormStub, createElPaginationStub, layoutStubs } from '../setup/stubs/element-plus';
 
 function mountToolCard(props: Record<string, unknown> = {}) {
-  formValidate.mockClear();
-  formResetFields.mockClear();
+  const { ElForm, validate, resetFields } = createElFormStub();
 
-  return mount(ToolCard, {
+  const wrapper = mount(ToolCard, {
     props: {
       formModel: { keyword: 'device' },
       page: { current: 1, size: 12, total: 36 },
@@ -86,38 +38,46 @@ function mountToolCard(props: Record<string, unknown> = {}) {
     global: {
       plugins: [i18n],
       stubs: {
-        ElButton: ElButtonStub,
-        ElCard: { template: '<section class="el-card-stub"><slot /></section>' },
-        ElForm: ElFormStub,
-        ElFormItem: { template: '<div class="el-form-item-stub"><slot /></div>' },
-        ElPagination: ElPaginationStub,
-        ElTooltip: { template: '<span class="el-tooltip-stub"><slot /></span>' },
+        ...layoutStubs,
+        ElButton: createElButtonStub(),
+        ElForm,
+        ElPagination: createElPaginationStub(),
       },
     },
   });
+
+  return { wrapper, validate, resetFields };
 }
 
 describe('ToolCard', () => {
-  it('validates before search and emits the live form model', async () => {
+  it('validates before search and emits the live form model when the search button is clicked', async () => {
     const formModel = { keyword: 'device' };
-    const wrapper = mountToolCard({ formModel });
+    const { wrapper, validate } = mountToolCard({ formModel });
 
-    await (wrapper.vm as unknown as { search: () => Promise<void> }).search();
+    // Trigger via the rendered Search button — testing the public contract,
+    // not internal vm methods. The Search button is the only `type=primary`
+    // button in the footer's button cluster.
+    const primaryButtons = wrapper.findAll('button.el-button-stub.is-primary');
+    expect(primaryButtons).toHaveLength(1);
+    await primaryButtons[0].trigger('click');
+    await Promise.resolve();
 
-    expect(formValidate).toHaveBeenCalledTimes(1);
+    expect(validate).toHaveBeenCalledTimes(1);
     expect(wrapper.emitted('search')).toEqual([[formModel]]);
   });
 
-  it('resets form fields and forwards pagination/tool events', async () => {
-    const wrapper = mountToolCard();
+  it('resets form fields and forwards pagination/tool events from button clicks', async () => {
+    const { wrapper, resetFields } = mountToolCard();
 
-    (wrapper.vm as unknown as { reset: () => void }).reset();
+    // Reset button is the second non-circle, non-primary button in the footer
+    // (Search comes first). Find by data-icon on its leading icon prop.
+    await wrapper.find('[data-icon="RefreshRight"]').trigger('click');
     await wrapper.find('.el-pagination-stub button:nth-of-type(1)').trigger('click');
     await wrapper.find('.el-pagination-stub button:nth-of-type(2)').trigger('click');
     await wrapper.find('[data-icon="Refresh"]').trigger('click');
     await wrapper.find('[data-icon="Sort"]').trigger('click');
 
-    expect(formResetFields).toHaveBeenCalledTimes(1);
+    expect(resetFields).toHaveBeenCalledTimes(1);
     expect(wrapper.emitted('reset')).toHaveLength(1);
     expect(wrapper.emitted('size-change')).toEqual([[24]]);
     expect(wrapper.emitted('current-change')).toEqual([[3]]);
@@ -126,7 +86,7 @@ describe('ToolCard', () => {
   });
 
   it('honors the hideSort contract', () => {
-    const wrapper = mountToolCard({ hideSort: true });
+    const { wrapper } = mountToolCard({ hideSort: true });
 
     expect(wrapper.find('[data-icon="Sort"]').exists()).toBe(false);
     expect(wrapper.find('[data-icon="Refresh"]').exists()).toBe(true);

@@ -24,6 +24,8 @@ import i18n from '@/config/i18n';
 import type { AgenticMessage } from '@/config/types';
 import { useAgenticStore } from '@/store';
 
+import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus';
+
 vi.mock('vue-element-plus-x/styles/index.css', () => ({}));
 vi.mock('vue-element-plus-x', () => ({
   Prompts: { template: '<div class="prompts-stub" />' },
@@ -37,14 +39,13 @@ const PassthroughStub = defineComponent({
   },
 });
 
-const ButtonStub = defineComponent({
-  name: 'ElButton',
-  props: ['disabled'],
-  setup(props, { slots }) {
-    return () => h('button', { disabled: props.disabled, type: 'button' }, slots.default?.());
-  },
-});
-
+// Direct state injection on the agentic store. Going through the public
+// `bootstrap()` action would force four mocked API calls per test for
+// values that are completely irrelevant to the UI assertions below; the
+// tradeoff favours seeded state with a one-line escape hatch over
+// scaffolding API mocks. If you find yourself growing this helper with
+// production-like derivation logic, that's the moment to switch back to
+// public actions.
 function seedAssistant(messages: AgenticMessage[]) {
   const store = useAgenticStore();
   store.visible = true;
@@ -79,6 +80,15 @@ function mountAssistant() {
         loading: () => undefined,
       },
       stubs: {
+        ...layoutStubs,
+        ElButton: createElButtonStub(),
+        ElDropdown: { template: '<span><slot /><slot name="dropdown" /></span>' },
+        ElDropdownItem: { template: '<span><slot /></span>' },
+        ElDropdownMenu: { template: '<span><slot /></span>' },
+        ElIcon: PassthroughStub,
+        ElPopover: { template: '<span><slot name="reference" /><slot /></span>' },
+        ElSlider: { template: '<input class="el-slider-stub" />' },
+        // Element Plus icons — stub to a passthrough so the component tree mounts.
         ChatDotRound: PassthroughStub,
         ChatLineSquare: PassthroughStub,
         Check: PassthroughStub,
@@ -90,31 +100,17 @@ function mountAssistant() {
         Document: PassthroughStub,
         DocumentCopy: PassthroughStub,
         EditPen: PassthroughStub,
-        ElButton: ButtonStub,
-        ElDropdown: { template: '<span><slot /><slot name="dropdown" /></span>' },
-        ElDropdownItem: { template: '<span><slot /></span>' },
-        ElDropdownMenu: { template: '<span><slot /></span>' },
-        ElIcon: PassthroughStub,
-        ElInput: { template: '<textarea />' },
-        ElInputNumber: { template: '<input />' },
-        ElOption: { template: '<option />' },
-        ElPopover: { template: '<span><slot name="reference" /><slot /></span>' },
-        ElSelect: { template: '<select><slot /></select>' },
-        ElSlider: { template: '<input />' },
-        ElSwitch: { template: '<input type="checkbox" />' },
-        ElTag: { template: '<span><slot /></span>' },
-        ElTooltip: PassthroughStub,
         Lightning: PassthroughStub,
         Paperclip: PassthroughStub,
         Plus: PassthroughStub,
         Promotion: PassthroughStub,
+        Setting: PassthroughStub,
+        VideoPause: PassthroughStub,
+        Warning: PassthroughStub,
         RenderedAssistantMessage: {
           props: ['content'],
           template: '<div class="rendered-assistant-message">{{ content }}</div>',
         },
-        Setting: PassthroughStub,
-        VideoPause: PassthroughStub,
-        Warning: PassthroughStub,
       },
     },
   });
@@ -141,7 +137,10 @@ describe('AgenticAssistant', () => {
     const panel = wrapper.find('.agentic-reasoning-panel');
 
     expect(panel.exists()).toBe(true);
-    expect(panel.attributes('open')).toBeDefined();
+    // <details open> renders with `open=""` — the attribute exists with an
+    // empty string value. Be explicit so an accidental `open="false"`
+    // wouldn't pass.
+    expect(Object.keys(panel.attributes())).toContain('open');
     expect(wrapper.find('.agentic-reasoning-panel__text').text()).toContain('正在确认当前租户上下文');
     expect(wrapper.find('.agentic-live-thinking').exists()).toBe(false);
   });

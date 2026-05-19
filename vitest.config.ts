@@ -40,19 +40,35 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json-summary', 'html'],
       reportsDirectory: './coverage',
+      // Coverage now reflects the **whole testable surface** of src/, not just
+      // the modules that already had tests. Views are still excluded — they
+      // are covered by Playwright e2e specs and would otherwise drown the
+      // unit-coverage signal.
       include: [
         'src/api/**/*.ts',
-        'src/config/axios/index.ts',
+        'src/composables/**/*.ts',
+        'src/config/axios/**/*.ts',
+        'src/config/router/**/*.ts',
+        'src/store/modules/**/*.ts',
         'src/utils/**/*.ts',
         'src/components/card/tool/ToolCard.vue',
         'src/components/segmented/RangeSegmented.vue',
       ],
-      exclude: ['src/api/dashboard/index.ts'],
+      exclude: [
+        'src/api/dashboard/index.ts',
+        // Ambient/type-only modules contribute no executable coverage signal.
+        'src/config/types/**',
+        'src/config/ambient/**',
+      ],
+      // Thresholds sit a couple of points below measured coverage so the
+      // gate fails on regression, not on noise. Bump again after the next
+      // round of test additions. Currently measured (post-A1 fixtures):
+      // branches 67% / functions 77% / lines 81% / statements 82%.
       thresholds: {
         branches: 65,
-        functions: 70,
-        lines: 70,
-        statements: 70,
+        functions: 75,
+        lines: 78,
+        statements: 78,
       },
     },
   },

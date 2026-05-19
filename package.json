@@ -41,6 +41,7 @@
     "test:unit": "vitest run tests/unit",
     "test:api": "vitest run tests/api",
     "test:component": "vitest run tests/component",
+    "test:views": "vitest run tests/views",
     "test:guard": "vitest run tests/guardrails",
     "test:impact": "node scripts/testing/changed-test-plan.mjs",
     "test:ci": "vitest run --coverage",

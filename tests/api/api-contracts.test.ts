@@ -43,7 +43,18 @@ import * as roleUserBindApi from '@/api/roleUserBind';
 import * as tokenApi from '@/api/token';
 import * as userApi from '@/api/user';
 import { AUTH_HEADERS } from '@/config/constant/common';
+import type { AgenticChatCompletionRequest } from '@/config/types';
 import { setStorage } from '@/utils/storageUtil';
+
+// Builds a minimal-but-valid streaming request. Only `messages`, `stream`,
+// `conversationId` are required by the contract — everything else is optional
+// and irrelevant to the wire-format assertions below.
+const streamRequest = (overrides: Partial<AgenticChatCompletionRequest> = {}): AgenticChatCompletionRequest => ({
+  messages: [{ role: 'user', content: 'hello' }],
+  conversationId: 'conversation-test',
+  stream: true,
+  ...overrides,
+});
 
 const apiSpies = vi.hoisted(() => ({
   httpGet: vi.fn(() => Promise.resolve({ ok: true, data: null })),
@@ -299,19 +310,12 @@ describe('agentic streaming contract', () => {
     const onReasoning = vi.fn();
     const onDone = vi.fn();
 
-    await agenticApi.streamAgenticChatCompletion(
-      {
-        messages: [{ role: 'user', content: 'hello' }],
-        conversationId: 'conversation-test',
-        stream: true,
-      } as never,
-      {
-        onDelta,
-        onEvent,
-        onReasoning,
-        onDone,
-      }
-    );
+    await agenticApi.streamAgenticChatCompletion(streamRequest(), {
+      onDelta,
+      onEvent,
+      onReasoning,
+      onDone,
+    });
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/v3/agentic/chat/completions',
@@ -346,12 +350,9 @@ describe('agentic streaming contract', () => {
 
     const onError = vi.fn();
 
-    await expect(
-      agenticApi.streamAgenticChatCompletion(
-        { messages: [], conversationId: 'conversation-test', stream: true } as never,
-        { onError }
-      )
-    ).rejects.toThrow('expired');
+    await expect(agenticApi.streamAgenticChatCompletion(streamRequest({ messages: [] }), { onError })).rejects.toThrow(
+      'expired'
+    );
 
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
     expect(window.location.hash).toBe('#/login');
@@ -382,10 +383,7 @@ describe('agentic streaming contract', () => {
     const onDone = vi.fn();
     const onError = vi.fn();
 
-    await agenticApi.streamAgenticChatCompletion(
-      { messages: [{ role: 'user', content: 'hello' }], conversationId: 'conversation-test', stream: true } as never,
-      { onEvent, onFinish, onDone, onError }
-    );
+    await agenticApi.streamAgenticChatCompletion(streamRequest(), { onEvent, onFinish, onDone, onError });
 
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'error', title: 'Request failed' }));
     expect(onFinish).toHaveBeenCalledWith('error');

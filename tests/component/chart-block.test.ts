@@ -77,11 +77,13 @@ describe('ChartBlock', () => {
   });
 
   it('rejects unsupported chart types through the safe whitelist', () => {
-    const chart = {
+    // @ts-expect-error — `type: 'custom'` is intentionally outside the
+    // AgenticVisualizationSpec union to verify the whitelist guard.
+    const chart: AgenticVisualizationSpec = {
       type: 'custom',
       dataset: [{ x: 1, y: 2 }],
       encode: { x: 'x', y: 'y' },
-    } as unknown as AgenticVisualizationSpec;
+    };
 
     const wrapper = mount(ChartBlock, { props: { chart } });
 
