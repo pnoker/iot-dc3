@@ -74,6 +74,12 @@
     </modules>
 
     <dependencies>
+        <!-- Unit test toolkit inherited by center application modules. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

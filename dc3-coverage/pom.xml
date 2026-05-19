@@ -37,20 +37,41 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <!-- Coverage thresholds gated by jacoco:check. Tightened per-stage. -->
-        <coverage.line.minimum>0.00</coverage.line.minimum>
-        <coverage.branch.minimum>0.00</coverage.branch.minimum>
+        <!-- Coverage thresholds gated by the aggregate XML report. Tightened per-stage. -->
+        <coverage.line.minimum>0.20</coverage.line.minimum>
+        <coverage.branch.minimum>0.15</coverage.branch.minimum>
+        <coverage.check.skip>false</coverage.check.skip>
     </properties>
 
     <dependencies>
         <!--
-          Modules listed here contribute to the aggregate report. As new test
-          stages land, the contributing modules are added below so their
-          jacoco.exec / jacoco-it.exec files are picked up.
+          Modules listed here contribute to the aggregate report. Generated API
+          artifacts and pure deployment wrappers stay out of this baseline so
+          the report follows hand-written code that currently has tests.
         -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-public</artifactId>
+            <artifactId>dc3-common-agentic</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-auth</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-constant</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-data</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-driver</artifactId>
             <version>${dc3.version}</version>
         </dependency>
         <dependency>
@@ -60,7 +81,117 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-constant</artifactId>
+            <artifactId>dc3-common-facade-local-auth</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-facade-local-data</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-facade-local-manager</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-gateway</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-manager</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-model</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mqtt</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-postgres</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-public</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-quartz</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-rabbitmq</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-repository</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-resource-registrar</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-thread</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-web</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-coap</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-listening-virtual</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-modbus-tcp</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-mqtt</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-opc-da</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-opc-ua</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-plcs7</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-virtual</artifactId>
             <version>${dc3.version}</version>
         </dependency>
     </dependencies>
@@ -93,30 +224,30 @@
                             </excludes>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
                     <execution>
-                        <id>aggregate-check</id>
+                        <id>aggregate-coverage-check</id>
                         <phase>verify</phase>
                         <goals>
-                            <goal>check</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <rules>
-                                <rule>
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>LINE</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>${coverage.line.minimum}</minimum>
-                                        </limit>
-                                        <limit>
-                                            <counter>BRANCH</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>${coverage.branch.minimum}</minimum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
+                            <skip>${coverage.check.skip}</skip>
+                            <executable>python3</executable>
+                            <arguments>
+                                <argument>${project.basedir}/scripts/check_coverage.py</argument>
+                                <argument>${project.build.directory}/site/jacoco-aggregate/jacoco.xml</argument>
+                                <argument>--minimum-line</argument>
+                                <argument>${coverage.line.minimum}</argument>
+                                <argument>--minimum-branch</argument>
+                                <argument>${coverage.branch.minimum}</argument>
+                            </arguments>
                         </configuration>
                     </execution>
                 </executions>

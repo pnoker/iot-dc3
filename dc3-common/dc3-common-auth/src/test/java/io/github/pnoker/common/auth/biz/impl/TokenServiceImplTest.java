@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.biz.impl;
 
+import io.github.pnoker.common.auth.cache.TokenDenylistCache;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
@@ -40,6 +41,8 @@ import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,6 +67,9 @@ class TokenServiceImplTest {
 
     @Mock
     private TenantBindService tenantBindService;
+
+    @Mock
+    private TokenDenylistCache tokenDenylistCache;
 
     @InjectMocks
     private TokenServiceImpl tokenService;
@@ -229,9 +235,24 @@ class TokenServiceImplTest {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
         when(userLoginService.getByLoginName(LOGIN, false)).thenReturn(userLogin);
         when(tenantBindService.getByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(bind);
+        when(tokenDenylistCache.isRevoked(eq(LOGIN), eq(TENANT_CODE), anyLong())).thenReturn(false);
         String token = KeyUtil.generateToken(LOGIN, SALT, TENANT_ID);
         TokenValid result = tokenService.checkValid(LOGIN, SALT, token, TENANT_CODE);
         assertThat(result.isValid()).isTrue();
+        assertThat(result.getExpireTime()).isNotNull();
+    }
+
+    @Test
+    void checkValidReturnsInvalidWhenTokenWasRevoked() {
+        when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
+        when(userLoginService.getByLoginName(LOGIN, false)).thenReturn(userLogin);
+        when(tenantBindService.getByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(bind);
+        when(tokenDenylistCache.isRevoked(eq(LOGIN), eq(TENANT_CODE), anyLong())).thenReturn(true);
+        String token = KeyUtil.generateToken(LOGIN, SALT, TENANT_ID);
+
+        TokenValid result = tokenService.checkValid(LOGIN, SALT, token, TENANT_CODE);
+
+        assertThat(result.isValid()).isFalse();
         assertThat(result.getExpireTime()).isNotNull();
     }
 

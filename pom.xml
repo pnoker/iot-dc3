@@ -76,6 +76,8 @@
         <!-- Test execution toggles (consumed by surefire/failsafe) -->
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
+        <mockito.version>5.20.0</mockito.version>
+        <mockito.javaagent.argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</mockito.javaagent.argLine>
     </properties>
 
     <modules>
@@ -266,14 +268,14 @@
                     <version>${surefire.version}</version>
                     <configuration>
                         <skip>${skip.unit.tests}</skip>
-                        <argLine>@{argLine} -Xshare:off -Duser.language=en -Duser.country=US</argLine>
+                        <argLine>@{argLine} ${mockito.javaagent.argLine} -Xshare:off -Duser.language=en -Duser.country=US</argLine>
                         <includes>
                             <include>**/*Test.java</include>
                             <include>**/*Tests.java</include>
                         </includes>
                         <excludes>
-                            <include>**/*IT.java</include>
-                            <include>**/Abstract*.java</include>
+                            <exclude>**/*IT.java</exclude>
+                            <exclude>**/Abstract*.java</exclude>
                         </excludes>
                     </configuration>
                 </plugin>
@@ -283,7 +285,7 @@
                     <version>${surefire.version}</version>
                     <configuration>
                         <skip>${skip.integration.tests}</skip>
-                        <argLine>@{failsafe.argLine} -Xshare:off -Duser.language=en -Duser.country=US</argLine>
+                        <argLine>@{failsafe.argLine} ${mockito.javaagent.argLine} -Xshare:off -Duser.language=en -Duser.country=US</argLine>
                         <includes>
                             <include>**/*IT.java</include>
                         </includes>
