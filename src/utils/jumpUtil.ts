@@ -32,7 +32,7 @@ import type { Router } from 'vue-router';
 export type JumpKind = 'driver' | 'device' | 'profile' | 'point';
 
 /** Event-source flavour — drives jumps to settingsDeviceEvent / settingsDriverEvent. */
-export type AlertSourceKind = 'device' | 'driver';
+export type AlertSourceKind = 'point' | 'device' | 'driver';
 
 /**
  * Jump to the detail / value page for the given entity. No-op on invalid
@@ -59,11 +59,12 @@ export const jumpToEntity = (router: Router, kind: JumpKind, id: string | number
 };
 
 /**
- * Jump to the per-source event list ({@code settings/event/{device,driver}})
- * with the source id pre-filtered. Used by Storm Sources, Flapping Sources,
- * Peer Deviation.
+ * Jump to the per-source event list with the source id pre-filtered.
  */
 export const jumpToSourceEvents = (router: Router, source: AlertSourceKind, sourceId: string | number): void => {
-  const name = source === 'device' ? 'settingsDeviceEvent' : 'settingsDriverEvent';
+  let name: string;
+  if (source === 'point') name = 'settingsDeviceEvent';
+  else if (source === 'driver') name = 'settingsDriverEvent';
+  else name = 'settingsDeviceEvent';
   router.push({ name, query: { sourceId: String(sourceId) } }).catch(() => {});
 };

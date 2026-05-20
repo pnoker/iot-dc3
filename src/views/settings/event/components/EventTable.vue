@@ -27,13 +27,16 @@
       @current-change="currentChange"
     >
       <template #filters="{ formData: fd }">
-        <el-form-item :label="$t('settings.event.eventType')" prop="eventTypeFlag">
+        <el-form-item :label="$t('settings.event.alarmType')" prop="alarmTypeFlag">
           <el-segmented
-            v-model="fd.eventTypeFlag"
+            v-model="fd.alarmTypeFlag"
             :options="[
               { label: $t('common.all'), value: '' },
-              { label: 'HEARTBEAT', value: 0 },
-              { label: 'ALARM', value: 1 },
+              { label: 'RULE', value: 0 },
+              { label: 'OFFLINE', value: 1 },
+              { label: 'FAULT', value: 2 },
+              { label: 'STATE_FLIP', value: 3 },
+              { label: 'REPORT', value: 4 },
             ]"
           />
         </el-form-item>
@@ -89,18 +92,22 @@
         @selection-change="onSelectionChange"
       >
         <el-table-column type="selection" width="44" />
-        <!-- Entity column: for device tables we look up deviceName via /device/ids,
-             for driver tables via /driver/ids. Falls back to the raw id. -->
         <el-table-column :label="entityLabel" min-width="180" show-overflow-tooltip>
           <template #default="{ row }">
             <span>{{ nameFor(row) }}</span>
           </template>
         </el-table-column>
-        <el-table-column v-if="source === 'device'" :label="$t('settings.event.pointId')" prop="pointId" width="140" />
-        <el-table-column :label="$t('settings.event.eventType')" width="110">
+        <el-table-column v-if="source === 'point'" :label="$t('settings.event.sourceId')" prop="sourceId" width="140" />
+        <el-table-column
+          v-if="source === 'device' || source === 'point'"
+          :label="$t('settings.event.pointId')"
+          prop="pointId"
+          width="140"
+        />
+        <el-table-column :label="$t('settings.event.alarmType')" width="110">
           <template #default="{ row }">
-            <el-tag :type="row.eventTypeFlag === 1 ? 'warning' : 'info'" size="small">
-              {{ row.eventTypeFlag === 1 ? 'ALARM' : 'HEARTBEAT' }}
+            <el-tag :type="alarmTypeTag(row.eventTypeFlag)" size="small">
+              {{ alarmTypeLabel(row.eventTypeFlag) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -160,6 +167,7 @@
   import { alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm } from '@/api/dashboard';
   import { listDeviceByIds } from '@/api/device';
   import { listDriverByIds } from '@/api/driver';
+  import { getPointByIds } from '@/api/point';
   import { timestampColumn } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -169,7 +177,7 @@
 
   interface Row {
     id: number | string;
-    source: 'device' | 'driver';
+    source: 'point' | 'device' | 'driver';
     sourceId: number | string;
     pointId: number | string;
     eventTypeFlag: number;
@@ -179,7 +187,7 @@
   }
 
   const props = defineProps<{
-    source: 'device' | 'driver';
+    source: 'point' | 'device' | 'driver';
   }>();
 
   const { t } = useI18n();
@@ -191,9 +199,36 @@
   const rows = ref<Row[]>([]);
   const nameMap = reactive<Record<string, string>>({});
 
-  // Seed filter state from the URL so deep-links from Overview's quick
-  // actions / storm-source drill-in land with the right filter prefilled
-  // instead of needing the operator to compose it again.
+  const alarmTypeOptions = [
+    { label: 'RULE', value: 0 },
+    { label: 'OFFLINE', value: 1 },
+    { label: 'FAULT', value: 2 },
+    { label: 'STATE_FLIP', value: 3 },
+    { label: 'REPORT', value: 4 },
+  ];
+
+  const alarmTypeLabel = (flag: number) => {
+    const opt = alarmTypeOptions.find((o) => o.value === flag);
+    return opt ? opt.label : String(flag);
+  };
+
+  const alarmTypeTag = (flag: number): 'info' | 'warning' | 'danger' => {
+    switch (flag) {
+      case 0:
+        return 'info';
+      case 1:
+        return 'danger';
+      case 2:
+        return 'danger';
+      case 3:
+        return 'warning';
+      case 4:
+        return 'info';
+      default:
+        return 'info';
+    }
+  };
+
   const readQuery = () => {
     const q = route.query;
     const parseEnum = (v: unknown, pool: readonly (number | '')[]): number | '' => {
@@ -205,30 +240,39 @@
     const rawRange = typeof q.rangeKey === 'string' ? q.rangeKey : '';
     const rangeKey = (rangeCandidates as readonly string[]).includes(rawRange) ? (rawRange as RangeKey) : '';
     return {
-      eventTypeFlag: parseEnum(q.eventTypeFlag, [0, 1]) as number | '',
+      alarmTypeFlag: parseEnum(q.alarmTypeFlag, [0, 1, 2, 3, 4]) as number | '',
       confirmFlag: parseEnum(q.confirmFlag, [0, 1]) as number | '',
       rangeKey,
     };
   };
 
   const initial = readQuery();
-  const formData = reactive<{ eventTypeFlag: number | ''; confirmFlag: number | ''; rangeKey: RangeKey }>({
-    eventTypeFlag: initial.eventTypeFlag,
+  const formData = reactive<{ alarmTypeFlag: number | ''; confirmFlag: number | ''; rangeKey: RangeKey }>({
+    alarmTypeFlag: initial.alarmTypeFlag,
     confirmFlag: initial.confirmFlag,
     rangeKey: initial.rangeKey,
   });
   const page = reactive({ current: 1, size: 20, total: 0 });
 
-  const entityLabel = computed(() =>
-    props.source === 'device' ? t('settings.event.device') : t('settings.event.driver')
-  );
+  const entityLabel = computed(() => {
+    switch (props.source) {
+      case 'point':
+        return t('settings.event.sourcePoint');
+      case 'device':
+        return t('settings.event.sourceDevice');
+      case 'driver':
+        return t('settings.event.sourceDriver');
+      default:
+        return '';
+    }
+  });
 
   const load = async () => {
     loading.value = true;
     try {
       const res: any = await alertPage({
         source: props.source,
-        eventTypeFlag: formData.eventTypeFlag === '' ? null : Number(formData.eventTypeFlag),
+        eventTypeFlag: formData.alarmTypeFlag === '' ? null : Number(formData.alarmTypeFlag),
         confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
         rangeKey: formData.rangeKey || null,
         current: page.current,
@@ -249,12 +293,25 @@
     const ids = Array.from(new Set(batch.map((r) => String(r.sourceId)).filter((id) => id && !nameMap[id])));
     if (ids.length === 0) return;
     try {
-      const res: any = props.source === 'device' ? await listDeviceByIds(ids) : await listDriverByIds(ids);
+      let res: any;
+      if (props.source === 'point') {
+        res = await getPointByIds(ids);
+      } else if (props.source === 'device') {
+        res = await listDeviceByIds(ids);
+      } else {
+        res = await listDriverByIds(ids);
+      }
       const data = res?.data || {};
       for (const id of ids) {
         const item = data[id];
         if (item) {
-          nameMap[id] = props.source === 'device' ? item.deviceName || id : item.driverName || id;
+          if (props.source === 'point') {
+            nameMap[id] = item.pointName || id;
+          } else if (props.source === 'device') {
+            nameMap[id] = item.deviceName || id;
+          } else {
+            nameMap[id] = item.driverName || id;
+          }
         }
       }
     } catch {
@@ -270,7 +327,7 @@
   };
 
   const onReset = () => {
-    formData.eventTypeFlag = '';
+    formData.alarmTypeFlag = '';
     formData.confirmFlag = '';
     formData.rangeKey = '';
     page.current = 1;
@@ -336,15 +393,11 @@
     }
   );
 
-  // When the user deep-links in again with a different query (e.g. clicks
-  // another quick-action while already on the page), Vue Router reuses
-  // this component instead of remounting it — so watch the query keys
-  // the overview can prefill and resync the filter state.
   watch(
-    () => [route.query.rangeKey, route.query.confirmFlag, route.query.eventTypeFlag],
+    () => [route.query.rangeKey, route.query.confirmFlag, route.query.alarmTypeFlag],
     () => {
       const next = readQuery();
-      formData.eventTypeFlag = next.eventTypeFlag;
+      formData.alarmTypeFlag = next.alarmTypeFlag;
       formData.confirmFlag = next.confirmFlag;
       formData.rangeKey = next.rangeKey;
       page.current = 1;

@@ -33,8 +33,8 @@
 
     <ul class="alert-storm__list">
       <li v-for="row in rows" :key="`${row.source}:${row.sourceId}`" class="alert-storm__item" @click="onDrillIn(row)">
-        <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
-          {{ row.source === 'device' ? t('settings.event.device') : t('settings.event.driver') }}
+        <el-tag :type="sourceTagType(row.source)" size="small">
+          {{ sourceLabel(row.source) }}
         </el-tag>
         <span class="alert-storm__name">{{ nameFor(row) }}</span>
         <span class="alert-storm__count">
@@ -47,18 +47,19 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref, watch } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import { Warning } from '@element-plus/icons-vue';
 
   import { alertStormSources } from '@/api/dashboard';
-  import { listDeviceByIds } from '@/api/device';
-  import { listDriverByIds } from '@/api/driver';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useEntityNames } from '@/composables/useEntityNames';
+  import { jumpToSourceEvents } from '@/utils/jumpUtil';
+  import type { AlertSource } from '@/config/types/dashboard';
 
   interface StormRow {
-    source: 'device' | 'driver';
+    source: AlertSource;
     sourceId: number | string;
     count: number;
   }
@@ -69,6 +70,7 @@
 
   const { t } = useI18n();
   const router = useRouter();
+  const { resolveBySource, nameBySource } = useEntityNames();
 
   // Storm is "high frequency within a short window", so the threshold has
   // to scale with the window: a source hitting 10 alarms in 1h is noisy,
@@ -92,7 +94,6 @@
 
   const loading = ref(false);
   const rows = ref<StormRow[]>([]);
-  const nameMap = reactive<Record<string, string>>({});
 
   const load = async () => {
     loading.value = true;
@@ -100,7 +101,7 @@
       const { hours, minCount } = window.value;
       const res: { data?: StormRow[] } = await alertStormSources(hours, minCount, props.limit);
       rows.value = res?.data ?? [];
-      await resolveNames(rows.value);
+      await resolveBySource(rows.value);
     } catch {
       // handled globally
     } finally {
@@ -110,53 +111,15 @@
 
   watch(windowKey, load);
 
-  const resolveNames = async (batch: StormRow[]) => {
-    const devIds = batch
-      .filter((r) => r.source === 'device')
-      .map((r) => String(r.sourceId))
-      .filter((id) => id && !nameMap[`d:${id}`]);
-    const drvIds = batch
-      .filter((r) => r.source === 'driver')
-      .map((r) => String(r.sourceId))
-      .filter((id) => id && !nameMap[`r:${id}`]);
-    const jobs: Promise<void>[] = [];
-    if (devIds.length) {
-      jobs.push(
-        listDeviceByIds(devIds)
-          .then((r: { data?: Record<string, { deviceName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of devIds) {
-              if (d[id]) nameMap[`d:${id}`] = d[id].deviceName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    if (drvIds.length) {
-      jobs.push(
-        listDriverByIds(drvIds)
-          .then((r: { data?: Record<string, { driverName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of drvIds) {
-              if (d[id]) nameMap[`r:${id}`] = d[id].driverName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    await Promise.all(jobs);
-  };
+  const nameFor = (r: StormRow) => nameBySource(r.source, r.sourceId);
 
-  const nameFor = (r: StormRow) => {
-    const id = String(r.sourceId);
-    return r.source === 'device' ? nameMap[`d:${id}`] || id : nameMap[`r:${id}`] || id;
-  };
+  const onDrillIn = (row: StormRow) => jumpToSourceEvents(router, row.source, row.sourceId);
 
-  // Jump into the per-source event page so the operator can triage the
-  // specific flapping driver / noisy device without filtering manually.
-  const onDrillIn = (row: StormRow) => {
-    const name = row.source === 'device' ? 'settingsDeviceEvent' : 'settingsDriverEvent';
-    router.push({ name, query: { sourceId: String(row.sourceId) } }).catch(() => {});
+  const sourceTagType = (s: AlertSource) => (s === 'device' ? 'primary' : s === 'driver' ? 'warning' : 'success');
+  const sourceLabel = (s: AlertSource) => {
+    if (s === 'point') return t('settings.event.sourcePoint');
+    if (s === 'driver') return t('settings.event.driver');
+    return t('settings.event.device');
   };
 
   onMounted(load);

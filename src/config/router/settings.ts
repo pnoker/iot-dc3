@@ -161,6 +161,12 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/event/DriverEvent.vue'),
         },
         {
+          name: 'settingsPointEvent',
+          path: 'event/point',
+          meta: { title: 'Point Events' },
+          component: () => import('@/views/settings/event/PointEvent.vue'),
+        },
+        {
           name: 'settingsAbout',
           path: 'about',
           meta: { title: 'About' },

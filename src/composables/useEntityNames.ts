@@ -103,7 +103,7 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): P
   }
 }
 
-export type AlertSourceKind = 'device' | 'driver';
+export type AlertSourceKind = 'point' | 'device' | 'driver';
 
 export const useEntityNames = () => {
   const resolveDevices = (ids: Array<string | number>) => fetchMissing('device', ids);
@@ -124,16 +124,22 @@ export const useEntityNames = () => {
   const resolveBySource = async (
     rows: Array<{ source: AlertSourceKind; sourceId: string | number }>
   ): Promise<void> => {
+    const ptIds: Array<string | number> = [];
     const devIds: Array<string | number> = [];
     const drvIds: Array<string | number> = [];
     for (const r of rows) {
-      (r.source === 'device' ? devIds : drvIds).push(r.sourceId);
+      if (r.source === 'point') ptIds.push(r.sourceId);
+      else if (r.source === 'device') devIds.push(r.sourceId);
+      else drvIds.push(r.sourceId);
     }
-    await Promise.all([resolveDevices(devIds), resolveDrivers(drvIds)]);
+    await Promise.all([resolvePoints(ptIds), resolveDevices(devIds), resolveDrivers(drvIds)]);
   };
 
-  const nameBySource = (source: AlertSourceKind, id: string | number): string =>
-    source === 'device' ? deviceName(id) : driverName(id);
+  const nameBySource = (source: AlertSourceKind, id: string | number): string => {
+    if (source === 'point') return pointName(id);
+    if (source === 'driver') return driverName(id);
+    return deviceName(id);
+  };
 
   return {
     // single-kind

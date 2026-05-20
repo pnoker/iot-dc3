@@ -114,8 +114,11 @@ export const RW_FLAG_OPTIONS: EnumOption[] = [
   { label: 'RW', value: 'RW' },
 ];
 
-// Backend: DeviceEventTypeEnum / DriverEventTypeEnum (same values)
-export const EVENT_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'HEARTBEAT', value: 'HEARTBEAT' },
-  { label: 'ALARM', value: 'ALARM' },
+// Backend: AlarmTypeFlagEnum
+export const ALARM_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'RULE', value: 'RULE' },
+  { label: 'OFFLINE', value: 'OFFLINE' },
+  { label: 'FAULT', value: 'FAULT' },
+  { label: 'STATE_FLIP', value: 'STATE_FLIP' },
+  { label: 'REPORT', value: 'REPORT' },
 ];

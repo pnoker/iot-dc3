@@ -18,15 +18,8 @@
   <div class="event-overview">
     <el-tabs v-model="activeTab" class="event-overview__tabs" @tab-change="onTabChange">
       <el-tab-pane :label="t('settings.event.overview.tabSituation')" name="situation">
-        <!-- Quick-actions: device / driver split into a two-column
-         el-descriptions so the two source lanes read side-by-side
-         instead of stacking. Wrapped in BlankCard (border:0) so the
-         block sits flush under the breadcrumb like the rest of the
-         dashboard, matching About's Platform card treatment. Every
-         chip carries real query params that EventTable picks up via
-         route.query. -->
         <blank-card>
-          <el-descriptions :column="2" border class="event-overview__quick">
+          <el-descriptions :column="3" border class="event-overview__quick">
             <el-descriptions-item>
               <template #label>
                 <span class="event-overview__quick-label">
@@ -75,6 +68,32 @@
                   {{ t('settings.event.overview.quick7d') }}
                 </el-button>
                 <el-button plain round size="small" @click="goto('driver', { rangeKey: '30d' })">
+                  {{ t('settings.event.overview.quick30d') }}
+                </el-button>
+              </div>
+            </el-descriptions-item>
+            <el-descriptions-item>
+              <template #label>
+                <span class="event-overview__quick-label">
+                  <el-icon><CircleCheck /></el-icon>
+                  {{ t('settings.event.sourcePoint') }}
+                </span>
+              </template>
+              <div class="event-overview__quick-actions">
+                <el-button round size="small" @click="goto('point', {})">
+                  {{ t('settings.event.overview.quickAll') }}
+                </el-button>
+                <el-button plain round size="small" type="warning" @click="goto('point', { confirmFlag: '0' })">
+                  {{ t('settings.event.overview.quickUnconfirmed') }}
+                </el-button>
+                <span class="event-overview__quick-divider" />
+                <el-button plain round size="small" @click="goto('point', { rangeKey: 'today' })">
+                  {{ t('settings.event.overview.quickToday') }}
+                </el-button>
+                <el-button plain round size="small" @click="goto('point', { rangeKey: '7d' })">
+                  {{ t('settings.event.overview.quick7d') }}
+                </el-button>
+                <el-button plain round size="small" @click="goto('point', { rangeKey: '30d' })">
                   {{ t('settings.event.overview.quick30d') }}
                 </el-button>
               </div>
@@ -154,7 +173,7 @@
   import { computed, defineAsyncComponent, onMounted, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
-  import { Bell, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
+  import { Bell, CircleCheck, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
   import { alertPage, alertStats, alertTrend } from '@/api/dashboard';
   import blankCard from '@/components/card/blank/BlankCard.vue';
@@ -236,7 +255,7 @@
     deviceDaily: [] as number[],
   });
 
-  const fetchCount = async (source: 'device' | 'driver', confirmFlag: number | null) => {
+  const fetchCount = async (source: 'point' | 'device' | 'driver', confirmFlag: number | null) => {
     try {
       const res: { data?: { total?: number } } = await alertPage({ source, confirmFlag, current: 1, size: 1 });
       return Number(res?.data?.total ?? 0);
@@ -406,8 +425,11 @@
   // event-list route (settings/event/{device,driver}) so the operator
   // lands with the URL query already narrowed; EventTable reads
   // route.query on mount and re-syncs on subsequent changes.
-  const goto = (source: 'device' | 'driver', query: Record<string, string>) => {
-    const name = source === 'device' ? 'settingsDeviceEvent' : 'settingsDriverEvent';
+  const goto = (source: 'point' | 'device' | 'driver', query: Record<string, string>) => {
+    let name: string;
+    if (source === 'point') name = 'settingsPointEvent';
+    else if (source === 'driver') name = 'settingsDriverEvent';
+    else name = 'settingsDeviceEvent';
     router.push({ name, query }).catch(() => {});
   };
 

@@ -31,14 +31,14 @@
       <el-timeline-item
         v-for="row in rows"
         :key="`${row.source}:${row.id}`"
-        :color="row.source === 'device' ? '#409eff' : '#e6a23c'"
+        :color="sourceColor(row.source)"
         :timestamp="formatTime(row.createTime)"
         placement="top"
       >
         <div class="recent-unconfirmed__item">
           <div class="recent-unconfirmed__line">
-            <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
-              {{ row.source === 'device' ? $t('settings.event.device') : $t('settings.event.driver') }}
+            <el-tag :type="sourceTagType(row.source)" size="small">
+              {{ sourceLabel(row.source) }}
             </el-tag>
             <span class="recent-unconfirmed__name">{{ nameFor(row) }}</span>
           </div>
@@ -50,35 +50,34 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { onMounted, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   import { alertPage } from '@/api/dashboard';
-  import { listDeviceByIds } from '@/api/device';
-  import { listDriverByIds } from '@/api/driver';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useEntityNames } from '@/composables/useEntityNames';
+  import type { AlertSource } from '@/config/types/dashboard';
 
   interface Row {
     id: number | string;
-    source: 'device' | 'driver';
+    source: AlertSource;
     sourceId: number | string;
     createTime: string;
     message?: string;
   }
 
+  const { t } = useI18n();
   const loading = ref(false);
   const rows = ref<Row[]>([]);
-  const nameMap = reactive<Record<string, string>>({});
+  const { resolveBySource, nameBySource } = useEntityNames();
 
   const load = async () => {
     loading.value = true;
     try {
-      // Size capped at 5 so the rendered timeline never exceeds the card's
-      // natural height — no internal scrollbar needed, no wheel contention
-      // with the page scrollbar above.
       const res: { data?: { records?: Row[] } } = await alertPage({ confirmFlag: 0, current: 1, size: 5 });
       const data: Row[] = res?.data?.records ?? [];
       rows.value = data;
-      await resolveNames(data);
+      await resolveBySource(data);
     } catch {
       // handled globally
     } finally {
@@ -86,46 +85,14 @@
     }
   };
 
-  const resolveNames = async (batch: Row[]) => {
-    const devIds = batch
-      .filter((r) => r.source === 'device')
-      .map((r) => String(r.sourceId))
-      .filter((id) => id && !nameMap[`d:${id}`]);
-    const drvIds = batch
-      .filter((r) => r.source === 'driver')
-      .map((r) => String(r.sourceId))
-      .filter((id) => id && !nameMap[`r:${id}`]);
-    const jobs: Promise<void>[] = [];
-    if (devIds.length) {
-      jobs.push(
-        listDeviceByIds(devIds)
-          .then((r: { data?: Record<string, { deviceName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of devIds) {
-              if (d[id]) nameMap[`d:${id}`] = d[id].deviceName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    if (drvIds.length) {
-      jobs.push(
-        listDriverByIds(drvIds)
-          .then((r: { data?: Record<string, { driverName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of drvIds) {
-              if (d[id]) nameMap[`r:${id}`] = d[id].driverName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    await Promise.all(jobs);
-  };
+  const nameFor = (r: Row) => nameBySource(r.source, r.sourceId);
 
-  const nameFor = (r: Row) => {
-    const id = String(r.sourceId);
-    return r.source === 'device' ? nameMap[`d:${id}`] || id : nameMap[`r:${id}`] || id;
+  const sourceTagType = (s: AlertSource) => (s === 'device' ? 'primary' : s === 'driver' ? 'warning' : 'success');
+  const sourceColor = (s: AlertSource) => (s === 'device' ? '#409eff' : s === 'driver' ? '#e6a23c' : '#67c23a');
+  const sourceLabel = (s: AlertSource) => {
+    if (s === 'point') return t('settings.event.sourcePoint');
+    if (s === 'driver') return t('settings.event.driver');
+    return t('settings.event.device');
   };
 
   const formatTime = (v?: string) => {

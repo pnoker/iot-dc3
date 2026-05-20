@@ -25,8 +25,8 @@
  * `'device' | 'driver'` inline.</p>
  */
 
-/** Two canonical event sources — device-level events vs driver-level events. */
-export type AlertSource = 'device' | 'driver';
+/** Three canonical alarm sources — point-level, device-level, driver-level. */
+export type AlertSource = 'point' | 'device' | 'driver';
 
 /** Top-level entity dimensions for top-N queries. */
 export type TopDimension = 'device' | 'point' | 'driver';

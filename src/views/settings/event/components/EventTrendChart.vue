@@ -66,6 +66,7 @@
       for (const r of rows) {
         flat.push({ date: r.date, source: 'Device', count: r.deviceCount ?? 0 });
         flat.push({ date: r.date, source: 'Driver', count: r.driverCount ?? 0 });
+        flat.push({ date: r.date, source: 'Point', count: r.pointCount ?? 0 });
       }
       await nextTick();
       render(flat);

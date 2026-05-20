@@ -42,7 +42,7 @@
               <el-tag :type="tagType(row.eventTypeFlag)" size="small">
                 {{ levelLabel(row.eventTypeFlag) }}
               </el-tag>
-              <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
+              <el-tag :type="sourceTagType(row.source)" size="small">
                 {{ sourceLabel(row) }}
               </el-tag>
               <span class="alert-list__name">{{ nameFor(row) }}</span>
@@ -63,13 +63,13 @@
   import { useI18n } from 'vue-i18n';
 
   import { alertLatest, alertStats } from '@/api/dashboard';
-  import { listDeviceByIds } from '@/api/device';
-  import { listDriverByIds } from '@/api/driver';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useEntityNames } from '@/composables/useEntityNames';
+  import type { AlertSource } from '@/config/types/dashboard';
 
   interface AlertRow {
     id: number | string;
-    source: 'device' | 'driver';
+    source: AlertSource;
     sourceId: number | string;
     pointId: number | string;
     eventTypeFlag: number;
@@ -87,8 +87,7 @@
   const loading = ref(false);
   const rows = ref<AlertRow[]>([]);
   const stats = reactive({ total: 0, unconfirmed: 0 });
-  const deviceMap = reactive<Record<string, string>>({});
-  const driverMap = reactive<Record<string, string>>({});
+  const { resolveBySource, nameBySource } = useEntityNames();
 
   const refresh = async () => {
     loading.value = true;
@@ -98,57 +97,12 @@
       stats.unconfirmed = (s?.data?.driverUnconfirmed ?? 0) + (s?.data?.deviceUnconfirmed ?? 0);
       const data: AlertRow[] = l?.data ?? [];
       rows.value = data;
-      await resolveNames(data);
+      await resolveBySource(data);
     } catch {
       // handled globally
     } finally {
       loading.value = false;
     }
-  };
-
-  const resolveNames = async (batch: AlertRow[]) => {
-    const devIds = Array.from(
-      new Set(
-        batch
-          .filter((r) => r.source === 'device')
-          .map((r) => String(r.sourceId))
-          .filter((id) => id && !deviceMap[id])
-      )
-    );
-    const drvIds = Array.from(
-      new Set(
-        batch
-          .filter((r) => r.source === 'driver')
-          .map((r) => String(r.sourceId))
-          .filter((id) => id && !driverMap[id])
-      )
-    );
-    const jobs: Promise<void>[] = [];
-    if (devIds.length) {
-      jobs.push(
-        listDeviceByIds(devIds)
-          .then((r: any) => {
-            const d = r?.data || {};
-            for (const id of devIds) {
-              if (d[id]) deviceMap[id] = d[id].deviceName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    if (drvIds.length) {
-      jobs.push(
-        listDriverByIds(drvIds)
-          .then((r: any) => {
-            const d = r?.data || {};
-            for (const id of drvIds) {
-              if (d[id]) driverMap[id] = d[id].driverName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    await Promise.all(jobs);
   };
 
   // Group the flat row list by YYYY-MM-DD so the timeline has day headings.
@@ -165,13 +119,15 @@
     return Array.from(byDate.entries()).map(([date, items]) => ({ date, items }));
   });
 
-  const sourceLabel = (r: AlertRow) =>
-    r.source === 'device' ? t('home.alertList.sourceDevice') : t('home.alertList.sourceDriver');
-
-  const nameFor = (r: AlertRow) => {
-    const id = String(r.sourceId);
-    return r.source === 'device' ? deviceMap[id] || id : driverMap[id] || id;
+  const sourceLabel = (r: AlertRow) => {
+    if (r.source === 'point') return t('home.alertList.sourcePoint');
+    if (r.source === 'driver') return t('home.alertList.sourceDriver');
+    return t('home.alertList.sourceDevice');
   };
+
+  const nameFor = (r: AlertRow) => nameBySource(r.source, r.sourceId);
+
+  const sourceTagType = (s: AlertSource) => (s === 'device' ? 'primary' : s === 'driver' ? 'warning' : 'success');
 
   const levelLabel = (flag: number) => {
     switch (flag) {

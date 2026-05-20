@@ -52,6 +52,7 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsEventOverview: 'nav.settingsEventOverview',
   settingsDeviceEvent: 'nav.settingsDeviceEvent',
   settingsDriverEvent: 'nav.settingsDriverEvent',
+  settingsPointEvent: 'nav.settingsPointEvent',
   settingsAbout: 'nav.settingsAbout',
   settingsUserDetail: 'nav.settingsUserDetail',
   settingsRoleDetail: 'nav.settingsRoleDetail',
@@ -95,6 +96,7 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsEventOverview: 'DataLine',
   settingsDeviceEvent: 'Management',
   settingsDriverEvent: 'Promotion',
+  settingsPointEvent: 'TrendCharts',
   settingsAbout: 'InfoFilled',
   settingsUserDetail: 'User',
   settingsRoleDetail: 'UserFilled',
@@ -133,6 +135,7 @@ export const SETTINGS_EVENT_CHILDREN: SettingsNavNode[] = [
   { name: 'settingsEventOverview', titleKey: 'nav.settingsEventOverview', icon: 'DataLine' },
   { name: 'settingsDriverEvent', titleKey: 'nav.settingsDriverEvent', icon: 'Promotion' },
   { name: 'settingsDeviceEvent', titleKey: 'nav.settingsDeviceEvent', icon: 'Management' },
+  { name: 'settingsPointEvent', titleKey: 'nav.settingsPointEvent', icon: 'TrendCharts' },
 ];
 
 export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
@@ -184,6 +187,7 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   settingsEventOverview: 'settingsEvent',
   settingsDeviceEvent: 'settingsEvent',
   settingsDriverEvent: 'settingsEvent',
+  settingsPointEvent: 'settingsEvent',
 };
 
 export const getSettingsRouteName = (name: string): string => SETTINGS_ROUTE_ALIAS[name] || name;
@@ -274,4 +278,5 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
   settingsEvent: [eventParent],
   settingsDeviceEvent: [eventParent],
   settingsDriverEvent: [eventParent],
+  settingsPointEvent: [eventParent],
 };

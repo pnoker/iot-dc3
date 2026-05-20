@@ -30,15 +30,15 @@
   import { Chart } from '@antv/g2';
 
   import { alertTopSources } from '@/api/dashboard';
-  import { listDeviceByIds } from '@/api/device';
-  import { listDriverByIds } from '@/api/driver';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useEntityNames } from '@/composables/useEntityNames';
 
   const props = defineProps<{ days?: number; limit?: number }>();
 
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
+  const { resolveBySource, nameBySource } = useEntityNames();
 
   const render = (data: { name: string; count: number }[]) => {
     const el = chartRef.value;
@@ -68,40 +68,10 @@
       const res: any = await alertTopSources(props.days ?? 30, props.limit ?? 10);
       const rows: any[] = res?.data ?? [];
 
-      // Resolve names
-      const devIds = rows.filter((r) => r.source === 'device').map((r) => String(r.sourceId));
-      const drvIds = rows.filter((r) => r.source === 'driver').map((r) => String(r.sourceId));
-      const nameMap: Record<string, string> = {};
-
-      const jobs: Promise<void>[] = [];
-      if (devIds.length) {
-        jobs.push(
-          listDeviceByIds(devIds)
-            .then((r: any) => {
-              const d = r?.data || {};
-              for (const id of devIds) {
-                nameMap[`device:${id}`] = d[id]?.deviceName || id;
-              }
-            })
-            .catch(() => {})
-        );
-      }
-      if (drvIds.length) {
-        jobs.push(
-          listDriverByIds(drvIds)
-            .then((r: any) => {
-              const d = r?.data || {};
-              for (const id of drvIds) {
-                nameMap[`driver:${id}`] = d[id]?.driverName || id;
-              }
-            })
-            .catch(() => {})
-        );
-      }
-      await Promise.all(jobs);
+      await resolveBySource(rows);
 
       const chartData = rows.map((r: any) => ({
-        name: nameMap[`${r.source}:${r.sourceId}`] || String(r.sourceId),
+        name: nameBySource(r.source, r.sourceId),
         count: r.count ?? 0,
       }));
       await nextTick();
