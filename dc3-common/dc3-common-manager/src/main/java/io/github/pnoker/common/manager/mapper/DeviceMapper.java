@@ -26,7 +26,7 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_device table, with paginated queries filtered by profile.
  * </p>
  *
  * @author pnoker

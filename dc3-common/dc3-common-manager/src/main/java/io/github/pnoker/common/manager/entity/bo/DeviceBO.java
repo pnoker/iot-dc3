@@ -30,7 +30,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * BO
+ * Business object for device operations.
  *
  * @author pnoker
  * @version 2025.9.0

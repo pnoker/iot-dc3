@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.DriverAttributeConfigDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_driver_attribute_config table.
  * </p>
  *
  * @author pnoker

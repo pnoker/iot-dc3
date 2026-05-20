@@ -60,7 +60,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Controller
+ * REST controller exposing device management endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

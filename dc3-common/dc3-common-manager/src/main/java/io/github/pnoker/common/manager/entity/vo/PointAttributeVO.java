@@ -34,7 +34,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * BO
+ * View object for point attribute API responses.
  *
  * @author pnoker
  * @version 2025.9.0

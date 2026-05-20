@@ -23,7 +23,7 @@ import io.github.pnoker.common.manager.entity.model.DeviceDO;
 
 /**
  * <p>
- *
+ * Persistence manager for device CRUD operations.
  * </p>
  *
  * @author pnoker

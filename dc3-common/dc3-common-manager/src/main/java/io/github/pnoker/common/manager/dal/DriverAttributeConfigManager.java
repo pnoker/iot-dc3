@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.DriverAttributeConfigDO;
 
 /**
  * <p>
- *
+ * Persistence manager for driver attribute config CRUD operations.
  * </p>
  *
  * @author pnoker

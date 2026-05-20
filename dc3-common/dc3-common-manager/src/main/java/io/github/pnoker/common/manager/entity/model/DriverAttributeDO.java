@@ -34,7 +34,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- *
+ * Persistence object for the dc3_driver_attribute table.
  * </p>
  *
  * @author pnoker
