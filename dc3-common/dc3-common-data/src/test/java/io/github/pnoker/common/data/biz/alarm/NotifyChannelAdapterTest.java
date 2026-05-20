@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
-import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
+import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +39,7 @@ class NotifyChannelAdapterTest {
         NotifySendResult result = adapter.send(channel, new MessagePayload(null, "JSON", Map.of("text", "hello"),
                 java.util.List.of()));
 
-        assertThat(result.getStatusFlag()).isEqualTo(NotifyRecordStatusEnum.FAILED);
+        assertThat(result.getStatusFlag()).isEqualTo(NotifyHistoryStatusEnum.FAILED);
         assertThat(result.getErrorMessage()).contains("credential");
     }
 
@@ -57,7 +57,7 @@ class NotifyChannelAdapterTest {
         NotifySendResult result = adapter.send(channel, new MessagePayload(null, "CARD", Map.of("title", "hello"),
                 java.util.List.of()));
 
-        assertThat(result.getStatusFlag()).isEqualTo(NotifyRecordStatusEnum.FAILED);
+        assertThat(result.getStatusFlag()).isEqualTo(NotifyHistoryStatusEnum.FAILED);
         assertThat(result.getErrorMessage()).contains("secret");
     }
 

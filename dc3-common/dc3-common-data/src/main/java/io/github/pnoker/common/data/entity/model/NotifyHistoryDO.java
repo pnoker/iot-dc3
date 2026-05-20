@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Notification delivery record.
+ * Notification delivery history.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,8 +42,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_notify_record", autoResultMap = true)
-public class NotifyRecordDO implements Serializable {
+@TableName(value = "dc3_notify_history", autoResultMap = true)
+public class NotifyHistoryDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

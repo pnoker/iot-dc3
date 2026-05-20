@@ -18,14 +18,14 @@
 package io.github.pnoker.common.data.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.bo.NotifyRecordBO;
-import io.github.pnoker.common.data.entity.model.NotifyRecordDO;
-import io.github.pnoker.common.data.entity.vo.NotifyRecordVO;
+import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
+import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
+import io.github.pnoker.common.data.entity.vo.NotifyHistoryVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.entity.ext.NotifyRecordRequestExt;
-import io.github.pnoker.common.entity.ext.NotifyRecordResponseExt;
+import io.github.pnoker.common.entity.ext.NotifyHistoryRequestExt;
+import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
+import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -39,66 +39,66 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Notification delivery record builder.
+ * Notification delivery history builder.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
-public interface NotifyRecordBuilder {
+public interface NotifyHistoryBuilder {
 
     @Mapping(target = "tenantId", ignore = true)
-    NotifyRecordBO buildBOByVO(NotifyRecordVO entityVO);
+    NotifyHistoryBO buildBOByVO(NotifyHistoryVO entityVO);
 
-    List<NotifyRecordBO> buildBOListByVOList(List<NotifyRecordVO> entityVOList);
+    List<NotifyHistoryBO> buildBOListByVOList(List<NotifyHistoryVO> entityVOList);
 
     @Mapping(target = "requestExt", ignore = true)
     @Mapping(target = "responseExt", ignore = true)
     @Mapping(target = "channelTypeFlag", ignore = true)
     @Mapping(target = "statusFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    NotifyRecordDO buildDOByBO(NotifyRecordBO entityBO);
+    NotifyHistoryDO buildDOByBO(NotifyHistoryBO entityBO);
 
     @AfterMapping
-    default void afterProcess(NotifyRecordBO entityBO, @MappingTarget NotifyRecordDO entityDO) {
+    default void afterProcess(NotifyHistoryBO entityBO, @MappingTarget NotifyHistoryDO entityDO) {
         entityDO.setRequestExt(buildRequestExt(entityBO.getRequestExt()));
         entityDO.setResponseExt(buildResponseExt(entityBO.getResponseExt()));
 
         NotifyChannelTypeFlagEnum channelTypeFlag = entityBO.getChannelTypeFlag();
         Optional.ofNullable(channelTypeFlag).ifPresent(value -> entityDO.setChannelTypeFlag(value.getIndex()));
 
-        NotifyRecordStatusEnum statusFlag = entityBO.getStatusFlag();
+        NotifyHistoryStatusEnum statusFlag = entityBO.getStatusFlag();
         Optional.ofNullable(statusFlag).ifPresent(value -> entityDO.setStatusFlag(value.getIndex()));
     }
 
-    List<NotifyRecordDO> buildDOListByBOList(List<NotifyRecordBO> entityBOList);
+    List<NotifyHistoryDO> buildDOListByBOList(List<NotifyHistoryBO> entityBOList);
 
     @Mapping(target = "requestExt", ignore = true)
     @Mapping(target = "responseExt", ignore = true)
     @Mapping(target = "channelTypeFlag", ignore = true)
     @Mapping(target = "statusFlag", ignore = true)
-    NotifyRecordBO buildBOByDO(NotifyRecordDO entityDO);
+    NotifyHistoryBO buildBOByDO(NotifyHistoryDO entityDO);
 
     @AfterMapping
-    default void afterProcess(NotifyRecordDO entityDO, @MappingTarget NotifyRecordBO entityBO) {
+    default void afterProcess(NotifyHistoryDO entityDO, @MappingTarget NotifyHistoryBO entityBO) {
         JsonExt requestExt = entityDO.getRequestExt();
         if (Objects.nonNull(requestExt)) {
-            NotifyRecordRequestExt ext = new NotifyRecordRequestExt();
+            NotifyHistoryRequestExt ext = new NotifyHistoryRequestExt();
             ext.setType(requestExt.getType());
             ext.setVersion(requestExt.getVersion());
             ext.setRemark(requestExt.getRemark());
-            ext.setContent(JsonUtil.parseObject(requestExt.getContent(), NotifyRecordRequestExt.Content.class));
+            ext.setContent(JsonUtil.parseObject(requestExt.getContent(), NotifyHistoryRequestExt.Content.class));
             entityBO.setRequestExt(ext);
         }
 
         JsonExt responseExt = entityDO.getResponseExt();
         if (Objects.nonNull(responseExt)) {
-            NotifyRecordResponseExt ext = new NotifyRecordResponseExt();
+            NotifyHistoryResponseExt ext = new NotifyHistoryResponseExt();
             ext.setType(responseExt.getType());
             ext.setVersion(responseExt.getVersion());
             ext.setRemark(responseExt.getRemark());
-            ext.setContent(JsonUtil.parseObject(responseExt.getContent(), NotifyRecordResponseExt.Content.class));
+            ext.setContent(JsonUtil.parseObject(responseExt.getContent(), NotifyHistoryResponseExt.Content.class));
             entityBO.setResponseExt(ext);
         }
 
@@ -106,24 +106,24 @@ public interface NotifyRecordBuilder {
         entityBO.setChannelTypeFlag(NotifyChannelTypeFlagEnum.ofIndex(channelTypeFlag));
 
         Byte statusFlag = entityDO.getStatusFlag();
-        entityBO.setStatusFlag(NotifyRecordStatusEnum.ofIndex(statusFlag));
+        entityBO.setStatusFlag(NotifyHistoryStatusEnum.ofIndex(statusFlag));
     }
 
-    List<NotifyRecordBO> buildBOListByDOList(List<NotifyRecordDO> entityDOList);
+    List<NotifyHistoryBO> buildBOListByDOList(List<NotifyHistoryDO> entityDOList);
 
-    NotifyRecordVO buildVOByBO(NotifyRecordBO entityBO);
+    NotifyHistoryVO buildVOByBO(NotifyHistoryBO entityBO);
 
-    List<NotifyRecordVO> buildVOListByBOList(List<NotifyRecordBO> entityBOList);
+    List<NotifyHistoryVO> buildVOListByBOList(List<NotifyHistoryBO> entityBOList);
 
-    default Page<NotifyRecordBO> buildBOPageByDOPage(Page<NotifyRecordDO> entityPageDO) {
+    default Page<NotifyHistoryBO> buildBOPageByDOPage(Page<NotifyHistoryDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
-    default Page<NotifyRecordVO> buildVOPageByBOPage(Page<NotifyRecordBO> entityPageBO) {
+    default Page<NotifyHistoryVO> buildVOPageByBOPage(Page<NotifyHistoryBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }
 
-    default JsonExt buildRequestExt(NotifyRecordRequestExt entityExt) {
+    default JsonExt buildRequestExt(NotifyHistoryRequestExt entityExt) {
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
@@ -134,7 +134,7 @@ public interface NotifyRecordBuilder {
         return ext;
     }
 
-    default JsonExt buildResponseExt(NotifyRecordResponseExt entityExt) {
+    default JsonExt buildResponseExt(NotifyHistoryResponseExt entityExt) {
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());

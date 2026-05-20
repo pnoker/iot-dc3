@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.data.entity.bo.NotifyRecordBO;
+import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 
 import java.util.List;
 
@@ -34,8 +34,8 @@ public interface RuleNotificationService {
      * Notify channels for one rule match.
      *
      * @param match rule match
-     * @return persisted notify records
+     * @return persisted notify histories
      */
-    List<NotifyRecordBO> notify(RuleMatch match);
+    List<NotifyHistoryBO> notify(RuleMatch match);
 
 }

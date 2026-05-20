@@ -75,7 +75,7 @@ class IndexedEnumContractTest {
             MetadataOperateTypeEnum.class,
             MetadataTypeEnum.class,
             NotifyChannelTypeFlagEnum.class,
-            NotifyRecordStatusEnum.class,
+            NotifyHistoryStatusEnum.class,
             PointTypeFlagEnum.class,
             ProfileShareFlagEnum.class,
             ProfileTypeFlagEnum.class,

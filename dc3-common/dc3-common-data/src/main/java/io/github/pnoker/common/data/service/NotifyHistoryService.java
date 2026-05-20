@@ -15,18 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.dal;
+package io.github.pnoker.common.data.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import io.github.pnoker.common.data.entity.model.NotifyRecordDO;
+import io.github.pnoker.common.base.service.BaseService;
+import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
+import io.github.pnoker.common.data.entity.query.NotifyHistoryQuery;
 
 /**
- * Notification delivery record manager.
+ * Notification delivery history service.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface NotifyRecordManager extends IService<NotifyRecordDO> {
+public interface NotifyHistoryService extends BaseService<NotifyHistoryBO, NotifyHistoryQuery> {
 
 }

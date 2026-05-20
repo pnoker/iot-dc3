@@ -35,7 +35,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NotifyRecordResponseExt extends BaseExt {
+public class NotifyHistoryResponseExt extends BaseExt {
 
     /**
      * Extended content.

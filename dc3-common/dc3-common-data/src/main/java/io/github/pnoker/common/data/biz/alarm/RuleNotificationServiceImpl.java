@@ -24,33 +24,33 @@ import io.github.pnoker.common.data.dal.MessageManager;
 import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
 import io.github.pnoker.common.data.dal.NotifyChannelManager;
 import io.github.pnoker.common.data.dal.NotifyManager;
-import io.github.pnoker.common.data.dal.NotifyRecordManager;
+import io.github.pnoker.common.data.dal.NotifyHistoryManager;
 import io.github.pnoker.common.data.dal.RuleStateManager;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
-import io.github.pnoker.common.data.entity.bo.NotifyRecordBO;
+import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.bo.RuleStateBO;
 import io.github.pnoker.common.data.entity.builder.MessageBuilder;
 import io.github.pnoker.common.data.entity.builder.NotifyBuilder;
 import io.github.pnoker.common.data.entity.builder.NotifyChannelBindBuilder;
 import io.github.pnoker.common.data.entity.builder.NotifyChannelBuilder;
-import io.github.pnoker.common.data.entity.builder.NotifyRecordBuilder;
+import io.github.pnoker.common.data.entity.builder.NotifyHistoryBuilder;
 import io.github.pnoker.common.data.entity.builder.RuleStateBuilder;
 import io.github.pnoker.common.data.entity.model.MessageDO;
 import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
 import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
-import io.github.pnoker.common.data.entity.model.NotifyRecordDO;
+import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.entity.ext.NotifyExt;
-import io.github.pnoker.common.entity.ext.NotifyRecordRequestExt;
-import io.github.pnoker.common.entity.ext.NotifyRecordResponseExt;
+import io.github.pnoker.common.entity.ext.NotifyHistoryRequestExt;
+import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
 import io.github.pnoker.common.entity.ext.RuleStateExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
+import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.enums.RuleStateFlagEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -108,10 +108,10 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
     private RuleStateBuilder ruleStateBuilder;
 
     @Resource
-    private NotifyRecordManager notifyRecordManager;
+    private NotifyHistoryManager notifyHistoryManager;
 
     @Resource
-    private NotifyRecordBuilder notifyRecordBuilder;
+    private NotifyHistoryBuilder notifyHistoryBuilder;
 
     @Resource
     private NotifyPolicyEngine notifyPolicyEngine;
@@ -127,7 +127,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<NotifyRecordBO> notify(RuleMatch match) {
+    public List<NotifyHistoryBO> notify(RuleMatch match) {
         if (Objects.isNull(match) || Objects.isNull(match.getRule()) || Objects.isNull(match.getFact())) {
             return List.of();
         }
@@ -143,7 +143,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
 
         MessageBO message = loadMessage(rule.getMessageId());
         List<NotifyChannelBindBO> binds = loadEnabledBinds(notify);
-        List<NotifyRecordBO> records = new ArrayList<>();
+        List<NotifyHistoryBO> histories = new ArrayList<>();
         for (NotifyChannelBindBO bind : binds) {
             NotifyChannelBO channel = loadChannel(bind.getChannelId(), bind.getTenantId());
             if (Objects.isNull(channel)) {
@@ -152,19 +152,19 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                 continue;
             }
             if (!EnableFlagEnum.ENABLE.equals(channel.getEnableFlag())) {
-                records.add(recordSkipped(match, notify, message, bind, channel, variables,
+                histories.add(historySkipped(match, notify, message, bind, channel, variables,
                         "Notify channel is disabled"));
                 continue;
             }
             if (Objects.isNull(message)) {
-                records.add(recordSkipped(match, notify, null, bind, channel, variables,
+                histories.add(historySkipped(match, notify, null, bind, channel, variables,
                         "Message template does not exist"));
                 continue;
             }
 
             NotifyDecision decision = notifyPolicyEngine.decide(match, notify, bind, state, LocalDateTime.now());
             if (!decision.isSend()) {
-                records.add(recordSkipped(match, notify, message, bind, channel, variables, decision.getReason()));
+                histories.add(historySkipped(match, notify, message, bind, channel, variables, decision.getReason()));
                 continue;
             }
 
@@ -172,14 +172,14 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
             NotifySendResult result = notifyChannelAdapterRegistry.find(channel.getChannelTypeFlag())
                     .map(adapter -> adapter.send(channel, payload))
                     .orElseGet(() -> NotifySendResult.failed(channel.getCredentialRef(), "Notify channel adapter is missing"));
-            NotifyRecordBO record = persistRecord(match, notify, message, bind, channel, payload, variables, result);
-            records.add(record);
-            if (NotifyRecordStatusEnum.SUCCESS.equals(result.getStatusFlag())) {
+            NotifyHistoryBO history = persistHistory(match, notify, message, bind, channel, payload, variables, result);
+            histories.add(history);
+            if (NotifyHistoryStatusEnum.SUCCESS.equals(result.getStatusFlag())) {
                 state.setLastNotifyTime(LocalDateTime.now());
                 persistState(state);
             }
         }
-        return records;
+        return histories;
     }
 
     private NotifyBO loadNotify(Long notifyId) {
@@ -302,7 +302,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                 + fact.getEntityId();
     }
 
-    private NotifyRecordBO recordSkipped(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
+    private NotifyHistoryBO historySkipped(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
                                          NotifyChannelBO channel, Map<String, Object> variables, String reason) {
         MessagePayload payload = new MessagePayload(
                 Objects.nonNull(channel) ? channel.getChannelTypeFlag() : null,
@@ -312,38 +312,38 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         NotifySendResult result = NotifySendResult.skipped(
                 Objects.nonNull(channel) ? channel.getCredentialRef() : "notify-channel:" + bind.getChannelId(),
                 reason);
-        return persistRecord(match, notify, message, bind, channel, payload, variables, result);
+        return persistHistory(match, notify, message, bind, channel, payload, variables, result);
     }
 
-    private NotifyRecordBO persistRecord(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
+    private NotifyHistoryBO persistHistory(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
                                          NotifyChannelBO channel, MessagePayload payload, Map<String, Object> variables,
                                          NotifySendResult result) {
-        NotifyRecordBO record = new NotifyRecordBO();
-        record.setRuleId(match.getRule().getId());
-        record.setNotifyId(Objects.nonNull(notify) ? notify.getId() : DEFAULT_ID);
-        record.setMessageId(Objects.nonNull(message) ? message.getId()
+        NotifyHistoryBO history = new NotifyHistoryBO();
+        history.setRuleId(match.getRule().getId());
+        history.setNotifyId(Objects.nonNull(notify) ? notify.getId() : DEFAULT_ID);
+        history.setMessageId(Objects.nonNull(message) ? message.getId()
                 : Objects.requireNonNullElse(match.getRule().getMessageId(), DEFAULT_ID));
-        record.setChannelId(Objects.nonNull(channel) ? channel.getId() : bind.getChannelId());
-        record.setEventId(Objects.requireNonNullElse(match.getFact().getEventId(), DEFAULT_ID));
-        record.setChannelTypeFlag(Objects.nonNull(channel) ? channel.getChannelTypeFlag() : payload.getChannelTypeFlag());
-        record.setTarget(Objects.toString(result.getTarget(), ""));
-        record.setStatusFlag(result.getStatusFlag());
-        record.setRequestExt(requestExt(payload, variables));
-        record.setResponseExt(responseExt(result));
-        record.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
-        record.setRetryCount(0);
-        record.setTenantId(match.getFact().getTenantId());
-        NotifyRecordDO entityDO = notifyRecordBuilder.buildDOByBO(record);
-        notifyRecordManager.save(entityDO);
-        return notifyRecordBuilder.buildBOByDO(entityDO);
+        history.setChannelId(Objects.nonNull(channel) ? channel.getId() : bind.getChannelId());
+        history.setEventId(Objects.requireNonNullElse(match.getFact().getEventId(), DEFAULT_ID));
+        history.setChannelTypeFlag(Objects.nonNull(channel) ? channel.getChannelTypeFlag() : payload.getChannelTypeFlag());
+        history.setTarget(Objects.toString(result.getTarget(), ""));
+        history.setStatusFlag(result.getStatusFlag());
+        history.setRequestExt(requestExt(payload, variables));
+        history.setResponseExt(responseExt(result));
+        history.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
+        history.setRetryCount(0);
+        history.setTenantId(match.getFact().getTenantId());
+        NotifyHistoryDO entityDO = notifyHistoryBuilder.buildDOByBO(history);
+        notifyHistoryManager.save(entityDO);
+        return notifyHistoryBuilder.buildBOByDO(entityDO);
     }
 
-    private NotifyRecordRequestExt requestExt(MessagePayload payload, Map<String, Object> variables) {
-        NotifyRecordRequestExt ext = new NotifyRecordRequestExt();
-        ext.setType(AlarmConstant.EXT_NOTIFY_RECORD_REQUEST);
+    private NotifyHistoryRequestExt requestExt(MessagePayload payload, Map<String, Object> variables) {
+        NotifyHistoryRequestExt ext = new NotifyHistoryRequestExt();
+        ext.setType(AlarmConstant.EXT_NOTIFY_HISTORY_REQUEST);
         ext.setVersion(1);
         Map<String, Object> renderedPayload = Objects.requireNonNullElse(payload.getPayload(), Map.of());
-        ext.setContent(new NotifyRecordRequestExt.Content(
+        ext.setContent(new NotifyHistoryRequestExt.Content(
                 Objects.toString(renderedPayload.get("title"), ""),
                 Objects.toString(renderedPayload.getOrDefault("summary", renderedPayload.getOrDefault("text", ""))),
                 payload.getPayloadType(),
@@ -352,11 +352,11 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         return ext;
     }
 
-    private NotifyRecordResponseExt responseExt(NotifySendResult result) {
-        NotifyRecordResponseExt ext = new NotifyRecordResponseExt();
-        ext.setType(AlarmConstant.EXT_NOTIFY_RECORD_RESPONSE);
+    private NotifyHistoryResponseExt responseExt(NotifySendResult result) {
+        NotifyHistoryResponseExt ext = new NotifyHistoryResponseExt();
+        ext.setType(AlarmConstant.EXT_NOTIFY_HISTORY_RESPONSE);
         ext.setVersion(1);
-        ext.setContent(new NotifyRecordResponseExt.Content(
+        ext.setContent(new NotifyHistoryResponseExt.Content(
                 result.getProviderMessageId(),
                 result.getStatusCode(),
                 result.getStatusMessage(),
