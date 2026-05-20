@@ -24,7 +24,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import java.util.List;
 
 /**
- * TenantBind Interface
+ * Business service for tenant binding operations.
  *
  * @author pnoker
  * @version 2025.9.0

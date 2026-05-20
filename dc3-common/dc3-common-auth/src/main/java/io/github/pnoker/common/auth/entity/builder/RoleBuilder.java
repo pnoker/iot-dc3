@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Role Builder
+ * MapStruct builder converting between role BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

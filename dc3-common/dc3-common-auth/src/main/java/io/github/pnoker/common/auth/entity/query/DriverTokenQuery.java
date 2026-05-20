@@ -31,7 +31,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * DriverToken Query
+ * Query parameters for driver token listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

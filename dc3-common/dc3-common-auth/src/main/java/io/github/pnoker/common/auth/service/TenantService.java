@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.query.TenantQuery;
 import io.github.pnoker.common.base.service.BaseService;
 
 /**
- * Tenant Interface
+ * Business service for tenant operations.
  *
  * @author pnoker
  * @version 2025.9.0

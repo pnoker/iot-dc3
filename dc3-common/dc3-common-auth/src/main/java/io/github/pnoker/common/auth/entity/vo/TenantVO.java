@@ -33,7 +33,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Tenant VO
+ * View object for tenant API responses.
  *
  * @author pnoker
  * @version 2025.9.0

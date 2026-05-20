@@ -36,7 +36,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Menu VO
+ * View object for menu API responses.
  *
  * @author pnoker
  * @version 2025.9.0

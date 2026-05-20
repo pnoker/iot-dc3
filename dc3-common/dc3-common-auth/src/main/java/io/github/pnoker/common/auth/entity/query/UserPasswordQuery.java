@@ -29,7 +29,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * UserPassword Query
+ * Query parameters for user password listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

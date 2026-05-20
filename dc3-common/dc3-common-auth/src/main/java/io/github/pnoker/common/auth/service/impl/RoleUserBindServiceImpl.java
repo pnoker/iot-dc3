@@ -54,6 +54,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * Business service implementation for role-user binding operations.
+ *
  * @author linys
  * @version 2025.9.0
  * @since 2016.10.1

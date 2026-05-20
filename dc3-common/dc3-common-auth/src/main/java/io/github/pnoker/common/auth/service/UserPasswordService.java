@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.query.UserPasswordQuery;
 import io.github.pnoker.common.base.service.BaseService;
 
 /**
- * UserPassword Interface
+ * Business service for user password operations.
  *
  * @author pnoker
  * @version 2025.9.0

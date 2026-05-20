@@ -26,7 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * UserLogin BO
+ * Business object for user login record operations.
  *
  * @author pnoker
  * @version 2025.9.0

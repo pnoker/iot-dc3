@@ -40,7 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Api Builder
+ * MapStruct builder converting between API BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

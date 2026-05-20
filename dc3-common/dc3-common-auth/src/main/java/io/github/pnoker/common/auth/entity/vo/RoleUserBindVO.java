@@ -29,7 +29,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * RoleUserBind VO
+ * View object for role-user binding API responses.
  *
  * @author pnoker
  * @version 2025.9.0

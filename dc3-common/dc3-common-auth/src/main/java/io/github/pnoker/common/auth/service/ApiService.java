@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.query.ApiQuery;
 import io.github.pnoker.common.base.service.BaseService;
 
 /**
- * Api Interface
+ * Business service for API operations.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * User Builder
+ * MapStruct builder converting between user BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

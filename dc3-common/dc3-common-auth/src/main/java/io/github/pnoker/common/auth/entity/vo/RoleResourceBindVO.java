@@ -29,7 +29,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * RoleResourceBind VO
+ * View object for role-resource binding API responses.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * GenerateTokenVO
+ * Query parameters for token validation and generation.
  *
  * @author pnoker
  * @version 2025.9.0

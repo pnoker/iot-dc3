@@ -31,7 +31,7 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * GrpcUser Builder
+ * MapStruct builder for user gRPC message conversion.
  *
  * @author pnoker
  * @version 2025.9.0

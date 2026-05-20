@@ -27,7 +27,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import java.util.List;
 
 /**
- * RoleUserBind Interface
+ * Business service for role-user binding operations.
  *
  * @author linys
  * @version 2025.9.0

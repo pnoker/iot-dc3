@@ -29,7 +29,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * TenantBind VO
+ * View object for tenant binding API responses.
  *
  * @author pnoker
  * @version 2025.9.0

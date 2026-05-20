@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.TenantBindDO;
 
 /**
  * <p>
- * Tenant
+ * Persistence manager for tenant binding CRUD operations.
  * </p>
  *
  * @author pnoker

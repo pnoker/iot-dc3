@@ -29,7 +29,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * DriverToken BO
+ * Business object for driver token operations.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * UserLogin Builder
+ * MapStruct builder converting between user login record BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

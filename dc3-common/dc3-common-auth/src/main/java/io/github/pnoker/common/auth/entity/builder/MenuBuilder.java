@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Menu Builder
+ * MapStruct builder converting between menu BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -54,7 +54,7 @@ import java.util.Objects;
 
 /**
  * <p>
- * Menu Service Impl
+ * Business service implementation for menu operations.
  * </p>
  *
  * @author pnoker

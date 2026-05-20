@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Role Controller
+ * REST controller exposing role management endpoints.
  *
  * @author pnoker
  * @version 2026.5.17

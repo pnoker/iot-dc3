@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Tenant Builder
+ * MapStruct builder converting between tenant BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0
