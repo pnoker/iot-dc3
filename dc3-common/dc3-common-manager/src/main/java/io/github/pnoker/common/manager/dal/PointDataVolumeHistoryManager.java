@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.PointDataVolumeHistoryDO;
 
 /**
  * <p>
- * Status
+ * Point data volume history table manager.
  * </p>
  *
  * @author fukq

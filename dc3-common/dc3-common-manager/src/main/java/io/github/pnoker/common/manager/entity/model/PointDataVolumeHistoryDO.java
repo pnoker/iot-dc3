@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * Status
+ * Point data volume history persistence object.
  * </p>
  *
  * @author fukq

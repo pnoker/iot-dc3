@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * -
+ * Profile bind persistence object.
  * </p>
  *
  * @author pnoker
