@@ -8,5 +8,7 @@ title: 项目待办
 
 ## 目录
 
+- [类注释统一完善](javadoc-cleanup.md) - 逐模块扫描并修正所有类级 Javadoc，消除空模板、占位符和错误描述
+
 - [物模型改造设计](thing-model-refactor.md) - 基于 `Profile` 扩展属性、服务、事件的改造任务清单
 
