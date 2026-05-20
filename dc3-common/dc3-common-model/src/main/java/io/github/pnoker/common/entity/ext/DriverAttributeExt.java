@@ -23,9 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Driver Attribute Ext
- * <p>
- *
+ * JSON extension object for driver attribute configuration.
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
