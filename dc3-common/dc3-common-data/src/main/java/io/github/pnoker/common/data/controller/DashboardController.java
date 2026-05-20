@@ -151,7 +151,7 @@ public class DashboardController implements BaseController {
             java.time.LocalDateTime from = TimeRangeUtil.resolveFrom(q.getRangeKey(), q.getRangeHours());
             long current = Objects.isNull(q.getCurrent()) ? 1L : q.getCurrent();
             long size = Objects.isNull(q.getSize()) ? 20L : q.getSize();
-            return R.ok(dashboardService.alertPage(tenantId, q.getSource(), q.getEventTypeFlag(),
+            return R.ok(dashboardService.alertPage(tenantId, q.getSource(), q.getAlarmTypeFlag(),
                     q.getConfirmFlag(), from, current, size));
         }));
     }

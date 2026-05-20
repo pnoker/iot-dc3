@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common device event type enumeration.
+ * Common alarm source enumeration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,68 +33,56 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum DeviceEventTypeEnum {
+public enum AlarmSourceFlagEnum {
 
     /**
-     * Heartbeat event.
+     * Rule engine
      */
-    HEARTBEAT((byte) 0, "heartbeat", "heartbeat event"),
+    RULE((byte) 0, "rule", "Rule engine"),
 
     /**
-     * Alarm event.
+     * State timeout
      */
-    ALARM((byte) 1, "alarm", "alarm event"),
+    STATE_TIMEOUT((byte) 1, "state-timeout", "State timeout"),
+
+    /**
+     * Device report
+     */
+    DEVICE_REPORT((byte) 2, "device-report", "Device report"),
+
+    /**
+     * Driver report
+     */
+    DRIVER_REPORT((byte) 3, "driver-report", "Driver report"),
+
+    /**
+     * System
+     */
+    SYSTEM((byte) 4, "system", "System"),
     ;
 
-    /**
-     * Index value stored in database.
-     */
     @EnumValue
     private final Byte index;
 
-    /**
-     * Code string.
-     */
     private final String code;
 
-    /**
-     * Human-readable description.
-     */
     private final String remark;
 
-    /**
-     * Get enum by index value.
-     *
-     * @param index index value
-     * @return {@link DeviceEventTypeEnum} or {@code null} if not found
-     */
-    public static DeviceEventTypeEnum ofIndex(Byte index) {
-        Optional<DeviceEventTypeEnum> any = Arrays.stream(DeviceEventTypeEnum.values())
+    public static AlarmSourceFlagEnum ofIndex(Byte index) {
+        Optional<AlarmSourceFlagEnum> any = Arrays.stream(AlarmSourceFlagEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by code string.
-     *
-     * @param code code string
-     * @return {@link DeviceEventTypeEnum} or {@code null} if not found
-     */
-    public static DeviceEventTypeEnum ofCode(String code) {
-        Optional<DeviceEventTypeEnum> any = Arrays.stream(DeviceEventTypeEnum.values())
+    public static AlarmSourceFlagEnum ofCode(String code) {
+        Optional<AlarmSourceFlagEnum> any = Arrays.stream(AlarmSourceFlagEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by enum name.
-     *
-     * @param name enum name
-     * @return {@link DeviceEventTypeEnum} or {@code null} if parsing fails
-     */
-    public static DeviceEventTypeEnum ofName(String name) {
+    public static AlarmSourceFlagEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

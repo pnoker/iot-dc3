@@ -107,7 +107,7 @@ public interface DashboardService {
      * ({@code current / size / total / pages / records}).
      */
     com.baomidou.mybatisplus.extension.plugins.pagination.Page<AlertItemVO> alertPage(Long tenantId, String source,
-                                                                                      Integer eventTypeFlag, Integer confirmFlag, java.time.LocalDateTime from, long current, long size);
+                                                                                      Integer alarmTypeFlag, Integer confirmFlag, java.time.LocalDateTime from, long current, long size);
 
     /**
      * Flip confirm_flag = 1 on a single event row. Returns true when the row was actually

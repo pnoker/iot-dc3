@@ -44,13 +44,23 @@ import org.springframework.context.annotation.Bean;
 public class ExchangeConfig {
 
     /**
-     * Event exchange for platform-side load balancing
+     * State exchange for platform-side load balancing
      *
-     * @return TopicExchange bean for event messages
+     * @return TopicExchange bean for state messages
      */
     @Bean
-    TopicExchange eventExchange() {
-        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_EVENT, true, false);
+    TopicExchange stateExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_STATE, true, false);
+    }
+
+    /**
+     * Alarm exchange for platform-side load balancing
+     *
+     * @return TopicExchange bean for alarm messages
+     */
+    @Bean
+    TopicExchange alarmExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_ALARM, true, false);
     }
 
     /**

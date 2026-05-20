@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Alert aggregate queries over {@code dc3_device_event} and {@code dc3_driver_event}.
+ * Alert aggregate queries over the unified {@code dc3_entity_alarm} table.
  * Returns typed Row DTOs — see {@code entity/bo/dashboard/} — with MyBatis snake→camel
  * mapping.
  *
@@ -47,11 +47,11 @@ public interface AlertMapper {
     List<HourCountRow> hourlyCounts(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from);
 
     List<AlertItemRow> listPaged(@Param("tenantId") Long tenantId, @Param("source") String source,
-                                 @Param("eventTypeFlag") Integer eventTypeFlag, @Param("confirmFlag") Integer confirmFlag,
+                                 @Param("alarmTypeFlag") Integer alarmTypeFlag, @Param("confirmFlag") Integer confirmFlag,
                                  @Param("from") LocalDateTime from, @Param("offset") long offset, @Param("size") long size);
 
     long countFiltered(@Param("tenantId") Long tenantId, @Param("source") String source,
-                       @Param("eventTypeFlag") Integer eventTypeFlag, @Param("confirmFlag") Integer confirmFlag,
+                       @Param("alarmTypeFlag") Integer alarmTypeFlag, @Param("confirmFlag") Integer confirmFlag,
                        @Param("from") LocalDateTime from);
 
     List<SourceStatsRow> todayBySource(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from);

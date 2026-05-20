@@ -63,10 +63,15 @@ public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
         RabbitConstant.QUEUE_REGISTER_UP = tag + RabbitConstant.QUEUE_REGISTER_UP;
         RabbitConstant.QUEUE_REGISTER_DOWN_PREFIX = tag + RabbitConstant.QUEUE_REGISTER_DOWN_PREFIX;
 
-        // Event related constants
-        RabbitConstant.TOPIC_EXCHANGE_EVENT = tag + RabbitConstant.TOPIC_EXCHANGE_EVENT;
-        RabbitConstant.QUEUE_DRIVER_EVENT = tag + RabbitConstant.QUEUE_DRIVER_EVENT;
-        RabbitConstant.QUEUE_DEVICE_EVENT = tag + RabbitConstant.QUEUE_DEVICE_EVENT;
+        // State related constants
+        RabbitConstant.TOPIC_EXCHANGE_STATE = tag + RabbitConstant.TOPIC_EXCHANGE_STATE;
+        RabbitConstant.QUEUE_DRIVER_STATE = tag + RabbitConstant.QUEUE_DRIVER_STATE;
+        RabbitConstant.QUEUE_DEVICE_STATE = tag + RabbitConstant.QUEUE_DEVICE_STATE;
+
+        // Alarm related constants
+        RabbitConstant.TOPIC_EXCHANGE_ALARM = tag + RabbitConstant.TOPIC_EXCHANGE_ALARM;
+        RabbitConstant.QUEUE_DRIVER_ALARM = tag + RabbitConstant.QUEUE_DRIVER_ALARM;
+        RabbitConstant.QUEUE_DEVICE_ALARM = tag + RabbitConstant.QUEUE_DEVICE_ALARM;
 
         // Metadata related constants
         RabbitConstant.TOPIC_EXCHANGE_METADATA = tag + RabbitConstant.TOPIC_EXCHANGE_METADATA;

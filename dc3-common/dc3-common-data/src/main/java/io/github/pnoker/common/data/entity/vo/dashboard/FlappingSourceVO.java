@@ -47,7 +47,7 @@ public class FlappingSourceVO implements Serializable {
 
     private long sourceId;
 
-    private int eventTypeFlag;
+    private int alarmTypeFlag;
 
     private long count;
 

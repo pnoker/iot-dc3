@@ -20,8 +20,7 @@ package io.github.pnoker.common.driver.job;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.DriverEventDTO;
-import io.github.pnoker.common.enums.DriverEventTypeEnum;
+import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +29,6 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 /**
- * Quartz job that periodically reports driver heartbeat status to the platform.
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
@@ -49,14 +46,10 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         DriverBO driver = driverMetadata.getDriver();
-        DriverEventDTO.DriverStatus driverStatus = new DriverEventDTO.DriverStatus(driver.getId(),
-                driverMetadata.getDriverStatus());
-        driverStatus.setTenantId(driver.getTenantId());
-        DriverEventDTO driverEventDTO = new DriverEventDTO(DriverEventTypeEnum.HEARTBEAT,
-                JsonUtil.toJsonString(driverStatus));
-        log.info("Report driver event: {}, event content: {}", driverEventDTO.getType().getCode(),
-                JsonUtil.toJsonString(driverEventDTO));
-        driverSenderService.driverEventSender(driverEventDTO);
+        DriverStateDTO driverState = new DriverStateDTO(driver.getId(), driverMetadata.getDriverStatus().getCode());
+        driverState.setTenantId(driver.getTenantId());
+        log.info("Report driver state: {}", JsonUtil.toJsonString(driverState));
+        driverSenderService.driverStateSender(driverState);
     }
 
 }

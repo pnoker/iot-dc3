@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.entity.query;
+package io.github.pnoker.common.entity.dto;
 
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,9 +27,10 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * DriverEvent Query
+ * Driver alarm payload sent over RabbitMQ.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,23 +42,50 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DriverEventQuery implements Serializable {
+public class DriverAlarmDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Pages page;
-
     /**
-     * Tenant ID
+     * Tenant ID the driver belongs to.
      */
     private Long tenantId;
-
-    //
 
     /**
      * Driver ID
      */
     private Long driverId;
+
+    /**
+     * Driver status code (see {@link io.github.pnoker.common.enums.DriverStatusEnum}), may be null.
+     */
+    private String status;
+
+    /**
+     * Driver status name, may be null.
+     */
+    private String statusName;
+
+    /**
+     * Human-readable alarm message.
+     */
+    private String message;
+
+    /**
+     * Alarm Id
+     */
+    private Long alarmId;
+
+    /**
+     * Create Time
+     */
+    private LocalDateTime createTime;
+
+    public DriverAlarmDTO(Long driverId, String message) {
+        this.driverId = driverId;
+        this.message = message;
+        this.createTime = LocalDateTimeUtil.now();
+    }
 
 }

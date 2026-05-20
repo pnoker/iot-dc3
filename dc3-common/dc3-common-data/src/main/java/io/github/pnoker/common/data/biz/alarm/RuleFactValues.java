@@ -18,14 +18,11 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.entity.dto.DeviceEventDTO;
-import io.github.pnoker.common.entity.dto.DriverEventDTO;
-import io.github.pnoker.common.enums.DeviceEventTypeEnum;
-import io.github.pnoker.common.enums.DriverEventTypeEnum;
+import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
+import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Runtime fact value snapshots used by the rule engine.
@@ -52,31 +49,25 @@ final class RuleFactValues {
                 pointValue.getOperateTime()));
     }
 
-    static Map<String, Object> device(DeviceEventDTO.DeviceStatus payload, DeviceEventTypeEnum eventType, String source,
-                                      Long eventId) {
-        return RuleValueMap.from(new DeviceEventSnapshot(
-                payload.getDeviceId(),
-                payload.getDriverId(),
-                Objects.nonNull(payload.getStatus()) ? payload.getStatus().getCode() : null,
-                Objects.nonNull(payload.getStatus()) ? payload.getStatus().name() : null,
-                payload.getMessage(),
-                Objects.nonNull(eventType) ? eventType.getCode() : null,
-                source,
-                eventId,
-                payload.getCreateTime()));
+    static Map<String, Object> deviceAlarm(DeviceAlarmDTO alarm) {
+        return RuleValueMap.from(new DeviceAlarmSnapshot(
+                alarm.getDeviceId(),
+                alarm.getDriverId(),
+                alarm.getStatus(),
+                alarm.getStatusName(),
+                alarm.getMessage(),
+                alarm.getAlarmId(),
+                alarm.getCreateTime()));
     }
 
-    static Map<String, Object> driver(DriverEventDTO.DriverStatus payload, DriverEventTypeEnum eventType, String source,
-                                      Long eventId) {
-        return RuleValueMap.from(new DriverEventSnapshot(
-                payload.getDriverId(),
-                Objects.nonNull(payload.getStatus()) ? payload.getStatus().getCode() : null,
-                Objects.nonNull(payload.getStatus()) ? payload.getStatus().name() : null,
-                payload.getMessage(),
-                Objects.nonNull(eventType) ? eventType.getCode() : null,
-                source,
-                eventId,
-                payload.getCreateTime()));
+    static Map<String, Object> driverAlarm(DriverAlarmDTO alarm) {
+        return RuleValueMap.from(new DriverAlarmSnapshot(
+                alarm.getDriverId(),
+                alarm.getStatus(),
+                alarm.getStatusName(),
+                alarm.getMessage(),
+                alarm.getAlarmId(),
+                alarm.getCreateTime()));
     }
 
     private record PointSnapshot(
@@ -91,26 +82,22 @@ final class RuleFactValues {
             LocalDateTime operateTime) {
     }
 
-    private record DeviceEventSnapshot(
+    private record DeviceAlarmSnapshot(
             Long deviceId,
             Long driverId,
             String status,
             String statusName,
             String message,
-            String eventType,
-            String source,
-            Long eventId,
+            Long alarmId,
             LocalDateTime createTime) {
     }
 
-    private record DriverEventSnapshot(
+    private record DriverAlarmSnapshot(
             Long driverId,
             String status,
             String statusName,
             String message,
-            String eventType,
-            String source,
-            Long eventId,
+            Long alarmId,
             LocalDateTime createTime) {
     }
 

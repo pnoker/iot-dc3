@@ -18,11 +18,9 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.entity.dto.DeviceEventDTO;
-import io.github.pnoker.common.entity.dto.DriverEventDTO;
+import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
+import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.DeviceEventTypeEnum;
-import io.github.pnoker.common.enums.DriverEventTypeEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -61,35 +59,33 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
     }
 
     @Override
-    public void processDeviceEvent(DeviceEventDTO.DeviceStatus payload, DeviceEventTypeEnum eventType, String source,
-                                   Long eventId) {
-        if (Objects.isNull(payload) || !isValidId(payload.getTenantId()) || !isValidId(payload.getDeviceId())) {
+    public void processDeviceAlarm(DeviceAlarmDTO alarm) {
+        if (Objects.isNull(alarm) || !isValidId(alarm.getTenantId()) || !isValidId(alarm.getDeviceId())) {
             return;
         }
 
         process(new RuleFact(
-                payload.getTenantId(),
+                alarm.getTenantId(),
                 AlarmTargetTypeFlagEnum.DEVICE,
-                payload.getDeviceId(),
-                eventId,
-                factTime(payload.getCreateTime()),
-                RuleFactValues.device(payload, eventType, source, eventId)));
+                alarm.getDeviceId(),
+                alarm.getAlarmId(),
+                factTime(alarm.getCreateTime()),
+                RuleFactValues.deviceAlarm(alarm)));
     }
 
     @Override
-    public void processDriverEvent(DriverEventDTO.DriverStatus payload, DriverEventTypeEnum eventType, String source,
-                                   Long eventId) {
-        if (Objects.isNull(payload) || !isValidId(payload.getTenantId()) || !isValidId(payload.getDriverId())) {
+    public void processDriverAlarm(DriverAlarmDTO alarm) {
+        if (Objects.isNull(alarm) || !isValidId(alarm.getTenantId()) || !isValidId(alarm.getDriverId())) {
             return;
         }
 
         process(new RuleFact(
-                payload.getTenantId(),
+                alarm.getTenantId(),
                 AlarmTargetTypeFlagEnum.DRIVER,
-                payload.getDriverId(),
-                eventId,
-                factTime(payload.getCreateTime()),
-                RuleFactValues.driver(payload, eventType, source, eventId)));
+                alarm.getDriverId(),
+                alarm.getAlarmId(),
+                factTime(alarm.getCreateTime()),
+                RuleFactValues.driverAlarm(alarm)));
     }
 
     private void process(RuleFact fact) {

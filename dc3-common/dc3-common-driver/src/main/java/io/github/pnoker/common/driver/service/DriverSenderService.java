@@ -18,8 +18,8 @@
 package io.github.pnoker.common.driver.service;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
-import io.github.pnoker.common.entity.dto.DeviceEventDTO;
-import io.github.pnoker.common.entity.dto.DriverEventDTO;
+import io.github.pnoker.common.entity.dto.DeviceStateDTO;
+import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 
 import java.util.List;
@@ -35,18 +35,18 @@ import java.util.concurrent.TimeUnit;
 public interface DriverSenderService {
 
     /**
-     * Publishes a driver event.
+     * Publishes a driver state heartbeat.
      *
-     * @param entityDTO driver event payload
+     * @param entityDTO driver state payload
      */
-    void driverEventSender(DriverEventDTO entityDTO);
+    void driverStateSender(DriverStateDTO entityDTO);
 
     /**
-     * Publishes a device event.
+     * Publishes a device state heartbeat.
      *
-     * @param entityDTO device event payload
+     * @param entityDTO device state payload
      */
-    void deviceEventSender(DeviceEventDTO entityDTO);
+    void deviceStateSender(DeviceStateDTO entityDTO);
 
     /**
      * Publishes a device status event using the default timeout.

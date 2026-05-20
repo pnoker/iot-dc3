@@ -30,8 +30,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 
 /**
- * Topic Config
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
@@ -41,46 +39,91 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnClass(ExchangeConfig.class)
 public class DataTopicConfig {
 
-    private final TopicExchange eventExchange;
+    private final TopicExchange stateExchange;
+
+    private final TopicExchange alarmExchange;
 
     private final TopicExchange valueExchange;
 
-    public DataTopicConfig(TopicExchange eventExchange, TopicExchange valueExchange) {
-        this.eventExchange = eventExchange;
+    public DataTopicConfig(TopicExchange stateExchange, TopicExchange alarmExchange, TopicExchange valueExchange) {
+        this.stateExchange = stateExchange;
+        this.alarmExchange = alarmExchange;
         this.valueExchange = valueExchange;
     }
 
+    // ===== Driver state =====================================================
+
     @Bean
-    Queue driverEventQueue() {
-        return QueueBuilder.durable(RabbitConstant.QUEUE_DRIVER_EVENT)
+    Queue driverStateQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DRIVER_STATE)
                 .ttl(30000)
                 .build();
     }
 
     @Bean
-    Binding driverEventBinding(Queue driverEventQueue) {
-        Binding binding = BindingBuilder.bind(driverEventQueue)
-                .to(eventExchange)
-                .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
+    Binding driverStateBinding(Queue driverStateQueue) {
+        Binding binding = BindingBuilder.bind(driverStateQueue)
+                .to(stateExchange)
+                .with(RabbitConstant.ROUTING_DRIVER_STATE_PREFIX + SymbolConstant.ASTERISK);
         binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
 
+    // ===== Device state =====================================================
+
     @Bean
-    Queue deviceEventQueue() {
-        return QueueBuilder.durable(RabbitConstant.QUEUE_DEVICE_EVENT)
+    Queue deviceStateQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DEVICE_STATE)
                 .ttl(30000)
                 .build();
     }
 
     @Bean
-    Binding deviceEventBinding(Queue deviceEventQueue) {
-        Binding binding = BindingBuilder.bind(deviceEventQueue)
-                .to(eventExchange)
-                .with(RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + SymbolConstant.ASTERISK);
+    Binding deviceStateBinding(Queue deviceStateQueue) {
+        Binding binding = BindingBuilder.bind(deviceStateQueue)
+                .to(stateExchange)
+                .with(RabbitConstant.ROUTING_DEVICE_STATE_PREFIX + SymbolConstant.ASTERISK);
         binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
+
+    // ===== Driver alarm =====================================================
+
+    @Bean
+    Queue driverAlarmQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DRIVER_ALARM)
+                .ttl(30000)
+                .build();
+    }
+
+    @Bean
+    Binding driverAlarmBinding(Queue driverAlarmQueue) {
+        Binding binding = BindingBuilder.bind(driverAlarmQueue)
+                .to(alarmExchange)
+                .with(RabbitConstant.ROUTING_DRIVER_ALARM_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+        return binding;
+    }
+
+    // ===== Device alarm =====================================================
+
+    @Bean
+    Queue deviceAlarmQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DEVICE_ALARM)
+                .ttl(30000)
+                .build();
+    }
+
+    @Bean
+    Binding deviceAlarmBinding(Queue deviceAlarmQueue) {
+        Binding binding = BindingBuilder.bind(deviceAlarmQueue)
+                .to(alarmExchange)
+                .with(RabbitConstant.ROUTING_DEVICE_ALARM_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+        return binding;
+    }
+
+    // ===== Point value ======================================================
 
     @Bean
     Queue pointValueQueue() {

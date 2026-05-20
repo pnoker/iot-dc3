@@ -29,7 +29,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * DeviceEvent Query
+ * EntityAlarm Query
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,7 +41,7 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeviceEventQuery implements Serializable {
+public class EntityAlarmQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -53,7 +53,15 @@ public class DeviceEventQuery implements Serializable {
      */
     private Long tenantId;
 
-    //
+    /**
+     * Alarm target type flag
+     */
+    private Byte alarmTargetTypeFlag;
+
+    /**
+     * Driver ID
+     */
+    private Long driverId;
 
     /**
      * Device ID

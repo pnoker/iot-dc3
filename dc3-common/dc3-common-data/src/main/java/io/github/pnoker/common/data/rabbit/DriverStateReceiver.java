@@ -18,12 +18,11 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.biz.DeviceEventService;
-import io.github.pnoker.common.entity.dto.DeviceEventDTO;
+import io.github.pnoker.common.data.biz.DriverStateService;
+import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -32,52 +31,36 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * Device Event
- *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
 @Component
-public class DeviceEventReceiver {
+public class DriverStateReceiver {
 
-    private final DeviceEventService deviceEventService;
+    private final DriverStateService driverStateService;
 
-    public DeviceEventReceiver(DeviceEventService deviceEventService) {
-        this.deviceEventService = deviceEventService;
+    public DriverStateReceiver(DriverStateService driverStateService) {
+        this.driverStateService = driverStateService;
     }
 
     @RabbitHandler
-    @RabbitListener(queues = "#{deviceEventQueue.name}")
-    public void deviceEventReceive(Channel channel, Message message, DeviceEventDTO entityDTO) {
+    @RabbitListener(queues = "#{driverStateQueue.name}")
+    public void driverStateReceive(Channel channel, Message message, DriverStateDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            log.debug("Receive device event: {}", JsonUtil.toJsonString(entityDTO));
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getType())
-                    || StringUtils.isEmpty(entityDTO.getContent())) {
-                log.error("Invalid device event: {}", entityDTO);
+            log.debug("Receive driver state: {}", JsonUtil.toJsonString(entityDTO));
+            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())
+                    || Objects.isNull(entityDTO.getStatus())) {
+                log.error("Invalid driver state: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
-
-            switch (entityDTO.getType()) {
-                case HEARTBEAT:
-                    deviceEventService.heartbeatEvent(entityDTO);
-                    break;
-                case ALARM:
-                    deviceEventService.alarmEvent(entityDTO);
-                    break;
-                default:
-                    log.error("Invalid event type, {}", entityDTO.getType());
-                    RabbitAckUtil.reject(channel, deliveryTag);
-                    return;
-            }
+            driverStateService.heartbeat(entityDTO);
             RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
-            log.error("Device event consume failed, type={}, deliveryTag={}, routingKey={}",
-                    Objects.nonNull(entityDTO) ? entityDTO.getType() : null, deliveryTag,
-                    message.getMessageProperties().getReceivedRoutingKey(), e);
+            log.error("Driver state consume failed, deliveryTag={}", deliveryTag, e);
             RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }
