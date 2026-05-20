@@ -30,7 +30,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * GroupBind Query
+ * Query parameters for group binding listing and filtering.
  *
  * @author pnoker
  * @version 2026.5.11

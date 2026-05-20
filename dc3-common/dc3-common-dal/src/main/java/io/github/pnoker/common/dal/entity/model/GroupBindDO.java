@@ -31,9 +31,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * Group and entity binding table entity.
- * </p>
+ * Persistence object for the dc3_group_bind table.
  *
  * @author pnoker
  * @version 2025.9.0

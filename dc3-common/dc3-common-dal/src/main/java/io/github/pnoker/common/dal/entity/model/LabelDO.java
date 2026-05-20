@@ -31,9 +31,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * Label data table entity.
- * </p>
+ * Persistence object for the dc3_label table.
  *
  * @author pnoker
  * @version 2025.9.0

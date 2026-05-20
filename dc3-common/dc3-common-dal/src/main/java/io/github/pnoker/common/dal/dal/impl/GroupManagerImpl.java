@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * Group Manager Service implementation class
+ * MyBatis-Plus manager implementation for the dc3_group table.
  * </p>
  *
  * @author pnoker

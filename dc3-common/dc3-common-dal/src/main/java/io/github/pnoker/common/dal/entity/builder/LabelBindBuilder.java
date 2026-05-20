@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * LabelBind Builder
+ * MapStruct builder converting between label binding BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

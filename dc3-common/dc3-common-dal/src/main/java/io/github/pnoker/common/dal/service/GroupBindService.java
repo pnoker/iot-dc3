@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.bo.GroupBindBO;
 import io.github.pnoker.common.dal.entity.query.GroupBindQuery;
 
 /**
- * GroupBind Interface
+ * Business service for group binding operations.
  *
  * @author pnoker
  * @version 2026.5.11

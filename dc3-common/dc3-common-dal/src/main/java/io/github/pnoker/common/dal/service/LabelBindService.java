@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.bo.LabelBindBO;
 import io.github.pnoker.common.dal.entity.query.LabelBindQuery;
 
 /**
- * LabelBind Interface
+ * Business service for label binding operations.
  *
  * @author pnoker
  * @version 2025.9.0

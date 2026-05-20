@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Group Builder
+ * MapStruct builder converting between group BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * GroupBindService Impl
+ * Business service implementation for group binding operations.
  *
  * @author pnoker
  * @version 2026.5.11

@@ -52,7 +52,7 @@ import java.util.Set;
 
 /**
  * <p>
- * Group Service Impl
+ * Business service implementation for group operations.
  * </p>
  *
  * @author pnoker

@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * LabelBindService Impl
+ * Business service implementation for label binding operations.
  *
  * @author pnoker
  * @version 2025.9.0

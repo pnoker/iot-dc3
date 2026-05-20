@@ -31,7 +31,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Label Query
+ * Query parameters for label listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

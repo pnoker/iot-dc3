@@ -31,7 +31,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Group Query
+ * Query parameters for group listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

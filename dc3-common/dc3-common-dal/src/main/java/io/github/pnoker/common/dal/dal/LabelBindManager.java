@@ -21,9 +21,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 
 /**
- * <p>
- * Label Bind Manager Service implementation class
- * </p>
+ * MyBatis-Plus manager for the dc3_label_bind table.
  *
  * @author pnoker
  * @version 2025.9.0

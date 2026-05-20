@@ -21,9 +21,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.dal.entity.model.GroupDO;
 
 /**
- * <p>
- * Group Manager Service implementation class
- * </p>
+ * MyBatis-Plus manager for the dc3_group table.
  *
  * @author pnoker
  * @version 2025.9.0
