@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Driver status enumeration
+ * Enumeration of driver online/offline/maintenance statuses.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common point type flag enumeration
+ * Enumeration of point type flags.
  *
  * @author pnoker
  * @version 2025.9.0

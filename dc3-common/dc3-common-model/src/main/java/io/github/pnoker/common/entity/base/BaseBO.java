@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Base BO
+ * Base business object providing common fields.
  *
  * @author pnoker
  * @version 2025.9.0

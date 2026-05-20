@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common resource type enumeration
+ * Enumeration of resource type flags.
  *
  * @author pnoker
  * @version 2025.9.0

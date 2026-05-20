@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common device command type enumeration
+ * Enumeration of device command types.
  *
  * @author pnoker
  * @version 2025.9.0

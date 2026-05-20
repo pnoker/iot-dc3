@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
 
 
 /**
- * Manager service constant
+ * Constants for the manager service module.
  *
  * @author pnoker
  * @version 2025.9.0

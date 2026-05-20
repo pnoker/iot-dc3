@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
 
 
 /**
- * RabbitMQ constant
+ * RabbitMQ exchange, queue, and routing key constants for the DC3 platform.
  *
  * @author pnoker
  * @version 2025.9.0

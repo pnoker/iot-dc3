@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common metadata operation type enumeration
+ * Enumeration of metadata operation types.
  *
  * @author pnoker
  * @version 2025.9.0

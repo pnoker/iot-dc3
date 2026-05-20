@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common response enumeration
+ * Enumeration of standard API response codes.
  *
  * @author pnoker
  * @version 2025.9.0

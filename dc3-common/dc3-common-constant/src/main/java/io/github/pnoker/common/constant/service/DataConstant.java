@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
 
 
 /**
- * Data service constant
+ * Constants for the data service module.
  *
  * @author pnoker
  * @version 2025.9.0

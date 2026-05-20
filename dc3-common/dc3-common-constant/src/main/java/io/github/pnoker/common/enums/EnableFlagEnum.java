@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common enable flag enumeration.
+ * Enumeration of enable/disable flag values.
  *
  * @author pnoker
  * @version 2025.9.0

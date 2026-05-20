@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
 
 
 /**
- * Schedule constant
+ * Constants for scheduled job intervals and cron expressions.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Point Attribute Ext
+ * JSON extension object for point attribute configuration.
  * <p>
  * Extended information related to point attributes.
  *

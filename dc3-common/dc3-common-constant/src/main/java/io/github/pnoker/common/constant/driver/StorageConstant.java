@@ -24,7 +24,7 @@ import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 
 /**
- * Storage constant
+ * Constants for point value storage paths and retention policies.
  *
  * @author pnoker
  * @version 2025.9.0

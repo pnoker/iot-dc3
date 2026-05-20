@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
 
 
 /**
- * Event related constants
+ * Constants for driver/device event messaging.
  *
  * @author pnoker
  * @version 2025.9.0

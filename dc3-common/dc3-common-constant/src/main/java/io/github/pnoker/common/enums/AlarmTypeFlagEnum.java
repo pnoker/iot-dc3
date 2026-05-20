@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common alarm type enumeration.
+ * Enumeration of alarm type flags.
  *
  * @author pnoker
  * @version 2025.9.0

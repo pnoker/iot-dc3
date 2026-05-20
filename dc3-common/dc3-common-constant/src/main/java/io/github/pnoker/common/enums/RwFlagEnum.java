@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common read/write flag enumeration
+ * Enumeration of read/write flag values.
  *
  * @author pnoker
  * @version 2025.9.0

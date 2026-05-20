@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common alarm source enumeration.
+ * Enumeration of alarm source flags.
  *
  * @author pnoker
  * @version 2025.9.0

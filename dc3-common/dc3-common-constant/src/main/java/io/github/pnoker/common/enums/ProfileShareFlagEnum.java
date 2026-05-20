@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common profile sharing type flag enumeration
+ * Enumeration of profile sharing type flags.
  *
  * @author pnoker
  * @version 2025.9.0

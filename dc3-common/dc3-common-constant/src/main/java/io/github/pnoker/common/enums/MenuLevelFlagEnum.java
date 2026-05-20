@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common menu level flag enum
+ * Enumeration of menu level flags.
  *
  * @author pnoker
  * @version 2025.9.0

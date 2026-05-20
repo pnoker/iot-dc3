@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Profile Ext
+ * JSON extension object for profile/template configuration.
  * <p>
  * Extended information related to templates.
  *

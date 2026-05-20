@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common default flag enumeration.
+ * Enumeration of default flag values.
  *
  * @author pnoker
  * @version 2026.5.11

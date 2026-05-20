@@ -26,7 +26,7 @@ import lombok.Setter;
 import java.util.Map;
 
 /**
- * Rule alarm event Ext.
+ * JSON extension object for rule alarm event context.
  *
  * @author pnoker
  * @version 2025.9.0

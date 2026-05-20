@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Tenant Ext
+ * JSON extension object for tenant metadata.
  * <p>
  * Extended information related to tenants.
  *
