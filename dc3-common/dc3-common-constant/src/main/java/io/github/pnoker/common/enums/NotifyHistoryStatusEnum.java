@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Notification delivery record status enumeration.
+ * Notification delivery history status enumeration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,7 +33,7 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum NotifyRecordStatusEnum {
+public enum NotifyHistoryStatusEnum {
 
     PENDING((byte) 0, "pending", "Pending"),
 
@@ -53,21 +53,21 @@ public enum NotifyRecordStatusEnum {
 
     private final String remark;
 
-    public static NotifyRecordStatusEnum ofIndex(Byte index) {
-        Optional<NotifyRecordStatusEnum> any = Arrays.stream(NotifyRecordStatusEnum.values())
+    public static NotifyHistoryStatusEnum ofIndex(Byte index) {
+        Optional<NotifyHistoryStatusEnum> any = Arrays.stream(NotifyHistoryStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static NotifyRecordStatusEnum ofCode(String code) {
-        Optional<NotifyRecordStatusEnum> any = Arrays.stream(NotifyRecordStatusEnum.values())
+    public static NotifyHistoryStatusEnum ofCode(String code) {
+        Optional<NotifyHistoryStatusEnum> any = Arrays.stream(NotifyHistoryStatusEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static NotifyRecordStatusEnum ofName(String name) {
+    public static NotifyHistoryStatusEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

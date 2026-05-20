@@ -18,15 +18,15 @@
 package io.github.pnoker.common.data.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.data.entity.model.NotifyRecordDO;
+import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 
 /**
- * Notification delivery record mapper.
+ * Notification delivery history mapper.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface NotifyRecordMapper extends BaseMapper<NotifyRecordDO> {
+public interface NotifyHistoryMapper extends BaseMapper<NotifyHistoryDO> {
 
 }

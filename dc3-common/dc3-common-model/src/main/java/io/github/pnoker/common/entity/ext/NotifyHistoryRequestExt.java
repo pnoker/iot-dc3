@@ -15,24 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.entity.query;
+package io.github.pnoker.common.entity.ext;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.util.Map;
 
 /**
- * Notification delivery record query.
+ * Notification delivery request Ext.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -40,34 +33,46 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-@Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class NotifyRecordQuery implements Serializable {
+public class NotifyHistoryRequestExt extends BaseExt {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    /**
+     * Extended content.
+     */
+    private Content content;
 
-    private Pages page;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Content {
 
-    private Long tenantId;
+        /**
+         * Rendered title.
+         */
+        private String title;
 
-    private Long ruleId;
+        /**
+         * Rendered plain text or markdown summary.
+         */
+        private String text;
 
-    private Long notifyId;
+        /**
+         * Message template type, for example TEXT, MARKDOWN or CARD.
+         */
+        private String templateType;
 
-    private Long messageId;
+        /**
+         * Template variables used during rendering.
+         */
+        private Map<String, Object> variables;
 
-    private Long channelId;
+        /**
+         * Channel request payload after rendering.
+         */
+        private Map<String, Object> payload;
 
-    private Long eventId;
-
-    private NotifyChannelTypeFlagEnum channelTypeFlag;
-
-    private String target;
-
-    private NotifyRecordStatusEnum statusFlag;
+    }
 
 }

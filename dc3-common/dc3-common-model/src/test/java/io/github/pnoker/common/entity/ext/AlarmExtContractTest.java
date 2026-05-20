@@ -144,23 +144,23 @@ class AlarmExtContractTest {
     }
 
     @Test
-    void notifyRecordExtRoundTripsAsRequestAndResponse() {
-        NotifyRecordRequestExt.Content request = new NotifyRecordRequestExt.Content(
+    void notifyHistoryExtRoundTripsAsRequestAndResponse() {
+        NotifyHistoryRequestExt.Content request = new NotifyHistoryRequestExt.Content(
                 "P1 Temperature Alarm",
                 "Line A temperature is 86.5 C",
                 "CARD",
                 Map.of("deviceName", "Line A PLC", "value", 86.5),
                 Map.of("msg_type", "interactive"));
-        NotifyRecordResponseExt.Content response = new NotifyRecordResponseExt.Content(
+        NotifyHistoryResponseExt.Content response = new NotifyHistoryResponseExt.Content(
                 "om_123",
                 200,
                 "ok",
                 Map.of("code", 0));
 
-        NotifyRecordRequestExt.Content parsedRequest = JsonUtil.parseObject(
-                JsonUtil.toJsonString(request), NotifyRecordRequestExt.Content.class);
-        NotifyRecordResponseExt.Content parsedResponse = JsonUtil.parseObject(
-                JsonUtil.toJsonString(response), NotifyRecordResponseExt.Content.class);
+        NotifyHistoryRequestExt.Content parsedRequest = JsonUtil.parseObject(
+                JsonUtil.toJsonString(request), NotifyHistoryRequestExt.Content.class);
+        NotifyHistoryResponseExt.Content parsedResponse = JsonUtil.parseObject(
+                JsonUtil.toJsonString(response), NotifyHistoryResponseExt.Content.class);
 
         assertThat(parsedRequest.getTitle()).isEqualTo("P1 Temperature Alarm");
         assertThat(parsedRequest.getPayload()).containsEntry("msg_type", "interactive");

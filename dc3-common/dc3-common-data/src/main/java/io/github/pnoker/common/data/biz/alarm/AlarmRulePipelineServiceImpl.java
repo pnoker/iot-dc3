@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.data.entity.bo.NotifyRecordBO;
+import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,13 +47,13 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
     }
 
     @Override
-    public List<NotifyRecordBO> process(RuleFact fact) {
-        List<NotifyRecordBO> records = new ArrayList<>();
+    public List<NotifyHistoryBO> process(RuleFact fact) {
+        List<NotifyHistoryBO> histories = new ArrayList<>();
         for (RuleMatch match : ruleEngine.evaluate(fact)) {
             alarmEventRecordService.ensureEvent(match);
-            records.addAll(ruleNotificationService.notify(match));
+            histories.addAll(ruleNotificationService.notify(match));
         }
-        return records;
+        return histories;
     }
 
 }

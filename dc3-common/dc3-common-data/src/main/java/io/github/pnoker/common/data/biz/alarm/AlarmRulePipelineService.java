@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.data.entity.bo.NotifyRecordBO;
+import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 
 import java.util.List;
 
@@ -36,6 +36,6 @@ public interface AlarmRulePipelineService {
      * @param fact normalized fact
      * @return persisted notification records
      */
-    List<NotifyRecordBO> process(RuleFact fact);
+    List<NotifyHistoryBO> process(RuleFact fact);
 
 }

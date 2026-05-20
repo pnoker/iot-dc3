@@ -36,9 +36,9 @@ public class AlarmConstant {
 
     public static final String EXT_RULE_STATE = "ALARM_RULE_STATE";
 
-    public static final String EXT_NOTIFY_RECORD_REQUEST = "ALARM_NOTIFY_RECORD_REQUEST";
+    public static final String EXT_NOTIFY_HISTORY_REQUEST = "ALARM_NOTIFY_HISTORY_REQUEST";
 
-    public static final String EXT_NOTIFY_RECORD_RESPONSE = "ALARM_NOTIFY_RECORD_RESPONSE";
+    public static final String EXT_NOTIFY_HISTORY_RESPONSE = "ALARM_NOTIFY_HISTORY_RESPONSE";
 
     private AlarmConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);

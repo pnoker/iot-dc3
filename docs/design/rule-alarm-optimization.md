@@ -119,7 +119,7 @@ entity_id = 当前实体 or entity_id = 0
 
 当前通知发送在 `RuleNotificationService.notify` 中同步执行。飞书、Webhook、Email 等外部系统慢或抖动时，会拖慢规则处理线程。
 
-更关键的是，规则状态更新、通知记录写入和外部发送耦合在同一条调用链中，不利于失败重试、削峰和排查。
+更关键的是，规则状态更新、通知历史写入和外部发送耦合在同一条调用链中，不利于失败重试、削峰和排查。
 
 ### 事件缺少 tenantId 时规则静默跳过
 
@@ -193,7 +193,7 @@ entity_id = 当前实体 or entity_id = 0
 - `dc3_rule` 是规则定义，不承载运行状态。
 - `dc3_rule_state` 是规则运行态，只记录 firing/recovered、触发次数、最近通知时间等。
 - `dc3_entity_alarm` 是告警事实记录，承载 point/device/driver 的统一告警。
-- `dc3_notify_record` 是通知投递记录，可扩展为 pending/success/failed/retrying/skipped 全生命周期。
+- `dc3_notify_history` 是通知投递历史，可扩展为 pending/success/failed/retrying/skipped 全生命周期。
 - 规则判断链路不直接依赖外部通知系统成功与否。
 
 ## 优化方案
@@ -251,7 +251,7 @@ AlarmRuleTriggerService.processPointValues(List<PointValueBO>)
 4. 组内逐条执行规则判断。
 5. 批量写入或更新 `dc3_rule_state`。
 6. 批量写入 `dc3_entity_alarm`。
-7. 批量创建 `dc3_notify_record` pending 任务。
+7. 批量创建 `dc3_notify_history` pending 任务。
 
 这样可以把规则查询成本从：
 
@@ -351,14 +351,14 @@ N 条点值 -> 按 pointId 分组后的 M 次缓存读取
 规则命中
   -> 写 dc3_rule_state
   -> 写 dc3_entity_alarm
-  -> 创建 dc3_notify_record，status_flag = pending
+  -> 创建 dc3_notify_history，status_flag = pending
   -> 提交事务
   -> 发布 notify task MQ
   -> NotifyWorker 发送
-  -> 更新 dc3_notify_record 为 success / failed / retrying / skipped
+  -> 更新 dc3_notify_history 为 success / failed / retrying / skipped
 ```
 
-`NotifyRecordStatusEnum` 已经有 `PENDING / SUCCESS / FAILED / RETRYING / SKIPPED`，可以复用 `dc3_notify_record` 表作为通知任务和投递结果表。
+`NotifyHistoryStatusEnum` 已经有 `PENDING / SUCCESS / FAILED / RETRYING / SKIPPED`，可以复用 `dc3_notify_history` 表作为通知任务和投递结果表。
 
 发送失败处理：
 
@@ -399,7 +399,7 @@ CREATE INDEX idx_rule_state_alarm
     WHERE deleted = 0 AND alarm_id > 0;
 ```
 
-### dc3_notify_record
+### dc3_notify_history
 
 字段调整：
 
@@ -412,12 +412,12 @@ event_id -> alarm_id
 建议补充 pending 任务索引：
 
 ```sql
-CREATE INDEX idx_notify_record_pending
-    ON dc3_notify_record (tenant_id, status_flag, create_time)
+CREATE INDEX idx_notify_history_pending
+    ON dc3_notify_history (tenant_id, status_flag, create_time)
     WHERE deleted = 0;
 ```
 
-原 `idx_notify_record_event` 同步调整为 `idx_notify_record_alarm`。
+原 `idx_notify_history_event` 同步调整为 `idx_notify_history_alarm`。
 
 ## 推荐代码结构
 
@@ -455,7 +455,7 @@ EntityAlarmService
 
 ```text
 NotifyTaskService
-  创建 pending notify_record
+  创建 pending notify_history
   发布通知任务
 
 NotifyWorker
@@ -463,7 +463,7 @@ NotifyWorker
   执行策略判断
   渲染模板
   调用通道适配器
-  更新 notify_record
+  更新 notify_history
 ```
 
 ## 分阶段落地
@@ -486,9 +486,9 @@ NotifyWorker
 ### 第三阶段：链路解耦
 
 - `dc3_rule_state.event_id` 改为 `alarm_id`。
-- `dc3_notify_record.event_id` 改为 `alarm_id`。
+- `dc3_notify_history.event_id` 改为 `alarm_id`。
 - 告警统一写入 `dc3_entity_alarm`。
-- 通知发送异步化，`dc3_notify_record` 先落 pending，再由 worker 投递。
+- 通知发送异步化，`dc3_notify_history` 先落 pending，再由 worker 投递。
 
 ### 第四阶段：窗口能力
 
@@ -507,13 +507,13 @@ NotifyWorker
 - `entity_id = 0` 全局规则命中。
 - 通道级别过滤生效。
 - 静默期和限流生效。
-- 模板变量缺失时通知记录可追踪。
+- 模板变量缺失时通知历史可追踪。
 
 ### 并发测试
 
 - 同一位号高频触发同一规则，`dc3_rule_state` 不重复。
 - 多实例同时处理同一实体告警，`trigger_count` 不丢增量。
-- 通知 worker 重试不会重复发送已成功记录。
+- 通知 worker 重试不会重复发送已成功历史。
 
 ### 性能测试
 
@@ -538,7 +538,7 @@ PointValue / EntityState / EntityAlarmFact
   -> RuleEvaluator
   -> RuleStateService upsert
   -> EntityAlarmService
-  -> NotifyTaskService pending record
+  -> NotifyTaskService pending history
   -> NotifyWorker async send
 ```
 
@@ -551,6 +551,5 @@ dc3_entity_alarm  记录已经发生的告警事实
 dc3_notify        定义通知策略
 dc3_message       定义消息模板
 dc3_notify_channel 定义投递通道
-dc3_notify_record 记录通知任务和投递结果
+dc3_notify_history 保存通知任务和投递历史
 ```
-

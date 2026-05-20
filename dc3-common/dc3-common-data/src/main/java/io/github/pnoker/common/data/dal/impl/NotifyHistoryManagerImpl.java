@@ -18,20 +18,20 @@
 package io.github.pnoker.common.data.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.common.data.dal.NotifyRecordManager;
-import io.github.pnoker.common.data.entity.model.NotifyRecordDO;
-import io.github.pnoker.common.data.mapper.NotifyRecordMapper;
+import io.github.pnoker.common.data.dal.NotifyHistoryManager;
+import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
+import io.github.pnoker.common.data.mapper.NotifyHistoryMapper;
 import org.springframework.stereotype.Service;
 
 /**
- * Notification delivery record manager.
+ * Notification delivery history manager.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service
-public class NotifyRecordManagerImpl extends ServiceImpl<NotifyRecordMapper, NotifyRecordDO>
-        implements NotifyRecordManager {
+public class NotifyHistoryManagerImpl extends ServiceImpl<NotifyHistoryMapper, NotifyHistoryDO>
+        implements NotifyHistoryManager {
 
 }

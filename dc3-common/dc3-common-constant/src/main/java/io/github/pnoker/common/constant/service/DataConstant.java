@@ -50,7 +50,7 @@ public class DataConstant {
 
     public static final String NOTIFY_CHANNEL_BIND_URL_PREFIX = "/notify/channel/bind";
 
-    public static final String NOTIFY_RECORD_URL_PREFIX = "/notify/record";
+    public static final String NOTIFY_HISTORY_URL_PREFIX = "/notify/history";
 
     public static final String MESSAGE_URL_PREFIX = "/message";
 

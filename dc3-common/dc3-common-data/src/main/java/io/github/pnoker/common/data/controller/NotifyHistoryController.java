@@ -20,11 +20,11 @@ package io.github.pnoker.common.data.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
-import io.github.pnoker.common.data.entity.bo.NotifyRecordBO;
-import io.github.pnoker.common.data.entity.builder.NotifyRecordBuilder;
-import io.github.pnoker.common.data.entity.query.NotifyRecordQuery;
-import io.github.pnoker.common.data.entity.vo.NotifyRecordVO;
-import io.github.pnoker.common.data.service.NotifyRecordService;
+import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
+import io.github.pnoker.common.data.entity.builder.NotifyHistoryBuilder;
+import io.github.pnoker.common.data.entity.query.NotifyHistoryQuery;
+import io.github.pnoker.common.data.entity.vo.NotifyHistoryVO;
+import io.github.pnoker.common.data.service.NotifyHistoryService;
 import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * Notification delivery record controller.
+ * Notification delivery history controller.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,34 +47,34 @@ import java.util.Objects;
  */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.NOTIFY_RECORD_URL_PREFIX)
-public class NotifyRecordController implements BaseController {
+@RequestMapping(DataConstant.NOTIFY_HISTORY_URL_PREFIX)
+public class NotifyHistoryController implements BaseController {
 
-    private final NotifyRecordBuilder notifyRecordBuilder;
+    private final NotifyHistoryBuilder notifyHistoryBuilder;
 
-    private final NotifyRecordService notifyRecordService;
+    private final NotifyHistoryService notifyHistoryService;
 
-    public NotifyRecordController(NotifyRecordBuilder notifyRecordBuilder,
-                                  NotifyRecordService notifyRecordService) {
-        this.notifyRecordBuilder = notifyRecordBuilder;
-        this.notifyRecordService = notifyRecordService;
+    public NotifyHistoryController(NotifyHistoryBuilder notifyHistoryBuilder,
+                                  NotifyHistoryService notifyHistoryService) {
+        this.notifyHistoryBuilder = notifyHistoryBuilder;
+        this.notifyHistoryService = notifyHistoryService;
     }
 
     @GetMapping("/get_by_id")
-    public Mono<R<NotifyRecordVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<NotifyHistoryVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            NotifyRecordBO entityBO = requireTenant(tenantId, notifyRecordService.getById(id));
-            return R.ok(notifyRecordBuilder.buildVOByBO(entityBO));
+            NotifyHistoryBO entityBO = requireTenant(tenantId, notifyHistoryService.getById(id));
+            return R.ok(notifyHistoryBuilder.buildVOByBO(entityBO));
         }));
     }
 
     @PostMapping("/list")
-    public Mono<R<Page<NotifyRecordVO>>> list(@RequestBody(required = false) NotifyRecordQuery entityQuery) {
+    public Mono<R<Page<NotifyHistoryVO>>> list(@RequestBody(required = false) NotifyHistoryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            NotifyRecordQuery query = Objects.isNull(entityQuery) ? new NotifyRecordQuery() : entityQuery;
+            NotifyHistoryQuery query = Objects.isNull(entityQuery) ? new NotifyHistoryQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<NotifyRecordBO> entityPageBO = notifyRecordService.list(query);
-            return R.ok(notifyRecordBuilder.buildVOPageByBOPage(entityPageBO));
+            Page<NotifyHistoryBO> entityPageBO = notifyHistoryService.list(query);
+            return R.ok(notifyHistoryBuilder.buildVOPageByBOPage(entityPageBO));
         }));
     }
 

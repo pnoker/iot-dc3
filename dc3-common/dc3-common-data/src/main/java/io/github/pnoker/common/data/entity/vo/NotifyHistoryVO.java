@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.entity.bo;
+package io.github.pnoker.common.data.entity.vo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.entity.common.TenantOwned;
-import io.github.pnoker.common.entity.ext.NotifyRecordRequestExt;
-import io.github.pnoker.common.entity.ext.NotifyRecordResponseExt;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.entity.ext.NotifyHistoryRequestExt;
+import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
-import io.github.pnoker.common.enums.NotifyRecordStatusEnum;
+import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Notification delivery record.
+ * Notification delivery history.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,7 +41,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class NotifyRecordBO extends BaseBO implements TenantOwned {
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public class NotifyHistoryVO extends BaseVO {
 
     private Long ruleId;
 
@@ -57,16 +58,14 @@ public class NotifyRecordBO extends BaseBO implements TenantOwned {
 
     private String target;
 
-    private NotifyRecordStatusEnum statusFlag;
+    private NotifyHistoryStatusEnum statusFlag;
 
-    private NotifyRecordRequestExt requestExt;
+    private NotifyHistoryRequestExt requestExt;
 
-    private NotifyRecordResponseExt responseExt;
+    private NotifyHistoryResponseExt responseExt;
 
     private String errorMessage;
 
     private Integer retryCount;
-
-    private Long tenantId;
 
 }
