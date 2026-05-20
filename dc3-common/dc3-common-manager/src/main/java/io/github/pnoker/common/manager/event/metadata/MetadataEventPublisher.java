@@ -25,7 +25,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 /**
- * Publisher
+ * Event publisher for metadata entity changes.
  *
  * @author zhangzi
  * @version 2025.9.0

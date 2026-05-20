@@ -69,7 +69,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * PointService Impl
+ * Business service implementation for point operations.
  *
  * @author pnoker
  * @version 2025.9.0

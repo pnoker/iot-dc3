@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Driver Api
+ * gRPC server handling manager driver facade requests.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -62,7 +62,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * PointConfigService Impl
+ * Business service implementation for point attribute configuration.
  *
  * @author pnoker
  * @version 2025.9.0

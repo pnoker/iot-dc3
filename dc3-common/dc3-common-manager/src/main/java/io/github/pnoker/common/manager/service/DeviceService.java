@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Interface
+ * Business service for device operations.
  *
  * @author pnoker
  * @version 2025.9.0

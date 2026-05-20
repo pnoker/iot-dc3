@@ -30,7 +30,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * PointConfig Query
+ * Query parameters for point attribute configuration listing.
  *
  * @author pnoker
  * @version 2025.9.0

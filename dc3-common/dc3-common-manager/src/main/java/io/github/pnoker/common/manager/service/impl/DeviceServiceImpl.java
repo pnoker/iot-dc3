@@ -88,7 +88,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * DeviceService Impl
+ * Business service implementation for device operations.
  *
  * @author pnoker
  * @version 2025.9.0

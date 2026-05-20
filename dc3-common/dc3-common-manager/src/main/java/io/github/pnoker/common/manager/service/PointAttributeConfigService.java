@@ -25,7 +25,7 @@ import io.github.pnoker.common.manager.entity.query.PointAttributeConfigQuery;
 import java.util.List;
 
 /**
- * PointConfig Interface
+ * Business service for point attribute configuration operations.
  *
  * @author pnoker
  * @version 2025.9.0

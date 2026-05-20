@@ -25,7 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * ProfileBind BO
+ * Business object for profile binding operations.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -32,7 +32,7 @@ import lombok.ToString;
 import java.math.BigDecimal;
 
 /**
- * Point BO
+ * Business object for point operations.
  *
  * @author pnoker
  * @version 2025.9.0

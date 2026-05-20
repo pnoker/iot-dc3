@@ -26,7 +26,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.List;
 
 /**
- * Import-related interfaces
+ * Service for bulk importing devices from structured data.
  *
  * @author pnoker
  * @version 2025.9.0

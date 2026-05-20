@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Api
+ * gRPC server handling driver-to-manager point requests.
  *
  * @author pnoker
  * @version 2025.9.0

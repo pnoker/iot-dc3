@@ -31,7 +31,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * PointAttributeConfig BO
+ * View object for point attribute configuration API responses.
  *
  * @author pnoker
  * @version 2025.9.0

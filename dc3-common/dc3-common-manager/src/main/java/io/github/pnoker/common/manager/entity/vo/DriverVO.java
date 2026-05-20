@@ -33,7 +33,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Driver VO
+ * View object for driver API responses.
  *
  * @author pnoker
  * @version 2025.9.0

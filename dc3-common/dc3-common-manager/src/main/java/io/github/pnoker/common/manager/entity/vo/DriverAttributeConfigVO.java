@@ -31,7 +31,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * DriverAttributeConfig VO
+ * View object for driver attribute configuration API responses.
  *
  * @author pnoker
  * @version 2025.9.0

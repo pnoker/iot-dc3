@@ -62,6 +62,8 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * Dashboard service implementation providing home-page aggregates and topology.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2026.5.2

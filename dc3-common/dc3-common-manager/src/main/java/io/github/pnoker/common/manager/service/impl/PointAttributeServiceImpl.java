@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PointAttributeService Impl
+ * Business service implementation for point attribute operations.
  *
  * @author pnoker
  * @version 2025.9.0

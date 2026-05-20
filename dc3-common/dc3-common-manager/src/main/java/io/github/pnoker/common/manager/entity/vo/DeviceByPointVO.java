@@ -28,7 +28,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * Device By Point VO
+ * View object for device-with-points API responses.
  *
  * @author pnoker
  * @version 2025.9.0

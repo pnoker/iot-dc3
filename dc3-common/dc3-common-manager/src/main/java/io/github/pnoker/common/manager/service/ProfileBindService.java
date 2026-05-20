@@ -24,7 +24,7 @@ import io.github.pnoker.common.manager.entity.query.ProfileBindQuery;
 import java.util.List;
 
 /**
- * ProfileBind Interface
+ * Business service for profile binding operations.
  *
  * @author pnoker
  * @version 2025.9.0

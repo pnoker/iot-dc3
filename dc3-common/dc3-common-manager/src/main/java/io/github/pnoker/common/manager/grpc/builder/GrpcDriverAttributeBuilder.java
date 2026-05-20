@@ -36,7 +36,7 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * GrpcDriverAttribute Builder
+ * MapStruct builder for driver attribute gRPC message conversion.
  *
  * @author pnoker
  * @version 2025.9.0

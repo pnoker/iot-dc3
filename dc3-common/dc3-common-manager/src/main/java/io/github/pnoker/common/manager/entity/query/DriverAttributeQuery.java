@@ -31,7 +31,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * ConnectInfo Query
+ * Query parameters for driver attribute listing.
  *
  * @author pnoker
  * @version 2025.9.0

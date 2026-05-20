@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Topic Service Impl
+ * Business service implementation for topic operations.
  *
  * @author pnoker
  * @version 2025.9.0

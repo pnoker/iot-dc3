@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 
 /**
  * <p>
- * Profile bind Mapper
+ * MyBatis-Plus mapper for the dc3_profile_bind table
  * </p>
  *
  * @author pnoker

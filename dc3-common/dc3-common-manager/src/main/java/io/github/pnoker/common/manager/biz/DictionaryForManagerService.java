@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
 
 /**
- * Dictionary Interface
+ * Dictionary lookup service for the manager module.
  *
  * @author pnoker
  * @version 2025.9.0

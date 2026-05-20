@@ -40,7 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Driver Builder
+ * MapStruct builder converting between driver BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -37,7 +37,7 @@ import lombok.ToString;
 import java.math.BigDecimal;
 
 /**
- * Point BO
+ * View object for point API responses.
  *
  * @author pnoker
  * @version 2025.9.0
