@@ -28,7 +28,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * DTO
+ * Data transfer object for metadata change events propagated via RabbitMQ.
  *
  * @author zhangzi
  * @version 2025.9.0

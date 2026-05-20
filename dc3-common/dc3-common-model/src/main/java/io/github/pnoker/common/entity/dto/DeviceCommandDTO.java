@@ -31,9 +31,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
+ * Data transfer object for device command dispatch.
+ *
+  * @author pnoker
+  * @version 2025.9.0
+  * @since 2016.10.1
  */
 @Getter
 @Setter

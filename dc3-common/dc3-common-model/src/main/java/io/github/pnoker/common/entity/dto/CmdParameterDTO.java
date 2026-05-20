@@ -28,9 +28,11 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
+ * Data transfer object for command execution parameters.
+ *
+  * @author pnoker
+  * @version 2025.9.0
+  * @since 2016.10.1
  */
 @Getter
 @Setter
