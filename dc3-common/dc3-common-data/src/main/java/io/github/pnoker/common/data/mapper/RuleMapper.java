@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.RuleDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_rule table.
  * </p>
  *
  * @author pnoker

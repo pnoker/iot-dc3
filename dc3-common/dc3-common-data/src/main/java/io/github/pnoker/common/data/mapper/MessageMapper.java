@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.MessageDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_message table.
  * </p>
  *
  * @author pnoker
