@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Grpc Builder Util
+ * Utility methods for building gRPC request/response messages.
  *
  * @author pnoker
  * @version 2025.9.0

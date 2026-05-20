@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Data Storage Strategy Service Interface
+ * Data storage strategy service interface for point value persistence.
  *
  * @author pnoker
  * @version 2025.9.0

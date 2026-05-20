@@ -41,7 +41,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Request Header
+ * Gateway filter that validates authentication headers.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -26,7 +26,7 @@ import org.springframework.boot.quartz.autoconfigure.QuartzAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 /**
- * Quartz auto configuration
+ * Spring Boot auto-configuration for Quartz scheduled jobs.
  *
  * @author pnoker
  * @version 2025.9.0
