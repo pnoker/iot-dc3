@@ -57,7 +57,7 @@ This service wires `dc3-common-data` which contains all business logic.
 ## Configuration
 
 - `application.yml` — base port and profile config
-- `application-dev.yml` — dev env: Postgres, Redis, RabbitMQ, gRPC client addresses
+- `application-dev.yml` — dev env: Postgres, RabbitMQ, gRPC client addresses
 - `application-pre.yml` — pre-release: Nacos-based service discovery
 - `application-pro.yml` — production: Nacos-based service discovery
 
@@ -93,4 +93,3 @@ java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

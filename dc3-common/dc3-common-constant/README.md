@@ -47,7 +47,7 @@ and enumeration types used across services, drivers, and common modules.
 | `DefaultConstant`                   | Platform defaults (page size, etc.)           |
 | `TimeConstant`                      | Date/time format strings                      |
 | `RequestConstant`                   | HTTP header key names (tenant/user injection) |
-| `PrefixConstant` / `SuffixConstant` | Common Redis key prefixes/suffixes            |
+| `PrefixConstant` / `SuffixConstant` | Common cache/key prefixes and suffixes        |
 
 ### Enumerations
 

@@ -42,8 +42,9 @@ iot-dc3 (root pom)
 |-----------------------|----------------------------------------------|
 | dc3-common-dal        | MyBatis-Plus mapper/repository               |
 | dc3-common-postgres   | PostgreSQL datasource (dynamic multi-schema) |
-| dc3-common-redis      | Redis cache configuration                    |
 | dc3-common-repository | File/blob storage abstraction                |
+
+Runtime caches use in-process Caffeine wrappers such as `LocalCacheService`; Redis is no longer a standalone module or infrastructure dependency.
 
 ### Communication Layer
 
@@ -61,7 +62,7 @@ iot-dc3 (root pom)
 |--------------------|------------------------|-----------------------------------------------------------------------------------|
 | dc3-common-auth    | Auth business logic    | dc3-api-auth, dal, postgres, web                                                  |
 | dc3-common-manager | Manager business logic | dc3-api-*, dal, facade-api, postgres, rabbitmq, quartz, web                       |
-| dc3-common-data    | Data business logic    | dc3-api-*, dal, facade-api, postgres, rabbitmq, redis, repository, quartz, web    |
+| dc3-common-data    | Data business logic    | dc3-api-*, dal, facade-api, postgres, rabbitmq, repository, quartz, web           |
 | dc3-common-driver  | Driver SDK             | dc3-api-driver, constant, exception, log, model, public, quartz, rabbitmq, thread |
 | dc3-common-gateway | Gateway filter         | facade-api, log, model, public, web                                               |
 | dc3-common-agentic | AI chat and tool logic | facade-api, postgres, web, Spring AI                                              |
@@ -104,7 +105,8 @@ Client --> Gateway (8000) --> Auth/Manager/Data (REST)
                                dc3-common-* libs
                                     |  |  |
                                     v  v  v
-                          PostgreSQL / Redis / RabbitMQ
+                          PostgreSQL / RabbitMQ
+                          in-process LocalCache (Caffeine)
                                     |
                                     v
                               dc3-driver (gRPC + MQ)

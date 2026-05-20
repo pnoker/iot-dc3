@@ -72,7 +72,7 @@ public class PointValueReceiver {
             // Judge whether to process data in batch according to the data transmission
             // speed
             if (PointValueJob.getValueSpeed() < pointBatchProperties.getSpeed()) {
-                // Save point value to Redis & PostgreSQL
+                // Save point value to local latest-value cache and repository storage
                 pointValueService.save(pointValueBO);
             } else {
                 // Save point value to schedule

@@ -40,6 +40,8 @@ export default defineConfig({
             {text: '使用指南', link: '/guide/'},
             {text: '操作手册', link: '/operation/'},
             {text: '架构', link: '/architecture/'},
+            {text: '项目设计方案', link: '/design/'},
+            {text: '项目待办', link: '/todo/'},
             {text: '开发', link: '/development/'},
             {text: '模块', link: '/modules/'},
             {
@@ -91,6 +93,28 @@ export default defineConfig({
                     items: [
                         {text: '概览', link: '/architecture/'},
                         {text: '模块与依赖', link: '/architecture/modules'}
+                    ]
+                }
+            ],
+            '/design/': [
+                {
+                    text: '项目设计方案',
+                    items: [
+                        {text: '概览', link: '/design/'},
+                        {text: '物模型设计方案', link: '/design/thing-model'},
+                        {text: '位号命令链路重构方案', link: '/design/point-command'},
+                        {text: '设备与驱动超时管理方案', link: '/design/device-driver-timeout'},
+                        {text: '实体告警统一表设计方案', link: '/design/entity-alarm'},
+                        {text: '规则告警链路优化与缺陷修复方案', link: '/design/rule-alarm-optimization'}
+                    ]
+                }
+            ],
+            '/todo/': [
+                {
+                    text: '项目待办',
+                    items: [
+                        {text: '概览', link: '/todo/'},
+                        {text: '物模型改造设计', link: '/todo/thing-model-refactor'}
                     ]
                 }
             ],
