@@ -42,7 +42,7 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsAlarmChannel: 'nav.settingsAlarmChannel',
   settingsAlarmBind: 'nav.settingsAlarmBind',
   settingsAlarmState: 'nav.settingsAlarmState',
-  settingsAlarmRecord: 'nav.settingsAlarmRecord',
+  settingsAlarmHistory: 'nav.settingsAlarmHistory',
   settingsModel: 'nav.settingsModel',
   settingsAgentic: 'nav.settingsAgentic',
   settingsAgenticProvider: 'nav.settingsAgenticProvider',
@@ -66,7 +66,7 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsAlarmChannelDetail: 'nav.settingsAlarmChannelDetail',
   settingsAlarmBindDetail: 'nav.settingsAlarmBindDetail',
   settingsAlarmStateDetail: 'nav.settingsAlarmStateDetail',
-  settingsAlarmRecordDetail: 'nav.settingsAlarmRecordDetail',
+  settingsAlarmHistoryDetail: 'nav.settingsAlarmHistoryDetail',
   settingsAgenticDetail: 'nav.settingsAgenticDetail',
   settingsAgenticProviderDetail: 'nav.settingsAgenticProviderDetail',
 };
@@ -87,7 +87,7 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsAlarmChannel: 'Connection',
   settingsAlarmBind: 'Link',
   settingsAlarmState: 'Monitor',
-  settingsAlarmRecord: 'DocumentChecked',
+  settingsAlarmHistory: 'DocumentChecked',
   settingsModel: 'Cpu',
   settingsAgentic: 'ChatDotRound',
   settingsAgenticProvider: 'ChatLineSquare',
@@ -109,7 +109,7 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsAlarmChannelDetail: 'Connection',
   settingsAlarmBindDetail: 'Link',
   settingsAlarmStateDetail: 'Monitor',
-  settingsAlarmRecordDetail: 'DocumentChecked',
+  settingsAlarmHistoryDetail: 'DocumentChecked',
   settingsAgenticDetail: 'ChatDotRound',
   settingsAgenticProviderDetail: 'ChatLineSquare',
 };
@@ -126,7 +126,7 @@ export const SETTINGS_ALARM_CHILDREN: SettingsNavNode[] = [
   { name: 'settingsAlarmChannel', titleKey: 'nav.settingsAlarmChannel', icon: 'Connection' },
   { name: 'settingsAlarmBind', titleKey: 'nav.settingsAlarmBind', icon: 'Link' },
   { name: 'settingsAlarmState', titleKey: 'nav.settingsAlarmState', icon: 'Monitor' },
-  { name: 'settingsAlarmRecord', titleKey: 'nav.settingsAlarmRecord', icon: 'DocumentChecked' },
+  { name: 'settingsAlarmHistory', titleKey: 'nav.settingsAlarmHistory', icon: 'DocumentChecked' },
 ];
 
 export const SETTINGS_EVENT_CHILDREN: SettingsNavNode[] = [
@@ -159,7 +159,7 @@ export const SETTINGS_ACTIVE_ALIAS: Record<string, string> = {
   settingsAlarmChannelDetail: 'settingsAlarmChannel',
   settingsAlarmBindDetail: 'settingsAlarmBind',
   settingsAlarmStateDetail: 'settingsAlarmState',
-  settingsAlarmRecordDetail: 'settingsAlarmRecord',
+  settingsAlarmHistoryDetail: 'settingsAlarmHistory',
   settingsEvent: 'settingsEventOverview',
   settingsGroupDetail: 'settingsGroup',
   settingsLabelDetail: 'settingsLabel',
@@ -178,7 +178,7 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   settingsAlarmChannel: 'settingsAlarm',
   settingsAlarmBind: 'settingsAlarm',
   settingsAlarmState: 'settingsAlarm',
-  settingsAlarmRecord: 'settingsAlarm',
+  settingsAlarmHistory: 'settingsAlarm',
   settingsAgentic: 'settingsModel',
   settingsAgenticProvider: 'settingsModel',
   settingsEventOverview: 'settingsEvent',
@@ -232,7 +232,7 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
   settingsAlarmChannel: [alarmParent],
   settingsAlarmBind: [alarmParent],
   settingsAlarmState: [alarmParent],
-  settingsAlarmRecord: [alarmParent],
+  settingsAlarmHistory: [alarmParent],
   settingsAlarmRuleDetail: [
     alarmParent,
     { path: '/settings/alarm/rule', titleKey: 'nav.settingsAlarmRule', code: 'settingsAlarmRule' },
@@ -257,9 +257,9 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
     alarmParent,
     { path: '/settings/alarm/state', titleKey: 'nav.settingsAlarmState', code: 'settingsAlarmState' },
   ],
-  settingsAlarmRecordDetail: [
+  settingsAlarmHistoryDetail: [
     alarmParent,
-    { path: '/settings/alarm/record', titleKey: 'nav.settingsAlarmRecord', code: 'settingsAlarmRecord' },
+    { path: '/settings/alarm/history', titleKey: 'nav.settingsAlarmHistory', code: 'settingsAlarmHistory' },
   ],
   settingsAgentic: [modelParent],
   settingsAgenticProvider: [modelParent],

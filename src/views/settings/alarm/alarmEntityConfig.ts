@@ -29,7 +29,7 @@ import {
   listNotify,
   listNotifyChannel,
   listNotifyChannelBind,
-  listNotifyRecord,
+  listNotifyHistory,
   listRule,
   listRuleState,
   updateMessage,
@@ -40,7 +40,7 @@ import {
 } from '@/api/alarm';
 import type { PageQuery } from '@/config/types';
 
-export type AlarmTabKey = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'record';
+export type AlarmTabKey = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'history';
 export type AlarmFieldKind = 'input' | 'number' | 'select' | 'enableFlag' | 'textarea' | 'json';
 export type AlarmColumnKind = 'text' | 'tag' | 'code' | 'time' | 'json';
 
@@ -98,7 +98,7 @@ export const ALARM_DETAIL_ROUTE_MAP: Record<AlarmTabKey, string> = {
   channel: 'settingsAlarmChannelDetail',
   bind: 'settingsAlarmBindDetail',
   state: 'settingsAlarmStateDetail',
-  record: 'settingsAlarmRecordDetail',
+  history: 'settingsAlarmHistoryDetail',
 };
 
 type Translate = (key: string) => string;
@@ -194,7 +194,7 @@ export const createAlarmEntityConfigs = (t: Translate) => {
     { label: t('settings.alarm.firing'), value: 'FIRING' },
     { label: t('settings.alarm.recovered'), value: 'RECOVERED' },
   ];
-  const recordStatusOptions: AlarmOption[] = [
+  const historyStatusOptions: AlarmOption[] = [
     { label: t('settings.alarm.pending'), value: 'PENDING' },
     { label: t('settings.alarm.success'), value: 'SUCCESS' },
     { label: t('settings.alarm.failed'), value: 'FAILED' },
@@ -464,16 +464,16 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       list: listRuleState,
     },
     {
-      key: 'record',
-      label: t('settings.alarm.records'),
+      key: 'history',
+      label: t('settings.alarm.histories'),
       editable: false,
       searchProp: 'target',
       searchLabel: t('settings.alarm.target'),
-      searchPlaceholder: t('settings.alarm.searchRecord'),
+      searchPlaceholder: t('settings.alarm.searchHistory'),
       filterProp: 'statusFlag',
       filterLabel: t('settings.alarm.status'),
       filterPlaceholder: t('settings.alarm.status'),
-      filterOptions: recordStatusOptions,
+      filterOptions: historyStatusOptions,
       columns: [
         { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 130 },
         { prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 130 },
@@ -486,7 +486,7 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       ],
       fields: [],
       defaultForm: () => ({}),
-      list: listNotifyRecord,
+      list: listNotifyHistory,
     },
   ];
 

@@ -42,7 +42,7 @@ export type {
   AlarmTargetTypeFlag,
   NotifyChannelTypeFlag,
   RuleStateFlag,
-  NotifyRecordStatusFlag,
+  NotifyHistoryStatusFlag,
   AutoConfirmFlag,
   EnableFlag,
   StructuredExt,
@@ -52,7 +52,7 @@ export type {
   NotifyChannelRecord,
   NotifyChannelBindRecord,
   RuleStateRecord,
-  NotifyDeliveryRecord,
+  NotifyHistoryRecord,
   AlarmEntityRecord,
 } from './alarm';
 

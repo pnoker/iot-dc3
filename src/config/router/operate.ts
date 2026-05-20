@@ -223,14 +223,14 @@ const routes: Array<RouteRecordRaw> = [
         props: { entity: 'state' },
       },
       {
-        name: 'settingsAlarmRecordDetail',
-        path: '/settings/alarm/record/detail',
+        name: 'settingsAlarmHistoryDetail',
+        path: '/settings/alarm/history/detail',
         meta: {
           icon: 'el-icon-document-checked',
-          title: 'Alarm Delivery Record Detail',
+          title: 'Alarm Delivery History Detail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
-        props: { entity: 'record' },
+        props: { entity: 'history' },
       },
     ],
   },

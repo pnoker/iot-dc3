@@ -31,7 +31,7 @@ export interface RouteIds {
   alarmChannelId?: string;
   alarmBindId?: string;
   alarmStateId?: string;
-  alarmRecordId?: string;
+  alarmHistoryId?: string;
   agenticModelConfigId?: string;
   agenticProviderId?: string;
   userId?: string;
@@ -57,7 +57,7 @@ export const protectedRoutes = [
   '/settings/alarm/channel',
   '/settings/alarm/bind',
   '/settings/alarm/state',
-  '/settings/alarm/record',
+  '/settings/alarm/history',
   '/settings/agentic',
   '/settings/agentic/provider',
   '/settings/event',
@@ -87,7 +87,7 @@ export const protectedRouteProbes = [
   '/settings/alarm/channel/detail?id=e2e-auth-probe',
   '/settings/alarm/bind/detail?id=e2e-auth-probe',
   '/settings/alarm/state/detail?id=e2e-auth-probe',
-  '/settings/alarm/record/detail?id=e2e-auth-probe',
+  '/settings/alarm/history/detail?id=e2e-auth-probe',
   '/settings/agentic/detail?id=e2e-auth-probe',
   '/settings/agentic/provider/detail?id=e2e-auth-probe',
 ];
@@ -120,7 +120,7 @@ export function buildEntityRoutes(routeIds: RouteIds) {
   if (routeIds.alarmChannelId) routes.push(`/settings/alarm/channel/detail?id=${routeIds.alarmChannelId}`);
   if (routeIds.alarmBindId) routes.push(`/settings/alarm/bind/detail?id=${routeIds.alarmBindId}`);
   if (routeIds.alarmStateId) routes.push(`/settings/alarm/state/detail?id=${routeIds.alarmStateId}`);
-  if (routeIds.alarmRecordId) routes.push(`/settings/alarm/record/detail?id=${routeIds.alarmRecordId}`);
+  if (routeIds.alarmHistoryId) routes.push(`/settings/alarm/history/detail?id=${routeIds.alarmHistoryId}`);
   if (routeIds.agenticModelConfigId) routes.push(`/settings/agentic/detail?id=${routeIds.agenticModelConfigId}`);
   if (routeIds.agenticProviderId) routes.push(`/settings/agentic/provider/detail?id=${routeIds.agenticProviderId}`);
   if (routeIds.userId) routes.push(`/settings/user/detail?id=${routeIds.userId}`);
@@ -230,7 +230,7 @@ export const interactionPages = [
     enableForm: true,
   },
   { name: 'Alarm Runtime State', route: '/settings/alarm/state', placeholder: 'Search rule ID', value: '1' },
-  { name: 'Alarm Delivery Record', route: '/settings/alarm/record', placeholder: 'Search target', value: 'ops' },
+  { name: 'Alarm Delivery History', route: '/settings/alarm/history', placeholder: 'Search target', value: 'ops' },
   {
     name: 'Agentic Model Config',
     route: '/settings/agentic',

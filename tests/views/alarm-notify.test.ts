@@ -44,7 +44,7 @@ const alarmMocks = vi.hoisted(() => {
     listNotifyChannelBind: list(),
     listNotifyChannel: list(),
     listNotify: list(),
-    listNotifyRecord: list(),
+    listNotifyHistory: list(),
     listRule: list(),
     listRuleState: list(),
     updateMessage: mutate(),

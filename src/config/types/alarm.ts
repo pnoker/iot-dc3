@@ -21,7 +21,7 @@
 export type AlarmTargetTypeFlag = 'POINT' | 'DEVICE' | 'DRIVER' | string;
 export type NotifyChannelTypeFlag = 'FEISHU_BOT' | 'WEBHOOK' | 'EMAIL' | string;
 export type RuleStateFlag = 'NORMAL' | 'FIRING' | 'RECOVERED' | string;
-export type NotifyRecordStatusFlag = 'PENDING' | 'SUCCESS' | 'FAILED' | 'RETRYING' | 'SKIPPED' | string;
+export type NotifyHistoryStatusFlag = 'PENDING' | 'SUCCESS' | 'FAILED' | 'RETRYING' | 'SKIPPED' | string;
 export type AutoConfirmFlag = 'AUTO' | 'MANUAL' | string;
 export type EnableFlag = 'ENABLE' | 'DISABLE' | string;
 
@@ -101,7 +101,7 @@ export interface RuleStateRecord extends AlarmBaseRecord {
   stateExt?: StructuredExt;
 }
 
-export interface NotifyDeliveryRecord extends AlarmBaseRecord {
+export interface NotifyHistoryRecord extends AlarmBaseRecord {
   ruleId?: string;
   notifyId?: string;
   messageId?: string;
@@ -109,7 +109,7 @@ export interface NotifyDeliveryRecord extends AlarmBaseRecord {
   eventId?: string;
   channelTypeFlag?: NotifyChannelTypeFlag;
   target?: string;
-  statusFlag?: NotifyRecordStatusFlag;
+  statusFlag?: NotifyHistoryStatusFlag;
   requestExt?: StructuredExt;
   responseExt?: StructuredExt;
   errorMessage?: string;
@@ -123,4 +123,4 @@ export type AlarmEntityRecord =
   | NotifyChannelRecord
   | NotifyChannelBindRecord
   | RuleStateRecord
-  | NotifyDeliveryRecord;
+  | NotifyHistoryRecord;

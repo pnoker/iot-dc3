@@ -476,10 +476,10 @@ exports[`API wrapper contracts > alarm > getNotifyChannelById maps to its transp
 }
 `;
 
-exports[`API wrapper contracts > alarm > getNotifyRecordById maps to its transport contract 1`] = `
+exports[`API wrapper contracts > alarm > getNotifyHistoryById maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/notify/record/get_by_id",
+    "api/v3/data/notify/history/get_by_id",
     {
       "params": {
         "id": "id-1",
@@ -534,14 +534,14 @@ exports[`API wrapper contracts > alarm > has every export covered by the contrac
   "getNotifyById",
   "getNotifyChannelBindById",
   "getNotifyChannelById",
-  "getNotifyRecordById",
+  "getNotifyHistoryById",
   "getRuleById",
   "getRuleStateById",
   "listMessage",
   "listNotify",
   "listNotifyChannel",
   "listNotifyChannelBind",
-  "listNotifyRecord",
+  "listNotifyHistory",
   "listRule",
   "listRuleState",
   "updateMessage",
@@ -592,10 +592,10 @@ exports[`API wrapper contracts > alarm > listNotifyChannelBind maps to its trans
 }
 `;
 
-exports[`API wrapper contracts > alarm > listNotifyRecord maps to its transport contract 1`] = `
+exports[`API wrapper contracts > alarm > listNotifyHistory maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/notify/record/list",
+    "api/v3/data/notify/history/list",
     undefined,
   ],
   "transport": "httpPost",

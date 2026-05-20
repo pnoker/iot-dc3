@@ -21,7 +21,7 @@ import type {
   MessageRecord,
   NotifyChannelBindRecord,
   NotifyChannelRecord,
-  NotifyDeliveryRecord,
+  NotifyHistoryRecord,
   NotifyRecord,
   RuleRecord,
   RuleStateRecord,
@@ -34,7 +34,7 @@ const endpoints = {
   channel: `${API_DATA_BASE}/notify/channel`,
   channelBind: `${API_DATA_BASE}/notify/channel/bind`,
   state: `${API_DATA_BASE}/rule/state`,
-  record: `${API_DATA_BASE}/notify/record`,
+  history: `${API_DATA_BASE}/notify/history`,
 } as const;
 
 const add = <T>(base: string, payload: T) => httpPost(`${base}/add`, payload);
@@ -77,5 +77,5 @@ export const listNotifyChannelBind = (query: PageQuery) => list<NotifyChannelBin
 export const getRuleStateById = (id: string) => selectById<RuleStateRecord>(endpoints.state, id);
 export const listRuleState = (query: PageQuery) => list<RuleStateRecord>(endpoints.state, query);
 
-export const getNotifyRecordById = (id: string) => selectById<NotifyDeliveryRecord>(endpoints.record, id);
-export const listNotifyRecord = (query: PageQuery) => list<NotifyDeliveryRecord>(endpoints.record, query);
+export const getNotifyHistoryById = (id: string) => selectById<NotifyHistoryRecord>(endpoints.history, id);
+export const listNotifyHistory = (query: PageQuery) => list<NotifyHistoryRecord>(endpoints.history, query);

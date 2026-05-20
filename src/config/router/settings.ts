@@ -124,11 +124,11 @@ const settingsRouter: RouteRecordRaw = {
           props: { entity: 'state' },
         },
         {
-          name: 'settingsAlarmRecord',
-          path: 'alarm/record',
-          meta: { title: 'Alarm Records' },
+          name: 'settingsAlarmHistory',
+          path: 'alarm/history',
+          meta: { title: 'Alarm Histories' },
           component: () => import('@/views/settings/alarm/AlarmNotify.vue'),
-          props: { entity: 'record' },
+          props: { entity: 'history' },
         },
         {
           name: 'settingsAgentic',

@@ -54,7 +54,7 @@
     getNotifyById,
     getNotifyChannelBindById,
     getNotifyChannelById,
-    getNotifyRecordById,
+    getNotifyHistoryById,
     getRuleById,
     getRuleStateById,
   } from '@/api/alarm';
@@ -63,7 +63,7 @@
   import type { AlarmEntityRecord } from '@/config/types';
   import { timestamp } from '@/utils/dateUtil';
 
-  type AlarmEntity = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'record';
+  type AlarmEntity = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'history';
   type FieldKind = 'text' | 'tag' | 'time' | 'code';
 
   interface DetailField {
@@ -193,8 +193,8 @@
       load: getRuleStateById,
     },
     {
-      entity: 'record',
-      detailTitle: t('nav.settingsAlarmRecordDetail'),
+      entity: 'history',
+      detailTitle: t('nav.settingsAlarmHistoryDetail'),
       fields: [
         { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code' },
         { prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code' },
@@ -209,7 +209,7 @@
         ...commonFields(),
       ],
       extProps: ['requestExt', 'responseExt'],
-      load: getNotifyRecordById,
+      load: getNotifyHistoryById,
     },
   ]);
 
