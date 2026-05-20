@@ -18,7 +18,7 @@
 package io.github.pnoker.common.exception;
 
 /**
- * Cron
+ * Exception for invalid cron expressions.
  *
  * @author pnoker
  * @version 2025.9.0

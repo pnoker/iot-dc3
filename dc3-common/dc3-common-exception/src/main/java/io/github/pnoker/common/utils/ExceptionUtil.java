@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.MessageFormat;
 
 /**
+ * Utility methods for exception message formatting.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

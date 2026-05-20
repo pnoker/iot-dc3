@@ -18,6 +18,7 @@
 package io.github.pnoker.common.exception;
 
 /**
+ * Exception for empty or missing required values.
  *
  * @author pnoker
  * @version 2025.9.0

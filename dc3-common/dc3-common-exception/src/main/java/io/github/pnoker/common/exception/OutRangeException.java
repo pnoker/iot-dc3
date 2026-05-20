@@ -18,6 +18,7 @@
 package io.github.pnoker.common.exception;
 
 /**
+ * Exception for values outside the valid range.
  *
  * @author pnoker
  * @version 2025.9.0

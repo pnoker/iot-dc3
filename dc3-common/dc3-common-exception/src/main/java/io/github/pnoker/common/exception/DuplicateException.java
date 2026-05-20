@@ -18,6 +18,7 @@
 package io.github.pnoker.common.exception;
 
 /**
+ * Exception for duplicate resource creation attempts.
  *
  * @author pnoker
  * @version 2025.9.0

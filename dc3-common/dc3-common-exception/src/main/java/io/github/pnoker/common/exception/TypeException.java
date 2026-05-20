@@ -18,7 +18,7 @@
 package io.github.pnoker.common.exception;
 
 /**
- * Type
+ * Exception for type mismatch or conversion errors.
  *
  * @author pnoker
  * @version 2025.9.0

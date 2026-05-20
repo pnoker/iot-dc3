@@ -18,7 +18,7 @@
 package io.github.pnoker.common.exception;
 
 /**
- * Json
+ * Exception for JSON parsing/serialization failures.
  *
  * @author pnoker
  * @version 2025.9.0

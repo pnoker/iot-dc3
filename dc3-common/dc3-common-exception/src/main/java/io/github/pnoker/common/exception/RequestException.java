@@ -18,7 +18,7 @@
 package io.github.pnoker.common.exception;
 
 /**
- * Request
+ * Exception for invalid request handling.
  *
  * @author pnoker
  * @version 2025.9.0
