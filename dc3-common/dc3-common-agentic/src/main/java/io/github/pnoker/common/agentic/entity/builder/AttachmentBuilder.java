@@ -28,7 +28,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * Agentic attachment builder.
+ * MapStruct builder converting between attachment BO, VO, and DO.
  *
  * @author pnoker
  * @version 2026.5.11

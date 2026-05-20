@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Agentic message builder.
+ * MapStruct builder converting between message BO, VO, and DO.
  *
  * @author pnoker
  * @version 2026.5.11

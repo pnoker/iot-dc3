@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 /**
- * Agentic model option endpoints.
+ * REST controller exposing agentic model configuration endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

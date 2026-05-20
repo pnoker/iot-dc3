@@ -24,7 +24,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Agentic attachment BO.
+ * Business object for agentic attachment operations.
  *
  * @author pnoker
  * @version 2026.5.11

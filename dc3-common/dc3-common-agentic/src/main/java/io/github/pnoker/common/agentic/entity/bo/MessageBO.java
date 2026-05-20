@@ -26,7 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Agentic message BO.
+ * Business object for agentic conversation message operations.
  *
  * @author pnoker
  * @version 2026.5.11

@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * Agentic action confirmation response.
+ * View object for agentic action API responses.
  *
  * @author pnoker
  * @version 2026.5.10

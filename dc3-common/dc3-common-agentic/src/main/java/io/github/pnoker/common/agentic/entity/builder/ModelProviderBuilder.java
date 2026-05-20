@@ -37,7 +37,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Agentic model provider builder.
+ * MapStruct builder converting between model provider BO, VO, and DO.
  *
  * @author pnoker
  * @version 2026.5.11

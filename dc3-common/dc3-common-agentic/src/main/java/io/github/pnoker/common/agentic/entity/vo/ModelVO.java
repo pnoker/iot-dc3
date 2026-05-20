@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Agentic model option exposed to the web client.
+ * View object for agentic model API responses.
  *
  * @author pnoker
  * @version 2025.9.0
