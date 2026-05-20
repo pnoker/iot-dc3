@@ -18,10 +18,8 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.entity.dto.DeviceEventDTO;
-import io.github.pnoker.common.entity.dto.DriverEventDTO;
-import io.github.pnoker.common.enums.DeviceEventTypeEnum;
-import io.github.pnoker.common.enums.DriverEventTypeEnum;
+import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
+import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 
 /**
  * Converts runtime data into rule facts and feeds the alarm rule pipeline.
@@ -40,25 +38,17 @@ public interface AlarmRuleTriggerService {
     void processPointValue(PointValueBO pointValue);
 
     /**
-     * Process a device runtime event.
+     * Process a device alarm event.
      *
-     * @param payload   device status payload
-     * @param eventType source event type
-     * @param source    source label stored in fact values
-     * @param eventId   persisted event id when one already exists
+     * @param alarm device alarm payload
      */
-    void processDeviceEvent(DeviceEventDTO.DeviceStatus payload, DeviceEventTypeEnum eventType, String source,
-                            Long eventId);
+    void processDeviceAlarm(DeviceAlarmDTO alarm);
 
     /**
-     * Process a driver runtime event.
+     * Process a driver alarm event.
      *
-     * @param payload   driver status payload
-     * @param eventType source event type
-     * @param source    source label stored in fact values
-     * @param eventId   persisted event id when one already exists
+     * @param alarm driver alarm payload
      */
-    void processDriverEvent(DriverEventDTO.DriverStatus payload, DriverEventTypeEnum eventType, String source,
-                            Long eventId);
+    void processDriverAlarm(DriverAlarmDTO alarm);
 
 }

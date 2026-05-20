@@ -15,20 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.mapper;
+package io.github.pnoker.common.data.biz;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.data.entity.model.DriverEventDO;
+import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 
 /**
- * <p>
- * Driver Event Mapper
- * </p>
+ * Persists driver alarm events to {@code dc3_entity_alarm} and feeds the rule pipeline.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface DriverEventMapper extends BaseMapper<DriverEventDO> {
+public interface DriverAlarmService {
+
+    /**
+     * Persist a driver alarm and trigger rule evaluation.
+     *
+     * @param entityDTO DriverAlarmDTO
+     */
+    void alarm(DriverAlarmDTO entityDTO);
 
 }

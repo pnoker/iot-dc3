@@ -39,9 +39,13 @@ public class RabbitConstant {
 
     public static final String ROUTING_REGISTER_DOWN_PREFIX = "dc3.r.register.down.";
 
-    public static final String ROUTING_DRIVER_EVENT_PREFIX = "dc3.r.event.driver.";
+    public static final String ROUTING_DRIVER_STATE_PREFIX = "dc3.r.state.driver.";
 
-    public static final String ROUTING_DEVICE_EVENT_PREFIX = "dc3.r.event.device.";
+    public static final String ROUTING_DEVICE_STATE_PREFIX = "dc3.r.state.device.";
+
+    public static final String ROUTING_DRIVER_ALARM_PREFIX = "dc3.r.alarm.driver.";
+
+    public static final String ROUTING_DEVICE_ALARM_PREFIX = "dc3.r.alarm.device.";
 
     public static final String ROUTING_DRIVER_METADATA_PREFIX = "dc3.r.metadata.driver.";
 
@@ -60,12 +64,19 @@ public class RabbitConstant {
 
     public static String QUEUE_REGISTER_DOWN_PREFIX = "dc3.q.register.down.";
 
-    // Event
-    public static String TOPIC_EXCHANGE_EVENT = "dc3.e.event";
+    // State
+    public static String TOPIC_EXCHANGE_STATE = "dc3.e.state";
 
-    public static String QUEUE_DRIVER_EVENT = "dc3.q.event.driver";
+    public static String QUEUE_DRIVER_STATE = "dc3.q.state.driver";
 
-    public static String QUEUE_DEVICE_EVENT = "dc3.q.event.device";
+    public static String QUEUE_DEVICE_STATE = "dc3.q.state.device";
+
+    // Alarm
+    public static String TOPIC_EXCHANGE_ALARM = "dc3.e.alarm";
+
+    public static String QUEUE_DRIVER_ALARM = "dc3.q.alarm.driver";
+
+    public static String QUEUE_DEVICE_ALARM = "dc3.q.alarm.device";
 
     // Metadata
     public static String TOPIC_EXCHANGE_METADATA = "dc3.e.metadata";

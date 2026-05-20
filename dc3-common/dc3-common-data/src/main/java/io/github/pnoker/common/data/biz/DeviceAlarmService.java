@@ -17,31 +17,22 @@
 
 package io.github.pnoker.common.data.biz;
 
-import io.github.pnoker.common.entity.dto.DriverEventDTO;
+import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 
 /**
- * Interface for driver-related events
+ * Persists device alarm events to {@code dc3_entity_alarm} and feeds the rule pipeline.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface DriverEventService {
+public interface DeviceAlarmService {
 
     /**
-     * Handle a driver heartbeat event: refresh the in-memory online-status key and
-     * persist one row to {@code dc3_driver_event}. Derives an ALARM event if the status
-     * flipped between ONLINE/MAINTAIN and OFFLINE.
+     * Persist a device alarm and trigger rule evaluation.
      *
-     * @param entityDTO DriverEventDTO
+     * @param entityDTO DeviceAlarmDTO
      */
-    void heartbeatEvent(DriverEventDTO entityDTO);
-
-    /**
-     * Persist a driver ALARM event to {@code dc3_driver_event}.
-     *
-     * @param entityDTO DriverEventDTO with type=ALARM
-     */
-    void alarmEvent(DriverEventDTO entityDTO);
+    void alarm(DeviceAlarmDTO entityDTO);
 
 }

@@ -51,7 +51,7 @@ public class AlertItemVO implements Serializable {
 
     private Long pointId;
 
-    private Integer eventTypeFlag;
+    private Integer alarmTypeFlag;
 
     private Integer confirmFlag;
 

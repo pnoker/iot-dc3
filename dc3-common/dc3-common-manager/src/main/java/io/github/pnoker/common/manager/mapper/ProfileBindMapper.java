@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 
 /**
  * <p>
- * - Mapper
+ * Profile bind Mapper
  * </p>
  *
  * @author pnoker

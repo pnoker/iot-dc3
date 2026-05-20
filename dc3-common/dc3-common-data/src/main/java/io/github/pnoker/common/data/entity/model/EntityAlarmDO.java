@@ -33,9 +33,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * Driver Event
- * </p>
+ * Entity Alarm
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,8 +42,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_driver_event", autoResultMap = true)
-public class DriverEventDO implements Serializable {
+@TableName(value = "dc3_entity_alarm", autoResultMap = true)
+public class EntityAlarmDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -57,31 +55,79 @@ public class DriverEventDO implements Serializable {
     private Long id;
 
     /**
+     * Alarm target type flag, 0: point, 1: device, 2: driver
+     */
+    @TableField("alarm_target_type_flag")
+    private Byte alarmTargetTypeFlag;
+
+    /**
+     * Alarm target entity ID
+     */
+    @TableField("entity_id")
+    private Long entityId;
+
+    /**
      * Driver ID
      */
     @TableField("driver_id")
     private Long driverId;
 
     /**
-     * Type
+     * Device ID
      */
-    @TableField("event_type_flag")
-    private Byte eventTypeFlag;
+    @TableField("device_id")
+    private Long deviceId;
 
     /**
-     *
+     * Point ID
      */
-    @TableField(value = "event_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt eventExt;
+    @TableField("point_id")
+    private Long pointId;
 
     /**
-     * ,
+     * Rule ID
+     */
+    @TableField("rule_id")
+    private Long ruleId;
+
+    /**
+     * Rule state ID
+     */
+    @TableField("rule_state_id")
+    private Long ruleStateId;
+
+    /**
+     * Alarm type flag, 0: rule, 1: offline, 2: fault, 3: state flip, 4: report
+     */
+    @TableField("alarm_type_flag")
+    private Byte alarmTypeFlag;
+
+    /**
+     * Alarm source flag, 0: rule, 1: state timeout, 2: device report, 3: driver report, 4: system
+     */
+    @TableField("alarm_source_flag")
+    private Byte alarmSourceFlag;
+
+    /**
+     * Alarm level flag, 0: P0, 1: P1, 2: P2, 3: P3
+     */
+    @TableField("alarm_level_flag")
+    private Byte alarmLevelFlag;
+
+    /**
+     * Alarm extension information
+     */
+    @TableField(value = "alarm_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt alarmExt;
+
+    /**
+     * Expiration duration, seconds
      */
     @TableField("expired_time")
     private Long expiredTime;
 
     /**
-     * , 0:, 1:
+     * Confirmation flag, 0: unconfirmed, 1: confirmed
      */
     @TableField("confirm_flag")
     private Byte confirmFlag;
@@ -105,7 +151,7 @@ public class DriverEventDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * Logical delete flag, 0:not deleted, 1:deleted
+     * Logical delete flag, 0: not deleted, 1: deleted
      */
     @TableLogic
     @TableField("deleted")

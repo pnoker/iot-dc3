@@ -18,22 +18,20 @@
 package io.github.pnoker.common.data.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.common.data.dal.DeviceEventManager;
-import io.github.pnoker.common.data.entity.model.DeviceEventDO;
-import io.github.pnoker.common.data.mapper.DeviceEventMapper;
+import io.github.pnoker.common.data.dal.EntityAlarmManager;
+import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.mapper.EntityAlarmMapper;
 import org.springframework.stereotype.Service;
 
 /**
- * <p>
- * Device event table service class
- * </p>
+ * Entity alarm table service class
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service
-public class DeviceEventManagerImpl extends ServiceImpl<DeviceEventMapper, DeviceEventDO>
-        implements DeviceEventManager {
+public class EntityAlarmManagerImpl extends ServiceImpl<EntityAlarmMapper, EntityAlarmDO>
+        implements EntityAlarmManager {
 
 }

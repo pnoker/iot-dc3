@@ -15,59 +15,62 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.entity.query;
+package io.github.pnoker.common.entity.dto;
 
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * Request body for {@code POST /dashboard/alert/page}. Replaces the earlier
- * Map&lt;String, Object&gt; shape so fields are typed and the controller doesn't have to
- * handwrite {@code Integer.parseInt(b.get("..").toString())} for every entry.
+ * Driver state heartbeat payload sent over RabbitMQ.
  *
  * @author pnoker
  * @version 2025.9.0
- * @since 2026.5.4
+ * @since 2016.10.1
  */
 @Getter
 @Setter
+@Builder
 @ToString
-public class AlertPageQuery implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class DriverStateDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * {@code "device"} / {@code "driver"} / {@code null} (both).
+     * Tenant ID the driver belongs to.
      */
-    private String source;
-
-    private Integer alarmTypeFlag;
+    private Long tenantId;
 
     /**
-     * 0 = unconfirmed, 1 = confirmed, null = both.
+     * Driver ID
      */
-    private Integer confirmFlag;
+    private Long driverId;
 
     /**
-     * Legacy integer window; {@code rangeKey} wins when both set.
+     * Driver status code (see {@link io.github.pnoker.common.enums.DriverStatusEnum})
      */
-    private Integer rangeHours;
+    private String status;
 
     /**
-     * Preset time-range key — resolved server-side via TimeRangeUtil.
+     * Create Time
      */
-    private String rangeKey;
+    private LocalDateTime createTime;
 
-    /**
-     * 1-based page index. Defaults to 1 if null or less.
-     */
-    private Long current;
-
-    private Long size;
+    public DriverStateDTO(Long driverId, String status) {
+        this.driverId = driverId;
+        this.status = status;
+        this.createTime = LocalDateTimeUtil.now();
+    }
 
 }

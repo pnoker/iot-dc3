@@ -24,7 +24,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * One raw event row from the paged / latest list.
+ * One raw alarm row from the paged / latest list.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -43,7 +43,7 @@ public class AlertItemRow {
 
     private long pointId;
 
-    private int eventTypeFlag;
+    private int alarmTypeFlag;
 
     private int confirmFlag;
 

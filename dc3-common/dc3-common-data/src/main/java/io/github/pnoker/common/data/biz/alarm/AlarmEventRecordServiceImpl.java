@@ -20,17 +20,15 @@ package io.github.pnoker.common.data.biz.alarm;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.constant.service.AlarmConstant;
-import io.github.pnoker.common.data.dal.DeviceEventManager;
-import io.github.pnoker.common.data.dal.DriverEventManager;
+import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.RuleStateManager;
-import io.github.pnoker.common.data.entity.model.DeviceEventDO;
-import io.github.pnoker.common.data.entity.model.DriverEventDO;
+import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RuleAlarmEventExt;
+import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.DeviceEventTypeEnum;
-import io.github.pnoker.common.enums.DriverEventTypeEnum;
+import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.enums.RuleStateFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
@@ -55,10 +53,7 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
     private static final long DEFAULT_ID = 0L;
 
     @Resource
-    private DeviceEventManager deviceEventManager;
-
-    @Resource
-    private DriverEventManager driverEventManager;
+    private EntityAlarmManager entityAlarmManager;
 
     @Resource
     private RuleStateManager ruleStateManager;
@@ -82,71 +77,56 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
             return;
         }
 
+        Long alarmId = persistEntityAlarm(match);
+        if (isValidId(alarmId)) {
+            fact.setEventId(alarmId);
+        }
+    }
+
+    private Long persistEntityAlarm(RuleMatch match) {
+        RuleFact fact = match.getFact();
         AlarmTargetTypeFlagEnum targetType = fact.getAlarmTargetTypeFlag();
-        if (AlarmTargetTypeFlagEnum.POINT.equals(targetType) || AlarmTargetTypeFlagEnum.DEVICE.equals(targetType)) {
-            Long eventId = persistDeviceEvent(match);
-            if (isValidId(eventId)) {
-                fact.setEventId(eventId);
-            }
-        } else if (AlarmTargetTypeFlagEnum.DRIVER.equals(targetType)) {
-            Long eventId = persistDriverEvent(match);
-            if (isValidId(eventId)) {
-                fact.setEventId(eventId);
-            }
-        }
-    }
+        Long entityId = fact.getEntityId();
 
-    private Long persistDeviceEvent(RuleMatch match) {
-        RuleFact fact = match.getFact();
-        Long deviceId = AlarmTargetTypeFlagEnum.DEVICE.equals(fact.getAlarmTargetTypeFlag())
-                ? fact.getEntityId() : longValue(fact.value("deviceId"));
-        if (!isValidId(deviceId)) {
-            log.warn("Skip rule device event because deviceId is missing, ruleId={}, targetType={}, entityId={}",
-                    match.getRule().getId(), fact.getAlarmTargetTypeFlag(), fact.getEntityId());
+        if (!isValidId(entityId)) {
+            log.warn("Skip rule entity alarm because entityId is missing, ruleId={}, targetType={}",
+                    match.getRule().getId(), targetType);
             return null;
         }
 
-        Long pointId = AlarmTargetTypeFlagEnum.POINT.equals(fact.getAlarmTargetTypeFlag())
-                ? fact.getEntityId() : longValue(fact.value("pointId"));
-        DeviceEventDO entity = new DeviceEventDO();
-        entity.setDeviceId(deviceId);
+        Long driverId = longValue(fact.value("driverId"));
+        Long deviceId = longValue(fact.value("deviceId"));
+        Long pointId = AlarmTargetTypeFlagEnum.POINT.equals(targetType) ? entityId
+                : longValue(fact.value("pointId"));
+
+        if (AlarmTargetTypeFlagEnum.DEVICE.equals(targetType) || AlarmTargetTypeFlagEnum.POINT.equals(targetType)) {
+            if (!isValidId(deviceId)) {
+                deviceId = AlarmTargetTypeFlagEnum.DEVICE.equals(targetType) ? entityId : DEFAULT_ID;
+            }
+        }
+
+        EntityAlarmDO entity = new EntityAlarmDO();
+        entity.setAlarmTargetTypeFlag(targetType.getIndex());
+        entity.setEntityId(entityId);
+        entity.setDriverId(Objects.requireNonNullElse(driverId, DEFAULT_ID));
+        entity.setDeviceId(Objects.requireNonNullElse(deviceId, DEFAULT_ID));
         entity.setPointId(Objects.requireNonNullElse(pointId, DEFAULT_ID));
-        entity.setEventTypeFlag(DeviceEventTypeEnum.ALARM.getIndex());
-        entity.setEventExt(eventExt(match));
+        entity.setRuleId(match.getRule().getId());
+        entity.setAlarmTypeFlag(AlarmTypeFlagEnum.RULE.getIndex());
+        entity.setAlarmSourceFlag(AlarmSourceFlagEnum.RULE.getIndex());
+        entity.setAlarmExt(alarmExt(match));
         entity.setExpiredTime(DEFAULT_ID);
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(Objects.requireNonNullElse(fact.getTenantId(), DEFAULT_ID));
-        if (!deviceEventManager.save(entity)) {
-            log.warn("Failed to persist rule device event, ruleId={}, deviceId={}, pointId={}",
-                    match.getRule().getId(), deviceId, pointId);
+        if (!entityAlarmManager.save(entity)) {
+            log.warn("Failed to persist entity alarm, ruleId={}, targetType={}, entityId={}",
+                    match.getRule().getId(), targetType, entityId);
             return null;
         }
         return entity.getId();
     }
 
-    private Long persistDriverEvent(RuleMatch match) {
-        RuleFact fact = match.getFact();
-        Long driverId = fact.getEntityId();
-        if (!isValidId(driverId)) {
-            log.warn("Skip rule driver event because driverId is missing, ruleId={}", match.getRule().getId());
-            return null;
-        }
-
-        DriverEventDO entity = new DriverEventDO();
-        entity.setDriverId(driverId);
-        entity.setEventTypeFlag(DriverEventTypeEnum.ALARM.getIndex());
-        entity.setEventExt(eventExt(match));
-        entity.setExpiredTime(DEFAULT_ID);
-        entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(Objects.requireNonNullElse(fact.getTenantId(), DEFAULT_ID));
-        if (!driverEventManager.save(entity)) {
-            log.warn("Failed to persist rule driver event, ruleId={}, driverId={}", match.getRule().getId(), driverId);
-            return null;
-        }
-        return entity.getId();
-    }
-
-    private JsonExt eventExt(RuleMatch match) {
+    private JsonExt alarmExt(RuleMatch match) {
         RuleAlarmEventExt ext = ruleAlarmEventExt(match);
 
         return JsonExt.builder()

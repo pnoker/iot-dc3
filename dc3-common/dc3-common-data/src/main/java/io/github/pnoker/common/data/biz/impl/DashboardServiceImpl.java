@@ -66,7 +66,7 @@ public class DashboardServiceImpl implements DashboardService {
     /**
      * Whitelist for the alert source parameter.
      */
-    private static final Set<String> ALERT_SOURCES = Set.of(SOURCE_DEVICE, SOURCE_DRIVER);
+    private static final Set<String> ALERT_SOURCES = Set.of(SOURCE_DEVICE, SOURCE_DRIVER, SOURCE_POINT);
 
     @Resource
     private DashboardMapper dashboardMapper;
@@ -143,15 +143,15 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public Page<AlertItemVO> alertPage(Long tenantId, String source, Integer eventTypeFlag, Integer confirmFlag,
+    public Page<AlertItemVO> alertPage(Long tenantId, String source, Integer alarmTypeFlag, Integer confirmFlag,
                                        LocalDateTime from, long current, long size) {
         String src = Objects.isNull(source) || source.isBlank() ? null : (ALERT_SOURCES.contains(source) ? source : null);
         long clampedCurrent = Math.max(1L, current);
         long clampedSize = Math.clamp(size, 1L, MAX_PAGE_SIZE);
         long offset = (clampedCurrent - 1L) * clampedSize;
 
-        long total = alertMapper.countFiltered(tenantId, src, eventTypeFlag, confirmFlag, from);
-        var rows = alertMapper.listPaged(tenantId, src, eventTypeFlag, confirmFlag, from, offset, clampedSize);
+        long total = alertMapper.countFiltered(tenantId, src, alarmTypeFlag, confirmFlag, from);
+        var rows = alertMapper.listPaged(tenantId, src, alarmTypeFlag, confirmFlag, from, offset, clampedSize);
         List<AlertItemVO> records = new ArrayList<>(rows.size());
         for (var row : rows) {
             AlertItemVO vo = new AlertItemVO();
@@ -159,7 +159,7 @@ public class DashboardServiceImpl implements DashboardService {
             vo.setSource(row.getSource());
             vo.setSourceId(row.getSourceId());
             vo.setPointId(row.getPointId());
-            vo.setEventTypeFlag(row.getEventTypeFlag());
+            vo.setAlarmTypeFlag(row.getAlarmTypeFlag());
             vo.setConfirmFlag(row.getConfirmFlag());
             vo.setCreateTime(row.getCreateTime());
             vo.setMessage(row.getMessage());
@@ -393,7 +393,7 @@ public class DashboardServiceImpl implements DashboardService {
             vo.setSource(row.getSource());
             vo.setSourceId(row.getSourceId());
             vo.setPointId(row.getPointId());
-            vo.setEventTypeFlag(row.getEventTypeFlag());
+            vo.setAlarmTypeFlag(row.getAlarmTypeFlag());
             vo.setConfirmFlag(row.getConfirmFlag());
             vo.setCreateTime(row.getCreateTime());
             vo.setMessage(row.getMessage());
@@ -511,7 +511,7 @@ public class DashboardServiceImpl implements DashboardService {
             FlappingSourceVO vo = new FlappingSourceVO();
             vo.setSource(r.getSource());
             vo.setSourceId(r.getSourceId());
-            vo.setEventTypeFlag(r.getEventTypeFlag());
+            vo.setAlarmTypeFlag(r.getAlarmTypeFlag());
             vo.setCount(r.getCount());
             out.add(vo);
         }

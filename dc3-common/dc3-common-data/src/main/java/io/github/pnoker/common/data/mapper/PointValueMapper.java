@@ -21,9 +21,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 
 /**
- * <p>
- * (, StringType) Mapper
- * </p>
+ * Point value Mapper.
  *
  * @author pnoker
  * @version 2025.9.0

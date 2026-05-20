@@ -18,17 +18,15 @@
 package io.github.pnoker.common.data.dal;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.github.pnoker.common.data.entity.model.DeviceEventDO;
+import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 
 /**
- * <p>
- * Device event table service class
- * </p>
+ * Entity alarm table service class
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface DeviceEventManager extends IService<DeviceEventDO> {
+public interface EntityAlarmManager extends IService<EntityAlarmDO> {
 
 }

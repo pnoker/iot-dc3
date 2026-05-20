@@ -20,433 +20,219 @@
 <mapper namespace="io.github.pnoker.common.data.mapper.AlertMapper">
 
     <!--
-        Alert stat queries count only ALARM rows (event_type_flag = 1).
-        HEARTBEAT (0) is not an "alert" and is excluded from the home-page
-        stat cards, sparkline, and badge.
+        All queries now target the unified dc3_entity_alarm table.
+        alarm_target_type_flag: 0=point, 1=device, 2=driver.
+        The old 'source' output column is derived from alarm_target_type_flag.
+        No event_type_flag filter needed — all rows are alarm records.
     -->
 
     <select id="countAll" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow">
-        SELECT (SELECT COUNT(*)
-                FROM dc3_device_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1)
-                   + (SELECT COUNT(*)
-                      FROM dc3_driver_event
-                      WHERE deleted = 0
-                        AND tenant_id = #{tenantId}
-                        AND event_type_flag = 1) AS total,
-               (SELECT COUNT(*)
-                FROM dc3_device_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1
-                  AND confirm_flag = 0)
-                   + (SELECT COUNT(*)
-                      FROM dc3_driver_event
-                      WHERE deleted = 0
-                        AND tenant_id = #{tenantId}
-                        AND event_type_flag = 1
-                        AND confirm_flag = 0)    AS unconfirmed
+        SELECT COUNT(*)                           AS total,
+               COUNT(*) FILTER (WHERE confirm_flag = 0) AS unconfirmed
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
     </select>
 
     <select id="countBySource" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow">
-        SELECT 'device'                    AS source,
-               (SELECT COUNT(*)
-                FROM dc3_device_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1) AS total,
-               (SELECT COUNT(*)
-                FROM dc3_device_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1
-                  AND confirm_flag = 0)    AS unconfirmed
-        UNION ALL
-        SELECT 'driver'                    AS source,
-               (SELECT COUNT(*)
-                FROM dc3_driver_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1) AS total,
-               (SELECT COUNT(*)
-                FROM dc3_driver_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1
-                  AND confirm_flag = 0)    AS unconfirmed
+        SELECT CASE alarm_target_type_flag
+                   WHEN 0 THEN 'point'
+                   WHEN 1 THEN 'device'
+                   ELSE 'driver'
+                   END AS source,
+               COUNT(*)                                              AS total,
+               COUNT(*) FILTER (WHERE confirm_flag = 0)              AS unconfirmed
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        GROUP BY alarm_target_type_flag
+        ORDER BY alarm_target_type_flag
     </select>
 
     <select id="countByType" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
-        SELECT event_type_flag::text AS key, COUNT(*) AS count
-        FROM (
-            SELECT event_type_flag FROM dc3_device_event
-            WHERE deleted = 0 AND tenant_id = #{tenantId} AND event_type_flag = 1
-            UNION ALL
-            SELECT event_type_flag FROM dc3_driver_event
-            WHERE deleted = 0 AND tenant_id = #{tenantId} AND event_type_flag = 1
-            ) merged
-        GROUP BY event_type_flag
-        ORDER BY count
-        DESC
+        SELECT alarm_type_flag::text AS key, COUNT(*) AS count
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        GROUP BY alarm_type_flag
+        ORDER BY count DESC
     </select>
 
-    <!--
-        Each branch has its own ORDER BY / LIMIT and must be wrapped in
-        parentheses to participate in UNION ALL (Postgres rule). Driver rows
-        have no point_id, so we project literal 0 to line up with the
-        device branch's schema.
-    -->
     <select id="latest" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
-        SELECT *
-        FROM ((SELECT id,
-                      'device'                              AS source,
-                      device_id                             AS source_id,
-                      point_id,
-                      event_type_flag,
-                      confirm_flag,
-                      create_time,
-                      COALESCE(event_ext ->> 'content', '') AS message
-               FROM dc3_device_event
-               WHERE deleted = 0
-                 AND tenant_id = #{tenantId}
-                 AND event_type_flag = 1
-               ORDER BY create_time DESC
-               LIMIT #{limit})
-              UNION ALL
-              (SELECT id,
-                      'driver'                              AS source,
-                      driver_id                             AS source_id,
-                      0,
-                      event_type_flag,
-                      confirm_flag,
-                      create_time,
-                      COALESCE(event_ext ->> 'content', '') AS message
-               FROM dc3_driver_event
-               WHERE deleted = 0
-                 AND tenant_id = #{tenantId}
-                 AND event_type_flag = 1
-               ORDER BY create_time DESC
-               LIMIT #{limit})) unioned
+        SELECT id,
+               CASE alarm_target_type_flag
+                   WHEN 0 THEN 'point'
+                   WHEN 1 THEN 'device'
+                   ELSE 'driver'
+                   END                               AS source,
+               entity_id                              AS source_id,
+               point_id,
+               alarm_type_flag                       AS alarm_type_flag,
+               confirm_flag,
+               create_time,
+               COALESCE(alarm_ext ->> 'content', '') AS message
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
         ORDER BY create_time DESC
         LIMIT #{limit}
     </select>
 
-    <!--
-        Common projection for a single event row. Included from the paging /
-        latest selects so both return the same shape (id, source, sourceId,
-        pointId, event_type_flag, confirm_flag, create_time, message).
-        message comes out of event_ext JSON via the "content" key; SQL reads
-        (event_ext->>'content') which works for both the new JsonExt layout
-        and a bare {"content": ...} wrapper.
-    -->
-
-    <!--
-        Per-hour event count since {from}. date_trunc('hour') buckets events
-        at hour boundaries; service layer then spreads rows into a fixed-
-        length sparkline array anchored to "now - 24h".
-    -->
     <select id="hourlyCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow">
         SELECT date_trunc('hour', create_time) AS bucket, COUNT(*) AS count
-        FROM (SELECT create_time
-              FROM dc3_device_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND event_type_flag = 1
-                AND create_time &gt;= #{from}
-              UNION ALL
-              SELECT create_time
-              FROM dc3_driver_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND event_type_flag = 1
-                AND create_time &gt;= #{from}) merged
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
         GROUP BY bucket
         ORDER BY bucket ASC
     </select>
 
-    <!--
-        Paged event list. source='device' or 'driver' restricts to one
-        table (faster); otherwise UNION ALL across both with consistent
-        shape. Inner LIMIT keeps each branch bounded before UNION.
-    -->
     <select id="listPaged" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
-        SELECT * FROM (
-        <choose>
-            <when test="source == 'device'">
-                SELECT id, 'device' AS source, device_id AS source_id, point_id,
-                event_type_flag, confirm_flag, create_time,
-                COALESCE(event_ext->>'content', '') AS message
-                FROM dc3_device_event
-                WHERE deleted = 0 AND tenant_id = #{tenantId}
-                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
-                <if test="from != null">AND create_time &gt;= #{from}</if>
-            </when>
-            <when test="source == 'driver'">
-                SELECT id, 'driver' AS source, driver_id AS source_id, 0 AS point_id,
-                event_type_flag, confirm_flag, create_time,
-                COALESCE(event_ext->>'content', '') AS message
-                FROM dc3_driver_event
-                WHERE deleted = 0 AND tenant_id = #{tenantId}
-                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
-                <if test="from != null">AND create_time &gt;= #{from}</if>
-            </when>
-            <otherwise>
-                (SELECT id, 'device' AS source, device_id AS source_id, point_id,
-                event_type_flag, confirm_flag, create_time,
-                COALESCE(event_ext->>'content', '') AS message
-                FROM dc3_device_event
-                WHERE deleted = 0 AND tenant_id = #{tenantId}
-                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
-                <if test="from != null">AND create_time &gt;= #{from}</if>)
-                UNION ALL
-                (SELECT id, 'driver' AS source, driver_id AS source_id, 0 AS point_id,
-                event_type_flag, confirm_flag, create_time,
-                COALESCE(event_ext->>'content', '') AS message
-                FROM dc3_driver_event
-                WHERE deleted = 0 AND tenant_id = #{tenantId}
-                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
-                <if test="from != null">AND create_time &gt;= #{from}</if>)
-            </otherwise>
-        </choose>
-        ) rows
+        SELECT id,
+               CASE alarm_target_type_flag
+                   WHEN 0 THEN 'point'
+                   WHEN 1 THEN 'device'
+                   ELSE 'driver'
+                   END                               AS source,
+               entity_id                              AS source_id,
+               point_id,
+               alarm_type_flag                       AS alarm_type_flag,
+               confirm_flag,
+               create_time,
+               COALESCE(alarm_ext ->> 'content', '') AS message
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
+        <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
+        <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
+        <if test="alarmTypeFlag != null">AND alarm_type_flag = #{alarmTypeFlag}</if>
+        <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+        <if test="from != null">AND create_time &gt;= #{from}</if>
         ORDER BY create_time DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
     <select id="countFiltered" resultType="long">
-        <choose>
-            <when test="source == 'device'">
-                SELECT COUNT(*) FROM dc3_device_event
-                WHERE deleted = 0 AND tenant_id = #{tenantId}
-                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
-                <if test="from != null">AND create_time &gt;= #{from}</if>
-            </when>
-            <when test="source == 'driver'">
-                SELECT COUNT(*) FROM dc3_driver_event
-                WHERE deleted = 0 AND tenant_id = #{tenantId}
-                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
-                <if test="from != null">AND create_time &gt;= #{from}</if>
-            </when>
-            <otherwise>
-                SELECT
-                (SELECT COUNT(*) FROM dc3_device_event
-                WHERE deleted = 0 AND tenant_id = #{tenantId}
-                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
-                <if test="from != null">AND create_time &gt;= #{from}</if>)
-                + (SELECT COUNT(*) FROM dc3_driver_event
-                WHERE deleted = 0 AND tenant_id = #{tenantId}
-                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
-                <if test="from != null">AND create_time &gt;= #{from}</if>)
-            </otherwise>
-        </choose>
+        SELECT COUNT(*)
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
+        <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
+        <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
+        <if test="alarmTypeFlag != null">AND alarm_type_flag = #{alarmTypeFlag}</if>
+        <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+        <if test="from != null">AND create_time &gt;= #{from}</if>
     </select>
 
-    <!--
-        Today's ALARM counts per source (event_type_flag = 1, create_time >= start of today).
-    -->
     <select id="todayBySource" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow">
-        SELECT 'device'                          AS source,
-               (SELECT COUNT(*)
-                FROM dc3_device_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1
-                  AND create_time &gt;= #{from}) AS total,
-               (SELECT COUNT(*)
-                FROM dc3_device_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1
-                  AND confirm_flag = 0
-                  AND create_time &gt;= #{from}) AS unconfirmed
-        UNION ALL
-        SELECT 'driver'                          AS source,
-               (SELECT COUNT(*)
-                FROM dc3_driver_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1
-                  AND create_time &gt;= #{from}) AS total,
-               (SELECT COUNT(*)
-                FROM dc3_driver_event
-                WHERE deleted = 0
-                  AND tenant_id = #{tenantId}
-                  AND event_type_flag = 1
-                  AND confirm_flag = 0
-                  AND create_time &gt;= #{from}) AS unconfirmed
+        SELECT CASE alarm_target_type_flag
+                   WHEN 0 THEN 'point'
+                   WHEN 1 THEN 'device'
+                   ELSE 'driver'
+                   END                                          AS source,
+               COUNT(*)                                         AS total,
+               COUNT(*) FILTER (WHERE confirm_flag = 0)         AS unconfirmed
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+        GROUP BY alarm_target_type_flag
+        ORDER BY alarm_target_type_flag
     </select>
 
     <update id="confirmOne">
-        <choose>
-            <when test="source == 'device'">
-                UPDATE dc3_device_event SET confirm_flag = 1
-                WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
-            </when>
-            <when test="source == 'driver'">
-                UPDATE dc3_driver_event SET confirm_flag = 1
-                WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
-            </when>
-        </choose>
+        UPDATE dc3_entity_alarm
+        SET confirm_flag = 1
+        WHERE id = #{id}
+          AND tenant_id = #{tenantId}
+          AND deleted = 0
+        <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
+        <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
+        <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
     </update>
 
     <update id="unconfirmOne">
-        <choose>
-            <when test="source == 'device'">
-                UPDATE dc3_device_event SET confirm_flag = 0
-                WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
-            </when>
-            <when test="source == 'driver'">
-                UPDATE dc3_driver_event SET confirm_flag = 0
-                WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
-            </when>
-        </choose>
+        UPDATE dc3_entity_alarm
+        SET confirm_flag = 0
+        WHERE id = #{id}
+          AND tenant_id = #{tenantId}
+          AND deleted = 0
+        <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
+        <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
+        <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
     </update>
 
-    <!--
-        Daily event trend: per-day counts split by source, over a window
-        starting at {from}. Returns (date, device_count, driver_count).
-    -->
     <select id="dailyTrend" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow">
-        SELECT date ::text AS date, device_count,
-               driver_count
-        FROM (SELECT d.day                AS date,
-                     COALESCE(dev.cnt, 0) AS device_count,
-                     COALESCE(drv.cnt, 0) AS driver_count
-              FROM (SELECT generate_series(date_trunc('day', #{from})::date,
-                                           CURRENT_DATE, '1 day') ::date AS day) d
-                       LEFT JOIN (SELECT date_trunc('day', create_time)::date AS day, COUNT(*) AS cnt
-                                  FROM dc3_device_event
-                                  WHERE deleted = 0
-                                    AND tenant_id = #{tenantId}
-                                    AND event_type_flag = 1
-                                    AND create_time &gt;= #{from}
-                                  GROUP BY day) dev ON d.day = dev.day
-                       LEFT JOIN (SELECT date_trunc('day', create_time)::date AS day, COUNT(*) AS cnt
-                                  FROM dc3_driver_event
-                                  WHERE deleted = 0
-                                    AND tenant_id = #{tenantId}
-                                    AND event_type_flag = 1
-                                    AND create_time &gt;= #{from}
-                                  GROUP BY day) drv ON d.day = drv.day) result
-        ORDER BY date ASC
+        SELECT d.day ::text                                                                   AS date,
+               COALESCE(SUM(CASE WHEN a.alarm_target_type_flag IN (0, 1) THEN 1 ELSE 0 END), 0) AS device_count,
+               COALESCE(SUM(CASE WHEN a.alarm_target_type_flag = 2 THEN 1 ELSE 0 END), 0)       AS driver_count
+        FROM (SELECT generate_series(date_trunc('day', #{from})::date,
+                                     CURRENT_DATE, '1 day') ::date AS day) d
+                 LEFT JOIN dc3_entity_alarm a
+                           ON date_trunc('day', a.create_time)::date = d.day
+                               AND a.deleted = 0
+                               AND a.tenant_id = #{tenantId}
+                               AND a.create_time &gt;= #{from}
+        GROUP BY d.day
+        ORDER BY d.day ASC
     </select>
 
-    <!--
-        Top event sources by alarm count, across device + driver tables.
-        Returns (source, source_id, count) ordered by count DESC.
-    -->
     <select id="topSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow">
-        SELECT *
-        FROM ((SELECT 'device' AS source, device_id AS source_id, COUNT(*) AS count
-               FROM dc3_device_event
-               WHERE deleted = 0
-                 AND tenant_id = #{tenantId}
-                 AND event_type_flag = 1
-                 AND create_time &gt;= #{from}
-               GROUP BY device_id
-               ORDER BY count DESC
-               LIMIT #{limit})
-              UNION ALL
-              (SELECT 'driver' AS source, driver_id AS source_id, COUNT(*) AS count
-               FROM dc3_driver_event
-               WHERE deleted = 0
-                 AND tenant_id = #{tenantId}
-                 AND event_type_flag = 1
-                 AND create_time &gt;= #{from}
-               GROUP BY driver_id
-               ORDER BY count DESC
-               LIMIT #{limit})) unioned
+        SELECT CASE alarm_target_type_flag
+                   WHEN 0 THEN 'point'
+                   WHEN 1 THEN 'device'
+                   ELSE 'driver'
+                   END     AS source,
+               entity_id   AS source_id,
+               COUNT(*)    AS count
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+        GROUP BY alarm_target_type_flag, entity_id
         ORDER BY count DESC
         LIMIT #{limit}
     </select>
 
-    <!--
-        ALARM counts bucketed by (day-of-week, hour-of-day). Service zero-pads
-        missing cells so the UI always gets a fully-filled 7×24 grid.
-    -->
     <select id="activityHeatmap" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow">
-        SELECT dow, hour, SUM(count) AS count
-        FROM (SELECT EXTRACT(DOW FROM create_time)::int AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS
-            count
-              FROM dc3_device_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND event_type_flag = 1
-                AND create_time &gt;= #{from}
-              GROUP BY dow, hour
-              UNION ALL
-              SELECT EXTRACT(DOW FROM create_time)::int AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
-              FROM dc3_driver_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND event_type_flag = 1
-                AND create_time &gt;= #{from}
-              GROUP BY dow, hour) u
+        SELECT EXTRACT(DOW FROM create_time)::int  AS dow,
+               EXTRACT(HOUR FROM create_time)::int AS hour,
+               COUNT(*)                            AS count
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
         GROUP BY dow, hour
     </select>
 
-    <!--
-        ALARM counts grouped by the event_ext.type tag. Both event tables
-        store their type under the same JSON key (see DriverEventServiceImpl
-        and DeviceEventServiceImpl), so we can union them before grouping.
-    -->
     <select id="typeDistribution" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
-        SELECT type AS key, SUM(count) AS count
-        FROM (SELECT event_ext ->> 'type' AS type, COUNT (*) AS count
-            FROM dc3_device_event
-            WHERE deleted = 0
-            AND tenant_id = #{tenantId}
-            AND event_type_flag = 1
-            AND create_time &gt;= #{from}
-            GROUP BY type
-            UNION ALL
-            SELECT event_ext ->> 'type' AS type, COUNT (*) AS count
-            FROM dc3_driver_event
-            WHERE deleted = 0
-            AND tenant_id = #{tenantId}
-            AND event_type_flag = 1
-            AND create_time &gt;= #{from}
-            GROUP BY type) u
-        WHERE type IS NOT NULL
-        GROUP BY type
-        ORDER BY count
-        DESC
+        SELECT alarm_ext ->> 'type' AS key, COUNT (*) AS count
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+          AND alarm_ext ->> 'type' IS NOT NULL
+        GROUP BY key
+        ORDER BY count DESC
     </select>
 
-    <!--
-        Sources that exceeded the storm threshold within the window. HAVING
-        COUNT(*) >= minCount filters out ordinary sources so the operator
-        only sees the ones deserving immediate attention.
-    -->
     <select id="stormSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow">
-        SELECT *
-        FROM ((SELECT 'device' AS source, device_id AS source_id, COUNT(*) AS count
-               FROM dc3_device_event
-               WHERE deleted = 0
-                 AND tenant_id = #{tenantId}
-                 AND event_type_flag = 1
-                 AND create_time &gt;= #{from}
-               GROUP BY device_id
-               HAVING COUNT(*) &gt;= #{minCount})
-              UNION ALL
-              (SELECT 'driver' AS source, driver_id AS source_id, COUNT(*) AS count
-               FROM dc3_driver_event
-               WHERE deleted = 0
-                 AND tenant_id = #{tenantId}
-                 AND event_type_flag = 1
-                 AND create_time &gt;= #{from}
-               GROUP BY driver_id
-               HAVING COUNT(*) &gt;= #{minCount})) unioned
+        SELECT CASE alarm_target_type_flag
+                   WHEN 0 THEN 'point'
+                   WHEN 1 THEN 'device'
+                   ELSE 'driver'
+                   END     AS source,
+               entity_id   AS source_id,
+               COUNT(*)    AS count
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+        GROUP BY alarm_target_type_flag, entity_id
+        HAVING COUNT(*) &gt;= #{minCount}
         ORDER BY count DESC
         LIMIT #{limit}
     </select>
@@ -455,98 +241,72 @@
          Phase-2 insight queries
          ========================================================= -->
 
-    <!--
-        Flapping = same (source, sourceId, eventType) producing multiple
-        events within the window. GROUP includes event_type_flag so a
-        device with 2 types of alarms produces 2 rows, not 1. Only ALARM
-        events (event_type_flag=1) typically, but we grouping-include the
-        flag itself in case HEARTBEAT(0) / state-change rows are useful
-        later — service passes minCount so small real groups are filtered.
-    -->
     <select id="flappingSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.FlappingRow">
-        SELECT *
-        FROM ((SELECT 'device' AS source, device_id AS source_id, event_type_flag, COUNT(*) AS count
-               FROM dc3_device_event
-               WHERE deleted = 0
-                 AND tenant_id = #{tenantId}
-                 AND create_time &gt;= #{from}
-               GROUP BY device_id, event_type_flag
-               HAVING COUNT(*) &gt;= #{minCount})
-              UNION ALL
-              (SELECT 'driver' AS source, driver_id AS source_id, event_type_flag, COUNT(*) AS count
-               FROM dc3_driver_event
-               WHERE deleted = 0
-                 AND tenant_id = #{tenantId}
-                 AND create_time &gt;= #{from}
-               GROUP BY driver_id, event_type_flag
-               HAVING COUNT(*) &gt;= #{minCount})) u
+        SELECT CASE alarm_target_type_flag
+                   WHEN 0 THEN 'point'
+                   WHEN 1 THEN 'device'
+                   ELSE 'driver'
+                   END          AS source,
+               entity_id        AS source_id,
+               alarm_type_flag  AS alarm_type_flag,
+               COUNT(*)         AS count
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+        GROUP BY alarm_target_type_flag, entity_id, alarm_type_flag
+        HAVING COUNT(*) &gt;= #{minCount}
         ORDER BY count DESC
         LIMIT #{limit}
     </select>
 
-    <!--
-        Correlation: cross-product of event pairs within windowSec of each
-        other, grouped by the pair identity. e1.id &lt; e2.id keeps each pair
-        counted once. source_id IS NOT the same pair — we require different
-        sources (otherwise it's just "this source had 2 events in a row",
-        which is already flapping). Expensive query: service should cache.
-    -->
     <select id="correlationPairs" resultType="io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow">
-        WITH ev AS (SELECT 'device'::text AS source, device_id AS source_id, event_type_flag, create_time, id
-                    FROM dc3_device_event
-                    WHERE deleted = 0
-                      AND tenant_id = #{tenantId}
-                      AND create_time &gt;= #{from}
-                    UNION ALL
-                    SELECT 'driver'::text AS source, driver_id AS source_id, event_type_flag, create_time, id
-                    FROM dc3_driver_event
+        WITH ev AS (SELECT CASE alarm_target_type_flag
+                               WHEN 0 THEN 'point'
+                               WHEN 1 THEN 'device'
+                               ELSE 'driver'
+                               END                  AS source,
+                           entity_id                 AS source_id,
+                           alarm_type_flag           AS alarm_type_flag,
+                           create_time,
+                           id
+                    FROM dc3_entity_alarm
                     WHERE deleted = 0
                       AND tenant_id = #{tenantId}
                       AND create_time &gt;= #{from})
         SELECT e1.source          AS a_source,
                e1.source_id       AS a_source_id,
-               e1.event_type_flag AS a_event_type,
+               e1.alarm_type_flag AS a_event_type,
                e2.source          AS b_source,
                e2.source_id       AS b_source_id,
-               e2.event_type_flag AS b_event_type,
+               e2.alarm_type_flag AS b_event_type,
                COUNT(*)           AS co_count
         FROM ev e1
                  JOIN ev e2 ON abs(EXTRACT(EPOCH FROM (e1.create_time - e2.create_time))) &lt;= #{windowSec}
             AND (e1.source &lt;&gt; e2.source OR e1.source_id &lt;&gt; e2.source_id)
-            AND (e1.source, e1.source_id, e1.event_type_flag) &lt; (e2.source, e2.source_id, e2.event_type_flag)
-        GROUP BY e1.source, e1.source_id, e1.event_type_flag,
-                 e2.source, e2.source_id, e2.event_type_flag
+            AND (e1.source, e1.source_id, e1.alarm_type_flag) &lt; (e2.source, e2.source_id, e2.alarm_type_flag)
+        GROUP BY e1.source, e1.source_id, e1.alarm_type_flag,
+                 e2.source, e2.source_id, e2.alarm_type_flag
         ORDER BY co_count DESC
         LIMIT #{limit}
     </select>
 
-    <!--
-        Peer deviation: per-(profile, device) alarm count. Cross-schema
-        join to dc3_manager.dc3_profile_bind because profile→device is a
-        M:N managed by manager, and we need the profile identity to
-        compute per-profile medians in the service layer.
-        Only device events matter here (drivers don't bind profiles).
-    -->
     <select id="peerAlarmCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow">
         SELECT pb.profile_id AS profile_id,
-               de.device_id  AS device_id,
+               ea.device_id  AS device_id,
                COUNT(*)      AS alarm_count
-        FROM dc3_device_event de
+        FROM dc3_entity_alarm ea
                  JOIN dc3_manager.dc3_profile_bind pb
-                      ON pb.device_id = de.device_id
-                          AND pb.tenant_id = de.tenant_id
+                      ON pb.device_id = ea.device_id
+                          AND pb.tenant_id = ea.tenant_id
                           AND pb.deleted = 0
-        WHERE de.deleted = 0
-          AND de.tenant_id = #{tenantId}
-          AND de.event_type_flag = 1
-          AND de.create_time &gt;= #{from}
-        GROUP BY pb.profile_id, de.device_id
+        WHERE ea.deleted = 0
+          AND ea.tenant_id = #{tenantId}
+          AND ea.alarm_target_type_flag IN (0, 1)
+          AND ea.create_time &gt;= #{from}
+        GROUP BY pb.profile_id, ea.device_id
     </select>
 
-    <!--
-        Aging backlog: unconfirmed rows bucketed by how long they've been
-        open. Both event tables contribute; return one row with 4 counts.
-    -->
     <select id="agingBuckets" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow">
         SELECT COALESCE(SUM(CASE WHEN age &lt; INTERVAL '1 hour' THEN 1 ELSE 0 END), 0)    AS under_1h,
                COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '1 hour' AND age &lt; INTERVAL '6 hours' THEN 1 ELSE 0 END),
@@ -556,25 +316,12 @@
                COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '24 hours' THEN 1 ELSE 0 END), 0) AS over_24h,
                COUNT(*)                                                                    AS total
         FROM (SELECT NOW() - create_time AS age
-              FROM dc3_device_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND confirm_flag = 0
-              UNION ALL
-              SELECT NOW() - create_time
-              FROM dc3_driver_event
+              FROM dc3_entity_alarm
               WHERE deleted = 0
                 AND tenant_id = #{tenantId}
                 AND confirm_flag = 0) ages
     </select>
 
-    <!--
-        MTTA per day: percentiles of (operate_time - create_time) for
-        confirm_flag=1 rows. The table has a BEFORE UPDATE trigger that
-        refreshes operate_time on every update, so for confirmed rows the
-        diff is the ack latency (assuming no other updates, which matches
-        the current app behaviour).
-    -->
     <select id="mttaByDay" resultType="io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow">
         SELECT to_char(DATE(create_time), 'YYYY-MM-DD')                                                        AS date,
                PERCENTILE_CONT(0.5)
@@ -582,28 +329,15 @@
                PERCENTILE_CONT(0.95)
                                WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p95_ms,
                COUNT(*)                                                                                        AS confirmed_count
-        FROM (SELECT create_time, operate_time
-              FROM dc3_device_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND confirm_flag = 1
-                AND create_time &gt;= #{from}
-              UNION ALL
-              SELECT create_time, operate_time
-              FROM dc3_driver_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND confirm_flag = 1
-                AND create_time &gt;= #{from}) u
+        FROM dc3_entity_alarm
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND confirm_flag = 1
+          AND create_time &gt;= #{from}
         GROUP BY DATE(create_time)
         ORDER BY date ASC
     </select>
 
-    <!--
-        Protocol health: service_name breakdown of drivers + their devices.
-        Cross-schema to dc3_manager because the driver/device tables live
-        there but the data service is the one exposing the dashboard API.
-    -->
     <select id="protocolHealth" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ProtocolHealthRow">
         SELECT d.service_name                                            AS service_name,
                COUNT(DISTINCT d.id)                                      AS driver_count,
@@ -620,11 +354,6 @@
         ORDER BY device_count DESC, driver_count DESC
     </select>
 
-    <!--
-        Recent config edits on driver/device/profile. operate_time &gt; create_time
-        is the "was edited after creation" test — PostgreSQL comparisons on
-        timestamptz handle DST / time-zone correctly.
-    -->
     <select id="recentChanges" resultType="io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow">
         SELECT kind, id AS entity_id, operate_time
         FROM (SELECT 'driver'::text AS kind, id, operate_time, create_time

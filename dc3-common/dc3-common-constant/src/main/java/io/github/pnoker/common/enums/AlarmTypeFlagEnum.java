@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common driver event type enumeration
+ * Common alarm type enumeration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,68 +33,56 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum DriverEventTypeEnum {
+public enum AlarmTypeFlagEnum {
 
     /**
-     * Heartbeat event
+     * Rule alarm
      */
-    HEARTBEAT((byte) 0, "heartbeat", "Heartbeat event"),
+    RULE((byte) 0, "rule", "Rule alarm"),
 
     /**
-     * Alarm event
+     * Offline alarm
      */
-    ALARM((byte) 1, "alarm", "Alarm event"),
+    OFFLINE((byte) 1, "offline", "Offline alarm"),
+
+    /**
+     * Fault alarm
+     */
+    FAULT((byte) 2, "fault", "Fault alarm"),
+
+    /**
+     * State flip alarm
+     */
+    STATE_FLIP((byte) 3, "state-flip", "State flip alarm"),
+
+    /**
+     * Report alarm
+     */
+    REPORT((byte) 4, "report", "Report alarm"),
     ;
 
-    /**
-     * Index
-     */
     @EnumValue
     private final Byte index;
 
-    /**
-     * Code
-     */
     private final String code;
 
-    /**
-     * Remark
-     */
     private final String remark;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link DriverEventTypeEnum}
-     */
-    public static DriverEventTypeEnum ofIndex(Byte index) {
-        Optional<DriverEventTypeEnum> any = Arrays.stream(DriverEventTypeEnum.values())
+    public static AlarmTypeFlagEnum ofIndex(Byte index) {
+        Optional<AlarmTypeFlagEnum> any = Arrays.stream(AlarmTypeFlagEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link DriverEventTypeEnum}
-     */
-    public static DriverEventTypeEnum ofCode(String code) {
-        Optional<DriverEventTypeEnum> any = Arrays.stream(DriverEventTypeEnum.values())
+    public static AlarmTypeFlagEnum ofCode(String code) {
+        Optional<AlarmTypeFlagEnum> any = Arrays.stream(AlarmTypeFlagEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link DriverEventTypeEnum}
-     */
-    public static DriverEventTypeEnum ofName(String name) {
+    public static AlarmTypeFlagEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

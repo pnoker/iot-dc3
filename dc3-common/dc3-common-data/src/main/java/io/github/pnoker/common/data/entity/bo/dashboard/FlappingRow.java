@@ -22,7 +22,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * (source, sourceId, eventTypeFlag, count) — one flapping (source, type) pair.
+ * (source, sourceId, alarmTypeFlag, count) — one flapping (source, type) pair.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,7 +37,7 @@ public class FlappingRow {
 
     private long sourceId;
 
-    private int eventTypeFlag;
+    private int alarmTypeFlag;
 
     private long count;
 

@@ -15,25 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.dal.impl;
+package io.github.pnoker.common.data.biz;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.common.data.dal.DriverEventManager;
-import io.github.pnoker.common.data.entity.model.DriverEventDO;
-import io.github.pnoker.common.data.mapper.DriverEventMapper;
-import org.springframework.stereotype.Service;
+import io.github.pnoker.common.entity.dto.DriverStateDTO;
 
 /**
- * <p>
- * Driver event table service class
- * </p>
+ * Handles driver heartbeat/state events: refreshes the online-status cache and
+ * derives alarm rows on status flips.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Service
-public class DriverEventManagerImpl extends ServiceImpl<DriverEventMapper, DriverEventDO>
-        implements DriverEventManager {
+public interface DriverStateService {
+
+    /**
+     * Handle a driver heartbeat: refresh the in-memory online-status key and
+     * delegate to {@link DriverAlarmService} when the status flips between
+     * ONLINE/MAINTAIN and OFFLINE.
+     *
+     * @param entityDTO DriverStateDTO
+     */
+    void heartbeat(DriverStateDTO entityDTO);
 
 }

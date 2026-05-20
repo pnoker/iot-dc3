@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.entity.dto;
 
-import io.github.pnoker.common.enums.DriverEventTypeEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,9 +28,10 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Driver Event
+ * Device state heartbeat payload sent over RabbitMQ.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,79 +43,60 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DriverEventDTO implements Serializable {
+public class DeviceStateDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * Type
+     * Driver ID that reports this state.
      */
-    private DriverEventTypeEnum type;
+    private Long driverId;
 
     /**
-     *
+     * Tenant ID the device belongs to.
      */
-    private String content;
+    private Long tenantId;
+
+    /**
+     * Device ID
+     */
+    private Long deviceId;
+
+    /**
+     * Device status code (see {@link io.github.pnoker.common.enums.DeviceStatusEnum})
+     */
+    private String status;
+
+    /**
+     * Cache TTL
+     */
+    @Builder.Default
+    private int timeOut = 15;
+
+    /**
+     * Cache TTL unit
+     */
+    @Builder.Default
+    private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     /**
      * Create Time
      */
     private LocalDateTime createTime;
 
-    public DriverEventDTO(DriverEventTypeEnum type, String content) {
-        this.type = type;
-        this.content = content;
+    public DeviceStateDTO(Long deviceId, String status) {
+        this.deviceId = deviceId;
+        this.status = status;
         this.createTime = LocalDateTimeUtil.now();
     }
 
-    /**
-     * Status
-     *
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2016.10.1
-     */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DriverStatus implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Driver ID
-         */
-        private Long driverId;
-
-        /**
-         * Tenant ID the driver belongs to. Populated by the sender.
-         */
-        private Long tenantId;
-
-        /**
-         * Status
-         */
-        private DriverStatusEnum status;
-
-        /**
-         * Human-readable message. Populated for ALARM events; null for HEARTBEAT.
-         */
-        private String message;
-
-        /**
-         * Create Time
-         */
-        private LocalDateTime createTime;
-
-        public DriverStatus(Long driverId, DriverStatusEnum status) {
-            this.driverId = driverId;
-            this.status = status;
-            this.createTime = LocalDateTimeUtil.now();
-        }
-
+    public DeviceStateDTO(Long deviceId, String status, int timeOut, TimeUnit timeUnit) {
+        this.deviceId = deviceId;
+        this.status = status;
+        this.timeOut = timeOut;
+        this.timeUnit = timeUnit;
+        this.createTime = LocalDateTimeUtil.now();
     }
 
 }
