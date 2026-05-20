@@ -18,6 +18,7 @@
 package io.github.pnoker.common.exception;
 
 /**
+ * Exception for configuration errors.
  *
  * @author pnoker
  * @version 2025.9.0
