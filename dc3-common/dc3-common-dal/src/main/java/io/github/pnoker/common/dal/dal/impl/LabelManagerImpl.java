@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * Label Manager Service implementation class
+ * MyBatis-Plus manager implementation for the dc3_label table.
  * </p>
  *
  * @author pnoker

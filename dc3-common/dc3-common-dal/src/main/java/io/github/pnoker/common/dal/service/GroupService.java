@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.bo.GroupBO;
 import io.github.pnoker.common.dal.entity.query.GroupQuery;
 
 /**
- * Group Interface
+ * Business service for group operations.
  *
  * @author pnoker
  * @version 2025.9.0

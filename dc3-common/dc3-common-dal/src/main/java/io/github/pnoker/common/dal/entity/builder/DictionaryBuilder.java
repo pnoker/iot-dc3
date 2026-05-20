@@ -27,7 +27,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 /**
- * Dictionary Builder
+ * MapStruct builder for dictionary value objects.
  *
  * @author pnoker
  * @version 2025.9.0

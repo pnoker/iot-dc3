@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * Group Bind Manager Service implementation class
+ * MyBatis-Plus manager implementation for the dc3_group_bind table.
  * </p>
  *
  * @author pnoker

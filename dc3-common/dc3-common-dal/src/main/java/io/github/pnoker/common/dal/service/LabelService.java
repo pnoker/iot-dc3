@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.bo.LabelBO;
 import io.github.pnoker.common.dal.entity.query.LabelQuery;
 
 /**
- * Label Interface
+ * Business service for label operations.
  *
  * @author pnoker
  * @version 2025.9.0
