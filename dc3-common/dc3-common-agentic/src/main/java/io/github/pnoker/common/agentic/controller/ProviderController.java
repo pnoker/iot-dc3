@@ -39,7 +39,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 /**
- * Agentic model provider endpoints.
+ * REST controller exposing agentic model provider management endpoints.
  *
  * @author pnoker
  * @version 2026.5.10

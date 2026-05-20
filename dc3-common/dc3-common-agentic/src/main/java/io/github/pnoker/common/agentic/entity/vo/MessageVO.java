@@ -24,7 +24,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Agentic message response.
+ * View object for agentic message API responses.
  *
  * @author pnoker
  * @version 2026.5.10

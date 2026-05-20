@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Agentic model configuration builder.
+ * MapStruct builder converting between model configuration BO, VO, and DO.
  *
  * @author pnoker
  * @version 2026.5.11

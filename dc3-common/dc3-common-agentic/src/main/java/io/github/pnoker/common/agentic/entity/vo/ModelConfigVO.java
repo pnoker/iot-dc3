@@ -24,7 +24,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Agentic model configuration response.
+ * View object for agentic model configuration API responses.
  *
  * @author pnoker
  * @version 2026.5.10

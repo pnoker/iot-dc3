@@ -22,7 +22,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Agentic attachment response.
+ * View object for agentic attachment API responses.
  *
  * @author pnoker
  * @version 2026.5.10

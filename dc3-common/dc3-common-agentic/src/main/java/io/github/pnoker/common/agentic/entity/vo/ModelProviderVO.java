@@ -25,7 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Agentic model provider response. Never exposes api_key.
+ * View object for agentic model provider API responses.
  *
  * @author pnoker
  * @version 2026.5.10

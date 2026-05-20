@@ -25,7 +25,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
+ * Spring profile activation configuration for the agentic service.
  *
  * @author pnoker
  * @version 2026.5.11

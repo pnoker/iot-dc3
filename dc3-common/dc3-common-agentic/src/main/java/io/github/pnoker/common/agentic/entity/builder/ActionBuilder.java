@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Agentic action builder.
+ * MapStruct builder converting between action BO, VO, and DO.
  *
  * @author pnoker
  * @version 2026.5.11

@@ -26,7 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Agentic model configuration BO.
+ * Business object for agentic model configuration operations.
  *
  * @author pnoker
  * @version 2026.5.11

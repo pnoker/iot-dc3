@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * Agentic action BO.
+ * Business object for agentic action operations.
  *
  * @author pnoker
  * @version 2026.5.11
