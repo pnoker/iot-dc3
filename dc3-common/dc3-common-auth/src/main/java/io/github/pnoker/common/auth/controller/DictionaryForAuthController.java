@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 /**
- * Controller
+ * REST controller exposing auth-related dictionary lookup endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

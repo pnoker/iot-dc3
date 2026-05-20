@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.UserPasswordDO;
 
 /**
  * <p>
+ * Persistence manager for user password CRUD operations.
  *
  * </p>
  *

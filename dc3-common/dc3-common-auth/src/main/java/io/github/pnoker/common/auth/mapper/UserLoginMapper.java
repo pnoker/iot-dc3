@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.UserLoginDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_user_login table.
  * </p>
  *
  * @author pnoker

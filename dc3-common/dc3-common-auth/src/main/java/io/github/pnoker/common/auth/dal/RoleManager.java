@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.RoleDO;
 
 /**
  * <p>
+ * Persistence manager for role CRUD operations.
  *
  * </p>
  *

@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.ApiDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_api table.
  * </p>
  *
  * @author pnoker

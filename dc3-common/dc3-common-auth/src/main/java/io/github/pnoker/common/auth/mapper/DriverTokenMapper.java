@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.DriverTokenDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_driver_token table.
  * </p>
  *
  * @author pnoker

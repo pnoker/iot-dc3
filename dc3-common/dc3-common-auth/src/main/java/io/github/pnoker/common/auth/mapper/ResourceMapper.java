@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.ResourceDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_resource table.
  * </p>
  *
  * @author pnoker

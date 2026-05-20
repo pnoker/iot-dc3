@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.ResourceDO;
 
 /**
  * <p>
+ * Persistence manager for resource CRUD operations.
  *
  * </p>
  *

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
+ * MyBatis-Plus implementation of user persistence.
  *
  * </p>
  *

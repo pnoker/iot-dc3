@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.ApiDO;
 
 /**
  * <p>
+ * Persistence manager for API CRUD operations.
  *
  * </p>
  *

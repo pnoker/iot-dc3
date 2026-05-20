@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
+ * Persistence object for the dc3_user_login table.
  *
  * </p>
  *

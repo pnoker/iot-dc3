@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.MenuDO;
 
 /**
  * <p>
+ * Persistence manager for menu CRUD operations.
  *
  * </p>
  *
