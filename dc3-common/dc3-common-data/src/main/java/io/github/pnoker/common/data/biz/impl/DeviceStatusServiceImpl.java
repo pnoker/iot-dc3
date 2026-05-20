@@ -38,7 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * DeviceService Impl
+ * Business service implementation for device status operations.
  *
  * @author pnoker
  * @version 2025.9.0

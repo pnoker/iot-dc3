@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
+ * RabbitMQ receiver for device state events.
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

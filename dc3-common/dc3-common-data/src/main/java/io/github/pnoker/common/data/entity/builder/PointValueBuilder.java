@@ -28,7 +28,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 /**
- * Group Builder
+ * MapStruct builder converting between point value BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

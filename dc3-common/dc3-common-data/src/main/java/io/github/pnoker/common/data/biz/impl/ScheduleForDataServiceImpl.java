@@ -30,7 +30,7 @@ import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 
 /**
- * ScheduleForDataServiceImpl
+ * Business service implementation for data-center scheduled jobs.
  *
  * @author pnoker
  * @version 2025.9.0

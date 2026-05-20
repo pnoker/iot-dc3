@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
+ * Quartz job for point value batch processing.
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

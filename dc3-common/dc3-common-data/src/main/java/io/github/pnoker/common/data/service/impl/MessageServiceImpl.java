@@ -44,9 +44,8 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * <p>
- * AlarmMessageProfile Service Impl
- * </p>
+
+ * Business service implementation for alarm message template operations.
  *
  * @author pnoker
  * @version 2025.9.0

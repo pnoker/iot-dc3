@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Device Status Controller
+ * REST controller exposing device status management endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

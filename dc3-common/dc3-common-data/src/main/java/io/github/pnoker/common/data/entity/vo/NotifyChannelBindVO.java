@@ -28,7 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Notification channel binding.
+ * View object for notification channel binding API responses.
  *
  * @author pnoker
  * @version 2025.9.0

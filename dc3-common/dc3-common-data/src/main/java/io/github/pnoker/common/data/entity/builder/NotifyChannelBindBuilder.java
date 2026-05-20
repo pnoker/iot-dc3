@@ -37,7 +37,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Notification channel binding builder.
+ * MapStruct builder converting between notification channel binding BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

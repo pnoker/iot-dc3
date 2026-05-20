@@ -34,9 +34,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- *
- * <p>
- * 200SinglePointValue: 60M400M
+ * RabbitMQ receiver for point value ingestion events.
  *
  * @author pnoker
  * @version 2025.9.0

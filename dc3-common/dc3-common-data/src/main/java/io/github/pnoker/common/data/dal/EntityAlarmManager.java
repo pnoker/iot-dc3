@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 
 /**
- * Entity alarm table service class
+ * MyBatis-Plus manager for the dc3_entity_alarm table.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -28,7 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Notification channel binding.
+ * Business object for notification channel binding operations.
  *
  * @author pnoker
  * @version 2025.9.0

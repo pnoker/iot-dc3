@@ -28,7 +28,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * PointValueRead VO
+ * View object for point value read API responses.
  *
  * @author pnoker
  * @version 2025.9.0

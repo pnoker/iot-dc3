@@ -31,7 +31,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * Rule runtime state.
+ * Business object for rule runtime state operations.
  *
  * @author pnoker
  * @version 2025.9.0

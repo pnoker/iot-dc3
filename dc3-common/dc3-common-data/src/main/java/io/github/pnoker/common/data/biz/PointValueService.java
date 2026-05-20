@@ -24,7 +24,7 @@ import io.github.pnoker.common.entity.query.PointValueQuery;
 import java.util.List;
 
 /**
- * Interface for point value-related operations
+ * Business service for point value operations.
  *
  * @author pnoker
  * @version 2025.9.0

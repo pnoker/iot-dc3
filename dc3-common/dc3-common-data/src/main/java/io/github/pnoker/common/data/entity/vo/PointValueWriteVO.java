@@ -29,7 +29,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * PointValueWrite VO
+ * View object for point value write API requests.
  *
  * @author pnoker
  * @version 2025.9.0

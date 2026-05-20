@@ -29,9 +29,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * <p>
- * Alarm notification template table
- * </p>
+
+ * View object for alarm notification template API responses.
  *
  * @author pnoker
  * @version 2025.9.0

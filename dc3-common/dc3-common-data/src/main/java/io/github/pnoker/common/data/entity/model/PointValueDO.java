@@ -28,9 +28,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * (, StringType)
- * </p>
+
+ * Persistence object for the dc3_point_value table.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Rule runtime state.
+ * Persistence object for the dc3_rule_state table.
  *
  * @author pnoker
  * @version 2025.9.0

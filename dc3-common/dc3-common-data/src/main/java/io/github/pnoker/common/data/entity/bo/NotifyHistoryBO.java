@@ -30,7 +30,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Notification delivery history.
+ * Business object for notification delivery history operations.
  *
  * @author pnoker
  * @version 2025.9.0

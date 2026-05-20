@@ -25,7 +25,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
+ * Spring profile activation configuration for the data service.
  *
  * @author pnoker
  * @version 2025.9.0

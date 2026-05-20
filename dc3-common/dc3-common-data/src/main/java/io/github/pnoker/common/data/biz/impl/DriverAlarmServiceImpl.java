@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
+ * Business service implementation for driver alarm event persistence.
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

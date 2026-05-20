@@ -31,7 +31,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Notification channel binding query.
+ * Query parameters for notification channel binding listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

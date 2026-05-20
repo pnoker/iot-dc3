@@ -29,7 +29,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * EntityAlarm Query
+ * Query parameters for entity alarm listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

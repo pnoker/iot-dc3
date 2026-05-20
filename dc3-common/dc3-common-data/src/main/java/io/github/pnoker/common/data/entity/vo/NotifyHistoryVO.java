@@ -30,7 +30,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Notification delivery history.
+ * View object for notification delivery history API responses.
  *
  * @author pnoker
  * @version 2025.9.0

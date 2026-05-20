@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz;
 
 /**
- * Interface for schedule for data-related operations
+ * Business service for data-center scheduled jobs.
  *
  * @author pnoker
  * @version 2025.9.0

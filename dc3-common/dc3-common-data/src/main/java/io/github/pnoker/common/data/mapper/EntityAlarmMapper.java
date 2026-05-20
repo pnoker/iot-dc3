@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 
 /**
- * Entity Alarm Mapper
+ * MyBatis-Plus mapper for the dc3_entity_alarm table.
  *
  * @author pnoker
  * @version 2025.9.0
