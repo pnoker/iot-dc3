@@ -31,6 +31,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
+ * Persistence object for the dc3_session table.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

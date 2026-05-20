@@ -23,6 +23,7 @@ import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 
 /**
+ * Service for managing agentic chat sessions with tenant-scoped lifecycle operations.
  *
  * @author pnoker
  * @version 2025.9.0

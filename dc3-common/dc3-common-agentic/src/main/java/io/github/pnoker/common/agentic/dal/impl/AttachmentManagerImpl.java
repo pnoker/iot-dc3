@@ -22,6 +22,14 @@ import io.github.pnoker.common.agentic.entity.model.AttachmentDO;
 import io.github.pnoker.common.agentic.mapper.AttachmentMapper;
 import org.springframework.stereotype.Service;
 
+
+/**
+ * MyBatis-Plus implementation of attachment persistence.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Service
 public class AttachmentManagerImpl extends ServiceImpl<AttachmentMapper, AttachmentDO> implements AttachmentManager {
 }

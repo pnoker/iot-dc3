@@ -35,6 +35,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+
+/**
+ * REST controller exposing agentic action management endpoints.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @RestController
 @RequestMapping(AgenticConstant.ACTION_URL_PREFIX)
 public class ActionController implements BaseController {

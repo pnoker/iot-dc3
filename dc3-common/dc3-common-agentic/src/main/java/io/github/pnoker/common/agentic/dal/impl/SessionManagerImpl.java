@@ -23,6 +23,8 @@ import io.github.pnoker.common.agentic.mapper.SessionMapper;
 import org.springframework.stereotype.Service;
 
 /**
+ * MyBatis-Plus implementation of session persistence.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

@@ -36,6 +36,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+
+/**
+ * REST controller exposing attachment upload and listing endpoints.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @RestController
 @RequestMapping(AgenticConstant.ATTACHMENT_URL_PREFIX)
 public class AttachmentController implements BaseController {

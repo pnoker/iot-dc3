@@ -22,6 +22,14 @@ import io.github.pnoker.common.agentic.entity.model.ModelConfigDO;
 import io.github.pnoker.common.agentic.mapper.ModelConfigMapper;
 import org.springframework.stereotype.Service;
 
+
+/**
+ * MyBatis-Plus implementation of model configuration persistence.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Service
 public class ModelConfigManagerImpl extends ServiceImpl<ModelConfigMapper, ModelConfigDO> implements ModelConfigManager {
 }

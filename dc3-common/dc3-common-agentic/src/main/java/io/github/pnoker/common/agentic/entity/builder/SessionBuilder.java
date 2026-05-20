@@ -28,6 +28,8 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
+ * MapStruct builder converting between session BO, VO, and DO representations.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

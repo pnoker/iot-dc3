@@ -19,5 +19,13 @@ package io.github.pnoker.common.agentic.dal;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
 
+
+/**
+ * Persistence manager for model provider CRUD operations.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 public interface ModelProviderManager extends IService<ModelProviderDO> {
 }
