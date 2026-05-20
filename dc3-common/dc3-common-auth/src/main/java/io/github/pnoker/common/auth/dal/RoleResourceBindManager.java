@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.RoleResourceBindDO;
 
 /**
  * <p>
+ * Persistence manager for role-resource binding CRUD operations.
  *
  * </p>
  *

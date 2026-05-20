@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
+ * Persistence object for the dc3_resource table.
  *
  * </p>
  *

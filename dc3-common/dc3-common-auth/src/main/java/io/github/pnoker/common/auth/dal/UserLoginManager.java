@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.UserLoginDO;
 
 /**
  * <p>
+ * Persistence manager for user login record CRUD operations.
  *
  * </p>
  *

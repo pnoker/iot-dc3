@@ -35,7 +35,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * Controller
+ * REST controller for token validation and management.
  *
  * @author pnoker
  * @version 2025.9.0

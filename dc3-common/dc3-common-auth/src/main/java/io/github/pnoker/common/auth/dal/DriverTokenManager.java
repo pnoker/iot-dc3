@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.DriverTokenDO;
 
 /**
  * <p>
+ * Persistence manager for driver token CRUD operations.
  *
  * </p>
  *

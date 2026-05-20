@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.model.RoleUserBindDO;
 
 /**
  * <p>
+ * Persistence manager for role-user binding CRUD operations.
  *
  * </p>
  *

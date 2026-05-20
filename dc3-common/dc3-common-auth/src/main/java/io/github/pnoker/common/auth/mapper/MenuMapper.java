@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.MenuDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_menu table.
  * </p>
  *
  * @author pnoker

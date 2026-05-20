@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.RoleDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_role table.
  * </p>
  *
  * @author pnoker

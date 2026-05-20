@@ -47,7 +47,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * Controller
+ * REST controller exposing user login record endpoints.
  *
  * @author pnoker
  * @version 2025.9.0
