@@ -26,7 +26,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 /**
- * Base Builder
+ * Base MapStruct builder providing shared conversion methods.
  *
  * @author pnoker
  * @version 2025.9.0

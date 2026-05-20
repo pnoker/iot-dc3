@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Resource Ext
+ * JSON extension object for resource metadata.
  * <p>
  * Extended information related to resources.
  *

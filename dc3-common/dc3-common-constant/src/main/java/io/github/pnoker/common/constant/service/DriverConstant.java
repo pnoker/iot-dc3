@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
 
 
 /**
- * Driver service constant
+ * Constants for the driver service module.
  *
  * @author pnoker
  * @version 2025.9.0

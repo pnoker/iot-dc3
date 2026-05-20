@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common driver type flag enumeration
+ * Enumeration of driver type flags.
  *
  * @author pnoker
  * @version 2025.9.0

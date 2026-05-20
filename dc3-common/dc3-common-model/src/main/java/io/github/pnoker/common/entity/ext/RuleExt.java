@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Rule Ext
+ * JSON extension object for rule configuration.
  * <p>
  * Extended information related to rules.
  *

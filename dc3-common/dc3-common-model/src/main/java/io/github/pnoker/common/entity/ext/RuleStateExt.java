@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Rule runtime state Ext.
+ * JSON extension object for rule runtime state metadata.
  *
  * @author pnoker
  * @version 2025.9.0

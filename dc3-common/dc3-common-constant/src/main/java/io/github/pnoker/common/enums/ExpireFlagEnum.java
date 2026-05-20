@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common expiration type enum
+ * Enumeration of expiration flag values (enabled/disabled).
  *
  * @author pnoker
  * @version 2025.9.0

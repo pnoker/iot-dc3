@@ -23,7 +23,7 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 
 /**
- * Metadata related constants
+ * Constants for driver metadata attributes and configuration.
  *
  * @author pnoker
  * @version 2025.9.0

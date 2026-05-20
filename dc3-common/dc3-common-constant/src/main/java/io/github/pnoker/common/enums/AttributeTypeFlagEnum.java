@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common attribute type flag enumeration
+ * Enumeration of attribute type flags.
  *
  * @author pnoker
  * @version 2025.9.0

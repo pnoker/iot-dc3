@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Api Ext
+ * JSON extension object for API interface configuration.
  * <p>
  * Extended information related to API interfaces.
  *

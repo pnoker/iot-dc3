@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common profile type flag enumeration
+ * Enumeration of profile type flags.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common API type enumeration
+ * Enumeration of API type flags (e.g. REST, WebSocket).
  *
  * @author pnoker
  * @version 2025.9.0

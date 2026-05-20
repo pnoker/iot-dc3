@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common notification channel type enumeration.
+ * Enumeration of notification channel type flags.
  *
  * @author pnoker
  * @version 2025.9.0

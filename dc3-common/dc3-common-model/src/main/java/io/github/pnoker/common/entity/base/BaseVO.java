@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Base VO
+ * Base view object providing common fields.
  *
  * @author pnoker
  * @version 2025.9.0

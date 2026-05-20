@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Message Ext
+ * JSON extension object for message metadata.
  * <p>
  * Extended information related to messages.
  *

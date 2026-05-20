@@ -28,7 +28,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Json Ext
+ * JSON extension object for generic JSON-typed extension data.
  *
  * @author pnoker
  * @version 2025.9.0

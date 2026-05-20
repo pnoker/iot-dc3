@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common entity type flag enumeration
+ * Enumeration of entity type flags.
  *
  * @author pnoker
  * @version 2025.9.0

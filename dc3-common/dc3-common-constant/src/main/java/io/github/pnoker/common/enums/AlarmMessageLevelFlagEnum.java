@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common alarm level enumeration
+ * Enumeration of alarm message level flags.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Role Ext
+ * JSON extension object for role configuration.
  * <p>
  * Extended information related to roles.
  *

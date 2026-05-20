@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common accrual type enumeration
+ * Enumeration of accrual type flags.
  *
  * @author pnoker
  * @version 2025.9.0

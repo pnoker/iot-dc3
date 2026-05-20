@@ -25,7 +25,7 @@ import lombok.Setter;
 import java.util.Map;
 
 /**
- * Menu Ext
+ * JSON extension object for menu configuration metadata.
  * <p>
  * Extended information related to menus.
  *

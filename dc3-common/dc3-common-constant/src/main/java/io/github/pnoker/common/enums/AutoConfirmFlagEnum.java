@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common auto-confirm flag enumeration
+ * Enumeration of auto-confirm flag values.
  *
  * @author pnoker
  * @version 2025.9.0

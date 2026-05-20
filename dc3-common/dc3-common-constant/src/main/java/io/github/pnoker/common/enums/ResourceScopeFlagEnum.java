@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common permission scope type enumeration
+ * Enumeration of permission scope type flags.
  *
  * @author pnoker
  * @version 2025.9.0

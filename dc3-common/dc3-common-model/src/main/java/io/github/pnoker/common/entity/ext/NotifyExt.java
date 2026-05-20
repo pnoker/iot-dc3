@@ -25,7 +25,7 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * Notify Ext
+ * JSON extension object for notification configuration.
  * <p>
  * Extended information related to notifications.
  *

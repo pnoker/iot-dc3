@@ -25,7 +25,7 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * Notify channel bind Ext.
+ * JSON extension object for notification channel binding metadata.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -28,7 +28,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Base Ext
+ * Base JSON extension object with a typed version field.
  *
  * @author pnoker
  * @version 2025.9.0

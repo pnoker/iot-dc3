@@ -22,7 +22,7 @@ import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 
 /**
- * Strategy factory constant
+ * Constants for driver strategy factory routing.
  *
  * @author pnoker
  * @version 2025.9.0
