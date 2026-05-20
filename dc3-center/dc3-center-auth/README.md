@@ -55,7 +55,7 @@ This service wires `dc3-common-auth` which contains all business logic controlle
 ## Configuration
 
 - `application.yml` — base port and profile config
-- `application-dev.yml` — dev env: Postgres, Redis, RabbitMQ connection via `${ENV:default}` vars
+- `application-dev.yml` — dev env: Postgres connection via `${ENV:default}` vars
 - `application-pre.yml` — pre-release: Nacos-based service discovery
 - `application-pro.yml` — production: Nacos-based service discovery
 
@@ -90,4 +90,3 @@ java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

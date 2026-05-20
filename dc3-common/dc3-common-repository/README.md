@@ -58,7 +58,7 @@ mvn -s ../../.mvn/settings.xml clean package
 ## Related Modules
 
 - `dc3-common-data` — Uses `RepositoryStrategyFactory` to route point-value persistence operations
-- `dc3-common-redis` — Caches latest point values alongside repository storage
+- `dc3-common-data` — Caches latest point values with in-process `LocalCacheService` alongside repository storage
 
 ## License
 

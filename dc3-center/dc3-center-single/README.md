@@ -57,7 +57,7 @@ Wires all three common service modules:
 ## Configuration
 
 - `application.yml` — base port and profile config
-- `application-dev.yml` — dev env: single Postgres/Redis/RabbitMQ config
+- `application-dev.yml` — dev env: single Postgres/RabbitMQ config
 - `application-pre.yml` — pre-release: Nacos-based service discovery
 - `application-pro.yml` — production target config
 
@@ -93,4 +93,3 @@ java -jar dc3-center/dc3-center-single/target/dc3-center-single.jar
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

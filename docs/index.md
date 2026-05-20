@@ -42,6 +42,16 @@ features:
     details: 网关、4 大中心服务、7 类协议驱动、API facade、20+ 通用组件,按职责分类。
     link: /modules/
     linkText: 浏览模块
+  - icon: 🧭
+    title: 项目设计方案
+    details: 项目级技术方案、领域模型调整、接口边界与分阶段落地思路。
+    link: /design/
+    linkText: 查看方案
+  - icon: ✅
+    title: 项目待办
+    details: 设计跟进项、改造任务清单与验收标准,用于追踪从方案到实现的过程。
+    link: /todo/
+    linkText: 查看待办
   - icon: 🤝
     title: 加入社区
     details: 贡献指南、行为准则、安全披露策略。开源 AGPL-3.0,欢迎 PR 与议题反馈。
