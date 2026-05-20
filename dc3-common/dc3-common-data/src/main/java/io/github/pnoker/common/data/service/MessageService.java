@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.query.MessageQuery;
 
 /**
- * AlarmMessageProfile Interface
+ * Business service for alarm message template operations.
  *
  * @author pnoker
  * @version 2025.9.0

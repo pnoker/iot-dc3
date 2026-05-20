@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.query.DriverQuery;
 import java.util.Map;
 
 /**
- * Interface for driver status-related operations
+ * Business service for driver status operations.
  *
  * @author pnoker
  * @version 2025.9.0

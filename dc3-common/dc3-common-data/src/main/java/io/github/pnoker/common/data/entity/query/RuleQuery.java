@@ -32,9 +32,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * <p>
- * Alarm rule
- * </p>
+
+ * Query parameters for alarm rule listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

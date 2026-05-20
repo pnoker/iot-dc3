@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Business service implementation for driver heartbeat and state processing.
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

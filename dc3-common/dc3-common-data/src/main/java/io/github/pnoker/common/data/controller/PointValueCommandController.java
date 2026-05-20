@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
- * PointValue Controller
+ * REST controller exposing point value command management endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

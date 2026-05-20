@@ -32,7 +32,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Notification delivery history query.
+ * Query parameters for notification delivery history listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

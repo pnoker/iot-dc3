@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PointValue Controller
+ * REST controller exposing point value management endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

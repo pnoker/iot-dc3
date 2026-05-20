@@ -30,7 +30,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * PointValue VO
+ * View object for point value API responses.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Notification delivery history.
+ * Persistence object for the dc3_notify_history table.
  *
  * @author pnoker
  * @version 2025.9.0

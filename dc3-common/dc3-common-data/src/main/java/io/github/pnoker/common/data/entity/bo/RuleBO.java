@@ -29,9 +29,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * <p>
- * Alarm rule
- * </p>
+
+ * Business object for alarm rule operations.
  *
  * @author pnoker
  * @version 2025.9.0

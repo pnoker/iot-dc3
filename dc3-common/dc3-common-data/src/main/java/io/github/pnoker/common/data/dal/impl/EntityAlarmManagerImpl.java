@@ -24,7 +24,7 @@ import io.github.pnoker.common.data.mapper.EntityAlarmMapper;
 import org.springframework.stereotype.Service;
 
 /**
- * Entity alarm table service class
+ * MyBatis-Plus manager implementation for the dc3_entity_alarm table.
  *
  * @author pnoker
  * @version 2025.9.0

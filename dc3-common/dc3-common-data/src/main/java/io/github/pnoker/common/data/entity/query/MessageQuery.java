@@ -32,9 +32,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * <p>
- * Alarm message template table
- * </p>
+
+ * Query parameters for alarm message template listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

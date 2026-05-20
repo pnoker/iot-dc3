@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Notification delivery history builder.
+ * MapStruct builder converting between notification delivery history BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

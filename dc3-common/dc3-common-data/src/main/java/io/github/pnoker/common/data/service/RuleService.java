@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.query.RuleQuery;
 
 /**
- * AlarmRule Interface
+ * Business service for alarm rule operations.
  *
  * @author pnoker
  * @version 2025.9.0

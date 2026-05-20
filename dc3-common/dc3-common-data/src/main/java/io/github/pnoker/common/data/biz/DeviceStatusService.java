@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.query.DeviceQuery;
 import java.util.Map;
 
 /**
- * Interface for device status-related operations
+ * Business service for device status operations.
  *
  * @author pnoker
  * @version 2025.9.0

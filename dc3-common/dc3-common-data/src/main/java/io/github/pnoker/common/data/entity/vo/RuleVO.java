@@ -29,9 +29,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * <p>
- * Alarm rule
- * </p>
+
+ * View object for alarm rule API responses.
  *
  * @author pnoker
  * @version 2025.9.0

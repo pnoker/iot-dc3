@@ -45,9 +45,8 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * <p>
- * AlarmNotifyProfile Service Impl
- * </p>
+
+ * Business service implementation for alarm notification template operations.
  *
  * @author pnoker
  * @version 2025.9.0

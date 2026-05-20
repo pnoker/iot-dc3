@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Entity Alarm
+ * Persistence object for the dc3_entity_alarm table.
  *
  * @author pnoker
  * @version 2025.9.0

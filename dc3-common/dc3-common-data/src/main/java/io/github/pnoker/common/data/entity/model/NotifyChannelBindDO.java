@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Notification channel binding.
+ * Persistence object for the dc3_notify_channel_bind table.
  *
  * @author pnoker
  * @version 2025.9.0

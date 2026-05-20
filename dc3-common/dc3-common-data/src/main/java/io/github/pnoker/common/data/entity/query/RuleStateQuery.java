@@ -32,7 +32,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Rule runtime state query.
+ * Query parameters for rule runtime state listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

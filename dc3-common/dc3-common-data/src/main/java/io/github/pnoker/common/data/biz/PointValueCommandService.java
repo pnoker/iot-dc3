@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
 import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
 
 /**
- * Interface for point value command-related operations
+ * Business service for point value command operations.
  *
  * @author pnoker
  * @version 2025.9.0

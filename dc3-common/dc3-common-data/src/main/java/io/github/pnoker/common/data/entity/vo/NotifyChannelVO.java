@@ -29,7 +29,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Notification channel.
+ * View object for notification channel API responses.
  *
  * @author pnoker
  * @version 2025.9.0

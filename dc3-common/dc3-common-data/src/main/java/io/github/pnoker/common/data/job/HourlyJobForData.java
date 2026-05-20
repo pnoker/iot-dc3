@@ -25,7 +25,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 /**
- * :
+ * Hourly scheduled job for data service maintenance tasks.
  *
  * @author pnoker
  * @version 2025.9.0

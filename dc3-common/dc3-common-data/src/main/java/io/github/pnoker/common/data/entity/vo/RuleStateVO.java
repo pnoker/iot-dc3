@@ -33,7 +33,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * Rule runtime state.
+ * View object for rule runtime state API responses.
  *
  * @author pnoker
  * @version 2025.9.0

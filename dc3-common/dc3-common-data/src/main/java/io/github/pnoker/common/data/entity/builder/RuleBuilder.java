@@ -40,7 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * AlarmRule Builder
+ * MapStruct builder converting between alarm rule BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0
