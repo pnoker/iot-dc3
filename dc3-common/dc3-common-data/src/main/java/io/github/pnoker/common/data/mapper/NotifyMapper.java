@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.NotifyDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_notify table.
  * </p>
  *
  * @author pnoker
