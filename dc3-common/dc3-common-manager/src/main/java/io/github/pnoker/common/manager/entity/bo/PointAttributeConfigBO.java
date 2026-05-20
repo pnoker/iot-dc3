@@ -28,7 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * PointAttributeConfig BO
+ * Business object for point attribute configuration operations.
  *
  * @author pnoker
  * @version 2025.9.0

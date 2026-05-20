@@ -26,7 +26,7 @@ import io.github.pnoker.common.manager.entity.vo.TopicVO;
 import java.util.List;
 
 /**
- * Topic Service
+ * Business service for topic operations.
  *
  * @author pnoker
  * @version 2025.9.0

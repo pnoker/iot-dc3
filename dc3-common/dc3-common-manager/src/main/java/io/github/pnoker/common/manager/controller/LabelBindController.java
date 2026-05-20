@@ -51,7 +51,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * LabelBind Controller
+ * REST controller exposing label binding management endpoints.
  *
  * @author pnoker
  * @version 2026.5.11

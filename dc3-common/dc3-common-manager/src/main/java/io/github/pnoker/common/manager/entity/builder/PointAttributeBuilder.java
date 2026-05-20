@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Builder
+ * MapStruct builder converting between point attribute BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

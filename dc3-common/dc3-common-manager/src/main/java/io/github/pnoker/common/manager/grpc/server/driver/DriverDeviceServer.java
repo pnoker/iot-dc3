@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Api
+ * gRPC server handling driver-to-manager device requests.
  *
  * @author pnoker
  * @version 2025.9.0

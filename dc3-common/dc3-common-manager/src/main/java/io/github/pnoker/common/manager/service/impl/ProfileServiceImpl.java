@@ -60,7 +60,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * ProfileService Impl
+ * Business service implementation for profile operations.
  *
  * @author pnoker
  * @version 2025.9.0

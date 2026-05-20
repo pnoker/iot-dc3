@@ -30,7 +30,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * DriverConfig Query
+ * Query parameters for driver attribute configuration listing.
  *
  * @author pnoker
  * @version 2025.9.0

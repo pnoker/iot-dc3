@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Interface
+ * Business service for point attribute operations.
  *
  * @author pnoker
  * @version 2025.9.0

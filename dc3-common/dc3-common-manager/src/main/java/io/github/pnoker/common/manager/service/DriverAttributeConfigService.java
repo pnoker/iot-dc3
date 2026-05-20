@@ -25,7 +25,7 @@ import io.github.pnoker.common.manager.entity.query.DriverAttributeConfigQuery;
 import java.util.List;
 
 /**
- * DriverConfig Interface
+ * Business service for driver attribute configuration operations.
  *
  * @author pnoker
  * @version 2025.9.0

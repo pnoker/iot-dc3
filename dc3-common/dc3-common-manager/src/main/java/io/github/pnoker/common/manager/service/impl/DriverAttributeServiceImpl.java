@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * DriverAttributeService Impl
+ * Business service implementation for driver attribute operations.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -32,7 +32,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Point Query
+ * Query parameters for point listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

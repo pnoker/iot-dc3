@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * DriverConfigService Impl
+ * Business service implementation for driver attribute configuration.
  *
  * @author pnoker
  * @version 2025.9.0

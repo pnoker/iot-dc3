@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Point Api
+ * gRPC server handling manager point facade requests.
  *
  * @author pnoker
  * @version 2025.9.0

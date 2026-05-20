@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Point Interface
+ * Business service for point operations.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Driver Interface
+ * Business service for driver operations.
  *
  * @author pnoker
  * @version 2025.9.0

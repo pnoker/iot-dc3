@@ -20,7 +20,7 @@ package io.github.pnoker.common.manager.entity.vo;
 import lombok.Data;
 
 /**
- * Topic VO
+ * View object for topic API responses.
  *
  * @author pnoker
  * @version 2025.9.0

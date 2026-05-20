@@ -29,7 +29,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * ProfileBind BO
+ * View object for profile binding API responses.
  *
  * @author pnoker
  * @version 2025.9.0

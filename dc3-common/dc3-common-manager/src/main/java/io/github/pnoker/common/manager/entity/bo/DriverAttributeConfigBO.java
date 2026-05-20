@@ -28,7 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * DriverAttributeConfig BO
+ * Business object for driver attribute configuration operations.
  *
  * @author pnoker
  * @version 2025.9.0

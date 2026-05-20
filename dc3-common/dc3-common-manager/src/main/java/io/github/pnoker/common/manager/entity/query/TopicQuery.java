@@ -29,7 +29,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Topic Query
+ * Query parameters for topic listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -25,7 +25,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 /**
- * :
+ * Scheduled job running hourly maintenance tasks for the manager module.
  *
  * @author pnoker
  * @version 2025.9.0

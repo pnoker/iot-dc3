@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Topic Controller
+ * REST controller exposing topic management endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

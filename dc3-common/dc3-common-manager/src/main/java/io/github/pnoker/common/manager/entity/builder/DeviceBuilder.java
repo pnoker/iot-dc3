@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Builder
+ * MapStruct builder converting between device BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

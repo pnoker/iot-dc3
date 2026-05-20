@@ -18,6 +18,8 @@
 package io.github.pnoker.common.manager.biz;
 
 /**
+ * Scheduled task service for the manager module.
+ *
  *
  * @author pnoker
  * @version 2025.9.0

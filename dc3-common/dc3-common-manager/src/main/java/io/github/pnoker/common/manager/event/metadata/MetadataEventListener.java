@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * Listener
+ * Event listener that processes metadata change events.
  *
  * @author zhangzi
  * @version 2025.9.0

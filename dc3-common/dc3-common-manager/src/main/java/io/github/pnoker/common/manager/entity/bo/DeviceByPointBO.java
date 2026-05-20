@@ -27,7 +27,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * Device By Point BO
+ * Business object representing a device with its associated points.
  *
  * @author pnoker
  * @version 2025.9.0

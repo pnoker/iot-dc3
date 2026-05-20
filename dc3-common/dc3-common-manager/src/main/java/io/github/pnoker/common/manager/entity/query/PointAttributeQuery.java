@@ -31,7 +31,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Query
+ * Query parameters for point attribute listing.
  *
  * @author pnoker
  * @version 2025.9.0

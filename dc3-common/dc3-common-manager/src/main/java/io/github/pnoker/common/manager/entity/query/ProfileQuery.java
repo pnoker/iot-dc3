@@ -32,7 +32,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Profile Query
+ * Query parameters for profile listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

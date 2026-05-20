@@ -27,6 +27,8 @@ import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 
 /**
+ * Scheduled task service implementation for the manager module.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

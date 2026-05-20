@@ -27,7 +27,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * Point Config By Device BO
+ * Business object for point configuration grouped by device.
  *
  * @author pnoker
  * @version 2025.9.0
