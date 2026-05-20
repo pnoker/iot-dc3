@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * Controller
+ * REST controller exposing dictionary management endpoints for the manager module.
  *
  * @author pnoker
  * @version 2025.9.0

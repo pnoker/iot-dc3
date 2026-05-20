@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
 
 /**
  * <p>
- *
+ * Persistence manager for point attribute config CRUD operations.
  * </p>
  *
  * @author pnoker

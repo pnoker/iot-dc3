@@ -29,7 +29,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * BO
+ * Business object for driver attribute operations.
  *
  * @author pnoker
  * @version 2025.9.0

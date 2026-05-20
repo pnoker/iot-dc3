@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- *
+ * MyBatis-Plus implementation of driver attribute config persistence.
  * </p>
  *
  * @author pnoker

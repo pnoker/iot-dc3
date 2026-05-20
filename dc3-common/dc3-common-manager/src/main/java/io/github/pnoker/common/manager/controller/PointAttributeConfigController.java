@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Controller
+ * REST controller exposing point attribute config management endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

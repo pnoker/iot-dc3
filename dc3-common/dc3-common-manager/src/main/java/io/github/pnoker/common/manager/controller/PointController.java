@@ -54,7 +54,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Controller
+ * REST controller exposing point management endpoints.
  *
  * @author pnoker
  * @version 2025.9.0

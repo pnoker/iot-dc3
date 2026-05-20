@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.PointAttributeDO;
 
 /**
  * <p>
- * Mapper
+ * MyBatis-Plus mapper for the dc3_point_attribute table.
  * </p>
  *
  * @author pnoker
