@@ -34,7 +34,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * Tenant
+ * Persistence object for the dc3_tenant table.
  * </p>
  *
  * @author pnoker

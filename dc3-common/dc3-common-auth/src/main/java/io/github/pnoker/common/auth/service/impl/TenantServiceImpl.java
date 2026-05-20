@@ -43,7 +43,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * Tenant
+ * Business service implementation for tenant operations.
  *
  * @author pnoker
  * @version 2025.9.0

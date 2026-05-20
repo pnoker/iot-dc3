@@ -27,7 +27,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * UserLogin VO
+ * View object for user login record API responses.
  *
  * @author pnoker
  * @version 2025.9.0

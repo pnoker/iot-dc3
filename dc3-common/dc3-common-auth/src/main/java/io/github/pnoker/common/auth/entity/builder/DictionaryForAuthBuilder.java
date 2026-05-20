@@ -27,7 +27,7 @@ import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
 
 /**
- * Dictionary For Auth Builder
+ * MapStruct builder for auth dictionary value objects.
  *
  * @author pnoker
  * @version 2025.9.0

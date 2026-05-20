@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * Tenant Api
+ * gRPC server handling tenant facade requests.
  *
  * @author pnoker
  * @version 2025.9.0

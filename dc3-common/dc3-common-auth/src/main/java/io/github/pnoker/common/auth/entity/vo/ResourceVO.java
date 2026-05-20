@@ -36,7 +36,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Resource VO
+ * View object for resource API responses.
  *
  * @author pnoker
  * @version 2025.9.0

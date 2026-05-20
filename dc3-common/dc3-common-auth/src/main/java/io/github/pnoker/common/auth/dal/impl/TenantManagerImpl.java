@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * Tenant
+ * MyBatis-Plus implementation of tenant persistence.
  * </p>
  *
  * @author pnoker

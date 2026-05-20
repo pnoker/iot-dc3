@@ -34,7 +34,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Role VO
+ * View object for role API responses.
  *
  * @author pnoker
  * @version 2025.9.0

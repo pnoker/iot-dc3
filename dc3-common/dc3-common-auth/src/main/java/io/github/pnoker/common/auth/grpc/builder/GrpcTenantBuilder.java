@@ -31,7 +31,7 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * GrpcTenant Builder
+ * MapStruct builder for tenant gRPC message conversion.
  *
  * @author pnoker
  * @version 2025.9.0

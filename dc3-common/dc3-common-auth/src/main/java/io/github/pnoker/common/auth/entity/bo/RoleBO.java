@@ -28,7 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Role BO
+ * Business object for role operations.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.TenantBindDO;
 
 /**
  * <p>
- * Tenant Mapper
+ * MyBatis-Plus mapper for the dc3_tenant_bind table.
  * </p>
  *
  * @author pnoker

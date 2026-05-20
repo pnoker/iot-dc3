@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Resource Builder
+ * MapStruct builder converting between resource BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

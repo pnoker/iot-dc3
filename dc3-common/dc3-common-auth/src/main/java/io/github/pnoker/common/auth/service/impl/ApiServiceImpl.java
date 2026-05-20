@@ -43,7 +43,7 @@ import java.util.Objects;
 
 /**
  * <p>
- * Api Service Impl
+ * Business service implementation for API operations.
  * </p>
  *
  * @author pnoker

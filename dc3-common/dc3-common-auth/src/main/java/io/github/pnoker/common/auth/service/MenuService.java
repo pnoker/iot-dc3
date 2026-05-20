@@ -25,7 +25,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import java.util.List;
 
 /**
- * Menu Interface
+ * Business service for menu operations.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -30,6 +30,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
+ * Query parameters for role listing and filtering.
+ *
  * @author linys
  * @version 2025.9.0
  * @since 2016.10.1

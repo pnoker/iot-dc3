@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Resource Controller
+ * REST controller exposing resource management endpoints.
  *
  * @author pnoker
  * @version 2026.5.17

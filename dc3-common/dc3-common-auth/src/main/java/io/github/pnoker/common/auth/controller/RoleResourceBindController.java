@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * RoleResourceBind Controller
+ * REST controller exposing role-resource binding management endpoints.
  *
  * @author pnoker
  * @version 2026.5.17

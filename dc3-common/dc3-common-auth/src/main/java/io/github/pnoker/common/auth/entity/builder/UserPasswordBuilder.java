@@ -29,7 +29,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * UserPassword Builder
+ * MapStruct builder converting between user password BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

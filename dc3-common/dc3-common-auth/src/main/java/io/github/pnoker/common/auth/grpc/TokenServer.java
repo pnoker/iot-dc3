@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * Token Api
+ * gRPC server handling token facade requests.
  *
  * @author pnoker
  * @version 2025.9.0

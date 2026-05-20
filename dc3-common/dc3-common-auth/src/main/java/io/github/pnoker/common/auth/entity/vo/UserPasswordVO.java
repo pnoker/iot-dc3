@@ -31,7 +31,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * UserPassword VO
+ * View object for user password API responses.
  *
  * @author pnoker
  * @version 2025.9.0

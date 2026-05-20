@@ -25,7 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * RoleUserBind BO
+ * Business object for role-user binding operations.
  *
  * @author pnoker
  * @version 2025.9.0

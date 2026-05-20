@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Resource Registry Api
+ * gRPC server handling resource registration requests.
  *
  * @author pnoker
  * @version 2026.5.17

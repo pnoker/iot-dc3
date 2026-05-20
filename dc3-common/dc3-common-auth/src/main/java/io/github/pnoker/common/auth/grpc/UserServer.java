@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * User Api
+ * gRPC server handling user facade requests.
  *
  * @author pnoker
  * @version 2025.9.0

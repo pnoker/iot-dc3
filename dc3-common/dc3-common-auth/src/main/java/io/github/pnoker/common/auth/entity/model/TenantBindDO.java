@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * Tenant
+ * Persistence object for the dc3_tenant_bind table.
  * </p>
  *
  * @author pnoker

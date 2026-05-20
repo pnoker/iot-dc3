@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import java.util.List;
 
 /**
- * Dictionary Interface
+ * Dictionary lookup service for the auth module.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -29,7 +29,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Resource BO
+ * Business object for resource operations.
  *
  * @author pnoker
  * @version 2025.9.0

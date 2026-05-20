@@ -52,7 +52,7 @@ import java.util.Objects;
 
 /**
  * <p>
- * Role Service Impl
+ * Business service implementation for role operations.
  * </p>
  *
  * @author pnoker

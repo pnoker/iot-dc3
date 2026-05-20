@@ -30,7 +30,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * User Query
+ * Query parameters for user login record listing and filtering.
  *
  * @author pnoker
  * @version 2025.9.0

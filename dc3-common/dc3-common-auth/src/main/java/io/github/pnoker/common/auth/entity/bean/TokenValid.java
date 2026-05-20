@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * Token validation result carrying validity status and expiry time.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

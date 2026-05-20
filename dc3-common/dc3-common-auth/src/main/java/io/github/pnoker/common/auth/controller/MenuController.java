@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Menu Controller
+ * REST controller exposing menu management endpoints.
  *
  * @author pnoker
  * @version 2026.5.17

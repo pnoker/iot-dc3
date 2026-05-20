@@ -31,7 +31,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Login
+ * Login request payload with user credentials.
  *
  * @author pnoker
  * @version 2025.9.0

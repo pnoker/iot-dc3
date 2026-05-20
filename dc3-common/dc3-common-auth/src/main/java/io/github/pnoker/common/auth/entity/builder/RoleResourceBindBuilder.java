@@ -29,7 +29,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * RoleResourceBind Builder
+ * MapStruct builder converting between role-resource binding BO, VO, and DO.
  *
  * @author pnoker
  * @version 2025.9.0

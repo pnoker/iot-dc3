@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.common.base.service.BaseService;
 
 /**
- * UserLogin Interface
+ * Business service for user login record operations.
  *
  * @author pnoker
  * @version 2025.9.0

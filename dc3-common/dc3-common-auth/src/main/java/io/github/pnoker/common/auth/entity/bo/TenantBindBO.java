@@ -25,7 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * TenantBind BO
+ * Business object for tenant binding operations.
  *
  * @author pnoker
  * @version 2025.9.0

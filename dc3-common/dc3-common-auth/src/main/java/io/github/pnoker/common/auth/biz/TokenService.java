@@ -20,7 +20,7 @@ package io.github.pnoker.common.auth.biz;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 
 /**
- * Token Interface
+ * Token validation and management service.
  *
  * @author pnoker
  * @version 2025.9.0
