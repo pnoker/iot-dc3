@@ -29,9 +29,11 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 /**
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
+ * Scheduled job that periodically evaluates and reports driver connectivity status.
+ *
+  * @author pnoker
+  * @version 2025.9.0
+  * @since 2016.10.1
  */
 @Slf4j
 @Component
