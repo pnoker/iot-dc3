@@ -145,7 +145,7 @@ public interface DashboardService {
     List<AlertActivityCellVO> alertActivity(Long tenantId, int days);
 
     /**
-     * ALARM count per {@code event_ext.type} bucket over the last {@code days} days,
+     * ALARM count per {@code alarm_ext.type} bucket over the last {@code days} days,
      * ordered by count DESC.
      */
     List<AlertTypeBucketVO> alertTypeDistribution(Long tenantId, int days);

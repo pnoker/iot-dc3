@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * Status
+ * Point data volume history table manager.
  * </p>
  *
  * @author fukq

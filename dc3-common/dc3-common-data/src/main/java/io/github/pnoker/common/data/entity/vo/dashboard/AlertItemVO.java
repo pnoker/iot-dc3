@@ -58,7 +58,7 @@ public class AlertItemVO implements Serializable {
     private LocalDateTime createTime;
 
     /**
-     * Human-readable message extracted from event_ext->>'content'. Populated by the
+     * Human-readable message extracted from alarm_ext->>'content'. Populated by the
      * paging / list endpoints; latest(size=N) leaves it null.
      */
     private String message;

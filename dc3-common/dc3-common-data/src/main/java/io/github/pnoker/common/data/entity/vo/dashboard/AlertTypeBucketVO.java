@@ -27,7 +27,7 @@ import java.io.Serializable;
 
 /**
  * One slice of the event-overview alarm type pie — type tag pulled from
- * {@code event_ext.type} (e.g. {@code driver-offline}, {@code driver-state-flip},
+ * {@code alarm_ext.type} (e.g. {@code driver-offline}, {@code driver-state-flip},
  * {@code driver-alarm}, {@code device-offline}, {@code device-alarm}).
  *
  * @author pnoker
