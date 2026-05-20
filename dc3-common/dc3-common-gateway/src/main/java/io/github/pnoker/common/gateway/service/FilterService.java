@@ -23,6 +23,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
+ * Service interface for gateway filter logic.
  *
  * @author pnoker
  * @version 2025.9.0

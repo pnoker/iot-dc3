@@ -23,7 +23,7 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.stereotype.Component;
 
 /**
- * Request Header
+ * Factory for creating authentic gateway filter instances.
  *
  * @author pnoker
  * @version 2025.9.0
