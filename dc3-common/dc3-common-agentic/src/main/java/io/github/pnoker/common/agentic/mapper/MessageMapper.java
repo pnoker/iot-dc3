@@ -20,6 +20,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.pnoker.common.agentic.entity.model.MessageDO;
 
 /**
+ * MyBatis-Plus mapper for the dc3_message table.
+ *
  * @author pnoker
  * @version 2026.5.10
  * @since 2026.5.10

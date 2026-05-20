@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 
 /**
+ * Persistence manager for session CRUD operations.
  *
  * @author pnoker
  * @version 2025.9.0

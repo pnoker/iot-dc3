@@ -38,6 +38,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+
+/**
+ * Implements agentic action lifecycle: creation, confirmation, rejection, and write-point-value execution.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Service
 public class ActionServiceImpl implements ActionService {
 

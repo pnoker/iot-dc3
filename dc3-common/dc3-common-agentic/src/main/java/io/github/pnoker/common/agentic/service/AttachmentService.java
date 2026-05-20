@@ -23,6 +23,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+
+/**
+ * Service for uploading and summarizing conversation attachments.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 public interface AttachmentService {
 
     Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.UserHeader header);

@@ -22,6 +22,14 @@ import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
 import io.github.pnoker.common.agentic.mapper.ModelProviderMapper;
 import org.springframework.stereotype.Service;
 
+
+/**
+ * MyBatis-Plus implementation of model provider persistence.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Service
 public class ModelProviderManagerImpl extends ServiceImpl<ModelProviderMapper, ModelProviderDO> implements ModelProviderManager {
 }

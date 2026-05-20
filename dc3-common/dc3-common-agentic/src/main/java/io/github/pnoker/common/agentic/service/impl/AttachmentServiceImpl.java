@@ -42,6 +42,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+
+/**
+ * Implements attachment upload, listing, and AI-based summarization.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Slf4j
 @Service
 public class AttachmentServiceImpl implements AttachmentService {

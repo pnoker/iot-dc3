@@ -22,6 +22,14 @@ import io.github.pnoker.common.agentic.entity.model.MessageDO;
 import io.github.pnoker.common.agentic.mapper.MessageMapper;
 import org.springframework.stereotype.Service;
 
+
+/**
+ * MyBatis-Plus implementation of chat message persistence.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Service
 public class MessageManagerImpl extends ServiceImpl<MessageMapper, MessageDO> implements MessageManager {
 }
