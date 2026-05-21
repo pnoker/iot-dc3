@@ -36,7 +36,7 @@ import io.github.pnoker.common.driver.entity.dto.PointAttributeConfigDTO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.optional.CollectionOptional;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -57,22 +57,18 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DeviceClient {
 
-    @Resource
-    private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
+    private final DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
-    @Resource
-    private DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DeviceBuilder deviceBuilder;
+    private final DeviceBuilder deviceBuilder;
 
-    @Resource
-    private GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
+    private final GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
 
-    @Resource
-    private GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
+    private final GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
 
     public List<DeviceBO> list() {
         long current = 1;

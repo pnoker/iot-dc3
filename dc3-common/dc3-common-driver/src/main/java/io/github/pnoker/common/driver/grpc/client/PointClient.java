@@ -29,7 +29,7 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.entity.builder.PointBuilder;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.exception.ServiceException;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -46,16 +46,14 @@ import java.util.List;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointClient {
 
-    @Resource
-    private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
+    private final PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
-    @Resource
-    private DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private PointBuilder pointBuilder;
+    private final PointBuilder pointBuilder;
 
     public List<PointBO> list() {
         long current = 1;

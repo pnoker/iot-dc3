@@ -24,7 +24,7 @@ import io.github.pnoker.common.driver.grpc.client.DriverClient;
 import io.github.pnoker.common.driver.service.DriverRegisterService;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -39,13 +39,12 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverRegisterServiceImpl implements DriverRegisterService {
 
-    @Resource
-    private DriverProperties driverProperties;
+    private final DriverProperties driverProperties;
 
-    @Resource
-    private DriverClient driverClient;
+    private final DriverClient driverClient;
 
     @Override
     public void initial() {

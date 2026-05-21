@@ -22,7 +22,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -37,13 +37,12 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DriverStatusScheduleJob extends QuartzJobBean {
 
-    @Resource
-    DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+    private final DriverSenderService driverSenderService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {

@@ -30,7 +30,7 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -47,19 +47,16 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverReadServiceImpl implements DriverReadService {
 
-    @Resource
-    private DeviceMetadata deviceMetadata;
+    private final DeviceMetadata deviceMetadata;
 
-    @Resource
-    private PointMetadata pointMetadata;
+    private final PointMetadata pointMetadata;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+    private final DriverSenderService driverSenderService;
 
-    @Resource
-    private DriverCustomService driverCustomService;
+    private final DriverCustomService driverCustomService;
 
     @Override
     public void read(Long deviceId, Long pointId) {

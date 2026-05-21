@@ -28,7 +28,6 @@ import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.driver.grpc.client.DeviceClient;
 import io.github.pnoker.common.exception.ConfigException;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
@@ -69,13 +68,13 @@ public final class DeviceMetadata {
      */
     private final AsyncLoadingCache<Long, DeviceBO> cache;
 
-    @Resource
-    private DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DeviceClient deviceClient;
+    private final DeviceClient deviceClient;
 
-    private DeviceMetadata() {
+    public DeviceMetadata(DriverMetadata driverMetadata, DeviceClient deviceClient) {
+        this.driverMetadata = driverMetadata;
+        this.deviceClient = deviceClient;
         this.cache = Caffeine.newBuilder()
                 .maximumSize(5000)
                 .removalListener(

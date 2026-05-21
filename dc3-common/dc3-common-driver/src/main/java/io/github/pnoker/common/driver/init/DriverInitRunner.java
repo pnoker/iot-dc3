@@ -21,7 +21,7 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverRegisterService;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -46,6 +46,7 @@ import java.time.Duration;
  */
 @Slf4j
 @AutoConfiguration
+@RequiredArgsConstructor
 @ComponentScan(basePackages = {"io.github.pnoker.common.driver"})
 @EnableConfigurationProperties({DriverProperties.class})
 public class DriverInitRunner implements ApplicationRunner {
@@ -54,14 +55,11 @@ public class DriverInitRunner implements ApplicationRunner {
     private static final Duration REGISTER_INITIAL_BACKOFF = Duration.ofSeconds(2);
     private static final Duration REGISTER_MAX_BACKOFF = Duration.ofSeconds(30);
 
-    @Resource
-    private DriverRegisterService driverRegisterService;
+    private final DriverRegisterService driverRegisterService;
 
-    @Resource
-    private DriverCustomService driverCustomService;
+    private final DriverCustomService driverCustomService;
 
-    @Resource
-    private DriverScheduleService driverScheduleService;
+    private final DriverScheduleService driverScheduleService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
