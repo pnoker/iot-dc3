@@ -60,6 +60,8 @@ public class MessageServiceImpl implements MessageService {
 
     private final MessageManager messageManager;
 
+    private final io.github.pnoker.common.data.biz.alarm.NotifyConfigCache notifyConfigCache;
+
     @Override
     public void add(MessageBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -68,6 +70,7 @@ public class MessageServiceImpl implements MessageService {
         if (!messageManager.save(entityDO)) {
             throw new AddException("Failed to create group");
         }
+        notifyConfigCache.invalidateMessage(entityDO.getId());
     }
 
     @Override
@@ -84,6 +87,7 @@ public class MessageServiceImpl implements MessageService {
         if (!messageManager.removeById(id)) {
             throw new DeleteException("Failed to remove group");
         }
+        notifyConfigCache.invalidateMessage(id);
     }
 
     @Override
@@ -97,6 +101,7 @@ public class MessageServiceImpl implements MessageService {
         if (!messageManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update group");
         }
+        notifyConfigCache.invalidateMessage(entityBO.getId());
     }
 
     @Override

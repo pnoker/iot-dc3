@@ -62,6 +62,8 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
 
     private final NotifyChannelBindManager notifyChannelBindManager;
 
+    private final io.github.pnoker.common.data.biz.alarm.NotifyConfigCache notifyConfigCache;
+
     @Override
     public void add(NotifyChannelBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -70,6 +72,7 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
         if (!notifyChannelManager.save(entityDO)) {
             throw new AddException("Failed to create notify channel");
         }
+        notifyConfigCache.invalidateChannel(entityDO.getId());
     }
 
     @Override
@@ -84,6 +87,7 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
         if (!notifyChannelManager.removeById(id)) {
             throw new DeleteException("Failed to remove notify channel");
         }
+        notifyConfigCache.invalidateChannel(id);
     }
 
     @Override
@@ -97,6 +101,7 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
         if (!notifyChannelManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update notify channel");
         }
+        notifyConfigCache.invalidateChannel(entityBO.getId());
     }
 
     @Override

@@ -65,6 +65,8 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
 
     private final NotifyChannelManager notifyChannelManager;
 
+    private final io.github.pnoker.common.data.biz.alarm.NotifyConfigCache notifyConfigCache;
+
     @Override
     public void add(NotifyChannelBindBO entityBO) {
         requireReferences(entityBO);
@@ -74,20 +76,22 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
         if (!notifyChannelBindManager.save(entityDO)) {
             throw new AddException("Failed to create notify channel binding");
         }
+        notifyConfigCache.invalidateBinds(entityBO.getTenantId(), entityBO.getNotifyId());
     }
 
     @Override
     public void delete(Long id) {
-        getDOById(id, true);
+        NotifyChannelBindDO existing = getDOById(id, true);
 
         if (!notifyChannelBindManager.removeById(id)) {
             throw new DeleteException("Failed to remove notify channel binding");
         }
+        notifyConfigCache.invalidateBinds(existing.getTenantId(), existing.getNotifyId());
     }
 
     @Override
     public void update(NotifyChannelBindBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        NotifyChannelBindDO existing = getDOById(entityBO.getId(), true);
 
         requireReferences(entityBO);
         checkDuplicate(entityBO, true, true);
@@ -97,6 +101,10 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
         if (!notifyChannelBindManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update notify channel binding");
         }
+        // Invalidate both old and new (tenant, notify) tuples; the parent notify
+        // could in principle change.
+        notifyConfigCache.invalidateBinds(existing.getTenantId(), existing.getNotifyId());
+        notifyConfigCache.invalidateBinds(entityBO.getTenantId(), entityBO.getNotifyId());
     }
 
     @Override
