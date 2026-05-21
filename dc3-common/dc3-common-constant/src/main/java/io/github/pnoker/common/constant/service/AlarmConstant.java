@@ -40,6 +40,14 @@ public class AlarmConstant {
 
     public static final String EXT_NOTIFY_HISTORY_RESPONSE = "ALARM_NOTIFY_HISTORY_RESPONSE";
 
+    /**
+     * The single rule-evaluation window mode supported in the current release.
+     * Other modes (AVG/MIN/MAX/SUM/COUNT/ALL/ANY) are reserved for the upcoming
+     * window-aggregation phase; configurations selecting them are rejected at
+     * save time and skipped at evaluation time.
+     */
+    public static final String WINDOW_MODE_LAST = "LAST";
+
     private AlarmConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }

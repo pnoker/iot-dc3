@@ -17,26 +17,42 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
+import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Deterministic evaluator for structured alarm rules.
+ *
+ * <p>Window-aware rules are not yet implemented in this release. The only
+ * supported {@code RuleExt.Window.mode} value is {@code LAST} (or null/blank,
+ * which is treated as LAST). Any other mode (AVG/MIN/MAX/SUM/COUNT/ALL/ANY) is
+ * skipped at evaluation time with a one-time WARN per rule id, so a rule
+ * configured against an unimplemented mode will not silently behave as LAST.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Slf4j
 @Service
 public class RuleEvaluatorImpl implements RuleEvaluator {
 
+    private final Set<Long> warnedUnsupportedRules = ConcurrentHashMap.newKeySet();
+
     @Override
     public boolean matches(RuleBO rule, RuleFact fact) {
+        if (!isWindowModeSupported(rule)) {
+            return false;
+        }
         RuleExt.Condition condition = condition(rule);
         if (Objects.isNull(condition) || Objects.isNull(fact)) {
             return false;
@@ -48,6 +64,9 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
     public boolean recovers(RuleBO rule, RuleFact fact) {
         if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())
                 || Objects.isNull(fact)) {
+            return false;
+        }
+        if (!isWindowModeSupported(rule)) {
             return false;
         }
         RuleExt.Recovery recovery = rule.getRuleExt().getContent().getRecovery();
@@ -64,6 +83,25 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
                 null,
                 condition.getUnit());
         return evaluate(recoveryCondition, fact.value(condition.getField()));
+    }
+
+    private boolean isWindowModeSupported(RuleBO rule) {
+        if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())) {
+            return true;
+        }
+        RuleExt.Window window = rule.getRuleExt().getContent().getWindow();
+        if (Objects.isNull(window) || StringUtils.isBlank(window.getMode())) {
+            return true;
+        }
+        if (StringUtils.equalsIgnoreCase(window.getMode(), AlarmConstant.WINDOW_MODE_LAST)) {
+            return true;
+        }
+        if (Objects.nonNull(rule.getId()) && warnedUnsupportedRules.add(rule.getId())) {
+            log.warn("Skipping rule[{}] because window mode '{}' is not yet supported; only LAST is implemented",
+                    rule.getId(), window.getMode());
+        }
+        return false;
     }
 
     private RuleExt.Condition condition(RuleBO rule) {
