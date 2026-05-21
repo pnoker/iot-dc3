@@ -20,11 +20,14 @@ package io.github.pnoker.common.data.biz.impl;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.SystemHealthService;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.TenantFacade;
@@ -40,6 +43,7 @@ import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +90,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
 
     private final DeviceFacade deviceFacade;
 
-    private final LocalCacheService localCacheService;
+    private final EntityStateManager entityStateManager;
 
     private static Pages firstPage(int size) {
         Pages p = new Pages();
@@ -177,12 +181,17 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             return summary;
         }
         int online = 0;
-        String onlineCode = DriverStatusEnum.ONLINE.getCode();
+        LocalDateTime now = LocalDateTime.now();
         for (FacadeDriverBO d : drivers) {
-            String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + d.getId();
-            String status = localCacheService.getKey(key);
-            if (Objects.equals(status, onlineCode)) {
-                online++;
+            EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                    .eq(EntityStateDO::getEntityId, d.getId())
+                    .one();
+            if (Objects.nonNull(state) && !state.getExpireTime().isBefore(now)) {
+                DriverStatusEnum e = DriverStatusEnum.ofIndex(state.getStateFlag());
+                if (Objects.nonNull(e) && DriverStatusEnum.ONLINE.getCode().equals(e.getCode())) {
+                    online++;
+                }
             }
         }
         summary.setTotal(drivers.size());
@@ -206,12 +215,17 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             return summary;
         }
         int online = 0;
-        String onlineCode = DeviceStatusEnum.ONLINE.getCode();
+        LocalDateTime now = LocalDateTime.now();
         for (FacadeDeviceBO d : devices) {
-            String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + d.getId();
-            String status = localCacheService.getKey(key);
-            if (Objects.equals(status, onlineCode)) {
-                online++;
+            EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                    .eq(EntityStateDO::getEntityId, d.getId())
+                    .one();
+            if (Objects.nonNull(state) && !state.getExpireTime().isBefore(now)) {
+                DeviceStatusEnum e = DeviceStatusEnum.ofIndex(state.getStateFlag());
+                if (Objects.nonNull(e) && DeviceStatusEnum.ONLINE.getCode().equals(e.getCode())) {
+                    online++;
+                }
             }
         }
         summary.setTotal(devices.size());

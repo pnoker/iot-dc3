@@ -19,6 +19,8 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
@@ -30,7 +32,9 @@ import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import java.time.LocalDateTime;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
@@ -67,6 +71,8 @@ public class OfflineExpiryListener {
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
+    private final EntityStateManager entityStateManager;
+
     private static Long parseIdSuffix(String key, String prefix) {
         try {
             return Long.parseLong(key.substring(prefix.length()));
@@ -102,6 +108,15 @@ public class OfflineExpiryListener {
         if (Objects.equals(lastStatus, DriverStatusEnum.OFFLINE.getCode()))
             return;
         Long id = parseIdSuffix(key, PrefixConstant.DRIVER_STATUS_KEY_PREFIX);
+
+        // Skip if the DB scanner has already processed this expiry
+        EntityStateDO dbState = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                .eq(EntityStateDO::getEntityId, id)
+                .one();
+        if (Objects.nonNull(dbState) && Objects.equals(dbState.getStateFlag(), DriverStatusEnum.OFFLINE.getIndex())) {
+            return;
+        }
         if (Objects.isNull(id))
             return;
 
@@ -154,6 +169,15 @@ public class OfflineExpiryListener {
         if (Objects.equals(lastStatus, DeviceStatusEnum.OFFLINE.getCode()))
             return;
         Long id = parseIdSuffix(key, PrefixConstant.DEVICE_STATUS_KEY_PREFIX);
+
+        // Skip if the DB scanner has already processed this expiry
+        EntityStateDO dbState = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                .eq(EntityStateDO::getEntityId, id)
+                .one();
+        if (Objects.nonNull(dbState) && Objects.equals(dbState.getStateFlag(), DeviceStatusEnum.OFFLINE.getIndex())) {
+            return;
+        }
         if (Objects.isNull(id))
             return;
 

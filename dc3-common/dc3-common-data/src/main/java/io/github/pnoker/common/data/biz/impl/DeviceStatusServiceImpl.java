@@ -19,9 +19,13 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import java.time.LocalDateTime;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
@@ -50,6 +54,8 @@ import java.util.stream.Collectors;
 public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     private final DeviceFacade deviceFacade;
+
+    private final EntityStateManager entityStateManager;
 
     private final LocalCacheService localCacheService;
 
@@ -87,12 +93,20 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
      */
     private Map<Long, String> getStatusMap(List<FacadeDeviceBO> devices) {
         Map<Long, String> statusMap = new HashMap<>(16);
-        Set<Long> deviceIds = devices.stream().map(FacadeDeviceBO::getId).collect(Collectors.toSet());
-        deviceIds.forEach(id -> {
-            String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
-            String status = localCacheService.getKey(key);
-            status = Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
-            statusMap.put(id, status);
+        LocalDateTime now = LocalDateTime.now();
+        devices.forEach(device -> {
+            EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                    .eq(EntityStateDO::getEntityId, device.getId())
+                    .one();
+            String status;
+            if (Objects.isNull(state) || state.getExpireTime().isBefore(now)) {
+                status = DeviceStatusEnum.OFFLINE.getCode();
+            } else {
+                DeviceStatusEnum e = DeviceStatusEnum.ofIndex(state.getStateFlag());
+                status = Objects.nonNull(e) ? e.getCode() : DeviceStatusEnum.OFFLINE.getCode();
+            }
+            statusMap.put(device.getId(), status);
         });
         return statusMap;
     }

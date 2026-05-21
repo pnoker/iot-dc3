@@ -17,12 +17,13 @@
 
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.SystemHealthService;
-import io.github.pnoker.common.data.cache.LocalCacheService;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,7 +58,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
 
     private final DriverFacade driverFacade;
 
-    private final LocalCacheService localCacheService;
+    private final EntityStateManager entityStateManager;
 
     private final SystemHealthService systemHealthService;
 
@@ -119,13 +121,27 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     }
 
     private String deviceStatus(Long deviceId) {
-        String status = localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceId);
-        return Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
+        EntityStateDO state = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                .eq(EntityStateDO::getEntityId, deviceId)
+                .one();
+        if (Objects.isNull(state) || state.getExpireTime().isBefore(LocalDateTime.now())) {
+            return DeviceStatusEnum.OFFLINE.getCode();
+        }
+        DeviceStatusEnum e = DeviceStatusEnum.ofIndex(state.getStateFlag());
+        return Objects.nonNull(e) ? e.getCode() : DeviceStatusEnum.OFFLINE.getCode();
     }
 
     private String driverStatus(Long driverId) {
-        String status = localCacheService.getKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverId);
-        return Objects.nonNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+        EntityStateDO state = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                .eq(EntityStateDO::getEntityId, driverId)
+                .one();
+        if (Objects.isNull(state) || state.getExpireTime().isBefore(LocalDateTime.now())) {
+            return DriverStatusEnum.OFFLINE.getCode();
+        }
+        DriverStatusEnum e = DriverStatusEnum.ofIndex(state.getStateFlag());
+        return Objects.nonNull(e) ? e.getCode() : DriverStatusEnum.OFFLINE.getCode();
     }
 
 }

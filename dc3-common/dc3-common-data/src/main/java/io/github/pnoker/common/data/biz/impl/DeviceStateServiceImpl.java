@@ -19,15 +19,19 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.biz.DeviceStateService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -44,6 +48,8 @@ public class DeviceStateServiceImpl implements DeviceStateService {
     private final LocalCacheService localCacheService;
 
     private final DeviceAlarmService deviceAlarmService;
+
+    private final EntityStateManager entityStateManager;
 
     private static boolean isFlip(String prev, String current) {
         return online(prev) != online(current);
@@ -62,6 +68,29 @@ public class DeviceStateServiceImpl implements DeviceStateService {
         String statusKey = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + entityDTO.getDeviceId();
         String prev = localCacheService.getKey(statusKey);
         String current = entityDTO.getStatus();
+
+        // Persist state lease to database (source of truth)
+        EntityStateDO stateDO = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                .eq(EntityStateDO::getEntityId, entityDTO.getDeviceId())
+                .one();
+        long ttlSeconds = entityDTO.getTimeUnit().toSeconds(entityDTO.getTimeOut());
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(ttlSeconds);
+        if (Objects.isNull(stateDO)) {
+            stateDO = new EntityStateDO();
+            stateDO.setEntityTypeFlag(EntityTypeFlagEnum.DEVICE.getIndex());
+            stateDO.setEntityId(entityDTO.getDeviceId());
+            stateDO.setDriverId(Objects.nonNull(entityDTO.getDriverId()) ? entityDTO.getDriverId() : 0L);
+            stateDO.setTenantId(entityDTO.getTenantId());
+            stateDO.setLeaseVersion(1L);
+        } else {
+            stateDO.setLeaseVersion(stateDO.getLeaseVersion() + 1L);
+        }
+        DeviceStatusEnum statusEnum = DeviceStatusEnum.ofCode(current);
+        stateDO.setStateFlag((byte) (Objects.nonNull(statusEnum) ? statusEnum.getIndex() : 0));
+        stateDO.setExpireTime(expireTime);
+        stateDO.setTtlSeconds((int) ttlSeconds);
+        entityStateManager.saveOrUpdate(stateDO);
 
         localCacheService.setKey(statusKey, current, entityDTO.getTimeOut(), entityDTO.getTimeUnit());
 

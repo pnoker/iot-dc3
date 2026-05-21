@@ -19,16 +19,20 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.biz.DriverStateService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,6 +52,8 @@ public class DriverStateServiceImpl implements DriverStateService {
 
     private final DriverAlarmService driverAlarmService;
 
+    private final EntityStateManager entityStateManager;
+
     private static boolean isFlip(String prev, String current) {
         return online(prev) != online(current);
     }
@@ -65,6 +71,28 @@ public class DriverStateServiceImpl implements DriverStateService {
         String statusKey = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + entityDTO.getDriverId();
         String prev = localCacheService.getKey(statusKey);
         String current = entityDTO.getStatus();
+
+        // Persist state lease to database (source of truth)
+        EntityStateDO stateDO = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                .eq(EntityStateDO::getEntityId, entityDTO.getDriverId())
+                .one();
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(STATUS_TTL_SECONDS);
+        if (Objects.isNull(stateDO)) {
+            stateDO = new EntityStateDO();
+            stateDO.setEntityTypeFlag(EntityTypeFlagEnum.DRIVER.getIndex());
+            stateDO.setEntityId(entityDTO.getDriverId());
+            stateDO.setDriverId(entityDTO.getDriverId());
+            stateDO.setTenantId(entityDTO.getTenantId());
+            stateDO.setLeaseVersion(1L);
+        } else {
+            stateDO.setLeaseVersion(stateDO.getLeaseVersion() + 1L);
+        }
+        DriverStatusEnum statusEnum = DriverStatusEnum.ofCode(current);
+        stateDO.setStateFlag((byte) (Objects.nonNull(statusEnum) ? statusEnum.getIndex() : 0));
+        stateDO.setExpireTime(expireTime);
+        stateDO.setTtlSeconds(STATUS_TTL_SECONDS);
+        entityStateManager.saveOrUpdate(stateDO);
 
         localCacheService.setKey(statusKey, current, STATUS_TTL_SECONDS, TimeUnit.SECONDS);
 
