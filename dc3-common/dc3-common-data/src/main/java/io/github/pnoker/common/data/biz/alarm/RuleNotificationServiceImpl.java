@@ -159,10 +159,15 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
             }
 
             MessagePayload payload = messageRenderService.render(message, channel.getChannelTypeFlag(), variables);
+            // Two-step write: PENDING row is committed first so the row id is
+            // visible on the channel send (and to the future async worker, which
+            // takes over the dispatch in commit 7). The send result then updates
+            // the same row to SUCCESS/FAILED instead of inserting a second one.
+            NotifyHistoryBO history = persistPendingHistory(match, notify, message, bind, channel, payload, variables);
             NotifySendResult result = notifyChannelAdapterRegistry.find(channel.getChannelTypeFlag())
                     .map(adapter -> adapter.send(channel, payload))
                     .orElseGet(() -> NotifySendResult.failed(channel.getCredentialRef(), "Notify channel adapter is missing"));
-            NotifyHistoryBO history = persistHistory(match, notify, message, bind, channel, payload, variables, result);
+            history = finalizeHistory(history, result);
             histories.add(history);
             if (NotifyHistoryStatusEnum.SUCCESS.equals(result.getStatusFlag())) {
                 state.setLastNotifyTime(LocalDateTime.now());
@@ -305,6 +310,10 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                 + fact.getEntityId();
     }
 
+    /**
+     * Skipped histories never enter the PENDING state — they describe a
+     * decision *not* to send and have a final status (SKIPPED) at write time.
+     */
     private NotifyHistoryBO historySkipped(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
                                          NotifyChannelBO channel, Map<String, Object> variables, String reason) {
         MessagePayload payload = new MessagePayload(
@@ -315,12 +324,52 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         NotifySendResult result = NotifySendResult.skipped(
                 Objects.nonNull(channel) ? channel.getCredentialRef() : "notify-channel:" + bind.getChannelId(),
                 reason);
-        return persistHistory(match, notify, message, bind, channel, payload, variables, result);
+        NotifyHistoryBO history = buildHistory(match, notify, message, bind, channel, payload, variables);
+        history.setStatusFlag(result.getStatusFlag());
+        history.setTarget(Objects.toString(result.getTarget(), ""));
+        history.setResponseExt(responseExt(result));
+        history.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
+        NotifyHistoryDO entityDO = notifyHistoryBuilder.buildDOByBO(history);
+        notifyHistoryManager.save(entityDO);
+        return notifyHistoryBuilder.buildBOByDO(entityDO);
     }
 
-    private NotifyHistoryBO persistHistory(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
-                                         NotifyChannelBO channel, MessagePayload payload, Map<String, Object> variables,
-                                         NotifySendResult result) {
+    /**
+     * Insert a PENDING history row and return the assigned id so subsequent
+     * dispatch can update rather than insert. The PENDING row carries
+     * everything the worker needs to find the channel and replay the payload
+     * (channel id + rendered request_ext) without a follow-up join.
+     */
+    private NotifyHistoryBO persistPendingHistory(RuleMatch match, NotifyBO notify, MessageBO message,
+                                                  NotifyChannelBindBO bind, NotifyChannelBO channel,
+                                                  MessagePayload payload, Map<String, Object> variables) {
+        NotifyHistoryBO history = buildHistory(match, notify, message, bind, channel, payload, variables);
+        history.setStatusFlag(NotifyHistoryStatusEnum.PENDING);
+        NotifyHistoryDO entityDO = notifyHistoryBuilder.buildDOByBO(history);
+        notifyHistoryManager.save(entityDO);
+        return notifyHistoryBuilder.buildBOByDO(entityDO);
+    }
+
+    /**
+     * Stamp a PENDING history with the dispatch result. The synchronous path
+     * here mirrors what the async NotifyWorker (commit 7) will do once it
+     * takes over outbound delivery — the row identity stays stable across the
+     * transition.
+     */
+    private NotifyHistoryBO finalizeHistory(NotifyHistoryBO pending, NotifySendResult result) {
+        pending.setStatusFlag(result.getStatusFlag());
+        pending.setTarget(Objects.toString(result.getTarget(), ""));
+        pending.setResponseExt(responseExt(result));
+        pending.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
+        NotifyHistoryDO entityDO = notifyHistoryBuilder.buildDOByBO(pending);
+        entityDO.setOperateTime(null);
+        notifyHistoryManager.updateById(entityDO);
+        return notifyHistoryBuilder.buildBOByDO(entityDO);
+    }
+
+    private NotifyHistoryBO buildHistory(RuleMatch match, NotifyBO notify, MessageBO message,
+                                         NotifyChannelBindBO bind, NotifyChannelBO channel,
+                                         MessagePayload payload, Map<String, Object> variables) {
         NotifyHistoryBO history = new NotifyHistoryBO();
         history.setRuleId(match.getRule().getId());
         history.setNotifyId(Objects.nonNull(notify) ? notify.getId() : DefaultConstant.DEFAULT_ID);
@@ -329,16 +378,10 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         history.setChannelId(Objects.nonNull(channel) ? channel.getId() : bind.getChannelId());
         history.setAlarmId(Objects.requireNonNullElse(match.getFact().getAlarmId(), DefaultConstant.DEFAULT_ID));
         history.setChannelTypeFlag(Objects.nonNull(channel) ? channel.getChannelTypeFlag() : payload.getChannelTypeFlag());
-        history.setTarget(Objects.toString(result.getTarget(), ""));
-        history.setStatusFlag(result.getStatusFlag());
         history.setRequestExt(requestExt(payload, variables));
-        history.setResponseExt(responseExt(result));
-        history.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
         history.setRetryCount(0);
         history.setTenantId(match.getFact().getTenantId());
-        NotifyHistoryDO entityDO = notifyHistoryBuilder.buildDOByBO(history);
-        notifyHistoryManager.save(entityDO);
-        return notifyHistoryBuilder.buildBOByDO(entityDO);
+        return history;
     }
 
     private NotifyHistoryRequestExt requestExt(MessagePayload payload, Map<String, Object> variables) {
