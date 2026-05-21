@@ -23,6 +23,7 @@ import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
@@ -101,6 +102,9 @@ public class DeviceAlarmServiceImpl implements DeviceAlarmService {
         entity.setRuleId(0L);
         entity.setAlarmTypeFlag(AlarmTypeFlagEnum.REPORT.getIndex());
         entity.setAlarmSourceFlag(AlarmSourceFlagEnum.DEVICE_REPORT.getIndex());
+        // Device-reported alarms default to P2; rule-driven severity is set when
+        // the rule pipeline writes a follow-up entity_alarm row.
+        entity.setAlarmLevelFlag(AlarmMessageLevelFlagEnum.P2.getIndex());
         entity.setAlarmExt(JsonExt.builder().type("device-alarm").content(msg).version(1).build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
