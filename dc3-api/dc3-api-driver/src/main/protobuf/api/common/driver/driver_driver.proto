@@ -22,6 +22,7 @@ package api.common.driver;
 import "api/common/r.proto";
 import "api/common/entity.proto";
 import "api/common/driver/driver_entity.proto";
+import "api/common/driver/driver_query.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.common.driver";
@@ -33,6 +34,9 @@ option java_multiple_files = true;
 service DriverApi {
   // Driver registration, used by the driver service to register itself with the platform
   rpc DriverRegister (GrpcDriverRegisterDTO) returns (GrpcRDriverRegisterDTO);
+
+  // Query the current registered driver metadata without re-registering it
+  rpc GetById (GrpcDriverQuery) returns (GrpcRDriverRegisterDTO);
 }
 
 // Driver registration response structure

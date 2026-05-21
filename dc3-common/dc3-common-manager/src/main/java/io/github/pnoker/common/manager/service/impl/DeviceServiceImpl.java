@@ -122,6 +122,7 @@ public class DeviceServiceImpl implements DeviceService {
     private final MetadataEventPublisher metadataEventPublisher;
 
     @Override
+    @Transactional
     public void add(DeviceBO entityBO) {
         validateTenantRelations(entityBO);
 
@@ -139,7 +140,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
-                MetadataOperateTypeEnum.ADD);
+                MetadataOperateTypeEnum.ADD, driverServiceNames(entityDO.getDriverId()));
         metadataEventPublisher.publishEvent(metadataEvent);
     }
 
@@ -147,6 +148,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Transactional
     public void delete(Long id) {
         DeviceDO entityDO = getDOById(id, true);
+        Set<String> targetServices = driverServiceNames(entityDO.getDriverId());
 
         //
         profileBindService.removeByDeviceId(id);
@@ -157,13 +159,15 @@ public class DeviceServiceImpl implements DeviceService {
 
         //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
-                MetadataOperateTypeEnum.DELETE);
+                MetadataOperateTypeEnum.DELETE, targetServices);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
+    @Transactional
     public void update(DeviceBO entityBO) {
         DeviceDO entityDO = getDOById(entityBO.getId(), true);
+        Long oldDriverId = entityDO.getDriverId();
         if (!Objects.equals(entityBO.getTenantId(), entityDO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
@@ -198,9 +202,16 @@ public class DeviceServiceImpl implements DeviceService {
         entityBO.setDeviceName(deviceBO.getDeviceName());
 
         //
-        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
-                MetadataOperateTypeEnum.UPDATE);
-        metadataEventPublisher.publishEvent(metadataEvent);
+        if (Objects.equals(oldDriverId, entityBO.getDriverId())) {
+            MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
+                    MetadataOperateTypeEnum.UPDATE, driverServiceNames(entityBO.getDriverId()));
+            metadataEventPublisher.publishEvent(metadataEvent);
+        } else {
+            metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
+                    MetadataOperateTypeEnum.DELETE, driverServiceNames(oldDriverId)));
+            metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
+                    MetadataOperateTypeEnum.ADD, driverServiceNames(entityBO.getDriverId())));
+        }
     }
 
     @Override
@@ -608,6 +619,24 @@ public class DeviceServiceImpl implements DeviceService {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
+
+    private Set<String> driverServiceNames(Long... driverIds) {
+        Set<String> services = new HashSet<>();
+        if (Objects.isNull(driverIds)) {
+            return services;
+        }
+
+        for (Long driverId : driverIds) {
+            if (Objects.isNull(driverId)) {
+                continue;
+            }
+            DriverBO driverBO = driverService.getById(driverId);
+            if (Objects.nonNull(driverBO) && StringUtils.isNotBlank(driverBO.getServiceName())) {
+                services.add(driverBO.getServiceName());
+            }
+        }
+        return services;
     }
 
     /**

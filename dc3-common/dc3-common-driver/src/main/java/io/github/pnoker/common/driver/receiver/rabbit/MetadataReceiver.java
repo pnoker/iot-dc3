@@ -19,6 +19,7 @@ package io.github.pnoker.common.driver.receiver.rabbit;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.event.metadata.MetadataEventPublisher;
+import io.github.pnoker.common.driver.grpc.client.DriverClient;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
@@ -55,6 +56,8 @@ public class MetadataReceiver {
     private final DriverMetadata driverMetadata;
 
     private final DeviceMetadata deviceMetadata;
+
+    private final DriverClient driverClient;
 
     private final MetadataEventPublisher metadataEventPublisher;
 
@@ -112,6 +115,20 @@ public class MetadataReceiver {
                 // Publish point metadata event
                 metadataEventPublisher.publishEvent(
                         new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.POINT, entityDTO.getOperateType()));
+            } else if (MetadataTypeEnum.DRIVER.equals(entityDTO.getMetadataType())) {
+                if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
+                    log.info("Delete driver metadata: {}", entityDTO.getId());
+                    driverMetadata.clear();
+                    deviceMetadata.clearCache();
+                    pointMetadata.clearCache();
+                } else if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
+                        || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
+                    log.info("Refresh driver metadata: {}", entityDTO.getId());
+                    driverClient.refreshMetadata(entityDTO.getId());
+                }
+
+                metadataEventPublisher.publishEvent(
+                        new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DRIVER, entityDTO.getOperateType()));
             } else {
                 log.error("Unsupported metadata type: {}", entityDTO.getMetadataType());
                 RabbitAckUtil.reject(channel, deliveryTag);

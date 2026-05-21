@@ -22,6 +22,7 @@ import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
+import io.github.pnoker.api.common.driver.GrpcDriverQuery;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bo.RegisterBO;
@@ -33,6 +34,7 @@ import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.exception.RegisterException;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.optional.CollectionOptional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -98,6 +101,30 @@ public class DriverClient {
             throw new RegisterException(rDriverRegisterDTO.getResult().getMessage());
         }
 
+        applyMetadata(rDriverRegisterDTO);
+    }
+
+    /**
+     * Reloads the current driver metadata from manager without submitting registration
+     * properties again.
+     *
+     * @param driverId registered driver id
+     */
+    public void refreshMetadata(Long driverId) {
+        if (Objects.isNull(driverId) || driverId <= 0) {
+            throw new ServiceException("Failed to refresh driver metadata: invalid driver id");
+        }
+
+        GrpcDriverQuery query = GrpcDriverQuery.newBuilder().setDriverId(driverId).build();
+        GrpcRDriverRegisterDTO rDriverRegisterDTO = driverApiBlockingStub.getById(query);
+        if (!rDriverRegisterDTO.getResult().getOk()) {
+            throw new ServiceException(rDriverRegisterDTO.getResult().getMessage());
+        }
+
+        applyMetadata(rDriverRegisterDTO);
+    }
+
+    private void applyMetadata(GrpcRDriverRegisterDTO rDriverRegisterDTO) {
         DriverBO driverBO = driverBuilder.buildDTOByGrpcDTO(rDriverRegisterDTO.getDriver());
         driverMetadata.setDriver(driverBO);
 

@@ -60,6 +60,12 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
             entityEvent.setMetadataType(MetadataTypeEnum.POINT);
             entityEvent.setOperateType(metadataEvent.getOperateType());
             driverCustomService.event(entityEvent);
+        } else if (MetadataTypeEnum.DRIVER.equals(metadataType)) {
+            MetadataEventDTO entityEvent = new MetadataEventDTO();
+            entityEvent.setId(metadataEvent.getId());
+            entityEvent.setMetadataType(MetadataTypeEnum.DRIVER);
+            entityEvent.setOperateType(metadataEvent.getOperateType());
+            driverCustomService.event(entityEvent);
         }
     }
 

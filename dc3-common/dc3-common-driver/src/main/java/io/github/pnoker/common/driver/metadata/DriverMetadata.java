@@ -76,12 +76,12 @@ public final class DriverMetadata {
      * Current driver status.
      */
     @Setter
-    private DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
+    private volatile DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
     /**
      * Registered driver definition.
      */
     @Setter
-    private DriverBO driver;
+    private volatile DriverBO driver;
 
     private static <E> void replaceContents(Set<E> target, Set<E> source) {
         target.clear();
@@ -115,6 +115,16 @@ public final class DriverMetadata {
 
     public void setPointAttributeNameMap(Map<String, PointAttributeDTO> pointAttributeNameMap) {
         replaceContents(this.pointAttributeNameMap, pointAttributeNameMap);
+    }
+
+    public void clear() {
+        deviceIds.clear();
+        driverAttributeIdMap.clear();
+        driverAttributeNameMap.clear();
+        pointAttributeIdMap.clear();
+        pointAttributeNameMap.clear();
+        driver = null;
+        driverStatus = DriverStatusEnum.OFFLINE;
     }
 
 }

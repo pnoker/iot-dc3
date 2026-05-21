@@ -26,12 +26,15 @@ import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Event listener that processes metadata change events.
@@ -43,26 +46,40 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MetadataEventListener implements ApplicationListener<MetadataEvent> {
+public class MetadataEventListener {
 
     private final DriverService driverService;
 
     private final RabbitTemplate rabbitTemplate;
 
     @Async
-    @Override
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onApplicationEvent(MetadataEvent metadataEvent) {
         log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
         try {
             Long id = metadataEvent.getId();
             MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
             MetadataEventDTO entityDTO = new MetadataEventDTO(id, metadataType, metadataEvent.getOperateType());
+            if (CollectionUtils.isNotEmpty(metadataEvent.getTargetServices())) {
+                metadataEvent.getTargetServices().forEach(service -> notifyDriver(service, entityDTO));
+                return;
+            }
+
             if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
                 DriverBO entityBO = driverService.listByDeviceId(id);
-                notifyDriver(entityBO.getServiceName(), entityDTO);
+                if (Objects.nonNull(entityBO)) {
+                    notifyDriver(entityBO.getServiceName(), entityDTO);
+                }
             } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
                 List<DriverBO> entityBOList = driverService.selectByPointId(id);
-                entityBOList.forEach(entityBO -> notifyDriver(entityBO.getServiceName(), entityDTO));
+                if (CollectionUtils.isNotEmpty(entityBOList)) {
+                    entityBOList.forEach(entityBO -> notifyDriver(entityBO.getServiceName(), entityDTO));
+                }
+            } else if (MetadataTypeEnum.DRIVER.equals(metadataType)) {
+                DriverBO entityBO = driverService.getById(id);
+                if (Objects.nonNull(entityBO)) {
+                    notifyDriver(entityBO.getServiceName(), entityDTO);
+                }
             }
         } catch (Exception e) {
             log.error("Metadata event listener failed, event={}", JsonUtil.toJsonString(metadataEvent), e);
@@ -74,6 +91,9 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
      * @param entityDTO DriverTransferMetadataDTO
      */
     private void notifyDriver(String service, MetadataEventDTO entityDTO) {
+        if (Objects.isNull(service) || service.isBlank()) {
+            return;
+        }
         log.info("Notify driver[{}]: {}", service, JsonUtil.toJsonString(entityDTO));
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA,
                 RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + service, entityDTO);

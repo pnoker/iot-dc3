@@ -33,6 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -105,6 +106,31 @@ class MetadataEventListenerTest {
                 MetadataOperateTypeEnum.UPDATE));
 
         verifyNoInteractions(rabbitTemplate);
+    }
+
+    @Test
+    void eventWithTargetServicesBypassesOwnerLookup() {
+        listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
+                MetadataOperateTypeEnum.DELETE, Set.of("dc3-driver-old")));
+
+        verify(driverService, never()).listByDeviceId(10L);
+        verify(rabbitTemplate).convertAndSend(
+                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
+                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-old"),
+                any(MetadataEventDTO.class));
+    }
+
+    @Test
+    void driverEventNotifiesRegisteredDriverService() {
+        when(driverService.getById(7L)).thenReturn(driver);
+
+        listener.onApplicationEvent(new MetadataEvent(this, 7L, MetadataTypeEnum.DRIVER,
+                MetadataOperateTypeEnum.UPDATE));
+
+        verify(rabbitTemplate).convertAndSend(
+                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
+                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-modbus-tcp"),
+                any(MetadataEventDTO.class));
     }
 
     @Test

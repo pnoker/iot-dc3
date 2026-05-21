@@ -18,6 +18,7 @@
 package io.github.pnoker.common.driver.receiver.rabbit;
 
 import com.rabbitmq.client.Channel;
+import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.driver.grpc.client.DriverClient;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
@@ -25,6 +26,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
@@ -148,6 +150,33 @@ class MetadataReceiverTest {
         MetadataEventDTO dto = event(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.DELETE, 20L);
         receiver.metadataReceive(channel, message, dto);
         verify(pointMetadata).removeCache(20L);
+        verify(channel).basicAck(eq(7L), eq(false));
+    }
+
+    @Test
+    void driverUpdateRefreshesDriverMetadata() throws Exception {
+        MetadataEventDTO dto = event(MetadataTypeEnum.DRIVER, MetadataOperateTypeEnum.UPDATE, 7L);
+        receiver.metadataReceive(channel, message, dto);
+        verify(driverClient).refreshMetadata(7L);
+        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
+        verify(channel).basicAck(eq(7L), eq(false));
+    }
+
+    @Test
+    void driverDeleteClearsAllDriverSideCaches() throws Exception {
+        driverMetadata.setDriver(new DriverBO());
+        driverMetadata.setDriverStatus(DriverStatusEnum.ONLINE);
+
+        MetadataEventDTO dto = event(MetadataTypeEnum.DRIVER, MetadataOperateTypeEnum.DELETE, 7L);
+        receiver.metadataReceive(channel, message, dto);
+
+        verify(deviceMetadata).clearCache();
+        verify(pointMetadata).clearCache();
+        assertThat(driverMetadata.getDeviceIds()).isEmpty();
+        assertThat(driverMetadata.getDriver()).isNull();
+        assertThat(driverMetadata.getDriverStatus()).isEqualTo(DriverStatusEnum.OFFLINE);
+        verify(driverClient, never()).refreshMetadata(7L);
+        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
         verify(channel).basicAck(eq(7L), eq(false));
     }
 

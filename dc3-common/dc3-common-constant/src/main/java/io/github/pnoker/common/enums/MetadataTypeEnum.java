@@ -44,6 +44,11 @@ public enum MetadataTypeEnum {
      * Point metadata
      */
     POINT((byte) 1, "point", "Point metadata"),
+
+    /**
+     * Driver metadata
+     */
+    DRIVER((byte) 2, "driver", "Driver metadata"),
     ;
 
     /**

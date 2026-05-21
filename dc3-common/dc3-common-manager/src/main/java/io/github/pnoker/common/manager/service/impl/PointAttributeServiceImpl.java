@@ -23,6 +23,9 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -34,6 +37,7 @@ import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.builder.PointAttributeBuilder;
 import io.github.pnoker.common.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.common.manager.entity.query.PointAttributeQuery;
+import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.utils.FieldUtil;
@@ -46,6 +50,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Business service implementation for point attribute operations.
@@ -65,6 +70,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     private final DriverService driverService;
 
+    private final MetadataEventPublisher metadataEventPublisher;
+
     @Override
     public void add(PointAttributeBO entityBO) {
         validateTenantRelations(entityBO);
@@ -74,15 +81,17 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (!pointAttributeManager.save(entityDO)) {
             throw new AddException("Failed to create point attribute");
         }
+        publishDriverMetadataEvent(entityDO.getDriverId());
     }
 
     @Override
     public void delete(Long id) {
-        getDOById(id, true);
+        PointAttributeDO entityDO = getDOById(id, true);
 
         if (!pointAttributeManager.removeById(id)) {
             throw new DeleteException("Failed to remove point attribute");
         }
+        publishDriverMetadataEvent(entityDO.getDriverId());
     }
 
     @Override
@@ -100,6 +109,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (!pointAttributeManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update point attribute");
         }
+        publishDriverMetadataEvent(entityDO.getDriverId());
     }
 
     @Override
@@ -136,6 +146,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (!pointAttributeManager.saveBatch(doList)) {
             throw new AddException("Failed to batch create point attributes");
         }
+        entityBOList.stream().map(PointAttributeBO::getDriverId).distinct().forEach(this::publishDriverMetadataEvent);
     }
 
     @Override
@@ -152,6 +163,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (!pointAttributeManager.updateBatchById(doList)) {
             throw new UpdateException("Failed to batch update point attributes");
         }
+        entityBOList.stream().map(PointAttributeBO::getDriverId).distinct().forEach(this::publishDriverMetadataEvent);
     }
 
     @Override
@@ -159,9 +171,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return;
         }
+        List<PointAttributeDO> entityDOList = pointAttributeManager.listByIds(ids);
         if (!pointAttributeManager.removeByIds(ids)) {
             throw new DeleteException("Failed to batch remove point attributes");
         }
+        entityDOList.stream().map(PointAttributeDO::getDriverId).distinct().forEach(this::publishDriverMetadataEvent);
     }
 
     @Override
@@ -225,6 +239,15 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (Objects.isNull(driverBO) || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+    }
+
+    private void publishDriverMetadataEvent(Long driverId) {
+        DriverBO driverBO = driverService.getById(driverId);
+        if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
+            return;
+        }
+        metadataEventPublisher.publishEvent(new MetadataEvent(this, driverId, MetadataTypeEnum.DRIVER,
+                MetadataOperateTypeEnum.UPDATE, Set.of(driverBO.getServiceName())));
     }
 
     /**

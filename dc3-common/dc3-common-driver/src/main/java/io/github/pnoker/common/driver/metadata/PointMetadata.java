@@ -103,8 +103,18 @@ public final class PointMetadata {
      * @param id point identifier
      */
     public void loadCache(long id) {
-        CompletableFuture<PointBO> future = CompletableFuture.supplyAsync(() -> pointClient.getById(id));
-        cache.put(id, future);
+        CompletableFuture.supplyAsync(() -> pointClient.getById(id))
+                .whenComplete((point, throwable) -> {
+                    if (throwable != null) {
+                        log.error("Failed to reload point metadata, pointId={}", id, throwable);
+                        return;
+                    }
+                    if (point == null) {
+                        cache.synchronous().invalidate(id);
+                        return;
+                    }
+                    cache.put(id, CompletableFuture.completedFuture(point));
+                });
     }
 
     /**
@@ -113,7 +123,14 @@ public final class PointMetadata {
      * @param id point identifier
      */
     public void removeCache(long id) {
-        cache.put(id, CompletableFuture.completedFuture(null));
+        cache.synchronous().invalidate(id);
+    }
+
+    /**
+     * Clears all cached point metadata.
+     */
+    public void clearCache() {
+        cache.synchronous().invalidateAll();
     }
 
 }
