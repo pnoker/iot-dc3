@@ -64,6 +64,6 @@ public class RuleStateQuery implements Serializable {
 
     private RuleStateFlagEnum stateFlag;
 
-    private Long eventId;
+    private Long alarmId;
 
 }

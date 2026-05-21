@@ -52,7 +52,7 @@ public class NotifyHistoryVO extends BaseVO {
 
     private Long channelId;
 
-    private Long eventId;
+    private Long alarmId;
 
     private NotifyChannelTypeFlagEnum channelTypeFlag;
 

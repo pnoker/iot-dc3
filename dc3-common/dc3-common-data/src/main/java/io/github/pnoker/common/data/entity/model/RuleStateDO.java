@@ -81,8 +81,8 @@ public class RuleStateDO implements Serializable {
     @TableField("trigger_count")
     private Long triggerCount;
 
-    @TableField("event_id")
-    private Long eventId;
+    @TableField("alarm_id")
+    private Long alarmId;
 
     @TableField(value = "state_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt stateExt;

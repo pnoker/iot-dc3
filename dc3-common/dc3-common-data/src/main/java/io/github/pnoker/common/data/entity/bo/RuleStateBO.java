@@ -64,7 +64,7 @@ public class RuleStateBO extends BaseBO implements TenantOwned {
 
     private Long triggerCount;
 
-    private Long eventId;
+    private Long alarmId;
 
     private RuleStateExt stateExt;
 

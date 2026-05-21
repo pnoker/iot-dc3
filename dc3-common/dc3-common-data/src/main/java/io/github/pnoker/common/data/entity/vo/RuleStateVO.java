@@ -71,7 +71,7 @@ public class RuleStateVO extends BaseVO {
 
     private Long triggerCount;
 
-    private Long eventId;
+    private Long alarmId;
 
     private RuleStateExt stateExt;
 

@@ -110,8 +110,8 @@ public class NotifyHistoryServiceImpl implements NotifyHistoryService {
                 entityQuery.getMessageId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getChannelId()), NotifyHistoryDO::getChannelId,
                 entityQuery.getChannelId());
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEventId()), NotifyHistoryDO::getEventId,
-                entityQuery.getEventId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAlarmId()), NotifyHistoryDO::getAlarmId,
+                entityQuery.getAlarmId());
         wrapper.eq(Objects.nonNull(entityQuery.getChannelTypeFlag()), NotifyHistoryDO::getChannelTypeFlag,
                 Objects.isNull(entityQuery.getChannelTypeFlag()) ? null
                         : entityQuery.getChannelTypeFlag().getIndex());
