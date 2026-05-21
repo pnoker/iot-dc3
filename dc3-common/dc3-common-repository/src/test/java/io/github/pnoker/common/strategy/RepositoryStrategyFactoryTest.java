@@ -165,6 +165,18 @@ class RepositoryStrategyFactoryTest {
         public Page<PointValueBO> listPagePointValue(PointValueQuery entityQuery) {
             return new Page<>();
         }
+
+        @Override
+        public io.github.pnoker.common.entity.bo.WindowAggregateResult aggregateInWindow(
+                io.github.pnoker.common.entity.query.WindowAggregateRequest request) {
+            return io.github.pnoker.common.entity.bo.WindowAggregateResult.empty();
+        }
+
+        @Override
+        public List<PointValueBO> samplesInWindow(Long tenantId, Long deviceId, Long pointId,
+                                                  java.time.LocalDateTime from, java.time.LocalDateTime to) {
+            return List.of();
+        }
     }
 
 }

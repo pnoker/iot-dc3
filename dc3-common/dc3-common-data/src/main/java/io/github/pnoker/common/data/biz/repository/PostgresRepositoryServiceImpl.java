@@ -24,9 +24,12 @@ import io.github.pnoker.common.constant.driver.StrategyConstant;
 import io.github.pnoker.common.data.dal.PointValueManager;
 import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.data.mapper.PointValueMapper;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.WindowAggregateResult;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
+import io.github.pnoker.common.entity.query.WindowAggregateRequest;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
@@ -38,6 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,6 +59,8 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     private final PointValueBuilder pointValueBuilder;
 
     private final PointValueManager pointValueManager;
+
+    private final PointValueMapper pointValueMapper;
 
     @Override
     public String getRepositoryName() {
@@ -111,6 +117,27 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
         throw new UnsupportedOperationException(
                 "selectLatestPointValues is not implemented; callers should use selectLatestPointValue in a loop "
                         + "or the PointValueLocalCacheService batch API until a real batch query is wired up.");
+    }
+
+    @Override
+    public WindowAggregateResult aggregateInWindow(WindowAggregateRequest request) {
+        if (Objects.isNull(request) || Objects.isNull(request.getFunction())
+                || Objects.isNull(request.getFrom()) || Objects.isNull(request.getTo())) {
+            return WindowAggregateResult.empty();
+        }
+        WindowAggregateResult result = pointValueMapper.aggregateInWindow(request);
+        return Objects.nonNull(result) ? result : WindowAggregateResult.empty();
+    }
+
+    @Override
+    public List<PointValueBO> samplesInWindow(Long tenantId, Long deviceId, Long pointId,
+                                              LocalDateTime from, LocalDateTime to) {
+        if (Objects.isNull(tenantId) || Objects.isNull(deviceId) || Objects.isNull(pointId)
+                || Objects.isNull(from) || Objects.isNull(to)) {
+            return List.of();
+        }
+        List<PointValueDO> rows = pointValueMapper.samplesInWindow(tenantId, deviceId, pointId, from, to);
+        return rows.stream().map(pointValueBuilder::buildBOByDO).toList();
     }
 
     @Override

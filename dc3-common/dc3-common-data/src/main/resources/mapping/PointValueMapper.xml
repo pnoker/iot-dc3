@@ -19,4 +19,53 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.common.data.mapper.PointValueMapper">
 
+    <!--
+      Window aggregation pushdown for the long-window alarm evaluator.
+      The aggregate function is selected by <choose> from a fixed set so the
+      string can't be a SQL-injection vector. AVG/MIN/MAX/SUM target num_value
+      (which is null for non-numeric payloads, hence the IS NOT NULL filter
+      mirrored on idx_dc3_point_value_num_value); COUNT counts every row in
+      the window.
+    -->
+    <select id="aggregateInWindow"
+            parameterType="io.github.pnoker.common.entity.query.WindowAggregateRequest"
+            resultType="io.github.pnoker.common.entity.bo.WindowAggregateResult">
+        SELECT
+        <choose>
+            <when test="request.function == 'AVG'">AVG(num_value)</when>
+            <when test="request.function == 'MIN'">MIN(num_value)</when>
+            <when test="request.function == 'MAX'">MAX(num_value)</when>
+            <when test="request.function == 'SUM'">SUM(num_value)</when>
+            <when test="request.function == 'COUNT'">CAST(COUNT(*) AS NUMERIC)</when>
+            <otherwise>NULL</otherwise>
+        </choose>
+        AS value,
+        COUNT(*) AS sample_count
+        FROM dc3_point_value
+        WHERE tenant_id = #{request.tenantId}
+          AND device_id = #{request.deviceId}
+          AND point_id = #{request.pointId}
+          AND create_time &gt;= #{request.from}
+          AND create_time &lt; #{request.to}
+        <if test="request.function == 'AVG' or request.function == 'MIN' or request.function == 'MAX' or request.function == 'SUM'">
+          AND num_value IS NOT NULL
+        </if>
+    </select>
+
+    <!--
+      Raw sample pull used by ALL/ANY long-window evaluation. We keep the
+      column list minimal — the consumer only needs num_value, cal_value,
+      and create_time to evaluate per-sample conditions.
+    -->
+    <select id="samplesInWindow" resultType="io.github.pnoker.common.data.entity.model.PointValueDO">
+        SELECT num_value, cal_value, create_time
+        FROM dc3_point_value
+        WHERE tenant_id = #{tenantId}
+          AND device_id = #{deviceId}
+          AND point_id = #{pointId}
+          AND create_time &gt;= #{from}
+          AND create_time &lt; #{to}
+        ORDER BY create_time
+    </select>
+
 </mapper>
