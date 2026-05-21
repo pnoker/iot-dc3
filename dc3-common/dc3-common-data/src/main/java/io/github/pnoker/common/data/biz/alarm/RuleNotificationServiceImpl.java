@@ -21,10 +21,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.AlarmConstant;
-import io.github.pnoker.common.data.dal.MessageManager;
-import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
-import io.github.pnoker.common.data.dal.NotifyChannelManager;
-import io.github.pnoker.common.data.dal.NotifyManager;
 import io.github.pnoker.common.data.dal.NotifyHistoryManager;
 import io.github.pnoker.common.data.dal.RuleStateManager;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
@@ -34,16 +30,8 @@ import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.bo.RuleStateBO;
-import io.github.pnoker.common.data.entity.builder.MessageBuilder;
-import io.github.pnoker.common.data.entity.builder.NotifyBuilder;
-import io.github.pnoker.common.data.entity.builder.NotifyChannelBindBuilder;
-import io.github.pnoker.common.data.entity.builder.NotifyChannelBuilder;
 import io.github.pnoker.common.data.entity.builder.NotifyHistoryBuilder;
 import io.github.pnoker.common.data.entity.builder.RuleStateBuilder;
-import io.github.pnoker.common.data.entity.model.MessageDO;
-import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
-import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
-import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
@@ -78,21 +66,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RuleNotificationServiceImpl implements RuleNotificationService {
 
-    private final NotifyManager notifyManager;
-
-    private final NotifyBuilder notifyBuilder;
-
-    private final MessageManager messageManager;
-
-    private final MessageBuilder messageBuilder;
-
-    private final NotifyChannelBindManager notifyChannelBindManager;
-
-    private final NotifyChannelBindBuilder notifyChannelBindBuilder;
-
-    private final NotifyChannelManager notifyChannelManager;
-
-    private final NotifyChannelBuilder notifyChannelBuilder;
+    private final NotifyConfigCache notifyConfigCache;
 
     private final RuleStateManager ruleStateManager;
 
@@ -190,34 +164,24 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         if (Objects.isNull(notifyId) || DefaultConstant.DEFAULT_ID == notifyId) {
             return null;
         }
-        NotifyDO entityDO = notifyManager.getById(notifyId);
-        return Objects.nonNull(entityDO) ? notifyBuilder.buildBOByDO(entityDO) : null;
+        return notifyConfigCache.findNotify(notifyId);
     }
 
     private MessageBO loadMessage(Long messageId) {
         if (Objects.isNull(messageId) || DefaultConstant.DEFAULT_ID == messageId) {
             return null;
         }
-        MessageDO entityDO = messageManager.getById(messageId);
-        return Objects.nonNull(entityDO) ? messageBuilder.buildBOByDO(entityDO) : null;
+        return notifyConfigCache.findMessage(messageId);
     }
 
     private List<NotifyChannelBindBO> loadEnabledBinds(NotifyBO notify) {
-        List<NotifyChannelBindDO> list = notifyChannelBindManager.lambdaQuery()
-                .eq(NotifyChannelBindDO::getNotifyId, notify.getId())
-                .eq(NotifyChannelBindDO::getTenantId, notify.getTenantId())
-                .eq(NotifyChannelBindDO::getEnableFlag, EnableFlagEnum.ENABLE.getIndex())
-                .list();
-        return notifyChannelBindBuilder.buildBOListByDOList(list);
+        return notifyConfigCache.findEnabledBinds(notify);
     }
 
     private NotifyChannelBO loadChannel(Long channelId, Long tenantId) {
-        NotifyChannelDO entityDO = notifyChannelManager.getById(channelId);
-        if (Objects.isNull(entityDO) || !Objects.equals(entityDO.getTenantId(), tenantId)
-                || Objects.isNull(entityDO.getChannelTypeFlag())) {
-            return null;
-        }
-        return notifyChannelBuilder.buildBOByDO(entityDO);
+        // Tenant scoping happens inside the cache; null means "do not dispatch"
+        // (channel missing, disabled-elsewhere, or cross-tenant lookup).
+        return notifyConfigCache.findChannel(channelId, tenantId);
     }
 
     private RuleStateBO persistRuleState(RuleMatch match, NotifyBO notify, Map<String, Object> variables) {

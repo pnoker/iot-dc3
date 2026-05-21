@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.data.biz.alarm.NotifyConfigCache;
 import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
 import io.github.pnoker.common.data.dal.NotifyManager;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
@@ -63,6 +64,8 @@ public class NotifyServiceImpl implements NotifyService {
 
     private final NotifyChannelBindManager notifyChannelBindManager;
 
+    private final NotifyConfigCache notifyConfigCache;
+
     @Override
     public void add(NotifyBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -71,6 +74,7 @@ public class NotifyServiceImpl implements NotifyService {
         if (!notifyManager.save(entityDO)) {
             throw new AddException("Failed to create alarm notify profile");
         }
+        notifyConfigCache.invalidateNotify(entityDO.getId());
     }
 
     @Override
@@ -85,6 +89,7 @@ public class NotifyServiceImpl implements NotifyService {
         if (!notifyManager.removeById(id)) {
             throw new DeleteException("Failed to remove alarm notify profile");
         }
+        notifyConfigCache.invalidateNotify(id);
     }
 
     @Override
@@ -98,6 +103,7 @@ public class NotifyServiceImpl implements NotifyService {
         if (!notifyManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update alarm notify profile");
         }
+        notifyConfigCache.invalidateNotify(entityBO.getId());
     }
 
     @Override
