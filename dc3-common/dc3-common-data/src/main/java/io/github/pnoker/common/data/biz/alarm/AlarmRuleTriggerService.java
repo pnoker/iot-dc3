@@ -21,6 +21,8 @@ import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 
+import java.util.List;
+
 /**
  * Converts runtime data into rule facts and feeds the alarm rule pipeline.
  *
@@ -36,6 +38,15 @@ public interface AlarmRuleTriggerService {
      * @param pointValue point value
      */
     void processPointValue(PointValueBO pointValue);
+
+    /**
+     * Process a batch of point value samples. Implementations should group
+     * samples by {@code (tenantId, pointId)} so the candidate-rule lookup
+     * runs once per group rather than per sample.
+     *
+     * @param pointValues point values
+     */
+    void processPointValues(List<PointValueBO> pointValues);
 
     /**
      * Process a device alarm event.
