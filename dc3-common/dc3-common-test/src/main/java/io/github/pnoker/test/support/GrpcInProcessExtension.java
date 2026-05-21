@@ -17,6 +17,7 @@
 
 package io.github.pnoker.test.support;
 
+import lombok.RequiredArgsConstructor;
 import io.grpc.BindableService;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -34,6 +35,7 @@ import java.util.UUID;
  * {@link BindableService} implementations and exposes a managed channel to the
  * test, then shuts both down after each test.
  */
+@RequiredArgsConstructor
 public class GrpcInProcessExtension implements BeforeEachCallback, AfterEachCallback {
 
     private final BindableService[] services;
@@ -41,10 +43,6 @@ public class GrpcInProcessExtension implements BeforeEachCallback, AfterEachCall
 
     private Server server;
     private ManagedChannel channel;
-
-    public GrpcInProcessExtension(BindableService... services) {
-        this.services = services;
-    }
 
     public ManagedChannel channel() {
         return channel;

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.bo.UserLoginBO;
@@ -56,6 +57,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.USER_URL_PREFIX)
+@RequiredArgsConstructor
 public class UserLoginController implements BaseController {
 
     private final UserLoginBuilder userLoginBuilder;
@@ -65,14 +67,6 @@ public class UserLoginController implements BaseController {
     private final UserPasswordService userPasswordService;
 
     private final TenantBindService tenantBindService;
-
-    public UserLoginController(UserLoginBuilder userLoginBuilder, UserLoginService userLoginService,
-                               UserPasswordService userPasswordService, TenantBindService tenantBindService) {
-        this.userLoginBuilder = userLoginBuilder;
-        this.userLoginService = userLoginService;
-        this.userPasswordService = userPasswordService;
-        this.tenantBindService = tenantBindService;
-    }
 
     /**
      * @param entityVO {@link UserLoginVO}

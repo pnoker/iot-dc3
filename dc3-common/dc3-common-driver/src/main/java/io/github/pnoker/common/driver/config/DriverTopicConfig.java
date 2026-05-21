@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.config;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.config.ExchangeConfig;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
@@ -41,6 +42,7 @@ import org.springframework.context.annotation.Bean;
 @Slf4j
 @AutoConfiguration
 @ConditionalOnClass(ExchangeConfig.class)
+@RequiredArgsConstructor
 public class DriverTopicConfig {
 
     private final DriverProperties driverProperties;
@@ -48,13 +50,6 @@ public class DriverTopicConfig {
     private final TopicExchange metadataExchange;
 
     private final TopicExchange commandExchange;
-
-    public DriverTopicConfig(DriverProperties driverProperties, TopicExchange metadataExchange,
-                             TopicExchange commandExchange) {
-        this.driverProperties = driverProperties;
-        this.metadataExchange = metadataExchange;
-        this.commandExchange = commandExchange;
-    }
 
     /**
      * Creates the metadata queue used to receive driver metadata synchronization events.

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.entity.ext.MessageExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
@@ -36,13 +37,10 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class MessageRenderServiceImpl implements MessageRenderService {
 
     private final AlarmTemplateRenderer alarmTemplateRenderer;
-
-    public MessageRenderServiceImpl(AlarmTemplateRenderer alarmTemplateRenderer) {
-        this.alarmTemplateRenderer = alarmTemplateRenderer;
-    }
 
     @Override
     public MessagePayload render(MessageBO message, NotifyChannelTypeFlagEnum channelTypeFlag,

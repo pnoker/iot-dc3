@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
@@ -41,7 +42,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-
 /**
  * Implements model configuration listing, save, update, and remove operations.
  *
@@ -50,6 +50,7 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class ModelConfigServiceImpl implements ModelConfigService {
 
     private final ModelConfigManager modelConfigManager;
@@ -65,16 +66,6 @@ public class ModelConfigServiceImpl implements ModelConfigService {
 
     @Value("${spring.ai.openai.chat.options.max-tokens:2048}")
     private Integer fallbackMaxTokens;
-
-    public ModelConfigServiceImpl(ModelConfigManager modelConfigManager,
-                                  ModelProviderManager modelProviderManager,
-                                  ModelConfigBuilder modelConfigBuilder,
-                                  AgenticProperties properties) {
-        this.modelConfigManager = modelConfigManager;
-        this.modelProviderManager = modelProviderManager;
-        this.modelConfigBuilder = modelConfigBuilder;
-        this.properties = properties;
-    }
 
     @Override
     public List<ModelVO> listOptions() {

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.rabbit;
 
+import lombok.RequiredArgsConstructor;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
@@ -38,13 +39,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DriverAlarmReceiver {
 
     private final DriverAlarmService driverAlarmService;
-
-    public DriverAlarmReceiver(DriverAlarmService driverAlarmService) {
-        this.driverAlarmService = driverAlarmService;
-    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverAlarmQueue.name}")

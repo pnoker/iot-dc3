@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.rabbit;
 
+import lombok.RequiredArgsConstructor;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DriverStateService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
@@ -38,13 +39,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DriverStateReceiver {
 
     private final DriverStateService driverStateService;
-
-    public DriverStateReceiver(DriverStateService driverStateService) {
-        this.driverStateService = driverStateService;
-    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverStateQueue.name}")

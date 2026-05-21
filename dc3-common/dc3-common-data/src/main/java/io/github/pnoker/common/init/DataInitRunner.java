@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.init;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.data.biz.ScheduleForDataService;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
@@ -43,6 +44,7 @@ import org.springframework.context.annotation.ComponentScan;
 @MapperScan(basePackages = {"io.github.pnoker.common.data.mapper"})
 @EnableConfigurationProperties({PointBatchProperties.class, NotifyCredentialProperties.class,
         AlarmCacheProperties.class, AlarmWindowProperties.class})
+@RequiredArgsConstructor
 public class DataInitRunner implements ApplicationRunner {
 
     private final ScheduleForDataService scheduleForDataService;
@@ -52,10 +54,6 @@ public class DataInitRunner implements ApplicationRunner {
      *
      * @param scheduleForDataService Service for handling data scheduling operations
      */
-    public DataInitRunner(ScheduleForDataService scheduleForDataService) {
-        this.scheduleForDataService = scheduleForDataService;
-    }
-
     /**
      * Executes the data initialization process when the application starts
      *

@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
 import io.github.pnoker.common.base.BaseController;
@@ -42,13 +43,10 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping(AgenticConstant.CHAT_URL_PREFIX)
+@RequiredArgsConstructor
 public class ChatController implements BaseController {
 
     private final AgenticChatService agenticChatService;
-
-    public ChatController(AgenticChatService agenticChatService) {
-        this.agenticChatService = agenticChatService;
-    }
 
     /**
      * Chat completion endpoint. Returns SSE when {@code request.stream == true};

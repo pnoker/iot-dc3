@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.quartz;
 
+import lombok.RequiredArgsConstructor;
 import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.DateBuilder;
@@ -46,13 +47,10 @@ import java.util.concurrent.TimeUnit;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@RequiredArgsConstructor
 public class QuartzService {
 
     private final Scheduler scheduler;
-
-    public QuartzService(Scheduler scheduler) {
-        this.scheduler = scheduler;
-    }
 
     private static void validateIdentity(String group, String name, Class<? extends Job> jobClass) {
         if (Objects.isNull(group) || group.isBlank()) {

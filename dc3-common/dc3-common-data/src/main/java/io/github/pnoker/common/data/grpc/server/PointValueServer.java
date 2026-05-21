@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.data.grpc.server;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.api.center.data.GrpcPointValueCommandQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcPointValueHistoryQuery;
@@ -48,16 +49,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
 
     private final PointValueService pointValueService;
 
     private final PointValueCommandService pointValueCommandService;
-
-    public PointValueServer(PointValueService pointValueService, PointValueCommandService pointValueCommandService) {
-        this.pointValueService = pointValueService;
-        this.pointValueCommandService = pointValueCommandService;
-    }
 
     @Override
     public void lastValue(GrpcPointValueQuery request, StreamObserver<GrpcRPointValueDTO> responseObserver) {

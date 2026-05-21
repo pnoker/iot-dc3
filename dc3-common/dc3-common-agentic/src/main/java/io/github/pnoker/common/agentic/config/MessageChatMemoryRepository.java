@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.config;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.service.MessageService;
@@ -60,15 +61,11 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @Slf4j
+@RequiredArgsConstructor
 public class MessageChatMemoryRepository implements ChatMemoryRepository {
 
     private final MessageService messageService;
     private final AgenticProperties properties;
-
-    public MessageChatMemoryRepository(MessageService messageService, AgenticProperties properties) {
-        this.messageService = messageService;
-        this.properties = properties;
-    }
 
     @Override
     public List<String> findConversationIds() {

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -47,17 +48,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DICTIONARY_URL_PREFIX)
+@RequiredArgsConstructor
 public class DictionaryForManagerController implements BaseController {
 
     private final DictionaryForManagerBuilder dictionaryForManagerBuilder;
 
     private final DictionaryForManagerService dictionaryForManagerService;
-
-    public DictionaryForManagerController(DictionaryForManagerBuilder dictionaryForManagerBuilder,
-                                          DictionaryForManagerService dictionaryForManagerService) {
-        this.dictionaryForManagerBuilder = dictionaryForManagerBuilder;
-        this.dictionaryForManagerService = dictionaryForManagerService;
-    }
 
     /**
      * Dictionary

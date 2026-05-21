@@ -38,4 +38,16 @@ public interface AlarmRulePipelineService {
      */
     List<NotifyHistoryBO> process(RuleFact fact);
 
+    /**
+     * Batch-evaluate facts and execute notification side effects for all
+     * matches in a single transaction. Facts are grouped internally by
+     * {@code (tenantId, alarmTargetTypeFlag, entityId)} so {@link RuleRegistry}
+     * lookups are amortized, and side-effect writes (rule_state, entity_alarm,
+     * notify_history) are collected into bulk operations.
+     *
+     * @param facts normalized facts
+     * @return persisted notification records
+     */
+    List<NotifyHistoryBO> processBatch(List<RuleFact> facts);
+
 }

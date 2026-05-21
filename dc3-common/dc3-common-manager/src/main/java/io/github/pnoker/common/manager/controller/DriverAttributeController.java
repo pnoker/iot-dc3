@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -56,6 +57,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_URL_PREFIX)
+@RequiredArgsConstructor
 public class DriverAttributeController implements BaseController {
 
     private final DriverAttributeBuilder driverAttributeBuilder;
@@ -63,13 +65,6 @@ public class DriverAttributeController implements BaseController {
     private final DriverAttributeService driverAttributeService;
 
     private final DriverService driverService;
-
-    public DriverAttributeController(DriverAttributeBuilder driverAttributeBuilder,
-                                     DriverAttributeService driverAttributeService, DriverService driverService) {
-        this.driverAttributeBuilder = driverAttributeBuilder;
-        this.driverAttributeService = driverAttributeService;
-        this.driverService = driverService;
-    }
 
     /**
      * DriverAttribute

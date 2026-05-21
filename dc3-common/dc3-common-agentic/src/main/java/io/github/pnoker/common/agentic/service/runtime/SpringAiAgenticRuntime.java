@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import org.springframework.ai.chat.client.ChatClient;
@@ -31,6 +32,7 @@ import reactor.core.publisher.Flux;
  * @since 2016.10.1
  */
 @Component
+@RequiredArgsConstructor
 public class SpringAiAgenticRuntime implements AgenticRuntime {
 
     private final AgenticPromptBuilder promptBuilder;
@@ -38,13 +40,6 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
     private final SpringAiChatResponseMapper responseMapper;
 
     private final OpenAiCompatibleAgenticRuntime openAiCompatibleAgenticRuntime;
-
-    public SpringAiAgenticRuntime(AgenticPromptBuilder promptBuilder, SpringAiChatResponseMapper responseMapper,
-                                  OpenAiCompatibleAgenticRuntime openAiCompatibleAgenticRuntime) {
-        this.promptBuilder = promptBuilder;
-        this.responseMapper = responseMapper;
-        this.openAiCompatibleAgenticRuntime = openAiCompatibleAgenticRuntime;
-    }
 
     @Override
     public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatRequest prepared) {

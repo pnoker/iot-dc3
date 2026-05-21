@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AcknowledgeMode;
@@ -48,6 +49,7 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 @AutoConfiguration
+@RequiredArgsConstructor
 public class RabbitConfig {
 
     /**
@@ -58,10 +60,6 @@ public class RabbitConfig {
     private static final int RETURN_BODY_LOG_LIMIT = 512;
 
     private final ConnectionFactory connectionFactory;
-
-    public RabbitConfig(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
 
     private static String summarizeBody(Message message) {
         if (message == null || message.getBody() == null) {

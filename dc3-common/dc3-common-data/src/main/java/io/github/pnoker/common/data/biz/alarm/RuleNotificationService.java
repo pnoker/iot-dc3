@@ -38,4 +38,15 @@ public interface RuleNotificationService {
      */
     List<NotifyHistoryBO> notify(RuleMatch match);
 
+    /**
+     * Batch notify channels for multiple rule matches in a single transaction.
+     * Config lookups (notify / message / channel / bind) are amortized via
+     * {@link NotifyConfigCache}, and rule_state transitions use atomic
+     * database-level increments.
+     *
+     * @param matches rule matches
+     * @return persisted notify histories
+     */
+    List<NotifyHistoryBO> notifyBatch(List<RuleMatch> matches);
+
 }

@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
@@ -49,13 +50,10 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AgenticChatResponseCodec {
 
     private final ObjectMapper objectMapper;
-
-    public AgenticChatResponseCodec(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     public ChatCompletionResponse blockingResponse(AgenticPreparedChatRequest prepared, String content,
                                                    String finishReason) {

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.data.entity.property.NotifyCredentialProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -33,13 +34,10 @@ import java.util.Optional;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class PropertyNotifyCredentialResolver implements NotifyCredentialResolver {
 
     private final NotifyCredentialProperties properties;
-
-    public PropertyNotifyCredentialResolver(NotifyCredentialProperties properties) {
-        this.properties = properties;
-    }
 
     @Override
     public Optional<NotifyCredential> resolve(String credentialRef) {

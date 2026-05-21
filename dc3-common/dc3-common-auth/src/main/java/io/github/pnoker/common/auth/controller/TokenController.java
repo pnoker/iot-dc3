@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.query.TokenQuery;
@@ -44,13 +45,10 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TOKEN_URL_PREFIX)
+@RequiredArgsConstructor
 public class TokenController implements BaseController {
 
     private final TokenService tokenService;
-
-    public TokenController(TokenService tokenService) {
-        this.tokenService = tokenService;
-    }
 
     /**
      * @param entityVO {@link TokenQuery}

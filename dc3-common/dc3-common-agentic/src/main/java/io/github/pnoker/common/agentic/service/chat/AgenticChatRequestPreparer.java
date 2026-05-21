@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
@@ -51,6 +52,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AgenticChatRequestPreparer {
 
     private final ChatClientFactory chatClientFactory;
@@ -62,17 +64,6 @@ public class AgenticChatRequestPreparer {
     private final AttachmentService attachmentService;
 
     private final AgenticProperties properties;
-
-    public AgenticChatRequestPreparer(ChatClientFactory chatClientFactory, SessionService sessionService,
-                                      MessageService messageService,
-                                      AttachmentService attachmentService,
-                                      AgenticProperties properties) {
-        this.chatClientFactory = chatClientFactory;
-        this.sessionService = sessionService;
-        this.messageService = messageService;
-        this.attachmentService = attachmentService;
-        this.properties = properties;
-    }
 
     public AgenticPreparedChatRequest prepare(ChatCompletionRequest request, RequestHeader.UserHeader userHeader,
                                               String mode) {

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
 import io.github.pnoker.common.auth.entity.builder.DictionaryForAuthBuilder;
 import io.github.pnoker.common.base.BaseController;
@@ -42,17 +43,12 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
+@RequiredArgsConstructor
 public class DictionaryForAuthController implements BaseController {
 
     private final DictionaryForAuthBuilder dictionaryForAuthBuilder;
 
     private final DictionaryForAuthService dictionaryForAuthService;
-
-    public DictionaryForAuthController(DictionaryForAuthBuilder dictionaryForAuthBuilder,
-                                       DictionaryForAuthService dictionaryForAuthService) {
-        this.dictionaryForAuthBuilder = dictionaryForAuthBuilder;
-        this.dictionaryForAuthService = dictionaryForAuthService;
-    }
 
     /**
      * Tenant

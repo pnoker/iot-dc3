@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
@@ -52,16 +53,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.RULE_URL_PREFIX)
+@RequiredArgsConstructor
 public class RuleController implements BaseController {
 
     private final RuleBuilder ruleBuilder;
 
     private final RuleService ruleService;
-
-    public RuleController(RuleBuilder ruleBuilder, RuleService ruleService) {
-        this.ruleBuilder = ruleBuilder;
-        this.ruleService = ruleService;
-    }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RuleVO entityVO) {

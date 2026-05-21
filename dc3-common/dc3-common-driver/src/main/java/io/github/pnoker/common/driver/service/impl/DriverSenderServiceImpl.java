@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
@@ -46,6 +47,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverSenderServiceImpl implements DriverSenderService {
 
     private final DriverProperties driverProperties;
@@ -53,13 +55,6 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     private final DriverMetadata driverMetadata;
 
     private final RabbitTemplate rabbitTemplate;
-
-    public DriverSenderServiceImpl(DriverProperties driverProperties, DriverMetadata driverMetadata,
-                                   RabbitTemplate rabbitTemplate) {
-        this.driverProperties = driverProperties;
-        this.driverMetadata = driverMetadata;
-        this.rabbitTemplate = rabbitTemplate;
-    }
 
     @Override
     public void driverStateSender(DriverStateDTO entityDTO) {

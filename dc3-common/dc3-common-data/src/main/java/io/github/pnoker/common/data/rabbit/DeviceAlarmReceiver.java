@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.rabbit;
 
+import lombok.RequiredArgsConstructor;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
@@ -38,13 +39,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DeviceAlarmReceiver {
 
     private final DeviceAlarmService deviceAlarmService;
-
-    public DeviceAlarmReceiver(DeviceAlarmService deviceAlarmService) {
-        this.deviceAlarmService = deviceAlarmService;
-    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{deviceAlarmQueue.name}")

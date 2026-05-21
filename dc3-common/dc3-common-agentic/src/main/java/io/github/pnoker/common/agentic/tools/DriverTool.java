@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
@@ -47,16 +48,12 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DriverTool {
 
     private final DriverFacade driverFacade;
 
     private final Optional<StatusHealthFacade> statusHealthFacade;
-
-    public DriverTool(DriverFacade driverFacade, Optional<StatusHealthFacade> statusHealthFacade) {
-        this.driverFacade = driverFacade;
-        this.statusHealthFacade = statusHealthFacade;
-    }
 
     @Tool(description = "Look up a driver by its numeric ID. Returns driver name, code, service name, host, type, and enable status.")
     @AgenticToolMetadata(domain = "driver", title = "Query driver by ID")

@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
@@ -39,13 +40,10 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SystemTool {
 
     private final Optional<StatusHealthFacade> statusHealthFacade;
-
-    public SystemTool(Optional<StatusHealthFacade> statusHealthFacade) {
-        this.statusHealthFacade = statusHealthFacade;
-    }
 
     @Tool(description = "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
     @AgenticToolMetadata(domain = "system", title = "Get system health")

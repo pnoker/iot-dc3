@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
@@ -49,16 +50,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_VALUE_URL_PREFIX)
+@RequiredArgsConstructor
 public class PointValueController implements BaseController {
 
     private final PointValueBuilder pointValueBuilder;
 
     private final PointValueService pointValueService;
-
-    public PointValueController(PointValueBuilder pointValueBuilder, PointValueService pointValueService) {
-        this.pointValueBuilder = pointValueBuilder;
-        this.pointValueService = pointValueService;
-    }
 
     /**
      * Query the latest PointValue for each point in the device

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
 import io.github.pnoker.common.auth.entity.bo.MenuTreeBO;
@@ -56,16 +57,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.MENU_URL_PREFIX)
+@RequiredArgsConstructor
 public class MenuController implements BaseController {
 
     private final MenuBuilder menuBuilder;
 
     private final MenuService menuService;
-
-    public MenuController(MenuBuilder menuBuilder, MenuService menuService) {
-        this.menuBuilder = menuBuilder;
-        this.menuService = menuService;
-    }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {

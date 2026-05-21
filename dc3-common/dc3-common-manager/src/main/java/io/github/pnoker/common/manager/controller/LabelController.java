@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -52,16 +53,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
+@RequiredArgsConstructor
 public class LabelController implements BaseController {
 
     private final LabelBuilder labelBuilder;
 
     private final LabelService labelService;
-
-    public LabelController(LabelBuilder labelBuilder, LabelService labelService) {
-        this.labelBuilder = labelBuilder;
-        this.labelService = labelService;
-    }
 
     /**
      * @param entityVO {@link LabelVO}

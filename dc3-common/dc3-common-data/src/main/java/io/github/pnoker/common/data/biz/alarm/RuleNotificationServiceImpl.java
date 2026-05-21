@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.AlarmConstant;
@@ -45,6 +46,7 @@ import io.github.pnoker.common.enums.RuleStateFlagEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,9 +98,6 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         NotifyBO notify = loadNotify(rule.getNotifyId());
         RuleStateBO state = persistRuleState(match, notify, variables);
         if (Objects.isNull(state)) {
-            // Recovery match without a corresponding FIRING fingerprint — defensively
-            // dropped by persistRuleState. Don't fan out notifications for a state
-            // transition that did not actually happen.
             return List.of();
         }
         if (Objects.isNull(notify)) {
@@ -136,13 +135,6 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
             MessagePayload payload = messageRenderService.render(message, channel.getChannelTypeFlag(), variables);
             NotifyHistoryBO history = persistPendingHistory(match, notify, message, bind, channel, payload, variables);
             histories.add(history);
-            // Outbound dispatch is asynchronous: hand the rendered payload to
-            // the NotifyWorker via the alarm exchange. The worker updates the
-            // same history row from PENDING to its terminal status. We stamp
-            // last_notify_time here (rather than on SUCCESS) so the rate-limit
-            // policy debounces follow-on rule firings even while the prior
-            // dispatch is still in flight — otherwise a slow webhook would
-            // let multiple notifications stack up on the queue.
             state.setLastNotifyTime(LocalDateTime.now());
             persistState(state);
             notifyTaskSender.publish(NotifyTaskDTO.builder()
@@ -158,6 +150,73 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                     .build());
         }
         return histories;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<NotifyHistoryBO> notifyBatch(List<RuleMatch> matches) {
+        if (matches == null || matches.isEmpty()) {
+            return List.of();
+        }
+        List<NotifyHistoryBO> allHistories = new ArrayList<>();
+        for (RuleMatch match : matches) {
+            if (Objects.isNull(match) || Objects.isNull(match.getRule()) || Objects.isNull(match.getFact())) {
+                continue;
+            }
+            RuleBO rule = match.getRule();
+            Map<String, Object> variables = RuleMatchVariables.of(match);
+            NotifyBO notify = loadNotify(rule.getNotifyId());
+            RuleStateBO state = persistRuleState(match, notify, variables);
+            if (Objects.isNull(state)) {
+                continue;
+            }
+            if (Objects.isNull(notify)) {
+                log.warn("Skip alarm notification because notify policy does not exist, ruleId={}", rule.getId());
+                continue;
+            }
+            MessageBO message = loadMessage(rule.getMessageId());
+            List<NotifyChannelBindBO> binds = loadEnabledBinds(notify);
+            for (NotifyChannelBindBO bind : binds) {
+                NotifyChannelBO channel = loadChannel(bind.getChannelId(), bind.getTenantId());
+                if (Objects.isNull(channel)) {
+                    log.warn("Skip alarm notification because notify channel does not exist, channelId={}",
+                            bind.getChannelId());
+                    continue;
+                }
+                if (!EnableFlagEnum.ENABLE.equals(channel.getEnableFlag())) {
+                    allHistories.add(historySkipped(match, notify, message, bind, channel, variables,
+                            "Notify channel is disabled"));
+                    continue;
+                }
+                if (Objects.isNull(message)) {
+                    allHistories.add(historySkipped(match, notify, null, bind, channel, variables,
+                            "Message template does not exist"));
+                    continue;
+                }
+                NotifyDecision decision = notifyPolicyEngine.decide(match, notify, bind, state, LocalDateTime.now());
+                if (!decision.isSend()) {
+                    allHistories.add(historySkipped(match, notify, message, bind, channel, variables, decision.getReason()));
+                    continue;
+                }
+                MessagePayload payload = messageRenderService.render(message, channel.getChannelTypeFlag(), variables);
+                NotifyHistoryBO history = persistPendingHistory(match, notify, message, bind, channel, payload, variables);
+                allHistories.add(history);
+                state.setLastNotifyTime(LocalDateTime.now());
+                persistState(state);
+                notifyTaskSender.publish(NotifyTaskDTO.builder()
+                        .notifyHistoryId(history.getId())
+                        .tenantId(match.getFact().getTenantId())
+                        .channelId(channel.getId())
+                        .channelTypeFlag(channel.getChannelTypeFlag().getIndex())
+                        .payloadType(payload.getPayloadType())
+                        .payload(payload.getPayload())
+                        .missingVariables(payload.getMissingVariables())
+                        .retryCount(0)
+                        .createTime(LocalDateTime.now())
+                        .build());
+            }
+        }
+        return allHistories;
     }
 
     private NotifyBO loadNotify(Long notifyId) {
@@ -179,8 +238,6 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
     }
 
     private NotifyChannelBO loadChannel(Long channelId, Long tenantId) {
-        // Tenant scoping happens inside the cache; null means "do not dispatch"
-        // (channel missing, disabled-elsewhere, or cross-tenant lookup).
         return notifyConfigCache.findChannel(channelId, tenantId);
     }
 
@@ -190,12 +247,6 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         String fingerprint = fingerprint(match, notify, variables);
         RuleStateBO state = loadState(rule, fact, fingerprint);
         boolean isRecovery = StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
-        // RuleEngineImpl already gates recovery on the existence of *some* firing
-        // row for this (tenant, rule, target, entity); this defensive check at the
-        // notification step ensures the *fingerprinted* row (which is what we are
-        // about to mutate) is actually FIRING. Otherwise we'd silently flip a
-        // never-fired or already-recovered fingerprinted row to RECOVERED and
-        // produce a phantom recovery notification.
         if (isRecovery && (Objects.isNull(state) || !RuleStateFlagEnum.FIRING.equals(state.getStateFlag()))) {
             log.debug("Skip recovery state transition because no FIRING fingerprint exists, ruleId={}, entityId={}",
                     rule.getId(), fact.getEntityId());
@@ -222,26 +273,78 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         } else {
             state.setStateFlag(RuleStateFlagEnum.FIRING);
             state.setLastTriggerTime(now);
-            state.setTriggerCount(Objects.requireNonNullElse(state.getTriggerCount(), 0L) + 1);
             if (Objects.isNull(state.getFirstTriggerTime())) {
                 state.setFirstTriggerTime(now);
             }
         }
-        return persistState(state);
+        return persistState(state, isRecovery);
     }
 
     private RuleStateBO loadState(RuleBO rule, RuleFact fact, String fingerprint) {
+        return loadState(rule.getId(), rule.getAlarmTargetTypeFlag().getIndex(),
+                fact.getEntityId(), fingerprint, fact.getTenantId());
+    }
+
+    private RuleStateBO loadState(long ruleId, byte alarmTargetTypeFlag, long entityId,
+                                   String fingerprint, long tenantId) {
         LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda()
-                .eq(RuleStateDO::getTenantId, fact.getTenantId())
-                .eq(RuleStateDO::getRuleId, rule.getId())
-                .eq(RuleStateDO::getAlarmTargetTypeFlag, rule.getAlarmTargetTypeFlag().getIndex())
-                .eq(RuleStateDO::getEntityId, fact.getEntityId())
+                .eq(RuleStateDO::getTenantId, tenantId)
+                .eq(RuleStateDO::getRuleId, ruleId)
+                .eq(RuleStateDO::getAlarmTargetTypeFlag, alarmTargetTypeFlag)
+                .eq(RuleStateDO::getEntityId, entityId)
                 .eq(RuleStateDO::getFingerprint, fingerprint)
                 .last("limit 1");
         RuleStateDO entityDO = ruleStateManager.getOne(wrapper);
         return Objects.nonNull(entityDO) ? ruleStateBuilder.buildBOByDO(entityDO) : null;
     }
 
+    /**
+     * Persist a rule-state transition atomically. For the INSERT path (new
+     * state row) it handles {@link DuplicateKeyException} by reloading and
+     * retrying through the UPDATE path. For the UPDATE path it uses
+     * {@code setSql("trigger_count = trigger_count + 1")} so concurrent
+     * firings do not lose increments.
+     */
+    private RuleStateBO persistState(RuleStateBO state, boolean recovery) {
+        RuleStateDO entityDO = ruleStateBuilder.buildDOByBO(state);
+        if (Objects.isNull(state.getId())) {
+            entityDO.setTriggerCount(recovery ? 0L : 1L);
+            try {
+                ruleStateManager.save(entityDO);
+            } catch (DuplicateKeyException e) {
+                RuleStateBO existing = loadState(state.getRuleId(), state.getAlarmTargetTypeFlag().getIndex(),
+                        state.getEntityId(), state.getFingerprint(), state.getTenantId());
+                if (Objects.isNull(existing)) {
+                    log.warn("Duplicate key on rule_state insert but reload returned null, ruleId={}, entityId={}",
+                            state.getRuleId(), state.getEntityId());
+                    throw e;
+                }
+                state.setId(existing.getId());
+                return persistState(state, recovery);
+            }
+        } else {
+            LambdaUpdateWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>lambdaUpdate()
+                    .eq(RuleStateDO::getId, state.getId())
+                    .set(RuleStateDO::getStateFlag, state.getStateFlag().getIndex())
+                    .set(RuleStateDO::getLastTriggerTime, state.getLastTriggerTime())
+                    .set(RuleStateDO::getLastRecoverTime, state.getLastRecoverTime())
+                    .set(RuleStateDO::getAlarmId, state.getAlarmId())
+                    .set(RuleStateDO::getStateExt, entityDO.getStateExt());
+            if (recovery) {
+                wrapper.setSql("trigger_count = trigger_count");
+            } else {
+                wrapper.setSql("trigger_count = trigger_count + 1");
+            }
+            ruleStateManager.update(wrapper);
+        }
+        return ruleStateBuilder.buildBOByDO(entityDO);
+    }
+
+    /**
+     * Lightweight persistence for last-notify-time stamp updates. Does not
+     * transition rule state or modify trigger_count — use
+     * {@link #persistState(RuleStateBO, boolean)} for state transitions.
+     */
     private RuleStateBO persistState(RuleStateBO state) {
         RuleStateDO entityDO = ruleStateBuilder.buildDOByBO(state);
         if (Objects.isNull(state.getId())) {
@@ -283,10 +386,6 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                 + fact.getEntityId();
     }
 
-    /**
-     * Skipped histories never enter the PENDING state — they describe a
-     * decision *not* to send and have a final status (SKIPPED) at write time.
-     */
     private NotifyHistoryBO historySkipped(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
                                          NotifyChannelBO channel, Map<String, Object> variables, String reason) {
         MessagePayload payload = new MessagePayload(
@@ -307,12 +406,6 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         return notifyHistoryBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * Insert a PENDING history row and return the assigned id so subsequent
-     * dispatch can update rather than insert. The PENDING row carries
-     * everything the worker needs to find the channel and replay the payload
-     * (channel id + rendered request_ext) without a follow-up join.
-     */
     private NotifyHistoryBO persistPendingHistory(RuleMatch match, NotifyBO notify, MessageBO message,
                                                   NotifyChannelBindBO bind, NotifyChannelBO channel,
                                                   MessagePayload payload, Map<String, Object> variables) {

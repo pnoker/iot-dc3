@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleUserBindBO;
@@ -62,6 +63,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.ROLE_USER_URL_PREFIX)
+@RequiredArgsConstructor
 public class RoleUserBindController implements BaseController {
 
     private final RoleUserBindBuilder roleUserBindBuilder;
@@ -75,17 +77,6 @@ public class RoleUserBindController implements BaseController {
     private final RoleService roleService;
 
     private final TenantBindService tenantBindService;
-
-    public RoleUserBindController(RoleUserBindBuilder roleUserBindBuilder, RoleUserBindService roleUserBindService,
-                                  RoleBuilder roleBuilder, UserBuilder userBuilder, RoleService roleService,
-                                  TenantBindService tenantBindService) {
-        this.roleUserBindBuilder = roleUserBindBuilder;
-        this.roleUserBindService = roleUserBindService;
-        this.roleBuilder = roleBuilder;
-        this.userBuilder = userBuilder;
-        this.roleService = roleService;
-        this.tenantBindService = tenantBindService;
-    }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleUserBindVO entityVO) {

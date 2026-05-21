@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
@@ -51,16 +52,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AgenticConstant.SESSION_URL_PREFIX)
+@RequiredArgsConstructor
 public class SessionController implements BaseController {
 
     private final SessionService sessionService;
 
     private final SessionBuilder sessionBuilder;
-
-    public SessionController(SessionService sessionService, SessionBuilder sessionBuilder) {
-        this.sessionService = sessionService;
-        this.sessionBuilder = sessionBuilder;
-    }
 
     @PostMapping("/list")
     public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {

@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
@@ -52,6 +53,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DeviceTool {
 
     private final DeviceFacade deviceFacade;
@@ -61,14 +63,6 @@ public class DeviceTool {
     private final PointValueFacade pointValueFacade;
 
     private final Optional<StatusHealthFacade> statusHealthFacade;
-
-    public DeviceTool(DeviceFacade deviceFacade, PointFacade pointFacade, PointValueFacade pointValueFacade,
-                      Optional<StatusHealthFacade> statusHealthFacade) {
-        this.deviceFacade = deviceFacade;
-        this.pointFacade = pointFacade;
-        this.pointValueFacade = pointValueFacade;
-        this.statusHealthFacade = statusHealthFacade;
-    }
 
     @Tool(description = "Look up a device by its numeric ID. Returns device name, code, driver ID, enable status, and profile IDs.")
     @AgenticToolMetadata(domain = "device", title = "Query device by ID")

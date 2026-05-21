@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
@@ -45,13 +46,10 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DEVICE_STATUS_URL_PREFIX)
+@RequiredArgsConstructor
 public class DeviceStatusController implements BaseController {
 
     private final DeviceStatusService deviceStatusService;
-
-    public DeviceStatusController(DeviceStatusService deviceStatusService) {
-        this.deviceStatusService = deviceStatusService;
-    }
 
     /**
      * Query device statuses ONLINE, OFFLINE, MAINTAIN, FAULT

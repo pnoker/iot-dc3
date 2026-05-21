@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -53,6 +54,7 @@ import java.util.Objects;
  */
 @Slf4j
 @AutoConfiguration
+@RequiredArgsConstructor
 public class MqttConfig {
 
     private final MqttProperties mqttProperties;
@@ -62,10 +64,6 @@ public class MqttConfig {
      *
      * @param mqttProperties MQTT configuration properties
      */
-    public MqttConfig(MqttProperties mqttProperties) {
-        this.mqttProperties = mqttProperties;
-    }
-
     /**
      * MQTT inbound message channel bean
      *

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.resource.registrar.scan;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
 import org.springframework.util.AntPathMatcher;
@@ -43,6 +44,7 @@ import java.util.Set;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@RequiredArgsConstructor
 public class ApiEndpointScanner {
 
     private static final Set<RequestMethod> SUPPORTED_METHODS = Set.of(RequestMethod.GET, RequestMethod.POST,
@@ -63,10 +65,6 @@ public class ApiEndpointScanner {
      * @param handlerMapping WebFlux request mapping registry
      * @param properties     registrar scan configuration
      */
-    public ApiEndpointScanner(RequestMappingHandlerMapping handlerMapping, ResourceRegistrarProperties properties) {
-        this.handlerMapping = handlerMapping;
-        this.properties = properties;
-    }
 
     private static String buildApiName(HandlerMethod handler) {
         String className = handler.getBeanType().getSimpleName();

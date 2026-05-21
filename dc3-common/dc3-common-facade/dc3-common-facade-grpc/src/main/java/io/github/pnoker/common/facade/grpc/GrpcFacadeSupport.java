@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.facade.grpc;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.grpc.config.GrpcFacadeProperties;
 import io.grpc.Status;
@@ -36,13 +37,10 @@ import java.util.function.Function;
  * @since 2026.5.9
  */
 @Component
+@RequiredArgsConstructor
 public class GrpcFacadeSupport {
 
     private final GrpcFacadeProperties properties;
-
-    public GrpcFacadeSupport(GrpcFacadeProperties properties) {
-        this.properties = properties;
-    }
 
     public <S extends AbstractStub<S>, T> T call(String operation, S stub, Function<S, T> invocation) {
         try {

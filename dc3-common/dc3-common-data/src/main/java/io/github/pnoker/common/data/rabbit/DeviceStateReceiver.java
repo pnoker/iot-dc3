@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.rabbit;
 
+import lombok.RequiredArgsConstructor;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DeviceStateService;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
@@ -38,13 +39,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DeviceStateReceiver {
 
     private final DeviceStateService deviceStateService;
-
-    public DeviceStateReceiver(DeviceStateService deviceStateService) {
-        this.deviceStateService = deviceStateService;
-    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{deviceStateQueue.name}")

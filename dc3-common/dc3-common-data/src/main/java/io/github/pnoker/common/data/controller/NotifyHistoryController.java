@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
@@ -48,17 +49,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_HISTORY_URL_PREFIX)
+@RequiredArgsConstructor
 public class NotifyHistoryController implements BaseController {
 
     private final NotifyHistoryBuilder notifyHistoryBuilder;
 
     private final NotifyHistoryService notifyHistoryService;
-
-    public NotifyHistoryController(NotifyHistoryBuilder notifyHistoryBuilder,
-                                  NotifyHistoryService notifyHistoryService) {
-        this.notifyHistoryBuilder = notifyHistoryBuilder;
-        this.notifyHistoryService = notifyHistoryService;
-    }
 
     @GetMapping("/get_by_id")
     public Mono<R<NotifyHistoryVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
