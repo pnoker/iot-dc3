@@ -37,7 +37,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -53,16 +53,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotifyChannelServiceImpl implements NotifyChannelService {
 
-    @Resource
-    private NotifyChannelBuilder notifyChannelBuilder;
+    private final NotifyChannelBuilder notifyChannelBuilder;
 
-    @Resource
-    private NotifyChannelManager notifyChannelManager;
+    private final NotifyChannelManager notifyChannelManager;
 
-    @Resource
-    private NotifyChannelBindManager notifyChannelBindManager;
+    private final NotifyChannelBindManager notifyChannelBindManager;
 
     @Override
     public void add(NotifyChannelBO entityBO) {
@@ -124,10 +122,10 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getChannelCode()), NotifyChannelDO::getChannelCode,
                 entityQuery.getChannelCode());
         wrapper.eq(Objects.nonNull(entityQuery.getChannelTypeFlag()), NotifyChannelDO::getChannelTypeFlag,
-                Objects.nonNull(entityQuery.getChannelTypeFlag()) ? entityQuery.getChannelTypeFlag().getIndex()
-                        : null);
+                Objects.isNull(entityQuery.getChannelTypeFlag()) ? null
+                        : entityQuery.getChannelTypeFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), NotifyChannelDO::getEnableFlag,
-                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyChannelDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

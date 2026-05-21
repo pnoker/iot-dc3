@@ -24,7 +24,7 @@ import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,13 +38,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DeviceStateServiceImpl implements DeviceStateService {
 
-    @Resource
-    private LocalCacheService localCacheService;
+    private final LocalCacheService localCacheService;
 
-    @Resource
-    private DeviceAlarmService deviceAlarmService;
+    private final DeviceAlarmService deviceAlarmService;
 
     private static boolean isFlip(String prev, String current) {
         return online(prev) != online(current);

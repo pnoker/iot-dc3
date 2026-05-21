@@ -33,7 +33,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -48,19 +48,16 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PointValueCommandServiceImpl implements PointValueCommandService {
 
-    @Resource
-    private DeviceFacade deviceFacade;
+    private final DeviceFacade deviceFacade;
 
-    @Resource
-    private DriverFacade driverFacade;
+    private final DriverFacade driverFacade;
 
-    @Resource
-    private PointFacade pointFacade;
+    private final PointFacade pointFacade;
 
-    @Resource
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public void read(Long tenantId, PointValueReadVO entityVO) {

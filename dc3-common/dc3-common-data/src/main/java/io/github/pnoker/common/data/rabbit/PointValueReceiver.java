@@ -24,7 +24,7 @@ import io.github.pnoker.common.data.job.PointValueJob;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -42,16 +42,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointValueReceiver {
 
     private final PointBatchProperties pointBatchProperties;
 
-    @Resource
-    private PointValueService pointValueService;
-
-    public PointValueReceiver(PointBatchProperties pointBatchProperties) {
-        this.pointBatchProperties = pointBatchProperties;
-    }
+    private final PointValueService pointValueService;
 
     @RabbitHandler
     @RabbitListener(queues = "#{pointValueQueue.name}")

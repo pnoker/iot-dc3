@@ -35,8 +35,9 @@ import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -53,13 +54,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RuleServiceImpl implements RuleService {
 
-    @Resource
-    private RuleBuilder ruleBuilder;
+    private final RuleBuilder ruleBuilder;
 
-    @Resource
-    private RuleManager ruleManager;
+    private final RuleManager ruleManager;
 
     @Override
     public void add(RuleBO entityBO) {
@@ -125,13 +125,13 @@ public class RuleServiceImpl implements RuleService {
                 entityQuery.getRuleName());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getRuleCode()), RuleDO::getRuleCode,
                 entityQuery.getRuleCode());
-        wrapper.eq(Objects.nonNull(entityQuery.getEntityId()), RuleDO::getEntityId, entityQuery.getEntityId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), RuleDO::getEntityId,
+                entityQuery.getEntityId());
         wrapper.eq(Objects.nonNull(entityQuery.getAlarmTargetTypeFlag()), RuleDO::getAlarmTargetTypeFlag,
-                Objects.nonNull(entityQuery.getAlarmTargetTypeFlag())
-                        ? entityQuery.getAlarmTargetTypeFlag().getIndex()
-                        : null);
+                Objects.isNull(entityQuery.getAlarmTargetTypeFlag()) ? null
+                        : entityQuery.getAlarmTargetTypeFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), RuleDO::getEnableFlag,
-                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

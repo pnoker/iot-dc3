@@ -28,7 +28,7 @@ import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +53,7 @@ import static io.github.pnoker.common.data.constant.DashboardLimits.*;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
 
     /**
@@ -69,20 +70,15 @@ public class DashboardServiceImpl implements DashboardService {
      */
     private static final Set<String> ALERT_SOURCES = Set.of(SOURCE_DEVICE, SOURCE_DRIVER, SOURCE_POINT);
 
-    @Resource
-    private DashboardMapper dashboardMapper;
+    private final DashboardMapper dashboardMapper;
 
-    @Resource
-    private AlertMapper alertMapper;
+    private final AlertMapper alertMapper;
 
-    @Resource
-    private DeviceFacade deviceFacade;
+    private final DeviceFacade deviceFacade;
 
-    @Resource
-    private PointFacade pointFacade;
+    private final PointFacade pointFacade;
 
-    @Resource
-    private DriverFacade driverFacade;
+    private final DriverFacade driverFacade;
 
     /**
      * BucketRow.key is Object (shared across SMALLINT / VARCHAR / BIGINT group columns);

@@ -32,7 +32,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.stereotype.Service;
@@ -66,6 +66,7 @@ import java.util.concurrent.TimeoutException;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SystemHealthServiceImpl implements SystemHealthService {
 
     private static final String UP = "up";
@@ -78,23 +79,17 @@ public class SystemHealthServiceImpl implements SystemHealthService {
      */
     private static final long PROBE_TIMEOUT_MS = 2000L;
 
-    @Resource
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    @Resource
-    private ConnectionFactory rabbitConnectionFactory;
+    private final ConnectionFactory rabbitConnectionFactory;
 
-    @Resource
-    private TenantFacade tenantFacade;
+    private final TenantFacade tenantFacade;
 
-    @Resource
-    private DriverFacade driverFacade;
+    private final DriverFacade driverFacade;
 
-    @Resource
-    private DeviceFacade deviceFacade;
+    private final DeviceFacade deviceFacade;
 
-    @Resource
-    private LocalCacheService localCacheService;
+    private final LocalCacheService localCacheService;
 
     private static Pages firstPage(int size) {
         Pages p = new Pages();

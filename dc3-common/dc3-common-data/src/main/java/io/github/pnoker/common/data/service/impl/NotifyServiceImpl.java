@@ -37,7 +37,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -54,16 +54,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotifyServiceImpl implements NotifyService {
 
-    @Resource
-    private NotifyBuilder notifyBuilder;
+    private final NotifyBuilder notifyBuilder;
 
-    @Resource
-    private NotifyManager notifyManager;
+    private final NotifyManager notifyManager;
 
-    @Resource
-    private NotifyChannelBindManager notifyChannelBindManager;
+    private final NotifyChannelBindManager notifyChannelBindManager;
 
     @Override
     public void add(NotifyBO entityBO) {
@@ -128,12 +126,12 @@ public class NotifyServiceImpl implements NotifyService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getNotifyCode()), NotifyDO::getNotifyCode,
                 entityQuery.getNotifyCode());
         wrapper.eq(Objects.nonNull(entityQuery.getAutoConfirmFlag()), NotifyDO::getAutoConfirmFlag,
-                Objects.nonNull(entityQuery.getAutoConfirmFlag()) ? entityQuery.getAutoConfirmFlag().getIndex()
-                        : null);
+                Objects.isNull(entityQuery.getAutoConfirmFlag()) ? null
+                        : entityQuery.getAutoConfirmFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getNotifyInterval()), NotifyDO::getNotifyInterval,
                 entityQuery.getNotifyInterval());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), NotifyDO::getEnableFlag,
-                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
