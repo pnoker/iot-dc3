@@ -31,7 +31,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
@@ -60,10 +59,8 @@ class PointLocalFacadeTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new PointLocalFacade();
-        injectField("pointService", pointService);
-        injectField("facadePointBuilder", facadePointBuilder);
+    void setUp() {
+        facade = new PointLocalFacade(pointService, facadePointBuilder);
     }
 
     @Test
@@ -123,9 +120,4 @@ class PointLocalFacadeTest {
         assertThat(facade.listByPage(query).getRecords()).isEmpty();
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = PointLocalFacade.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(facade, value);
-    }
 }

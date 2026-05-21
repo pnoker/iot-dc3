@@ -30,8 +30,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
@@ -51,7 +49,7 @@ class DriverRegisterServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         properties = new DriverProperties();
         properties.setName("ModbusTcp");
         properties.setCode("modbus-tcp");
@@ -61,13 +59,7 @@ class DriverRegisterServiceImplTest {
         properties.setClient("client-1");
         properties.setRemark("integration");
         properties.setType(DriverTypeFlagEnum.DRIVER_CLIENT);
-        service = new DriverRegisterServiceImpl();
-        Field field = DriverRegisterServiceImpl.class.getDeclaredField("driverProperties");
-        field.setAccessible(true);
-        field.set(service, properties);
-        Field clientField = DriverRegisterServiceImpl.class.getDeclaredField("driverClient");
-        clientField.setAccessible(true);
-        clientField.set(service, driverClient);
+        service = new DriverRegisterServiceImpl(properties, driverClient);
     }
 
     @Test

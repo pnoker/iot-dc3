@@ -63,7 +63,7 @@ public class NettyUdpServer {
                     .handler(new ChannelInitializer<Channel>() {
                         @Override
                         protected void initChannel(Channel channel) {
-                            channel.pipeline().addLast(new WriteTimeoutHandler(30), new NettyUdpServerHandler());
+                            channel.pipeline().addLast(new WriteTimeoutHandler(30), new NettyUdpServerHandler(null));
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();

@@ -94,12 +94,8 @@ class ListeningVirtualDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new ListeningVirtualDriverCustomServiceImpl();
-        injectField("driverMetadata", driverMetadata);
-        injectField("driverSenderService", driverSenderService);
-        injectField("nettyTcpServer", nettyTcpServer);
-        injectField("nettyUdpServer", nettyUdpServer);
-        injectField("threadPoolExecutor", threadPoolExecutor);
+        service = new ListeningVirtualDriverCustomServiceImpl(driverMetadata, driverSenderService, nettyTcpServer,
+                nettyUdpServer, threadPoolExecutor);
         injectField("tcpPort", 6700);
         injectField("udpPort", 6800);
     }

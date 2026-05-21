@@ -28,7 +28,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,11 +52,8 @@ class MqttReceiveServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new MqttReceiveServiceImpl();
-        Field field = MqttReceiveServiceImpl.class.getDeclaredField("driverSenderService");
-        field.setAccessible(true);
-        field.set(service, driverSenderService);
+    void setUp() {
+        service = new MqttReceiveServiceImpl(driverSenderService);
     }
 
     @Test

@@ -34,7 +34,7 @@ import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
@@ -69,13 +69,12 @@ import java.util.concurrent.TimeoutException;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
 
-    @Resource
-    DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+    private final DriverSenderService driverSenderService;
 
     /**
      * Cache of device ID to OPC UA client connections.

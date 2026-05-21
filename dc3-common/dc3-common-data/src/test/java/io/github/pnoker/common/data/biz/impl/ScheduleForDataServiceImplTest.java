@@ -31,8 +31,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
 
-import java.lang.reflect.Field;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -49,13 +47,10 @@ class ScheduleForDataServiceImplTest {
     private ScheduleForDataServiceImpl service;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         properties = new PointBatchProperties();
         properties.setInterval(5);
-        service = new ScheduleForDataServiceImpl(properties);
-        Field field = ScheduleForDataServiceImpl.class.getDeclaredField("quartzService");
-        field.setAccessible(true);
-        field.set(service, quartzService);
+        service = new ScheduleForDataServiceImpl(properties, quartzService);
     }
 
     @Test

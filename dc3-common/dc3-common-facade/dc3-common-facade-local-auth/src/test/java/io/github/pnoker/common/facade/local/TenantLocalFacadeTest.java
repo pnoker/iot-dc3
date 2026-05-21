@@ -27,8 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -50,10 +48,8 @@ class TenantLocalFacadeTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new TenantLocalFacade();
-        injectField("tenantService", tenantService);
-        injectField("facadeTenantBuilder", facadeTenantBuilder);
+    void setUp() {
+        facade = new TenantLocalFacade(tenantService, facadeTenantBuilder);
     }
 
     @Test
@@ -73,9 +69,4 @@ class TenantLocalFacadeTest {
         assertThat(facade.getByCode("acme")).isSameAs(mapped);
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = TenantLocalFacade.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(facade, value);
-    }
 }

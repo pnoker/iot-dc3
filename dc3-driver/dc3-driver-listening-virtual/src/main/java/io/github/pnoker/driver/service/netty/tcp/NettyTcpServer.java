@@ -92,7 +92,7 @@ public class NettyTcpServer {
                             socketChannel.pipeline()
                                     .addLast(new StringEncoder())
                                     .addLast(new ByteArrayEncoder())
-                                    .addLast(new WriteTimeoutHandler(30), new NettyTcpServerHandler());
+                                    .addLast(new WriteTimeoutHandler(30), new NettyTcpServerHandler(null));
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();

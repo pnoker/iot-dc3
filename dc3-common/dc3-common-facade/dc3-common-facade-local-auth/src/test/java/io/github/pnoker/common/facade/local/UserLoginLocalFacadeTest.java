@@ -27,8 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -51,10 +49,8 @@ class UserLoginLocalFacadeTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new UserLoginLocalFacade();
-        injectField("userLoginService", userLoginService);
-        injectField("facadeUserLoginBuilder", facadeUserLoginBuilder);
+    void setUp() {
+        facade = new UserLoginLocalFacade(userLoginService, facadeUserLoginBuilder);
     }
 
     @Test
@@ -77,9 +73,4 @@ class UserLoginLocalFacadeTest {
         verify(userLoginService).getByLoginName("alice", false);
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = UserLoginLocalFacade.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(facade, value);
-    }
 }

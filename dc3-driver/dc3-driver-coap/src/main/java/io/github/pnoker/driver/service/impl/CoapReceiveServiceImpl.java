@@ -23,7 +23,7 @@ import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.driver.coap.entity.CoapMessage;
 import io.github.pnoker.driver.coap.service.CoapReceiveService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,10 +41,10 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CoapReceiveServiceImpl implements CoapReceiveService {
 
-    @Resource
-    private DriverSenderService driverSenderService;
+    private final DriverSenderService driverSenderService;
 
     @Override
     public void receiveValue(CoapMessage coapMessage) {

@@ -31,7 +31,7 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.driver.coap.client.CoapClientManager;
 import io.github.pnoker.driver.coap.entity.CoapResult;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -51,16 +51,14 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CoapDriverCustomServiceImpl implements DriverCustomService {
 
-    @Resource
-    private DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+    private final DriverSenderService driverSenderService;
 
-    @Resource
-    private CoapClientManager coapClientManager;
+    private final CoapClientManager coapClientManager;
 
     @Override
     public void initial() {

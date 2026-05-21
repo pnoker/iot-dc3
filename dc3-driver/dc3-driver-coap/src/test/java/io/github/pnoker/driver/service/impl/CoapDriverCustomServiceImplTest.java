@@ -38,7 +38,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -87,11 +86,8 @@ class CoapDriverCustomServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new CoapDriverCustomServiceImpl();
-        injectField("driverMetadata", driverMetadata);
-        injectField("driverSenderService", driverSenderService);
-        injectField("coapClientManager", coapClientManager);
+    void setUp() {
+        service = new CoapDriverCustomServiceImpl(driverMetadata, driverSenderService, coapClientManager);
     }
 
     @Test
@@ -221,12 +217,6 @@ class CoapDriverCustomServiceImplTest {
                 WritePointValue.builder().value("ON").type(PointTypeFlagEnum.STRING).build());
 
         assertThat(result).isFalse();
-    }
-
-    private void injectField(String name, Object value) throws Exception {
-        Field field = CoapDriverCustomServiceImpl.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(service, value);
     }
 
 }

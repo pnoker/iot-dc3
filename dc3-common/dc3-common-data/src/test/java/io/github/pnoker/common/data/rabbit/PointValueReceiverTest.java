@@ -31,8 +31,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
-import java.lang.reflect.Field;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,14 +52,11 @@ class PointValueReceiverTest {
     private PointBatchProperties properties;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         properties = new PointBatchProperties();
         properties.setSpeed(100);
         properties.setInterval(5);
-        receiver = new PointValueReceiver(properties);
-        Field field = PointValueReceiver.class.getDeclaredField("pointValueService");
-        field.setAccessible(true);
-        field.set(receiver, pointValueService);
+        receiver = new PointValueReceiver(properties, pointValueService);
 
         MessageProperties props = new MessageProperties();
         props.setDeliveryTag(7L);

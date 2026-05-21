@@ -79,10 +79,8 @@ class OpcDaDriverCustomServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new OpcDaDriverCustomServiceImpl();
-        injectField("driverMetadata", driverMetadata);
-        injectField("driverSenderService", driverSenderService);
+    void setUp() {
+        service = new OpcDaDriverCustomServiceImpl(driverMetadata, driverSenderService);
         service.initial();
     }
 
@@ -281,9 +279,4 @@ class OpcDaDriverCustomServiceImplTest {
         return (Map<Long, Server>) field.get(service);
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = OpcDaDriverCustomServiceImpl.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(service, value);
-    }
 }

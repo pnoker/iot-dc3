@@ -30,7 +30,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,10 +57,8 @@ class PointValueLocalFacadeTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new PointValueLocalFacade();
-        injectField("pointValueService", pointValueService);
-        injectField("facadePointValueBuilder", facadePointValueBuilder);
+    void setUp() {
+        facade = new PointValueLocalFacade(pointValueService, facadePointValueBuilder);
     }
 
     @Test
@@ -112,9 +109,4 @@ class PointValueLocalFacadeTest {
         assertThat(facade.history(1L, 2L, 3L, 10)).containsExactly("23.5", "24.0");
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = PointValueLocalFacade.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(facade, value);
-    }
 }

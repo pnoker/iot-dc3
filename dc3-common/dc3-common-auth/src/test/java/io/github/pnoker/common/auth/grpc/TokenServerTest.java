@@ -34,7 +34,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.UUID;
 
@@ -51,16 +50,9 @@ class TokenServerTest {
     private ManagedChannel channel;
     private TokenApiGrpc.TokenApiBlockingStub stub;
 
-    private static void injectService(TokenServer target, TokenService service) throws Exception {
-        Field field = TokenServer.class.getDeclaredField("tokenService");
-        field.setAccessible(true);
-        field.set(target, service);
-    }
-
     @BeforeEach
     void setUp() throws Exception {
-        TokenServer tokenServer = new TokenServer();
-        injectService(tokenServer, tokenService);
+        TokenServer tokenServer = new TokenServer(tokenService);
 
         String name = "dc3-token-" + UUID.randomUUID();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(tokenServer).build().start();

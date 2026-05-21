@@ -134,9 +134,7 @@ class ModbusTcpDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new ModbusTcpDriverCustomServiceImpl();
-        injectField("driverMetadata", driverMetadata);
-        injectField("driverSenderService", driverSenderService);
+        service = new ModbusTcpDriverCustomServiceImpl(driverMetadata, driverSenderService);
         previousFactory = swapStaticFactory(modbusFactory);
         service.initial();
     }
@@ -323,9 +321,4 @@ class ModbusTcpDriverCustomServiceImplTest {
         verify(modbusMaster, never()).send(any(com.serotonin.modbus4j.msg.WriteCoilRequest.class));
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = ModbusTcpDriverCustomServiceImpl.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(service, value);
-    }
 }

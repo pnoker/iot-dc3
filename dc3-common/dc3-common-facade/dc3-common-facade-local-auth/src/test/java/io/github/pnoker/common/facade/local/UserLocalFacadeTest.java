@@ -27,8 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -50,10 +48,8 @@ class UserLocalFacadeTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new UserLocalFacade();
-        injectField("userService", userService);
-        injectField("facadeUserBuilder", facadeUserBuilder);
+    void setUp() {
+        facade = new UserLocalFacade(userService, facadeUserBuilder);
     }
 
     @Test
@@ -73,9 +69,4 @@ class UserLocalFacadeTest {
         assertThat(facade.getById(1L)).isSameAs(mapped);
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = UserLocalFacade.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(facade, value);
-    }
 }

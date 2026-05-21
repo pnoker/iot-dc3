@@ -30,7 +30,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionContext;
 
-import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -54,23 +53,14 @@ class MqttScheduleJobTest {
     private MqttScheduleJob job;
     private ExecutorService executor;
 
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
-
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         MqttProperties properties = new MqttProperties();
         properties.getBatch().setSpeed(100);
         properties.getBatch().setInterval(5);
 
         executor = Executors.newSingleThreadExecutor();
-        job = new MqttScheduleJob();
-        injectField(job, "mqttProperties", properties);
-        injectField(job, "mqttReceiveService", mqttReceiveService);
-        injectField(job, "virtualThreadExecutor", executor);
+        job = new MqttScheduleJob(properties, mqttReceiveService, executor);
 
         MqttScheduleJob.resetMetrics();
         MqttScheduleJob.clearMqttMessages();

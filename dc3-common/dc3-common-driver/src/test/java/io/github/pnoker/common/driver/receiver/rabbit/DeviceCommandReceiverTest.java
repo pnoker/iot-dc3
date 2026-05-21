@@ -30,8 +30,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
-import java.lang.reflect.Field;
-
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -53,17 +51,9 @@ class DeviceCommandReceiverTest {
     private DeviceCommandReceiver receiver;
     private Message message;
 
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
-
     @BeforeEach
-    void setUp() throws Exception {
-        receiver = new DeviceCommandReceiver();
-        injectField(receiver, "driverReadService", driverReadService);
-        injectField(receiver, "driverWriteService", driverWriteService);
+    void setUp() {
+        receiver = new DeviceCommandReceiver(driverReadService, driverWriteService);
 
         MessageProperties props = new MessageProperties();
         props.setDeliveryTag(7L);

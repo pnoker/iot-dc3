@@ -22,7 +22,6 @@ import io.github.pnoker.common.entity.bo.PointValueBO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -44,13 +43,10 @@ class PointValueLocalCacheServiceTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         localCache = new LocalCacheService();
         localCache.init();
-        service = new PointValueLocalCacheService();
-        Field field = PointValueLocalCacheService.class.getDeclaredField("localCacheService");
-        field.setAccessible(true);
-        field.set(service, localCache);
+        service = new PointValueLocalCacheService(localCache);
     }
 
     @Test

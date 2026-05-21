@@ -23,7 +23,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -54,6 +54,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
+@RequiredArgsConstructor
 public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
     /**
@@ -61,8 +62,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
      */
     private static NettyUdpServerHandler nettyUdpServerHandler;
 
-    @Resource
-    private NettyServerHandler nettyServerHandler;
+    private final NettyServerHandler nettyServerHandler;
 
     /**
      * Initializes the handler instance after Spring dependency injection.
