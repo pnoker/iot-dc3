@@ -26,7 +26,7 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.UserLoginFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcUserLoginBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -39,16 +39,14 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserLoginGrpcFacade implements UserLoginFacade {
 
-    @Resource
-    private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
+    private final UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcUserLoginBuilder facadeGrpcUserLoginBuilder;
+    private final FacadeGrpcUserLoginBuilder facadeGrpcUserLoginBuilder;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public FacadeUserLoginBO getByName(String name) {

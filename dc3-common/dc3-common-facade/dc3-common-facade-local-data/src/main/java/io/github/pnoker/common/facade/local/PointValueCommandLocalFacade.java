@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.biz.PointValueCommandService;
 import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
 import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -38,10 +38,10 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointValueCommandLocalFacade implements PointValueCommandFacade {
 
-    @Resource
-    private PointValueCommandService pointValueCommandService;
+    private final PointValueCommandService pointValueCommandService;
 
     @Override
     public boolean dispatchRead(Long tenantId, Long deviceId, Long pointId) {

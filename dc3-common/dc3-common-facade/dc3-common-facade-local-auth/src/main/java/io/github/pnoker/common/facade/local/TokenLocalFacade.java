@@ -20,7 +20,7 @@ package io.github.pnoker.common.facade.local;
 import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.facade.api.TokenFacade;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -36,10 +36,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TokenLocalFacade implements TokenFacade {
 
-    @Resource
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
     @Override
     public boolean checkValid(String tenant, String name, String salt, String token) {

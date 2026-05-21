@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.auth.GrpcLoginQuery;
 import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.common.facade.api.TokenFacade;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -34,13 +34,12 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TokenGrpcFacade implements TokenFacade {
 
-    @Resource
-    private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
+    private final TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public boolean checkValid(String tenant, String name, String salt, String token) {

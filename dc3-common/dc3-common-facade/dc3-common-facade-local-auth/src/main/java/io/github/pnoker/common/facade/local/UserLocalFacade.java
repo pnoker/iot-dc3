@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.service.UserService;
 import io.github.pnoker.common.facade.api.UserFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
 import io.github.pnoker.common.facade.local.builder.FacadeUserBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -37,13 +37,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserLocalFacade implements UserFacade {
 
-    @Resource
-    private UserService userService;
+    private final UserService userService;
 
-    @Resource
-    private FacadeUserBuilder facadeUserBuilder;
+    private final FacadeUserBuilder facadeUserBuilder;
 
     @Override
     public FacadeUserBO getById(Long id) {

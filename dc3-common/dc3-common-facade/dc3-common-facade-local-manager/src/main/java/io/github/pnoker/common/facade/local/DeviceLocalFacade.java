@@ -26,7 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeDeviceBuilder;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.service.DeviceService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -48,13 +48,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DeviceLocalFacade implements DeviceFacade {
 
-    @Resource
-    private DeviceService deviceService;
+    private final DeviceService deviceService;
 
-    @Resource
-    private FacadeDeviceBuilder facadeDeviceBuilder;
+    private final FacadeDeviceBuilder facadeDeviceBuilder;
 
     @Override
     public FacadeDeviceBO getById(Long id) {

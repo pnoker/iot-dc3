@@ -26,7 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeDriverBuilder;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.manager.service.DriverService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -45,13 +45,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DriverLocalFacade implements DriverFacade {
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
-    @Resource
-    private FacadeDriverBuilder facadeDriverBuilder;
+    private final FacadeDriverBuilder facadeDriverBuilder;
 
     @Override
     public FacadeDriverBO getById(Long id) {

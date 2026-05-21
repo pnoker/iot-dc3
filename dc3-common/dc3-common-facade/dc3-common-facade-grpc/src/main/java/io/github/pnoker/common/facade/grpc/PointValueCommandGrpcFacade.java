@@ -22,7 +22,7 @@ import io.github.pnoker.api.center.data.GrpcPointValueWriteCommand;
 import io.github.pnoker.api.center.data.GrpcRBoolean;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.common.facade.api.PointValueCommandFacade;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -41,13 +41,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointValueCommandGrpcFacade implements PointValueCommandFacade {
 
-    @Resource
-    private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
+    private final PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public boolean dispatchRead(Long tenantId, Long deviceId, Long pointId) {

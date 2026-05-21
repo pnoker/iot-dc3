@@ -25,7 +25,7 @@ import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -43,10 +43,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ResourceRegistryLocalFacade implements ResourceRegistryFacade {
 
-    @Resource
-    private ResourceRegistrySyncService resourceRegistrySyncService;
+    private final ResourceRegistrySyncService resourceRegistrySyncService;
 
     private static List<ResourceRegistryScannedApi> toScannedApis(List<FacadeScannedApiBO> apis) {
         if (Objects.isNull(apis) || apis.isEmpty()) {

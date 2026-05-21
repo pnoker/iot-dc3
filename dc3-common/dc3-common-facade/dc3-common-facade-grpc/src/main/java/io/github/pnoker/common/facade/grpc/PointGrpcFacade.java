@@ -33,7 +33,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcPointBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -52,16 +52,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointGrpcFacade implements PointFacade {
 
-    @Resource
-    private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
+    private final PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcPointBuilder facadeGrpcPointBuilder;
+    private final FacadeGrpcPointBuilder facadeGrpcPointBuilder;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public FacadePointBO getById(Long id) {

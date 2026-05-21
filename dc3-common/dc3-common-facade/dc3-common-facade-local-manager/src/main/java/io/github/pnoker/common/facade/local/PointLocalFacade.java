@@ -26,7 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadePointBuilder;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.service.PointService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -45,13 +45,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointLocalFacade implements PointFacade {
 
-    @Resource
-    private PointService pointService;
+    private final PointService pointService;
 
-    @Resource
-    private FacadePointBuilder facadePointBuilder;
+    private final FacadePointBuilder facadePointBuilder;
 
     @Override
     public FacadePointBO getById(Long id) {
