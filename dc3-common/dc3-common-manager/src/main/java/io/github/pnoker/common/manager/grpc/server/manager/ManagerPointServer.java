@@ -35,7 +35,7 @@ import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointBuilder;
 import io.github.pnoker.common.manager.service.PointService;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,13 +52,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
-    @Resource
-    private GrpcPointBuilder grpcPointBuilder;
+    private final GrpcPointBuilder grpcPointBuilder;
 
-    @Resource
-    private PointService pointService;
+    private final PointService pointService;
 
     @Override
     public void listByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {

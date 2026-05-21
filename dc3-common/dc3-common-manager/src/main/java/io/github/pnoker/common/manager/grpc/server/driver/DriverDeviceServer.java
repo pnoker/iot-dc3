@@ -45,7 +45,7 @@ import io.github.pnoker.common.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.optional.CollectionOptional;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -61,31 +61,24 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
-    @Resource
-    private GrpcDeviceBuilder grpcDeviceBuilder;
+    private final GrpcDeviceBuilder grpcDeviceBuilder;
 
-    @Resource
-    private GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
+    private final GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
 
-    @Resource
-    private GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
+    private final GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
 
-    @Resource
-    private DeviceService deviceService;
+    private final DeviceService deviceService;
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
-    @Resource
-    private PointService pointService;
+    private final PointService pointService;
 
-    @Resource
-    private DriverAttributeConfigService driverAttributeConfigService;
+    private final DriverAttributeConfigService driverAttributeConfigService;
 
-    @Resource
-    private PointAttributeConfigService pointAttributeConfigService;
+    private final PointAttributeConfigService pointAttributeConfigService;
 
     @Override
     public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {

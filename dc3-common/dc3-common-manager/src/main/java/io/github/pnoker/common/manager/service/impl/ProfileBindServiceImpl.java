@@ -36,7 +36,7 @@ import io.github.pnoker.common.manager.entity.query.ProfileBindQuery;
 import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,13 +52,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProfileBindServiceImpl implements ProfileBindService {
 
-    @Resource
-    private ProfileBindBuilder profileBindBuilder;
+    private final ProfileBindBuilder profileBindBuilder;
 
-    @Resource
-    private ProfileBindManager profileBindManager;
+    private final ProfileBindManager profileBindManager;
 
     @Override
     public void add(ProfileBindBO entityBO) {

@@ -35,7 +35,7 @@ import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.manager.service.ProfileService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -50,22 +50,18 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DictionaryForManagerServiceImpl implements DictionaryForManagerService {
 
-    @Resource
-    private DictionaryForManagerBuilder dictionaryBuilder;
+    private final DictionaryForManagerBuilder dictionaryBuilder;
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
-    @Resource
-    private ProfileService profileService;
+    private final ProfileService profileService;
 
-    @Resource
-    private DeviceService deviceService;
+    private final DeviceService deviceService;
 
-    @Resource
-    private PointService pointService;
+    private final PointService pointService;
 
     @Override
     public Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery) {

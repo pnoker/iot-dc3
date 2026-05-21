@@ -22,7 +22,7 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.manager.biz.ScheduleForManagerService;
 import io.github.pnoker.common.manager.job.HourlyJobForManager;
 import io.github.pnoker.common.quartz.QuartzService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +34,10 @@ import org.springframework.stereotype.Service;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class ScheduleForManagerServiceImpl implements ScheduleForManagerService {
 
-    @Resource
-    private QuartzService quartzService;
+    private final QuartzService quartzService;
 
     @Override
     public void initial() {

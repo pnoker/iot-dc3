@@ -42,7 +42,7 @@ import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,22 +63,18 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverServiceImpl implements DriverService {
 
-    @Resource
-    private DriverBuilder driverBuilder;
+    private final DriverBuilder driverBuilder;
 
-    @Resource
-    private DriverManager driverManager;
+    private final DriverManager driverManager;
 
-    @Resource
-    private DeviceManager deviceManager;
+    private final DeviceManager deviceManager;
 
-    @Resource
-    private PointManager pointManager;
+    private final PointManager pointManager;
 
-    @Resource
-    private ProfileBindService profileBindService;
+    private final ProfileBindService profileBindService;
 
     @Override
     public void add(DriverBO entityBO) {
@@ -193,9 +189,11 @@ public class DriverServiceImpl implements DriverService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceHost()), DriverDO::getServiceHost,
                 entityQuery.getServiceHost());
         wrapper.eq(Objects.nonNull(entityQuery.getDriverTypeFlag()), DriverDO::getDriverTypeFlag,
-                entityQuery.getDriverTypeFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverDO::getEnableFlag, entityQuery.getEnableFlag());
+                Objects.isNull(entityQuery.getDriverTypeFlag()) ? null : entityQuery.getDriverTypeFlag().getIndex());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), DriverDO::getVersion, entityQuery.getVersion());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
                 "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
                         + "and dgb.tenant_id = dc3_driver.tenant_id "

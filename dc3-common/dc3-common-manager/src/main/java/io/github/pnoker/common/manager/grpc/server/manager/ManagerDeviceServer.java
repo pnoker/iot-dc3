@@ -37,7 +37,7 @@ import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDeviceBuilder;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -54,13 +54,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
-    @Resource
-    private GrpcDeviceBuilder grpcDeviceBuilder;
+    private final GrpcDeviceBuilder grpcDeviceBuilder;
 
-    @Resource
-    private DeviceService deviceService;
+    private final DeviceService deviceService;
 
     @Override
     public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {

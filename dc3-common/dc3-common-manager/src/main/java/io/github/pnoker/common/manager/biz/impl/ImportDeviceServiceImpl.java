@@ -34,7 +34,7 @@ import io.github.pnoker.common.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.PoiUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,22 +53,18 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ImportDeviceServiceImpl implements ImportDeviceService {
 
-    @Resource
-    private DeviceBuilder deviceBuilder;
+    private final DeviceBuilder deviceBuilder;
 
-    @Resource
-    private DeviceManager deviceManager;
+    private final DeviceManager deviceManager;
 
-    @Resource
-    private ProfileBindService profileBindService;
+    private final ProfileBindService profileBindService;
 
-    @Resource
-    private DriverAttributeConfigService driverAttributeConfigService;
+    private final DriverAttributeConfigService driverAttributeConfigService;
 
-    @Resource
-    private PointAttributeConfigService pointAttributeConfigService;
+    private final PointAttributeConfigService pointAttributeConfigService;
 
     @Override
     @Transactional

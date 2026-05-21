@@ -44,7 +44,7 @@ import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -60,22 +60,18 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigService {
 
-    @Resource
-    private DriverAttributeConfigBuilder driverAttributeConfigBuilder;
+    private final DriverAttributeConfigBuilder driverAttributeConfigBuilder;
 
-    @Resource
-    private DriverAttributeConfigManager driverAttributeConfigManager;
+    private final DriverAttributeConfigManager driverAttributeConfigManager;
 
-    @Resource
-    private MetadataEventPublisher metadataEventPublisher;
+    private final MetadataEventPublisher metadataEventPublisher;
 
-    @Resource
-    private DeviceManager deviceManager;
+    private final DeviceManager deviceManager;
 
-    @Resource
-    private DriverAttributeManager driverAttributeManager;
+    private final DriverAttributeManager driverAttributeManager;
 
     @Override
     public void add(DriverAttributeConfigBO entityBO) {
@@ -205,8 +201,12 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
                 entityQuery.getAttributeId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), DriverAttributeConfigDO::getDeviceId,
                 entityQuery.getDeviceId());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverAttributeConfigDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverAttributeConfigDO::getTenantId,
                 entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), DriverAttributeConfigDO::getVersion,
+                entityQuery.getVersion());
         return wrapper;
     }
 
