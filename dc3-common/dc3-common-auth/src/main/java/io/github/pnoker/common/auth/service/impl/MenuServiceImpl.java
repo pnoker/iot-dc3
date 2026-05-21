@@ -38,7 +38,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,16 +63,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
 
-    @Resource
-    private MenuBuilder menuBuilder;
+    private final MenuBuilder menuBuilder;
 
-    @Resource
-    private MenuManager menuManager;
+    private final MenuManager menuManager;
 
-    @Resource
-    private ResourceRegistrySyncService resourceRegistrySyncService;
+    private final ResourceRegistrySyncService resourceRegistrySyncService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

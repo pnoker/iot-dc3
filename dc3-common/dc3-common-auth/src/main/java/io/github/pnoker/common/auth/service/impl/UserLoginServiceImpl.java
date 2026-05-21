@@ -36,8 +36,9 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.EmptyException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -55,16 +56,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserLoginServiceImpl implements UserLoginService {
 
-    @Resource
-    private UserLoginBuilder userLoginBuilder;
+    private final UserLoginBuilder userLoginBuilder;
 
-    @Resource
-    private UserLoginManager userLoginManager;
+    private final UserLoginManager userLoginManager;
 
-    @Resource
-    private TenantBindService tenantBindService;
+    private final TenantBindService tenantBindService;
 
     @Override
     public void add(UserLoginBO entityBO) {
@@ -168,11 +167,11 @@ public class UserLoginServiceImpl implements UserLoginService {
         LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getLoginName()), UserLoginDO::getLoginName,
                 entityQuery.getLoginName());
-        wrapper.eq(Objects.nonNull(entityQuery.getUserId()), UserLoginDO::getUserId, entityQuery.getUserId());
-        wrapper.eq(Objects.nonNull(entityQuery.getUserPasswordId()), UserLoginDO::getUserPasswordId,
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), UserLoginDO::getUserId, entityQuery.getUserId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserPasswordId()), UserLoginDO::getUserPasswordId,
                 entityQuery.getUserPasswordId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), UserLoginDO::getEnableFlag,
-                entityQuery.getEnableFlag());
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         if (Objects.nonNull(entityQuery.getTenantId())) {
             List<Long> userIds = tenantBindService.listUserIdsByTenantId(entityQuery.getTenantId());
             if (CollectionUtils.isEmpty(userIds)) {

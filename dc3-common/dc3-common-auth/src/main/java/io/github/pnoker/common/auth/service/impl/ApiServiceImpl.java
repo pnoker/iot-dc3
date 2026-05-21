@@ -34,7 +34,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -52,13 +52,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ApiServiceImpl implements ApiService {
 
-    @Resource
-    private ApiBuilder apiBuilder;
+    private final ApiBuilder apiBuilder;
 
-    @Resource
-    private ApiManager apiManager;
+    private final ApiManager apiManager;
 
     @Override
     public void add(ApiBO entityBO) {
@@ -114,11 +113,14 @@ public class ApiServiceImpl implements ApiService {
     private LambdaQueryWrapper<ApiDO> fuzzyQuery(ApiQuery entityQuery) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getApiName()), ApiDO::getApiName, entityQuery.getApiName());
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getApiCode()), ApiDO::getApiCode, entityQuery.getApiCode());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getApiCode()), ApiDO::getApiCode, entityQuery.getApiCode());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceName()), ApiDO::getServiceName,
                 entityQuery.getServiceName());
-        wrapper.eq(Objects.nonNull(entityQuery.getApiTypeFlag()), ApiDO::getApiTypeFlag, entityQuery.getApiTypeFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ApiDO::getEnableFlag, entityQuery.getEnableFlag());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getApiGroup()), ApiDO::getApiGroup, entityQuery.getApiGroup());
+        wrapper.eq(Objects.nonNull(entityQuery.getApiTypeFlag()), ApiDO::getApiTypeFlag,
+                Objects.isNull(entityQuery.getApiTypeFlag()) ? null : entityQuery.getApiTypeFlag().getIndex());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ApiDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         return wrapper;
     }
 

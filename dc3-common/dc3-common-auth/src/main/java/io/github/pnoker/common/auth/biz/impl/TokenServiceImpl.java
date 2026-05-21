@@ -33,7 +33,7 @@ import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.github.pnoker.common.utils.PasswordUtil;
 import io.jsonwebtoken.Claims;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -51,22 +51,18 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
 
-    @Resource
-    private TenantService tenantService;
+    private final TenantService tenantService;
 
-    @Resource
-    private UserLoginService userLoginService;
+    private final UserLoginService userLoginService;
 
-    @Resource
-    private UserPasswordService userPasswordService;
+    private final UserPasswordService userPasswordService;
 
-    @Resource
-    private TenantBindService tenantBindService;
+    private final TenantBindService tenantBindService;
 
-    @Resource
-    private TokenDenylistCache tokenDenylistCache;
+    private final TokenDenylistCache tokenDenylistCache;
 
     @Override
     public String generateSalt(String loginName, String tenantCode) {

@@ -26,7 +26,7 @@ import io.github.pnoker.common.auth.grpc.builder.GrpcTenantBuilder;
 import io.github.pnoker.common.auth.service.TenantService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,13 +41,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TenantServer extends TenantApiGrpc.TenantApiImplBase {
 
-    @Resource
-    private GrpcTenantBuilder grpcTenantBuilder;
+    private final GrpcTenantBuilder grpcTenantBuilder;
 
-    @Resource
-    private TenantService tenantService;
+    private final TenantService tenantService;
 
     @Override
     public void getByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {

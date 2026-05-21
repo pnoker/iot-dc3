@@ -26,7 +26,7 @@ import io.github.pnoker.common.auth.grpc.builder.GrpcUserLoginBuilder;
 import io.github.pnoker.common.auth.service.UserLoginService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,13 +41,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserLoginServer extends UserLoginApiGrpc.UserLoginApiImplBase {
 
-    @Resource
-    private GrpcUserLoginBuilder grpcUserLoginBuilder;
+    private final GrpcUserLoginBuilder grpcUserLoginBuilder;
 
-    @Resource
-    private UserLoginService userLoginService;
+    private final UserLoginService userLoginService;
 
     @Override
     public void getByName(GrpcNameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {

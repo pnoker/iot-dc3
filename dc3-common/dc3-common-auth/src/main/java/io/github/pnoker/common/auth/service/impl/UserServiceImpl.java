@@ -37,7 +37,7 @@ import io.github.pnoker.common.exception.EmptyException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -59,16 +59,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Resource
-    private UserBuilder userBuilder;
+    private final UserBuilder userBuilder;
 
-    @Resource
-    private UserManager userManager;
+    private final UserManager userManager;
 
-    @Resource
-    private TenantBindService tenantBindService;
+    private final TenantBindService tenantBindService;
 
     @Override
     public void add(UserBO entityBO) {
@@ -200,7 +198,8 @@ public class UserServiceImpl implements UserService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getUserName()), UserDO::getUserName, entityQuery.getUserName());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getPhone()), UserDO::getPhone, entityQuery.getPhone());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getEmail()), UserDO::getEmail, entityQuery.getEmail());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), UserDO::getEnableFlag, entityQuery.getEnableFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), UserDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         // Tenant scope. Users have no tenant_id column — they're associated with
         // tenants through dc3_tenant_bind. Resolve the bound user_ids for the
         // controller-supplied tenant and constrain the list to that set.

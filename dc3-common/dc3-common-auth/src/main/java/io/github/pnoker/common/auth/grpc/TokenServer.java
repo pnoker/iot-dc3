@@ -26,7 +26,7 @@ import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.TimeUtil;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,10 +41,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
 
-    @Resource
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
     @Override
     public void checkValid(GrpcLoginQuery request, StreamObserver<GrpcRTokenDTO> responseObserver) {
