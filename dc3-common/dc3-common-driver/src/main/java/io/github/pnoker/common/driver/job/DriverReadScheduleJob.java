@@ -22,7 +22,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -50,17 +50,15 @@ import java.util.Set;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @DisallowConcurrentExecution
 public class DriverReadScheduleJob extends QuartzJobBean {
 
-    @Resource
-    private DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DeviceMetadata deviceMetadata;
+    private final DeviceMetadata deviceMetadata;
 
-    @Resource
-    private DriverReadService driverReadService;
+    private final DriverReadService driverReadService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {

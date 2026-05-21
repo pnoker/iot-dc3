@@ -34,7 +34,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.exception.RegisterException;
 import io.github.pnoker.common.optional.CollectionOptional;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -54,22 +54,18 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DriverClient {
 
-    @Resource
-    private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
+    private final DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
-    @Resource
-    private DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DriverBuilder driverBuilder;
+    private final DriverBuilder driverBuilder;
 
-    @Resource
-    private GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
+    private final GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
 
-    @Resource
-    private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
+    private final GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
     /**
      * Registers the current driver and stores the returned metadata in the shared driver

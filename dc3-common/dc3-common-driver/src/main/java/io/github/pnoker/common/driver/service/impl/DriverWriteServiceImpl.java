@@ -32,7 +32,7 @@ import io.github.pnoker.common.driver.service.DriverWriteService;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -49,22 +49,18 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverWriteServiceImpl implements DriverWriteService {
 
-    @Resource
-    private DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DeviceMetadata deviceMetadata;
+    private final DeviceMetadata deviceMetadata;
 
-    @Resource
-    private PointMetadata pointMetadata;
+    private final PointMetadata pointMetadata;
 
-    @Resource
-    private DriverCustomService driverCustomService;
+    private final DriverCustomService driverCustomService;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+    private final DriverSenderService driverSenderService;
 
     @Override
     public void write(Long deviceId, Long pointId, String value) {

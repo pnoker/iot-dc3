@@ -28,7 +28,7 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -47,19 +47,16 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MetadataReceiver {
 
-    @Resource
-    PointMetadata pointMetadata;
+    private final PointMetadata pointMetadata;
 
-    @Resource
-    private DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DeviceMetadata deviceMetadata;
+    private final DeviceMetadata deviceMetadata;
 
-    @Resource
-    private MetadataEventPublisher metadataEventPublisher;
+    private final MetadataEventPublisher metadataEventPublisher;
 
     /**
      * Receive and process metadata events from RabbitMQ queue

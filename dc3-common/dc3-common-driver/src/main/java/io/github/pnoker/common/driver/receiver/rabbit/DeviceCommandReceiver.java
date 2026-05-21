@@ -23,7 +23,7 @@ import io.github.pnoker.common.driver.service.DriverWriteService;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.core.Message;
@@ -43,13 +43,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DeviceCommandReceiver {
 
-    @Resource
-    private DriverReadService driverReadService;
+    private final DriverReadService driverReadService;
 
-    @Resource
-    private DriverWriteService driverWriteService;
+    private final DriverWriteService driverWriteService;
 
     /**
      * Receive and process device commands from RabbitMQ queue
