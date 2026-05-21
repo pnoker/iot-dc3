@@ -54,7 +54,7 @@ public class EntityStateDO implements Serializable {
     private Long id;
 
     /**
-     * Entity type flag, 1: device, 2: driver (matches EntityTypeFlagEnum)
+     * Entity type flag (matches EntityTypeFlagEnum: DRIVER=3, DEVICE=6)
      */
     @TableField("entity_type_flag")
     private Byte entityTypeFlag;

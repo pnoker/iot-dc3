@@ -120,6 +120,18 @@ public class OfflineExpiryListener {
         if (Objects.isNull(id))
             return;
 
+        // Mark DB state as offline so the scanner does not duplicate the alarm
+        if (Objects.nonNull(dbState)) {
+            entityStateManager.lambdaUpdate()
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                    .eq(EntityStateDO::getEntityId, id)
+                    .eq(EntityStateDO::getLeaseVersion, dbState.getLeaseVersion())
+                    .set(EntityStateDO::getStateFlag, (byte) DriverStatusEnum.OFFLINE.getIndex())
+                    .set(EntityStateDO::getLeaseVersion, dbState.getLeaseVersion() + 1L)
+                    .set(EntityStateDO::getExpireTime, LocalDateTime.now().plusSeconds(300))
+                    .update();
+        }
+
         FacadeDriverBO driver = driverFacade.getById(id);
         if (Objects.isNull(driver)) {
             log.debug("Driver {} not found when handling offline expiry", id);
@@ -180,6 +192,18 @@ public class OfflineExpiryListener {
         }
         if (Objects.isNull(id))
             return;
+
+        // Mark DB state as offline so the scanner does not duplicate the alarm
+        if (Objects.nonNull(dbState)) {
+            entityStateManager.lambdaUpdate()
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                    .eq(EntityStateDO::getEntityId, id)
+                    .eq(EntityStateDO::getLeaseVersion, dbState.getLeaseVersion())
+                    .set(EntityStateDO::getStateFlag, (byte) DeviceStatusEnum.OFFLINE.getIndex())
+                    .set(EntityStateDO::getLeaseVersion, dbState.getLeaseVersion() + 1L)
+                    .set(EntityStateDO::getExpireTime, LocalDateTime.now().plusSeconds(300))
+                    .update();
+        }
 
         FacadeDeviceBO device = deviceFacade.getById(id);
         if (Objects.isNull(device)) {

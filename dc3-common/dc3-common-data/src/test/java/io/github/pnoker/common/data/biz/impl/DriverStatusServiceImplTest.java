@@ -17,11 +17,13 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.data.cache.LocalCacheService;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
@@ -33,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +52,10 @@ class DriverStatusServiceImplTest {
     private DeviceFacade deviceFacade;
 
     @Mock
-    private LocalCacheService localCacheService;
+    private EntityStateManager entityStateManager;
+
+    @Mock
+    private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
 
     @InjectMocks
     private DriverStatusServiceImpl service;
@@ -66,6 +72,24 @@ class DriverStatusServiceImplTest {
         return bo;
     }
 
+    private EntityStateDO onlineState(Long entityId, int typeFlag) {
+        EntityStateDO state = new EntityStateDO();
+        state.setEntityTypeFlag((byte) typeFlag);
+        state.setEntityId(entityId);
+        state.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
+        state.setExpireTime(LocalDateTime.now().plusSeconds(60));
+        return state;
+    }
+
+    private EntityStateDO expiredState(Long entityId, int typeFlag) {
+        EntityStateDO state = new EntityStateDO();
+        state.setEntityTypeFlag((byte) typeFlag);
+        state.setEntityId(entityId);
+        state.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
+        state.setExpireTime(LocalDateTime.now().minusSeconds(10));
+        return state;
+    }
+
     @Test
     void getStatusByPageReturnsEmptyMapForEmptyPage() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
@@ -75,24 +99,39 @@ class DriverStatusServiceImplTest {
     }
 
     @Test
-    void getStatusByPageDefaultsToOfflineWhenCacheMissing() {
+    void getStatusByPageDefaultsToOfflineWhenDbRowMissing() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
         page.setRecords(List.of(driver(1L)));
         when(driverFacade.listByPage(any())).thenReturn(page);
-        when(localCacheService.getKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + 1L)).thenReturn(null);
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(null);
         assertThat(service.getStatusByPage(new DriverQuery()))
                 .containsEntry(1L, DriverStatusEnum.OFFLINE.getCode());
     }
 
     @Test
-    void getStatusByPageReturnsCachedStatus() {
+    void getStatusByPageReturnsOnlineFromDb() {
         FacadePage<FacadeDriverBO> page = new FacadePage<>();
         page.setRecords(List.of(driver(1L)));
         when(driverFacade.listByPage(any())).thenReturn(page);
-        when(localCacheService.getKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + 1L))
-                .thenReturn(DriverStatusEnum.ONLINE.getCode());
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(onlineState(1L, EntityTypeFlagEnum.DRIVER.getIndex()));
         assertThat(service.getStatusByPage(new DriverQuery()))
                 .containsEntry(1L, DriverStatusEnum.ONLINE.getCode());
+    }
+
+    @Test
+    void getStatusByPageReturnsOfflineWhenExpired() {
+        FacadePage<FacadeDriverBO> page = new FacadePage<>();
+        page.setRecords(List.of(driver(1L)));
+        when(driverFacade.listByPage(any())).thenReturn(page);
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(expiredState(1L, EntityTypeFlagEnum.DRIVER.getIndex()));
+        assertThat(service.getStatusByPage(new DriverQuery()))
+                .containsEntry(1L, DriverStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -112,31 +151,25 @@ class DriverStatusServiceImplTest {
     void getDeviceOnlineByDriverIdCountsOnlineDevices() {
         when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
         when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L)));
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
-                .thenReturn(DeviceStatusEnum.ONLINE.getCode());
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 11L))
-                .thenReturn(DeviceStatusEnum.OFFLINE.getCode());
+        EntityStateDO online10 = onlineState(10L, EntityTypeFlagEnum.DEVICE.getIndex());
+        online10.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        EntityStateDO expired11 = expiredState(11L, EntityTypeFlagEnum.DEVICE.getIndex());
+        expired11.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(online10).thenReturn(expired11);
         assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo("1");
-    }
-
-    @Test
-    void getDeviceOnlineByDriverIdTreatsMissingCacheAsOffline() {
-        when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
-        when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L)));
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L)).thenReturn(null);
-        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo("0");
     }
 
     @Test
     void getDeviceOfflineByDriverIdCountsOfflineAndMissingDevices() {
         when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
         when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L), device(12L)));
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
-                .thenReturn(DeviceStatusEnum.ONLINE.getCode());
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 11L))
-                .thenReturn(DeviceStatusEnum.OFFLINE.getCode());
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 12L))
-                .thenReturn(null);
+        EntityStateDO online10 = onlineState(10L, EntityTypeFlagEnum.DEVICE.getIndex());
+        online10.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(online10).thenReturn(null).thenReturn(null);
         assertThat(service.getDeviceOfflineByDriverId(1L, 7L)).isEqualTo("2");
     }
 }

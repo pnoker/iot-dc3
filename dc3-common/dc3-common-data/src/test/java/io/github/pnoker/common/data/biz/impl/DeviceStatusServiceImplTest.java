@@ -17,10 +17,12 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.data.cache.LocalCacheService;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
@@ -30,6 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +46,10 @@ class DeviceStatusServiceImplTest {
     private DeviceFacade deviceFacade;
 
     @Mock
-    private LocalCacheService localCacheService;
+    private EntityStateManager entityStateManager;
+
+    @Mock
+    private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
 
     @InjectMocks
     private DeviceStatusServiceImpl service;
@@ -52,6 +58,24 @@ class DeviceStatusServiceImplTest {
         FacadeDeviceBO bo = new FacadeDeviceBO();
         bo.setId(id);
         return bo;
+    }
+
+    private EntityStateDO onlineState(Long entityId) {
+        EntityStateDO state = new EntityStateDO();
+        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        state.setEntityId(entityId);
+        state.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        state.setExpireTime(LocalDateTime.now().plusSeconds(60));
+        return state;
+    }
+
+    private EntityStateDO expiredState(Long entityId) {
+        EntityStateDO state = new EntityStateDO();
+        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        state.setEntityId(entityId);
+        state.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        state.setExpireTime(LocalDateTime.now().minusSeconds(10));
+        return state;
     }
 
     @Test
@@ -63,24 +87,39 @@ class DeviceStatusServiceImplTest {
     }
 
     @Test
-    void getStatusByPageDefaultsToOfflineWhenCacheMissing() {
+    void getStatusByPageDefaultsToOfflineWhenDbRowMissing() {
         FacadePage<FacadeDeviceBO> page = new FacadePage<>();
         page.setRecords(List.of(device(10L)));
         when(deviceFacade.listByPage(any())).thenReturn(page);
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L)).thenReturn(null);
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(null);
         assertThat(service.getStatusByPage(new DeviceQuery()))
                 .containsEntry(10L, DeviceStatusEnum.OFFLINE.getCode());
     }
 
     @Test
-    void getStatusByPageReturnsCachedStatus() {
+    void getStatusByPageReturnsOnlineFromDb() {
         FacadePage<FacadeDeviceBO> page = new FacadePage<>();
         page.setRecords(List.of(device(10L)));
         when(deviceFacade.listByPage(any())).thenReturn(page);
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
-                .thenReturn(DeviceStatusEnum.ONLINE.getCode());
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(onlineState(10L));
         assertThat(service.getStatusByPage(new DeviceQuery()))
                 .containsEntry(10L, DeviceStatusEnum.ONLINE.getCode());
+    }
+
+    @Test
+    void getStatusByPageReturnsOfflineWhenExpired() {
+        FacadePage<FacadeDeviceBO> page = new FacadePage<>();
+        page.setRecords(List.of(device(10L)));
+        when(deviceFacade.listByPage(any())).thenReturn(page);
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(expiredState(10L));
+        assertThat(service.getStatusByPage(new DeviceQuery()))
+                .containsEntry(10L, DeviceStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -90,12 +129,11 @@ class DeviceStatusServiceImplTest {
     }
 
     @Test
-    void listByProfileIdMapsAllDevicesToCachedOrOfflineStatus() {
+    void listByProfileIdMapsAllDevicesToDbOrOfflineStatus() {
         when(deviceFacade.listByProfileId(1L, 5L)).thenReturn(List.of(device(10L), device(11L)));
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 10L))
-                .thenReturn(DeviceStatusEnum.ONLINE.getCode());
-        when(localCacheService.getKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + 11L)).thenReturn(null);
-
+        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.one()).thenReturn(onlineState(10L)).thenReturn(null);
         assertThat(service.listByProfileId(1L, 5L))
                 .containsEntry(10L, DeviceStatusEnum.ONLINE.getCode())
                 .containsEntry(11L, DeviceStatusEnum.OFFLINE.getCode());
