@@ -691,6 +691,7 @@ export default {
       sourceId: '来源ID',
       pointId: '位号ID',
       alarmType: '告警类型',
+      alarmLevel: '级别',
       confirmFlag: '确认状态',
       timeRange: '时间范围',
       createTime: '发生时间',

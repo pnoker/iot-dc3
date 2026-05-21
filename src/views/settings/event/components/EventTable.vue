@@ -111,6 +111,13 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column :label="$t('settings.event.alarmLevel')" width="100">
+          <template #default="{ row }">
+            <el-tag :type="alarmLevelTag(row.alarmLevelFlag)" size="small">
+              {{ alarmLevelLabel(row.alarmLevelFlag) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('settings.event.message')" min-width="240" prop="message" show-overflow-tooltip />
         <el-table-column :label="$t('settings.event.confirmFlag')" width="110">
           <template #default="{ row }">
@@ -181,6 +188,7 @@
     sourceId: number | string;
     pointId: number | string;
     eventTypeFlag: number;
+    alarmLevelFlag?: number;
     confirmFlag: number;
     createTime: string;
     message: string;
@@ -210,6 +218,36 @@
   const alarmTypeLabel = (flag: number) => {
     const opt = alarmTypeOptions.find((o) => o.value === flag);
     return opt ? opt.label : String(flag);
+  };
+
+  const alarmLevelLabel = (flag?: number) => {
+    switch (flag) {
+      case 0:
+        return 'P0';
+      case 1:
+        return 'P1';
+      case 2:
+        return 'P2';
+      case 3:
+        return 'P3';
+      default:
+        return '—';
+    }
+  };
+
+  const alarmLevelTag = (flag?: number): 'info' | 'success' | 'warning' | 'danger' => {
+    switch (flag) {
+      case 0:
+        return 'danger';
+      case 1:
+        return 'warning';
+      case 2:
+        return 'info';
+      case 3:
+        return 'success';
+      default:
+        return 'info';
+    }
   };
 
   const alarmTypeTag = (flag: number): 'info' | 'warning' | 'danger' => {

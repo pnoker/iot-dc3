@@ -692,6 +692,7 @@ export default {
       sourceId: 'Source ID',
       pointId: 'Point ID',
       alarmType: 'Alarm Type',
+      alarmLevel: 'Level',
       confirmFlag: 'Confirm',
       timeRange: 'Time Range',
       createTime: 'Time',

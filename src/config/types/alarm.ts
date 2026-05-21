@@ -97,7 +97,7 @@ export interface RuleStateRecord extends AlarmBaseRecord {
   lastRecoverTime?: string;
   lastNotifyTime?: string;
   triggerCount?: number | string;
-  eventId?: string;
+  alarmId?: string;
   stateExt?: StructuredExt;
 }
 
@@ -106,7 +106,7 @@ export interface NotifyHistoryRecord extends AlarmBaseRecord {
   notifyId?: string;
   messageId?: string;
   channelId?: string;
-  eventId?: string;
+  alarmId?: string;
   channelTypeFlag?: NotifyChannelTypeFlag;
   target?: string;
   statusFlag?: NotifyHistoryStatusFlag;
