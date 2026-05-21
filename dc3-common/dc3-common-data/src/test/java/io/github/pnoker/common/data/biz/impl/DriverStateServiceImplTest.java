@@ -19,7 +19,6 @@ package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
-import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
@@ -31,24 +30,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DriverStateServiceImplTest {
-
-    @Mock
-    private LocalCacheService localCacheService;
 
     @Mock
     private DriverAlarmService driverAlarmService;
@@ -58,6 +52,9 @@ class DriverStateServiceImplTest {
 
     @Mock
     private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
+
+    @Mock
+    private RabbitTemplate rabbitTemplate;
 
     @InjectMocks
     private DriverStateServiceImpl service;
@@ -74,7 +71,6 @@ class DriverStateServiceImplTest {
     void nullDtoDoesNothing() {
         service.heartbeat(null);
         verify(entityStateManager, never()).saveOrUpdate(any());
-        verify(localCacheService, never()).setKey(anyString(), any(), anyLong(), any(TimeUnit.class));
     }
 
     @Test
@@ -87,7 +83,6 @@ class DriverStateServiceImplTest {
 
     @Test
     void newDriverCreatesDbRow() {
-        when(localCacheService.getKey(anyString())).thenReturn(null);
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(null);
@@ -101,14 +96,18 @@ class DriverStateServiceImplTest {
         EntityStateDO saved = captor.getValue();
         assertThat(saved.getEntityTypeFlag()).isEqualTo((byte) EntityTypeFlagEnum.DRIVER.getIndex());
         assertThat(saved.getEntityId()).isEqualTo(1L);
-        assertThat(saved.getDriverId()).isEqualTo(1L);
+        assertThat(saved.getParentEntityId()).isEqualTo(1L);
         assertThat(saved.getTenantId()).isEqualTo(100L);
         assertThat(saved.getLeaseVersion()).isEqualTo(1L);
         assertThat(saved.getStateFlag()).isEqualTo((byte) DriverStatusEnum.ONLINE.getIndex());
-        assertThat(saved.getTtlSeconds()).isEqualTo(45);
+        assertThat(saved.getTimeoutSeconds()).isEqualTo(45);
         assertThat(saved.getExpireTime()).isAfter(LocalDateTime.now().plusSeconds(40));
+        assertThat(saved.getLastStateFlag()).isEqualTo((byte) DriverStatusEnum.OFFLINE.getIndex());
+        assertThat(saved.getLastHeartbeatTime()).isNotNull();
+        assertThat(saved.getLastAlarmId()).isEqualTo(0L);
+        assertThat(saved.getStateExt()).isNotNull();
 
-        verify(localCacheService).setKey(anyString(), eq("online"), eq(45L), eq(TimeUnit.SECONDS));
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), any(Object.class));
     }
 
     @Test
@@ -117,8 +116,8 @@ class DriverStateServiceImplTest {
         existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
         existing.setEntityId(1L);
         existing.setLeaseVersion(5L);
+        existing.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
 
-        when(localCacheService.getKey(anyString())).thenReturn("online");
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(existing);
@@ -129,14 +128,22 @@ class DriverStateServiceImplTest {
         ArgumentCaptor<EntityStateDO> captor = ArgumentCaptor.forClass(EntityStateDO.class);
         verify(entityStateManager).saveOrUpdate(captor.capture());
         assertThat(captor.getValue().getLeaseVersion()).isEqualTo(6L);
+        assertThat(captor.getValue().getLastStateFlag()).isEqualTo((byte) DriverStatusEnum.ONLINE.getIndex());
+
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), any(Object.class));
     }
 
     @Test
     void statusFlipFromOnlineToOfflineTriggersAlarm() {
-        when(localCacheService.getKey(anyString())).thenReturn("online");
+        EntityStateDO existing = new EntityStateDO();
+        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
+        existing.setEntityId(1L);
+        existing.setLeaseVersion(3L);
+        existing.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
+
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(null);
+        when(queryWrapper.one()).thenReturn(existing);
         when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
 
         service.heartbeat(heartbeat(1L, "offline", 100L));
@@ -146,10 +153,15 @@ class DriverStateServiceImplTest {
 
     @Test
     void sameStatusNoFlipDoesNotTriggerAlarm() {
-        when(localCacheService.getKey(anyString())).thenReturn("online");
+        EntityStateDO existing = new EntityStateDO();
+        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
+        existing.setEntityId(1L);
+        existing.setLeaseVersion(3L);
+        existing.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
+
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(null);
+        when(queryWrapper.one()).thenReturn(existing);
         when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
 
         service.heartbeat(heartbeat(1L, "online", 100L));

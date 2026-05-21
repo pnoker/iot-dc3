@@ -19,7 +19,6 @@ package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
-import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
@@ -36,16 +35,12 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceStateServiceImplTest {
-
-    @Mock
-    private LocalCacheService localCacheService;
 
     @Mock
     private DeviceAlarmService deviceAlarmService;
@@ -77,8 +72,7 @@ class DeviceStateServiceImplTest {
     }
 
     @Test
-    void newDeviceCreatesDbRowWithCustomTtl() {
-        when(localCacheService.getKey(anyString())).thenReturn(null);
+    void newDeviceCreatesDbRowWithCustomTimeout() {
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(null);
@@ -92,11 +86,15 @@ class DeviceStateServiceImplTest {
         EntityStateDO saved = captor.getValue();
         assertThat(saved.getEntityTypeFlag()).isEqualTo((byte) EntityTypeFlagEnum.DEVICE.getIndex());
         assertThat(saved.getEntityId()).isEqualTo(10L);
-        assertThat(saved.getDriverId()).isEqualTo(7L);
+        assertThat(saved.getParentEntityId()).isEqualTo(7L);
         assertThat(saved.getTenantId()).isEqualTo(100L);
         assertThat(saved.getLeaseVersion()).isEqualTo(1L);
         assertThat(saved.getStateFlag()).isEqualTo((byte) DeviceStatusEnum.ONLINE.getIndex());
-        assertThat(saved.getTtlSeconds()).isEqualTo(25);
+        assertThat(saved.getTimeoutSeconds()).isEqualTo(25);
+        assertThat(saved.getLastStateFlag()).isEqualTo((byte) DeviceStatusEnum.OFFLINE.getIndex());
+        assertThat(saved.getLastHeartbeatTime()).isNotNull();
+        assertThat(saved.getLastAlarmId()).isEqualTo(0L);
+        assertThat(saved.getStateExt()).isNotNull();
     }
 
     @Test
@@ -105,8 +103,8 @@ class DeviceStateServiceImplTest {
         existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
         existing.setEntityId(10L);
         existing.setLeaseVersion(3L);
+        existing.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
 
-        when(localCacheService.getKey(anyString())).thenReturn("online");
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(existing);
@@ -117,11 +115,11 @@ class DeviceStateServiceImplTest {
         ArgumentCaptor<EntityStateDO> captor = ArgumentCaptor.forClass(EntityStateDO.class);
         verify(entityStateManager).saveOrUpdate(captor.capture());
         assertThat(captor.getValue().getLeaseVersion()).isEqualTo(4L);
+        assertThat(captor.getValue().getLastStateFlag()).isEqualTo((byte) DeviceStatusEnum.ONLINE.getIndex());
     }
 
     @Test
     void nullDriverIdDefaultsToZero() {
-        when(localCacheService.getKey(anyString())).thenReturn(null);
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(null);
@@ -131,15 +129,20 @@ class DeviceStateServiceImplTest {
 
         ArgumentCaptor<EntityStateDO> captor = ArgumentCaptor.forClass(EntityStateDO.class);
         verify(entityStateManager).saveOrUpdate(captor.capture());
-        assertThat(captor.getValue().getDriverId()).isEqualTo(0L);
+        assertThat(captor.getValue().getParentEntityId()).isEqualTo(0L);
     }
 
     @Test
     void statusFlipTriggersAlarm() {
-        when(localCacheService.getKey(anyString())).thenReturn("online");
+        EntityStateDO existing = new EntityStateDO();
+        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        existing.setEntityId(10L);
+        existing.setLeaseVersion(2L);
+        existing.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(null);
+        when(queryWrapper.one()).thenReturn(existing);
         when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
 
         service.heartbeat(heartbeat(10L, "offline", 7L, 100L, 25, TimeUnit.SECONDS));
@@ -149,10 +152,15 @@ class DeviceStateServiceImplTest {
 
     @Test
     void sameStatusNoAlarm() {
-        when(localCacheService.getKey(anyString())).thenReturn("online");
+        EntityStateDO existing = new EntityStateDO();
+        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        existing.setEntityId(10L);
+        existing.setLeaseVersion(2L);
+        existing.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(null);
+        when(queryWrapper.one()).thenReturn(existing);
         when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
 
         service.heartbeat(heartbeat(10L, "online", 7L, 100L, 25, TimeUnit.SECONDS));

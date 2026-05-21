@@ -164,4 +164,35 @@ public class DataTopicConfig {
         return binding;
     }
 
+
+    // ===== Device timeout scan tick (TTL + DLX) ===============================
+
+    @Bean
+    Queue deviceScanTickQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DEVICE_SCAN_TICK)
+                .ttl(10_000)  // 10 seconds
+                .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK)
+                .deadLetterRoutingKey(RabbitConstant.ROUTING_DEVICE_SCAN)
+                .build();
+    }
+
+    @Bean
+    Binding deviceScanTickBinding(Queue deviceScanTickQueue, TopicExchange stateTimeoutDelayExchange) {
+        return BindingBuilder.bind(deviceScanTickQueue)
+                .to(stateTimeoutDelayExchange)
+                .with(RabbitConstant.ROUTING_DEVICE_SCAN_TICK);
+    }
+
+    @Bean
+    Queue deviceScanQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DEVICE_SCAN).build();
+    }
+
+    @Bean
+    Binding deviceScanBinding(Queue deviceScanQueue, TopicExchange stateTimeoutCheckExchange) {
+        return BindingBuilder.bind(deviceScanQueue)
+                .to(stateTimeoutCheckExchange)
+                .with(RabbitConstant.ROUTING_DEVICE_SCAN);
+    }
+
 }
