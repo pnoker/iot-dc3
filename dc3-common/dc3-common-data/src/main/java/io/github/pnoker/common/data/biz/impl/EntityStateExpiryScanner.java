@@ -47,12 +47,14 @@ import java.util.Objects;
  * primary expiry detection mechanism, surviving restarts and working consistently
  * across multiple Data Center instances.
  *
- * <p>The scanner runs every 15 seconds. For each expired row it performs a
- * lease-version recheck to avoid racing with a concurrent heartbeat that renewed
- * the lease between the scan query and the alarm write.
+ * <p>The scanner runs every 15 seconds. For each expired row it uses an atomic
+ * {@code lambdaUpdate} with a {@code lease_version} WHERE condition so that only
+ * one Data Center instance processes a given expiry — if another instance (or a
+ * late heartbeat) already updated the row, the UPDATE affects zero rows and the
+ * alarm is skipped.
  *
  * @author pnoker
- * @version 2026.5.21
+ * @version 2026.5.22
  * @since 2026.5.21
  */
 @Slf4j
@@ -66,17 +68,16 @@ public class EntityStateExpiryScanner {
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
-    /**
-     * How far into the future to push expire_time after marking a row offline,
-     * so the scanner does not re-process the same row every cycle.
-     */
     private static final int OFFLINE_RENEW_SECONDS = 300;
+
+    private static final int BATCH_LIMIT = 500;
 
     @Scheduled(fixedDelay = 15_000, initialDelay = 30_000)
     public void scanExpiredLeases() {
         LocalDateTime now = LocalDateTime.now();
         List<EntityStateDO> expired = entityStateManager.lambdaQuery()
                 .lt(EntityStateDO::getExpireTime, now)
+                .last("LIMIT " + BATCH_LIMIT)
                 .list();
 
         if (expired.isEmpty()) {
@@ -94,59 +95,60 @@ public class EntityStateExpiryScanner {
     }
 
     private void processExpiredState(EntityStateDO scanned) {
-        // Re-read from DB for lease-version check (heartbeat may have renewed)
-        EntityStateDO current = entityStateManager.lambdaQuery()
-                .eq(EntityStateDO::getEntityTypeFlag, scanned.getEntityTypeFlag())
-                .eq(EntityStateDO::getEntityId, scanned.getEntityId())
-                .one();
-        if (Objects.isNull(current)) {
-            return;
-        }
-        // Lease was renewed since the scan query
-        if (!Objects.equals(current.getLeaseVersion(), scanned.getLeaseVersion())) {
-            return;
-        }
-        // Lease is no longer expired
-        if (current.getExpireTime().isAfter(LocalDateTime.now())) {
-            return;
-        }
-
-        // Check if already offline
-        EntityTypeFlagEnum typeFlag = EntityTypeFlagEnum.ofIndex(current.getEntityTypeFlag());
+        EntityTypeFlagEnum typeFlag = EntityTypeFlagEnum.ofIndex(scanned.getEntityTypeFlag());
         if (Objects.isNull(typeFlag)) {
             return;
         }
+
         byte offlineIndex;
         if (typeFlag == EntityTypeFlagEnum.DRIVER) {
             offlineIndex = (byte) DriverStatusEnum.OFFLINE.getIndex();
         } else {
             offlineIndex = (byte) DeviceStatusEnum.OFFLINE.getIndex();
         }
-        if (Objects.equals(current.getStateFlag(), offlineIndex)) {
-            // Already offline; just push expire_time forward to avoid re-scanning
-            current.setLeaseVersion(current.getLeaseVersion() + 1L);
-            current.setStateFlag(offlineIndex);
-            current.setExpireTime(LocalDateTime.now().plusSeconds(OFFLINE_RENEW_SECONDS));
-            entityStateManager.updateById(current);
+
+        // Already offline — just push expire_time forward
+        if (Objects.equals(scanned.getStateFlag(), offlineIndex)) {
+            entityStateManager.lambdaUpdate()
+                    .eq(EntityStateDO::getEntityTypeFlag, scanned.getEntityTypeFlag())
+                    .eq(EntityStateDO::getEntityId, scanned.getEntityId())
+                    .eq(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion())
+                    .set(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion() + 1L)
+                    .set(EntityStateDO::getExpireTime, LocalDateTime.now().plusSeconds(OFFLINE_RENEW_SECONDS))
+                    .update();
             return;
         }
 
-        // Record the previous status for the alarm message
-        String prevStatusName;
-        if (typeFlag == EntityTypeFlagEnum.DRIVER) {
-            DriverStatusEnum prev = DriverStatusEnum.ofIndex(current.getStateFlag());
-            prevStatusName = Objects.nonNull(prev) ? prev.getCode() : "unknown";
-        } else {
-            DeviceStatusEnum prev = DeviceStatusEnum.ofIndex(current.getStateFlag());
-            prevStatusName = Objects.nonNull(prev) ? prev.getCode() : "unknown";
+        // Atomically claim: UPDATE ... WHERE lease_version = scanned version
+        long newVersion = scanned.getLeaseVersion() + 1L;
+        LocalDateTime renewTime = LocalDateTime.now().plusSeconds(OFFLINE_RENEW_SECONDS);
+        boolean claimed = entityStateManager.lambdaUpdate()
+                .eq(EntityStateDO::getEntityTypeFlag, scanned.getEntityTypeFlag())
+                .eq(EntityStateDO::getEntityId, scanned.getEntityId())
+                .eq(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion())
+                .set(EntityStateDO::getLeaseVersion, newVersion)
+                .set(EntityStateDO::getStateFlag, offlineIndex)
+                .set(EntityStateDO::getExpireTime, renewTime)
+                .update();
+        if (!claimed) {
+            return;
         }
 
         // Write alarm row
+        String prevStatusName;
+        if (typeFlag == EntityTypeFlagEnum.DRIVER) {
+            DriverStatusEnum prev = DriverStatusEnum.ofIndex(scanned.getStateFlag());
+            prevStatusName = Objects.nonNull(prev) ? prev.getCode() : "unknown";
+        } else {
+            DeviceStatusEnum prev = DeviceStatusEnum.ofIndex(scanned.getStateFlag());
+            prevStatusName = Objects.nonNull(prev) ? prev.getCode() : "unknown";
+        }
+
         String message = String.format("%s heartbeat timed out (last=%s); marked OFFLINE",
                 typeFlag.getCode(), prevStatusName);
         EntityAlarmDO alarm = new EntityAlarmDO();
-        alarm.setEntityId(current.getEntityId());
-        alarm.setDriverId(current.getDriverId());
+        alarm.setEntityId(scanned.getEntityId());
+        alarm.setDriverId(scanned.getDriverId());
 
         if (typeFlag == EntityTypeFlagEnum.DRIVER) {
             alarm.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.DRIVER.getIndex());
@@ -158,7 +160,7 @@ public class EntityStateExpiryScanner {
                     .build());
         } else {
             alarm.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.DEVICE.getIndex());
-            alarm.setDeviceId(current.getEntityId());
+            alarm.setDeviceId(scanned.getEntityId());
             alarm.setAlarmExt(JsonExt.builder()
                     .type("device-offline")
                     .content(message)
@@ -174,20 +176,14 @@ public class EntityStateExpiryScanner {
         alarm.setAlarmLevelFlag(AlarmMessageLevelFlagEnum.P1.getIndex());
         alarm.setExpiredTime(0L);
         alarm.setConfirmFlag((byte) 0);
-        alarm.setTenantId(current.getTenantId());
+        alarm.setTenantId(scanned.getTenantId());
         entityAlarmManager.save(alarm);
-
-        // Update state to offline
-        current.setLeaseVersion(current.getLeaseVersion() + 1L);
-        current.setStateFlag(offlineIndex);
-        current.setExpireTime(LocalDateTime.now().plusSeconds(OFFLINE_RENEW_SECONDS));
-        entityStateManager.updateById(current);
 
         // Trigger alarm rule pipeline
         if (typeFlag == EntityTypeFlagEnum.DRIVER) {
             DriverAlarmDTO dto = DriverAlarmDTO.builder()
-                    .tenantId(current.getTenantId())
-                    .driverId(current.getEntityId())
+                    .tenantId(scanned.getTenantId())
+                    .driverId(scanned.getEntityId())
                     .status(null)
                     .statusName(null)
                     .message(message)
@@ -196,9 +192,9 @@ public class EntityStateExpiryScanner {
             alarmRuleTriggerService.processDriverAlarm(dto);
         } else {
             DeviceAlarmDTO dto = DeviceAlarmDTO.builder()
-                    .driverId(current.getDriverId())
-                    .tenantId(current.getTenantId())
-                    .deviceId(current.getEntityId())
+                    .driverId(scanned.getDriverId())
+                    .tenantId(scanned.getTenantId())
+                    .deviceId(scanned.getEntityId())
                     .status(null)
                     .statusName(null)
                     .message(message)
@@ -208,7 +204,7 @@ public class EntityStateExpiryScanner {
         }
 
         log.info("State lease expired: type={}, entityId={}, tenantId={}, prevStatus={}",
-                typeFlag.getCode(), current.getEntityId(), current.getTenantId(), prevStatusName);
+                typeFlag.getCode(), scanned.getEntityId(), scanned.getTenantId(), prevStatusName);
     }
 
 }
