@@ -98,6 +98,29 @@ public class DataConstant {
 
     }
 
+    /**
+     * System health probe API constants. The string values are part of the
+     * dashboard banner contract — frontend keys off them as-is.
+     */
+    public static class Health {
+
+        /**
+         * Status reported when a probe target is reachable.
+         */
+        public static final String STATUS_UP = "up";
+
+        /**
+         * Status reported when a probe target is unreachable, returned false,
+         * or did not finish within the probe deadline.
+         */
+        public static final String STATUS_DOWN = "down";
+
+        private Health() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
     private DataConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }

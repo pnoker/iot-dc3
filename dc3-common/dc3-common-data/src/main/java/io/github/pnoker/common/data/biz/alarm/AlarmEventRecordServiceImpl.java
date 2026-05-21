@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.RuleStateManager;
@@ -50,8 +51,6 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
-
-    private static final long DEFAULT_ID = 0L;
 
     private final EntityAlarmManager entityAlarmManager;
 
@@ -100,23 +99,23 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
 
         if (AlarmTargetTypeFlagEnum.DEVICE.equals(targetType) || AlarmTargetTypeFlagEnum.POINT.equals(targetType)) {
             if (!isValidId(deviceId)) {
-                deviceId = AlarmTargetTypeFlagEnum.DEVICE.equals(targetType) ? entityId : DEFAULT_ID;
+                deviceId = AlarmTargetTypeFlagEnum.DEVICE.equals(targetType) ? entityId : DefaultConstant.DEFAULT_ID;
             }
         }
 
         EntityAlarmDO entity = new EntityAlarmDO();
         entity.setAlarmTargetTypeFlag(targetType.getIndex());
         entity.setEntityId(entityId);
-        entity.setDriverId(Objects.requireNonNullElse(driverId, DEFAULT_ID));
-        entity.setDeviceId(Objects.requireNonNullElse(deviceId, DEFAULT_ID));
-        entity.setPointId(Objects.requireNonNullElse(pointId, DEFAULT_ID));
+        entity.setDriverId(Objects.requireNonNullElse(driverId, DefaultConstant.DEFAULT_ID));
+        entity.setDeviceId(Objects.requireNonNullElse(deviceId, DefaultConstant.DEFAULT_ID));
+        entity.setPointId(Objects.requireNonNullElse(pointId, DefaultConstant.DEFAULT_ID));
         entity.setRuleId(match.getRule().getId());
         entity.setAlarmTypeFlag(AlarmTypeFlagEnum.RULE.getIndex());
         entity.setAlarmSourceFlag(AlarmSourceFlagEnum.RULE.getIndex());
         entity.setAlarmExt(alarmExt(match));
-        entity.setExpiredTime(DEFAULT_ID);
+        entity.setExpiredTime(DefaultConstant.DEFAULT_ID);
         entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(Objects.requireNonNullElse(fact.getTenantId(), DEFAULT_ID));
+        entity.setTenantId(Objects.requireNonNullElse(fact.getTenantId(), DefaultConstant.DEFAULT_ID));
         if (!entityAlarmManager.save(entity)) {
             log.warn("Failed to persist entity alarm, ruleId={}, targetType={}, entityId={}",
                     match.getRule().getId(), targetType, entityId);
@@ -172,7 +171,7 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
                 .eq(RuleStateDO::getAlarmTargetTypeFlag, fact.getAlarmTargetTypeFlag().getIndex())
                 .eq(RuleStateDO::getEntityId, fact.getEntityId())
                 .eq(RuleStateDO::getStateFlag, RuleStateFlagEnum.FIRING.getIndex())
-                .gt(RuleStateDO::getEventId, DEFAULT_ID)
+                .gt(RuleStateDO::getEventId, DefaultConstant.DEFAULT_ID)
                 .orderByDesc(RuleStateDO::getLastTriggerTime)
                 .last("limit 1");
         RuleStateDO state = ruleStateManager.getOne(wrapper);

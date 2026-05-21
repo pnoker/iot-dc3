@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.SystemHealthService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
@@ -69,10 +70,6 @@ import java.util.concurrent.TimeoutException;
 @RequiredArgsConstructor
 public class SystemHealthServiceImpl implements SystemHealthService {
 
-    private static final String UP = "up";
-
-    private static final String DOWN = "down";
-
     /**
      * Per-probe hard deadline. gRPC facades don't set a client-side timeout by default,
      * so a dead sibling would otherwise stall the whole banner.
@@ -112,17 +109,18 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             }
         });
         try {
-            return future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS) ? UP : DOWN;
+            return future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS) ? DataConstant.Health.STATUS_UP
+                    : DataConstant.Health.STATUS_DOWN;
         } catch (TimeoutException e) {
             future.cancel(true);
             log.debug("Probe timed out after {}ms", PROBE_TIMEOUT_MS);
-            return DOWN;
+            return DataConstant.Health.STATUS_DOWN;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return DOWN;
+            return DataConstant.Health.STATUS_DOWN;
         } catch (ExecutionException e) {
             log.debug("Probe execution failed: {}", e.getMessage());
-            return DOWN;
+            return DataConstant.Health.STATUS_DOWN;
         }
     }
 
@@ -139,7 +137,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     private Map<String, String> probeCenter() {
         Map<String, String> out = new LinkedHashMap<>();
         out.put("auth", probe(() -> Objects.nonNull(tenantFacade.getByCode("default"))));
-        out.put("data", UP); // reaching this code == data is up
+        out.put("data", DataConstant.Health.STATUS_UP); // reaching this code == data is up
         out.put("manager", probe(() -> {
             FacadeDriverQuery q = FacadeDriverQuery.builder().page(firstPage(1)).build();
             return Objects.nonNull(driverFacade.listByPage(q));
@@ -159,7 +157,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
                 return connection.isOpen();
             }
         }));
-        out.put("gateway", UP); // the request reached this server via gateway
+        out.put("gateway", DataConstant.Health.STATUS_UP); // the request reached this server via gateway
         return out;
     }
 

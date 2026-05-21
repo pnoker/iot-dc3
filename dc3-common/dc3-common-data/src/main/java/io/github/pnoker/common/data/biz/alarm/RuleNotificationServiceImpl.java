@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.dal.MessageManager;
 import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
@@ -75,8 +76,6 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class RuleNotificationServiceImpl implements RuleNotificationService {
-
-    private static final long DEFAULT_ID = 0L;
 
     private final NotifyManager notifyManager;
 
@@ -168,7 +167,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
     }
 
     private NotifyBO loadNotify(Long notifyId) {
-        if (Objects.isNull(notifyId) || DEFAULT_ID == notifyId) {
+        if (Objects.isNull(notifyId) || DefaultConstant.DEFAULT_ID == notifyId) {
             return null;
         }
         NotifyDO entityDO = notifyManager.getById(notifyId);
@@ -176,7 +175,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
     }
 
     private MessageBO loadMessage(Long messageId) {
-        if (Objects.isNull(messageId) || DEFAULT_ID == messageId) {
+        if (Objects.isNull(messageId) || DefaultConstant.DEFAULT_ID == messageId) {
             return null;
         }
         MessageDO entityDO = messageManager.getById(messageId);
@@ -217,7 +216,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
             state.setTriggerCount(0L);
             state.setTenantId(fact.getTenantId());
         }
-        state.setEventId(Objects.requireNonNullElse(fact.getEventId(), DEFAULT_ID));
+        state.setEventId(Objects.requireNonNullElse(fact.getEventId(), DefaultConstant.DEFAULT_ID));
         state.setStateExt(ruleStateExt(match));
 
         if (StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY)) {
@@ -305,11 +304,11 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                                          NotifySendResult result) {
         NotifyHistoryBO history = new NotifyHistoryBO();
         history.setRuleId(match.getRule().getId());
-        history.setNotifyId(Objects.nonNull(notify) ? notify.getId() : DEFAULT_ID);
+        history.setNotifyId(Objects.nonNull(notify) ? notify.getId() : DefaultConstant.DEFAULT_ID);
         history.setMessageId(Objects.nonNull(message) ? message.getId()
-                : Objects.requireNonNullElse(match.getRule().getMessageId(), DEFAULT_ID));
+                : Objects.requireNonNullElse(match.getRule().getMessageId(), DefaultConstant.DEFAULT_ID));
         history.setChannelId(Objects.nonNull(channel) ? channel.getId() : bind.getChannelId());
-        history.setEventId(Objects.requireNonNullElse(match.getFact().getEventId(), DEFAULT_ID));
+        history.setEventId(Objects.requireNonNullElse(match.getFact().getEventId(), DefaultConstant.DEFAULT_ID));
         history.setChannelTypeFlag(Objects.nonNull(channel) ? channel.getChannelTypeFlag() : payload.getChannelTypeFlag());
         history.setTarget(Objects.toString(result.getTarget(), ""));
         history.setStatusFlag(result.getStatusFlag());
