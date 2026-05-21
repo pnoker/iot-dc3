@@ -82,6 +82,14 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         return policyEnabled && bindEnabled;
     }
 
+    /**
+     * Compares the rule-derived severity against the channel binding's allowed
+     * levels. Severity is sourced from {@code rule_ext.severity} (which is
+     * persisted onto {@code dc3_entity_alarm.alarm_level_flag} when the rule
+     * fires); {@code dc3_message.message_level} is intentionally not consulted
+     * here because that column is for template-rendering defaults only —
+     * routing decisions belong on the rule, not on the message body.
+     */
     private boolean levelAllowed(RuleMatch match, NotifyChannelBindBO bind) {
         NotifyChannelBindExt.Content bindContent = bindContent(bind);
         if (Objects.isNull(bindContent) || Objects.isNull(bindContent.getLevels()) || bindContent.getLevels().isEmpty()) {

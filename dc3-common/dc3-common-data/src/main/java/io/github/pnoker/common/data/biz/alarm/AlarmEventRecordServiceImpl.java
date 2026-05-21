@@ -17,20 +17,16 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
-import io.github.pnoker.common.data.dal.RuleStateManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
-import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RuleAlarmEventExt;
+import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +50,7 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
 
     private final EntityAlarmManager entityAlarmManager;
 
-    private final RuleStateManager ruleStateManager;
+    private final RuleStateLookup ruleStateLookup;
 
     @Override
     public void ensureEvent(RuleMatch match) {
@@ -112,6 +108,11 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
         entity.setRuleId(match.getRule().getId());
         entity.setAlarmTypeFlag(AlarmTypeFlagEnum.RULE.getIndex());
         entity.setAlarmSourceFlag(AlarmSourceFlagEnum.RULE.getIndex());
+        // Severity originates from rule_ext.severity — message_level on the
+        // template is for rendering only, not for level routing. Default to P2
+        // when the rule does not declare a severity.
+        entity.setAlarmLevelFlag(AlarmLevelResolver.resolve(match.getSeverity(), AlarmMessageLevelFlagEnum.P2)
+                .getIndex());
         entity.setAlarmExt(alarmExt(match));
         entity.setExpiredTime(DefaultConstant.DEFAULT_ID);
         entity.setConfirmFlag((byte) 0);
@@ -164,18 +165,11 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
                 || Objects.isNull(fact.getAlarmTargetTypeFlag()) || !isValidId(fact.getEntityId())) {
             return null;
         }
-
-        LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda()
-                .eq(RuleStateDO::getTenantId, fact.getTenantId())
-                .eq(RuleStateDO::getRuleId, match.getRule().getId())
-                .eq(RuleStateDO::getAlarmTargetTypeFlag, fact.getAlarmTargetTypeFlag().getIndex())
-                .eq(RuleStateDO::getEntityId, fact.getEntityId())
-                .eq(RuleStateDO::getStateFlag, RuleStateFlagEnum.FIRING.getIndex())
-                .gt(RuleStateDO::getEventId, DefaultConstant.DEFAULT_ID)
-                .orderByDesc(RuleStateDO::getLastTriggerTime)
-                .last("limit 1");
-        RuleStateDO state = ruleStateManager.getOne(wrapper);
-        return Objects.nonNull(state) ? state.getEventId() : null;
+        return ruleStateLookup.findFiringEventId(
+                fact.getTenantId(),
+                match.getRule().getId(),
+                fact.getAlarmTargetTypeFlag().getIndex(),
+                fact.getEntityId());
     }
 
     private Long longValue(Object value) {

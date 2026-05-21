@@ -17,11 +17,14 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.data.dal.RuleStateManager;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.enums.RuleStateFlagEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * Read-only helper that exposes the small subset of {@code dc3_rule_state}
@@ -52,6 +55,26 @@ public class RuleStateLookup {
                 .eq(RuleStateDO::getEntityId, entityId)
                 .eq(RuleStateDO::getStateFlag, RuleStateFlagEnum.FIRING.getIndex())
                 .exists();
+    }
+
+    /**
+     * Returns the most recent {@code event_id} (i.e. the {@code dc3_entity_alarm.id})
+     * recorded on a {@code FIRING} row for this rule + entity, or {@code null}
+     * when none exists. Used by the alarm pipeline to reuse an existing firing
+     * alarm id on a follow-up evaluation rather than creating a duplicate row.
+     */
+    public Long findFiringEventId(long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId) {
+        RuleStateDO state = ruleStateManager.lambdaQuery()
+                .eq(RuleStateDO::getTenantId, tenantId)
+                .eq(RuleStateDO::getRuleId, ruleId)
+                .eq(RuleStateDO::getAlarmTargetTypeFlag, alarmTargetTypeFlag)
+                .eq(RuleStateDO::getEntityId, entityId)
+                .eq(RuleStateDO::getStateFlag, RuleStateFlagEnum.FIRING.getIndex())
+                .gt(RuleStateDO::getEventId, DefaultConstant.DEFAULT_ID)
+                .orderByDesc(RuleStateDO::getLastTriggerTime)
+                .last("limit 1")
+                .one();
+        return Objects.nonNull(state) ? state.getEventId() : null;
     }
 
 }

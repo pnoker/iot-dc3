@@ -25,6 +25,7 @@ import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
@@ -124,6 +125,10 @@ public class OfflineExpiryListener {
         entity.setRuleId(0L);
         entity.setAlarmTypeFlag(AlarmTypeFlagEnum.OFFLINE.getIndex());
         entity.setAlarmSourceFlag(AlarmSourceFlagEnum.STATE_TIMEOUT.getIndex());
+        // Heartbeat-timeout offline events default to P1 — they indicate a
+        // connectivity problem the operator usually wants to see ahead of normal
+        // P2 device-reported issues.
+        entity.setAlarmLevelFlag(AlarmMessageLevelFlagEnum.P1.getIndex());
         entity.setAlarmExt(JsonExt.builder()
                 .type("driver-offline")
                 .content(message)
@@ -172,6 +177,8 @@ public class OfflineExpiryListener {
         entity.setRuleId(0L);
         entity.setAlarmTypeFlag(AlarmTypeFlagEnum.OFFLINE.getIndex());
         entity.setAlarmSourceFlag(AlarmSourceFlagEnum.STATE_TIMEOUT.getIndex());
+        // See handleDriverExpiry — heartbeat-timeout offline events default to P1.
+        entity.setAlarmLevelFlag(AlarmMessageLevelFlagEnum.P1.getIndex());
         entity.setAlarmExt(JsonExt.builder()
                 .type("device-offline")
                 .content(message)
