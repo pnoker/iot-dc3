@@ -39,7 +39,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -55,16 +55,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class LabelServiceImpl implements LabelService {
 
-    @Resource
-    private LabelBuilder labelBuilder;
+    private final LabelBuilder labelBuilder;
 
-    @Resource
-    private LabelManager labelManager;
+    private final LabelManager labelManager;
 
-    @Resource
-    private LabelBindManager labelBindManager;
+    private final LabelBindManager labelBindManager;
 
     @Override
     public void add(LabelBO entityBO) {
