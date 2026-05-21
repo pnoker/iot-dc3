@@ -28,10 +28,15 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class RuleEvaluatorImplTest {
 
-    private final RuleEvaluatorImpl evaluator = new RuleEvaluatorImpl();
+    private final WindowedRuleEvaluator windowedRuleEvaluator = mock(WindowedRuleEvaluator.class);
+    private final RuleEvaluatorImpl evaluator = new RuleEvaluatorImpl(windowedRuleEvaluator);
 
     @Test
     void matchesNumericThresholdRule() {
@@ -86,39 +91,37 @@ class RuleEvaluatorImplTest {
     }
 
     @Test
-    void rejectsNonLastWindowModeOnMatches() {
+    void delegatesNonLastModesToWindowedEvaluator() {
         RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
         rule.getRuleExt().getContent().setWindow(new RuleExt.Window("AVG", "PT3M", 3));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
+        when(windowedRuleEvaluator.matches(any(), any(), any())).thenReturn(true);
 
-        // The current fact would otherwise satisfy the threshold, but AVG mode is
-        // not yet implemented; refuse to fall back to LAST semantics silently.
-        assertThat(evaluator.matches(rule, fact)).isFalse();
+        assertThat(evaluator.matches(rule, fact)).isTrue();
+        verify(windowedRuleEvaluator).matches(any(), any(), any());
     }
 
     @Test
-    void rejectsNonLastWindowModeOnRecovers() {
+    void delegatesNonLastModesToWindowedEvaluatorOnRecovery() {
         RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
         rule.getRuleExt().getContent().setRecovery(new RuleExt.Recovery(true, "<=", BigDecimal.valueOf(75), "PT2M"));
         rule.getRuleExt().getContent().setWindow(new RuleExt.Window("COUNT", "PT3M", 3));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(72)));
+        when(windowedRuleEvaluator.recovers(any(), any(), any())).thenReturn(true);
 
-        assertThat(evaluator.recovers(rule, fact)).isFalse();
+        assertThat(evaluator.recovers(rule, fact)).isTrue();
+        verify(windowedRuleEvaluator).recovers(any(), any(), any());
     }
 
     @Test
-    void warnsOnceForRepeatedRejectionOfSameRule() {
-        // Two evaluations of the same rule should not double-log; the rejection
-        // warning is rate-limited per rule id via a ConcurrentHashMap.
+    void invalidWindowSpecIsSkipped() {
+        // Malformed duration → spec is invalid → matches returns false without
+        // touching the windowed evaluator.
         RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
-        rule.getRuleExt().getContent().setWindow(new RuleExt.Window("MAX", "PT3M", 3));
+        rule.getRuleExt().getContent().setWindow(new RuleExt.Window("AVG", "5 minutes", 3));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
 
         assertThat(evaluator.matches(rule, fact)).isFalse();
-        assertThat(evaluator.matches(rule, fact)).isFalse();
-        // No assertions on log output here — the dedup guarantee is internal —
-        // but the test exists so a regression that rips the dedup will at least
-        // be visible in the test trace.
     }
 
     private RuleBO rule(String operator, BigDecimal threshold, String expected) {
