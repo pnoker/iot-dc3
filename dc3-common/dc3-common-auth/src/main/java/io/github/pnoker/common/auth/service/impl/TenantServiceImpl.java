@@ -35,7 +35,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -51,13 +51,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TenantServiceImpl implements TenantService {
 
-    @Resource
-    private TenantBuilder tenantBuilder;
+    private final TenantBuilder tenantBuilder;
 
-    @Resource
-    private TenantManager tenantManager;
+    private final TenantManager tenantManager;
 
     @Override
     public void add(TenantBO entityBO) {
@@ -124,6 +123,10 @@ public class TenantServiceImpl implements TenantService {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getTenantName()), TenantDO::getTenantName,
                 entityQuery.getTenantName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getTenantCode()), TenantDO::getTenantCode,
+                entityQuery.getTenantCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), TenantDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         return wrapper;
     }
 

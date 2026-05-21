@@ -24,7 +24,7 @@ import io.github.pnoker.common.auth.dal.TenantManager;
 import io.github.pnoker.common.auth.entity.model.TenantDO;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -39,10 +39,10 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DictionaryForAuthServiceImpl implements DictionaryForAuthService {
 
-    @Resource
-    private TenantManager tenantManager;
+    private final TenantManager tenantManager;
 
     @Override
     public List<DictionaryBO> tenantDictionary() {

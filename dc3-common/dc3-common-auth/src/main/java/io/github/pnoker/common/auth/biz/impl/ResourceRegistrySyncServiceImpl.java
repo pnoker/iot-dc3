@@ -35,7 +35,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -67,14 +67,12 @@ import static io.github.pnoker.common.constant.service.AuthConstant.MENU_RESOURC
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncService {
 
-    @Resource
-    private ApiManager apiManager;
-    @Resource
-    private ResourceManager resourceManager;
-    @Resource
-    private ResourceRegistryLockMapper resourceRegistryLockMapper;
+    private final ApiManager apiManager;
+    private final ResourceManager resourceManager;
+    private final ResourceRegistryLockMapper resourceRegistryLockMapper;
 
     private static String apiCodeOf(String serviceName, String method, String path) {
         return serviceName + ":" + methodToTypeFlag(method).name() + ":" + path;

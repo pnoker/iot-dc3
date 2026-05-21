@@ -37,7 +37,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,13 +59,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ResourceServiceImpl implements ResourceService {
 
-    @Resource
-    private ResourceBuilder resourceBuilder;
+    private final ResourceBuilder resourceBuilder;
 
-    @Resource
-    private ResourceManager resourceManager;
+    private final ResourceManager resourceManager;
 
     @Override
     public void add(ResourceBO entityBO) {
@@ -158,7 +157,7 @@ public class ResourceServiceImpl implements ResourceService {
         wrapper.eq(Objects.nonNull(entityQuery.getParentResourceId()), ResourceDO::getParentResourceId,
                 entityQuery.getParentResourceId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag,
-                entityQuery.getEnableFlag());
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         return wrapper;
     }
 

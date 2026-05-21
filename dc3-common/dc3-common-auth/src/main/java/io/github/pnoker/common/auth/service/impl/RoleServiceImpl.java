@@ -37,7 +37,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -61,13 +61,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
 
-    @Resource
-    private RoleBuilder roleBuilder;
+    private final RoleBuilder roleBuilder;
 
-    @Resource
-    private RoleManager roleManager;
+    private final RoleManager roleManager;
 
     @Override
     public void add(RoleBO entityBO) {
@@ -180,6 +179,8 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getRoleName()), RoleDO::getRoleName, entityQuery.getRoleName());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getRoleCode()), RoleDO::getRoleCode, entityQuery.getRoleCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), RoleDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RoleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

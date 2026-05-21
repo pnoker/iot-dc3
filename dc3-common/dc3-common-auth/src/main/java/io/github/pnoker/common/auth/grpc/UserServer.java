@@ -26,7 +26,7 @@ import io.github.pnoker.common.auth.grpc.builder.GrpcUserBuilder;
 import io.github.pnoker.common.auth.service.UserService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,13 +41,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServer extends UserApiGrpc.UserApiImplBase {
 
-    @Resource
-    private GrpcUserBuilder grpcUserBuilder;
+    private final GrpcUserBuilder grpcUserBuilder;
 
-    @Resource
-    private UserService userService;
+    private final UserService userService;
 
     @Override
     public void getById(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {

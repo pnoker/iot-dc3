@@ -46,7 +46,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -64,28 +64,22 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
-    @Resource
-    private ResourceBuilder resourceBuilder;
+    private final ResourceBuilder resourceBuilder;
 
-    @Resource
-    private RoleBuilder roleBuilder;
+    private final RoleBuilder roleBuilder;
 
-    @Resource
-    private RoleResourceBindBuilder roleResourceBindBuilder;
+    private final RoleResourceBindBuilder roleResourceBindBuilder;
 
-    @Resource
-    private RoleResourceBindManager roleResourceBindManager;
+    private final RoleResourceBindManager roleResourceBindManager;
 
-    @Resource
-    private ResourceManager resourceManager;
+    private final ResourceManager resourceManager;
 
-    @Resource
-    private RoleManager roleManager;
+    private final RoleManager roleManager;
 
-    @Resource
-    private RoleUserBindManager roleUserBindManager;
+    private final RoleUserBindManager roleUserBindManager;
 
     @Override
     public void add(RoleResourceBindBO entityBO) {

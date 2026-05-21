@@ -29,7 +29,7 @@ import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -46,10 +46,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegistryApiImplBase {
 
-    @Resource
-    private ResourceRegistrySyncService resourceRegistrySyncService;
+    private final ResourceRegistrySyncService resourceRegistrySyncService;
 
     private static List<ResourceRegistryScannedApi> toScannedApis(List<GrpcScannedApiDTO> dtos) {
         List<ResourceRegistryScannedApi> apis = new ArrayList<>(dtos.size());

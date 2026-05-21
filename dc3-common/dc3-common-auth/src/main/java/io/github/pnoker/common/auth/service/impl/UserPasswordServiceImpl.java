@@ -37,8 +37,9 @@ import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import io.github.pnoker.common.utils.PasswordUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -52,13 +53,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserPasswordServiceImpl implements UserPasswordService {
 
-    @Resource
-    private UserPasswordBuilder userPasswordBuilder;
+    private final UserPasswordBuilder userPasswordBuilder;
 
-    @Resource
-    private UserPasswordManager userPasswordManager;
+    private final UserPasswordManager userPasswordManager;
 
     @Override
     public void add(UserPasswordBO entityBO) {
@@ -126,7 +126,10 @@ public class UserPasswordServiceImpl implements UserPasswordService {
      * @return {@link LambdaQueryWrapper}
      */
     private LambdaQueryWrapper<UserPasswordDO> fuzzyQuery(UserPasswordQuery entityQuery) {
-        return Wrappers.<UserPasswordDO>query().lambda();
+        LambdaQueryWrapper<UserPasswordDO> wrapper = Wrappers.<UserPasswordDO>query().lambda();
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getLoginPassword()), UserPasswordDO::getLoginPassword,
+                entityQuery.getLoginPassword());
+        return wrapper;
     }
 
     /**
