@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.config;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;

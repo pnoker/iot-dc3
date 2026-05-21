@@ -6,7 +6,8 @@ title: 类注释统一完善
 
 ## 背景
 
-项目中大量类存在 Javadoc 问题：空模板 `<p></p>`、占位符（`-`）、笼统描述（只写 `Mapper`、`Status`）、描述与实际职责不符、完全缺失。这次任务逐模块扫描并修正所有 `public` 类/接口/枚举的类级 Javadoc，使其准确、一致、有意义。
+项目中大量类存在 Javadoc 问题：空模板 `<p></p>`、占位符（`-`）、笼统描述（只写 `Mapper`、`Status`
+）、描述与实际职责不符、完全缺失。这次任务逐模块扫描并修正所有 `public` 类/接口/枚举的类级 Javadoc，使其准确、一致、有意义。
 
 ## 注释规范
 
@@ -31,26 +32,26 @@ title: 类注释统一完善
 3. 不暴露实现细节（如具体 SQL、MyBatis-Plus 继承关系），聚焦于这个类在系统中承担的角色。
 4. 各层的描述模板参考：
 
-| 层 | 描述模板 |
-|---|---|
-| `*DO` | Persistence object for the `{table_name}` table. |
-| `*BO` | Business object for `{entity}` operations. |
-| `*VO` | View object returned by the `{entity}` API endpoints. |
-| `*DTO` | Data transfer object for `{purpose}`. |
-| `*Query` | Query parameters for `{entity}` listing/filtering. |
-| `*Mapper` (XML-backed) | Aggregate / custom SQL queries for `{purpose}`. |
-| `*Mapper` (BaseMapper-only) | MyBatis-Plus mapper for the dc3_{table} table. |
-| `*Manager` | Persistence manager (DAL) for `{entity}` CRUD. |
-| `*ManagerImpl` | MyBatis-Plus implementation of `{entity}` persistence. |
-| `*Service` | Business service interface for `{entity}` operations. |
-| `*ServiceImpl` | Business service implementation for `{entity}`. |
-| `*Controller` | REST controller exposing `{entity}` CRUD endpoints. |
-| `*Enum` | Enumeration of `{purpose}` values. |
-| `*Config` | Spring configuration for `{feature}`. |
-| `*Constant` | Constant definitions for `{scope}`. |
-| `*Builder` | MapStruct builder converting between `{from}` and `{to}`. |
-| `*Receiver` | RabbitMQ message receiver for `{event_type}` events. |
-| `*Ext` | JSON extension object for `{entity}` metadata and configuration. |
+| 层                           | 描述模板                                                             |
+|-----------------------------|------------------------------------------------------------------|
+| `*DO`                       | Persistence object for the `{table_name}` table.                 |
+| `*BO`                       | Business object for `{entity}` operations.                       |
+| `*VO`                       | View object returned by the `{entity}` API endpoints.            |
+| `*DTO`                      | Data transfer object for `{purpose}`.                            |
+| `*Query`                    | Query parameters for `{entity}` listing/filtering.               |
+| `*Mapper` (XML-backed)      | Aggregate / custom SQL queries for `{purpose}`.                  |
+| `*Mapper` (BaseMapper-only) | MyBatis-Plus mapper for the dc3_{table} table.                   |
+| `*Manager`                  | Persistence manager (DAL) for `{entity}` CRUD.                   |
+| `*ManagerImpl`              | MyBatis-Plus implementation of `{entity}` persistence.           |
+| `*Service`                  | Business service interface for `{entity}` operations.            |
+| `*ServiceImpl`              | Business service implementation for `{entity}`.                  |
+| `*Controller`               | REST controller exposing `{entity}` CRUD endpoints.              |
+| `*Enum`                     | Enumeration of `{purpose}` values.                               |
+| `*Config`                   | Spring configuration for `{feature}`.                            |
+| `*Constant`                 | Constant definitions for `{scope}`.                              |
+| `*Builder`                  | MapStruct builder converting between `{from}` and `{to}`.        |
+| `*Receiver`                 | RabbitMQ message receiver for `{event_type}` events.             |
+| `*Ext`                      | JSON extension object for `{entity}` metadata and configuration. |
 
 5. 纯 `BaseMapper` 继承且无自定义方法的 Mapper 接口也应有简短描述。
 6. 只修改类级 Javadoc，不改方法级注释，不改代码逻辑。

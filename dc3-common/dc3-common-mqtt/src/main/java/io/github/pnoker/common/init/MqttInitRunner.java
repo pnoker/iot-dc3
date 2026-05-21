@@ -17,10 +17,10 @@
 
 package io.github.pnoker.common.init;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.mqtt.service.MqttScheduleService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.ApplicationArguments;

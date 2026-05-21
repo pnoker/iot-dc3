@@ -60,6 +60,30 @@ public class WindowedRuleEvaluator {
     private final WindowDataSource windowDataSource;
 
     /**
+     * Pick the sample's numeric or text projection depending on the field the
+     * rule's condition selects. Supports {@code numValue}, {@code calValue} /
+     * {@code value} / {@code rawValue}; everything else falls back to the
+     * numeric projection — the condition's operator coerces from there.
+     */
+    private static Object sampleValue(RuleExt.Condition condition, WindowSample sample) {
+        if (Objects.isNull(condition) || Objects.isNull(condition.getField())) {
+            return sample.numValue();
+        }
+        return switch (condition.getField()) {
+            case "numValue" -> sample.numValue();
+            case "calValue", "value", "rawValue" -> sample.calValue();
+            default -> sample.numValue();
+        };
+    }
+
+    private static RuleExt.Condition condition(RuleBO rule) {
+        if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
+            return null;
+        }
+        return rule.getRuleExt().getContent().getCondition();
+    }
+
+    /**
      * Evaluate the rule's firing branch against the windowed samples.
      */
     public boolean matches(RuleBO rule, RuleFact fact, WindowSpec spec) {
@@ -120,34 +144,12 @@ public class WindowedRuleEvaluator {
             return false;
         }
         return switch (mode) {
-            case ALL -> samples.stream().allMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
-            case ANY -> samples.stream().anyMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
+            case ALL ->
+                    samples.stream().allMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
+            case ANY ->
+                    samples.stream().anyMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
             default -> false;
         };
-    }
-
-    /**
-     * Pick the sample's numeric or text projection depending on the field the
-     * rule's condition selects. Supports {@code numValue}, {@code calValue} /
-     * {@code value} / {@code rawValue}; everything else falls back to the
-     * numeric projection — the condition's operator coerces from there.
-     */
-    private static Object sampleValue(RuleExt.Condition condition, WindowSample sample) {
-        if (Objects.isNull(condition) || Objects.isNull(condition.getField())) {
-            return sample.numValue();
-        }
-        return switch (condition.getField()) {
-            case "numValue" -> sample.numValue();
-            case "calValue", "value", "rawValue" -> sample.calValue();
-            default -> sample.numValue();
-        };
-    }
-
-    private static RuleExt.Condition condition(RuleBO rule) {
-        if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
-            return null;
-        }
-        return rule.getRuleExt().getContent().getCondition();
     }
 
 }

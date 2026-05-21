@@ -17,12 +17,12 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import lombok.RequiredArgsConstructor;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DriverStateService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -33,6 +33,7 @@ import java.util.Objects;
 
 /**
  * RabbitMQ receiver for driver state events.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

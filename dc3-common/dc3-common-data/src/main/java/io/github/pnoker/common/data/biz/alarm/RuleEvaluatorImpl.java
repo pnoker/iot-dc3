@@ -51,6 +51,20 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
 
     private final Set<Long> warnedInvalidRules = ConcurrentHashMap.newKeySet();
 
+    private static RuleExt.Window window(RuleBO rule) {
+        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
+            return null;
+        }
+        return rule.getRuleExt().getContent().getWindow();
+    }
+
+    private static RuleExt.Condition condition(RuleBO rule) {
+        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
+            return null;
+        }
+        return rule.getRuleExt().getContent().getCondition();
+    }
+
     @Override
     public boolean matches(RuleBO rule, RuleFact fact) {
         if (Objects.isNull(rule) || Objects.isNull(fact)) {
@@ -99,20 +113,6 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
             log.warn("Skipping rule[{}] because window spec is invalid: {}", rule.getId(), spec.reason());
         }
         return spec;
-    }
-
-    private static RuleExt.Window window(RuleBO rule) {
-        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
-            return null;
-        }
-        return rule.getRuleExt().getContent().getWindow();
-    }
-
-    private static RuleExt.Condition condition(RuleBO rule) {
-        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
-            return null;
-        }
-        return rule.getRuleExt().getContent().getCondition();
     }
 
 }

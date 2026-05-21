@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.data.controller;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointValueCommandService;
 import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
 import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
 import io.github.pnoker.common.entity.R;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;

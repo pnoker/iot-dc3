@@ -17,10 +17,10 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.entity.ext.MessageExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 

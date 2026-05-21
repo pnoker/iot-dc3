@@ -32,7 +32,6 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
-
  * Query parameters for alarm notification template listing and filtering.
  *
  * @author pnoker

@@ -31,9 +31,9 @@ import org.springframework.stereotype.Component;
 /**
  * Scheduled job that periodically evaluates and reports driver connectivity status.
  *
-  * @author pnoker
-  * @version 2025.9.0
-  * @since 2016.10.1
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
  */
 @Slf4j
 @Component

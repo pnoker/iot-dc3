@@ -17,9 +17,9 @@
 
 package io.github.pnoker.driver.coap.client;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.driver.coap.entity.CoapResult;
 import io.github.pnoker.driver.coap.entity.property.CoapProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;

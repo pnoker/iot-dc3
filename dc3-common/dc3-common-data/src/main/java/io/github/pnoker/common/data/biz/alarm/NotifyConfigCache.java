@@ -108,6 +108,10 @@ public class NotifyConfigCache {
                 .build();
     }
 
+    private static boolean isValidId(Long id) {
+        return Objects.nonNull(id) && id > 0;
+    }
+
     /**
      * Returns the notify policy for {@code id}, or {@code null} when it doesn't
      * exist. Caches the result either way so a hot rule pointing at a missing
@@ -217,10 +221,6 @@ public class NotifyConfigCache {
         messageCache.invalidateAll();
         channelCache.invalidateAll();
         bindCache.invalidateAll();
-    }
-
-    private static boolean isValidId(Long id) {
-        return Objects.nonNull(id) && id > 0;
     }
 
     public record NotifyBindKey(Long tenantId, Long notifyId) {

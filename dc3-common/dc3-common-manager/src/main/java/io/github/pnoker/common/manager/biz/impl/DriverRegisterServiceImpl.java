@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.biz.impl;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
@@ -35,6 +34,7 @@ import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.utils.JsonUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

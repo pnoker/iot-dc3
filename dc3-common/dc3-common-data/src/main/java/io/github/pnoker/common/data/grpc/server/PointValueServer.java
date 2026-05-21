@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.data.grpc.server;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.api.center.data.GrpcPointValueCommandQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcPointValueHistoryQuery;
@@ -33,6 +32,7 @@ import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
 import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

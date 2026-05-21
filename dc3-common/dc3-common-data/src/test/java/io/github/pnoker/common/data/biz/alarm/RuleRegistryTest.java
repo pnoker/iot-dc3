@@ -49,12 +49,6 @@ class RuleRegistryTest {
 
     private RuleRegistry registry;
 
-    @BeforeEach
-    void setUp() {
-        AlarmCacheProperties props = new AlarmCacheProperties();
-        registry = new RuleRegistry(ruleCandidateLookup, ruleBuilder, props);
-    }
-
     private static RuleFact fact(long tenantId, long entityId) {
         return new RuleFact(tenantId, AlarmTargetTypeFlagEnum.POINT, entityId, null, LocalDateTime.now(), Map.of());
     }
@@ -63,6 +57,12 @@ class RuleRegistryTest {
         RuleBO bo = new RuleBO();
         bo.setId(id);
         return bo;
+    }
+
+    @BeforeEach
+    void setUp() {
+        AlarmCacheProperties props = new AlarmCacheProperties();
+        registry = new RuleRegistry(ruleCandidateLookup, ruleBuilder, props);
     }
 
     @Test

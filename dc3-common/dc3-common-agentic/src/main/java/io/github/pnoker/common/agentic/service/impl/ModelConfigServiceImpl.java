@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
@@ -33,6 +32,7 @@ import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

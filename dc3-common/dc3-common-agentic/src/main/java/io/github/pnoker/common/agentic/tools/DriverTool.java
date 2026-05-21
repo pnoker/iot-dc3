@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
@@ -28,6 +27,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;

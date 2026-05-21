@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
@@ -40,6 +39,7 @@ import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;

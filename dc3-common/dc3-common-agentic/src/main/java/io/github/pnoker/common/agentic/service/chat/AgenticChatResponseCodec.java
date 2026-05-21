@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
@@ -27,6 +26,7 @@ import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.codec.ServerSentEvent;

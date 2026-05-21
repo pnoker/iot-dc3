@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.data.entity.property.NotifyCredentialProperties;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 

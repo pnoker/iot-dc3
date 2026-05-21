@@ -286,7 +286,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
     }
 
     private RuleStateBO loadState(long ruleId, byte alarmTargetTypeFlag, long entityId,
-                                   String fingerprint, long tenantId) {
+                                  String fingerprint, long tenantId) {
         LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda()
                 .eq(RuleStateDO::getTenantId, tenantId)
                 .eq(RuleStateDO::getRuleId, ruleId)
@@ -387,7 +387,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
     }
 
     private NotifyHistoryBO historySkipped(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
-                                         NotifyChannelBO channel, Map<String, Object> variables, String reason) {
+                                           NotifyChannelBO channel, Map<String, Object> variables, String reason) {
         MessagePayload payload = new MessagePayload(
                 Objects.nonNull(channel) ? channel.getChannelTypeFlag() : null,
                 null,

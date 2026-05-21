@@ -17,11 +17,11 @@
 
 package io.github.pnoker.common.config;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MqttUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

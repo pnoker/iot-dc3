@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.config;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.utils.JsonUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Message;

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.grpc.server;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.api.center.data.GrpcDriverStatusQuery;
 import io.github.pnoker.api.center.data.GrpcFleetSummaryDTO;
 import io.github.pnoker.api.center.data.GrpcIdsStatusQuery;
@@ -43,6 +42,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.grpc.stub.StreamObserver;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

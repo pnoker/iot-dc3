@@ -56,30 +56,19 @@ public class RabbitConstant {
     public static final String ROUTING_POINT_VALUE_PREFIX = "dc3.r.value.point.";
 
     public static final String ROUTING_MQTT_PREFIX = "dc3.r.mqtt.";
-
+    public static final String ROUTING_NOTIFY_TASK_PREFIX = "dc3.r.notify.task.";
     // Register
     public static String TOPIC_EXCHANGE_REGISTER = "dc3.e.register";
-
     public static String QUEUE_REGISTER_UP = "dc3.q.register.up";
-
     public static String QUEUE_REGISTER_DOWN_PREFIX = "dc3.q.register.down.";
-
     // State
     public static String TOPIC_EXCHANGE_STATE = "dc3.e.state";
-
     public static String QUEUE_DRIVER_STATE = "dc3.q.state.driver";
-
     public static String QUEUE_DEVICE_STATE = "dc3.q.state.device";
-
     // Alarm
     public static String TOPIC_EXCHANGE_ALARM = "dc3.e.alarm";
-
     public static String QUEUE_DRIVER_ALARM = "dc3.q.alarm.driver";
-
     public static String QUEUE_DEVICE_ALARM = "dc3.q.alarm.device";
-
-    public static final String ROUTING_NOTIFY_TASK_PREFIX = "dc3.r.notify.task.";
-
     public static String QUEUE_NOTIFY_TASK = "dc3.q.notify.task";
 
     // Metadata

@@ -60,20 +60,14 @@ import java.util.concurrent.TimeUnit;
 public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
-
+    private final DriverSenderService driverSenderService;
+    private final NettyTcpServer nettyTcpServer;
+    private final NettyUdpServer nettyUdpServer;
+    private final ThreadPoolExecutor threadPoolExecutor;
     @Value("${dc3.driver.custom.tcp.port}")
     private Integer tcpPort;
-
     @Value("${dc3.driver.custom.udp.port}")
     private Integer udpPort;
-
-    private final DriverSenderService driverSenderService;
-
-    private final NettyTcpServer nettyTcpServer;
-
-    private final NettyUdpServer nettyUdpServer;
-
-    private final ThreadPoolExecutor threadPoolExecutor;
 
     /**
      * Initializes the driver by starting TCP and UDP listening services.

@@ -27,8 +27,8 @@
     -->
 
     <select id="countAll" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow">
-        SELECT COUNT(*)                           AS total,
-               COUNT(*) FILTER (WHERE confirm_flag = 0) AS unconfirmed
+        SELECT COUNT(*) AS total,
+               COUNT(*)    FILTER (WHERE confirm_flag = 0) AS unconfirmed
         FROM dc3_entity_alarm
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -39,9 +39,9 @@
                    WHEN 0 THEN 'point'
                    WHEN 1 THEN 'device'
                    ELSE 'driver'
-                   END AS source,
-               COUNT(*)                                              AS total,
-               COUNT(*) FILTER (WHERE confirm_flag = 0)              AS unconfirmed
+                   END  AS source,
+               COUNT(*) AS total,
+               COUNT(*)    FILTER (WHERE confirm_flag = 0)              AS unconfirmed
         FROM dc3_entity_alarm
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -55,7 +55,8 @@
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
         GROUP BY alarm_type_flag
-        ORDER BY count DESC
+        ORDER BY count
+        DESC
     </select>
 
     <select id="latest" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
@@ -65,7 +66,7 @@
                    WHEN 1 THEN 'device'
                    ELSE 'driver'
                    END                               AS source,
-               entity_id                              AS source_id,
+               entity_id                             AS source_id,
                point_id,
                alarm_type_flag                       AS alarm_type_flag,
                confirm_flag,
@@ -90,20 +91,20 @@
 
     <select id="listPaged" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
         SELECT id,
-               CASE alarm_target_type_flag
-                   WHEN 0 THEN 'point'
-                   WHEN 1 THEN 'device'
-                   ELSE 'driver'
-                   END                               AS source,
-               entity_id                              AS source_id,
-               point_id,
-               alarm_type_flag                       AS alarm_type_flag,
-               confirm_flag,
-               create_time,
-               COALESCE(alarm_ext ->> 'content', '') AS message
+        CASE alarm_target_type_flag
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        point_id,
+        alarm_type_flag AS alarm_type_flag,
+        confirm_flag,
+        create_time,
+        COALESCE(alarm_ext ->> 'content', '') AS message
         FROM dc3_entity_alarm
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        AND tenant_id = #{tenantId}
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
         <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
         <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
@@ -118,7 +119,7 @@
         SELECT COUNT(*)
         FROM dc3_entity_alarm
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        AND tenant_id = #{tenantId}
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
         <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
         <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
@@ -132,9 +133,9 @@
                    WHEN 0 THEN 'point'
                    WHEN 1 THEN 'device'
                    ELSE 'driver'
-                   END                                          AS source,
-               COUNT(*)                                         AS total,
-               COUNT(*) FILTER (WHERE confirm_flag = 0)         AS unconfirmed
+                   END  AS source,
+               COUNT(*) AS total,
+               COUNT(*)    FILTER (WHERE confirm_flag = 0)         AS unconfirmed
         FROM dc3_entity_alarm
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -147,8 +148,8 @@
         UPDATE dc3_entity_alarm
         SET confirm_flag = 1
         WHERE id = #{id}
-          AND tenant_id = #{tenantId}
-          AND deleted = 0
+        AND tenant_id = #{tenantId}
+        AND deleted = 0
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
         <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
         <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
@@ -158,24 +159,24 @@
         UPDATE dc3_entity_alarm
         SET confirm_flag = 0
         WHERE id = #{id}
-          AND tenant_id = #{tenantId}
-          AND deleted = 0
+        AND tenant_id = #{tenantId}
+        AND deleted = 0
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
         <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
         <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
     </update>
 
     <select id="dailyTrend" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow">
-        SELECT d.day ::text                                                                   AS date,
-               COALESCE(SUM(CASE WHEN a.alarm_target_type_flag IN (0, 1) THEN 1 ELSE 0 END), 0) AS device_count,
-               COALESCE(SUM(CASE WHEN a.alarm_target_type_flag = 2 THEN 1 ELSE 0 END), 0)       AS driver_count
+        SELECT d.day ::text                                                                   AS date, COALESCE(
+                SUM(CASE WHEN a.alarm_target_type_flag IN (0, 1) THEN 1 ELSE 0 END), 0) AS device_count,
+               COALESCE(SUM(CASE WHEN a.alarm_target_type_flag = 2 THEN 1 ELSE 0 END), 0) AS driver_count
         FROM (SELECT generate_series(date_trunc('day', #{from})::date,
                                      CURRENT_DATE, '1 day') ::date AS day) d
                  LEFT JOIN dc3_entity_alarm a
                            ON date_trunc('day', a.create_time)::date = d.day
                                AND a.deleted = 0
                                AND a.tenant_id = #{tenantId}
-                               AND a.create_time &gt;= #{from}
+            AND a.create_time &gt;= #{from}
         GROUP BY d.day
         ORDER BY d.day ASC
     </select>
@@ -185,9 +186,9 @@
                    WHEN 0 THEN 'point'
                    WHEN 1 THEN 'device'
                    ELSE 'driver'
-                   END     AS source,
-               entity_id   AS source_id,
-               COUNT(*)    AS count
+                   END   AS source,
+               entity_id AS source_id,
+               COUNT(*)  AS count
         FROM dc3_entity_alarm
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -198,9 +199,7 @@
     </select>
 
     <select id="activityHeatmap" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow">
-        SELECT EXTRACT(DOW FROM create_time)::int  AS dow,
-               EXTRACT(HOUR FROM create_time)::int AS hour,
-               COUNT(*)                            AS count
+        SELECT EXTRACT(DOW FROM create_time)::int  AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
         FROM dc3_entity_alarm
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -216,7 +215,8 @@
           AND create_time &gt;= #{from}
           AND alarm_ext ->> 'type' IS NOT NULL
         GROUP BY key
-        ORDER BY count DESC
+        ORDER BY count
+        DESC
     </select>
 
     <select id="stormSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow">
@@ -224,9 +224,9 @@
                    WHEN 0 THEN 'point'
                    WHEN 1 THEN 'device'
                    ELSE 'driver'
-                   END     AS source,
-               entity_id   AS source_id,
-               COUNT(*)    AS count
+                   END   AS source,
+               entity_id AS source_id,
+               COUNT(*)  AS count
         FROM dc3_entity_alarm
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -246,10 +246,10 @@
                    WHEN 0 THEN 'point'
                    WHEN 1 THEN 'device'
                    ELSE 'driver'
-                   END          AS source,
-               entity_id        AS source_id,
-               alarm_type_flag  AS alarm_type_flag,
-               COUNT(*)         AS count
+                   END         AS source,
+               entity_id       AS source_id,
+               alarm_type_flag AS alarm_type_flag,
+               COUNT(*)        AS count
         FROM dc3_entity_alarm
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -265,9 +265,9 @@
                                WHEN 0 THEN 'point'
                                WHEN 1 THEN 'device'
                                ELSE 'driver'
-                               END                  AS source,
-                           entity_id                 AS source_id,
-                           alarm_type_flag           AS alarm_type_flag,
+                               END         AS source,
+                           entity_id       AS source_id,
+                           alarm_type_flag AS alarm_type_flag,
                            create_time,
                            id
                     FROM dc3_entity_alarm

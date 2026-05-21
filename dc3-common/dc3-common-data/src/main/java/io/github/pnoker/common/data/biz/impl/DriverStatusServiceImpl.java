@@ -17,16 +17,14 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DriverStatusService;
+import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
-import java.time.LocalDateTime;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
@@ -37,13 +35,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Business service implementation for driver status operations.

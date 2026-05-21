@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.builder.MessageBuilder;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
 import io.github.pnoker.common.agentic.service.MessageService;
@@ -26,6 +25,7 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

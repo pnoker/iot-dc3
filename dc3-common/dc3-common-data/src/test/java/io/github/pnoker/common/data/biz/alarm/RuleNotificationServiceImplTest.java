@@ -18,8 +18,6 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.dal.NotifyHistoryManager;
 import io.github.pnoker.common.data.dal.RuleStateManager;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
@@ -34,10 +32,8 @@ import io.github.pnoker.common.data.entity.builder.RuleStateBuilder;
 import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
-import io.github.pnoker.common.entity.ext.NotifyChannelBindExt;
 import io.github.pnoker.common.entity.ext.NotifyExt;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.entity.ext.RuleStateExt;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
@@ -58,7 +54,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -179,6 +174,30 @@ class RuleNotificationServiceImplTest {
 
     // ---------- notify: firing path ----------
 
+    private static RuleStateDO stateDO(long id, RuleStateFlagEnum flag, long triggerCount) {
+        RuleStateDO entity = new RuleStateDO();
+        entity.setId(id);
+        entity.setRuleId(1L);
+        entity.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT.getIndex());
+        entity.setEntityId(11L);
+        entity.setFingerprint("7:1:point:11");
+        entity.setStateFlag(flag.getIndex());
+        entity.setTriggerCount(triggerCount);
+        entity.setAlarmId(100L);
+        entity.setTenantId(7L);
+        return entity;
+    }
+
+    private static NotifyExt dedupDisabledExt() {
+        NotifyExt ext = new NotifyExt();
+        NotifyExt.Content content = new NotifyExt.Content();
+        content.setRecovery(new NotifyExt.Recovery(false, false, false));
+        ext.setContent(content);
+        return ext;
+    }
+
+    // ---------- notify: recovery path ----------
+
     @Test
     void notifyPersistsFiringStateAndPendingHistoryAndPublishesTask() {
         RuleMatch match = firingMatch();
@@ -240,7 +259,7 @@ class RuleNotificationServiceImplTest {
         verify(ruleStateManager, never()).updateById(any());
     }
 
-    // ---------- notify: recovery path ----------
+    // ---------- notify: skip conditions ----------
 
     @Test
     void notifySetsRecoveredStateForExistingFiringRow() {
@@ -284,8 +303,6 @@ class RuleNotificationServiceImplTest {
         verify(notifyHistoryManager, never()).save(any(NotifyHistoryDO.class));
     }
 
-    // ---------- notify: skip conditions ----------
-
     @Test
     void notifyReturnsEmptyWhenNotifyPolicyMissing() {
         RuleMatch match = firingMatch();
@@ -328,6 +345,8 @@ class RuleNotificationServiceImplTest {
         verify(notifyTaskSender, never()).publish(any());
     }
 
+    // ---------- notifyBatch ----------
+
     @Test
     void notifySkipsChannelOnMissingMessageTemplate() {
         RuleMatch match = firingMatch();
@@ -368,7 +387,7 @@ class RuleNotificationServiceImplTest {
         verify(notifyTaskSender, never()).publish(any());
     }
 
-    // ---------- notifyBatch ----------
+    // ---------- persistState: duplicate-key fallback ----------
 
     @Test
     void notifyBatchProcessesMultipleMatchesInSingleCall() {
@@ -390,14 +409,14 @@ class RuleNotificationServiceImplTest {
         verify(notifyTaskSender).publish(any(NotifyTaskDTO.class));
     }
 
+    // ---------- helpers ----------
+
     @Test
     void notifyBatchReturnsEmptyForNullAndEmptyInput() {
         assertThat(service.notifyBatch(null)).isEmpty();
         assertThat(service.notifyBatch(List.of())).isEmpty();
         verifyNoDbInteraction();
     }
-
-    // ---------- persistState: duplicate-key fallback ----------
 
     @Test
     void persistStateRetriesWithUpdateOnDuplicateKey() {
@@ -440,8 +459,6 @@ class RuleNotificationServiceImplTest {
         verify(ruleStateManager).update(any(com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper.class));
     }
 
-    // ---------- helpers ----------
-
     private void stubNotifyConfigLoaded(RuleMatch match) {
         NotifyBO notify = notify(match.getRule().getNotifyId());
         notify.setNotifyExt(dedupDisabledExt());
@@ -454,20 +471,6 @@ class RuleNotificationServiceImplTest {
         when(notifyConfigCache.findChannel(30L, 7L)).thenReturn(channel);
 
         when(alarmTemplateRenderer.renderText(any(), any())).thenReturn("7:1:point:11");
-    }
-
-    private static RuleStateDO stateDO(long id, RuleStateFlagEnum flag, long triggerCount) {
-        RuleStateDO entity = new RuleStateDO();
-        entity.setId(id);
-        entity.setRuleId(1L);
-        entity.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT.getIndex());
-        entity.setEntityId(11L);
-        entity.setFingerprint("7:1:point:11");
-        entity.setStateFlag(flag.getIndex());
-        entity.setTriggerCount(triggerCount);
-        entity.setAlarmId(100L);
-        entity.setTenantId(7L);
-        return entity;
     }
 
     private void doNotExpectDuplicateKey() {
@@ -600,14 +603,6 @@ class RuleNotificationServiceImplTest {
             return bo;
         });
         when(notifyHistoryManager.save(any(NotifyHistoryDO.class))).thenReturn(true);
-    }
-
-    private static NotifyExt dedupDisabledExt() {
-        NotifyExt ext = new NotifyExt();
-        NotifyExt.Content content = new NotifyExt.Content();
-        content.setRecovery(new NotifyExt.Recovery(false, false, false));
-        ext.setContent(content);
-        return ext;
     }
 
     private void verifyNoDbInteraction() {

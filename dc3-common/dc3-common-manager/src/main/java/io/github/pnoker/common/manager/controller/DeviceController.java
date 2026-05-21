@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -36,6 +35,7 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.github.pnoker.common.valid.Upload;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;

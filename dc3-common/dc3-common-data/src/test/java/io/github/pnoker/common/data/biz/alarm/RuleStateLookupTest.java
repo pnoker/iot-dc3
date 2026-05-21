@@ -28,8 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -39,19 +37,16 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RuleStateLookupTest {
 
-    @Mock
-    private RuleStateManager ruleStateManager;
-
-    @Mock
-    private LambdaQueryChainWrapper<RuleStateDO> chainWrapper;
-
-    @InjectMocks
-    private RuleStateLookup lookup;
-
     private static final long TENANT_ID = 7L;
     private static final long RULE_ID = 1L;
     private static final byte TARGET_TYPE = AlarmTargetTypeFlagEnum.POINT.getIndex();
     private static final long ENTITY_ID = 11L;
+    @Mock
+    private RuleStateManager ruleStateManager;
+    @Mock
+    private LambdaQueryChainWrapper<RuleStateDO> chainWrapper;
+    @InjectMocks
+    private RuleStateLookup lookup;
 
     // ---------- hasFiringState ----------
 

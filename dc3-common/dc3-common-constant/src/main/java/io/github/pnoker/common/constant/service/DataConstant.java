@@ -78,6 +78,10 @@ public class DataConstant {
 
     public static final String RABBITMQ_CLUSTER_URL_PREFIX = "/rabbitmq/cluster";
 
+    private DataConstant() {
+        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+    }
+
     /**
      * Point value API constants.
      *
@@ -119,10 +123,6 @@ public class DataConstant {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
-    }
-
-    private DataConstant() {
-        throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
 }

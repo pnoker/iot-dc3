@@ -16,9 +16,9 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;

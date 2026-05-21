@@ -50,6 +50,21 @@ import java.util.Objects;
 @Component
 public class RepositoryWindowDataSource implements WindowDataSource {
 
+    private static boolean isPointFact(RuleFact fact) {
+        return Objects.nonNull(fact) && fact.getAlarmTargetTypeFlag() == AlarmTargetTypeFlagEnum.POINT
+                && Objects.nonNull(fact.getTenantId()) && Objects.nonNull(fact.getEntityId());
+    }
+
+    private static Long longValue(Object value) {
+        if (value instanceof Long longValue) {
+            return longValue;
+        }
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        return null;
+    }
+
     @Override
     public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowMode mode) {
         if (!isPointFact(fact) || Objects.isNull(spec) || Objects.isNull(spec.duration())) {
@@ -102,21 +117,6 @@ public class RepositoryWindowDataSource implements WindowDataSource {
                     fact.getTenantId(), fact.getEntityId(), e);
             return List.of();
         }
-    }
-
-    private static boolean isPointFact(RuleFact fact) {
-        return Objects.nonNull(fact) && fact.getAlarmTargetTypeFlag() == AlarmTargetTypeFlagEnum.POINT
-                && Objects.nonNull(fact.getTenantId()) && Objects.nonNull(fact.getEntityId());
-    }
-
-    private static Long longValue(Object value) {
-        if (value instanceof Long longValue) {
-            return longValue;
-        }
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-        return null;
     }
 
     /**

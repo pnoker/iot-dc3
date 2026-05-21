@@ -17,10 +17,10 @@
 
 package io.github.pnoker.common.driver.config;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.config.ExchangeConfig;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;

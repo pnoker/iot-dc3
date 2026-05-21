@@ -30,11 +30,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class WindowSampleBufferTest {
 
+    private static final WindowSampleKey KEY_A = new WindowSampleKey(7L, AlarmTargetTypeFlagEnum.POINT, 11L);
+    private static final WindowSampleKey KEY_B = new WindowSampleKey(7L, AlarmTargetTypeFlagEnum.POINT, 12L);
     private AlarmWindowProperties properties;
     private WindowSampleBuffer buffer;
 
-    private static final WindowSampleKey KEY_A = new WindowSampleKey(7L, AlarmTargetTypeFlagEnum.POINT, 11L);
-    private static final WindowSampleKey KEY_B = new WindowSampleKey(7L, AlarmTargetTypeFlagEnum.POINT, 12L);
+    private static WindowSample sample(double value, LocalDateTime at) {
+        return new WindowSample(value, Double.toString(value), at);
+    }
 
     @BeforeEach
     void setUp() {
@@ -43,10 +46,6 @@ class WindowSampleBufferTest {
         properties.setMaxSamplesPerBuffer(10);
         properties.setMaxBufferKeys(100);
         buffer = new WindowSampleBuffer(properties);
-    }
-
-    private static WindowSample sample(double value, LocalDateTime at) {
-        return new WindowSample(value, Double.toString(value), at);
     }
 
     @Test

@@ -73,6 +73,12 @@ class RuleServiceImplTest {
         return rule;
     }
 
+    private static RuleBO ruleWithDuration(String mode, String duration) {
+        RuleBO rule = rule(mode);
+        rule.getRuleExt().getContent().setWindow(new RuleExt.Window(mode, duration, 1));
+        return rule;
+    }
+
     @Test
     void rejectsAddWhenWindowModeIsUnknown() {
         // The save validator now parses the spec instead of comparing strings;
@@ -126,12 +132,6 @@ class RuleServiceImplTest {
         // these modes lands in a follow-up commit.
         RuleBO rule = ruleWithDuration("AVG", "PT3M");
         assertThatThrownBy(() -> service.add(rule)).isNotInstanceOf(UnSupportException.class);
-    }
-
-    private static RuleBO ruleWithDuration(String mode, String duration) {
-        RuleBO rule = rule(mode);
-        rule.getRuleExt().getContent().setWindow(new RuleExt.Window(mode, duration, 1));
-        return rule;
     }
 
 }

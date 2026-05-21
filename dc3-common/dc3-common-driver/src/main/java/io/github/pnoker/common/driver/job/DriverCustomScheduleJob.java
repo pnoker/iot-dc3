@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.driver.job;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.driver.service.DriverCustomService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;

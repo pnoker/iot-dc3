@@ -19,10 +19,10 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
-import io.github.pnoker.common.data.dal.EntityStateManager;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.biz.DriverStateService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
+import io.github.pnoker.common.data.dal.EntityStateManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.enums.DriverStatusEnum;
@@ -31,12 +31,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Business service implementation for driver heartbeat and state processing.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

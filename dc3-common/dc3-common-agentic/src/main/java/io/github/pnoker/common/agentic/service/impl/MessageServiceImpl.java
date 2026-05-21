@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.dal.MessageManager;
@@ -28,6 +27,7 @@ import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 

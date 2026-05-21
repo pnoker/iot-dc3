@@ -34,8 +34,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,6 +58,44 @@ class FilterServiceImplTest {
     private TokenFacade tokenFacade;
     @InjectMocks
     private FilterServiceImpl filterService;
+
+    private static ServerHttpRequest request(String tenant, String login, String token) {
+        MockServerHttpRequest.BaseBuilder<?> builder = MockServerHttpRequest.get("/api/manager/device");
+        if (tenant != null) {
+            builder.header(RequestConstant.Header.X_AUTH_TENANT, tenant);
+        }
+        if (login != null) {
+            builder.header(RequestConstant.Header.X_AUTH_LOGIN, login);
+        }
+        if (token != null) {
+            builder.header(RequestConstant.Header.X_AUTH_TOKEN, token);
+        }
+        return builder.build();
+    }
+
+    private static FacadeTenantBO tenant(Long id, String code, EnableFlagEnum enableFlag) {
+        FacadeTenantBO tenant = new FacadeTenantBO();
+        tenant.setId(id);
+        tenant.setTenantCode(code);
+        tenant.setEnableFlag(enableFlag);
+        return tenant;
+    }
+
+    private static FacadeUserLoginBO userLogin(String name, Long userId, EnableFlagEnum enableFlag) {
+        FacadeUserLoginBO userLogin = new FacadeUserLoginBO();
+        userLogin.setLoginName(name);
+        userLogin.setUserId(userId);
+        userLogin.setEnableFlag(enableFlag);
+        return userLogin;
+    }
+
+    private static FacadeUserBO user(Long id, String nickName, String userName) {
+        FacadeUserBO user = new FacadeUserBO();
+        user.setId(id);
+        user.setNickName(nickName);
+        user.setUserName(userName);
+        return user;
+    }
 
     @Test
     void getTenantRequiresEnabledTenantAndCachesLookup() {
@@ -157,44 +195,6 @@ class FilterServiceImplTest {
         assertThatThrownBy(() -> filterService.checkValid(request("acme", "alice",
                 JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", "token"))), tenant, userLogin))
                 .isInstanceOf(UnAuthorizedException.class);
-    }
-
-    private static ServerHttpRequest request(String tenant, String login, String token) {
-        MockServerHttpRequest.BaseBuilder<?> builder = MockServerHttpRequest.get("/api/manager/device");
-        if (tenant != null) {
-            builder.header(RequestConstant.Header.X_AUTH_TENANT, tenant);
-        }
-        if (login != null) {
-            builder.header(RequestConstant.Header.X_AUTH_LOGIN, login);
-        }
-        if (token != null) {
-            builder.header(RequestConstant.Header.X_AUTH_TOKEN, token);
-        }
-        return builder.build();
-    }
-
-    private static FacadeTenantBO tenant(Long id, String code, EnableFlagEnum enableFlag) {
-        FacadeTenantBO tenant = new FacadeTenantBO();
-        tenant.setId(id);
-        tenant.setTenantCode(code);
-        tenant.setEnableFlag(enableFlag);
-        return tenant;
-    }
-
-    private static FacadeUserLoginBO userLogin(String name, Long userId, EnableFlagEnum enableFlag) {
-        FacadeUserLoginBO userLogin = new FacadeUserLoginBO();
-        userLogin.setLoginName(name);
-        userLogin.setUserId(userId);
-        userLogin.setEnableFlag(enableFlag);
-        return userLogin;
-    }
-
-    private static FacadeUserBO user(Long id, String nickName, String userName) {
-        FacadeUserBO user = new FacadeUserBO();
-        user.setId(id);
-        user.setNickName(nickName);
-        user.setUserName(userName);
-        return user;
     }
 
 }

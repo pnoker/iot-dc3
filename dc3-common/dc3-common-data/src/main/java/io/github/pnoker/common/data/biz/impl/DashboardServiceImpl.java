@@ -47,6 +47,7 @@ import static io.github.pnoker.common.data.constant.DashboardLimits.*;
 
 /**
  * Business service implementation for dashboard aggregation operations.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2026.5.2
