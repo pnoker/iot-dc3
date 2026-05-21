@@ -78,6 +78,10 @@ public class RabbitConstant {
 
     public static String QUEUE_DEVICE_ALARM = "dc3.q.alarm.device";
 
+    public static final String ROUTING_NOTIFY_TASK_PREFIX = "dc3.r.notify.task.";
+
+    public static String QUEUE_NOTIFY_TASK = "dc3.q.notify.task";
+
     // Metadata
     public static String TOPIC_EXCHANGE_METADATA = "dc3.e.metadata";
 

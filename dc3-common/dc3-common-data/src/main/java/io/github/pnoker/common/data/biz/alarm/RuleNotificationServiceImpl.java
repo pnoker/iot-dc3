@@ -46,6 +46,7 @@ import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
+import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import io.github.pnoker.common.entity.ext.NotifyExt;
 import io.github.pnoker.common.entity.ext.NotifyHistoryRequestExt;
 import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
@@ -105,7 +106,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
 
     private final MessageRenderService messageRenderService;
 
-    private final NotifyChannelAdapterRegistry notifyChannelAdapterRegistry;
+    private final NotifyTaskSender notifyTaskSender;
 
     private final AlarmTemplateRenderer alarmTemplateRenderer;
 
@@ -159,20 +160,28 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
             }
 
             MessagePayload payload = messageRenderService.render(message, channel.getChannelTypeFlag(), variables);
-            // Two-step write: PENDING row is committed first so the row id is
-            // visible on the channel send (and to the future async worker, which
-            // takes over the dispatch in commit 7). The send result then updates
-            // the same row to SUCCESS/FAILED instead of inserting a second one.
             NotifyHistoryBO history = persistPendingHistory(match, notify, message, bind, channel, payload, variables);
-            NotifySendResult result = notifyChannelAdapterRegistry.find(channel.getChannelTypeFlag())
-                    .map(adapter -> adapter.send(channel, payload))
-                    .orElseGet(() -> NotifySendResult.failed(channel.getCredentialRef(), "Notify channel adapter is missing"));
-            history = finalizeHistory(history, result);
             histories.add(history);
-            if (NotifyHistoryStatusEnum.SUCCESS.equals(result.getStatusFlag())) {
-                state.setLastNotifyTime(LocalDateTime.now());
-                persistState(state);
-            }
+            // Outbound dispatch is asynchronous: hand the rendered payload to
+            // the NotifyWorker via the alarm exchange. The worker updates the
+            // same history row from PENDING to its terminal status. We stamp
+            // last_notify_time here (rather than on SUCCESS) so the rate-limit
+            // policy debounces follow-on rule firings even while the prior
+            // dispatch is still in flight — otherwise a slow webhook would
+            // let multiple notifications stack up on the queue.
+            state.setLastNotifyTime(LocalDateTime.now());
+            persistState(state);
+            notifyTaskSender.publish(NotifyTaskDTO.builder()
+                    .notifyHistoryId(history.getId())
+                    .tenantId(match.getFact().getTenantId())
+                    .channelId(channel.getId())
+                    .channelTypeFlag(channel.getChannelTypeFlag().getIndex())
+                    .payloadType(payload.getPayloadType())
+                    .payload(payload.getPayload())
+                    .missingVariables(payload.getMissingVariables())
+                    .retryCount(0)
+                    .createTime(LocalDateTime.now())
+                    .build());
         }
         return histories;
     }
@@ -347,23 +356,6 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         history.setStatusFlag(NotifyHistoryStatusEnum.PENDING);
         NotifyHistoryDO entityDO = notifyHistoryBuilder.buildDOByBO(history);
         notifyHistoryManager.save(entityDO);
-        return notifyHistoryBuilder.buildBOByDO(entityDO);
-    }
-
-    /**
-     * Stamp a PENDING history with the dispatch result. The synchronous path
-     * here mirrors what the async NotifyWorker (commit 7) will do once it
-     * takes over outbound delivery — the row identity stays stable across the
-     * transition.
-     */
-    private NotifyHistoryBO finalizeHistory(NotifyHistoryBO pending, NotifySendResult result) {
-        pending.setStatusFlag(result.getStatusFlag());
-        pending.setTarget(Objects.toString(result.getTarget(), ""));
-        pending.setResponseExt(responseExt(result));
-        pending.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
-        NotifyHistoryDO entityDO = notifyHistoryBuilder.buildDOByBO(pending);
-        entityDO.setOperateTime(null);
-        notifyHistoryManager.updateById(entityDO);
         return notifyHistoryBuilder.buildBOByDO(entityDO);
     }
 
