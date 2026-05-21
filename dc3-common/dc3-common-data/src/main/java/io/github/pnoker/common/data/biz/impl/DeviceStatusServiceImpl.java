@@ -18,7 +18,6 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DeviceStatusService;
-import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
@@ -54,7 +53,6 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     private final EntityStateManager entityStateManager;
 
-    private final LocalCacheService localCacheService;
 
     @Override
     public Map<Long, String> getStatusByPage(DeviceQuery pageQuery) {

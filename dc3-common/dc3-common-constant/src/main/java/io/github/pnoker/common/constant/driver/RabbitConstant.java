@@ -93,6 +93,32 @@ public class RabbitConstant {
 
     public static String QUEUE_MQTT = "dc3.q.mqtt";
 
+    // State Timeout - Delay Exchange (receives messages to be delayed)
+    public static String TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY = "dc3.e.state_timeout_delay";
+
+    // State Timeout - Check Exchange (receives expired messages from DLX)
+    public static String TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK = "dc3.e.state_timeout_check";
+
+    // Driver timeout delay queue (45s TTL, dead-letter to check exchange)
+    public static String QUEUE_DRIVER_TIMEOUT_DELAY = "dc3.q.state_timeout.driver.45s";
+
+    // Driver timeout check queue (consumed by Data Center)
+    public static String QUEUE_DRIVER_TIMEOUT_CHECK = "dc3.q.state_timeout.driver_check";
+
+    // Routing keys
+    public static final String ROUTING_DRIVER_TIMEOUT_DELAY = "state.timeout.driver.45s";
+    public static final String ROUTING_DRIVER_TIMEOUT_CHECK = "state.timeout.driver.check";
+
+    // Device scan tick delay queue (10s TTL, dead-letter to scan queue)
+    public static String QUEUE_DEVICE_SCAN_TICK = "dc3.q.state_timeout.device_scan_tick.10s";
+
+    // Device scan execution queue (consumed by Data Center)
+    public static String QUEUE_DEVICE_SCAN = "dc3.q.state_timeout.device_scan";
+
+    // Routing keys
+    public static final String ROUTING_DEVICE_SCAN_TICK = "state.timeout.device.scan.tick";
+    public static final String ROUTING_DEVICE_SCAN = "state.timeout.device.scan";
+
     private RabbitConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }

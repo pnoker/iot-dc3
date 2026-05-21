@@ -17,16 +17,16 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.data.biz.DeviceStateService;
-import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,14 +46,16 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DeviceStateServiceImpl implements DeviceStateService {
 
-    private final LocalCacheService localCacheService;
-
     private final DeviceAlarmService deviceAlarmService;
 
     private final EntityStateManager entityStateManager;
 
-    private static boolean isFlip(String prev, String current) {
-        return online(prev) != online(current);
+    private static boolean isFlip(byte prevIndex, String currentCode) {
+        return online(prevIndex) != online(currentCode);
+    }
+
+    private static boolean online(byte index) {
+        return index == DeviceStatusEnum.ONLINE.getIndex() || index == DeviceStatusEnum.MAINTAIN.getIndex();
     }
 
     private static boolean online(String code) {
@@ -66,8 +68,6 @@ public class DeviceStateServiceImpl implements DeviceStateService {
             return;
         }
 
-        String statusKey = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + entityDTO.getDeviceId();
-        String prev = localCacheService.getKey(statusKey);
         String current = entityDTO.getStatus();
 
         // Persist state lease to database (source of truth)
@@ -81,22 +81,30 @@ public class DeviceStateServiceImpl implements DeviceStateService {
             stateDO = new EntityStateDO();
             stateDO.setEntityTypeFlag(EntityTypeFlagEnum.DEVICE.getIndex());
             stateDO.setEntityId(entityDTO.getDeviceId());
-            stateDO.setDriverId(Objects.nonNull(entityDTO.getDriverId()) ? entityDTO.getDriverId() : 0L);
+            stateDO.setParentEntityId(Objects.nonNull(entityDTO.getDriverId()) ? entityDTO.getDriverId() : 0L);
             stateDO.setTenantId(entityDTO.getTenantId());
             stateDO.setLeaseVersion(1L);
+            stateDO.setLastStateFlag((byte) DeviceStatusEnum.OFFLINE.getIndex());
+            stateDO.setLastHeartbeatTime(LocalDateTime.now());
+            stateDO.setLastAlarmId(0L);
+            stateDO.setTimeoutSourceFlag((byte) TimeoutSourceFlagEnum.DRIVER.getIndex());
+            stateDO.setStateExt(JsonExt.builder().type("device-heartbeat").content("").version(1).build());
         } else {
             stateDO.setLeaseVersion(stateDO.getLeaseVersion() + 1L);
+            stateDO.setLastStateFlag(stateDO.getStateFlag());
+            stateDO.setLastHeartbeatTime(LocalDateTime.now());
         }
         DeviceStatusEnum statusEnum = DeviceStatusEnum.ofCode(current);
         stateDO.setStateFlag((byte) (Objects.nonNull(statusEnum) ? statusEnum.getIndex() : 0));
         stateDO.setExpireTime(expireTime);
-        stateDO.setTtlSeconds((int) ttlSeconds);
+        stateDO.setTimeoutSeconds((int) ttlSeconds);
         entityStateManager.saveOrUpdate(stateDO);
 
-        localCacheService.setKey(statusKey, current, entityDTO.getTimeOut(), entityDTO.getTimeUnit());
-
-        if (Objects.nonNull(prev) && !Objects.equals(prev, current) && isFlip(prev, current)) {
-            String message = String.format("Device status changed: %s -> %s", prev, current);
+        byte lastIndex = stateDO.getLastStateFlag();
+        if (isFlip(lastIndex, current)) {
+            String message = String.format("Device status changed: %s -> %s",
+                    DeviceStatusEnum.ofIndex(lastIndex) != null ? DeviceStatusEnum.ofIndex(lastIndex).getCode() : "unknown",
+                    current);
             DeviceAlarmDTO alarm = DeviceAlarmDTO.builder()
                     .driverId(entityDTO.getDriverId())
                     .tenantId(entityDTO.getTenantId())

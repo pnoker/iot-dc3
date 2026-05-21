@@ -18,7 +18,6 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DriverStatusService;
-import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
@@ -60,7 +59,6 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     private final EntityStateManager entityStateManager;
 
-    private final LocalCacheService localCacheService;
 
     @Override
     public Map<Long, String> getStatusByPage(DriverQuery pageQuery) {

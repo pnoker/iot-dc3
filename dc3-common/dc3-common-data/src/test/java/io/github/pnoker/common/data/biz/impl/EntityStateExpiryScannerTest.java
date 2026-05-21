@@ -19,26 +19,30 @@ package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
+import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -57,6 +61,12 @@ class EntityStateExpiryScannerTest {
     private AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Mock
+    private RabbitTemplate rabbitTemplate;
+
+    @Mock
+    private Channel channel;
+
+    @Mock
     private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
 
     @Mock
@@ -65,23 +75,11 @@ class EntityStateExpiryScannerTest {
     @InjectMocks
     private EntityStateExpiryScanner scanner;
 
-    private EntityStateDO driverState(Long driverId, byte statusFlag, long leaseVersion, LocalDateTime expireTime) {
-        EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
-        state.setEntityId(driverId);
-        state.setDriverId(driverId);
-        state.setStateFlag(statusFlag);
-        state.setLeaseVersion(leaseVersion);
-        state.setExpireTime(expireTime);
-        state.setTenantId(100L);
-        return state;
-    }
-
     private EntityStateDO deviceState(Long deviceId, Long driverId, byte statusFlag, long leaseVersion, LocalDateTime expireTime) {
         EntityStateDO state = new EntityStateDO();
         state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
         state.setEntityId(deviceId);
-        state.setDriverId(driverId);
+        state.setParentEntityId(driverId);
         state.setStateFlag(statusFlag);
         state.setLeaseVersion(leaseVersion);
         state.setExpireTime(expireTime);
@@ -89,130 +87,118 @@ class EntityStateExpiryScannerTest {
         return state;
     }
 
-    @Test
-    void noExpiredRowsDoesNothing() {
+    private Message mockMessage(long deliveryTag) {
+        MessageProperties props = new MessageProperties();
+        props.setDeliveryTag(deliveryTag);
+        return new Message("tick".getBytes(), props);
+    }
+
+    private void stubDeviceQuery(List<EntityStateDO> results) {
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
+        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
+        when(queryWrapper.in(any(), any(Object[].class))).thenReturn(queryWrapper);
         when(queryWrapper.lt(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.last(any())).thenReturn(queryWrapper);
-        when(queryWrapper.list()).thenReturn(Collections.emptyList());
+        when(queryWrapper.list()).thenReturn(results);
+    }
 
-        scanner.scanExpiredLeases();
+    private void stubClaimSuccess() {
+        when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
+        when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
+        when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
+        when(updateWrapper.update()).thenReturn(true);
+    }
 
+    private void stubClaimFailure() {
+        when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
+        when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
+        when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
+        when(updateWrapper.update()).thenReturn(false);
+    }
+
+    @Test
+    void noExpiredRowsDoesNothing() throws Exception {
+        stubDeviceQuery(Collections.emptyList());
+
+        scanner.onScanTick(channel, mockMessage(1L));
+
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
         verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService);
     }
 
     @Test
-    void alreadyOfflineDriverSkipsAlarm() {
-        EntityStateDO offline = driverState(1L,
-                (byte) DriverStatusEnum.OFFLINE.getIndex(),
+    void alreadyOfflineDeviceSkipsAlarm() throws Exception {
+        EntityStateDO offline = deviceState(10L, 7L,
+                (byte) DeviceStatusEnum.OFFLINE.getIndex(),
                 5L, LocalDateTime.now().minusSeconds(10));
 
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.lt(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.last(any())).thenReturn(queryWrapper);
-        when(queryWrapper.list()).thenReturn(List.of(offline));
+        stubDeviceQuery(List.of(offline));
         // already offline path: lambdaUpdate for renewal
         when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
         when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
         when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
         when(updateWrapper.update()).thenReturn(true);
 
-        scanner.scanExpiredLeases();
+        scanner.onScanTick(channel, mockMessage(1L));
 
         verify(entityAlarmManager, never()).save(any());
-        verify(alarmRuleTriggerService, never()).processDriverAlarm(any());
+        verify(alarmRuleTriggerService, never()).processDeviceAlarm(any());
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
     }
 
     @Test
-    void onlineDriverExpiredWritesAlarmAndUpdatesState() {
-        EntityStateDO expired = driverState(1L,
-                (byte) DriverStatusEnum.ONLINE.getIndex(),
-                3L, LocalDateTime.now().minusSeconds(10));
-
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.lt(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.last(any())).thenReturn(queryWrapper);
-        when(queryWrapper.list()).thenReturn(List.of(expired));
-        // atomic claim
-        when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
-        when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.update()).thenReturn(true);
-        when(entityAlarmManager.save(any())).thenReturn(true);
-
-        scanner.scanExpiredLeases();
-
-        verify(entityAlarmManager).save(any());
-        verify(alarmRuleTriggerService).processDriverAlarm(any());
-    }
-
-    @Test
-    void claimFailsWhenAnotherInstanceAlreadyProcessed() {
-        EntityStateDO expired = driverState(1L,
-                (byte) DriverStatusEnum.ONLINE.getIndex(),
-                3L, LocalDateTime.now().minusSeconds(10));
-
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.lt(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.last(any())).thenReturn(queryWrapper);
-        when(queryWrapper.list()).thenReturn(List.of(expired));
-        // atomic UPDATE returns false = another instance won
-        when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
-        when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.update()).thenReturn(false);
-
-        scanner.scanExpiredLeases();
-
-        verify(entityAlarmManager, never()).save(any());
-        verify(alarmRuleTriggerService, never()).processDriverAlarm(any());
-    }
-
-    @Test
-    void onlineDeviceExpiredWritesAlarmAndUpdatesState() {
+    void onlineDeviceExpiredWritesAlarmAndUpdatesState() throws Exception {
         EntityStateDO expired = deviceState(10L, 7L,
                 (byte) DeviceStatusEnum.ONLINE.getIndex(),
                 2L, LocalDateTime.now().minusSeconds(10));
 
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.lt(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.last(any())).thenReturn(queryWrapper);
-        when(queryWrapper.list()).thenReturn(List.of(expired));
-        when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
-        when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.update()).thenReturn(true);
+        stubDeviceQuery(List.of(expired));
+        stubClaimSuccess();
         when(entityAlarmManager.save(any())).thenReturn(true);
 
-        scanner.scanExpiredLeases();
+        scanner.onScanTick(channel, mockMessage(1L));
 
         verify(entityAlarmManager).save(any());
         verify(alarmRuleTriggerService).processDeviceAlarm(any());
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
     }
 
     @Test
-    void multipleExpiredRowsAllProcessed() {
-        EntityStateDO driver = driverState(1L,
-                (byte) DriverStatusEnum.ONLINE.getIndex(),
-                1L, LocalDateTime.now().minusSeconds(10));
-        EntityStateDO device = deviceState(10L, 1L,
+    void claimFailsWhenAnotherInstanceAlreadyProcessed() throws Exception {
+        EntityStateDO expired = deviceState(10L, 7L,
                 (byte) DeviceStatusEnum.ONLINE.getIndex(),
-                1L, LocalDateTime.now().minusSeconds(10));
+                3L, LocalDateTime.now().minusSeconds(10));
 
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.lt(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.last(any())).thenReturn(queryWrapper);
-        when(queryWrapper.list()).thenReturn(List.of(driver, device));
-        when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
-        when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.update()).thenReturn(true);
-        when(entityAlarmManager.save(any())).thenReturn(true);
+        stubDeviceQuery(List.of(expired));
+        stubClaimFailure();
 
-        scanner.scanExpiredLeases();
+        scanner.onScanTick(channel, mockMessage(1L));
 
-        InOrder inOrder = inOrder(alarmRuleTriggerService);
-        inOrder.verify(alarmRuleTriggerService).processDriverAlarm(any());
-        inOrder.verify(alarmRuleTriggerService).processDeviceAlarm(any());
+        verify(entityAlarmManager, never()).save(any());
+        verify(alarmRuleTriggerService, never()).processDeviceAlarm(any());
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void scanTickPublishesNextTickOnSuccess() throws Exception {
+        stubDeviceQuery(Collections.emptyList());
+
+        scanner.onScanTick(channel, mockMessage(1L));
+
+        verify(rabbitTemplate).convertAndSend(
+                "dc3.e.state_timeout_delay",
+                "state.timeout.device.scan.tick",
+                "tick");
+    }
+
+    @Test
+    void scanTickNacksAndRequeuesOnFailure() throws Exception {
+        when(entityStateManager.lambdaQuery()).thenThrow(new RuntimeException("DB down"));
+
+        scanner.onScanTick(channel, mockMessage(1L));
+
+        verify(channel).basicNack(1L, false, true);
+        // next tick NOT published on failure
+        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), anyString());
     }
 }
