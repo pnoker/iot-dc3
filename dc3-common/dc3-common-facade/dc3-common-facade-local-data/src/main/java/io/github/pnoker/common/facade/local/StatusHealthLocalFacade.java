@@ -30,7 +30,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -49,19 +49,16 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class StatusHealthLocalFacade implements StatusHealthFacade {
 
-    @Resource
-    private DeviceFacade deviceFacade;
+    private final DeviceFacade deviceFacade;
 
-    @Resource
-    private DriverFacade driverFacade;
+    private final DriverFacade driverFacade;
 
-    @Resource
-    private LocalCacheService localCacheService;
+    private final LocalCacheService localCacheService;
 
-    @Resource
-    private SystemHealthService systemHealthService;
+    private final SystemHealthService systemHealthService;
 
     @Override
     public Map<Long, String> selectDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {

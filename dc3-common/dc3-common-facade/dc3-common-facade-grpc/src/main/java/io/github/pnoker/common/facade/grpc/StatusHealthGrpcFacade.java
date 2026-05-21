@@ -32,7 +32,7 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -50,13 +50,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class StatusHealthGrpcFacade implements StatusHealthFacade {
 
-    @Resource
-    private StatusHealthApiGrpc.StatusHealthApiBlockingStub statusHealthApiBlockingStub;
+    private final StatusHealthApiGrpc.StatusHealthApiBlockingStub statusHealthApiBlockingStub;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public Map<Long, String> selectDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {

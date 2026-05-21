@@ -26,7 +26,7 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcTenantBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -39,16 +39,14 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TenantGrpcFacade implements TenantFacade {
 
-    @Resource
-    private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
+    private final TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcTenantBuilder facadeGrpcTenantBuilder;
+    private final FacadeGrpcTenantBuilder facadeGrpcTenantBuilder;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public FacadeTenantBO getByCode(String code) {

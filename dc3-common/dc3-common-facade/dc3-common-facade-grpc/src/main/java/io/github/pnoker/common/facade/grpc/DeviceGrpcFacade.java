@@ -35,7 +35,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcDeviceBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -57,16 +57,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DeviceGrpcFacade implements DeviceFacade {
 
-    @Resource
-    private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
+    private final DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcDeviceBuilder facadeGrpcDeviceBuilder;
+    private final FacadeGrpcDeviceBuilder facadeGrpcDeviceBuilder;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public FacadeDeviceBO getById(Long id) {

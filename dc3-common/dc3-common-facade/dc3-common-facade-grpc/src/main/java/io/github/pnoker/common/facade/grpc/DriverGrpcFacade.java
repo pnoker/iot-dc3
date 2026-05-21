@@ -34,7 +34,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcDriverBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -53,16 +53,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DriverGrpcFacade implements DriverFacade {
 
-    @Resource
-    private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
+    private final DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcDriverBuilder facadeGrpcDriverBuilder;
+    private final FacadeGrpcDriverBuilder facadeGrpcDriverBuilder;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public FacadeDriverBO getById(Long id) {

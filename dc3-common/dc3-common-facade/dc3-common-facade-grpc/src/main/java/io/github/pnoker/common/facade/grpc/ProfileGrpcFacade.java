@@ -33,7 +33,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcProfileBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -51,16 +51,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ProfileGrpcFacade implements ProfileFacade {
 
-    @Resource
-    private ProfileApiGrpc.ProfileApiBlockingStub profileApiBlockingStub;
+    private final ProfileApiGrpc.ProfileApiBlockingStub profileApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcProfileBuilder facadeGrpcProfileBuilder;
+    private final FacadeGrpcProfileBuilder facadeGrpcProfileBuilder;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public FacadeProfileBO getById(Long id) {

@@ -28,7 +28,7 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcPointValueBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -48,16 +48,14 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointValueGrpcFacade implements PointValueFacade {
 
-    @Resource
-    private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
+    private final PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
 
-    @Resource
-    private FacadeGrpcPointValueBuilder facadeGrpcPointValueBuilder;
+    private final FacadeGrpcPointValueBuilder facadeGrpcPointValueBuilder;
 
-    @Resource
-    private GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
     public FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId) {

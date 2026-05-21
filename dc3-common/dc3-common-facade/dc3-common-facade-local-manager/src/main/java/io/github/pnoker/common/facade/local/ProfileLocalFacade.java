@@ -26,7 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeProfileBuilder;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.manager.service.ProfileService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -45,13 +45,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ProfileLocalFacade implements ProfileFacade {
 
-    @Resource
-    private ProfileService profileService;
+    private final ProfileService profileService;
 
-    @Resource
-    private FacadeProfileBuilder facadeProfileBuilder;
+    private final FacadeProfileBuilder facadeProfileBuilder;
 
     @Override
     public FacadeProfileBO getById(Long id) {

@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.service.TenantService;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.local.builder.FacadeTenantBuilder;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -37,13 +37,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TenantLocalFacade implements TenantFacade {
 
-    @Resource
-    private TenantService tenantService;
+    private final TenantService tenantService;
 
-    @Resource
-    private FacadeTenantBuilder facadeTenantBuilder;
+    private final FacadeTenantBuilder facadeTenantBuilder;
 
     @Override
     public FacadeTenantBO getByCode(String code) {
