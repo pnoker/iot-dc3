@@ -15,34 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.center.data;
+package io.github.pnoker.common.data.dal;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import com.baomidou.mybatisplus.extension.service.IService;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 
 /**
- * Data Center Service Application
- * <p>
- * Main entry point for Data Center Service. This service handles data collection,
- * storage, and processing for IoT devices.
- * </p>
+ * Manager for dc3_entity_state table.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
+ * @version 2026.5.21
+ * @since 2026.5.21
  */
-@SpringBootApplication
-@EnableScheduling
-public class DataApplication {
-
-    /**
-     * Main entry point for the Data Center Service.
-     *
-     * @param args command line arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(DataApplication.class, args);
-    }
+public interface EntityStateManager extends IService<EntityStateDO> {
 
 }
