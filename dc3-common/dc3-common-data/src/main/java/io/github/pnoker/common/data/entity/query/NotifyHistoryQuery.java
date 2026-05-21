@@ -62,7 +62,7 @@ public class NotifyHistoryQuery implements Serializable {
 
     private Long channelId;
 
-    private Long eventId;
+    private Long alarmId;
 
     private NotifyChannelTypeFlagEnum channelTypeFlag;
 

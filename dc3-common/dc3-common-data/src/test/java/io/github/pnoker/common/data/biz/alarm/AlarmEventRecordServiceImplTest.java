@@ -85,7 +85,7 @@ class AlarmEventRecordServiceImplTest {
     @Test
     void persistsEntityAlarmWithSeverityFromRuleExt() {
         RuleMatch match = firingMatch("P0");
-        when(ruleStateLookup.findFiringEventId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
+        when(ruleStateLookup.findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
         when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenAnswer(inv -> {
             EntityAlarmDO d = inv.getArgument(0);
             d.setId(42L);
@@ -102,13 +102,13 @@ class AlarmEventRecordServiceImplTest {
         assertThat(persisted.getRuleId()).isEqualTo(1L);
         assertThat(persisted.getTenantId()).isEqualTo(7L);
         // The fact gets the new alarm id back so downstream notification persists it
-        assertThat(match.getFact().getEventId()).isEqualTo(42L);
+        assertThat(match.getFact().getAlarmId()).isEqualTo(42L);
     }
 
     @Test
     void defaultsToP2WhenSeverityIsBlank() {
         RuleMatch match = firingMatch(null);
-        when(ruleStateLookup.findFiringEventId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
+        when(ruleStateLookup.findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
         when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenAnswer(inv -> {
             EntityAlarmDO d = inv.getArgument(0);
             d.setId(99L);
@@ -123,16 +123,16 @@ class AlarmEventRecordServiceImplTest {
     }
 
     @Test
-    void reusesExistingFiringEventIdAndSkipsInsert() {
+    void reusesExistingFiringAlarmIdAndSkipsInsert() {
         RuleMatch match = firingMatch("P1");
-        when(ruleStateLookup.findFiringEventId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(101L);
+        when(ruleStateLookup.findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(101L);
 
         service.ensureEvent(match);
 
         // No new entity alarm is written when a firing one already exists; the
-        // fact's eventId is just rebound to the existing alarm.
+        // fact's alarmId is just rebound to the existing alarm.
         verify(entityAlarmManager, never()).save(any());
-        assertThat(match.getFact().getEventId()).isEqualTo(101L);
+        assertThat(match.getFact().getAlarmId()).isEqualTo(101L);
     }
 
     @Test
@@ -141,24 +141,24 @@ class AlarmEventRecordServiceImplTest {
         // ensureEvent should not create a new EntityAlarm row for a RECOVERY match
         // when no firing alarm exists to recover from.
         RuleMatch match = recoveryMatch();
-        when(ruleStateLookup.findFiringEventId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
+        when(ruleStateLookup.findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
 
         service.ensureEvent(match);
 
         verify(entityAlarmManager, never()).save(any());
-        assertThat(match.getFact().getEventId()).isNull();
+        assertThat(match.getFact().getAlarmId()).isNull();
         assertThat(match.getMatchType()).isEqualTo(AlarmConstant.MATCH_TYPE_RECOVERY);
     }
 
     @Test
-    void skipsWhenFactAlreadyHasEventId() {
+    void skipsWhenFactAlreadyHasAlarmId() {
         RuleMatch match = firingMatch("P1");
-        match.getFact().setEventId(55L);
+        match.getFact().setAlarmId(55L);
 
         service.ensureEvent(match);
 
         verify(entityAlarmManager, never()).save(any());
-        verify(ruleStateLookup, never()).findFiringEventId(anyLong(), anyLong(), anyByte(), anyLong());
+        verify(ruleStateLookup, never()).findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong());
     }
 
 }

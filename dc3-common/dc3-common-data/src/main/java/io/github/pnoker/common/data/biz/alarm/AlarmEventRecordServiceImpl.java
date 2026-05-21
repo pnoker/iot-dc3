@@ -58,13 +58,13 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
             return;
         }
         RuleFact fact = match.getFact();
-        if (isValidId(fact.getEventId())) {
+        if (isValidId(fact.getAlarmId())) {
             return;
         }
 
-        Long firingEventId = findFiringEventId(match);
-        if (isValidId(firingEventId)) {
-            fact.setEventId(firingEventId);
+        Long firingAlarmId = findFiringAlarmId(match);
+        if (isValidId(firingAlarmId)) {
+            fact.setAlarmId(firingAlarmId);
             return;
         }
         if (!StringUtils.equalsIgnoreCase(AlarmConstant.MATCH_TYPE_FIRING, match.getMatchType())) {
@@ -73,7 +73,7 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
 
         Long alarmId = persistEntityAlarm(match);
         if (isValidId(alarmId)) {
-            fact.setEventId(alarmId);
+            fact.setAlarmId(alarmId);
         }
     }
 
@@ -159,13 +159,13 @@ public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
         return ext;
     }
 
-    private Long findFiringEventId(RuleMatch match) {
+    private Long findFiringAlarmId(RuleMatch match) {
         RuleFact fact = match.getFact();
         if (!isValidId(match.getRule().getId()) || !isValidId(fact.getTenantId())
                 || Objects.isNull(fact.getAlarmTargetTypeFlag()) || !isValidId(fact.getEntityId())) {
             return null;
         }
-        return ruleStateLookup.findFiringEventId(
+        return ruleStateLookup.findFiringAlarmId(
                 fact.getTenantId(),
                 match.getRule().getId(),
                 fact.getAlarmTargetTypeFlag().getIndex(),

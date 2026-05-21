@@ -235,7 +235,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
             state.setTriggerCount(0L);
             state.setTenantId(fact.getTenantId());
         }
-        state.setEventId(Objects.requireNonNullElse(fact.getEventId(), DefaultConstant.DEFAULT_ID));
+        state.setAlarmId(Objects.requireNonNullElse(fact.getAlarmId(), DefaultConstant.DEFAULT_ID));
         state.setStateExt(ruleStateExt(match));
 
         if (isRecovery) {
@@ -327,7 +327,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         history.setMessageId(Objects.nonNull(message) ? message.getId()
                 : Objects.requireNonNullElse(match.getRule().getMessageId(), DefaultConstant.DEFAULT_ID));
         history.setChannelId(Objects.nonNull(channel) ? channel.getId() : bind.getChannelId());
-        history.setEventId(Objects.requireNonNullElse(match.getFact().getEventId(), DefaultConstant.DEFAULT_ID));
+        history.setAlarmId(Objects.requireNonNullElse(match.getFact().getAlarmId(), DefaultConstant.DEFAULT_ID));
         history.setChannelTypeFlag(Objects.nonNull(channel) ? channel.getChannelTypeFlag() : payload.getChannelTypeFlag());
         history.setTarget(Objects.toString(result.getTarget(), ""));
         history.setStatusFlag(result.getStatusFlag());

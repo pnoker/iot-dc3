@@ -51,7 +51,7 @@ public class NotifyHistoryBO extends BaseBO implements TenantOwned {
 
     private Long channelId;
 
-    private Long eventId;
+    private Long alarmId;
 
     private NotifyChannelTypeFlagEnum channelTypeFlag;
 

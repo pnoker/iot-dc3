@@ -48,7 +48,7 @@ public class RuleFact {
 
     private Long entityId;
 
-    private Long eventId;
+    private Long alarmId;
 
     private LocalDateTime factTime;
 

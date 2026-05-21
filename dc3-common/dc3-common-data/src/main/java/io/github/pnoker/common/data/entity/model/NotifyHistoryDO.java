@@ -63,8 +63,8 @@ public class NotifyHistoryDO implements Serializable {
     @TableField("channel_id")
     private Long channelId;
 
-    @TableField("event_id")
-    private Long eventId;
+    @TableField("alarm_id")
+    private Long alarmId;
 
     @TableField("channel_type_flag")
     private Byte channelTypeFlag;
