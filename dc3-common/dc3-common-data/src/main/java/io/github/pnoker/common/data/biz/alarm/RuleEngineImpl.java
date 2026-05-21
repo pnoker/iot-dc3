@@ -17,11 +17,8 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.data.dal.RuleManager;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
-import io.github.pnoker.common.data.entity.model.RuleDO;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +29,14 @@ import java.util.Objects;
 /**
  * Deterministic rule engine implementation.
  *
+ * <p>Recovery is treated as a state transition, not an independent match: even
+ * when the current fact satisfies the rule's recovery condition, no
+ * {@link RuleMatch.recovery} is produced unless an existing FIRING row in
+ * {@code dc3_rule_state} attests that the rule actually fired earlier. Without
+ * this guard a cold start would emit {@code RECOVERED} notifications for rules
+ * that never fired, and any normal data point that happens to satisfy the
+ * recovery threshold would do the same.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
@@ -40,9 +45,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RuleEngineImpl implements RuleEngine {
 
-    private static final long GLOBAL_ENTITY_ID = 0L;
+    private final RuleCandidateLookup ruleCandidateLookup;
 
-    private final RuleManager ruleManager;
+    private final RuleStateLookup ruleStateLookup;
 
     private final RuleBuilder ruleBuilder;
 
@@ -55,28 +60,29 @@ public class RuleEngineImpl implements RuleEngine {
             return List.of();
         }
 
-        List<RuleBO> rules = ruleBuilder.buildBOListByDOList(loadCandidateRules(fact));
+        List<RuleBO> rules = ruleBuilder.buildBOListByDOList(ruleCandidateLookup.findCandidates(fact));
         List<RuleMatch> matches = new ArrayList<>();
         for (RuleBO rule : rules) {
             if (ruleEvaluator.matches(rule, fact)) {
                 matches.add(RuleMatch.firing(rule, fact));
-            } else if (ruleEvaluator.recovers(rule, fact)) {
+            } else if (ruleEvaluator.recovers(rule, fact) && hasFiringState(rule, fact)) {
                 matches.add(RuleMatch.recovery(rule, fact));
             }
         }
         return matches;
     }
 
-    private List<RuleDO> loadCandidateRules(RuleFact fact) {
-        return ruleManager.lambdaQuery()
-                .eq(RuleDO::getTenantId, fact.getTenantId())
-                .eq(RuleDO::getAlarmTargetTypeFlag, fact.getAlarmTargetTypeFlag().getIndex())
-                .eq(RuleDO::getEnableFlag, EnableFlagEnum.ENABLE.getIndex())
-                .and(Objects.nonNull(fact.getEntityId()),
-                        wrapper -> wrapper.eq(RuleDO::getEntityId, fact.getEntityId())
-                                .or()
-                                .eq(RuleDO::getEntityId, GLOBAL_ENTITY_ID))
-                .list();
+    private boolean hasFiringState(RuleBO rule, RuleFact fact) {
+        if (Objects.isNull(rule) || Objects.isNull(rule.getId()) || rule.getId() <= 0
+                || Objects.isNull(fact.getEntityId()) || fact.getEntityId() <= 0
+                || Objects.isNull(rule.getAlarmTargetTypeFlag())) {
+            return false;
+        }
+        return ruleStateLookup.hasFiringState(
+                fact.getTenantId(),
+                rule.getId(),
+                rule.getAlarmTargetTypeFlag().getIndex(),
+                fact.getEntityId());
     }
 
 }
