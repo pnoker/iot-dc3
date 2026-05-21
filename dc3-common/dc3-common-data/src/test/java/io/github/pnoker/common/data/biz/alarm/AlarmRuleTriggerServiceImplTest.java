@@ -39,6 +39,9 @@ class AlarmRuleTriggerServiceImplTest {
     @Mock
     private AlarmRulePipelineService alarmRulePipelineService;
 
+    @Mock
+    private WindowSampleBuffer windowSampleBuffer;
+
     @InjectMocks
     private AlarmRuleTriggerServiceImpl service;
 

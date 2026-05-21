@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+
 /**
  * Alarm rule trigger service implementation.
  *
@@ -45,18 +46,29 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
 
     private final AlarmRulePipelineService alarmRulePipelineService;
 
+    private final WindowSampleBuffer windowSampleBuffer;
+
     @Override
     public void processPointValue(PointValueBO pointValue) {
         if (Objects.isNull(pointValue) || !isValidId(pointValue.getTenantId()) || !isValidId(pointValue.getPointId())) {
             return;
         }
 
+        // Append to the in-memory window buffer *before* dispatching to the
+        // pipeline so the rule engine, when it asks for a window snapshot,
+        // already sees the current sample. Keeps "evaluation includes the
+        // triggering fact" intuition intact.
+        LocalDateTime ts = factTime(pointValue.getCreateTime());
+        windowSampleBuffer.append(
+                WindowSampleKey.of(pointValue.getTenantId(), AlarmTargetTypeFlagEnum.POINT, pointValue.getPointId()),
+                new WindowSample(pointValue.getNumValue(), pointValue.getCalValue(), ts));
+
         process(new RuleFact(
                 pointValue.getTenantId(),
                 AlarmTargetTypeFlagEnum.POINT,
                 pointValue.getPointId(),
                 null,
-                factTime(pointValue.getCreateTime()),
+                ts,
                 RuleFactValues.point(pointValue)));
     }
 
