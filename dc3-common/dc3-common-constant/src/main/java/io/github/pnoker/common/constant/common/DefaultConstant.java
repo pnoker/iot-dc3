@@ -37,6 +37,13 @@ public class DefaultConstant {
     public static final Integer DEFAULT_INT = 0;
 
     /**
+     * Default placeholder for an absent or unset {@code Long} identifier:
+     * {@code 0L}. Use with primitive {@code ==} comparison after a
+     * {@link java.util.Objects#isNull(Object)} check on the boxed value.
+     */
+    public static final long DEFAULT_ID = 0L;
+
+    /**
      * Zero constant: {@code 0}.
      */
     public static final Integer ZERO = 0;
