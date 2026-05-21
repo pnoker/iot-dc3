@@ -31,8 +31,9 @@ import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.exception.RequestException;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -49,19 +50,16 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SessionServiceImpl implements SessionService {
 
-    @Resource
-    private SessionBuilder sessionBuilder;
+    private final SessionBuilder sessionBuilder;
 
-    @Resource
-    private SessionManager sessionManager;
+    private final SessionManager sessionManager;
 
-    @Resource
-    private ChatMemory agenticChatMemory;
+    private final ChatMemory agenticChatMemory;
 
-    @Resource
-    private MessageService messageService;
+    private final MessageService messageService;
 
     @Override
     public SessionBO touch(String conversationId, Long tenantId, Long userId) {
@@ -176,7 +174,7 @@ public class SessionServiceImpl implements SessionService {
     private LambdaQueryWrapper<SessionDO> fuzzyQuery(SessionQuery query) {
         LambdaQueryWrapper<SessionDO> wrapper = Wrappers.<SessionDO>query().lambda();
         wrapper.eq(Objects.nonNull(query.getTenantId()), SessionDO::getTenantId, query.getTenantId());
-        wrapper.eq(Objects.nonNull(query.getUserId()), SessionDO::getUserId, query.getUserId());
+        wrapper.eq(FieldUtil.isValidIdField(query.getUserId()), SessionDO::getUserId, query.getUserId());
         wrapper.like(StringUtils.isNotEmpty(query.getConversationId()), SessionDO::getConversationId,
                 query.getConversationId());
         wrapper.orderByDesc(SessionDO::getOperateTime);
