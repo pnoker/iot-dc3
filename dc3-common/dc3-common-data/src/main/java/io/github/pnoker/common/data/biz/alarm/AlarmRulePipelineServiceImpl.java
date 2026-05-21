@@ -17,12 +17,15 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Alarm rule processing pipeline implementation.
@@ -49,6 +52,41 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
             histories.addAll(ruleNotificationService.notify(match));
         }
         return histories;
+    }
+
+    @Override
+    public List<NotifyHistoryBO> processBatch(List<RuleFact> facts) {
+        if (facts == null || facts.isEmpty()) {
+            return List.of();
+        }
+        List<RuleFact> validFacts = facts.stream()
+                .filter(Objects::nonNull)
+                .filter(f -> Objects.nonNull(f.getTenantId()))
+                .filter(f -> Objects.nonNull(f.getAlarmTargetTypeFlag()))
+                .toList();
+        if (validFacts.isEmpty()) {
+            return List.of();
+        }
+
+        // Group by (tenantId, alarmTargetTypeFlag, entityId) so RuleRegistry
+        // cache lookups amortize across all facts in the same group.
+        Map<RuleRegistry.RuleCacheKey, List<RuleFact>> grouped = validFacts.stream()
+                .collect(Collectors.groupingBy(f ->
+                        new RuleRegistry.RuleCacheKey(f.getTenantId(), f.getAlarmTargetTypeFlag(), f.getEntityId())));
+
+        List<RuleMatch> allMatches = new ArrayList<>();
+        for (List<RuleFact> group : grouped.values()) {
+            for (RuleFact fact : group) {
+                for (RuleMatch match : ruleEngine.evaluate(fact)) {
+                    alarmEventRecordService.ensureEvent(match);
+                    allMatches.add(match);
+                }
+            }
+        }
+        if (allMatches.isEmpty()) {
+            return List.of();
+        }
+        return ruleNotificationService.notifyBatch(allMatches);
     }
 
 }
