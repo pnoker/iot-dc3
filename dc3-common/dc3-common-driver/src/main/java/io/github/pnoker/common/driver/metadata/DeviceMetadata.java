@@ -17,32 +17,33 @@
 
 package io.github.pnoker.common.driver.metadata;
 
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.grpc.client.DeviceClient;
-import io.github.pnoker.common.exception.ConfigException;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 /**
  * Device metadata cache that loads device definitions and resolves driver and point
  * configuration views for the driver runtime.
+ *
+ * <p>Cache freshness is event-driven: RabbitMQ metadata events call
+ * {@link #loadCache(long)} or {@link #removeCache(long)}. There is no TTL — the
+ * {@code maximumSize} bound only caps memory.
+ *
+ * <p>When the upstream loader returns {@code null} (the device has been removed at
+ * the manager center but the DELETE event was missed or delayed), the cache also
+ * drops the orphan id from {@link DriverMetadata#getDeviceIds()} so the periodic
+ * read scan stops re-fetching a non-existent device.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -50,101 +51,36 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public final class DeviceMetadata {
-
-    /**
-     * Asynchronous cache keyed by device identifier. No time-based expiration —
-     * cache contents are kept current by RabbitMQ metadata events that call
-     * {@link #loadCache(long)} or {@link #removeCache(long)}; the
-     * {@code maximumSize} bound caps memory if the driver attaches an
-     * unexpectedly large device fleet.
-     */
-    private final AsyncLoadingCache<Long, DeviceBO> cache;
+public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
 
     private final DriverMetadata driverMetadata;
 
-    private final DeviceClient deviceClient;
-
-    public DeviceMetadata(DriverMetadata driverMetadata, DeviceClient deviceClient) {
+    public DeviceMetadata(DriverProperties driverProperties,
+                          DriverMetadata driverMetadata,
+                          DeviceClient deviceClient) {
+        super(driverProperties.getMetadata().getCache(), "device", deviceClient::getById);
         this.driverMetadata = driverMetadata;
-        this.deviceClient = deviceClient;
-        this.cache = Caffeine.newBuilder()
-                .maximumSize(MetadataCacheConstants.MAX_CACHE_SIZE)
-                .removalListener(
-                        (key, value, cause) -> log.info("Remove key={}, value={} cache, reason is: {}", key, value, cause))
-                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> {
-                    log.info("Load device metadata by id: {}", key);
-                    DeviceBO deviceBO = deviceClient.getById(key);
-                    log.info("Cache device metadata: {}", JsonUtil.toJsonString(deviceBO));
-                    return deviceBO;
-                }, executor));
     }
 
-    /**
-     * Returns the cached device metadata for the specified device identifier.
-     *
-     * @param id device identifier
-     * @return cached device business object
-     */
-    public DeviceBO getCache(long id) {
-        try {
-            CompletableFuture<DeviceBO> future = cache.get(id);
-            return future.get(MetadataCacheConstants.CACHE_LOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("Interrupted while loading device cache, deviceId={}", id, e);
-            return null;
-        } catch (TimeoutException e) {
-            log.warn("Timed out loading device cache after {}s, deviceId={}", MetadataCacheConstants.CACHE_LOAD_TIMEOUT_SECONDS, id);
-            return null;
-        } catch (ExecutionException e) {
-            log.error("Failed to load device cache, deviceId={}", id, e);
-            return null;
+    @Override
+    protected void postLoad(long id, DeviceBO value) {
+        if (value == null) {
+            // Manager has dropped this device; drop the orphan id so the Quartz read
+            // scan stops attempting to read a record that no longer exists.
+            if (driverMetadata.getDeviceIds().remove(id)) {
+                log.info("Drop orphan device id={} after upstream returned null", id);
+            }
         }
     }
 
     /**
-     * Reloads the cache entry for the specified device identifier.
-     *
-     * @param id device identifier
-     */
-    public void loadCache(long id) {
-        CompletableFuture.supplyAsync(() -> deviceClient.getById(id))
-                .whenComplete((device, throwable) -> {
-                    if (Objects.nonNull(throwable)) {
-                        log.error("Failed to reload device metadata, deviceId={}", id, throwable);
-                        return;
-                    }
-                    if (Objects.isNull(device)) {
-                        cache.synchronous().invalidate(id);
-                        return;
-                    }
-                    cache.put(id, CompletableFuture.completedFuture(device));
-                });
-    }
-
-    /**
-     * Removes the cache entry for the specified device identifier.
-     *
-     * @param id device identifier
-     */
-    public void removeCache(long id) {
-        cache.synchronous().invalidate(id);
-    }
-
-    /**
-     * Clears all cached device metadata.
-     */
-    public void clearCache() {
-        cache.synchronous().invalidateAll();
-    }
-
-    /**
      * Resolves driver attribute configuration for the specified device and verifies that
-     * all required attributes are present.
+     * all required attributes are present. Returns an empty map when the configuration
+     * is incomplete or the device cannot be resolved — never throws, so callers can
+     * uniformly short-circuit on {@link Map#isEmpty()}.
      *
      * @param deviceId device identifier
-     * @return driver configuration map keyed by attribute code
+     * @return driver configuration map keyed by attribute code, or an empty map
      */
     public Map<String, AttributeBO> getDriverConfig(long deviceId) {
         Map<Long, DriverAttributeDTO> attributeMap = driverMetadata.getDriverAttributeIdMap();
@@ -153,15 +89,17 @@ public final class DeviceMetadata {
         }
 
         DeviceBO device = getCache(deviceId);
-        if (Objects.isNull(device)) {
-            throw new ConfigException("Failed to get driver config, the device is empty");
+        if (device == null) {
+            log.warn("Driver config unavailable, deviceId={}, reason=device cache miss", deviceId);
+            return Map.of();
         }
 
         Map<Long, DriverAttributeConfigDTO> attributeConfigMap = device.getDriverAttributeConfigIdMap();
         if (MapUtils.isEmpty(attributeConfigMap)
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
-            log.warn("Driver attribute config incomplete for device[{}], required={}, configured={}",
-                    deviceId, attributeMap.keySet(), attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
+            log.warn("Driver config incomplete, deviceId={}, required={}, configured={}",
+                    deviceId, attributeMap.keySet(),
+                    attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
             return Map.of();
         }
 
@@ -176,6 +114,8 @@ public final class DeviceMetadata {
 
     /**
      * Resolves point attribute configuration for all points of the specified device.
+     * Points with incomplete configuration are filtered out silently; an empty map is
+     * returned when the device or its point-config map is unavailable.
      *
      * @param deviceId device identifier
      * @return point configuration map keyed by point identifier and attribute code
@@ -187,14 +127,15 @@ public final class DeviceMetadata {
         }
 
         DeviceBO device = getCache(deviceId);
-        if (Objects.isNull(device)) {
-            throw new ConfigException("Failed to get point config[{}], the device is empty", deviceId);
+        if (device == null) {
+            log.warn("Point config unavailable, deviceId={}, reason=device cache miss", deviceId);
+            return Map.of();
         }
 
         Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigMap = device.getPointAttributeConfigIdMap();
-        if (Objects.isNull(pointAttributeConfigMap)) {
-            throw new ConfigException("Failed to get point config[{}], the device point attribute config is empty",
-                    deviceId);
+        if (MapUtils.isEmpty(pointAttributeConfigMap)) {
+            log.warn("Point config unavailable, deviceId={}, reason=empty point-attribute-config map", deviceId);
+            return Map.of();
         }
 
         return pointAttributeConfigMap.entrySet()
@@ -213,10 +154,12 @@ public final class DeviceMetadata {
 
     /**
      * Resolves point attribute configuration for a single point of the specified device.
+     * Returns an empty map when any required piece of context is missing — same
+     * short-circuit semantics as {@link #getDriverConfig(long)}.
      *
      * @param deviceId device identifier
      * @param pointId  point identifier
-     * @return point configuration map keyed by attribute code
+     * @return point configuration map keyed by attribute code, or an empty map
      */
     public Map<String, AttributeBO> getPointConfig(long deviceId, long pointId) {
         Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();
@@ -225,24 +168,25 @@ public final class DeviceMetadata {
         }
 
         DeviceBO device = getCache(deviceId);
-        if (Objects.isNull(device)) {
-            throw new ConfigException("Failed to get point config[{}:{}], the device is empty", deviceId, pointId);
+        if (device == null) {
+            log.warn("Point config unavailable, deviceId={}, pointId={}, reason=device cache miss", deviceId, pointId);
+            return Map.of();
         }
 
         Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigMap = device.getPointAttributeConfigIdMap();
-        if (Objects.isNull(pointAttributeConfigMap)) {
-            throw new ConfigException("Failed to get point config[{}:{}], the device point attribute config is empty",
+        if (MapUtils.isEmpty(pointAttributeConfigMap)) {
+            log.warn("Point config unavailable, deviceId={}, pointId={}, reason=empty point-attribute-config map",
                     deviceId, pointId);
+            return Map.of();
         }
 
         Map<Long, PointAttributeConfigDTO> attributeConfigMap = pointAttributeConfigMap.get(pointId);
-        if (MapUtils.isEmpty(attributeConfigMap)) {
-            throw new ConfigException("Failed to get point config[{}:{}], the point attribute config is empty",
-                    deviceId, pointId);
-        }
-        if (!attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
-            throw new ConfigException("Failed to get point config[{}:{}], the point attribute config is incomplete",
-                    deviceId, pointId);
+        if (MapUtils.isEmpty(attributeConfigMap)
+                || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
+            log.warn("Point config incomplete, deviceId={}, pointId={}, required={}, configured={}",
+                    deviceId, pointId, attributeMap.keySet(),
+                    attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
+            return Map.of();
         }
 
         return attributeMap.entrySet()

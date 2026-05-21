@@ -47,6 +47,12 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         DriverBO driver = driverMetadata.getDriver();
+        if (driver == null) {
+            // Driver has not yet registered (or was just cleared by a DRIVER DELETE
+            // event). Skip this tick instead of NPE'ing into Quartz.
+            log.warn("Skip driver state report: driver metadata is not initialized");
+            return;
+        }
         DriverStateDTO driverState = new DriverStateDTO(driver.getId(), driverMetadata.getDriverStatus().getCode());
         driverState.setTenantId(driver.getTenantId());
         log.info("Report driver state: {}", JsonUtil.toJsonString(driverState));

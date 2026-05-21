@@ -21,6 +21,7 @@ import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -85,6 +86,12 @@ public class DriverProperties {
     private ScheduleProperties schedule;
 
     /**
+     * Metadata cache tuning for the driver runtime.
+     */
+    @Valid
+    private MetadataProperties metadata = new MetadataProperties();
+
+    /**
      * Driver-level attribute definitions declared in configuration.
      */
     private List<@Valid DriverAttributeDTO> driverAttribute;
@@ -118,6 +125,44 @@ public class DriverProperties {
      * Driver client identifier used for queue and registration routing.
      */
     private String client;
+
+    /**
+     * Tunables for the driver-side metadata caches (device/point).
+     */
+    @Getter
+    @Setter
+    public static class MetadataProperties {
+
+        @Valid
+        private CacheProperties cache = new CacheProperties();
+
+        @Getter
+        @Setter
+        public static class CacheProperties {
+
+            /**
+             * Maximum number of entries kept in each metadata cache. Eviction is
+             * size-based; freshness comes from RabbitMQ events, not TTL.
+             */
+            @Min(1)
+            private long maxSize = 5000L;
+
+            /**
+             * Upper bound on a single cache lookup. Expired waits return {@code null}
+             * so a stuck manager center cannot pin Quartz/RabbitMQ worker threads.
+             */
+            @Min(1)
+            private long loadTimeoutSeconds = 5L;
+
+            /**
+             * Whether Caffeine should record hit/miss/eviction statistics. Off by
+             * default — flip on when diagnosing cache behavior in production.
+             */
+            private boolean recordStats = false;
+
+        }
+
+    }
 
     /**
      * Scheduling options for built-in driver jobs.

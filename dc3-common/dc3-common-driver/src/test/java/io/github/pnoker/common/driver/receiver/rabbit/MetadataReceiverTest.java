@@ -29,6 +29,7 @@ import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.exception.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -187,5 +188,23 @@ class MetadataReceiverTest {
                 .when(metadataEventPublisher).publishEvent(any());
         receiver.metadataReceive(channel, message, dto);
         verify(channel).basicNack(eq(7L), eq(false), eq(true));
+    }
+
+    @Test
+    void deviceAddNacksAndRequeuesWhenLoadCacheFails() throws Exception {
+        MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 10L);
+        doThrow(new ServiceException("manager center unreachable"))
+                .when(deviceMetadata).loadCache(10L);
+
+        receiver.metadataReceive(channel, message, dto);
+
+        // gRPC failure must surface as nack(requeue) rather than ack — earlier the
+        // loader was fire-and-forget and a failure silently dropped the event.
+        verify(channel).basicNack(eq(7L), eq(false), eq(true));
+        // deviceId is added before loadCache so that a Quartz scan racing with the
+        // refresh sees a consistent view; on failure the id stays so the requeued
+        // event can retry, and a confirmed-null upstream will clean it via postLoad.
+        assertThat(driverMetadata.getDeviceIds()).contains(10L);
+        verify(metadataEventPublisher, never()).publishEvent(any());
     }
 }

@@ -89,12 +89,18 @@ public class MetadataReceiver {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
                         || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
                     log.info("Upsert device: {}", entityDTO.getId());
-                    deviceMetadata.loadCache(entityDTO.getId());
+                    // Add the id first so a refresh that races with a Quartz scan does
+                    // not bypass the just-loaded entry; loadCache below either fills
+                    // the cache or, on a null upstream, removes the orphan id again.
                     driverMetadata.getDeviceIds().add(entityDTO.getId());
+                    deviceMetadata.loadCache(entityDTO.getId());
                 } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
                     log.info("Delete device: {}", entityDTO.getId());
-                    deviceMetadata.removeCache(entityDTO.getId());
+                    // Remove the id before invalidating the cache so a Quartz scan
+                    // hitting the cache between the two operations does not re-fetch
+                    // the doomed device through the loader.
                     driverMetadata.getDeviceIds().remove(entityDTO.getId());
+                    deviceMetadata.removeCache(entityDTO.getId());
                 }
 
                 // Publish device metadata event
