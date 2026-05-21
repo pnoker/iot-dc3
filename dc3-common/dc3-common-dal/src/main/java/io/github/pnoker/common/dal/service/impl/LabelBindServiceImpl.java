@@ -35,7 +35,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -50,13 +50,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class LabelBindServiceImpl implements LabelBindService {
 
-    @Resource
-    private LabelBindBuilder labelBindBuilder;
+    private final LabelBindBuilder labelBindBuilder;
 
-    @Resource
-    private LabelBindManager labelBindManager;
+    private final LabelBindManager labelBindManager;
 
     @Override
     public void add(LabelBindBO entityBO) {

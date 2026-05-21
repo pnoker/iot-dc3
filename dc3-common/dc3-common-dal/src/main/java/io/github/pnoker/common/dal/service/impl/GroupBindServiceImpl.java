@@ -35,7 +35,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -50,13 +50,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GroupBindServiceImpl implements GroupBindService {
 
-    @Resource
-    private GroupBindBuilder groupBindBuilder;
+    private final GroupBindBuilder groupBindBuilder;
 
-    @Resource
-    private GroupBindManager groupBindManager;
+    private final GroupBindManager groupBindManager;
 
     @Override
     public void add(GroupBindBO entityBO) {

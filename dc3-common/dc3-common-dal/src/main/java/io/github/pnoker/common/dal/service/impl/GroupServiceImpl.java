@@ -41,7 +41,7 @@ import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -61,16 +61,14 @@ import java.util.Set;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
-    @Resource
-    private GroupBuilder groupBuilder;
+    private final GroupBuilder groupBuilder;
 
-    @Resource
-    private GroupManager groupManager;
+    private final GroupManager groupManager;
 
-    @Resource
-    private GroupBindManager groupBindManager;
+    private final GroupBindManager groupBindManager;
 
     @Override
     public void add(GroupBO entityBO) {
