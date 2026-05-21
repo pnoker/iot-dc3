@@ -109,6 +109,10 @@ public class OfflineExpiryListener {
             log.debug("Driver {} not found when handling offline expiry", id);
             return;
         }
+        if (Objects.isNull(driver.getTenantId()) || driver.getTenantId() <= 0) {
+            log.warn("Drop driver offline alarm because tenantId could not be resolved, driverId={}", id);
+            return;
+        }
 
         String message = String.format("Driver heartbeat timed out (last=%s); marked OFFLINE", lastStatus);
         EntityAlarmDO entity = new EntityAlarmDO();
@@ -127,7 +131,7 @@ public class OfflineExpiryListener {
                 .build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(Objects.nonNull(driver.getTenantId()) ? driver.getTenantId() : 0L);
+        entity.setTenantId(driver.getTenantId());
         entityAlarmManager.save(entity);
 
         DriverAlarmDTO alarm = DriverAlarmDTO.builder()
@@ -153,6 +157,10 @@ public class OfflineExpiryListener {
             log.debug("Device {} not found when handling offline expiry", id);
             return;
         }
+        if (Objects.isNull(device.getTenantId()) || device.getTenantId() <= 0) {
+            log.warn("Drop device offline alarm because tenantId could not be resolved, deviceId={}", id);
+            return;
+        }
 
         String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", lastStatus);
         EntityAlarmDO entity = new EntityAlarmDO();
@@ -171,7 +179,7 @@ public class OfflineExpiryListener {
                 .build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(Objects.nonNull(device.getTenantId()) ? device.getTenantId() : 0L);
+        entity.setTenantId(device.getTenantId());
         entityAlarmManager.save(entity);
 
         DeviceAlarmDTO alarm = DeviceAlarmDTO.builder()
