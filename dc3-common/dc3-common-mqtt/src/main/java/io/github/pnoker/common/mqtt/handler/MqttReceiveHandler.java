@@ -22,7 +22,7 @@ import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -47,17 +47,15 @@ import java.util.concurrent.ExecutorService;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnBean(MqttReceiveService.class)
 public class MqttReceiveHandler {
 
-    @Resource
-    private MqttProperties mqttProperties;
+    private final MqttProperties mqttProperties;
 
-    @Resource
-    private MqttReceiveService mqttReceiveService;
+    private final MqttReceiveService mqttReceiveService;
 
-    @Resource
-    private ExecutorService virtualThreadExecutor;
+    private final ExecutorService virtualThreadExecutor;
 
     /**
      * Configure MQTT inbound message handler bean

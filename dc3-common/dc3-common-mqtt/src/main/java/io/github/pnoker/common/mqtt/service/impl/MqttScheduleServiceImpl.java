@@ -21,7 +21,7 @@ import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttScheduleService;
 import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
 import io.github.pnoker.common.quartz.QuartzService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
@@ -38,13 +38,12 @@ import org.springframework.stereotype.Service;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class MqttScheduleServiceImpl implements MqttScheduleService {
 
-    @Resource
-    private MqttProperties mqttProperties;
+    private final MqttProperties mqttProperties;
 
-    @Resource
-    private QuartzService quartzService;
+    private final QuartzService quartzService;
 
     @Override
     public void initial() {
