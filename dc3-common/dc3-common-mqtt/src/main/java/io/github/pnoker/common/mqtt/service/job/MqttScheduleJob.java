@@ -20,7 +20,7 @@ package io.github.pnoker.common.mqtt.service.job;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -47,6 +47,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnBean(MqttReceiveService.class)
 public class MqttScheduleJob extends QuartzJobBean {
 
@@ -58,14 +59,11 @@ public class MqttScheduleJob extends QuartzJobBean {
 
     private static final List<MqttMessage> MQTT_MESSAGES = new ArrayList<>();
 
-    @Resource
-    private MqttProperties mqttProperties;
+    private final MqttProperties mqttProperties;
 
-    @Resource
-    private MqttReceiveService mqttReceiveService;
+    private final MqttReceiveService mqttReceiveService;
 
-    @Resource
-    private ExecutorService virtualThreadExecutor;
+    private final ExecutorService virtualThreadExecutor;
 
     /**
      * Get MqttMessage list size
