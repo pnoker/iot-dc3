@@ -22,6 +22,12 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Metadata event.
  *
@@ -38,6 +44,8 @@ public class MetadataEvent extends ApplicationEvent {
 
     private final MetadataOperateTypeEnum operateType;
 
+    private final Set<String> targetServices;
+
     /**
      * Constructor.
      *
@@ -47,10 +55,29 @@ public class MetadataEvent extends ApplicationEvent {
      * @param operateType  Metadata operation type
      */
     public MetadataEvent(Object source, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
+        this(source, id, metadataType, operateType, Collections.emptySet());
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param source         Event source object
+     * @param id             Metadata ID
+     * @param metadataType   Metadata type
+     * @param operateType    Metadata operation type
+     * @param targetServices Driver services that must receive this event
+     */
+    public MetadataEvent(Object source, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType,
+                         Collection<String> targetServices) {
         super(source);
         this.id = id;
         this.metadataType = metadataType;
         this.operateType = operateType;
+        this.targetServices = Objects.isNull(targetServices) ? Collections.emptySet()
+                : targetServices.stream()
+                        .filter(Objects::nonNull)
+                        .filter(service -> !service.isBlank())
+                        .collect(Collectors.toUnmodifiableSet());
     }
 
 }

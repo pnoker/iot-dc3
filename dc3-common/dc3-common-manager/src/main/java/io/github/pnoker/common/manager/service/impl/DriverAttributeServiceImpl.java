@@ -23,6 +23,9 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -34,6 +37,7 @@ import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.builder.DriverAttributeBuilder;
 import io.github.pnoker.common.manager.entity.model.DriverAttributeDO;
 import io.github.pnoker.common.manager.entity.query.DriverAttributeQuery;
+import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.utils.FieldUtil;
@@ -46,6 +50,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Business service implementation for driver attribute operations.
@@ -65,6 +70,8 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     private final DriverService driverService;
 
+    private final MetadataEventPublisher metadataEventPublisher;
+
     @Override
     public void add(DriverAttributeBO entityBO) {
         validateTenantRelations(entityBO);
@@ -76,15 +83,17 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (!driverAttributeManager.save(entityDO)) {
             throw new AddException("Failed to create driver attribute");
         }
+        publishDriverMetadataEvent(entityDO.getDriverId());
     }
 
     @Override
     public void delete(Long id) {
-        getDOById(id, true);
+        DriverAttributeDO entityDO = getDOById(id, true);
 
         if (!driverAttributeManager.removeById(id)) {
             throw new DeleteException("Failed to remove driver attribute");
         }
+        publishDriverMetadataEvent(entityDO.getDriverId());
     }
 
     @Override
@@ -104,6 +113,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (!driverAttributeManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update driver attribute");
         }
+        publishDriverMetadataEvent(entityDO.getDriverId());
     }
 
     @Override
@@ -140,6 +150,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (!driverAttributeManager.saveBatch(doList)) {
             throw new AddException("Failed to batch create driver attributes");
         }
+        entityBOList.stream().map(DriverAttributeBO::getDriverId).distinct().forEach(this::publishDriverMetadataEvent);
     }
 
     @Override
@@ -156,6 +167,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (!driverAttributeManager.updateBatchById(doList)) {
             throw new UpdateException("Failed to batch update driver attributes");
         }
+        entityBOList.stream().map(DriverAttributeBO::getDriverId).distinct().forEach(this::publishDriverMetadataEvent);
     }
 
     @Override
@@ -163,9 +175,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return;
         }
+        List<DriverAttributeDO> entityDOList = driverAttributeManager.listByIds(ids);
         if (!driverAttributeManager.removeByIds(ids)) {
             throw new DeleteException("Failed to batch remove driver attributes");
         }
+        entityDOList.stream().map(DriverAttributeDO::getDriverId).distinct().forEach(this::publishDriverMetadataEvent);
     }
 
     @Override
@@ -224,6 +238,15 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (Objects.isNull(driverBO) || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+    }
+
+    private void publishDriverMetadataEvent(Long driverId) {
+        DriverBO driverBO = driverService.getById(driverId);
+        if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
+            return;
+        }
+        metadataEventPublisher.publishEvent(new MetadataEvent(this, driverId, MetadataTypeEnum.DRIVER,
+                MetadataOperateTypeEnum.UPDATE, Set.of(driverBO.getServiceName())));
     }
 
     /**

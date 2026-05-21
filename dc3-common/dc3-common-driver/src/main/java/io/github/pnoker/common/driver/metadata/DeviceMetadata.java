@@ -116,8 +116,18 @@ public final class DeviceMetadata {
      * @param id device identifier
      */
     public void loadCache(long id) {
-        CompletableFuture<DeviceBO> future = CompletableFuture.supplyAsync(() -> deviceClient.getById(id));
-        cache.put(id, future);
+        CompletableFuture.supplyAsync(() -> deviceClient.getById(id))
+                .whenComplete((device, throwable) -> {
+                    if (Objects.nonNull(throwable)) {
+                        log.error("Failed to reload device metadata, deviceId={}", id, throwable);
+                        return;
+                    }
+                    if (Objects.isNull(device)) {
+                        cache.synchronous().invalidate(id);
+                        return;
+                    }
+                    cache.put(id, CompletableFuture.completedFuture(device));
+                });
     }
 
     /**
@@ -126,7 +136,14 @@ public final class DeviceMetadata {
      * @param id device identifier
      */
     public void removeCache(long id) {
-        cache.put(id, CompletableFuture.completedFuture(null));
+        cache.synchronous().invalidate(id);
+    }
+
+    /**
+     * Clears all cached device metadata.
+     */
+    public void clearCache() {
+        cache.synchronous().invalidateAll();
     }
 
     /**

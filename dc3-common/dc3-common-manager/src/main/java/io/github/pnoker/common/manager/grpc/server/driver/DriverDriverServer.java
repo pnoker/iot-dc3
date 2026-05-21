@@ -23,6 +23,7 @@ import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
+import io.github.pnoker.api.common.driver.GrpcDriverQuery;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
@@ -33,12 +34,17 @@ import io.github.pnoker.common.manager.grpc.builder.GrpcDriverAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeBuilder;
 import io.github.pnoker.common.manager.service.DeviceService;
+import io.github.pnoker.common.manager.service.DriverAttributeService;
+import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * gRPC server handling driver-to-manager driver requests.
@@ -59,6 +65,12 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
     private final GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
     private final DriverRegisterService driverRegisterService;
+
+    private final DriverService driverService;
+
+    private final DriverAttributeService driverAttributeService;
+
+    private final PointAttributeService pointAttributeService;
 
     private final DeviceService deviceService;
 
@@ -108,6 +120,62 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
         builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getById(GrpcDriverQuery request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {
+        GrpcRDriverRegisterDTO.Builder builder = GrpcRDriverRegisterDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+
+        try {
+            DriverBO entityBO = driverService.getById(request.getDriverId());
+            if (Objects.isNull(entityBO)) {
+                rBuilder.setOk(false);
+                rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            } else {
+                buildMetadataResponse(builder, entityBO);
+
+                rBuilder.setOk(true);
+                rBuilder.setCode(ResponseEnum.OK.getCode());
+                rBuilder.setMessage(ResponseEnum.OK.getText());
+            }
+        } catch (Exception e) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
+            rBuilder.setMessage(e.getMessage());
+
+            log.error("Driver metadata gRPC query failed, driverId={}", request.getDriverId(), e);
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    private void buildMetadataResponse(GrpcRDriverRegisterDTO.Builder builder, DriverBO entityBO) {
+        builder.setDriver(grpcDriverBuilder.buildGrpcDTOByBO(entityBO));
+
+        List<GrpcDriverAttributeDTO> driverAttributeDTOList = Optional
+                .ofNullable(driverAttributeService.listByDriverId(entityBO.getId()))
+                .orElseGet(List::of)
+                .stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .map(grpcDriverAttributeBuilder::buildGrpcDTOByBO)
+                .toList();
+        builder.addAllDriverAttributes(driverAttributeDTOList);
+
+        List<GrpcPointAttributeDTO> pointAttributeDTOList = Optional
+                .ofNullable(pointAttributeService.listByDriverId(entityBO.getId()))
+                .orElseGet(List::of)
+                .stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .map(grpcPointAttributeBuilder::buildGrpcDTOByBO)
+                .toList();
+        builder.addAllPointAttributes(pointAttributeDTOList);
+
+        List<Long> idList = Optional.ofNullable(deviceService.listIdsByDriverId(entityBO.getId())).orElseGet(List::of);
+        builder.addAllDeviceIds(idList);
     }
 
 }

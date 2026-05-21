@@ -37,6 +37,7 @@ import io.github.pnoker.common.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.common.manager.dal.PointManager;
 import io.github.pnoker.common.manager.dal.ProfileBindManager;
 import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
@@ -49,6 +50,7 @@ import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.mapper.PointMapper;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.manager.service.ProfileService;
@@ -59,7 +61,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -98,7 +102,10 @@ public class PointServiceImpl implements PointService {
 
     private final DeviceMapper deviceMapper;
 
+    private final DriverService driverService;
+
     @Override
+    @Transactional
     public void add(PointBO entityBO) {
         validateTenantRelations(entityBO);
         checkDuplicate(entityBO, false, true);
@@ -109,16 +116,19 @@ public class PointServiceImpl implements PointService {
         }
 
         //
-        metadataEventPublisher.publishEvent(
-                new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD));
         List<Long> deviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
-        deviceIds.forEach(entityId -> metadataEventPublisher
-                .publishEvent(new MetadataEvent(this, entityId, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE)));
+        metadataEventPublisher.publishEvent(
+                new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD,
+                        driverServiceNamesByDeviceIds(deviceIds)));
+        publishDeviceUpdateEvents(deviceIds);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         PointDO entityDO = getDOById(id, true);
+        List<Long> deviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
+        Set<String> targetServices = driverServiceNamesByDeviceIds(deviceIds);
 
         if (!pointManager.removeById(id)) {
             throw new DeleteException("Failed to remove ");
@@ -126,16 +136,16 @@ public class PointServiceImpl implements PointService {
 
         //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
-                MetadataOperateTypeEnum.DELETE);
+                MetadataOperateTypeEnum.DELETE, targetServices);
         metadataEventPublisher.publishEvent(metadataEvent);
-        List<Long> deviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
-        deviceIds.forEach(entityId -> metadataEventPublisher
-                .publishEvent(new MetadataEvent(this, entityId, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE)));
+        publishDeviceUpdateEvents(deviceIds);
     }
 
     @Override
+    @Transactional
     public void update(PointBO entityBO) {
         PointDO current = getDOById(entityBO.getId(), true);
+        List<Long> oldDeviceIds = profileBindService.listDeviceIdsByProfileId(current.getProfileId());
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
@@ -150,9 +160,19 @@ public class PointServiceImpl implements PointService {
         }
 
         //
-        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
-                MetadataOperateTypeEnum.UPDATE);
-        metadataEventPublisher.publishEvent(metadataEvent);
+        if (Objects.equals(current.getProfileId(), entityDO.getProfileId())) {
+            MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
+                    MetadataOperateTypeEnum.UPDATE, driverServiceNamesByDeviceIds(oldDeviceIds));
+            metadataEventPublisher.publishEvent(metadataEvent);
+        } else {
+            List<Long> newDeviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
+            metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
+                    MetadataOperateTypeEnum.DELETE, driverServiceNamesByDeviceIds(oldDeviceIds)));
+            metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
+                    MetadataOperateTypeEnum.ADD, driverServiceNamesByDeviceIds(newDeviceIds)));
+            publishDeviceUpdateEvents(oldDeviceIds);
+            publishDeviceUpdateEvents(newDeviceIds);
+        }
     }
 
     @Override
@@ -368,6 +388,37 @@ public class PointServiceImpl implements PointService {
         if (Objects.isNull(profileBO) || !Objects.equals(entityBO.getTenantId(), profileBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+    }
+
+    private void publishDeviceUpdateEvents(Collection<Long> deviceIds) {
+        if (CollectionUtils.isEmpty(deviceIds)) {
+            return;
+        }
+        deviceIds.forEach(deviceId -> metadataEventPublisher.publishEvent(
+                new MetadataEvent(this, deviceId, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE,
+                        driverServiceNamesByDeviceId(deviceId))));
+    }
+
+    private Set<String> driverServiceNamesByDeviceIds(Collection<Long> deviceIds) {
+        if (CollectionUtils.isEmpty(deviceIds)) {
+            return Collections.emptySet();
+        }
+        return deviceIds.stream()
+                .map(this::driverServiceNamesByDeviceId)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> driverServiceNamesByDeviceId(Long deviceId) {
+        if (Objects.isNull(deviceId)) {
+            return Collections.emptySet();
+        }
+
+        DriverBO driverBO = driverService.listByDeviceId(deviceId);
+        if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
+            return Collections.emptySet();
+        }
+        return Set.of(driverBO.getServiceName());
     }
 
     /**
