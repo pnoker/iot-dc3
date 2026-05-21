@@ -33,7 +33,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -52,6 +52,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FilterServiceImpl implements FilterService {
 
     /**
@@ -70,17 +71,13 @@ public class FilterServiceImpl implements FilterService {
     private final Cache<Long, Optional<FacadeUserBO>> userCache = Caffeine.newBuilder()
             .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
 
-    @Resource
-    private TenantFacade tenantFacade;
+    private final TenantFacade tenantFacade;
 
-    @Resource
-    private UserLoginFacade userLoginFacade;
+    private final UserLoginFacade userLoginFacade;
 
-    @Resource
-    private UserFacade userFacade;
+    private final UserFacade userFacade;
 
-    @Resource
-    private TokenFacade tokenFacade;
+    private final TokenFacade tokenFacade;
 
     @Override
     public FacadeTenantBO getTenant(ServerHttpRequest request) {

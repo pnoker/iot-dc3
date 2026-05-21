@@ -23,7 +23,7 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -53,10 +53,10 @@ import java.util.Objects;
  */
 @Slf4j
 @AutoConfiguration
+@RequiredArgsConstructor
 public class WebFilterConfig {
 
-    @Resource
-    private HmacAuthSigner hmacAuthSigner;
+    private final HmacAuthSigner hmacAuthSigner;
 
     /**
      * Custom user header interceptor filter

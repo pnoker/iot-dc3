@@ -26,7 +26,6 @@ import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.exception.RequestException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -34,8 +33,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.memory.ChatMemory;
-
-import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -64,29 +61,6 @@ class SessionServiceImplTest {
 
     private static LambdaQueryWrapper<SessionDO> anySessionQuery() {
         return any();
-    }
-
-    @BeforeEach
-    void wireResources() throws Exception {
-        // SessionServiceImpl uses @Resource which @InjectMocks resolves by field name; the
-        // names match so injection should succeed but we re-set defensively in case the
-        // resolution misses.
-        for (String name : new String[]{"sessionBuilder", "sessionManager", "agenticChatMemory",
-                "messageService"}) {
-            Field f = SessionServiceImpl.class.getDeclaredField(name);
-            f.setAccessible(true);
-            if (f.get(service) == null) {
-                if ("sessionBuilder".equals(name)) {
-                    f.set(service, sessionBuilder);
-                } else if ("sessionManager".equals(name)) {
-                    f.set(service, sessionManager);
-                } else if ("agenticChatMemory".equals(name)) {
-                    f.set(service, agenticChatMemory);
-                } else {
-                    f.set(service, messageService);
-                }
-            }
-        }
     }
 
     @Test
