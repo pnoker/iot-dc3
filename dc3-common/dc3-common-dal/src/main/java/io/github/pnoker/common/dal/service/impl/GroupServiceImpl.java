@@ -147,6 +147,7 @@ public class GroupServiceImpl implements GroupService {
                 entityQuery.getGroupName());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getParentGroupId()), GroupDO::getParentGroupId,
                 entityQuery.getParentGroupId());
+        wrapper.eq(Objects.nonNull(entityQuery.getPosition()), GroupDO::getGroupIndex, entityQuery.getPosition());
         wrapper.eq(Objects.nonNull(entityQuery.getGroupTypeFlag()), GroupDO::getGroupTypeFlag,
                 Objects.isNull(entityQuery.getGroupTypeFlag()) ? null : entityQuery.getGroupTypeFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), GroupDO::getEnableFlag,
