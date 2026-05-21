@@ -120,6 +120,12 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         Map<String, Object> variables = RuleMatchVariables.of(match);
         NotifyBO notify = loadNotify(rule.getNotifyId());
         RuleStateBO state = persistRuleState(match, notify, variables);
+        if (Objects.isNull(state)) {
+            // Recovery match without a corresponding FIRING fingerprint — defensively
+            // dropped by persistRuleState. Don't fan out notifications for a state
+            // transition that did not actually happen.
+            return List.of();
+        }
         if (Objects.isNull(notify)) {
             log.warn("Skip alarm notification because notify policy does not exist, ruleId={}", rule.getId());
             return List.of();
@@ -205,6 +211,19 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         RuleFact fact = match.getFact();
         String fingerprint = fingerprint(match, notify, variables);
         RuleStateBO state = loadState(rule, fact, fingerprint);
+        boolean isRecovery = StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
+        // RuleEngineImpl already gates recovery on the existence of *some* firing
+        // row for this (tenant, rule, target, entity); this defensive check at the
+        // notification step ensures the *fingerprinted* row (which is what we are
+        // about to mutate) is actually FIRING. Otherwise we'd silently flip a
+        // never-fired or already-recovered fingerprinted row to RECOVERED and
+        // produce a phantom recovery notification.
+        if (isRecovery && (Objects.isNull(state) || !RuleStateFlagEnum.FIRING.equals(state.getStateFlag()))) {
+            log.debug("Skip recovery state transition because no FIRING fingerprint exists, ruleId={}, entityId={}",
+                    rule.getId(), fact.getEntityId());
+            return null;
+        }
+
         LocalDateTime now = LocalDateTime.now();
         if (Objects.isNull(state)) {
             state = new RuleStateBO();
@@ -219,7 +238,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         state.setEventId(Objects.requireNonNullElse(fact.getEventId(), DefaultConstant.DEFAULT_ID));
         state.setStateExt(ruleStateExt(match));
 
-        if (StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY)) {
+        if (isRecovery) {
             state.setStateFlag(RuleStateFlagEnum.RECOVERED);
             state.setLastRecoverTime(now);
         } else {
