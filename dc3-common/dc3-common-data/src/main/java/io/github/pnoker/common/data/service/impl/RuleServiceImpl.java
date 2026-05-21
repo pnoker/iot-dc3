@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.service.AlarmConstant;
+import io.github.pnoker.common.data.biz.alarm.RuleRegistry;
 import io.github.pnoker.common.data.dal.RuleManager;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
@@ -64,6 +65,8 @@ public class RuleServiceImpl implements RuleService {
 
     private final RuleManager ruleManager;
 
+    private final RuleRegistry ruleRegistry;
+
     @Override
     public void add(RuleBO entityBO) {
         validateWindowMode(entityBO);
@@ -73,11 +76,12 @@ public class RuleServiceImpl implements RuleService {
         if (!ruleManager.save(entityDO)) {
             throw new AddException("Failed to create alarm rule");
         }
+        ruleRegistry.invalidateTenant(entityBO.getTenantId());
     }
 
     @Override
     public void delete(Long id) {
-        getDOById(id, true);
+        RuleDO existing = getDOById(id, true);
 
         // Alarm ruleAlarm rule
         LambdaQueryChainWrapper<RuleDO> wrapper = ruleManager.lambdaQuery().eq(RuleDO::getEntityId, id);
@@ -89,6 +93,7 @@ public class RuleServiceImpl implements RuleService {
         if (!ruleManager.removeById(id)) {
             throw new DeleteException("Failed to remove alarm rule");
         }
+        ruleRegistry.invalidateTenant(existing.getTenantId());
     }
 
     @Override
@@ -103,6 +108,7 @@ public class RuleServiceImpl implements RuleService {
         if (!ruleManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update alarm rule");
         }
+        ruleRegistry.invalidateTenant(entityBO.getTenantId());
     }
 
     @Override
