@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -46,6 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @AutoConfiguration
+@RequiredArgsConstructor
 public class ThreadPoolConfig {
 
     private final AtomicInteger threadPoolAtomic = new AtomicInteger(1);
@@ -53,10 +55,6 @@ public class ThreadPoolConfig {
     private final AtomicInteger scheduledThreadPoolAtomic = new AtomicInteger(1);
 
     private final ThreadProperties thread;
-
-    public ThreadPoolConfig(ThreadProperties thread) {
-        this.thread = thread;
-    }
 
     /**
      * Create ThreadPoolExecutor with LinkedBlockingQueue

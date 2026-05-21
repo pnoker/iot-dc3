@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.ResourceTreeBO;
@@ -56,16 +57,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.RESOURCE_URL_PREFIX)
+@RequiredArgsConstructor
 public class ResourceController implements BaseController {
 
     private final ResourceBuilder resourceBuilder;
 
     private final ResourceService resourceService;
-
-    public ResourceController(ResourceBuilder resourceBuilder, ResourceService resourceService) {
-        this.resourceBuilder = resourceBuilder;
-        this.resourceService = resourceService;
-    }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ResourceVO entityVO) {

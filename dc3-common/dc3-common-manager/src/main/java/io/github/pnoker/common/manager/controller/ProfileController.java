@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
+@RequiredArgsConstructor
 public class ProfileController implements BaseController {
 
     private final ProfileBuilder profileBuilder;
@@ -64,12 +66,6 @@ public class ProfileController implements BaseController {
     private final ProfileService profileService;
 
     private final DeviceService deviceService;
-
-    public ProfileController(ProfileBuilder profileBuilder, ProfileService profileService, DeviceService deviceService) {
-        this.profileBuilder = profileBuilder;
-        this.profileService = profileService;
-        this.deviceService = deviceService;
-    }
 
     /**
      * Profile

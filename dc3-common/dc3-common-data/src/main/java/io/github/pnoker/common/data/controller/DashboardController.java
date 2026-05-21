@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DashboardService;
@@ -56,17 +57,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DASHBOARD_URL_PREFIX)
+@RequiredArgsConstructor
 public class DashboardController implements BaseController {
 
     private final DashboardService dashboardService;
 
     private final io.github.pnoker.common.data.biz.SystemHealthService systemHealthService;
-
-    public DashboardController(DashboardService dashboardService,
-                               io.github.pnoker.common.data.biz.SystemHealthService systemHealthService) {
-        this.dashboardService = dashboardService;
-        this.systemHealthService = systemHealthService;
-    }
 
     @GetMapping("/stats/today")
     public Mono<R<TodayStatsVO>> today() {

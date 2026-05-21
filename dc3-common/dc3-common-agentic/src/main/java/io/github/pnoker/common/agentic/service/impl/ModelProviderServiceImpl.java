@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.dal.ModelProviderManager;
@@ -37,7 +38,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-
 /**
  * Implements model provider listing, save, update, and remove operations.
  *
@@ -46,19 +46,12 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class ModelProviderServiceImpl implements ModelProviderService {
 
     private final ModelProviderManager modelProviderManager;
     private final ModelProviderBuilder modelProviderBuilder;
     private final ChatClientFactory chatClientFactory;
-
-    public ModelProviderServiceImpl(ModelProviderManager modelProviderManager,
-                                    ModelProviderBuilder modelProviderBuilder,
-                                    ChatClientFactory chatClientFactory) {
-        this.modelProviderManager = modelProviderManager;
-        this.modelProviderBuilder = modelProviderBuilder;
-        this.chatClientFactory = chatClientFactory;
-    }
 
     @Override
     public List<ModelProviderBO> list() {

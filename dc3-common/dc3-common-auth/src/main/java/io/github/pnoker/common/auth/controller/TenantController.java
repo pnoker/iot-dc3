@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.entity.builder.TenantBuilder;
@@ -52,16 +53,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TENANT_URL_PREFIX)
+@RequiredArgsConstructor
 public class TenantController implements BaseController {
 
     private final TenantBuilder tenantBuilder;
 
     private final TenantService tenantService;
-
-    public TenantController(TenantBuilder tenantBuilder, TenantService tenantService) {
-        this.tenantBuilder = tenantBuilder;
-        this.tenantService = tenantService;
-    }
 
     /**
      * Tenant

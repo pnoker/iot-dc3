@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
@@ -49,6 +50,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointValueTool {
 
     private final PointValueFacade pointValueFacade;
@@ -56,13 +58,6 @@ public class PointValueTool {
     private final PointValueCommandFacade pointValueCommandFacade;
 
     private final ActionService actionService;
-
-    public PointValueTool(PointValueFacade pointValueFacade, PointValueCommandFacade pointValueCommandFacade,
-                          ActionService actionService) {
-        this.pointValueFacade = pointValueFacade;
-        this.pointValueCommandFacade = pointValueCommandFacade;
-        this.actionService = actionService;
-    }
 
     @Tool(description = "Get the latest point value for a specific device and point. Returns the current value.")
     @AgenticToolMetadata(domain = "point-value", title = "Get latest point value")

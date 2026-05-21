@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.biz.impl;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
@@ -55,6 +56,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverRegisterServiceImpl implements DriverRegisterService {
 
     private final GrpcDriverBuilder grpcDriverBuilder;
@@ -70,19 +72,6 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     private final PointAttributeService pointAttributeService;
 
     private final TenantFacade tenantFacade;
-
-    public DriverRegisterServiceImpl(GrpcDriverBuilder grpcDriverBuilder,
-                                     GrpcDriverAttributeBuilder grpcDriverAttributeBuilder, GrpcPointAttributeBuilder grpcPointAttributeBuilder,
-                                     DriverService driverService, DriverAttributeService driverAttributeService,
-                                     PointAttributeService pointAttributeService, TenantFacade tenantFacade) {
-        this.grpcDriverBuilder = grpcDriverBuilder;
-        this.grpcDriverAttributeBuilder = grpcDriverAttributeBuilder;
-        this.grpcPointAttributeBuilder = grpcPointAttributeBuilder;
-        this.driverService = driverService;
-        this.driverAttributeService = driverAttributeService;
-        this.pointAttributeService = pointAttributeService;
-        this.tenantFacade = tenantFacade;
-    }
 
     @Override
     public DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc) {

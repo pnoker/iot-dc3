@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleTreeBO;
@@ -56,16 +57,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.ROLE_URL_PREFIX)
+@RequiredArgsConstructor
 public class RoleController implements BaseController {
 
     private final RoleBuilder roleBuilder;
 
     private final RoleService roleService;
-
-    public RoleController(RoleBuilder roleBuilder, RoleService roleService) {
-        this.roleBuilder = roleBuilder;
-        this.roleService = roleService;
-    }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {

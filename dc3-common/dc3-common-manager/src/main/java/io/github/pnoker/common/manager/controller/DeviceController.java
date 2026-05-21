@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -69,6 +70,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DEVICE_URL_PREFIX)
+@RequiredArgsConstructor
 public class DeviceController implements BaseController {
 
     private static final long MAX_IMPORT_BYTES = 20 * 1024 * 1024;
@@ -78,12 +80,6 @@ public class DeviceController implements BaseController {
     private final DeviceService deviceService;
 
     private final DriverService driverService;
-
-    public DeviceController(DeviceBuilder deviceBuilder, DeviceService deviceService, DriverService driverService) {
-        this.deviceBuilder = deviceBuilder;
-        this.deviceService = deviceService;
-        this.driverService = driverService;
-    }
 
     /**
      * @param entityVO {@link DeviceVO}

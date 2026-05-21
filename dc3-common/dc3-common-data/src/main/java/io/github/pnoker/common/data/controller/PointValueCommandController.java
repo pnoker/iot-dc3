@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointValueCommandService;
@@ -41,13 +42,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_VALUE_COMMAND_URL_PREFIX)
+@RequiredArgsConstructor
 public class PointValueCommandController implements BaseController {
 
     private final PointValueCommandService pointValueCommandService;
-
-    public PointValueCommandController(PointValueCommandService pointValueCommandService) {
-        this.pointValueCommandService = pointValueCommandService;
-    }
 
     /**
      * Read instruction

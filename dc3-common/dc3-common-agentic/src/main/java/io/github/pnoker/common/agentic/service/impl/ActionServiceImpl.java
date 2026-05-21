@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.dal.ActionManager;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-
 /**
  * Implements agentic action lifecycle: creation, confirmation, rejection, and write-point-value execution.
  *
@@ -47,6 +47,7 @@ import java.util.UUID;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class ActionServiceImpl implements ActionService {
 
     private static final String ACTION_WRITE_POINT_VALUE = "writePointValue";
@@ -55,14 +56,6 @@ public class ActionServiceImpl implements ActionService {
     private final ActionBuilder actionBuilder;
 
     private final PointValueCommandFacade pointValueCommandFacade;
-
-    public ActionServiceImpl(ActionManager actionManager,
-                             ActionBuilder actionBuilder,
-                             PointValueCommandFacade pointValueCommandFacade) {
-        this.actionManager = actionManager;
-        this.actionBuilder = actionBuilder;
-        this.pointValueCommandFacade = pointValueCommandFacade;
-    }
 
     @Override
     public String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,

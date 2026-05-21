@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
 import io.github.pnoker.common.agentic.entity.request.ModelConfigRequest;
@@ -48,16 +49,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(AgenticConstant.MODEL_URL_PREFIX)
+@RequiredArgsConstructor
 public class ModelController implements BaseController {
 
     private final ModelConfigBuilder modelConfigBuilder;
 
     private final ModelConfigService modelConfigService;
-
-    public ModelController(ModelConfigBuilder modelConfigBuilder, ModelConfigService modelConfigService) {
-        this.modelConfigBuilder = modelConfigBuilder;
-        this.modelConfigService = modelConfigService;
-    }
 
     @GetMapping("/list")
     public Mono<R<List<ModelVO>>> list() {

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.init;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.mqtt.service.MqttScheduleService;
@@ -42,6 +43,7 @@ import org.springframework.context.annotation.ComponentScan;
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.mqtt"})
 @EnableConfigurationProperties({MqttProperties.class})
+@RequiredArgsConstructor
 public class MqttInitRunner implements ApplicationRunner {
 
     private final MqttScheduleService mqttScheduleService;
@@ -52,12 +54,6 @@ public class MqttInitRunner implements ApplicationRunner {
      *
      * @param mqttScheduleService The MQTT schedule service to be initialized
      */
-    public MqttInitRunner(MqttScheduleService mqttScheduleService,
-                          ObjectProvider<MqttReceiveService> mqttReceiveServiceProvider) {
-        this.mqttScheduleService = mqttScheduleService;
-        this.mqttReceiveServiceProvider = mqttReceiveServiceProvider;
-    }
-
     /**
      * Executes the MQTT initialization process when the application starts. This method
      * is called automatically by Spring Boot after the application context is loaded.

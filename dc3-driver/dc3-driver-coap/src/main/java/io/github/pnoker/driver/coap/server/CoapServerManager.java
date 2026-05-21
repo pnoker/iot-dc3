@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.coap.server;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.driver.coap.entity.property.CoapProperties;
 import io.github.pnoker.driver.coap.server.resource.DataResource;
 import io.github.pnoker.driver.coap.service.CoapReceiveService;
@@ -41,16 +42,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CoapServerManager implements CommandLineRunner {
 
     private final CoapProperties coapProperties;
     private final CoapReceiveService coapReceiveService;
     private CoapServer coapServer;
-
-    public CoapServerManager(CoapProperties coapProperties, CoapReceiveService coapReceiveService) {
-        this.coapProperties = coapProperties;
-        this.coapReceiveService = coapReceiveService;
-    }
 
     @Override
     public void run(String... args) {

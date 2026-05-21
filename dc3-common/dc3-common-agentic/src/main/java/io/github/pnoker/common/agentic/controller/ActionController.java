@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.agentic.entity.builder.ActionBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ActionVO;
@@ -35,7 +36,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-
 /**
  * REST controller exposing agentic action management endpoints.
  *
@@ -45,16 +45,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(AgenticConstant.ACTION_URL_PREFIX)
+@RequiredArgsConstructor
 public class ActionController implements BaseController {
 
     private final ActionBuilder actionBuilder;
 
     private final ActionService actionService;
-
-    public ActionController(ActionBuilder actionBuilder, ActionService actionService) {
-        this.actionBuilder = actionBuilder;
-        this.actionService = actionService;
-    }
 
     @GetMapping("/pending")
     public Mono<R<List<ActionVO>>> pending(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {

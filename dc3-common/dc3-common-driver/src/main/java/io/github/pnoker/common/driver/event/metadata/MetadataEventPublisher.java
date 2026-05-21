@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.event.metadata;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +34,10 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MetadataEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
-
-    public MetadataEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.applicationEventPublisher = applicationEventPublisher;
-    }
 
     /**
      * Publishes the supplied metadata event to the Spring application context.

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.grpc.server;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.api.center.data.GrpcDriverStatusQuery;
 import io.github.pnoker.api.center.data.GrpcFleetSummaryDTO;
 import io.github.pnoker.api.center.data.GrpcIdsStatusQuery;
@@ -58,6 +59,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplBase {
 
     private final DeviceFacade deviceFacade;
@@ -67,14 +69,6 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
     private final LocalCacheService localCacheService;
 
     private final SystemHealthService systemHealthService;
-
-    public StatusHealthServer(DeviceFacade deviceFacade, DriverFacade driverFacade, LocalCacheService localCacheService,
-                              SystemHealthService systemHealthService) {
-        this.deviceFacade = deviceFacade;
-        this.driverFacade = driverFacade;
-        this.localCacheService = localCacheService;
-        this.systemHealthService = systemHealthService;
-    }
 
     @Override
     public void deviceStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcRStatusMap> responseObserver) {

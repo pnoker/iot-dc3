@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
@@ -55,6 +56,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.USER_PROFILE_URL_PREFIX)
+@RequiredArgsConstructor
 public class UserController implements BaseController {
 
     private final UserBuilder userBuilder;
@@ -62,12 +64,6 @@ public class UserController implements BaseController {
     private final UserService userService;
 
     private final TenantBindService tenantBindService;
-
-    public UserController(UserBuilder userBuilder, UserService userService, TenantBindService tenantBindService) {
-        this.userBuilder = userBuilder;
-        this.userService = userService;
-        this.tenantBindService = tenantBindService;
-    }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {

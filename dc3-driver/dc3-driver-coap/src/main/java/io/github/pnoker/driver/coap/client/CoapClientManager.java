@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.coap.client;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.driver.coap.entity.CoapResult;
 import io.github.pnoker.driver.coap.entity.property.CoapProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -41,14 +42,11 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CoapClientManager implements DisposableBean {
 
     private final CoapProperties coapProperties;
     private final ConcurrentHashMap<String, CoapClient> clientPool = new ConcurrentHashMap<>();
-
-    public CoapClientManager(CoapProperties coapProperties) {
-        this.coapProperties = coapProperties;
-    }
 
     /**
      * Get or create a CoapClient for the given URI.

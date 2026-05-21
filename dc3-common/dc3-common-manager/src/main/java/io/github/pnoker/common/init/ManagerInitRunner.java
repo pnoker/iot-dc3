@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.init;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.manager.biz.ScheduleForManagerService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
@@ -36,6 +37,7 @@ import org.springframework.context.annotation.ComponentScan;
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.manager"})
 @MapperScan(basePackages = {"io.github.pnoker.common.manager.mapper"})
+@RequiredArgsConstructor
 public class ManagerInitRunner implements ApplicationRunner {
 
     private final ScheduleForManagerService scheduleForManagerService;
@@ -46,10 +48,6 @@ public class ManagerInitRunner implements ApplicationRunner {
      * @param scheduleForManagerService The service responsible for manager scheduling
      *                                  operations
      */
-    public ManagerInitRunner(ScheduleForManagerService scheduleForManagerService) {
-        this.scheduleForManagerService = scheduleForManagerService;
-    }
-
     /**
      * Executes the initialization process when the application starts. This method
      * initializes the schedule manager service to set up necessary scheduling

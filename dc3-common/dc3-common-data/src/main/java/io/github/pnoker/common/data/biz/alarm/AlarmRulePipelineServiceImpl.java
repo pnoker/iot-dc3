@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,7 @@ import java.util.List;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
 
     private final RuleEngine ruleEngine;
@@ -38,13 +40,6 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
     private final RuleNotificationService ruleNotificationService;
 
     private final AlarmEventRecordService alarmEventRecordService;
-
-    public AlarmRulePipelineServiceImpl(RuleEngine ruleEngine, RuleNotificationService ruleNotificationService,
-                                        AlarmEventRecordService alarmEventRecordService) {
-        this.ruleEngine = ruleEngine;
-        this.ruleNotificationService = ruleNotificationService;
-        this.alarmEventRecordService = alarmEventRecordService;
-    }
 
     @Override
     public List<NotifyHistoryBO> process(RuleFact fact) {

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ApiBO;
 import io.github.pnoker.common.auth.entity.builder.ApiBuilder;
@@ -52,16 +53,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.API_URL_PREFIX)
+@RequiredArgsConstructor
 public class ApiController implements BaseController {
 
     private final ApiBuilder apiBuilder;
 
     private final ApiService apiService;
-
-    public ApiController(ApiBuilder apiBuilder, ApiService apiService) {
-        this.apiBuilder = apiBuilder;
-        this.apiService = apiService;
-    }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {

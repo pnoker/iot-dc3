@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
@@ -49,6 +50,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AgenticChatServiceImpl implements AgenticChatService {
 
     private final AgenticChatRequestPreparer requestPreparer;
@@ -58,15 +60,6 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     private final AgenticMessageRecorder messageRecorder;
 
     private final AgenticRuntime agenticRuntime;
-
-    public AgenticChatServiceImpl(AgenticChatRequestPreparer requestPreparer,
-                                  AgenticChatResponseCodec responseCodec, AgenticMessageRecorder messageRecorder,
-                                  AgenticRuntime agenticRuntime) {
-        this.requestPreparer = requestPreparer;
-        this.responseCodec = responseCodec;
-        this.messageRecorder = messageRecorder;
-        this.agenticRuntime = agenticRuntime;
-    }
 
     @Override
     public Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionRequest request,

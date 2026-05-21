@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.dal.MessageManager;
@@ -35,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-
 /**
  * Implements chat message persistence and history retrieval for conversation replay.
  *
@@ -44,15 +44,11 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
     private final MessageManager messageManager;
     private final MessageBuilder messageBuilder;
-
-    public MessageServiceImpl(MessageManager messageManager, MessageBuilder messageBuilder) {
-        this.messageManager = messageManager;
-        this.messageBuilder = messageBuilder;
-    }
 
     @Override
     public MessageBO save(String conversationId, String role, AgenticMessageContent content, String model,

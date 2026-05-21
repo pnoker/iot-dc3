@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ import org.springframework.context.annotation.Bean;
 @Slf4j
 @AutoConfiguration
 @ConditionalOnClass(ExchangeConfig.class)
+@RequiredArgsConstructor
 public class DataTopicConfig {
 
     private final TopicExchange stateExchange;
@@ -45,12 +47,6 @@ public class DataTopicConfig {
     private final TopicExchange alarmExchange;
 
     private final TopicExchange valueExchange;
-
-    public DataTopicConfig(TopicExchange stateExchange, TopicExchange alarmExchange, TopicExchange valueExchange) {
-        this.stateExchange = stateExchange;
-        this.alarmExchange = alarmExchange;
-        this.valueExchange = valueExchange;
-    }
 
     // ===== Driver state =====================================================
 

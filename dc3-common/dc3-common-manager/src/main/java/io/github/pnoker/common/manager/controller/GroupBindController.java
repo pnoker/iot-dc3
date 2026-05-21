@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -60,6 +61,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.GROUP_BIND_URL_PREFIX)
+@RequiredArgsConstructor
 public class GroupBindController implements BaseController {
 
     private final GroupBindBuilder groupBindBuilder;
@@ -75,18 +77,6 @@ public class GroupBindController implements BaseController {
     private final PointService pointService;
 
     private final DeviceService deviceService;
-
-    public GroupBindController(GroupBindBuilder groupBindBuilder, GroupBindService groupBindService,
-                               GroupService groupService, DriverService driverService, ProfileService profileService,
-                               PointService pointService, DeviceService deviceService) {
-        this.groupBindBuilder = groupBindBuilder;
-        this.groupBindService = groupBindService;
-        this.groupService = groupService;
-        this.driverService = driverService;
-        this.profileService = profileService;
-        this.pointService = pointService;
-        this.deviceService = deviceService;
-    }
 
     /**
      * @param entityVO {@link GroupBindVO}

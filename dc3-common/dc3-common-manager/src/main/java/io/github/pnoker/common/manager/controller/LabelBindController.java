@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -60,6 +61,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.LABEL_BIND_URL_PREFIX)
+@RequiredArgsConstructor
 public class LabelBindController implements BaseController {
 
     private final LabelBindBuilder labelBindBuilder;
@@ -75,18 +77,6 @@ public class LabelBindController implements BaseController {
     private final PointService pointService;
 
     private final DeviceService deviceService;
-
-    public LabelBindController(LabelBindBuilder labelBindBuilder, LabelBindService labelBindService,
-                               LabelService labelService, DriverService driverService, ProfileService profileService,
-                               PointService pointService, DeviceService deviceService) {
-        this.labelBindBuilder = labelBindBuilder;
-        this.labelBindService = labelBindService;
-        this.labelService = labelService;
-        this.driverService = driverService;
-        this.profileService = profileService;
-        this.pointService = pointService;
-        this.deviceService = deviceService;
-    }
 
     /**
      * @param entityVO {@link LabelBindVO}

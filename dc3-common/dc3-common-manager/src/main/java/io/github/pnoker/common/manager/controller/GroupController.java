@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -52,16 +53,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.GROUP_URL_PREFIX)
+@RequiredArgsConstructor
 public class GroupController implements BaseController {
 
     private final GroupBuilder groupBuilder;
 
     private final GroupService groupService;
-
-    public GroupController(GroupBuilder groupBuilder, GroupService groupService) {
-        this.groupBuilder = groupBuilder;
-        this.groupService = groupService;
-    }
 
     /**
      * @param entityVO {@link GroupVO}

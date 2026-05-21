@@ -17,6 +17,7 @@
 
 package io.github.pnoker.test.support;
 
+import lombok.RequiredArgsConstructor;
 import org.awaitility.Awaitility;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -29,13 +30,10 @@ import java.util.concurrent.Callable;
  * cycle most listener tests need: send a payload to an exchange/routing key, then
  * await an external signal driven by the consumer.
  */
+@RequiredArgsConstructor
 public final class RabbitTestHarness {
 
     private final RabbitTemplate rabbitTemplate;
-
-    public RabbitTestHarness(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
-    }
 
     public void send(String exchange, String routingKey, Object payload) {
         rabbitTemplate.convertAndSend(exchange, routingKey, payload);

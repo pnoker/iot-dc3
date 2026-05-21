@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
@@ -42,7 +43,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-
 /**
  * Implements attachment upload, listing, and AI-based summarization.
  *
@@ -52,6 +52,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AttachmentServiceImpl implements AttachmentService {
 
     private static final long MAX_BYTES = 10 * 1024 * 1024;
@@ -60,14 +61,6 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentBuilder attachmentBuilder;
 
     private final AgenticProperties properties;
-
-    public AttachmentServiceImpl(AttachmentManager attachmentManager,
-                                 AttachmentBuilder attachmentBuilder,
-                                 AgenticProperties properties) {
-        this.attachmentManager = attachmentManager;
-        this.attachmentBuilder = attachmentBuilder;
-        this.properties = properties;
-    }
 
     @Override
     public Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.UserHeader header) {

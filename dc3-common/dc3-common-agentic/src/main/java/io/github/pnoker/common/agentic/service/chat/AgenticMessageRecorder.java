@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.service.MessageService;
@@ -36,13 +37,10 @@ import java.util.List;
  * @since 2016.10.1
  */
 @Component
+@RequiredArgsConstructor
 public class AgenticMessageRecorder {
 
     private final MessageService messageService;
-
-    public AgenticMessageRecorder(MessageService messageService) {
-        this.messageService = messageService;
-    }
 
     public void persistUserMessage(AgenticPreparedChatRequest prepared, RequestHeader.UserHeader userHeader) {
         messageService.save(prepared.scopedConversationId(), "user", buildUserContent(prepared), prepared.model(),

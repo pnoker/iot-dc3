@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.builder.ModelProviderBuilder;
 import io.github.pnoker.common.agentic.entity.request.ModelProviderRequest;
@@ -47,16 +48,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(AgenticConstant.PROVIDER_URL_PREFIX)
+@RequiredArgsConstructor
 public class ProviderController implements BaseController {
 
     private final ModelProviderBuilder modelProviderBuilder;
 
     private final ModelProviderService modelProviderService;
-
-    public ProviderController(ModelProviderBuilder modelProviderBuilder, ModelProviderService modelProviderService) {
-        this.modelProviderBuilder = modelProviderBuilder;
-        this.modelProviderService = modelProviderService;
-    }
 
     @GetMapping("/list")
     public Mono<R<List<ModelProviderVO>>> list() {

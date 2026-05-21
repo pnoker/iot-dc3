@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
@@ -48,13 +49,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DASHBOARD_URL_PREFIX)
+@RequiredArgsConstructor
 public class DashboardController implements BaseController {
 
     private final DashboardService dashboardService;
-
-    public DashboardController(DashboardService dashboardService) {
-        this.dashboardService = dashboardService;
-    }
 
     @GetMapping("/driver/stats")
     public Mono<R<DriverStatsVO>> driverStats() {

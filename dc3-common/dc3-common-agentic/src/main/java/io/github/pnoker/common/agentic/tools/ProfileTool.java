@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
@@ -46,13 +47,10 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ProfileTool {
 
     private final Optional<ProfileFacade> profileFacade;
-
-    public ProfileTool(Optional<ProfileFacade> profileFacade) {
-        this.profileFacade = profileFacade;
-    }
 
     @Tool(description = "Look up a profile/template by its numeric ID. Returns template name, code, type, share flag, enable status, and version.")
     @AgenticToolMetadata(domain = "profile", title = "Query profile by ID")

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
@@ -52,17 +53,12 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_CHANNEL_BIND_URL_PREFIX)
+@RequiredArgsConstructor
 public class NotifyChannelBindController implements BaseController {
 
     private final NotifyChannelBindBuilder notifyChannelBindBuilder;
 
     private final NotifyChannelBindService notifyChannelBindService;
-
-    public NotifyChannelBindController(NotifyChannelBindBuilder notifyChannelBindBuilder,
-                                       NotifyChannelBindService notifyChannelBindService) {
-        this.notifyChannelBindBuilder = notifyChannelBindBuilder;
-        this.notifyChannelBindService = notifyChannelBindService;
-    }
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelBindVO entityVO) {

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DriverStatusService;
@@ -45,13 +46,10 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DRIVER_STATUS_URL_PREFIX)
+@RequiredArgsConstructor
 public class DriverStatusController implements BaseController {
 
     private final DriverStatusService driverStatusService;
-
-    public DriverStatusController(DriverStatusService driverStatusService) {
-        this.driverStatusService = driverStatusService;
-    }
 
     /**
      * Query driver statuses ONLINE, OFFLINE

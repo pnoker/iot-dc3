@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.event.metadata;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
@@ -36,13 +37,10 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MetadataEventListener implements ApplicationListener<MetadataEvent> {
 
     private final DriverCustomService driverCustomService;
-
-    public MetadataEventListener(DriverCustomService driverCustomService) {
-        this.driverCustomService = driverCustomService;
-    }
 
     @Override
     public void onApplicationEvent(MetadataEvent metadataEvent) {

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -56,6 +57,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
+@RequiredArgsConstructor
 public class PointAttributeController implements BaseController {
 
     private final PointAttributeBuilder pointAttributeBuilder;
@@ -63,13 +65,6 @@ public class PointAttributeController implements BaseController {
     private final PointAttributeService pointAttributeService;
 
     private final DriverService driverService;
-
-    public PointAttributeController(PointAttributeBuilder pointAttributeBuilder,
-                                    PointAttributeService pointAttributeService, DriverService driverService) {
-        this.pointAttributeBuilder = pointAttributeBuilder;
-        this.pointAttributeService = pointAttributeService;
-        this.driverService = driverService;
-    }
 
     /**
      * PointAttribute

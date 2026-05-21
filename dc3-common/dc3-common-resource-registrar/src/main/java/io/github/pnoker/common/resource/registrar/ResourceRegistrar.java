@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.resource.registrar;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
@@ -42,6 +43,7 @@ import java.util.List;
  * @since 2016.10.1
  */
 @Slf4j
+@RequiredArgsConstructor
 public class ResourceRegistrar {
 
     private final ApiEndpointScanner scanner;
@@ -61,13 +63,6 @@ public class ResourceRegistrar {
      * @param properties  registrar runtime options
      * @param environment Spring environment used for service-name fallback
      */
-    public ResourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
-                             ResourceRegistrarProperties properties, Environment environment) {
-        this.scanner = scanner;
-        this.facade = facade;
-        this.properties = properties;
-        this.environment = environment;
-    }
 
     /**
      * Register scanned endpoints after the application is ready and all WebFlux handler

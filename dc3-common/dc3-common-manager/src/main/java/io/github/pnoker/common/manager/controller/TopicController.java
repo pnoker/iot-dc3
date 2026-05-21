@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -45,13 +46,10 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.TOPIC_URL_PREFIX)
+@RequiredArgsConstructor
 public class TopicController implements BaseController {
 
     private final TopicService topicService;
-
-    public TopicController(TopicService topicService) {
-        this.topicService = topicService;
-    }
 
     @PostMapping("/list")
     public Mono<R<Page<List<TopicVO>>>> query(@RequestBody(required = false) TopicQuery topicQuery) {

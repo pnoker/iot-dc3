@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.builder.MessageBuilder;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
 import io.github.pnoker.common.agentic.service.MessageService;
@@ -33,7 +34,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-
 /**
  * REST controller exposing chat message history endpoints.
  *
@@ -43,16 +43,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(AgenticConstant.MESSAGE_URL_PREFIX)
+@RequiredArgsConstructor
 public class MessageController implements BaseController {
 
     private final MessageBuilder messageBuilder;
 
     private final MessageService messageService;
-
-    public MessageController(MessageBuilder messageBuilder, MessageService messageService) {
-        this.messageBuilder = messageBuilder;
-        this.messageService = messageService;
-    }
 
     @GetMapping("/list")
     public Mono<R<List<MessageVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {

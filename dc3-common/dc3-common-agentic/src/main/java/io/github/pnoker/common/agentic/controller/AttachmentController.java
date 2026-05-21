@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.builder.AttachmentBuilder;
 import io.github.pnoker.common.agentic.entity.vo.AttachmentVO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
@@ -36,7 +37,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-
 /**
  * REST controller exposing attachment upload and listing endpoints.
  *
@@ -46,16 +46,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(AgenticConstant.ATTACHMENT_URL_PREFIX)
+@RequiredArgsConstructor
 public class AttachmentController implements BaseController {
 
     private final AttachmentBuilder attachmentBuilder;
 
     private final AttachmentService attachmentService;
-
-    public AttachmentController(AttachmentBuilder attachmentBuilder, AttachmentService attachmentService) {
-        this.attachmentBuilder = attachmentBuilder;
-        this.attachmentService = attachmentService;
-    }
 
     @PostMapping("/upload")
     public Mono<R<AttachmentVO>> upload(@NotBlank @RequestParam(value = "conversation_id") String conversationId,

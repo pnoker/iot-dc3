@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.job;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
@@ -36,13 +37,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @DisallowConcurrentExecution
+@RequiredArgsConstructor
 public class DriverCustomScheduleJob extends QuartzJobBean {
 
     private final DriverCustomService driverCustomService;
-
-    public DriverCustomScheduleJob(DriverCustomService driverCustomService) {
-        this.driverCustomService = driverCustomService;
-    }
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {

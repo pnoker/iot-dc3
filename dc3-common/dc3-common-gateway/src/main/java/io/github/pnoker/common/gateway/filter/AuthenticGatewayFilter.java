@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.gateway.filter;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -49,16 +50,12 @@ import reactor.core.scheduler.Schedulers;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AuthenticGatewayFilter implements GatewayFilter {
 
     private final FilterService filterService;
 
     private final HmacAuthSigner hmacAuthSigner;
-
-    public AuthenticGatewayFilter(FilterService filterService, HmacAuthSigner hmacAuthSigner) {
-        this.filterService = filterService;
-        this.hmacAuthSigner = hmacAuthSigner;
-    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {

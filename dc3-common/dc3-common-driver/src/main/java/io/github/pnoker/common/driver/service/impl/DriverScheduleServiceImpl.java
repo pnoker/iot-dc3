@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
@@ -41,16 +42,12 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class DriverScheduleServiceImpl implements DriverScheduleService {
 
     private final DriverProperties driverProperties;
 
     private final QuartzService quartzService;
-
-    public DriverScheduleServiceImpl(DriverProperties driverProperties, QuartzService quartzService) {
-        this.driverProperties = driverProperties;
-        this.quartzService = quartzService;
-    }
 
     @Override
     public void initial() {
