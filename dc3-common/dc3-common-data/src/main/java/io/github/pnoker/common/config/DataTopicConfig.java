@@ -142,4 +142,29 @@ public class DataTopicConfig {
         return binding;
     }
 
+    // ===== Notify task ======================================================
+
+    /**
+     * Outbound notification work queue. Each message is one channel send for a
+     * fully-rendered payload; the worker that consumes the queue updates the
+     * matching {@code dc3_notify_history} row from PENDING to its terminal
+     * status. 24-hour TTL on the queue guards against runaway backlog when the
+     * outbound channel adapters are stuck.
+     */
+    @Bean
+    Queue notifyTaskQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_NOTIFY_TASK)
+                .ttl(86_400_000)
+                .build();
+    }
+
+    @Bean
+    Binding notifyTaskBinding(Queue notifyTaskQueue) {
+        Binding binding = BindingBuilder.bind(notifyTaskQueue)
+                .to(alarmExchange)
+                .with(RabbitConstant.ROUTING_NOTIFY_TASK_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+        return binding;
+    }
+
 }
