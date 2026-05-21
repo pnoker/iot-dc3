@@ -103,7 +103,7 @@ public class PointValueServiceImpl implements PointValueService {
         }).collect(Collectors.groupingBy(PointValueBO::getDeviceId));
 
         group.forEach(this::savePointValuesToRepository);
-        pointValueBOList.forEach(alarmRuleTriggerService::processPointValue);
+        alarmRuleTriggerService.processPointValues(pointValueBOList);
     }
 
     @Override

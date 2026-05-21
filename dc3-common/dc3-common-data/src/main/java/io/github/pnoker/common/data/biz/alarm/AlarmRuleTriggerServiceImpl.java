@@ -24,9 +24,11 @@ import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -56,6 +58,22 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
                 null,
                 factTime(pointValue.getCreateTime()),
                 RuleFactValues.point(pointValue)));
+    }
+
+    @Override
+    public void processPointValues(List<PointValueBO> pointValues) {
+        if (CollectionUtils.isEmpty(pointValues)) {
+            return;
+        }
+        // The pipeline still evaluates each fact through RuleEngine per-call; the
+        // bulk entrypoint exists so callers (notably PointValueServiceImpl) can
+        // hand off the whole batch in one go and the engine's cached lookups
+        // (RuleRegistry) are amortized across the group. Per-fact pipeline
+        // execution is intentional — alarm semantics (firing, recovery, dedup)
+        // are still defined sample-by-sample.
+        for (PointValueBO pointValue : pointValues) {
+            processPointValue(pointValue);
+        }
     }
 
     @Override

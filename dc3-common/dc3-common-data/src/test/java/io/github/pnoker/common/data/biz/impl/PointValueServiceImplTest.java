@@ -160,7 +160,10 @@ class PointValueServiceImplTest {
             // 250 entries -> 100 + 100 + 50 = 3 chunks
             verify(repositoryService, times(3)).savePointValues(any());
             verify(pointValueLocalCacheService).savePointValue(eqLong(10L), any());
-            verify(alarmRuleTriggerService, times(250)).processPointValue(any(PointValueBO.class));
+            // PointValueServiceImpl.save(List) hands the whole batch to the trigger
+            // in one call now; the trigger's own contract is responsible for the
+            // per-element fan-out (covered in AlarmRuleTriggerServiceImplTest).
+            verify(alarmRuleTriggerService).processPointValues(batch);
         }
     }
 
