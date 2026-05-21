@@ -26,6 +26,8 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.facade.api.DriverFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,10 @@ import java.util.Objects;
 
 /**
  * Business service implementation for driver alarm event persistence.
+ *
+ * <p>See {@link DeviceAlarmServiceImpl} for the rationale behind the tenant-id
+ * backfill — the same silent-drop hazard exists on the driver path.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
@@ -47,12 +53,30 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
+    private final DriverFacade driverFacade;
+
     @Override
     public void alarm(DriverAlarmDTO entityDTO) {
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
             log.warn("Drop driver alarm without driverId: {}", entityDTO);
             return;
         }
+
+        Long tenantId = entityDTO.getTenantId();
+        if (Objects.isNull(tenantId) || tenantId <= 0) {
+            FacadeDriverBO driver = driverFacade.getById(entityDTO.getDriverId());
+            if (Objects.isNull(driver)) {
+                log.warn("Drop driver alarm because driver[{}] is not found in metadata; tenant context unavailable",
+                        entityDTO.getDriverId());
+                return;
+            }
+            tenantId = driver.getTenantId();
+        }
+        if (Objects.isNull(tenantId) || tenantId <= 0) {
+            log.warn("Drop driver alarm because tenantId could not be resolved, driverId={}", entityDTO.getDriverId());
+            return;
+        }
+        entityDTO.setTenantId(tenantId);
 
         String msg = Objects.nonNull(entityDTO.getMessage()) ? entityDTO.getMessage() : "driver-alarm";
         EntityAlarmDO entity = new EntityAlarmDO();
@@ -67,7 +91,7 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
         entity.setAlarmExt(JsonExt.builder().type("driver-alarm").content(msg).version(1).build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
-        entity.setTenantId(Objects.nonNull(entityDTO.getTenantId()) ? entityDTO.getTenantId() : 0L);
+        entity.setTenantId(tenantId);
         entityAlarmManager.save(entity);
 
         entityDTO.setAlarmId(entity.getId());
