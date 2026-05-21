@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.service.impl;
 
+import io.github.pnoker.common.data.biz.alarm.RuleRegistry;
 import io.github.pnoker.common.data.dal.RuleManager;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
@@ -44,6 +45,9 @@ class RuleServiceImplTest {
 
     @Mock
     private RuleManager ruleManager;
+
+    @Mock
+    private RuleRegistry ruleRegistry;
 
     @InjectMocks
     private RuleServiceImpl service;

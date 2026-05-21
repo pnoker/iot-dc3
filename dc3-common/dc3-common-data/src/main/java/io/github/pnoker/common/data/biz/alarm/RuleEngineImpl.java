@@ -18,7 +18,6 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.data.entity.builder.RuleBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,11 +44,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RuleEngineImpl implements RuleEngine {
 
-    private final RuleCandidateLookup ruleCandidateLookup;
+    private final RuleRegistry ruleRegistry;
 
     private final RuleStateLookup ruleStateLookup;
-
-    private final RuleBuilder ruleBuilder;
 
     private final RuleEvaluator ruleEvaluator;
 
@@ -60,7 +57,7 @@ public class RuleEngineImpl implements RuleEngine {
             return List.of();
         }
 
-        List<RuleBO> rules = ruleBuilder.buildBOListByDOList(ruleCandidateLookup.findCandidates(fact));
+        List<RuleBO> rules = ruleRegistry.findCandidates(fact);
         List<RuleMatch> matches = new ArrayList<>();
         for (RuleBO rule : rules) {
             if (ruleEvaluator.matches(rule, fact)) {

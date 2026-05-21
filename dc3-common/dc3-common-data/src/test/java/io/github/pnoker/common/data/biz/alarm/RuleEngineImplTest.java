@@ -19,8 +19,6 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.data.entity.builder.RuleBuilder;
-import io.github.pnoker.common.data.entity.model.RuleDO;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import org.junit.jupiter.api.Test;
@@ -46,13 +44,10 @@ import static org.mockito.Mockito.when;
 class RuleEngineImplTest {
 
     @Mock
-    private RuleCandidateLookup ruleCandidateLookup;
+    private RuleRegistry ruleRegistry;
 
     @Mock
     private RuleStateLookup ruleStateLookup;
-
-    @Mock
-    private RuleBuilder ruleBuilder;
 
     @Mock
     private RuleEvaluator ruleEvaluator;
@@ -92,8 +87,7 @@ class RuleEngineImplTest {
     @Test
     void emitsFiringWhenMatchesAndDoesNotConsultRuleState() {
         RuleBO rule = rule(1L);
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(rule));
+        when(ruleRegistry.findCandidates(any())).thenReturn(List.of(rule));
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(true);
 
         List<RuleMatch> matches = engine.evaluate(fact());
@@ -107,8 +101,7 @@ class RuleEngineImplTest {
     @Test
     void emitsRecoveryOnlyWhenFiringStateExists() {
         RuleBO rule = rule(1L);
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(rule));
+        when(ruleRegistry.findCandidates(any())).thenReturn(List.of(rule));
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(false);
         when(ruleEvaluator.recovers(eq(rule), any())).thenReturn(true);
         when(ruleStateLookup.hasFiringState(7L, 1L,
@@ -123,8 +116,7 @@ class RuleEngineImplTest {
     @Test
     void suppressesRecoveryWhenNoFiringState() {
         RuleBO rule = rule(1L);
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(rule));
+        when(ruleRegistry.findCandidates(any())).thenReturn(List.of(rule));
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(false);
         when(ruleEvaluator.recovers(eq(rule), any())).thenReturn(true);
         when(ruleStateLookup.hasFiringState(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(false);
@@ -142,8 +134,7 @@ class RuleEngineImplTest {
         // Edge case: a malformed rule whose condition and recovery overlap. The
         // engine should treat it as a firing event, not both.
         RuleBO rule = rule(1L);
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(rule));
+        when(ruleRegistry.findCandidates(any())).thenReturn(List.of(rule));
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(true);
 
         List<RuleMatch> matches = engine.evaluate(fact());
@@ -157,8 +148,7 @@ class RuleEngineImplTest {
     void evaluatesAllCandidatesIndependently() {
         RuleBO ruleA = rule(1L);
         RuleBO ruleB = rule(2L);
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO(), new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(ruleA, ruleB));
+        when(ruleRegistry.findCandidates(any())).thenReturn(List.of(ruleA, ruleB));
         when(ruleEvaluator.matches(eq(ruleA), any())).thenReturn(true);
 
         List<RuleMatch> matches = engine.evaluate(fact());
