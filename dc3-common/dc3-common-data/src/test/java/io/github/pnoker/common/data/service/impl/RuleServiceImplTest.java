@@ -74,12 +74,31 @@ class RuleServiceImplTest {
     }
 
     @Test
-    void rejectsAddWhenWindowModeIsNotLast() {
-        RuleBO rule = rule("AVG");
+    void rejectsAddWhenWindowModeIsUnknown() {
+        // The save validator now parses the spec instead of comparing strings;
+        // unknown mode values are still rejected as they map to no enum.
+        RuleBO rule = rule("FOOBAR");
         assertThatThrownBy(() -> service.add(rule))
                 .isInstanceOf(UnSupportException.class)
-                .hasMessageContaining("AVG")
-                .hasMessageContaining("LAST");
+                .hasMessageContaining("FOOBAR");
+        verify(ruleManager, never()).save(any());
+    }
+
+    @Test
+    void rejectsAddWhenAggregationModeHasZeroDuration() {
+        RuleBO rule = ruleWithDuration("AVG", "PT0S");
+        assertThatThrownBy(() -> service.add(rule))
+                .isInstanceOf(UnSupportException.class)
+                .hasMessageContaining("positive");
+        verify(ruleManager, never()).save(any());
+    }
+
+    @Test
+    void rejectsAddWhenDurationIsMalformed() {
+        RuleBO rule = ruleWithDuration("AVG", "5 minutes");
+        assertThatThrownBy(() -> service.add(rule))
+                .isInstanceOf(UnSupportException.class)
+                .hasMessageContaining("ISO-8601");
         verify(ruleManager, never()).save(any());
     }
 
@@ -98,6 +117,21 @@ class RuleServiceImplTest {
     void allowsAddWhenWindowIsNull() {
         RuleBO rule = rule(null);
         assertThatThrownBy(() -> service.add(rule)).isNotInstanceOf(UnSupportException.class);
+    }
+
+    @Test
+    void allowsAddWhenWindowModeIsAvgWithValidDuration() {
+        // Phase 4 lifts the LAST-only gate; aggregation modes with valid
+        // ISO-8601 durations are accepted at save. Runtime evaluation of
+        // these modes lands in a follow-up commit.
+        RuleBO rule = ruleWithDuration("AVG", "PT3M");
+        assertThatThrownBy(() -> service.add(rule)).isNotInstanceOf(UnSupportException.class);
+    }
+
+    private static RuleBO ruleWithDuration(String mode, String duration) {
+        RuleBO rule = rule(mode);
+        rule.getRuleExt().getContent().setWindow(new RuleExt.Window(mode, duration, 1));
+        return rule;
     }
 
 }

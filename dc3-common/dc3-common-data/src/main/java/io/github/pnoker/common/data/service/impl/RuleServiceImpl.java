@@ -22,8 +22,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.biz.alarm.RuleRegistry;
+import io.github.pnoker.common.data.biz.alarm.WindowSpec;
+import io.github.pnoker.common.data.biz.alarm.WindowSpecParser;
 import io.github.pnoker.common.data.dal.RuleManager;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
@@ -172,9 +173,10 @@ public class RuleServiceImpl implements RuleService {
     }
 
     /**
-     * Reject rule definitions that select a window aggregation mode the engine
-     * does not yet implement. Without this guard a user could save a rule with
-     * mode=AVG and silently get LAST semantics at runtime.
+     * Validate the rule's window block by parsing it through {@link WindowSpecParser}.
+     * Rejects unknown modes, missing or non-positive durations on
+     * aggregation modes, and malformed ISO-8601 duration strings — the same
+     * rules the runtime evaluator will apply later.
      */
     private void validateWindowMode(RuleBO entityBO) {
         if (Objects.isNull(entityBO) || Objects.isNull(entityBO.getRuleExt())
@@ -182,15 +184,13 @@ public class RuleServiceImpl implements RuleService {
             return;
         }
         RuleExt.Window window = entityBO.getRuleExt().getContent().getWindow();
-        if (Objects.isNull(window) || StringUtils.isBlank(window.getMode())) {
+        if (Objects.isNull(window)) {
             return;
         }
-        if (StringUtils.equalsIgnoreCase(window.getMode(), AlarmConstant.WINDOW_MODE_LAST)) {
-            return;
+        WindowSpec spec = WindowSpecParser.parse(window);
+        if (!spec.valid()) {
+            throw new UnSupportException("Invalid rule window: {}", spec.reason());
         }
-        throw new UnSupportException(
-                "Window mode '{}' is not yet supported; only 'LAST' is implemented in the current release",
-                window.getMode());
     }
 
     /**
