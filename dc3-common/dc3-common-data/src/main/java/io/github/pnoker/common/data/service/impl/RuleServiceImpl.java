@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.dal.RuleManager;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
@@ -29,11 +30,13 @@ import io.github.pnoker.common.data.entity.model.RuleDO;
 import io.github.pnoker.common.data.entity.query.RuleQuery;
 import io.github.pnoker.common.data.service.RuleService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.AssociatedException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -63,6 +66,7 @@ public class RuleServiceImpl implements RuleService {
 
     @Override
     public void add(RuleBO entityBO) {
+        validateWindowMode(entityBO);
         checkDuplicate(entityBO, false, true);
 
         RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
@@ -90,6 +94,7 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public void update(RuleBO entityBO) {
         getDOById(entityBO.getId(), true);
+        validateWindowMode(entityBO);
 
         checkDuplicate(entityBO, true, true);
 
@@ -158,6 +163,28 @@ public class RuleServiceImpl implements RuleService {
             throw new DuplicateException("Alarm rule has been duplicated");
         }
         return duplicate;
+    }
+
+    /**
+     * Reject rule definitions that select a window aggregation mode the engine
+     * does not yet implement. Without this guard a user could save a rule with
+     * mode=AVG and silently get LAST semantics at runtime.
+     */
+    private void validateWindowMode(RuleBO entityBO) {
+        if (Objects.isNull(entityBO) || Objects.isNull(entityBO.getRuleExt())
+                || Objects.isNull(entityBO.getRuleExt().getContent())) {
+            return;
+        }
+        RuleExt.Window window = entityBO.getRuleExt().getContent().getWindow();
+        if (Objects.isNull(window) || StringUtils.isBlank(window.getMode())) {
+            return;
+        }
+        if (StringUtils.equalsIgnoreCase(window.getMode(), AlarmConstant.WINDOW_MODE_LAST)) {
+            return;
+        }
+        throw new UnSupportException(
+                "Window mode '{}' is not yet supported; only 'LAST' is implemented in the current release",
+                window.getMode());
     }
 
     /**

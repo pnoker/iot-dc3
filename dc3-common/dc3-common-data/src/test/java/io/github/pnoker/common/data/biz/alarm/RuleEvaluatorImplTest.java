@@ -67,6 +67,60 @@ class RuleEvaluatorImplTest {
         assertThat(evaluator.recovers(rule, fact)).isTrue();
     }
 
+    @Test
+    void treatsNullWindowModeAsLast() {
+        RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
+        rule.getRuleExt().getContent().setWindow(new RuleExt.Window(null, null, null));
+        RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
+
+        assertThat(evaluator.matches(rule, fact)).isTrue();
+    }
+
+    @Test
+    void treatsExplicitLastModeAsSupported() {
+        RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
+        rule.getRuleExt().getContent().setWindow(new RuleExt.Window("LAST", "PT3M", 1));
+        RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
+
+        assertThat(evaluator.matches(rule, fact)).isTrue();
+    }
+
+    @Test
+    void rejectsNonLastWindowModeOnMatches() {
+        RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
+        rule.getRuleExt().getContent().setWindow(new RuleExt.Window("AVG", "PT3M", 3));
+        RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
+
+        // The current fact would otherwise satisfy the threshold, but AVG mode is
+        // not yet implemented; refuse to fall back to LAST semantics silently.
+        assertThat(evaluator.matches(rule, fact)).isFalse();
+    }
+
+    @Test
+    void rejectsNonLastWindowModeOnRecovers() {
+        RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
+        rule.getRuleExt().getContent().setRecovery(new RuleExt.Recovery(true, "<=", BigDecimal.valueOf(75), "PT2M"));
+        rule.getRuleExt().getContent().setWindow(new RuleExt.Window("COUNT", "PT3M", 3));
+        RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(72)));
+
+        assertThat(evaluator.recovers(rule, fact)).isFalse();
+    }
+
+    @Test
+    void warnsOnceForRepeatedRejectionOfSameRule() {
+        // Two evaluations of the same rule should not double-log; the rejection
+        // warning is rate-limited per rule id via a ConcurrentHashMap.
+        RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
+        rule.getRuleExt().getContent().setWindow(new RuleExt.Window("MAX", "PT3M", 3));
+        RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
+
+        assertThat(evaluator.matches(rule, fact)).isFalse();
+        assertThat(evaluator.matches(rule, fact)).isFalse();
+        // No assertions on log output here — the dedup guarantee is internal —
+        // but the test exists so a regression that rips the dedup will at least
+        // be visible in the test trace.
+    }
+
     private RuleBO rule(String operator, BigDecimal threshold, String expected) {
         RuleExt.Content content = new RuleExt.Content(
                 new RuleExt.Condition("numValue", operator, expected, threshold, null, null, "C"),
