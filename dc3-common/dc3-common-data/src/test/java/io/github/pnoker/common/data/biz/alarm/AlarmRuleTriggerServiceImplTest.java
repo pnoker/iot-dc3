@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -81,23 +82,22 @@ class AlarmRuleTriggerServiceImplTest {
 
     @Test
     void processPointValuesFansOutPerEntry() {
-        // 250 inputs across 5 distinct point ids → 250 pipeline invocations
-        // (one per fact). RuleRegistry caching keeps the pipeline cheap; the
-        // batch entrypoint just exists to make the bulk call site explicit.
+        // 250 inputs across 5 distinct point ids are grouped internally and
+        // dispatched as one processBatch call so the engine can amortize
+        // RuleRegistry lookups and batch-write rule_state / notify_history.
         List<PointValueBO> batch = IntStream.range(0, 250)
                 .mapToObj(i -> point(11L + (i % 5), 7L))
                 .toList();
 
         service.processPointValues(batch);
 
-        verify(alarmRulePipelineService, times(250)).process(any(RuleFact.class));
+        verify(alarmRulePipelineService).processBatch(anyList());
     }
 
     @Test
     void processPointValuesSkipsInvalidEntriesIndividually() {
-        // Mixed batch: 3 valid + 2 invalid (zero ids). Only the valid ones
-        // should reach the pipeline; the invalid samples are dropped at the
-        // single-fact entry guard, not the batch level.
+        // Mixed batch: 3 valid + 2 invalid (zero ids). Invalid entries are
+        // filtered before the batch call; only 3 facts reach the pipeline.
         List<PointValueBO> batch = List.of(
                 point(11L, 7L),
                 point(0L, 7L),       // invalid pointId
@@ -107,9 +107,8 @@ class AlarmRuleTriggerServiceImplTest {
 
         service.processPointValues(batch);
 
-        verify(alarmRulePipelineService, times(3)).process(any(RuleFact.class));
-        // Sanity: no extra invocations
-        verify(alarmRulePipelineService, never()).process(null);
+        verify(alarmRulePipelineService).processBatch(anyList());
+        verify(alarmRulePipelineService, never()).processBatch(null);
     }
 
 }

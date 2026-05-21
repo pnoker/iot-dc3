@@ -28,6 +28,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -77,15 +78,33 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
         if (CollectionUtils.isEmpty(pointValues)) {
             return;
         }
-        // The pipeline still evaluates each fact through RuleEngine per-call; the
-        // bulk entrypoint exists so callers (notably PointValueServiceImpl) can
-        // hand off the whole batch in one go and the engine's cached lookups
-        // (RuleRegistry) are amortized across the group. Per-fact pipeline
-        // execution is intentional — alarm semantics (firing, recovery, dedup)
-        // are still defined sample-by-sample.
+
+        List<PointValueBO> valid = new ArrayList<>();
+        List<RuleFact> facts = new ArrayList<>();
         for (PointValueBO pointValue : pointValues) {
-            processPointValue(pointValue);
+            if (Objects.isNull(pointValue) || !isValidId(pointValue.getTenantId()) || !isValidId(pointValue.getPointId())) {
+                continue;
+            }
+            valid.add(pointValue);
+            LocalDateTime ts = factTime(pointValue.getCreateTime());
+            windowSampleBuffer.append(
+                    WindowSampleKey.of(pointValue.getTenantId(), AlarmTargetTypeFlagEnum.POINT, pointValue.getPointId()),
+                    new WindowSample(pointValue.getNumValue(), pointValue.getCalValue(), ts));
+            facts.add(new RuleFact(
+                    pointValue.getTenantId(),
+                    AlarmTargetTypeFlagEnum.POINT,
+                    pointValue.getPointId(),
+                    null,
+                    ts,
+                    RuleFactValues.point(pointValue)));
         }
+        if (facts.isEmpty()) {
+            return;
+        }
+        // Group by (tenantId, targetType, entityId) so the engine's RuleRegistry
+        // cache is amortized across all facts in the same group; rule_state and
+        // notify_history are batch-written in a single transaction.
+        alarmRulePipelineService.processBatch(facts);
     }
 
     @Override
