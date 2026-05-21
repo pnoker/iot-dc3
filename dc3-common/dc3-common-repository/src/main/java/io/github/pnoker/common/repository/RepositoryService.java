@@ -19,9 +19,12 @@ package io.github.pnoker.common.repository;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.WindowAggregateResult;
 import io.github.pnoker.common.entity.query.PointValueQuery;
+import io.github.pnoker.common.entity.query.WindowAggregateRequest;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -94,5 +97,35 @@ public interface RepositoryService {
      * @return Entity of BO Page
      */
     Page<PointValueBO> listPagePointValue(PointValueQuery entityQuery);
+
+    /**
+     * Compute a single SQL aggregate (AVG/MIN/MAX/SUM/COUNT) over the rows of
+     * {@code dc3_point_value} that fall inside {@code [from, to)} for the
+     * given tenant + device + point. Used by the long-window alarm evaluator
+     * when the rule's window exceeds the local-buffer cutoff.
+     *
+     * @param request aggregation parameters
+     * @return aggregate value and sample count
+     */
+    WindowAggregateResult aggregateInWindow(WindowAggregateRequest request);
+
+    /**
+     * Pull the raw samples in {@code [from, to)} for the given tenant +
+     * device + point, ordered oldest → newest. Used by ALL/ANY long-window
+     * evaluation, where the rule condition has to be applied per-sample
+     * (which cannot be pushed into a single SQL aggregate).
+     *
+     * <p>Callers should bound the window — pulling unbounded samples
+     * defeats the whole point of the time-series store.
+     *
+     * @param tenantId tenant id
+     * @param deviceId device id
+     * @param pointId  point id
+     * @param from     inclusive lower bound on create_time
+     * @param to       exclusive upper bound on create_time
+     * @return ordered samples
+     */
+    List<PointValueBO> samplesInWindow(Long tenantId, Long deviceId, Long pointId,
+                                       LocalDateTime from, LocalDateTime to);
 
 }

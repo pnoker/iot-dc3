@@ -19,6 +19,12 @@ package io.github.pnoker.common.data.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.entity.bo.WindowAggregateResult;
+import io.github.pnoker.common.entity.query.WindowAggregateRequest;
+import org.apache.ibatis.annotations.Param;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Point value Mapper.
@@ -28,5 +34,24 @@ import io.github.pnoker.common.data.entity.model.PointValueDO;
  * @since 2016.10.1
  */
 public interface PointValueMapper extends BaseMapper<PointValueDO> {
+
+    /**
+     * Run a SQL aggregate (AVG/MIN/MAX/SUM/COUNT) over the rows that match
+     * the tenant/device/point bracket and fall inside {@code [from, to)}.
+     * The function name is selected by {@code <choose>} in the XML so the
+     * parameter is safe from injection. Returns null aggregate + zero count
+     * when the window is empty.
+     */
+    WindowAggregateResult aggregateInWindow(@Param("request") WindowAggregateRequest request);
+
+    /**
+     * Pull raw rows in {@code [from, to)} ordered oldest → newest. Used by
+     * ALL/ANY long-window paths where the rule condition has to run per row.
+     */
+    List<PointValueDO> samplesInWindow(@Param("tenantId") Long tenantId,
+                                       @Param("deviceId") Long deviceId,
+                                       @Param("pointId") Long pointId,
+                                       @Param("from") LocalDateTime from,
+                                       @Param("to") LocalDateTime to);
 
 }
