@@ -30,9 +30,11 @@ import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
@@ -47,13 +49,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service("postgresRepositoryService")
+@RequiredArgsConstructor
 public class PostgresRepositoryServiceImpl implements RepositoryService, InitializingBean {
 
-    @Resource
-    private PointValueBuilder pointValueBuilder;
+    private final PointValueBuilder pointValueBuilder;
 
-    @Resource
-    private PointValueManager pointValueManager;
+    private final PointValueManager pointValueManager;
 
     @Override
     public String getRepositoryName() {
@@ -131,10 +132,30 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     private LambdaQueryWrapper<PointValueDO> fuzzyQuery(PointValueQuery entityQuery) {
         LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointValueDO::getTenantId, entityQuery.getTenantId());
-        wrapper.eq(Objects.nonNull(entityQuery.getDeviceId()), PointValueDO::getDeviceId, entityQuery.getDeviceId());
-        wrapper.eq(Objects.nonNull(entityQuery.getPointId()), PointValueDO::getPointId, entityQuery.getPointId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), PointValueDO::getDeviceId,
+                entityQuery.getDeviceId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointId()), PointValueDO::getPointId,
+                entityQuery.getPointId());
         wrapper.ge(Objects.nonNull(entityQuery.getCreateTimeFrom()), PointValueDO::getCreateTime,
                 entityQuery.getCreateTimeFrom());
+        wrapper.exists(StringUtils.isNotEmpty(entityQuery.getDeviceName()),
+                "select 1 from dc3_device dd where dd.deleted = 0 "
+                        + "and dd.tenant_id = dc3_point_value.tenant_id "
+                        + "and dd.id = dc3_point_value.device_id "
+                        + "and dd.device_name like concat('%', {0}, '%')",
+                entityQuery.getDeviceName());
+        wrapper.exists(StringUtils.isNotEmpty(entityQuery.getPointName()),
+                "select 1 from dc3_point dp where dp.deleted = 0 "
+                        + "and dp.tenant_id = dc3_point_value.tenant_id "
+                        + "and dp.id = dc3_point_value.point_id "
+                        + "and dp.point_name like concat('%', {0}, '%')",
+                entityQuery.getPointName());
+        wrapper.exists(Objects.nonNull(entityQuery.getEnableFlag()),
+                "select 1 from dc3_point dp where dp.deleted = 0 "
+                        + "and dp.tenant_id = dc3_point_value.tenant_id "
+                        + "and dp.id = dc3_point_value.point_id "
+                        + "and dp.enable_flag = {0}",
+                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
         return wrapper;
     }
 

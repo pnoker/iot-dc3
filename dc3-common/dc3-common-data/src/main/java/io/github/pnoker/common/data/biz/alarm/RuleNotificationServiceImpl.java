@@ -52,7 +52,7 @@ import io.github.pnoker.common.entity.ext.RuleStateExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.enums.RuleStateFlagEnum;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -73,57 +73,42 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RuleNotificationServiceImpl implements RuleNotificationService {
 
     private static final long DEFAULT_ID = 0L;
 
-    @Resource
-    private NotifyManager notifyManager;
+    private final NotifyManager notifyManager;
 
-    @Resource
-    private NotifyBuilder notifyBuilder;
+    private final NotifyBuilder notifyBuilder;
 
-    @Resource
-    private MessageManager messageManager;
+    private final MessageManager messageManager;
 
-    @Resource
-    private MessageBuilder messageBuilder;
+    private final MessageBuilder messageBuilder;
 
-    @Resource
-    private NotifyChannelBindManager notifyChannelBindManager;
+    private final NotifyChannelBindManager notifyChannelBindManager;
 
-    @Resource
-    private NotifyChannelBindBuilder notifyChannelBindBuilder;
+    private final NotifyChannelBindBuilder notifyChannelBindBuilder;
 
-    @Resource
-    private NotifyChannelManager notifyChannelManager;
+    private final NotifyChannelManager notifyChannelManager;
 
-    @Resource
-    private NotifyChannelBuilder notifyChannelBuilder;
+    private final NotifyChannelBuilder notifyChannelBuilder;
 
-    @Resource
-    private RuleStateManager ruleStateManager;
+    private final RuleStateManager ruleStateManager;
 
-    @Resource
-    private RuleStateBuilder ruleStateBuilder;
+    private final RuleStateBuilder ruleStateBuilder;
 
-    @Resource
-    private NotifyHistoryManager notifyHistoryManager;
+    private final NotifyHistoryManager notifyHistoryManager;
 
-    @Resource
-    private NotifyHistoryBuilder notifyHistoryBuilder;
+    private final NotifyHistoryBuilder notifyHistoryBuilder;
 
-    @Resource
-    private NotifyPolicyEngine notifyPolicyEngine;
+    private final NotifyPolicyEngine notifyPolicyEngine;
 
-    @Resource
-    private MessageRenderService messageRenderService;
+    private final MessageRenderService messageRenderService;
 
-    @Resource
-    private NotifyChannelAdapterRegistry notifyChannelAdapterRegistry;
+    private final NotifyChannelAdapterRegistry notifyChannelAdapterRegistry;
 
-    @Resource
-    private AlarmTemplateRenderer alarmTemplateRenderer;
+    private final AlarmTemplateRenderer alarmTemplateRenderer;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

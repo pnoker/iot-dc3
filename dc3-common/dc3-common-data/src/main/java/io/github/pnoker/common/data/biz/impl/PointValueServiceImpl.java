@@ -36,7 +36,7 @@ import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -58,19 +58,16 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PointValueServiceImpl implements PointValueService {
 
-    @Resource
-    private PointFacade pointFacade;
+    private final PointFacade pointFacade;
 
-    @Resource
-    private DeviceFacade deviceFacade;
+    private final DeviceFacade deviceFacade;
 
-    @Resource
-    private PointValueLocalCacheService pointValueLocalCacheService;
+    private final PointValueLocalCacheService pointValueLocalCacheService;
 
-    @Resource
-    private AlarmRuleTriggerService alarmRuleTriggerService;
+    private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Override
     public void save(PointValueBO pointValueBO) {

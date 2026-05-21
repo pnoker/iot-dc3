@@ -31,7 +31,7 @@ import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.enums.RuleStateFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -48,15 +48,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AlarmEventRecordServiceImpl implements AlarmEventRecordService {
 
     private static final long DEFAULT_ID = 0L;
 
-    @Resource
-    private EntityAlarmManager entityAlarmManager;
+    private final EntityAlarmManager entityAlarmManager;
 
-    @Resource
-    private RuleStateManager ruleStateManager;
+    private final RuleStateManager ruleStateManager;
 
     @Override
     public void ensureEvent(RuleMatch match) {

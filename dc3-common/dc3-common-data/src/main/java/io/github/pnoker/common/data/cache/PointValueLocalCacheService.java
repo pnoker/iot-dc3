@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.cache;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +44,10 @@ import java.util.stream.Collectors;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class PointValueLocalCacheService {
 
-    @Resource
-    private LocalCacheService localCacheService;
+    private final LocalCacheService localCacheService;
 
     public void savePointValue(PointValueBO entityBO) {
         if (Objects.isNull(entityBO.getTenantId()) || Objects.isNull(entityBO.getDeviceId())

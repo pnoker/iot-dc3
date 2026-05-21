@@ -22,7 +22,7 @@ import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,10 +38,10 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
 
-    @Resource
-    private AlarmRulePipelineService alarmRulePipelineService;
+    private final AlarmRulePipelineService alarmRulePipelineService;
 
     @Override
     public void processPointValue(PointValueBO pointValue) {

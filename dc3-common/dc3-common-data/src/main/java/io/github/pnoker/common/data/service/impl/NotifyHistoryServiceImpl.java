@@ -31,8 +31,9 @@ import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -48,13 +49,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotifyHistoryServiceImpl implements NotifyHistoryService {
 
-    @Resource
-    private NotifyHistoryBuilder notifyHistoryBuilder;
+    private final NotifyHistoryBuilder notifyHistoryBuilder;
 
-    @Resource
-    private NotifyHistoryManager notifyHistoryManager;
+    private final NotifyHistoryManager notifyHistoryManager;
 
     @Override
     public void add(NotifyHistoryBO entityBO) {
@@ -102,22 +102,23 @@ public class NotifyHistoryServiceImpl implements NotifyHistoryService {
 
     private LambdaQueryWrapper<NotifyHistoryDO> fuzzyQuery(NotifyHistoryQuery entityQuery) {
         LambdaQueryWrapper<NotifyHistoryDO> wrapper = Wrappers.<NotifyHistoryDO>query().lambda();
-        wrapper.eq(Objects.nonNull(entityQuery.getRuleId()), NotifyHistoryDO::getRuleId, entityQuery.getRuleId());
-        wrapper.eq(Objects.nonNull(entityQuery.getNotifyId()), NotifyHistoryDO::getNotifyId,
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRuleId()), NotifyHistoryDO::getRuleId,
+                entityQuery.getRuleId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getNotifyId()), NotifyHistoryDO::getNotifyId,
                 entityQuery.getNotifyId());
-        wrapper.eq(Objects.nonNull(entityQuery.getMessageId()), NotifyHistoryDO::getMessageId,
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getMessageId()), NotifyHistoryDO::getMessageId,
                 entityQuery.getMessageId());
-        wrapper.eq(Objects.nonNull(entityQuery.getChannelId()), NotifyHistoryDO::getChannelId,
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getChannelId()), NotifyHistoryDO::getChannelId,
                 entityQuery.getChannelId());
-        wrapper.eq(Objects.nonNull(entityQuery.getEventId()), NotifyHistoryDO::getEventId, entityQuery.getEventId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEventId()), NotifyHistoryDO::getEventId,
+                entityQuery.getEventId());
         wrapper.eq(Objects.nonNull(entityQuery.getChannelTypeFlag()), NotifyHistoryDO::getChannelTypeFlag,
-                Objects.nonNull(entityQuery.getChannelTypeFlag())
-                        ? entityQuery.getChannelTypeFlag().getIndex()
-                        : null);
+                Objects.isNull(entityQuery.getChannelTypeFlag()) ? null
+                        : entityQuery.getChannelTypeFlag().getIndex());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getTarget()), NotifyHistoryDO::getTarget,
                 entityQuery.getTarget());
         wrapper.eq(Objects.nonNull(entityQuery.getStatusFlag()), NotifyHistoryDO::getStatusFlag,
-                Objects.nonNull(entityQuery.getStatusFlag()) ? entityQuery.getStatusFlag().getIndex() : null);
+                Objects.isNull(entityQuery.getStatusFlag()) ? null : entityQuery.getStatusFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyHistoryDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

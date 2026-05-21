@@ -37,8 +37,9 @@ import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -53,19 +54,16 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
 
-    @Resource
-    private NotifyChannelBindBuilder notifyChannelBindBuilder;
+    private final NotifyChannelBindBuilder notifyChannelBindBuilder;
 
-    @Resource
-    private NotifyChannelBindManager notifyChannelBindManager;
+    private final NotifyChannelBindManager notifyChannelBindManager;
 
-    @Resource
-    private NotifyManager notifyManager;
+    private final NotifyManager notifyManager;
 
-    @Resource
-    private NotifyChannelManager notifyChannelManager;
+    private final NotifyChannelManager notifyChannelManager;
 
     @Override
     public void add(NotifyChannelBindBO entityBO) {
@@ -119,12 +117,12 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
 
     private LambdaQueryWrapper<NotifyChannelBindDO> fuzzyQuery(NotifyChannelBindQuery entityQuery) {
         LambdaQueryWrapper<NotifyChannelBindDO> wrapper = Wrappers.<NotifyChannelBindDO>query().lambda();
-        wrapper.eq(Objects.nonNull(entityQuery.getNotifyId()), NotifyChannelBindDO::getNotifyId,
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getNotifyId()), NotifyChannelBindDO::getNotifyId,
                 entityQuery.getNotifyId());
-        wrapper.eq(Objects.nonNull(entityQuery.getChannelId()), NotifyChannelBindDO::getChannelId,
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getChannelId()), NotifyChannelBindDO::getChannelId,
                 entityQuery.getChannelId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), NotifyChannelBindDO::getEnableFlag,
-                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyChannelBindDO::getTenantId,
                 entityQuery.getTenantId());
         return wrapper;

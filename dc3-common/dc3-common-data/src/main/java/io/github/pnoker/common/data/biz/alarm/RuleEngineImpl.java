@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
 import io.github.pnoker.common.data.entity.model.RuleDO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,18 +37,16 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class RuleEngineImpl implements RuleEngine {
 
     private static final long GLOBAL_ENTITY_ID = 0L;
 
-    @Resource
-    private RuleManager ruleManager;
+    private final RuleManager ruleManager;
 
-    @Resource
-    private RuleBuilder ruleBuilder;
+    private final RuleBuilder ruleBuilder;
 
-    @Resource
-    private RuleEvaluator ruleEvaluator;
+    private final RuleEvaluator ruleEvaluator;
 
     @Override
     public List<RuleMatch> evaluate(RuleFact fact) {

@@ -33,8 +33,9 @@ import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -50,13 +51,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RuleStateServiceImpl implements RuleStateService {
 
-    @Resource
-    private RuleStateBuilder ruleStateBuilder;
+    private final RuleStateBuilder ruleStateBuilder;
 
-    @Resource
-    private RuleStateManager ruleStateManager;
+    private final RuleStateManager ruleStateManager;
 
     @Override
     public void add(RuleStateBO entityBO) {
@@ -108,17 +108,19 @@ public class RuleStateServiceImpl implements RuleStateService {
 
     private LambdaQueryWrapper<RuleStateDO> fuzzyQuery(RuleStateQuery entityQuery) {
         LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda();
-        wrapper.eq(Objects.nonNull(entityQuery.getRuleId()), RuleStateDO::getRuleId, entityQuery.getRuleId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRuleId()), RuleStateDO::getRuleId,
+                entityQuery.getRuleId());
         wrapper.eq(Objects.nonNull(entityQuery.getAlarmTargetTypeFlag()), RuleStateDO::getAlarmTargetTypeFlag,
-                Objects.nonNull(entityQuery.getAlarmTargetTypeFlag())
-                        ? entityQuery.getAlarmTargetTypeFlag().getIndex()
-                        : null);
-        wrapper.eq(Objects.nonNull(entityQuery.getEntityId()), RuleStateDO::getEntityId, entityQuery.getEntityId());
+                Objects.isNull(entityQuery.getAlarmTargetTypeFlag()) ? null
+                        : entityQuery.getAlarmTargetTypeFlag().getIndex());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), RuleStateDO::getEntityId,
+                entityQuery.getEntityId());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getFingerprint()), RuleStateDO::getFingerprint,
                 entityQuery.getFingerprint());
         wrapper.eq(Objects.nonNull(entityQuery.getStateFlag()), RuleStateDO::getStateFlag,
-                Objects.nonNull(entityQuery.getStateFlag()) ? entityQuery.getStateFlag().getIndex() : null);
-        wrapper.eq(Objects.nonNull(entityQuery.getEventId()), RuleStateDO::getEventId, entityQuery.getEventId());
+                Objects.isNull(entityQuery.getStateFlag()) ? null : entityQuery.getStateFlag().getIndex());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEventId()), RuleStateDO::getEventId,
+                entityQuery.getEventId());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleStateDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

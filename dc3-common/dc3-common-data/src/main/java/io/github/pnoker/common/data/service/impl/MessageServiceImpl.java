@@ -36,7 +36,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -53,13 +53,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
-    @Resource
-    private MessageBuilder messageBuilder;
+    private final MessageBuilder messageBuilder;
 
-    @Resource
-    private MessageManager messageManager;
+    private final MessageManager messageManager;
 
     @Override
     public void add(MessageBO entityBO) {
@@ -127,9 +126,9 @@ public class MessageServiceImpl implements MessageService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getMessageCode()), MessageDO::getMessageCode,
                 entityQuery.getMessageCode());
         wrapper.eq(Objects.nonNull(entityQuery.getMessageLevel()), MessageDO::getMessageLevel,
-                Objects.nonNull(entityQuery.getMessageLevel()) ? entityQuery.getMessageLevel().getIndex() : null);
+                Objects.isNull(entityQuery.getMessageLevel()) ? null : entityQuery.getMessageLevel().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), MessageDO::getEnableFlag,
-                Objects.nonNull(entityQuery.getEnableFlag()) ? entityQuery.getEnableFlag().getIndex() : null);
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), MessageDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

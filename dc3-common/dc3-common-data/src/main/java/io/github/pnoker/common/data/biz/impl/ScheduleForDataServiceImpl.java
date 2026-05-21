@@ -24,7 +24,7 @@ import io.github.pnoker.common.data.job.HourlyJobForData;
 import io.github.pnoker.common.data.job.PointValueJob;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
@@ -37,16 +37,12 @@ import org.springframework.stereotype.Service;
  * @since 2016.10.1
  */
 @Service
+@RequiredArgsConstructor
 public class ScheduleForDataServiceImpl implements ScheduleForDataService {
 
     private final PointBatchProperties pointBatchProperties;
 
-    @Resource
-    private QuartzService quartzService;
-
-    public ScheduleForDataServiceImpl(PointBatchProperties pointBatchProperties) {
-        this.pointBatchProperties = pointBatchProperties;
-    }
+    private final QuartzService quartzService;
 
     /**
      * Initialize data scheduling

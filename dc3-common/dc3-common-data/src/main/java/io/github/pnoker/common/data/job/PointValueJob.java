@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.job;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -41,6 +41,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PointValueJob extends QuartzJobBean {
 
     private static final ReentrantReadWriteLock VALUE_LOCK = new ReentrantReadWriteLock();
@@ -53,15 +54,9 @@ public class PointValueJob extends QuartzJobBean {
 
     private final PointBatchProperties pointBatchProperties;
 
-    @Resource
-    private PointValueService pointValueService;
+    private final PointValueService pointValueService;
 
-    @Resource
-    private ExecutorService virtualThreadExecutor;
-
-    public PointValueJob(PointBatchProperties pointBatchProperties) {
-        this.pointBatchProperties = pointBatchProperties;
-    }
+    private final ExecutorService virtualThreadExecutor;
 
     /**
      * PointValue

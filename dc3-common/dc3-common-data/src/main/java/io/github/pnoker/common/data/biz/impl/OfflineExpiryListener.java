@@ -35,7 +35,7 @@ import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -53,22 +53,18 @@ import java.util.concurrent.CompletableFuture;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class OfflineExpiryListener {
 
-    @Resource
-    private LocalCacheService localCacheService;
+    private final LocalCacheService localCacheService;
 
-    @Resource
-    private DriverFacade driverFacade;
+    private final DriverFacade driverFacade;
 
-    @Resource
-    private DeviceFacade deviceFacade;
+    private final DeviceFacade deviceFacade;
 
-    @Resource
-    private EntityAlarmManager entityAlarmManager;
+    private final EntityAlarmManager entityAlarmManager;
 
-    @Resource
-    private AlarmRuleTriggerService alarmRuleTriggerService;
+    private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     private static Long parseIdSuffix(String key, String prefix) {
         try {

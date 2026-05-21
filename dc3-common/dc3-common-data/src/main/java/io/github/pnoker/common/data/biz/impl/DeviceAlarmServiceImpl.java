@@ -26,7 +26,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -40,13 +40,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DeviceAlarmServiceImpl implements DeviceAlarmService {
 
-    @Resource
-    private EntityAlarmManager entityAlarmManager;
+    private final EntityAlarmManager entityAlarmManager;
 
-    @Resource
-    private AlarmRuleTriggerService alarmRuleTriggerService;
+    private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Override
     public void alarm(DeviceAlarmDTO entityDTO) {
