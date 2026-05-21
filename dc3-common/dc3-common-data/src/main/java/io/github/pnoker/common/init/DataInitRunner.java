@@ -17,12 +17,12 @@
 
 package io.github.pnoker.common.init;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.data.biz.ScheduleForDataService;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
 import io.github.pnoker.common.data.entity.property.NotifyCredentialProperties;
 import io.github.pnoker.common.data.entity.property.PointBatchProperties;
+import lombok.RequiredArgsConstructor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

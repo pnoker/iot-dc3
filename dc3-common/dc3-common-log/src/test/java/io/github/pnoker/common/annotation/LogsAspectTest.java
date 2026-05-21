@@ -35,6 +35,20 @@ class LogsAspectTest {
 
     private final LogsAspect logsAspect = new LogsAspect();
 
+    private static ProceedingJoinPoint joinPoint(String methodName) {
+        Signature signature = mock(Signature.class);
+        when(signature.getDeclaringType()).thenReturn(AnnotatedOperations.class);
+        when(signature.getName()).thenReturn(methodName);
+
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+        when(joinPoint.getSignature()).thenReturn(signature);
+        return joinPoint;
+    }
+
+    private static java.lang.reflect.Method annotatedMethod(String name) throws NoSuchMethodException {
+        return AnnotatedOperations.class.getDeclaredMethod(name);
+    }
+
     @Test
     void doAroundReturnsProceedResult() throws Throwable {
         ProceedingJoinPoint joinPoint = joinPoint("create");
@@ -82,20 +96,6 @@ class LogsAspectTest {
         assertThat(logs.save()).isTrue();
         assertThat(LogsType.values())
                 .containsExactly(LogsType.INFO, LogsType.WARN, LogsType.DEBUG, LogsType.ERROR);
-    }
-
-    private static ProceedingJoinPoint joinPoint(String methodName) {
-        Signature signature = mock(Signature.class);
-        when(signature.getDeclaringType()).thenReturn(AnnotatedOperations.class);
-        when(signature.getName()).thenReturn(methodName);
-
-        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
-        when(joinPoint.getSignature()).thenReturn(signature);
-        return joinPoint;
-    }
-
-    private static java.lang.reflect.Method annotatedMethod(String name) throws NoSuchMethodException {
-        return AnnotatedOperations.class.getDeclaredMethod(name);
     }
 
     private static final class AnnotatedOperations {

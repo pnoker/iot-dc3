@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
-import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,20 +50,40 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class WindowedAlarmPipelineIntegrationTest {
 
+    private static final long TENANT_ID = 7L;
+    private static final long POINT_ID = 11L;
     @Mock
     private RuleRegistry ruleRegistry;
-
     @Mock
     private RuleStateLookup ruleStateLookup;
-
     private WindowSampleBuffer buffer;
     private LocalWindowDataSource localSource;
     private WindowedRuleEvaluator windowedEvaluator;
     private RuleEvaluatorImpl ruleEvaluator;
     private RuleEngineImpl engine;
 
-    private static final long TENANT_ID = 7L;
-    private static final long POINT_ID = 11L;
+    private static RuleBO rule(String mode, String operator, BigDecimal threshold, int minSamples) {
+        return rule(mode, operator, threshold, minSamples, "numValue");
+    }
+
+    private static RuleBO rule(String mode, String operator, BigDecimal threshold, int minSamples, String field) {
+        RuleExt.Content content = new RuleExt.Content(
+                new RuleExt.Condition(field, operator, "offline", threshold, null, null, "C"),
+                new RuleExt.Window(mode, "PT3M", minSamples),
+                null,
+                "P1",
+                "ALARM",
+                List.of("temperature"));
+        RuleExt ext = new RuleExt(content);
+        ext.setType("POINT_VALUE_RULE");
+        ext.setVersion(1);
+        RuleBO rule = new RuleBO();
+        rule.setId(1L);
+        rule.setRuleCode("rule");
+        rule.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
+        rule.setRuleExt(ext);
+        return rule;
+    }
 
     @BeforeEach
     void setUp() {
@@ -92,29 +111,6 @@ class WindowedAlarmPipelineIntegrationTest {
         // appended sample, so the evaluator's window includes it.
         return new RuleFact(TENANT_ID, AlarmTargetTypeFlagEnum.POINT, POINT_ID, null,
                 LocalDateTime.now().plusNanos(1), Map.of("numValue", 0));
-    }
-
-    private static RuleBO rule(String mode, String operator, BigDecimal threshold, int minSamples) {
-        return rule(mode, operator, threshold, minSamples, "numValue");
-    }
-
-    private static RuleBO rule(String mode, String operator, BigDecimal threshold, int minSamples, String field) {
-        RuleExt.Content content = new RuleExt.Content(
-                new RuleExt.Condition(field, operator, "offline", threshold, null, null, "C"),
-                new RuleExt.Window(mode, "PT3M", minSamples),
-                null,
-                "P1",
-                "ALARM",
-                List.of("temperature"));
-        RuleExt ext = new RuleExt(content);
-        ext.setType("POINT_VALUE_RULE");
-        ext.setVersion(1);
-        RuleBO rule = new RuleBO();
-        rule.setId(1L);
-        rule.setRuleCode("rule");
-        rule.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
-        rule.setRuleExt(ext);
-        return rule;
     }
 
     @Test

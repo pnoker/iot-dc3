@@ -27,7 +27,6 @@ import java.math.BigDecimal;
  *                    integer count packaged as a BigDecimal).
  * @param sampleCount number of rows that fell inside {@code [from, to)}.
  *                    Aggregators use this to enforce {@code minSamples}.
- *
  * @author pnoker
  * @version 2026.5.21
  * @since 2026.5.21

@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.manager.event.metadata;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.utils.JsonUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.EnableAsync;

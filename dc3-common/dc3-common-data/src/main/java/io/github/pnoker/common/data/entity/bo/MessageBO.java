@@ -29,7 +29,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
-
  * Business object for alarm message template operations.
  *
  * @author pnoker

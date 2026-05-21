@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
@@ -27,6 +26,7 @@ import io.github.pnoker.common.driver.service.DriverScheduleService;
 import io.github.pnoker.common.exception.CronException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
+import lombok.RequiredArgsConstructor;
 import org.quartz.CronExpression;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;

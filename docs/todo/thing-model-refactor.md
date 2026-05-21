@@ -10,7 +10,8 @@ title: 物模型改造设计
 
 - 当前阶段：初版方案
 - 目标范围：基于现有 `Profile`、`Point`、读写指令补齐自定义指令、事件能力
-- 核心判断：先把设备与 `Profile` 收敛为单归属，确保 `Profile` 承载设备能力模型、`Point` 承载点位能力；之后把物模型语义里的服务统一落到 DC3 的 `Command / 指令` 体系
+- 核心判断：先把设备与 `Profile` 收敛为单归属，确保 `Profile` 承载设备能力模型、`Point` 承载点位能力；之后把物模型语义里的服务统一落到
+  DC3 的 `Command / 指令` 体系
 
 ## 待办清单
 
@@ -25,7 +26,8 @@ title: 物模型改造设计
 - [ ] 确认自定义指令定义表命名为 `dc3_command`、`dc3_command_param`。
 - [ ] 确认事件定义表命名为 `dc3_event`、`dc3_event_param`。
 - [ ] 确认设备/驱动在线状态由 `LocalCacheService`（Caffeine）和运行态事件派生，不纳入 `dc3_event` 模型事件定义范围。
-- [ ] 确认 `dc3_driver_event` 保持平台运行态事件定位，`dc3_device_event` 只有在补充 `event_id` 或 `event_code` 后才可承载模型事件实例。
+- [ ] 确认 `dc3_driver_event` 保持平台运行态事件定位，`dc3_device_event` 只有在补充 `event_id` 或 `event_code`
+  后才可承载模型事件实例。
 - [ ] 确认历史多 `Profile` 绑定设备的迁移规则和人工确认流程。
 
 ### 设备与 Profile 单归属

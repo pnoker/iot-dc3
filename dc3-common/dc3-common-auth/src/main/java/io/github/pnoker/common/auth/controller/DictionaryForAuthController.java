@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
 import io.github.pnoker.common.auth.entity.builder.DictionaryForAuthBuilder;
 import io.github.pnoker.common.base.BaseController;
@@ -25,6 +24,7 @@ import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.dal.entity.vo.DictionaryVO;
 import io.github.pnoker.common.entity.R;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

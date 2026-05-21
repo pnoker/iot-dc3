@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
@@ -30,6 +29,7 @@ import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -41,9 +41,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Implements point-value dispatch to the data center via RabbitMQ.
  *
-  * @author pnoker
-  * @version 2025.9.0
-  * @since 2016.10.1
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
  */
 @Slf4j
 @Service

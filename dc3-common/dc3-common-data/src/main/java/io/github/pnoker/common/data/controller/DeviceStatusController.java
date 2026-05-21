@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.data.controller;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
 import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

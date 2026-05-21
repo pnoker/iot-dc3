@@ -75,9 +75,9 @@ public class MetadataEvent extends ApplicationEvent {
         this.operateType = operateType;
         this.targetServices = Objects.isNull(targetServices) ? Collections.emptySet()
                 : targetServices.stream()
-                        .filter(Objects::nonNull)
-                        .filter(service -> !service.isBlank())
-                        .collect(Collectors.toUnmodifiableSet());
+                .filter(Objects::nonNull)
+                .filter(service -> !service.isBlank())
+                .collect(Collectors.toUnmodifiableSet());
     }
 
 }

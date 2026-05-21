@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.resource.registrar;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
 import io.github.pnoker.common.resource.registrar.scan.ApiEndpointScanner;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

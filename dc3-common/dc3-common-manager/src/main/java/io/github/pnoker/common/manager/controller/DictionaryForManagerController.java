@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -28,6 +27,7 @@ import io.github.pnoker.common.manager.biz.DictionaryForManagerService;
 import io.github.pnoker.common.manager.entity.builder.DictionaryForManagerBuilder;
 import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.common.valid.Parent;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;

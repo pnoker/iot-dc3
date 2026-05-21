@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.gateway.filter;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -27,6 +26,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;

@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.init;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.manager.biz.ScheduleForManagerService;
+import lombok.RequiredArgsConstructor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.config;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Bean;
 
 /**
  * Spring auto-configuration for data service RabbitMQ topic exchanges.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

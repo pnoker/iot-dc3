@@ -16,11 +16,11 @@
  */
 package io.github.pnoker.common.agentic.config;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;

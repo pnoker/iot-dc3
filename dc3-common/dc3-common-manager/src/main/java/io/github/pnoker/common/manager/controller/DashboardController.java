@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
@@ -26,6 +25,7 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
 import io.github.pnoker.common.manager.service.DashboardService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

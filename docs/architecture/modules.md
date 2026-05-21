@@ -44,7 +44,8 @@ iot-dc3 (root pom)
 | dc3-common-postgres   | PostgreSQL datasource (dynamic multi-schema) |
 | dc3-common-repository | File/blob storage abstraction                |
 
-Runtime caches use in-process Caffeine wrappers such as `LocalCacheService`; Redis is no longer a standalone module or infrastructure dependency.
+Runtime caches use in-process Caffeine wrappers such as `LocalCacheService`; Redis is no longer a standalone module or
+infrastructure dependency.
 
 ### Communication Layer
 

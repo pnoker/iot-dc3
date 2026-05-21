@@ -17,12 +17,12 @@
 
 package io.github.pnoker.common.driver.event.metadata;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

@@ -62,15 +62,11 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class EntityStateExpiryScanner {
 
-    private final EntityStateManager entityStateManager;
-
-    private final EntityAlarmManager entityAlarmManager;
-
-    private final AlarmRuleTriggerService alarmRuleTriggerService;
-
     private static final int OFFLINE_RENEW_SECONDS = 300;
-
     private static final int BATCH_LIMIT = 500;
+    private final EntityStateManager entityStateManager;
+    private final EntityAlarmManager entityAlarmManager;
+    private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Scheduled(fixedDelay = 15_000, initialDelay = 30_000)
     public void scanExpiredLeases() {

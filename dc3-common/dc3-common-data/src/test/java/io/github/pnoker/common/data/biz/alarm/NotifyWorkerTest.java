@@ -78,13 +78,6 @@ class NotifyWorkerTest {
 
     private Message message;
 
-    @BeforeEach
-    void setUp() {
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(11L);
-        message = new Message(new byte[0], props);
-    }
-
     private static NotifyTaskDTO task(int retry) {
         return NotifyTaskDTO.builder()
                 .notifyHistoryId(50L)
@@ -95,6 +88,13 @@ class NotifyWorkerTest {
                 .payload(Map.of("title", "test"))
                 .retryCount(retry)
                 .build();
+    }
+
+    @BeforeEach
+    void setUp() {
+        MessageProperties props = new MessageProperties();
+        props.setDeliveryTag(11L);
+        message = new Message(new byte[0], props);
     }
 
     private void stubChannel(boolean enabled, NotifyChannelTypeFlagEnum type) {

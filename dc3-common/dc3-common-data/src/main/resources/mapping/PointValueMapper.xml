@@ -43,12 +43,12 @@
         COUNT(*) AS sample_count
         FROM dc3_point_value
         WHERE tenant_id = #{request.tenantId}
-          AND device_id = #{request.deviceId}
-          AND point_id = #{request.pointId}
-          AND create_time &gt;= #{request.from}
-          AND create_time &lt; #{request.to}
+        AND device_id = #{request.deviceId}
+        AND point_id = #{request.pointId}
+        AND create_time &gt;= #{request.from}
+        AND create_time &lt; #{request.to}
         <if test="request.function == 'AVG' or request.function == 'MIN' or request.function == 'MAX' or request.function == 'SUM'">
-          AND num_value IS NOT NULL
+            AND num_value IS NOT NULL
         </if>
     </select>
 

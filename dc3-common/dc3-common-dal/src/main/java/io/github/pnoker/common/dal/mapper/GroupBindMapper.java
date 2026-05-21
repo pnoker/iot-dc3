@@ -24,9 +24,10 @@ import io.github.pnoker.common.dal.entity.model.GroupBindDO;
  * <p>
  * Mapper interface for the group and entity binding table.
  * </p>
- *
-
+ * <p>
+ * <p>
  * MyBatis-Plus mapper for the dc3_group_bind table.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

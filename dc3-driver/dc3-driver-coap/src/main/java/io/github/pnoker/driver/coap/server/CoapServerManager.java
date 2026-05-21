@@ -17,10 +17,10 @@
 
 package io.github.pnoker.driver.coap.server;
 
-import lombok.RequiredArgsConstructor;
 import io.github.pnoker.driver.coap.entity.property.CoapProperties;
 import io.github.pnoker.driver.coap.server.resource.DataResource;
 import io.github.pnoker.driver.coap.service.CoapReceiveService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.config.CoapConfig;

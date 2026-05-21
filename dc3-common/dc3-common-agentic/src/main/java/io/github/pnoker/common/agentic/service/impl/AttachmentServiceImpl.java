@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
@@ -27,6 +26,7 @@ import io.github.pnoker.common.agentic.entity.model.AttachmentDO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
