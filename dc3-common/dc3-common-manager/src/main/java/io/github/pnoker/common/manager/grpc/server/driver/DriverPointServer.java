@@ -37,7 +37,7 @@ import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -57,19 +57,16 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
 
-    @Resource
-    private GrpcPointBuilder grpcPointBuilder;
+    private final GrpcPointBuilder grpcPointBuilder;
 
-    @Resource
-    private PointService pointService;
+    private final PointService pointService;
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
-    @Resource
-    private DeviceService deviceService;
+    private final DeviceService deviceService;
 
     @Override
     public void listByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {

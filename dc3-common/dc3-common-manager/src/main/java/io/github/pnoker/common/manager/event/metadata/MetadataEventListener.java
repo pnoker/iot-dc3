@@ -24,7 +24,7 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.ApplicationListener;
@@ -42,13 +42,12 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MetadataEventListener implements ApplicationListener<MetadataEvent> {
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
-    @Resource
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Async
     @Override

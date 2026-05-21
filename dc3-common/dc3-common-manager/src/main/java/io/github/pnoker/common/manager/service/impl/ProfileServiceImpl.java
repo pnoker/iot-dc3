@@ -47,7 +47,7 @@ import io.github.pnoker.common.manager.mapper.ProfileMapper;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -68,25 +68,20 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
-    @Resource
-    private ProfileBuilder profileBuilder;
+    private final ProfileBuilder profileBuilder;
 
-    @Resource
-    private ProfileManager profileManager;
+    private final ProfileManager profileManager;
 
-    @Resource
-    private ProfileBindManager profileBindManager;
+    private final ProfileBindManager profileBindManager;
 
-    @Resource
-    private PointManager pointManager;
+    private final PointManager pointManager;
 
-    @Resource
-    private ProfileMapper profileMapper;
+    private final ProfileMapper profileMapper;
 
-    @Resource
-    private DeviceMapper deviceMapper;
+    private final DeviceMapper deviceMapper;
 
     @Override
     public void add(ProfileBO entityBO) {
@@ -199,9 +194,14 @@ public class ProfileServiceImpl implements ProfileService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getProfileCode()), "dp.profile_code",
                 entityQuery.getProfileCode());
         wrapper.eq(Objects.nonNull(entityQuery.getProfileShareFlag()), "dp.profile_share_flag",
-                entityQuery.getProfileShareFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
+                Objects.isNull(entityQuery.getProfileShareFlag()) ? null
+                        : entityQuery.getProfileShareFlag().getIndex());
+        wrapper.eq(Objects.nonNull(entityQuery.getProfileTypeFlag()), "dp.profile_type_flag",
+                Objects.isNull(entityQuery.getProfileTypeFlag()) ? null : entityQuery.getProfileTypeFlag().getIndex());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag",
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dp.tenant_id", entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dp.version", entityQuery.getVersion());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
                 "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
                         + "and dgb.tenant_id = dp.tenant_id "

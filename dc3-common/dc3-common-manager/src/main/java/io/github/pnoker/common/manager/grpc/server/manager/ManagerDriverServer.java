@@ -36,7 +36,7 @@ import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -53,13 +53,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
-    @Resource
-    private GrpcDriverBuilder grpcDriverBuilder;
+    private final GrpcDriverBuilder grpcDriverBuilder;
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
     @Override
     public void listByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {

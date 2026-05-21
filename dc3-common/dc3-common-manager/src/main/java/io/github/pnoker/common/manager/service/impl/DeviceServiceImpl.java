@@ -60,7 +60,7 @@ import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import io.github.pnoker.common.utils.PoiUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -96,40 +96,30 @@ import java.util.Set;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DeviceServiceImpl implements DeviceService {
 
-    @Resource
-    private DeviceBuilder deviceBuilder;
+    private final DeviceBuilder deviceBuilder;
 
-    @Resource
-    private DeviceManager deviceManager;
+    private final DeviceManager deviceManager;
 
-    @Resource
-    private DeviceMapper deviceMapper;
+    private final DeviceMapper deviceMapper;
 
-    @Resource
-    private PointService pointService;
+    private final PointService pointService;
 
-    @Resource
-    private ProfileBindService profileBindService;
+    private final ProfileBindService profileBindService;
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
-    @Resource
-    private ProfileService profileService;
+    private final ProfileService profileService;
 
-    @Resource
-    private DriverAttributeService driverAttributeService;
+    private final DriverAttributeService driverAttributeService;
 
-    @Resource
-    private PointAttributeService pointAttributeService;
+    private final PointAttributeService pointAttributeService;
 
-    @Resource
-    private ImportDeviceService importDeviceService;
+    private final ImportDeviceService importDeviceService;
 
-    @Resource
-    private MetadataEventPublisher metadataEventPublisher;
+    private final MetadataEventPublisher metadataEventPublisher;
 
     @Override
     public void add(DeviceBO entityBO) {
@@ -580,8 +570,10 @@ public class DeviceServiceImpl implements DeviceService {
             wrapper.eq(StringUtils.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code",
                     entityQuery.getDeviceCode());
             wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
-            wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
+            wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dd.enable_flag",
+                    Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
             wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dd.tenant_id", entityQuery.getTenantId());
+            wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dd.version", entityQuery.getVersion());
             wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
                     "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
                             + "and dgb.tenant_id = dd.tenant_id "

@@ -38,7 +38,7 @@ import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -56,16 +56,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverAttributeServiceImpl implements DriverAttributeService {
 
-    @Resource
-    private DriverAttributeBuilder driverAttributeBuilder;
+    private final DriverAttributeBuilder driverAttributeBuilder;
 
-    @Resource
-    private DriverAttributeManager driverAttributeManager;
+    private final DriverAttributeManager driverAttributeManager;
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
     @Override
     public void add(DriverAttributeBO entityBO) {
@@ -186,16 +184,20 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), DriverAttributeDO::getAttributeCode,
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), DriverAttributeDO::getAttributeCode,
                 entityQuery.getAttributeCode());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName,
                 entityQuery.getAttributeName());
         wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag,
-                entityQuery.getAttributeTypeFlag());
+                Objects.isNull(entityQuery.getAttributeTypeFlag()) ? null
+                        : entityQuery.getAttributeTypeFlag().getIndex());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), DriverAttributeDO::getDriverId,
                 entityQuery.getDriverId());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverAttributeDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverAttributeDO::getTenantId,
                 entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), DriverAttributeDO::getVersion, entityQuery.getVersion());
         return wrapper;
     }
 

@@ -35,7 +35,7 @@ import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcProfileBuilder;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -53,13 +53,12 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
 
-    @Resource
-    private GrpcProfileBuilder grpcProfileBuilder;
+    private final GrpcProfileBuilder grpcProfileBuilder;
 
-    @Resource
-    private ProfileService profileService;
+    private final ProfileService profileService;
 
     @Override
     public void listByPage(GrpcPageProfileQuery request, StreamObserver<GrpcRPageProfileDTO> responseObserver) {

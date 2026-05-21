@@ -50,7 +50,7 @@ import io.github.pnoker.common.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -70,31 +70,24 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PointAttributeConfigServiceImpl implements PointAttributeConfigService {
 
-    @Resource
-    private PointAttributeConfigBuilder pointAttributeConfigBuilder;
+    private final PointAttributeConfigBuilder pointAttributeConfigBuilder;
 
-    @Resource
-    private PointAttributeConfigManager pointAttributeConfigManager;
+    private final PointAttributeConfigManager pointAttributeConfigManager;
 
-    @Resource
-    private MetadataEventPublisher metadataEventPublisher;
+    private final MetadataEventPublisher metadataEventPublisher;
 
-    @Resource
-    private PointService pointService;
+    private final PointService pointService;
 
-    @Resource
-    private DeviceManager deviceManager;
+    private final DeviceManager deviceManager;
 
-    @Resource
-    private PointManager pointManager;
+    private final PointManager pointManager;
 
-    @Resource
-    private PointAttributeManager pointAttributeManager;
+    private final PointAttributeManager pointAttributeManager;
 
-    @Resource
-    private ProfileBindManager profileBindManager;
+    private final ProfileBindManager profileBindManager;
 
     @Override
     public void add(PointAttributeConfigBO entityBO) {
@@ -244,8 +237,12 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
                 entityQuery.getDeviceId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointId()), PointAttributeConfigDO::getPointId,
                 entityQuery.getPointId());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), PointAttributeConfigDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeConfigDO::getTenantId,
                 entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), PointAttributeConfigDO::getVersion,
+                entityQuery.getVersion());
         return wrapper;
     }
 

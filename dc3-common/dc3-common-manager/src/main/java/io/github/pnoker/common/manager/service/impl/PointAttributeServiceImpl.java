@@ -38,7 +38,7 @@ import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -56,16 +56,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PointAttributeServiceImpl implements PointAttributeService {
 
-    @Resource
-    private PointAttributeBuilder pointAttributeBuilder;
+    private final PointAttributeBuilder pointAttributeBuilder;
 
-    @Resource
-    private PointAttributeManager pointAttributeManager;
+    private final PointAttributeManager pointAttributeManager;
 
-    @Resource
-    private DriverService driverService;
+    private final DriverService driverService;
 
     @Override
     public void add(PointAttributeBO entityBO) {
@@ -182,16 +180,20 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     private LambdaQueryWrapper<PointAttributeDO> fuzzyQuery(PointAttributeQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), PointAttributeDO::getAttributeCode,
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), PointAttributeDO::getAttributeCode,
                 entityQuery.getAttributeCode());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName,
                 entityQuery.getAttributeName());
         wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag,
-                entityQuery.getAttributeTypeFlag());
+                Objects.isNull(entityQuery.getAttributeTypeFlag()) ? null
+                        : entityQuery.getAttributeTypeFlag().getIndex());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId,
                 entityQuery.getDriverId());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), PointAttributeDO::getEnableFlag,
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeDO::getTenantId,
                 entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), PointAttributeDO::getVersion, entityQuery.getVersion());
         return wrapper;
     }
 

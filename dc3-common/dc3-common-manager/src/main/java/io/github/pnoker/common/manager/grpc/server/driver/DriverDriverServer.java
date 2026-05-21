@@ -34,7 +34,7 @@ import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeBuilder;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.grpc.stub.StreamObserver;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -49,22 +49,18 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
-    @Resource
-    private GrpcDriverBuilder grpcDriverBuilder;
+    private final GrpcDriverBuilder grpcDriverBuilder;
 
-    @Resource
-    private GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
+    private final GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
 
-    @Resource
-    private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
+    private final GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
-    @Resource
-    private DriverRegisterService driverRegisterService;
+    private final DriverRegisterService driverRegisterService;
 
-    @Resource
-    private DeviceService deviceService;
+    private final DeviceService deviceService;
 
     @Override
     public void driverRegister(GrpcDriverRegisterDTO request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {

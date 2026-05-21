@@ -42,7 +42,7 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
 import io.github.pnoker.common.manager.mapper.DashboardMapper;
 import io.github.pnoker.common.manager.service.DashboardService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +70,7 @@ import java.util.Set;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
 
     // Top-N caps, mode / range literals and cache sizing all live in
@@ -80,8 +81,7 @@ public class DashboardServiceImpl implements DashboardService {
             .maximumSize(TopologyLimits.CACHE_MAX_SIZE)
             .build();
 
-    @Resource
-    private DashboardMapper dashboardMapper;
+    private final DashboardMapper dashboardMapper;
 
     private static List<BucketVO> buckets(List<BucketRow> rows, KeyFormatter fmt) {
         List<BucketVO> out = new ArrayList<>(rows.size());

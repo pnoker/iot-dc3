@@ -54,7 +54,7 @@ import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -77,34 +77,26 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PointServiceImpl implements PointService {
 
-    @Resource
-    private PointBuilder pointBuilder;
+    private final PointBuilder pointBuilder;
 
-    @Resource
-    private PointManager pointManager;
+    private final PointManager pointManager;
 
-    @Resource
-    private ProfileBindManager profileBindManager;
+    private final ProfileBindManager profileBindManager;
 
-    @Resource
-    private PointMapper pointMapper;
+    private final PointMapper pointMapper;
 
-    @Resource
-    private MetadataEventPublisher metadataEventPublisher;
+    private final MetadataEventPublisher metadataEventPublisher;
 
-    @Resource
-    private ProfileBindService profileBindService;
+    private final ProfileBindService profileBindService;
 
-    @Resource
-    private ProfileService profileService;
+    private final ProfileService profileService;
 
-    @Resource
-    private PointAttributeConfigManager pointAttributeConfigManager;
+    private final PointAttributeConfigManager pointAttributeConfigManager;
 
-    @Resource
-    private DeviceMapper deviceMapper;
+    private final DeviceMapper deviceMapper;
 
     @Override
     public void add(PointBO entityBO) {
@@ -322,11 +314,14 @@ public class PointServiceImpl implements PointService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getPointName()), "dp.point_name", entityQuery.getPointName());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getPointCode()), "dp.point_code", entityQuery.getPointCode());
         wrapper.eq(Objects.nonNull(entityQuery.getPointTypeFlag()), "dp.point_type_flag",
-                entityQuery.getPointTypeFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getRwFlag()), "dp.rw_flag", entityQuery.getRwFlag());
+                Objects.isNull(entityQuery.getPointTypeFlag()) ? null : entityQuery.getPointTypeFlag().getIndex());
+        wrapper.eq(Objects.nonNull(entityQuery.getRwFlag()), "dp.rw_flag",
+                Objects.isNull(entityQuery.getRwFlag()) ? null : entityQuery.getRwFlag().getIndex());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dp.profile_id", entityQuery.getProfileId());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag",
+                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dp.tenant_id", entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dp.version", entityQuery.getVersion());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
                 "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
                         + "and dgb.tenant_id = dp.tenant_id "
