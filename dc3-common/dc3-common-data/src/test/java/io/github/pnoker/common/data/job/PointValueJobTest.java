@@ -29,7 +29,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionContext;
 
-import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -55,22 +54,14 @@ class PointValueJobTest {
     private ExecutorService executor;
     private PointBatchProperties properties;
 
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
-
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         properties = new PointBatchProperties();
         properties.setSpeed(100);
         properties.setInterval(5);
         executor = Executors.newSingleThreadExecutor();
 
-        job = new PointValueJob(properties);
-        injectField(job, "pointValueService", pointValueService);
-        injectField(job, "virtualThreadExecutor", executor);
+        job = new PointValueJob(properties, pointValueService, executor);
 
         PointValueJob.resetMetrics();
         PointValueJob.clearPointValues();

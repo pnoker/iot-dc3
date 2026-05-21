@@ -121,10 +121,8 @@ class PlcS7DriverCustomServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new PlcS7DriverCustomServiceImpl();
-        injectField("driverMetadata", driverMetadata);
-        injectField("driverSenderService", driverSenderService);
+    void setUp() {
+        service = new PlcS7DriverCustomServiceImpl(driverMetadata, driverSenderService);
         service.initial();
     }
 
@@ -275,9 +273,4 @@ class PlcS7DriverCustomServiceImplTest {
         return (Map) field.get(service);
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = PlcS7DriverCustomServiceImpl.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(service, value);
-    }
 }

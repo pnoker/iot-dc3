@@ -120,10 +120,8 @@ class OpcUaDriverCustomServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new OpcUaDriverCustomServiceImpl();
-        injectField("driverMetadata", driverMetadata);
-        injectField("driverSenderService", driverSenderService);
+    void setUp() {
+        service = new OpcUaDriverCustomServiceImpl(driverMetadata, driverSenderService);
         service.initial();
     }
 
@@ -231,9 +229,4 @@ class OpcUaDriverCustomServiceImplTest {
         return (Map<Long, OpcUaClient>) field.get(service);
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(service, value);
-    }
 }

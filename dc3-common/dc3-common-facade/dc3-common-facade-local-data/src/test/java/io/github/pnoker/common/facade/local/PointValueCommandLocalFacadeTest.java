@@ -27,8 +27,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -42,11 +40,8 @@ class PointValueCommandLocalFacadeTest {
     private PointValueCommandLocalFacade facade;
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new PointValueCommandLocalFacade();
-        Field field = PointValueCommandLocalFacade.class.getDeclaredField("pointValueCommandService");
-        field.setAccessible(true);
-        field.set(facade, pointValueCommandService);
+    void setUp() {
+        facade = new PointValueCommandLocalFacade(pointValueCommandService);
     }
 
     @Test

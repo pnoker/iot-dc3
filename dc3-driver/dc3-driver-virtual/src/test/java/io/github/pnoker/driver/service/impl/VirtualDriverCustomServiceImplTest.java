@@ -27,14 +27,12 @@ import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -72,15 +70,6 @@ class VirtualDriverCustomServiceImplTest {
         event.setOperateType(op);
         event.setId(id);
         return event;
-    }
-
-    @BeforeEach
-    void setUp() throws Exception {
-        // @InjectMocks resolves @Resource via reflection in the same class — re-assert
-        // the field is non-null.
-        Field field = VirtualDriverCustomServiceImpl.class.getDeclaredField("driverMetadata");
-        field.setAccessible(true);
-        field.set(service, driverMetadata);
     }
 
     @Test

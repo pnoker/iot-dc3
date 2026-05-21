@@ -40,7 +40,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -62,17 +61,9 @@ class ManagerDriverServerTest {
     private ManagedChannel channel;
     private DriverApiGrpc.DriverApiBlockingStub stub;
 
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
-
     @BeforeEach
     void setUp() throws Exception {
-        ManagerDriverServer driverServer = new ManagerDriverServer();
-        injectField(driverServer, "driverService", driverService);
-        injectField(driverServer, "grpcDriverBuilder", grpcDriverBuilder);
+        ManagerDriverServer driverServer = new ManagerDriverServer(grpcDriverBuilder, driverService);
 
         String name = "dc3-manager-driver-" + UUID.randomUUID();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(driverServer).build().start();

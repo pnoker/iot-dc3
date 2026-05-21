@@ -29,7 +29,7 @@ import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -54,16 +54,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NettyServerHandler {
 
-    @Resource
-    private DeviceMetadata deviceMetadata;
+    private final DeviceMetadata deviceMetadata;
 
-    @Resource
-    private PointMetadata pointMetadata;
+    private final PointMetadata pointMetadata;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+    private final DriverSenderService driverSenderService;
 
     /**
      * Processes incoming messages from TCP/UDP clients.

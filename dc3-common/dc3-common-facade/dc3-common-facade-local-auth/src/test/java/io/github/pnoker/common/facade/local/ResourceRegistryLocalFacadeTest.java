@@ -31,7 +31,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,11 +60,8 @@ class ResourceRegistryLocalFacadeTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new ResourceRegistryLocalFacade();
-        Field field = ResourceRegistryLocalFacade.class.getDeclaredField("resourceRegistrySyncService");
-        field.setAccessible(true);
-        field.set(facade, resourceRegistrySyncService);
+    void setUp() {
+        facade = new ResourceRegistryLocalFacade(resourceRegistrySyncService);
     }
 
     @Test

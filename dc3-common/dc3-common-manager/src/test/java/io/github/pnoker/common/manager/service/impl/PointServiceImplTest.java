@@ -34,6 +34,7 @@ import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.mapper.PointMapper;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,6 +86,9 @@ class PointServiceImplTest {
 
     @Mock
     private DeviceMapper deviceMapper;
+
+    @Mock
+    private DriverService driverService;
 
     @InjectMocks
     private PointServiceImpl service;

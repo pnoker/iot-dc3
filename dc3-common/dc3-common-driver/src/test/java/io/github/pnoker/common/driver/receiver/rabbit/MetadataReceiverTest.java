@@ -19,6 +19,7 @@ package io.github.pnoker.common.driver.receiver.rabbit;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.event.metadata.MetadataEventPublisher;
+import io.github.pnoker.common.driver.grpc.client.DriverClient;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
@@ -34,7 +35,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,6 +57,9 @@ class MetadataReceiverTest {
     private MetadataEventPublisher metadataEventPublisher;
 
     @Mock
+    private DriverClient driverClient;
+
+    @Mock
     private Channel channel;
 
     private DriverMetadata driverMetadata;
@@ -71,26 +74,16 @@ class MetadataReceiverTest {
         return dto;
     }
 
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
-
     private static <T> T any() {
         return org.mockito.ArgumentMatchers.any();
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         driverMetadata = new DriverMetadata();
         driverMetadata.setDeviceIds(new HashSet<>(Set.of(99L)));
 
-        receiver = new MetadataReceiver();
-        injectField(receiver, "deviceMetadata", deviceMetadata);
-        injectField(receiver, "pointMetadata", pointMetadata);
-        injectField(receiver, "driverMetadata", driverMetadata);
-        injectField(receiver, "metadataEventPublisher", metadataEventPublisher);
+        receiver = new MetadataReceiver(pointMetadata, driverMetadata, deviceMetadata, driverClient, metadataEventPublisher);
 
         MessageProperties props = new MessageProperties();
         props.setDeliveryTag(7L);

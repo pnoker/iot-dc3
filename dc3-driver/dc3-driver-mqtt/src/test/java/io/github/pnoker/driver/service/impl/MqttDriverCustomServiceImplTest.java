@@ -36,7 +36,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -85,11 +84,8 @@ class MqttDriverCustomServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new MqttDriverCustomServiceImpl();
-        injectField("driverMetadata", driverMetadata);
-        injectField("driverSenderService", driverSenderService);
-        injectField("mqttSendService", mqttSendService);
+    void setUp() {
+        service = new MqttDriverCustomServiceImpl(driverMetadata, driverSenderService, mqttSendService);
     }
 
     @Test
@@ -168,9 +164,4 @@ class MqttDriverCustomServiceImplTest {
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = MqttDriverCustomServiceImpl.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(service, value);
-    }
 }

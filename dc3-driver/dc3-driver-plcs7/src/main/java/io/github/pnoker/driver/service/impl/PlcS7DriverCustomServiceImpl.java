@@ -37,7 +37,7 @@ import io.github.pnoker.driver.api.S7Serializer;
 import io.github.pnoker.driver.api.factory.S7ConnectorFactory;
 import io.github.pnoker.driver.api.factory.S7SerializerFactory;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -66,13 +66,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
-    @Resource
-    DriverMetadata driverMetadata;
+    private final DriverMetadata driverMetadata;
 
-    @Resource
-    private DriverSenderService driverSenderService;
+    private final DriverSenderService driverSenderService;
 
     /**
      * Cache of device ID to S7 connector instances.

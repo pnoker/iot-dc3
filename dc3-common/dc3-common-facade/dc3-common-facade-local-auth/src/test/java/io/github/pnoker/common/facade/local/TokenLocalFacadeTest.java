@@ -25,8 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -39,11 +37,8 @@ class TokenLocalFacadeTest {
     private TokenLocalFacade facade;
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new TokenLocalFacade();
-        Field field = TokenLocalFacade.class.getDeclaredField("tokenService");
-        field.setAccessible(true);
-        field.set(facade, tokenService);
+    void setUp() {
+        facade = new TokenLocalFacade(tokenService);
     }
 
     @Test

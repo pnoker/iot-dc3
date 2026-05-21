@@ -28,7 +28,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,11 +49,8 @@ class CoapReceiveServiceImplTest {
     private CoapReceiveServiceImpl service;
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new CoapReceiveServiceImpl();
-        Field field = CoapReceiveServiceImpl.class.getDeclaredField("driverSenderService");
-        field.setAccessible(true);
-        field.set(service, driverSenderService);
+    void setUp() {
+        service = new CoapReceiveServiceImpl(driverSenderService);
     }
 
     @Test

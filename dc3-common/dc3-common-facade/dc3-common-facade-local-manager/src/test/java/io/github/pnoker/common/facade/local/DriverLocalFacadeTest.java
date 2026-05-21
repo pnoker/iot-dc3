@@ -31,7 +31,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
@@ -60,10 +59,8 @@ class DriverLocalFacadeTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        facade = new DriverLocalFacade();
-        injectField("driverService", driverService);
-        injectField("facadeDriverBuilder", facadeDriverBuilder);
+    void setUp() {
+        facade = new DriverLocalFacade(driverService, facadeDriverBuilder);
     }
 
     @Test
@@ -146,9 +143,4 @@ class DriverLocalFacadeTest {
         assertThat(facade.getByDeviceId(7L)).isSameAs(mapped);
     }
 
-    private void injectField(String name, Object value) throws Exception {
-        Field field = DriverLocalFacade.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(facade, value);
-    }
 }
