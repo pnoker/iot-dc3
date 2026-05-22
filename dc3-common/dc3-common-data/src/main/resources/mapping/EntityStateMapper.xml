@@ -19,4 +19,132 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.common.data.mapper.EntityStateMapper">
 
+    <resultMap id="EntityStateResultMap" type="io.github.pnoker.common.data.entity.model.EntityStateDO">
+        <id column="id" property="id"/>
+        <result column="entity_type_flag" property="entityTypeFlag"/>
+        <result column="entity_id" property="entityId"/>
+        <result column="parent_entity_id" property="parentEntityId"/>
+        <result column="state_flag" property="stateFlag"/>
+        <result column="last_state_flag" property="lastStateFlag"/>
+        <result column="lease_version" property="leaseVersion"/>
+        <result column="expire_time" property="expireTime"/>
+        <result column="timeout_seconds" property="timeoutSeconds"/>
+        <result column="last_heartbeat_time" property="lastHeartbeatTime"/>
+        <result column="last_alarm_id" property="lastAlarmId"/>
+        <result column="timeout_source_flag" property="timeoutSourceFlag"/>
+        <result column="state_ext" property="stateExt"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="operate_time" property="operateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="upsertEntityState" resultMap="EntityStateResultMap" flushCache="true" useCache="false">
+        INSERT INTO dc3_entity_state (
+            id,
+            entity_type_flag,
+            entity_id,
+            parent_entity_id,
+            state_flag,
+            last_state_flag,
+            lease_version,
+            expire_time,
+            timeout_seconds,
+            last_heartbeat_time,
+            last_alarm_id,
+            timeout_source_flag,
+            state_ext,
+            tenant_id
+        )
+        VALUES (
+            #{id},
+            #{entityTypeFlag},
+            #{entityId},
+            #{parentEntityId},
+            #{stateFlag},
+            #{initialLastStateFlag},
+            1,
+            #{expireTime},
+            #{timeoutSeconds},
+            CURRENT_TIMESTAMP,
+            0,
+            #{timeoutSourceFlag},
+            json_build_object('type', #{stateExtType}, 'content', '', 'version', 1),
+            #{tenantId}
+        )
+        ON CONFLICT (tenant_id, entity_type_flag, entity_id) WHERE deleted = 0
+        DO UPDATE SET
+            parent_entity_id = EXCLUDED.parent_entity_id,
+            state_flag = EXCLUDED.state_flag,
+            last_state_flag = dc3_entity_state.state_flag,
+            lease_version = dc3_entity_state.lease_version + 1,
+            expire_time = EXCLUDED.expire_time,
+            timeout_seconds = EXCLUDED.timeout_seconds,
+            last_heartbeat_time = CURRENT_TIMESTAMP,
+            timeout_source_flag = EXCLUDED.timeout_source_flag,
+            operate_time = CURRENT_TIMESTAMP
+        RETURNING
+            id,
+            entity_type_flag,
+            entity_id,
+            parent_entity_id,
+            state_flag,
+            last_state_flag,
+            lease_version,
+            expire_time,
+            timeout_seconds,
+            last_heartbeat_time,
+            last_alarm_id,
+            timeout_source_flag,
+            state_ext,
+            tenant_id,
+            create_time,
+            operate_time,
+            deleted
+    </select>
+
+    <select id="claimExpiredDevices" resultMap="EntityStateResultMap" flushCache="true" useCache="false">
+        WITH picked AS (
+            SELECT
+                id,
+                state_flag AS previous_state_flag,
+                lease_version AS previous_lease_version
+            FROM dc3_entity_state
+            WHERE deleted = 0
+              AND entity_type_flag = #{entityTypeFlag}
+              AND state_flag IN (#{onlineFlag}, #{maintainFlag})
+              AND expire_time &lt;= CURRENT_TIMESTAMP
+            ORDER BY expire_time ASC
+            LIMIT #{batchSize}
+            FOR UPDATE SKIP LOCKED
+        )
+        UPDATE dc3_entity_state s
+        SET lease_version = picked.previous_lease_version + 1,
+            state_flag = #{offlineFlag},
+            last_state_flag = picked.previous_state_flag,
+            expire_time = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
+            operate_time = CURRENT_TIMESTAMP
+        FROM picked
+        WHERE s.id = picked.id
+        RETURNING
+            s.id,
+            s.entity_type_flag,
+            s.entity_id,
+            s.parent_entity_id,
+            s.state_flag,
+            s.last_state_flag,
+            s.lease_version,
+            s.expire_time,
+            s.timeout_seconds,
+            s.last_heartbeat_time,
+            s.last_alarm_id,
+            s.timeout_source_flag,
+            s.state_ext,
+            s.tenant_id,
+            s.create_time,
+            s.operate_time,
+            s.deleted
+    </select>
+
 </mapper>

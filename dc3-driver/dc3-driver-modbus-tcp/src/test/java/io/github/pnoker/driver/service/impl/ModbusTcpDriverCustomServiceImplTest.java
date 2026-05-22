@@ -25,6 +25,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
+import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -50,12 +51,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -145,13 +146,30 @@ class ModbusTcpDriverCustomServiceImplTest {
     }
 
     @Test
-    void scheduleSendsOnlineForEveryAttachedDevice() {
-        when(driverMetadata.getDeviceIds()).thenReturn(Set.of(11L, 22L));
+    void scheduleDoesNotReportDeviceStatus() {
         service.schedule();
-        verify(driverSenderService).deviceStatusSender(eq(11L), eq(DeviceStatusEnum.ONLINE), eq(25),
-                eq(TimeUnit.SECONDS));
-        verify(driverSenderService).deviceStatusSender(eq(22L), eq(DeviceStatusEnum.ONLINE), eq(25),
-                eq(TimeUnit.SECONDS));
+        verify(driverSenderService, never()).deviceStatusSender(any(), any(), anyInt(), any(TimeUnit.class));
+    }
+
+    @Test
+    void healthReturnsOnlineWhenConnectorIsInitialized() throws Exception {
+        when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
+        when(modbusMaster.isInitialized()).thenReturn(true);
+
+        DeviceHealthState health = service.health(driverConfig("h", 502), device(11L));
+
+        assertThat(health.getStatus()).isEqualTo(DeviceStatusEnum.ONLINE);
+        verify(modbusMaster).init();
+    }
+
+    @Test
+    void healthReturnsOfflineWhenConnectionCannotInitialize() throws Exception {
+        when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
+        doThrow(new ModbusInitException("offline")).when(modbusMaster).init();
+
+        DeviceHealthState health = service.health(driverConfig("h", 502), device(11L));
+
+        assertThat(health.getStatus()).isEqualTo(DeviceStatusEnum.OFFLINE);
     }
 
     @Test

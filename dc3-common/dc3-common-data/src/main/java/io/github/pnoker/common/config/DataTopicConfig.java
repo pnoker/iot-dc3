@@ -165,6 +165,37 @@ public class DataTopicConfig {
     }
 
 
+    // ===== Driver timeout check (TTL + DLX) ===================================
+
+    @Bean
+    Queue driverTimeoutDelayQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DRIVER_TIMEOUT_DELAY)
+                .ttl(45_000)
+                .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK)
+                .deadLetterRoutingKey(RabbitConstant.ROUTING_DRIVER_TIMEOUT_CHECK)
+                .build();
+    }
+
+    @Bean
+    Binding driverTimeoutDelayBinding(Queue driverTimeoutDelayQueue, TopicExchange stateTimeoutDelayExchange) {
+        return BindingBuilder.bind(driverTimeoutDelayQueue)
+                .to(stateTimeoutDelayExchange)
+                .with(RabbitConstant.ROUTING_DRIVER_TIMEOUT_DELAY);
+    }
+
+    @Bean
+    Queue driverTimeoutCheckQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_DRIVER_TIMEOUT_CHECK).build();
+    }
+
+    @Bean
+    Binding driverTimeoutCheckBinding(Queue driverTimeoutCheckQueue, TopicExchange stateTimeoutCheckExchange) {
+        return BindingBuilder.bind(driverTimeoutCheckQueue)
+                .to(stateTimeoutCheckExchange)
+                .with(RabbitConstant.ROUTING_DRIVER_TIMEOUT_CHECK);
+    }
+
+
     // ===== Device timeout scan tick (TTL + DLX) ===============================
 
     @Bean

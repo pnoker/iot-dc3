@@ -103,4 +103,24 @@ public class ExchangeConfig {
         return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_MQTT, true, false);
     }
 
+    /**
+     * State timeout delay exchange for TTL + DLX based lease checks.
+     *
+     * @return TopicExchange bean for state timeout delay messages
+     */
+    @Bean
+    TopicExchange stateTimeoutDelayExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY, true, false);
+    }
+
+    /**
+     * State timeout check exchange receiving dead-lettered timeout messages.
+     *
+     * @return TopicExchange bean for state timeout check messages
+     */
+    @Bean
+    TopicExchange stateTimeoutCheckExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK, true, false);
+    }
+
 }

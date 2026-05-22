@@ -66,7 +66,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     public Map<Long, String> selectDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {
         List<FacadeDeviceBO> devices = deviceFacade.listByIds(tenantId, deviceIds);
         Map<Long, String> result = new LinkedHashMap<>();
-        devices.forEach(device -> result.put(device.getId(), deviceStatus(device.getId())));
+        devices.forEach(device -> result.put(device.getId(), deviceStatus(tenantId, device.getId())));
         return result;
     }
 
@@ -74,7 +74,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     public Map<Long, String> selectDeviceStatusesByProfileId(Long tenantId, Long profileId) {
         List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
         Map<Long, String> result = new LinkedHashMap<>();
-        devices.forEach(device -> result.put(device.getId(), deviceStatus(device.getId())));
+        devices.forEach(device -> result.put(device.getId(), deviceStatus(tenantId, device.getId())));
         return result;
     }
 
@@ -82,7 +82,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     public Map<Long, String> selectDriverStatusesByIds(Long tenantId, Collection<Long> driverIds) {
         List<FacadeDriverBO> drivers = driverFacade.listByIds(tenantId, driverIds);
         Map<Long, String> result = new LinkedHashMap<>();
-        drivers.forEach(driver -> result.put(driver.getId(), driverStatus(driver.getId())));
+        drivers.forEach(driver -> result.put(driver.getId(), driverStatus(tenantId, driver.getId())));
         return result;
     }
 
@@ -93,7 +93,8 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
         }
         List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(tenantId, driverId);
         long online = devices.stream()
-                .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(), deviceStatus(device.getId())))
+                .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(), deviceStatus(tenantId,
+                        device.getId())))
                 .count();
         int offline = (int) Math.max(0, devices.size() - online);
         return new FacadeDriverDeviceStatusSummaryBO(driverId, devices.size(), (int) online, offline);
@@ -120,8 +121,9 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
         return new FacadeSystemHealthBO.FleetSummary(source.getTotal(), source.getOnline());
     }
 
-    private String deviceStatus(Long deviceId) {
+    private String deviceStatus(Long tenantId, Long deviceId) {
         EntityStateDO state = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getTenantId, tenantId)
                 .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
                 .eq(EntityStateDO::getEntityId, deviceId)
                 .one();
@@ -132,8 +134,9 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
         return Objects.nonNull(e) ? e.getCode() : DeviceStatusEnum.OFFLINE.getCode();
     }
 
-    private String driverStatus(Long driverId) {
+    private String driverStatus(Long tenantId, Long driverId) {
         EntityStateDO state = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getTenantId, tenantId)
                 .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
                 .eq(EntityStateDO::getEntityId, driverId)
                 .one();

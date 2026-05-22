@@ -88,8 +88,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void schedule() {
-        driverMetadata.getDeviceIds()
-                .forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+        // Device state lease renewal is owned by the SDK device health job.
     }
 
     @Override

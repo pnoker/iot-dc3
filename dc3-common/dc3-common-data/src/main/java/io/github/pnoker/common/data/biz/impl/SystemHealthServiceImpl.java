@@ -183,6 +183,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         LocalDateTime now = LocalDateTime.now();
         for (FacadeDriverBO d : drivers) {
             EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getTenantId, tenantId)
                     .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, d.getId())
                     .one();
@@ -217,6 +218,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         LocalDateTime now = LocalDateTime.now();
         for (FacadeDeviceBO d : devices) {
             EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getTenantId, tenantId)
                     .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
                     .eq(EntityStateDO::getEntityId, d.getId())
                     .one();

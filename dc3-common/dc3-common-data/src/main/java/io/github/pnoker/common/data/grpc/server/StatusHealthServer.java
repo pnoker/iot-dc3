@@ -76,7 +76,7 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
     public void deviceStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcRStatusMap> responseObserver) {
         List<FacadeDeviceBO> devices = deviceFacade.listByIds(request.getTenantId(), request.getIdsList());
         Map<Long, String> statuses = new LinkedHashMap<>();
-        devices.forEach(device -> statuses.put(device.getId(), deviceStatus(device.getId())));
+        devices.forEach(device -> statuses.put(device.getId(), deviceStatus(request.getTenantId(), device.getId())));
         responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
         responseObserver.onCompleted();
     }
@@ -86,7 +86,7 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
                                           StreamObserver<GrpcRStatusMap> responseObserver) {
         List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(request.getTenantId(), request.getProfileId());
         Map<Long, String> statuses = new LinkedHashMap<>();
-        devices.forEach(device -> statuses.put(device.getId(), deviceStatus(device.getId())));
+        devices.forEach(device -> statuses.put(device.getId(), deviceStatus(request.getTenantId(), device.getId())));
         responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
         responseObserver.onCompleted();
     }
@@ -95,7 +95,7 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
     public void driverStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcRStatusMap> responseObserver) {
         List<FacadeDriverBO> drivers = driverFacade.listByIds(request.getTenantId(), request.getIdsList());
         Map<Long, String> statuses = new LinkedHashMap<>();
-        drivers.forEach(driver -> statuses.put(driver.getId(), driverStatus(driver.getId())));
+        drivers.forEach(driver -> statuses.put(driver.getId(), driverStatus(request.getTenantId(), driver.getId())));
         responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
         responseObserver.onCompleted();
     }
@@ -111,7 +111,8 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
         }
         List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(request.getTenantId(), request.getDriverId());
         long online = devices.stream()
-                .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(), deviceStatus(device.getId())))
+                .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(),
+                        deviceStatus(request.getTenantId(), device.getId())))
                 .count();
         FacadeDriverDeviceStatusSummaryBO summary = new FacadeDriverDeviceStatusSummaryBO(
                 request.getDriverId(),
@@ -151,8 +152,9 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
         return GrpcFleetSummaryDTO.newBuilder().setTotal(summary.getTotal()).setOnline(summary.getOnline()).build();
     }
 
-    private String deviceStatus(Long deviceId) {
+    private String deviceStatus(Long tenantId, Long deviceId) {
         EntityStateDO state = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getTenantId, tenantId)
                 .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
                 .eq(EntityStateDO::getEntityId, deviceId)
                 .one();
@@ -163,8 +165,9 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
         return Objects.nonNull(e) ? e.getCode() : DeviceStatusEnum.OFFLINE.getCode();
     }
 
-    private String driverStatus(Long driverId) {
+    private String driverStatus(Long tenantId, Long driverId) {
         EntityStateDO state = entityStateManager.lambdaQuery()
+                .eq(EntityStateDO::getTenantId, tenantId)
                 .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
                 .eq(EntityStateDO::getEntityId, driverId)
                 .one();

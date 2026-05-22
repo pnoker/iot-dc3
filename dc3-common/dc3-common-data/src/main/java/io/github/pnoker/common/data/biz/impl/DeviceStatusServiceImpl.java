@@ -91,6 +91,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         LocalDateTime now = LocalDateTime.now();
         devices.forEach(device -> {
             EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getTenantId, device.getTenantId())
                     .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
                     .eq(EntityStateDO::getEntityId, device.getId())
                     .one();

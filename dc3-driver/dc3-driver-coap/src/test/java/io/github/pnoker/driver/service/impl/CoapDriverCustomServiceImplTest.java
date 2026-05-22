@@ -97,13 +97,9 @@ class CoapDriverCustomServiceImplTest {
     }
 
     @Test
-    void scheduleSendsOnlineForEveryAttachedDevice() {
-        when(driverMetadata.getDeviceIds()).thenReturn(Set.of(1L, 2L));
-        service.schedule();
-        verify(driverSenderService).deviceStatusSender(eq(1L), eq(DeviceStatusEnum.ONLINE), eq(25),
-                eq(TimeUnit.SECONDS));
-        verify(driverSenderService).deviceStatusSender(eq(2L), eq(DeviceStatusEnum.ONLINE), eq(25),
-                eq(TimeUnit.SECONDS));
+    void scheduleDoesNotReportDeviceStatus() {
+        assertThatNoException().isThrownBy(() -> service.schedule());
+        verifyNoInteractions(driverSenderService);
     }
 
     @Test

@@ -77,7 +77,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     @Override
     public void deviceStatusSender(Long deviceId, DeviceStatusEnum status) {
-        sendDeviceStatus(deviceId, status, 15, TimeUnit.MINUTES);
+        sendDeviceStatus(deviceId, status, driverProperties.getHealth().getDevice().getTimeoutSeconds(), TimeUnit.SECONDS);
     }
 
     @Override

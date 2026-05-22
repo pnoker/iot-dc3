@@ -30,6 +30,11 @@ dc3:
       custom:
         enable: true
         cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout-seconds: 45
     point-attribute:
       - attribute-name: Command Topic
         attribute-code: commandTopic

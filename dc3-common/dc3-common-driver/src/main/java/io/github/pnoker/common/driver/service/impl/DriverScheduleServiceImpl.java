@@ -22,6 +22,7 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
 import io.github.pnoker.common.driver.job.DriverStatusScheduleJob;
+import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
 import io.github.pnoker.common.exception.CronException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -62,6 +63,17 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
                     ScheduleConstant.DRIVER_STATUS_SCHEDULE_JOB, ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON,
                     DriverStatusScheduleJob.class);
+
+            // Create and schedule the device health job if enabled
+            DriverProperties.DeviceHealthProperties deviceHealth = driverProperties.getHealth().getDevice();
+            if (Objects.nonNull(deviceHealth) && Boolean.TRUE.equals(deviceHealth.getEnable())) {
+                if (!CronExpression.isValidExpression(deviceHealth.getCron())) {
+                    throw new CronException("Device health schedule cron expression is invalid");
+                }
+                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                        ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB, deviceHealth.getCron(),
+                        DeviceHealthScheduleJob.class);
+            }
 
             // Create and schedule the read job if enabled
             if (Boolean.TRUE.equals(property.getRead().getEnable())) {

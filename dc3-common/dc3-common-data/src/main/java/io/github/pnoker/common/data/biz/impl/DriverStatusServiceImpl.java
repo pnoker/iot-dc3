@@ -119,6 +119,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         List<String> list = new ArrayList<>(devices.size());
         devices.forEach(device -> {
             EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getTenantId, tenantId)
                     .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
                     .eq(EntityStateDO::getEntityId, device.getId())
                     .one();
@@ -139,6 +140,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         LocalDateTime now = LocalDateTime.now();
         drivers.forEach(driver -> {
             EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getTenantId, driver.getTenantId())
                     .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, driver.getId())
                     .one();

@@ -120,13 +120,9 @@ class ListeningVirtualDriverCustomServiceImplTest {
     }
 
     @Test
-    void scheduleSendsOnlineStatusForEveryAttachedDevice() {
-        when(driverMetadata.getDeviceIds()).thenReturn(Set.of(101L, 102L));
-        service.schedule();
-        verify(driverSenderService).deviceStatusSender(eq(101L), eq(DeviceStatusEnum.ONLINE), eq(25),
-                eq(TimeUnit.SECONDS));
-        verify(driverSenderService).deviceStatusSender(eq(102L), eq(DeviceStatusEnum.ONLINE), eq(25),
-                eq(TimeUnit.SECONDS));
+    void scheduleDoesNotReportDeviceStatus() {
+        assertThatNoException().isThrownBy(() -> service.schedule());
+        verifyNoInteractions(driverSenderService);
     }
 
     @Test
