@@ -72,6 +72,7 @@ public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
         RabbitConstant.TOPIC_EXCHANGE_ALARM = tag + RabbitConstant.TOPIC_EXCHANGE_ALARM;
         RabbitConstant.QUEUE_DRIVER_ALARM = tag + RabbitConstant.QUEUE_DRIVER_ALARM;
         RabbitConstant.QUEUE_DEVICE_ALARM = tag + RabbitConstant.QUEUE_DEVICE_ALARM;
+        RabbitConstant.QUEUE_NOTIFY_TASK = tag + RabbitConstant.QUEUE_NOTIFY_TASK;
 
         // Metadata related constants
         RabbitConstant.TOPIC_EXCHANGE_METADATA = tag + RabbitConstant.TOPIC_EXCHANGE_METADATA;
@@ -80,10 +81,26 @@ public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
         // Point command related constants
         RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND = tag + RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND;
         RabbitConstant.QUEUE_POINT_COMMAND_PREFIX = tag + RabbitConstant.QUEUE_POINT_COMMAND_PREFIX;
+        RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_DEAD = tag + RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_DEAD;
+        RabbitConstant.QUEUE_POINT_COMMAND_DEAD = tag + RabbitConstant.QUEUE_POINT_COMMAND_DEAD;
+        RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT = tag + RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT;
+        RabbitConstant.QUEUE_POINT_COMMAND_RESULT = tag + RabbitConstant.QUEUE_POINT_COMMAND_RESULT;
 
         // Point Value related constants
         RabbitConstant.TOPIC_EXCHANGE_VALUE = tag + RabbitConstant.TOPIC_EXCHANGE_VALUE;
         RabbitConstant.QUEUE_POINT_VALUE = tag + RabbitConstant.QUEUE_POINT_VALUE;
+
+        // MQTT related constants
+        RabbitConstant.TOPIC_EXCHANGE_MQTT = tag + RabbitConstant.TOPIC_EXCHANGE_MQTT;
+        RabbitConstant.QUEUE_MQTT = tag + RabbitConstant.QUEUE_MQTT;
+
+        // State timeout related constants
+        RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY = tag + RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY;
+        RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK = tag + RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK;
+        RabbitConstant.QUEUE_DRIVER_TIMEOUT_DELAY = tag + RabbitConstant.QUEUE_DRIVER_TIMEOUT_DELAY;
+        RabbitConstant.QUEUE_DRIVER_TIMEOUT_CHECK = tag + RabbitConstant.QUEUE_DRIVER_TIMEOUT_CHECK;
+        RabbitConstant.QUEUE_DEVICE_SCAN_TICK = tag + RabbitConstant.QUEUE_DEVICE_SCAN_TICK;
+        RabbitConstant.QUEUE_DEVICE_SCAN = tag + RabbitConstant.QUEUE_DEVICE_SCAN;
     }
 
 }

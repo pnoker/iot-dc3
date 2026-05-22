@@ -50,6 +50,11 @@ public class ScheduleConstant {
     public static final String DRIVER_STATUS_SCHEDULE_JOB = "status-schedule-job";
 
     /**
+     * Device health schedule job
+     */
+    public static final String DEVICE_HEALTH_SCHEDULE_JOB = "device-health-schedule-job";
+
+    /**
      * Driver status schedule cron
      */
     public static final String DRIVER_STATUS_SCHEDULE_CRON = "0/15 * * * * ?";

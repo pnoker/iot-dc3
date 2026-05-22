@@ -27,6 +27,7 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
+import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -36,7 +37,6 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
@@ -51,7 +51,6 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Custom driver service implementation for the Modbus TCP driver.
@@ -94,8 +93,22 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void schedule() {
-        driverMetadata.getDeviceIds()
-                .forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+        // Device state lease renewal is owned by the SDK device health job.
+    }
+
+    @Override
+    public DeviceHealthState health(Map<String, AttributeBO> driverConfig, DeviceBO device) {
+        if (Objects.isNull(device) || Objects.isNull(device.getId())) {
+            return DeviceHealthState.offline();
+        }
+        try {
+            return getConnector(device.getId(), driverConfig).isInitialized()
+                    ? DeviceHealthState.online()
+                    : DeviceHealthState.offline();
+        } catch (Exception e) {
+            log.warn("Driver health check failed, protocol=modbusTcp, deviceId={}", device.getId(), e);
+            return DeviceHealthState.offline();
+        }
     }
 
     @Override

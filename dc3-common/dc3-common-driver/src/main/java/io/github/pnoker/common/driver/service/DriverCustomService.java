@@ -21,18 +21,18 @@ package io.github.pnoker.common.driver.service;
  * Aggregate driver SPI that combines the lifecycle, metadata, and protocol
  * contracts a fully-featured driver typically implements. The SDK injects this
  * type wherever it needs the union of all driver hooks (boot, schedule,
- * metadata events, read/write).
+ * metadata events, health checks, read/write).
  *
  * <p>This interface intentionally adds no methods of its own — it exists so
  * existing drivers that {@code implements DriverCustomService} keep compiling
  * unchanged, while new drivers can pick the smaller capability interfaces
  * ({@link DriverLifecycle}, {@link DriverMetadataListener},
- * {@link DriverProtocol}) when they only need a subset.
+ * {@link DeviceHealth}, {@link DriverProtocol}) when they only need a subset.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface DriverCustomService extends DriverLifecycle, DriverMetadataListener, DriverProtocol {
+public interface DriverCustomService extends DriverLifecycle, DriverMetadataListener, DeviceHealth, DriverProtocol {
 
 }

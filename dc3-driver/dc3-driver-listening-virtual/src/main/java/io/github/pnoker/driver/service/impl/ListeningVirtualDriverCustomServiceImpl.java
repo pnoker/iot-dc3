@@ -88,17 +88,9 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         });
     }
 
-    /**
-     * Scheduled task to report device status.
-     * <p>
-     * Sets all devices to ONLINE status with a validity period of 25 seconds. This method
-     * is called periodically by the driver framework.
-     * </p>
-     */
     @Override
     public void schedule() {
-        driverMetadata.getDeviceIds()
-                .forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+        // Device state lease renewal is owned by the SDK device health job.
     }
 
     /**

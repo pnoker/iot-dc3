@@ -24,6 +24,7 @@ import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
+import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
@@ -42,7 +43,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,6 +71,7 @@ public class EntityStateExpiryScanner {
     private static final int BATCH_LIMIT = 500;
 
     private final EntityStateManager entityStateManager;
+    private final EntityStateMapper entityStateMapper;
     private final EntityAlarmManager entityAlarmManager;
     private final AlarmRuleTriggerService alarmRuleTriggerService;
     private final RabbitTemplate rabbitTemplate;
@@ -113,15 +114,13 @@ public class EntityStateExpiryScanner {
     }
 
     private void scanExpiredDevices() {
-        LocalDateTime now = LocalDateTime.now();
-        List<EntityStateDO> expired = entityStateManager.lambdaQuery()
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
-                .in(EntityStateDO::getStateFlag,
-                        DeviceStatusEnum.ONLINE.getIndex(),
-                        DeviceStatusEnum.MAINTAIN.getIndex())
-                .lt(EntityStateDO::getExpireTime, now)
-                .last("LIMIT " + BATCH_LIMIT)
-                .list();
+        List<EntityStateDO> expired = entityStateMapper.claimExpiredDevices(
+                EntityTypeFlagEnum.DEVICE.getIndex(),
+                DeviceStatusEnum.ONLINE.getIndex(),
+                DeviceStatusEnum.MAINTAIN.getIndex(),
+                DeviceStatusEnum.OFFLINE.getIndex(),
+                BATCH_LIMIT,
+                OFFLINE_RENEW_SECONDS);
 
         if (expired.isEmpty()) {
             return;
@@ -137,37 +136,8 @@ public class EntityStateExpiryScanner {
     }
 
     private void processExpiredDevice(EntityStateDO scanned) {
-        byte offlineIndex = (byte) DeviceStatusEnum.OFFLINE.getIndex();
-
-        // Already offline — just push expire_time forward
-        if (Objects.equals(scanned.getStateFlag(), offlineIndex)) {
-            entityStateManager.lambdaUpdate()
-                    .eq(EntityStateDO::getEntityId, scanned.getEntityId())
-                    .eq(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion())
-                    .set(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion() + 1L)
-                    .set(EntityStateDO::getExpireTime, LocalDateTime.now().plusSeconds(OFFLINE_RENEW_SECONDS))
-                    .update();
-            return;
-        }
-
-        // Atomically claim
-        long newVersion = scanned.getLeaseVersion() + 1L;
-        LocalDateTime renewTime = LocalDateTime.now().plusSeconds(OFFLINE_RENEW_SECONDS);
-        boolean claimed = entityStateManager.lambdaUpdate()
-                .eq(EntityStateDO::getEntityId, scanned.getEntityId())
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
-                .eq(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion())
-                .set(EntityStateDO::getLeaseVersion, newVersion)
-                .set(EntityStateDO::getStateFlag, offlineIndex)
-                .set(EntityStateDO::getLastStateFlag, scanned.getStateFlag())
-                .set(EntityStateDO::getExpireTime, renewTime)
-                .update();
-        if (!claimed) {
-            return;
-        }
-
         // Write alarm row
-        DeviceStatusEnum prev = DeviceStatusEnum.ofIndex(scanned.getStateFlag());
+        DeviceStatusEnum prev = DeviceStatusEnum.ofIndex(scanned.getLastStateFlag());
         String prevCode = Objects.nonNull(prev) ? prev.getCode() : "unknown";
         String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", prevCode);
 
@@ -190,8 +160,11 @@ public class EntityStateExpiryScanner {
 
         // Update lastAlarmId
         entityStateManager.lambdaUpdate()
+                .eq(EntityStateDO::getTenantId, scanned.getTenantId())
+                .eq(EntityStateDO::getId, scanned.getId())
                 .eq(EntityStateDO::getEntityId, scanned.getEntityId())
                 .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                .eq(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion())
                 .set(EntityStateDO::getLastAlarmId, alarm.getId())
                 .update();
 

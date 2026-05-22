@@ -71,12 +71,14 @@ public class DriverTimeoutCheckReceiver {
     public void driverTimeoutCheck(Channel channel, Message message, DriverTimeoutCheckDTO dto) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            if (Objects.isNull(dto) || Objects.isNull(dto.getDriverId()) || Objects.isNull(dto.getLeaseVersion())) {
+            if (Objects.isNull(dto) || Objects.isNull(dto.getDriverId()) || Objects.isNull(dto.getTenantId())
+                    || Objects.isNull(dto.getLeaseVersion())) {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
             EntityStateDO state = entityStateManager.lambdaQuery()
+                    .eq(EntityStateDO::getTenantId, dto.getTenantId())
                     .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, dto.getDriverId())
                     .one();
@@ -117,6 +119,7 @@ public class DriverTimeoutCheckReceiver {
             // Claim: atomically update to OFFLINE
             long newVersion = state.getLeaseVersion() + 1L;
             boolean claimed = entityStateManager.lambdaUpdate()
+                    .eq(EntityStateDO::getTenantId, dto.getTenantId())
                     .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, dto.getDriverId())
                     .eq(EntityStateDO::getLeaseVersion, state.getLeaseVersion())
@@ -155,8 +158,10 @@ public class DriverTimeoutCheckReceiver {
 
             // Update lastAlarmId on state row
             entityStateManager.lambdaUpdate()
+                    .eq(EntityStateDO::getTenantId, dto.getTenantId())
                     .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, dto.getDriverId())
+                    .eq(EntityStateDO::getLeaseVersion, newVersion)
                     .set(EntityStateDO::getLastAlarmId, alarm.getId())
                     .update();
 

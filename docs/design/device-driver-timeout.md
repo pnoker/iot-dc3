@@ -80,7 +80,10 @@ CREATE UNIQUE INDEX idx_entity_state_active_unique
     ON dc3_entity_state (tenant_id, entity_type_flag, entity_id) WHERE deleted = 0;
 
 CREATE INDEX idx_entity_state_expire
-    ON dc3_entity_state (tenant_id, entity_type_flag, state_flag, expire_time) WHERE deleted = 0;
+    ON dc3_entity_state (entity_type_flag, state_flag, expire_time) WHERE deleted = 0;
+
+CREATE INDEX idx_entity_state_tenant_status
+    ON dc3_entity_state (tenant_id, entity_type_flag, state_flag) WHERE deleted = 0;
 
 CREATE INDEX idx_entity_state_parent
     ON dc3_entity_state (tenant_id, entity_type_flag, parent_entity_id, state_flag) WHERE deleted = 0;
@@ -195,9 +198,13 @@ timeout message
 
 ### 心跳续租
 
-1. 驱动根据协议行为上报设备状态。
-2. `DeviceEventDTO.DeviceStatus` 携带 `deviceId`、`driverId`、`status`、`timeOut`、`timeUnit`。
-3. Data Center upsert `dc3_entity_state`：
+1. 驱动 SDK 按 `dc3.driver.health.device.cron` 触发设备健康检查。
+2. SDK 调用驱动实现的 `DeviceHealth.health(driverConfig, device)` 判断设备健康。
+3. 驱动返回 `DeviceHealthState`：
+    - `status` 表示要上报的设备状态。
+    - `timeout/timeUnit` 可选；为空时使用 `dc3.driver.health.device.timeout-seconds` 作为兜底租约。
+4. SDK 通过 `DeviceStateDTO` 上报 `deviceId`、`driverId`、`tenantId`、`status`、`timeOut`、`timeUnit`。
+5. Data Center upsert `dc3_entity_state`：
     - `entity_type_flag = 6`
     - `entity_id = deviceId`
     - `parent_entity_id = driverId`
@@ -221,19 +228,32 @@ device_scan_tick
   -> 发布下一条 scan tick
 ```
 
-扫描 SQL：
+扫描 SQL 使用"一次性 claim 并返回"的形式，避免多实例重复处理同一批设备：
 
 ```sql
-SELECT *
-FROM dc3_entity_state
-WHERE deleted = 0
-  AND entity_type_flag = 6
-  AND state_flag IN (0, 2)
-  AND expire_time <= now()
-ORDER BY expire_time ASC
-LIMIT #{batchSize}
-FOR
-UPDATE SKIP LOCKED;
+WITH picked AS (
+    SELECT
+        id,
+        state_flag AS previous_state_flag,
+        lease_version AS previous_lease_version
+    FROM dc3_entity_state
+    WHERE deleted = 0
+      AND entity_type_flag = 6
+      AND state_flag IN (0, 2)
+      AND expire_time <= CURRENT_TIMESTAMP
+    ORDER BY expire_time ASC
+    LIMIT #{batchSize}
+    FOR UPDATE SKIP LOCKED
+)
+UPDATE dc3_entity_state s
+SET lease_version = picked.previous_lease_version + 1,
+    state_flag = 1,
+    last_state_flag = picked.previous_state_flag,
+    expire_time = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
+    operate_time = CURRENT_TIMESTAMP
+FROM picked
+WHERE s.id = picked.id
+RETURNING s.*;
 ```
 
 示例：
@@ -244,13 +264,13 @@ UPDATE SKIP LOCKED;
 | B  | 5 分钟  | 10:00:00 | 10:05:00      | 不处理                |
 | C  | 15 分钟 | 10:00:00 | 10:15:00      | 不处理                |
 
-多实例下使用 `FOR UPDATE SKIP LOCKED` 避免重复处理同一批设备。
+多实例下使用 `UPDATE ... RETURNING` + `FOR UPDATE SKIP LOCKED` 避免重复处理同一批设备。
 
 每条过期记录处理：
 
-1. 再次确认 `expire_time <= now()`。
-2. 更新 `state_flag = 1`。
-3. 构建 DEVICE 规则事实，命中规则后写入 `dc3_entity_alarm`，告警来源为 `device-offline`。
+1. claim SQL 已经完成过期条件确认与 `state_flag = 1` 更新。
+2. 根据 `RETURNING` 的状态行写入 `dc3_entity_alarm`，告警来源为 `device-offline`。
+3. 构建 DEVICE 规则事实，触发规则告警链路。
 
 ## 二次检查
 
@@ -307,11 +327,25 @@ UPDATE SKIP LOCKED;
 
 ## 设备超时策略
 
-设备超时建议按以下优先级取值：
+当前阶段，设备超时时间先落在各驱动 `application.yml`：
+
+```yaml
+dc3:
+  driver:
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout-seconds: 45
+```
+
+其中 `cron` 是设备健康检查频率，不是设备离线超时时间；`timeout-seconds` 是驱动未返回设备专属 TTL 时的兜底租约。
+
+驱动可以在 `DeviceHealth.health()` 中按设备、协议会话、最近报文时间等逻辑返回不同的 `DeviceHealthState.timeout/timeUnit`。后续产品化后，设备超时建议按以下优先级取值：
 
 1. `Device.device_ext.stateTimeout`。
 2. `Profile.profile_ext.defaultStateTimeout`。
-3. 驱动上报的 `DeviceStatus.timeOut/timeUnit`。
+3. 驱动上报的 `DeviceHealthState.timeout/timeUnit`。
 4. 系统默认值，例如 15 分钟。
 
 协议建议：
@@ -343,7 +377,7 @@ UPDATE SKIP LOCKED;
 - 新增设备扫描 tick。
 - 扫描状态表中过期的在线设备。
 - 批量写 `device-offline`。
-- 多实例使用 `FOR UPDATE SKIP LOCKED`。
+- 多实例使用 `UPDATE ... RETURNING` + `FOR UPDATE SKIP LOCKED` claim 过期设备。
 
 ### 第四阶段：清理旧链路
 

@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.data.biz.DeviceStateService;
-import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
+import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
-import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
@@ -48,7 +48,7 @@ public class DeviceStateServiceImpl implements DeviceStateService {
 
     private final DeviceAlarmService deviceAlarmService;
 
-    private final EntityStateManager entityStateManager;
+    private final EntityStateMapper entityStateMapper;
 
     private static boolean isFlip(byte prevIndex, String currentCode) {
         return online(prevIndex) != online(currentCode);
@@ -64,41 +64,39 @@ public class DeviceStateServiceImpl implements DeviceStateService {
 
     @Override
     public void heartbeat(DeviceStateDTO entityDTO) {
-        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId()) || Objects.isNull(entityDTO.getStatus())) {
+        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())
+                || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
+                || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeUnit())
+                || entityDTO.getTimeOut() <= 0) {
             return;
         }
 
-        String current = entityDTO.getStatus();
-
-        // Persist state lease to database (source of truth)
-        EntityStateDO stateDO = entityStateManager.lambdaQuery()
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
-                .eq(EntityStateDO::getEntityId, entityDTO.getDeviceId())
-                .one();
         long ttlSeconds = entityDTO.getTimeUnit().toSeconds(entityDTO.getTimeOut());
-        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(ttlSeconds);
-        if (Objects.isNull(stateDO)) {
-            stateDO = new EntityStateDO();
-            stateDO.setEntityTypeFlag(EntityTypeFlagEnum.DEVICE.getIndex());
-            stateDO.setEntityId(entityDTO.getDeviceId());
-            stateDO.setParentEntityId(Objects.nonNull(entityDTO.getDriverId()) ? entityDTO.getDriverId() : 0L);
-            stateDO.setTenantId(entityDTO.getTenantId());
-            stateDO.setLeaseVersion(1L);
-            stateDO.setLastStateFlag((byte) DeviceStatusEnum.OFFLINE.getIndex());
-            stateDO.setLastHeartbeatTime(LocalDateTime.now());
-            stateDO.setLastAlarmId(0L);
-            stateDO.setTimeoutSourceFlag((byte) TimeoutSourceFlagEnum.DRIVER.getIndex());
-            stateDO.setStateExt(JsonExt.builder().type("device-heartbeat").content("").version(1).build());
-        } else {
-            stateDO.setLeaseVersion(stateDO.getLeaseVersion() + 1L);
-            stateDO.setLastStateFlag(stateDO.getStateFlag());
-            stateDO.setLastHeartbeatTime(LocalDateTime.now());
+        if (ttlSeconds <= 0 || ttlSeconds > Integer.MAX_VALUE) {
+            return;
         }
-        DeviceStatusEnum statusEnum = DeviceStatusEnum.ofCode(current);
-        stateDO.setStateFlag((byte) (Objects.nonNull(statusEnum) ? statusEnum.getIndex() : 0));
-        stateDO.setExpireTime(expireTime);
-        stateDO.setTimeoutSeconds((int) ttlSeconds);
-        entityStateManager.saveOrUpdate(stateDO);
+
+        DeviceStatusEnum statusEnum = DeviceStatusEnum.ofCode(entityDTO.getStatus());
+        if (Objects.isNull(statusEnum)) {
+            statusEnum = DeviceStatusEnum.OFFLINE;
+        }
+        String current = statusEnum.getCode();
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(ttlSeconds);
+        EntityStateDO stateDO = entityStateMapper.upsertEntityState(
+                IdWorker.getId(),
+                entityDTO.getTenantId(),
+                EntityTypeFlagEnum.DEVICE.getIndex(),
+                entityDTO.getDeviceId(),
+                entityDTO.getDriverId(),
+                (byte) statusEnum.getIndex(),
+                (byte) DeviceStatusEnum.OFFLINE.getIndex(),
+                expireTime,
+                (int) ttlSeconds,
+                (byte) TimeoutSourceFlagEnum.DRIVER.getIndex(),
+                "device-heartbeat");
+        if (Objects.isNull(stateDO)) {
+            return;
+        }
 
         byte lastIndex = stateDO.getLastStateFlag();
         if (isFlip(lastIndex, current)) {

@@ -17,26 +17,31 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
-import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
+import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyByte;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,10 +51,7 @@ class DeviceStateServiceImplTest {
     private DeviceAlarmService deviceAlarmService;
 
     @Mock
-    private EntityStateManager entityStateManager;
-
-    @Mock
-    private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
+    private EntityStateMapper entityStateMapper;
 
     @InjectMocks
     private DeviceStateServiceImpl service;
@@ -65,85 +67,71 @@ class DeviceStateServiceImplTest {
         return dto;
     }
 
+    private EntityStateDO persisted(byte stateFlag, byte lastStateFlag, long leaseVersion) {
+        EntityStateDO state = new EntityStateDO();
+        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        state.setEntityId(10L);
+        state.setParentEntityId(7L);
+        state.setTenantId(100L);
+        state.setStateFlag(stateFlag);
+        state.setLastStateFlag(lastStateFlag);
+        state.setLeaseVersion(leaseVersion);
+        state.setTimeoutSeconds(25);
+        state.setLastHeartbeatTime(LocalDateTime.now());
+        state.setLastAlarmId(0L);
+        return state;
+    }
+
+    private void stubUpsert(EntityStateDO state) {
+        when(entityStateMapper.upsertEntityState(anyLong(), anyLong(), anyByte(), anyLong(), anyLong(), anyByte(),
+                anyByte(), any(), anyInt(), anyByte(), anyString())).thenReturn(state);
+    }
+
     @Test
     void nullDtoDoesNothing() {
         service.heartbeat(null);
-        verify(entityStateManager, never()).saveOrUpdate(any());
+
+        verifyNoInteractions(entityStateMapper);
     }
 
     @Test
-    void newDeviceCreatesDbRowWithCustomTimeout() {
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(null);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
+    void newDeviceUpsertsDbRowWithCustomTimeout() {
+        stubUpsert(persisted((byte) DeviceStatusEnum.ONLINE.getIndex(),
+                (byte) DeviceStatusEnum.OFFLINE.getIndex(), 1L));
 
         service.heartbeat(heartbeat(10L, "online", 7L, 100L, 25, TimeUnit.SECONDS));
 
-        ArgumentCaptor<EntityStateDO> captor = ArgumentCaptor.forClass(EntityStateDO.class);
-        verify(entityStateManager).saveOrUpdate(captor.capture());
-
-        EntityStateDO saved = captor.getValue();
-        assertThat(saved.getEntityTypeFlag()).isEqualTo((byte) EntityTypeFlagEnum.DEVICE.getIndex());
-        assertThat(saved.getEntityId()).isEqualTo(10L);
-        assertThat(saved.getParentEntityId()).isEqualTo(7L);
-        assertThat(saved.getTenantId()).isEqualTo(100L);
-        assertThat(saved.getLeaseVersion()).isEqualTo(1L);
-        assertThat(saved.getStateFlag()).isEqualTo((byte) DeviceStatusEnum.ONLINE.getIndex());
-        assertThat(saved.getTimeoutSeconds()).isEqualTo(25);
-        assertThat(saved.getLastStateFlag()).isEqualTo((byte) DeviceStatusEnum.OFFLINE.getIndex());
-        assertThat(saved.getLastHeartbeatTime()).isNotNull();
-        assertThat(saved.getLastAlarmId()).isEqualTo(0L);
-        assertThat(saved.getStateExt()).isNotNull();
+        verify(entityStateMapper).upsertEntityState(anyLong(),
+                eq(100L),
+                eq((byte) EntityTypeFlagEnum.DEVICE.getIndex()),
+                eq(10L),
+                eq(7L),
+                eq((byte) DeviceStatusEnum.ONLINE.getIndex()),
+                eq((byte) DeviceStatusEnum.OFFLINE.getIndex()),
+                any(LocalDateTime.class),
+                eq(25),
+                eq((byte) TimeoutSourceFlagEnum.DRIVER.getIndex()),
+                eq("device-heartbeat"));
     }
 
     @Test
-    void existingDeviceIncrementsLeaseVersion() {
-        EntityStateDO existing = new EntityStateDO();
-        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
-        existing.setEntityId(10L);
-        existing.setLeaseVersion(3L);
-        existing.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
-
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(existing);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
-
-        service.heartbeat(heartbeat(10L, "online", 7L, 100L, 25, TimeUnit.SECONDS));
-
-        ArgumentCaptor<EntityStateDO> captor = ArgumentCaptor.forClass(EntityStateDO.class);
-        verify(entityStateManager).saveOrUpdate(captor.capture());
-        assertThat(captor.getValue().getLeaseVersion()).isEqualTo(4L);
-        assertThat(captor.getValue().getLastStateFlag()).isEqualTo((byte) DeviceStatusEnum.ONLINE.getIndex());
-    }
-
-    @Test
-    void nullDriverIdDefaultsToZero() {
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(null);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
-
+    void nullDriverIdDoesNothing() {
         service.heartbeat(heartbeat(10L, "online", null, 100L, 25, TimeUnit.SECONDS));
 
-        ArgumentCaptor<EntityStateDO> captor = ArgumentCaptor.forClass(EntityStateDO.class);
-        verify(entityStateManager).saveOrUpdate(captor.capture());
-        assertThat(captor.getValue().getParentEntityId()).isEqualTo(0L);
+        verifyNoInteractions(entityStateMapper);
+    }
+
+    @Test
+    void nonPositiveTimeoutDoesNothing() {
+        service.heartbeat(heartbeat(10L, "online", 7L, 100L, 0, TimeUnit.SECONDS));
+
+        verifyNoInteractions(entityStateMapper);
     }
 
     @Test
     void statusFlipTriggersAlarm() {
-        EntityStateDO existing = new EntityStateDO();
-        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
-        existing.setEntityId(10L);
-        existing.setLeaseVersion(2L);
-        existing.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
-
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(existing);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
+        stubUpsert(persisted((byte) DeviceStatusEnum.OFFLINE.getIndex(),
+                (byte) DeviceStatusEnum.ONLINE.getIndex(), 3L));
 
         service.heartbeat(heartbeat(10L, "offline", 7L, 100L, 25, TimeUnit.SECONDS));
 
@@ -152,16 +140,8 @@ class DeviceStateServiceImplTest {
 
     @Test
     void sameStatusNoAlarm() {
-        EntityStateDO existing = new EntityStateDO();
-        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
-        existing.setEntityId(10L);
-        existing.setLeaseVersion(2L);
-        existing.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
-
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(existing);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
+        stubUpsert(persisted((byte) DeviceStatusEnum.ONLINE.getIndex(),
+                (byte) DeviceStatusEnum.ONLINE.getIndex(), 3L));
 
         service.heartbeat(heartbeat(10L, "online", 7L, 100L, 25, TimeUnit.SECONDS));
 

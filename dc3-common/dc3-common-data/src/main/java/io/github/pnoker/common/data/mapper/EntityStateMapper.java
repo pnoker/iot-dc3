@@ -20,6 +20,9 @@ package io.github.pnoker.common.data.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * Mapper for dc3_entity_state table.
@@ -30,5 +33,59 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
+
+    /**
+     * Atomically inserts or renews one entity state lease.
+     * <p>
+     * The returned row contains the state after renewal; {@code lastStateFlag}
+     * is the previous persisted state for updates, or the supplied initial value
+     * for inserts.
+     *
+     * @param id                   generated id used only when inserting
+     * @param tenantId             tenant id
+     * @param entityTypeFlag       entity type flag
+     * @param entityId             driver/device id
+     * @param parentEntityId       owning entity id, or 0 for drivers
+     * @param stateFlag            current state flag
+     * @param initialLastStateFlag initial previous state for inserted rows
+     * @param expireTime           lease expiry time
+     * @param timeoutSeconds       lease timeout in seconds
+     * @param timeoutSourceFlag    timeout source flag
+     * @param stateExtType         state extension type for inserted rows
+     * @return inserted or updated state row
+     */
+    EntityStateDO upsertEntityState(@Param("id") Long id,
+                                    @Param("tenantId") Long tenantId,
+                                    @Param("entityTypeFlag") byte entityTypeFlag,
+                                    @Param("entityId") Long entityId,
+                                    @Param("parentEntityId") Long parentEntityId,
+                                    @Param("stateFlag") byte stateFlag,
+                                    @Param("initialLastStateFlag") byte initialLastStateFlag,
+                                    @Param("expireTime") java.time.LocalDateTime expireTime,
+                                    @Param("timeoutSeconds") int timeoutSeconds,
+                                    @Param("timeoutSourceFlag") byte timeoutSourceFlag,
+                                    @Param("stateExtType") String stateExtType);
+
+    /**
+     * Atomically claims expired online device leases and marks them offline.
+     * <p>
+     * PostgreSQL {@code FOR UPDATE SKIP LOCKED} lets multiple Data Center
+     * instances split expired rows without blocking or processing the same row.
+     *
+     * @param entityTypeFlag       device entity type flag
+     * @param onlineFlag           online state flag
+     * @param maintainFlag         maintain state flag
+     * @param offlineFlag          offline state flag
+     * @param batchSize            maximum rows to claim
+     * @param offlineRenewSeconds  renewal window for already-offline state rows
+     * @return claimed rows after the offline update; {@code lastStateFlag}
+     * contains the previous state
+     */
+    List<EntityStateDO> claimExpiredDevices(@Param("entityTypeFlag") byte entityTypeFlag,
+                                            @Param("onlineFlag") byte onlineFlag,
+                                            @Param("maintainFlag") byte maintainFlag,
+                                            @Param("offlineFlag") byte offlineFlag,
+                                            @Param("batchSize") int batchSize,
+                                            @Param("offlineRenewSeconds") int offlineRenewSeconds);
 
 }

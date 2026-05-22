@@ -68,7 +68,7 @@ public class EntityStateDO implements Serializable {
     private Long entityId;
 
     /**
-     * Parent entity ID. For driver entries same as entity_id; for device entries the owning driver.
+     * Parent entity ID. For driver entries this is 0; for device entries the owning driver.
      */
     @TableField("parent_entity_id")
     private Long parentEntityId;

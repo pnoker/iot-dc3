@@ -79,22 +79,14 @@ class VirtualDriverCustomServiceImplTest {
     }
 
     @Test
-    void scheduleSendsOnlineStatusForEveryAttachedDevice() {
-        Set<Long> ids = new HashSet<>(Set.of(10L, 20L, 30L));
-        org.mockito.Mockito.when(driverMetadata.getDeviceIds()).thenReturn(ids);
-
-        service.schedule();
-
-        for (Long id : ids) {
-            verify(driverSenderService).deviceStatusSender(eq(id), eq(DeviceStatusEnum.ONLINE), eq(25),
-                    eq(TimeUnit.SECONDS));
-        }
+    void scheduleDoesNotReportDeviceStatus() {
+        assertThatNoException().isThrownBy(() -> service.schedule());
+        verifyNoInteractions(driverSenderService);
     }
 
     @Test
     void scheduleIsSilentWhenNoDevicesRegistered() {
-        org.mockito.Mockito.when(driverMetadata.getDeviceIds()).thenReturn(Set.of());
-        service.schedule();
+        assertThatNoException().isThrownBy(() -> service.schedule());
         verifyNoInteractions(driverSenderService);
     }
 

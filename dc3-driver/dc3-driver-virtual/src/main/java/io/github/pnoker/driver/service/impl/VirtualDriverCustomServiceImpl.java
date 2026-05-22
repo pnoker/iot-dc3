@@ -78,38 +78,9 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
          */
     }
 
-    /**
-     * Scheduled task to report device status.
-     * <p>
-     * This method is called periodically to update device status. By default, all virtual
-     * devices are reported as ONLINE with a 25-second validity period. Override this
-     * method to implement custom status reporting logic.
-     * </p>
-     */
     @Override
     public void schedule() {
-        /*
-         * Device status upload logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario. Device status upload can be flexibly implemented
-         * based on specific requirements. Here are some common approaches: - Determine
-         * device status based on read data in the `read` method; - Periodically check
-         * device status in a custom scheduled task; - Trigger device status judgment
-         * based on specific business logic or events.
-         *
-         * Finally, submit the device status to the SDK management through the {@link
-         * DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface. The
-         * device status enumeration {@link DeviceStatusEnum} includes the following
-         * states: - ONLINE: Device online - OFFLINE: Device offline - MAINTAIN: Device
-         * under maintenance - FAULT: Device fault
-         *
-         * In the following example, all devices are set to {@link
-         * DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link
-         * TimeUnit#SECONDS}.
-         */
-        driverMetadata.getDeviceIds()
-                .forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+        // Device state lease renewal is owned by the SDK device health job.
     }
 
     /**

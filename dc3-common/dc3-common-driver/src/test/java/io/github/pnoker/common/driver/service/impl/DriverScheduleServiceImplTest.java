@@ -22,6 +22,7 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
 import io.github.pnoker.common.driver.job.DriverStatusScheduleJob;
+import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.exception.CronException;
 import io.github.pnoker.common.quartz.QuartzService;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,6 +74,42 @@ class DriverScheduleServiceImplTest {
                 eq(ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON),
                 eq(DriverStatusScheduleJob.class));
         verify(quartzService).startScheduler();
+    }
+
+    @Test
+    void initialRegistersHealthJobWhenEnabled() throws Exception {
+        DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
+        properties.setSchedule(s);
+        properties.getHealth().getDevice().setCron("0/20 * * * * ?");
+        service.initial();
+        verify(quartzService).createJobWithCron(
+                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
+                eq("0/20 * * * * ?"),
+                eq(DeviceHealthScheduleJob.class));
+    }
+
+    @Test
+    void initialSkipsHealthJobWhenDisabled() throws Exception {
+        DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
+        properties.setSchedule(s);
+        properties.getHealth().getDevice().setEnable(false);
+        service.initial();
+        verify(quartzService, never()).createJobWithCron(
+                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
+                any(),
+                eq(DeviceHealthScheduleJob.class));
+    }
+
+    @Test
+    void initialRejectsInvalidHealthCron() {
+        DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
+        properties.setSchedule(s);
+        properties.getHealth().getDevice().setCron("nope");
+        assertThatThrownBy(() -> service.initial())
+                .isInstanceOf(CronException.class)
+                .hasMessageContaining("Device health schedule");
     }
 
     @Test

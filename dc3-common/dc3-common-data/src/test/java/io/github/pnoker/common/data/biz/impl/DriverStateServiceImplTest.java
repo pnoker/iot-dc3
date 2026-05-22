@@ -17,13 +17,14 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
-import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
+import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
+import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -36,9 +37,14 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyByte;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,10 +54,7 @@ class DriverStateServiceImplTest {
     private DriverAlarmService driverAlarmService;
 
     @Mock
-    private EntityStateManager entityStateManager;
-
-    @Mock
-    private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
+    private EntityStateMapper entityStateMapper;
 
     @Mock
     private RabbitTemplate rabbitTemplate;
@@ -67,84 +70,74 @@ class DriverStateServiceImplTest {
         return dto;
     }
 
+    private EntityStateDO persisted(byte stateFlag, byte lastStateFlag, long leaseVersion) {
+        EntityStateDO state = new EntityStateDO();
+        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
+        state.setEntityId(1L);
+        state.setParentEntityId(0L);
+        state.setTenantId(100L);
+        state.setStateFlag(stateFlag);
+        state.setLastStateFlag(lastStateFlag);
+        state.setLeaseVersion(leaseVersion);
+        state.setTimeoutSeconds(45);
+        state.setExpireTime(LocalDateTime.now().plusSeconds(45));
+        state.setLastHeartbeatTime(LocalDateTime.now());
+        state.setLastAlarmId(0L);
+        return state;
+    }
+
+    private void stubUpsert(EntityStateDO state) {
+        when(entityStateMapper.upsertEntityState(anyLong(), anyLong(), anyByte(), anyLong(), anyLong(), anyByte(),
+                anyByte(), any(), anyInt(), anyByte(), anyString())).thenReturn(state);
+    }
+
     @Test
     void nullDtoDoesNothing() {
         service.heartbeat(null);
-        verify(entityStateManager, never()).saveOrUpdate(any());
+
+        verifyNoInteractions(entityStateMapper, rabbitTemplate);
     }
 
     @Test
     void nullDriverIdDoesNothing() {
         DriverStateDTO dto = new DriverStateDTO();
         dto.setStatus("online");
+
         service.heartbeat(dto);
-        verify(entityStateManager, never()).saveOrUpdate(any());
+
+        verifyNoInteractions(entityStateMapper, rabbitTemplate);
     }
 
     @Test
-    void newDriverCreatesDbRow() {
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(null);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
+    void driverHeartbeatUpsertsDbRowAndPublishesTimeoutCheck() {
+        stubUpsert(persisted((byte) DriverStatusEnum.ONLINE.getIndex(),
+                (byte) DriverStatusEnum.OFFLINE.getIndex(), 6L));
 
         service.heartbeat(heartbeat(1L, "online", 100L));
 
-        ArgumentCaptor<EntityStateDO> captor = ArgumentCaptor.forClass(EntityStateDO.class);
-        verify(entityStateManager).saveOrUpdate(captor.capture());
+        verify(entityStateMapper).upsertEntityState(anyLong(),
+                eq(100L),
+                eq((byte) EntityTypeFlagEnum.DRIVER.getIndex()),
+                eq(1L),
+                eq(0L),
+                eq((byte) DriverStatusEnum.ONLINE.getIndex()),
+                eq((byte) DriverStatusEnum.OFFLINE.getIndex()),
+                any(LocalDateTime.class),
+                eq(45),
+                eq((byte) TimeoutSourceFlagEnum.SYSTEM.getIndex()),
+                eq("driver-heartbeat"));
 
-        EntityStateDO saved = captor.getValue();
-        assertThat(saved.getEntityTypeFlag()).isEqualTo((byte) EntityTypeFlagEnum.DRIVER.getIndex());
-        assertThat(saved.getEntityId()).isEqualTo(1L);
-        assertThat(saved.getParentEntityId()).isEqualTo(1L);
-        assertThat(saved.getTenantId()).isEqualTo(100L);
-        assertThat(saved.getLeaseVersion()).isEqualTo(1L);
-        assertThat(saved.getStateFlag()).isEqualTo((byte) DriverStatusEnum.ONLINE.getIndex());
-        assertThat(saved.getTimeoutSeconds()).isEqualTo(45);
-        assertThat(saved.getExpireTime()).isAfter(LocalDateTime.now().plusSeconds(40));
-        assertThat(saved.getLastStateFlag()).isEqualTo((byte) DriverStatusEnum.OFFLINE.getIndex());
-        assertThat(saved.getLastHeartbeatTime()).isNotNull();
-        assertThat(saved.getLastAlarmId()).isEqualTo(0L);
-        assertThat(saved.getStateExt()).isNotNull();
-
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), any(Object.class));
-    }
-
-    @Test
-    void existingDriverIncrementsLeaseVersion() {
-        EntityStateDO existing = new EntityStateDO();
-        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
-        existing.setEntityId(1L);
-        existing.setLeaseVersion(5L);
-        existing.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
-
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(existing);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
-
-        service.heartbeat(heartbeat(1L, "online", 100L));
-
-        ArgumentCaptor<EntityStateDO> captor = ArgumentCaptor.forClass(EntityStateDO.class);
-        verify(entityStateManager).saveOrUpdate(captor.capture());
+        ArgumentCaptor<DriverTimeoutCheckDTO> captor = ArgumentCaptor.forClass(DriverTimeoutCheckDTO.class);
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), captor.capture());
+        assertThat(captor.getValue().getDriverId()).isEqualTo(1L);
+        assertThat(captor.getValue().getTenantId()).isEqualTo(100L);
         assertThat(captor.getValue().getLeaseVersion()).isEqualTo(6L);
-        assertThat(captor.getValue().getLastStateFlag()).isEqualTo((byte) DriverStatusEnum.ONLINE.getIndex());
-
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), any(Object.class));
     }
 
     @Test
     void statusFlipFromOnlineToOfflineTriggersAlarm() {
-        EntityStateDO existing = new EntityStateDO();
-        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
-        existing.setEntityId(1L);
-        existing.setLeaseVersion(3L);
-        existing.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
-
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(existing);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
+        stubUpsert(persisted((byte) DriverStatusEnum.OFFLINE.getIndex(),
+                (byte) DriverStatusEnum.ONLINE.getIndex(), 4L));
 
         service.heartbeat(heartbeat(1L, "offline", 100L));
 
@@ -153,16 +146,8 @@ class DriverStateServiceImplTest {
 
     @Test
     void sameStatusNoFlipDoesNotTriggerAlarm() {
-        EntityStateDO existing = new EntityStateDO();
-        existing.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
-        existing.setEntityId(1L);
-        existing.setLeaseVersion(3L);
-        existing.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
-
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(existing);
-        when(entityStateManager.saveOrUpdate(any())).thenReturn(true);
+        stubUpsert(persisted((byte) DriverStatusEnum.ONLINE.getIndex(),
+                (byte) DriverStatusEnum.ONLINE.getIndex(), 4L));
 
         service.heartbeat(heartbeat(1L, "online", 100L));
 

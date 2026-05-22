@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
+import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import org.junit.jupiter.api.Test;
@@ -40,6 +40,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyByte;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -51,6 +53,9 @@ class EntityStateExpiryScannerTest {
 
     @Mock
     private EntityStateManager entityStateManager;
+
+    @Mock
+    private EntityStateMapper entityStateMapper;
 
     @Mock
     private EntityAlarmManager entityAlarmManager;
@@ -65,9 +70,6 @@ class EntityStateExpiryScannerTest {
     private Channel channel;
 
     @Mock
-    private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
-
-    @Mock
     private LambdaUpdateChainWrapper<EntityStateDO> updateWrapper;
 
     @InjectMocks
@@ -79,9 +81,11 @@ class EntityStateExpiryScannerTest {
         state.setEntityId(deviceId);
         state.setParentEntityId(driverId);
         state.setStateFlag(statusFlag);
+        state.setLastStateFlag(statusFlag);
         state.setLeaseVersion(leaseVersion);
         state.setExpireTime(expireTime);
         state.setTenantId(100L);
+        state.setId(deviceId);
         return state;
     }
 
@@ -91,32 +95,21 @@ class EntityStateExpiryScannerTest {
         return new Message("tick".getBytes(), props);
     }
 
-    private void stubDeviceQuery(List<EntityStateDO> results) {
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.in(any(), any(Object[].class))).thenReturn(queryWrapper);
-        when(queryWrapper.lt(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.last(any())).thenReturn(queryWrapper);
-        when(queryWrapper.list()).thenReturn(results);
+    private void stubClaimedDevices(List<EntityStateDO> results) {
+        when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
+                .thenReturn(results);
     }
 
-    private void stubClaimSuccess() {
+    private void stubLastAlarmUpdate() {
         when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
         when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
         when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
         when(updateWrapper.update()).thenReturn(true);
     }
 
-    private void stubClaimFailure() {
-        when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
-        when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.update()).thenReturn(false);
-    }
-
     @Test
     void noExpiredRowsDoesNothing() throws Exception {
-        stubDeviceQuery(Collections.emptyList());
+        stubClaimedDevices(Collections.emptyList());
 
         scanner.onScanTick(channel, mockMessage(1L));
 
@@ -125,17 +118,8 @@ class EntityStateExpiryScannerTest {
     }
 
     @Test
-    void alreadyOfflineDeviceSkipsAlarm() throws Exception {
-        EntityStateDO offline = deviceState(10L, 7L,
-                (byte) DeviceStatusEnum.OFFLINE.getIndex(),
-                5L, LocalDateTime.now().minusSeconds(10));
-
-        stubDeviceQuery(List.of(offline));
-        // already offline path: lambdaUpdate for renewal
-        when(entityStateManager.lambdaUpdate()).thenReturn(updateWrapper);
-        when(updateWrapper.eq(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.set(any(), any())).thenReturn(updateWrapper);
-        when(updateWrapper.update()).thenReturn(true);
+    void emptyClaimSkipsAlarm() throws Exception {
+        stubClaimedDevices(Collections.emptyList());
 
         scanner.onScanTick(channel, mockMessage(1L));
 
@@ -150,8 +134,8 @@ class EntityStateExpiryScannerTest {
                 (byte) DeviceStatusEnum.ONLINE.getIndex(),
                 2L, LocalDateTime.now().minusSeconds(10));
 
-        stubDeviceQuery(List.of(expired));
-        stubClaimSuccess();
+        stubClaimedDevices(List.of(expired));
+        stubLastAlarmUpdate();
         when(entityAlarmManager.save(any())).thenReturn(true);
 
         scanner.onScanTick(channel, mockMessage(1L));
@@ -162,13 +146,8 @@ class EntityStateExpiryScannerTest {
     }
 
     @Test
-    void claimFailsWhenAnotherInstanceAlreadyProcessed() throws Exception {
-        EntityStateDO expired = deviceState(10L, 7L,
-                (byte) DeviceStatusEnum.ONLINE.getIndex(),
-                3L, LocalDateTime.now().minusSeconds(10));
-
-        stubDeviceQuery(List.of(expired));
-        stubClaimFailure();
+    void anotherInstanceAlreadyClaimedRowsDoesNothing() throws Exception {
+        stubClaimedDevices(Collections.emptyList());
 
         scanner.onScanTick(channel, mockMessage(1L));
 
@@ -179,7 +158,7 @@ class EntityStateExpiryScannerTest {
 
     @Test
     void scanTickPublishesNextTickOnSuccess() throws Exception {
-        stubDeviceQuery(Collections.emptyList());
+        stubClaimedDevices(Collections.emptyList());
 
         scanner.onScanTick(channel, mockMessage(1L));
 
@@ -191,7 +170,8 @@ class EntityStateExpiryScannerTest {
 
     @Test
     void scanTickNacksAndRequeuesOnFailure() throws Exception {
-        when(entityStateManager.lambdaQuery()).thenThrow(new RuntimeException("DB down"));
+        when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
+                .thenThrow(new RuntimeException("DB down"));
 
         scanner.onScanTick(channel, mockMessage(1L));
 

@@ -83,7 +83,13 @@ public class DriverProperties {
      * Schedule configuration for periodic driver tasks.
      */
     @Valid
-    private ScheduleProperties schedule;
+    private ScheduleProperties schedule = new ScheduleProperties();
+
+    /**
+     * Health configuration for driver-side runtime checks.
+     */
+    @Valid
+    private HealthProperties health = new HealthProperties();
 
     /**
      * Metadata cache tuning for the driver runtime.
@@ -161,6 +167,49 @@ public class DriverProperties {
             private boolean recordStats = false;
 
         }
+
+    }
+
+    /**
+     * Health reporting options.
+     */
+    @Getter
+    @Setter
+    public static class HealthProperties {
+
+        /**
+         * Device health lease configuration.
+         */
+        @Valid
+        private DeviceHealthProperties device = new DeviceHealthProperties();
+
+    }
+
+    /**
+     * Device health reporting options.
+     */
+    @Getter
+    @Setter
+    public static class DeviceHealthProperties {
+
+        /**
+         * Whether the SDK should periodically evaluate and report device health.
+         */
+        private Boolean enable = true;
+
+        /**
+         * Quartz cron expression used by the device health job. Drivers can tune
+         * this separately from the fixed driver heartbeat cadence.
+         */
+        private String cron = "0/15 * * * * ?";
+
+        /**
+         * Fallback device state lease duration in seconds. Protocol drivers can
+         * return a per-device timeout from the health hook when different devices
+         * need different offline windows.
+         */
+        @Min(1)
+        private int timeoutSeconds = 45;
 
     }
 

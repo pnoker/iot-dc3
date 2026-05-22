@@ -17,22 +17,20 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.data.biz.DriverStateService;
-import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
+import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
-import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +53,7 @@ public class DriverStateServiceImpl implements DriverStateService {
 
     private final DriverAlarmService driverAlarmService;
 
-    private final EntityStateManager entityStateManager;
+    private final EntityStateMapper entityStateMapper;
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -73,40 +71,32 @@ public class DriverStateServiceImpl implements DriverStateService {
 
     @Override
     public void heartbeat(DriverStateDTO entityDTO) {
-        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getStatus())) {
+        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())
+                || Objects.isNull(entityDTO.getTenantId()) || Objects.isNull(entityDTO.getStatus())) {
             return;
         }
 
-        String current = entityDTO.getStatus();
-
-        // Persist state lease to database (source of truth)
-        EntityStateDO stateDO = entityStateManager.lambdaQuery()
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
-                .eq(EntityStateDO::getEntityId, entityDTO.getDriverId())
-                .one();
-        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(STATUS_TIMEOUT_SECONDS);
-        if (Objects.isNull(stateDO)) {
-            stateDO = new EntityStateDO();
-            stateDO.setEntityTypeFlag(EntityTypeFlagEnum.DRIVER.getIndex());
-            stateDO.setEntityId(entityDTO.getDriverId());
-            stateDO.setParentEntityId(entityDTO.getDriverId());
-            stateDO.setTenantId(entityDTO.getTenantId());
-            stateDO.setLeaseVersion(1L);
-            stateDO.setLastStateFlag((byte) DriverStatusEnum.OFFLINE.getIndex());
-            stateDO.setLastHeartbeatTime(LocalDateTime.now());
-            stateDO.setLastAlarmId(0L);
-            stateDO.setTimeoutSourceFlag((byte) TimeoutSourceFlagEnum.SYSTEM.getIndex());
-            stateDO.setStateExt(JsonExt.builder().type("driver-heartbeat").content("").version(1).build());
-        } else {
-            stateDO.setLeaseVersion(stateDO.getLeaseVersion() + 1L);
-            stateDO.setLastStateFlag(stateDO.getStateFlag());
-            stateDO.setLastHeartbeatTime(LocalDateTime.now());
+        DriverStatusEnum statusEnum = DriverStatusEnum.ofCode(entityDTO.getStatus());
+        if (Objects.isNull(statusEnum)) {
+            statusEnum = DriverStatusEnum.OFFLINE;
         }
-        DriverStatusEnum statusEnum = DriverStatusEnum.ofCode(current);
-        stateDO.setStateFlag((byte) (Objects.nonNull(statusEnum) ? statusEnum.getIndex() : 0));
-        stateDO.setExpireTime(expireTime);
-        stateDO.setTimeoutSeconds(STATUS_TIMEOUT_SECONDS);
-        entityStateManager.saveOrUpdate(stateDO);
+        String current = statusEnum.getCode();
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(STATUS_TIMEOUT_SECONDS);
+        EntityStateDO stateDO = entityStateMapper.upsertEntityState(
+                IdWorker.getId(),
+                entityDTO.getTenantId(),
+                EntityTypeFlagEnum.DRIVER.getIndex(),
+                entityDTO.getDriverId(),
+                0L,
+                (byte) statusEnum.getIndex(),
+                (byte) DriverStatusEnum.OFFLINE.getIndex(),
+                expireTime,
+                STATUS_TIMEOUT_SECONDS,
+                (byte) TimeoutSourceFlagEnum.SYSTEM.getIndex(),
+                "driver-heartbeat");
+        if (Objects.isNull(stateDO)) {
+            return;
+        }
 
         // Publish timeout check message with current lease version
         DriverTimeoutCheckDTO checkDTO = DriverTimeoutCheckDTO.builder()
