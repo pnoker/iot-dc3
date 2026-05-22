@@ -17,41 +17,84 @@
 
 package io.github.pnoker.common.entity.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.Instant;
 
 /**
  * Result receipt sent by the driver after executing a point command.
+ * Received by {@code PointCommandResultReceiver} on the data-center side.
  *
  * @author pnoker
  * @version 2026.5.22
  * @since 2026.5.22
  */
-@Getter
-@Setter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class PointCommandResultDTO implements Serializable {
+public record PointCommandResultDTO(
+        String commandId,
+        Long tenantId,
+        String status,
+        String responseValue,
+        String errorCode,
+        String errorMessage,
+        Instant finishedAt,
+        int schemaVersion
+) {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    public static Builder builder() {
+        return new Builder();
+    }
 
-    private String commandId;
-    private Long tenantId;
-    private String status;
-    private String responseValue;
-    private String errorCode;
-    private String errorMessage;
-    private Instant finishedAt;
-    private int schemaVersion;
+    public static class Builder {
+        private String commandId;
+        private Long tenantId;
+        private String status;
+        private String responseValue;
+        private String errorCode;
+        private String errorMessage;
+        private Instant finishedAt;
+        private int schemaVersion;
+
+        public Builder commandId(String commandId) {
+            this.commandId = commandId;
+            return this;
+        }
+
+        public Builder tenantId(Long tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder responseValue(String responseValue) {
+            this.responseValue = responseValue;
+            return this;
+        }
+
+        public Builder errorCode(String errorCode) {
+            this.errorCode = errorCode;
+            return this;
+        }
+
+        public Builder errorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
+            return this;
+        }
+
+        public Builder finishedAt(Instant finishedAt) {
+            this.finishedAt = finishedAt;
+            return this;
+        }
+
+        public Builder schemaVersion(int schemaVersion) {
+            this.schemaVersion = schemaVersion;
+            return this;
+        }
+
+        public PointCommandResultDTO build() {
+            return new PointCommandResultDTO(commandId, tenantId, status, responseValue, errorCode, errorMessage,
+                    finishedAt, schemaVersion);
+        }
+    }
 }

@@ -19,17 +19,18 @@ package io.github.pnoker.common.driver.receiver.rabbit;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.command.CommandDedupCache;
+import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
+import io.github.pnoker.common.entity.dto.PointCommandPayload;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -40,11 +41,11 @@ import java.util.Objects;
 
 /**
  * RabbitMQ consumer that dispatches point read and write commands to the corresponding
- * services. Performs idempotent deduplication and sends result receipts back to the
- * data center.
+ * services. Performs expire-at pre-check, idempotent deduplication, and sends result
+ * receipts back to the data center.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
@@ -57,14 +58,8 @@ public class PointCommandReceiver {
     private final DriverWriteService driverWriteService;
     private final DriverSenderService driverSenderService;
     private final CommandDedupCache dedupCache;
+    private final DeviceLockManager deviceLockManager;
 
-    /**
-     * Receive and process point commands from RabbitMQ queue.
-     *
-     * @param channel   RabbitMQ channel for message acknowledgment
-     * @param message   Raw RabbitMQ message containing delivery information
-     * @param entityDTO Point command data transfer object containing command details
-     */
     @RabbitHandler
     @RabbitListener(queues = "#{pointCommandQueue.name}")
     public void pointCommandReceive(Channel channel, Message message, PointCommandDTO entityDTO) {
@@ -73,15 +68,23 @@ public class PointCommandReceiver {
         try {
             log.info("Receive point command: {}", JsonUtil.toJsonString(entityDTO));
 
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getType())
-                    || StringUtils.isEmpty(entityDTO.getContent())) {
+            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.type())
+                    || Objects.isNull(entityDTO.payload())) {
                 log.error("Invalid point command: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
-            String commandId = entityDTO.getCommandId();
-            Long tenantId = entityDTO.getTenantId();
+            String commandId = entityDTO.commandId();
+            Long tenantId = entityDTO.tenantId();
+
+            // Expire-at pre-check
+            if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
+                log.warn("Command already expired: commandId={}, expireAt={}", commandId, entityDTO.expireAt());
+                sendResult(commandId, tenantId, PointCommandStatusEnum.EXPIRED.getCode(),
+                        null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
+                return;
+            }
 
             // Dedup check
             if (Objects.nonNull(commandId) && !dedupCache.tryAcquire(commandId)) {
@@ -91,31 +94,44 @@ public class PointCommandReceiver {
                 return;
             }
 
-            // Dispatch
-            switch (entityDTO.getType()) {
-                case READ:
-                    driverReadService.read(entityDTO);
-                    break;
-                case WRITE:
-                    driverWriteService.write(entityDTO);
-                    break;
-                default:
-                    log.error("Unsupported point command type: {}", entityDTO.getType());
-                    sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED.getCode(),
-                            null, "UNSUPPORTED_TYPE", "Unsupported command type: " + entityDTO.getType(),
-                            channel, deliveryTag);
-                    return;
+            // Extract deviceId for per-device serialization
+            Long lockDeviceId = switch (entityDTO.payload()) {
+                case PointCommandPayload.ReadPayload r -> r.deviceId();
+                case PointCommandPayload.WritePayload w -> w.deviceId();
+            };
+
+            // Dispatch under per-device lock to prevent protocol interleaving
+            String responseValue = deviceLockManager.runExclusive(lockDeviceId, () -> {
+                String rv = null;
+                switch (entityDTO.payload()) {
+                    case PointCommandPayload.ReadPayload r -> {
+                        driverReadService.read(r.deviceId(), r.pointId());
+                    }
+                    case PointCommandPayload.WritePayload w -> {
+                        boolean ok = driverWriteService.write(w.deviceId(), w.pointId(), w.value());
+                        if (ok) {
+                            rv = w.value();
+                        }
+                    }
+                }
+                return rv;
+            });
+
+            if (Objects.isNull(responseValue) && entityDTO.payload()
+                    instanceof PointCommandPayload.WritePayload) {
+                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED.getCode(),
+                        null, "WRITE_FAILED", "Device write returned false", channel, deliveryTag);
+                return;
             }
 
-            // Success
             sendResult(commandId, tenantId, PointCommandStatusEnum.SUCCESS.getCode(),
-                    null, null, null, channel, deliveryTag);
+                    responseValue, null, null, channel, deliveryTag);
 
         } catch (Exception e) {
             if (redelivered) {
                 log.error("Point command failed on redelivery, sending FAILED. deliveryTag={}", deliveryTag, e);
-                String commandId = Objects.nonNull(entityDTO) ? entityDTO.getCommandId() : null;
-                Long tenantId = Objects.nonNull(entityDTO) ? entityDTO.getTenantId() : null;
+                String commandId = Objects.nonNull(entityDTO) ? entityDTO.commandId() : null;
+                Long tenantId = Objects.nonNull(entityDTO) ? entityDTO.tenantId() : null;
                 sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED.getCode(),
                         null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
             } else {

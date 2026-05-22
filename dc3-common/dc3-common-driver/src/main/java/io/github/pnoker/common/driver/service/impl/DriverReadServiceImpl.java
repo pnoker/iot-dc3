@@ -27,9 +27,7 @@ import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +40,7 @@ import java.util.Objects;
  * actual read operation to the custom driver, and publishes the resulting point value.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
@@ -60,19 +58,16 @@ public class DriverReadServiceImpl implements DriverReadService {
 
     @Override
     public void read(Long deviceId, Long pointId) {
-        // Get device from metadata cache
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
             throw new ReadPointException("Failed to read point value, device[{}] is null", deviceId);
         }
 
-        // Check if device contains the specified point
         if (!device.getPointIds().contains(pointId)) {
             throw new ReadPointException("Failed to read point value, device[{}] not contained point[{}]", deviceId,
                     pointId);
         }
 
-        // Get driver and point configurations
         Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
         if (driverConfig.isEmpty()) {
             return;
@@ -82,40 +77,18 @@ public class DriverReadServiceImpl implements DriverReadService {
             return;
         }
 
-        // Get point from metadata cache
         PointBO point = pointMetadata.getCache(pointId);
         if (Objects.isNull(point)) {
             throw new ReadPointException("Failed to read point value, point is null, deviceId={}, pointId={}",
                     deviceId, pointId);
         }
 
-        // Read point value using custom driver service
         ReadPointValue readPointValue = driverCustomService.read(driverConfig, pointConfig, device, point);
         if (Objects.isNull(readPointValue)) {
             throw new ReadPointException("Failed to read point value, point value is null");
         }
 
-        // Send point value to message queue
         driverSenderService.pointValueSender(new PointValue(readPointValue));
-    }
-
-    @Override
-    public void read(PointCommandDTO commandDTO) {
-        // Parse device read command from command DTO
-        // Deserialize the command content into PointRead object
-        PointCommandDTO.PointRead deviceRead = JsonUtil.parseObject(commandDTO.getContent(),
-                PointCommandDTO.PointRead.class);
-        if (Objects.isNull(deviceRead)) {
-            return;
-        }
-
-        // Execute read command and log the process
-        // Log the start of command execution with command details
-        log.info("Start command of read: {}", JsonUtil.toJsonString(commandDTO));
-        // Call the read method with device and point IDs
-        read(deviceRead.getDeviceId(), deviceRead.getPointId());
-        // Log the completion of command execution
-        log.info("End command of read");
     }
 
 }

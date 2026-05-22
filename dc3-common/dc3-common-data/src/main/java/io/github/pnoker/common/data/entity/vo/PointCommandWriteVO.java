@@ -54,4 +54,11 @@ public class PointCommandWriteVO implements Serializable {
     @NotBlank(message = "Value can't be empty")
     private String value;
 
+    /**
+     * Optional pre-generated commandId for idempotent submission.
+     * When provided and already exists, returns the existing command status.
+     * When omitted, the server generates a new UUID.
+     */
+    private String commandId;
+
 }

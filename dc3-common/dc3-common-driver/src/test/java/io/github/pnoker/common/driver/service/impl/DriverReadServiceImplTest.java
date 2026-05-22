@@ -26,9 +26,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
-import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -153,32 +151,5 @@ class DriverReadServiceImplTest {
                 .isInstanceOf(ReadPointException.class)
                 .hasMessageContaining("point value is null");
         verify(driverSenderService, never()).pointValueSender(any(PointValue.class));
-    }
-
-    @Test
-    void commandReadIgnoresUnparseablePayload() {
-        PointCommandDTO commandDTO = new PointCommandDTO();
-        commandDTO.setContent("not-json");
-        // JsonUtil throws on parse; surface via the catch path? It actually throws
-        // because parseObject re-raises as JsonException. Verify the no-op path of
-        // parseObject(null content) instead by injecting a null content.
-        commandDTO.setContent(null);
-        assertThatNoException().isThrownBy(() -> service.read(commandDTO));
-        verifyNoInteractions(driverCustomService);
-    }
-
-    @Test
-    void commandReadDispatchesParsedPointRead() {
-        when(deviceMetadata.getCache(10L)).thenReturn(device);
-        when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
-        when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
-        when(pointMetadata.getCache(20L)).thenReturn(point);
-        when(driverCustomService.read(driverConfig, pointConfig, device, point))
-                .thenReturn(new ReadPointValue(device, point, "42"));
-
-        PointCommandDTO commandDTO = new PointCommandDTO();
-        commandDTO.setContent(JsonUtil.toJsonString(new PointCommandDTO.PointRead(10L, 20L)));
-        service.read(commandDTO);
-        verify(driverSenderService).pointValueSender(any(PointValue.class));
     }
 }

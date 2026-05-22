@@ -17,7 +17,9 @@
 
 package io.github.pnoker.common.data.biz;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.PointCommandDO;
+import io.github.pnoker.common.data.entity.vo.PointCommandQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 
@@ -25,45 +27,47 @@ import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
  * Business service for point command operations.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 public interface PointCommandService {
 
     /**
-     * Read command
+     * Submit a read command.
      *
      * @param tenantId current tenant id
      * @param entityVO PointCommandReadVO
+     * @return generated commandId for status tracking
      */
-    void read(Long tenantId, PointCommandReadVO entityVO);
+    String read(Long tenantId, PointCommandReadVO entityVO);
 
     /**
-     * Read command from trusted internal callers that do not carry request tenant
-     * context.
+     * Read command from trusted internal callers.
      *
      * @param entityVO PointCommandReadVO
+     * @return generated commandId
      */
-    default void read(PointCommandReadVO entityVO) {
-        read(null, entityVO);
+    default String read(PointCommandReadVO entityVO) {
+        return read(null, entityVO);
     }
 
     /**
-     * Write command
+     * Submit a write command.
      *
      * @param tenantId current tenant id
      * @param entityVO PointCommandWriteVO
+     * @return generated commandId for status tracking
      */
-    void write(Long tenantId, PointCommandWriteVO entityVO);
+    String write(Long tenantId, PointCommandWriteVO entityVO);
 
     /**
-     * Write command from trusted internal callers that do not carry request tenant
-     * context.
+     * Write command from trusted internal callers.
      *
      * @param entityVO PointCommandWriteVO
+     * @return generated commandId
      */
-    default void write(PointCommandWriteVO entityVO) {
-        write(null, entityVO);
+    default String write(PointCommandWriteVO entityVO) {
+        return write(null, entityVO);
     }
 
     /**
@@ -73,5 +77,14 @@ public interface PointCommandService {
      * @return matching command row, or null
      */
     PointCommandDO getByCommandId(String commandId);
+
+    /**
+     * Query commands with pagination and optional filters.
+     *
+     * @param tenantId current tenant id
+     * @param queryVO  query filters (deviceId, pointId, status, type, page, size)
+     * @return paginated command rows
+     */
+    Page<PointCommandDO> list(Long tenantId, PointCommandQueryVO queryVO);
 
 }

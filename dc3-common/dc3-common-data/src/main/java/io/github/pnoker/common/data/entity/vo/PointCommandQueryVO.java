@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.data.entity.vo;
 
-import jakarta.validation.constraints.NotNull;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.data.entity.model.PointCommandDO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,33 +29,39 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * View object for point command read API responses.
+ * Query view object for point command list API.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
+ * @version 2026.5.22
+ * @since 2026.5.22
  */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PointCommandReadVO implements Serializable {
+public class PointCommandQueryVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "Device ID can't be empty")
     private Long deviceId;
 
-    @NotNull(message = "Point ID can't be empty")
     private Long pointId;
 
+    private String status;
+
+    private String type;
+
+    private Long page = 1L;
+
+    private Long size = 20L;
+
     /**
-     * Optional pre-generated commandId for idempotent submission.
-     * When provided and already exists, returns the existing command status.
-     * When omitted, the server generates a new UUID.
+     * Convert to MyBatis-Plus Page object.
      */
-    private String commandId;
+    public Page<PointCommandDO> toPage() {
+        return new Page<>(page, size);
+    }
 
 }

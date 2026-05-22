@@ -19,10 +19,13 @@ package io.github.pnoker.common.driver.receiver.rabbit;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.command.CommandDedupCache;
+import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
+import io.github.pnoker.common.entity.dto.PointCommandPayload;
+import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +35,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
+import java.time.Instant;
+import java.util.function.Supplier;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -56,6 +64,9 @@ class PointCommandReceiverTest {
     private CommandDedupCache dedupCache;
 
     @Mock
+    private DeviceLockManager deviceLockManager;
+
+    @Mock
     private Channel channel;
 
     private PointCommandReceiver receiver;
@@ -64,47 +75,49 @@ class PointCommandReceiverTest {
     @BeforeEach
     void setUp() {
         receiver = new PointCommandReceiver(driverReadService, driverWriteService,
-                driverSenderService, dedupCache);
+                driverSenderService, dedupCache, deviceLockManager);
+
+        // DeviceLockManager executes the supplier inline
+        when(deviceLockManager.runExclusive(anyLong(), any()))
+                .thenAnswer(invocation -> ((Supplier<?>) invocation.getArgument(1)).get());
 
         MessageProperties props = new MessageProperties();
         props.setDeliveryTag(7L);
         message = new Message(new byte[0], props);
     }
 
+    private PointCommandDTO readCommand(String commandId) {
+        return new PointCommandDTO(commandId, 100L, PointCommandTypeEnum.READ,
+                new PointCommandPayload.ReadPayload(10L, 20L),
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
+                Instant.now(), Instant.now().plusSeconds(10), 1);
+    }
+
+    private PointCommandDTO writeCommand(String commandId) {
+        return new PointCommandDTO(commandId, 100L, PointCommandTypeEnum.WRITE,
+                new PointCommandPayload.WritePayload(10L, 20L, "42"),
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
+                Instant.now(), Instant.now().plusSeconds(10), 1);
+    }
+
     @Test
     void readCommandIsDispatchedToReadService() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO(PointCommandTypeEnum.READ, "{}");
-        dto.setCommandId("test-cmd-1");
         when(dedupCache.tryAcquire("test-cmd-1")).thenReturn(true);
 
-        receiver.pointCommandReceive(channel, message, dto);
+        receiver.pointCommandReceive(channel, message, readCommand("test-cmd-1"));
 
-        verify(driverReadService).read(dto);
+        verify(driverReadService).read(eq(10L), eq(20L));
         verify(channel).basicAck(eq(7L), eq(false));
     }
 
     @Test
     void writeCommandIsDispatchedToWriteService() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO(PointCommandTypeEnum.WRITE, "{}");
-        dto.setCommandId("test-cmd-2");
         when(dedupCache.tryAcquire("test-cmd-2")).thenReturn(true);
+        when(driverWriteService.write(eq(10L), eq(20L), eq("42"))).thenReturn(true);
 
-        receiver.pointCommandReceive(channel, message, dto);
+        receiver.pointCommandReceive(channel, message, writeCommand("test-cmd-2"));
 
-        verify(driverWriteService).write(dto);
-        verify(channel).basicAck(eq(7L), eq(false));
-    }
-
-    @Test
-    void configCommandSendsFailedResult() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO(PointCommandTypeEnum.CONFIG, "{}");
-        dto.setCommandId("test-cmd-3");
-        when(dedupCache.tryAcquire("test-cmd-3")).thenReturn(true);
-
-        receiver.pointCommandReceive(channel, message, dto);
-
-        verifyNoInteractions(driverReadService, driverWriteService);
-        verify(driverSenderService).pointCommandResultSender(any(io.github.pnoker.common.entity.dto.PointCommandResultDTO.class));
+        verify(driverWriteService).write(eq(10L), eq(20L), eq("42"));
         verify(channel).basicAck(eq(7L), eq(false));
     }
 
@@ -117,8 +130,11 @@ class PointCommandReceiverTest {
     }
 
     @Test
-    void rejectsPayloadWithBlankContent() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO(PointCommandTypeEnum.READ, "");
+    void rejectsPayloadWithNullType() throws Exception {
+        PointCommandDTO dto = new PointCommandDTO("id", 100L, null,
+                new PointCommandPayload.ReadPayload(10L, 20L),
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
+                Instant.now(), Instant.now().plusSeconds(10), 1);
         receiver.pointCommandReceive(channel, message, dto);
 
         verify(channel).basicReject(eq(7L), eq(false));
@@ -126,27 +142,49 @@ class PointCommandReceiverTest {
 
     @Test
     void nacksAndRequeuesOnServiceFailure() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO(PointCommandTypeEnum.READ, "{}");
-        dto.setCommandId("test-cmd-4");
         when(dedupCache.tryAcquire("test-cmd-4")).thenReturn(true);
-        doThrow(new RuntimeException("driver offline")).when(driverReadService).read(dto);
+        doThrow(new RuntimeException("driver offline")).when(driverReadService).read(anyLong(), anyLong());
 
-        receiver.pointCommandReceive(channel, message, dto);
+        receiver.pointCommandReceive(channel, message, readCommand("test-cmd-4"));
 
         verify(channel).basicNack(eq(7L), eq(false), eq(true));
     }
 
     @Test
     void duplicateCommandSendsDuplicateResult() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO(PointCommandTypeEnum.READ, "{}");
-        dto.setCommandId("dup-cmd");
         when(dedupCache.tryAcquire("dup-cmd")).thenReturn(false);
 
-        receiver.pointCommandReceive(channel, message, dto);
+        receiver.pointCommandReceive(channel, message, readCommand("dup-cmd"));
 
         verifyNoInteractions(driverReadService, driverWriteService);
-        verify(driverSenderService).pointCommandResultSender(
-                any(io.github.pnoker.common.entity.dto.PointCommandResultDTO.class));
+        verify(driverSenderService).pointCommandResultSender(any(PointCommandResultDTO.class));
+        verify(channel).basicAck(eq(7L), eq(false));
+    }
+
+    @Test
+    void expiredCommandSendsExpiredResult() throws Exception {
+        when(dedupCache.tryAcquire("exp-cmd")).thenReturn(true);
+
+        PointCommandDTO expired = new PointCommandDTO("exp-cmd", 100L, PointCommandTypeEnum.READ,
+                new PointCommandPayload.ReadPayload(10L, 20L),
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
+                Instant.now().minusSeconds(60), Instant.now().minusSeconds(30), 1);
+
+        receiver.pointCommandReceive(channel, message, expired);
+
+        verifyNoInteractions(driverReadService, driverWriteService);
+        verify(driverSenderService).pointCommandResultSender(any(PointCommandResultDTO.class));
+        verify(channel).basicAck(eq(7L), eq(false));
+    }
+
+    @Test
+    void failedWriteSendsFailedResult() throws Exception {
+        when(dedupCache.tryAcquire("write-fail")).thenReturn(true);
+        when(driverWriteService.write(eq(10L), eq(20L), eq("42"))).thenReturn(false);
+
+        receiver.pointCommandReceive(channel, message, writeCommand("write-fail"));
+
+        verify(driverSenderService).pointCommandResultSender(any(PointCommandResultDTO.class));
         verify(channel).basicAck(eq(7L), eq(false));
     }
 }
