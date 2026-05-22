@@ -20,8 +20,8 @@ package io.github.pnoker.common.driver.service.impl;
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
+import io.github.pnoker.common.driver.job.DriverHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
-import io.github.pnoker.common.driver.job.DriverStatusScheduleJob;
 import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.exception.CronException;
 import io.github.pnoker.common.quartz.QuartzService;
@@ -64,15 +64,15 @@ class DriverScheduleServiceImplTest {
     }
 
     @Test
-    void initialAlwaysRegistersStatusJob() throws Exception {
+    void initialAlwaysRegistersDriverHealthJob() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
         properties.setSchedule(s);
         service.initial();
         verify(quartzService).createJobWithCron(
                 eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DRIVER_STATUS_SCHEDULE_JOB),
-                eq(ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON),
-                eq(DriverStatusScheduleJob.class));
+                eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB),
+                eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON),
+                eq(DriverHealthScheduleJob.class));
         verify(quartzService).startScheduler();
     }
 

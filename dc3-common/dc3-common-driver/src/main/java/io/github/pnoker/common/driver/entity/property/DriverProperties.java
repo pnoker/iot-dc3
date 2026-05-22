@@ -33,6 +33,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Spring configuration properties for a driver instance.
@@ -204,12 +205,18 @@ public class DriverProperties {
         private String cron = "0/15 * * * * ?";
 
         /**
-         * Fallback device state lease duration in seconds. Protocol drivers can
-         * return a per-device timeout from the health hook when different devices
-         * need different offline windows.
+         * Fallback device state lease duration. Protocol drivers can return a
+         * per-device timeout from the health hook when different devices need
+         * different offline windows.
          */
         @Min(1)
-        private int timeoutSeconds = 45;
+        private int timeout = 45;
+
+        /**
+         * Unit for the fallback device state lease duration.
+         */
+        @NotNull
+        private TimeUnit timeoutUnit = TimeUnit.SECONDS;
 
     }
 

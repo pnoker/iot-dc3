@@ -43,6 +43,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyByte;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -96,7 +97,7 @@ class EntityStateExpiryScannerTest {
     }
 
     private void stubClaimedDevices(List<EntityStateDO> results) {
-        when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
+        when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
                 .thenReturn(results);
     }
 
@@ -123,6 +124,14 @@ class EntityStateExpiryScannerTest {
 
         scanner.onScanTick(channel, mockMessage(1L));
 
+        verify(entityStateMapper).claimExpiredDevices(
+                eq((byte) EntityTypeFlagEnum.DEVICE.getIndex()),
+                eq((byte) DeviceStatusEnum.ONLINE.getIndex()),
+                eq((byte) DeviceStatusEnum.MAINTAIN.getIndex()),
+                eq((byte) DeviceStatusEnum.FAULT.getIndex()),
+                eq((byte) DeviceStatusEnum.OFFLINE.getIndex()),
+                anyInt(),
+                anyInt());
         verify(entityAlarmManager, never()).save(any());
         verify(alarmRuleTriggerService, never()).processDeviceAlarm(any());
         verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
@@ -170,7 +179,7 @@ class EntityStateExpiryScannerTest {
 
     @Test
     void scanTickNacksAndRequeuesOnFailure() throws Exception {
-        when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
+        when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
                 .thenThrow(new RuntimeException("DB down"));
 
         scanner.onScanTick(channel, mockMessage(1L));

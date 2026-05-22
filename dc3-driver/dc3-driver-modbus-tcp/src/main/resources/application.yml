@@ -34,7 +34,8 @@ dc3:
       device:
         enable: true
         cron: '0/15 * * * * ?'
-        timeout-seconds: 45
+        timeout: 45
+        timeout-unit: SECONDS
     driver-attribute:
       - attribute-name: Host
         attribute-code: host

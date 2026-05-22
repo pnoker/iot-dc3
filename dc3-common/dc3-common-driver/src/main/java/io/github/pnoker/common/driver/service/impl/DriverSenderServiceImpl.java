@@ -77,12 +77,13 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     @Override
     public void deviceStatusSender(Long deviceId, DeviceStatusEnum status) {
-        sendDeviceStatus(deviceId, status, driverProperties.getHealth().getDevice().getTimeoutSeconds(), TimeUnit.SECONDS);
+        sendDeviceStatus(deviceId, status, driverProperties.getHealth().getDevice().getTimeout(),
+                driverProperties.getHealth().getDevice().getTimeoutUnit());
     }
 
     @Override
-    public void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
-        sendDeviceStatus(deviceId, status, timeOut, timeUnit);
+    public void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeout, TimeUnit timeoutUnit) {
+        sendDeviceStatus(deviceId, status, timeout, timeoutUnit);
     }
 
     @Override
@@ -158,8 +159,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_POINT_COMMAND_RESULT + "." + driverProperties.getService(), resultDTO);
     }
 
-    private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
-        DeviceStateDTO deviceState = new DeviceStateDTO(deviceId, status.getCode(), timeOut, timeUnit);
+    private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeout, TimeUnit timeoutUnit) {
+        DeviceStateDTO deviceState = new DeviceStateDTO(deviceId, status, timeout, timeoutUnit);
         DriverBO driver = driverMetadata.getDriver();
         if (Objects.nonNull(driver)) {
             deviceState.setDriverId(driver.getId());

@@ -48,7 +48,7 @@ import java.util.Objects;
  * <p>
  * Consumes messages dead-lettered from the 45s TTL delay queue and performs
  * a secondary check against {@code dc3_entity_state}. Only marks the driver
- * OFFLINE when the lease version, expiry, and online-family conditions all
+ * OFFLINE when the lease version, expiry, and heartbeat-renewed state conditions all
  * confirm the driver has truly stopped sending heartbeats.
  *
  * @author pnoker
@@ -102,16 +102,17 @@ public class DriverTimeoutCheckReceiver {
             }
 
             // Already offline
-            byte offlineIndex = (byte) DriverStatusEnum.OFFLINE.getIndex();
+            Byte offlineIndex = DriverStatusEnum.OFFLINE.getIndex();
             if (Objects.equals(state.getStateFlag(), offlineIndex)) {
                 RabbitAckUtil.ack(channel, deliveryTag);
                 return;
             }
 
-            // Online family check
-            boolean isOnline = state.getStateFlag() == DriverStatusEnum.ONLINE.getIndex()
-                    || state.getStateFlag() == DriverStatusEnum.MAINTAIN.getIndex();
-            if (!isOnline) {
+            // Heartbeat-renewed states should become OFFLINE once their lease expires.
+            boolean heartbeatRenewed = statusIs(state.getStateFlag(), DriverStatusEnum.ONLINE)
+                    || statusIs(state.getStateFlag(), DriverStatusEnum.MAINTAIN)
+                    || statusIs(state.getStateFlag(), DriverStatusEnum.FAULT);
+            if (!heartbeatRenewed) {
                 RabbitAckUtil.ack(channel, deliveryTag);
                 return;
             }
@@ -184,5 +185,9 @@ public class DriverTimeoutCheckReceiver {
             log.error("Driver timeout check failed, deliveryTag={}", deliveryTag, e);
             RabbitAckUtil.nack(channel, deliveryTag, true);
         }
+    }
+
+    private static boolean statusIs(Byte stateFlag, DriverStatusEnum status) {
+        return Objects.equals(stateFlag, status.getIndex());
     }
 }

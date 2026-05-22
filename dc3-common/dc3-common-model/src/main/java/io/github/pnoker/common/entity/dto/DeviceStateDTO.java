@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.dto;
 
+import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,16 +70,16 @@ public class DeviceStateDTO implements Serializable {
     private String status;
 
     /**
-     * Cache TTL
+     * Lease timeout value.
      */
     @Builder.Default
-    private int timeOut = 15;
+    private int timeout = 15;
 
     /**
-     * Cache TTL unit
+     * Lease timeout unit.
      */
     @Builder.Default
-    private TimeUnit timeUnit = TimeUnit.MINUTES;
+    private TimeUnit timeoutUnit = TimeUnit.MINUTES;
 
     /**
      * Create Time
@@ -91,12 +92,20 @@ public class DeviceStateDTO implements Serializable {
         this.createTime = LocalDateTimeUtil.now();
     }
 
-    public DeviceStateDTO(Long deviceId, String status, int timeOut, TimeUnit timeUnit) {
+    public DeviceStateDTO(Long deviceId, DeviceStatusEnum status) {
+        this(deviceId, status == null ? null : status.getCode());
+    }
+
+    public DeviceStateDTO(Long deviceId, String status, int timeout, TimeUnit timeoutUnit) {
         this.deviceId = deviceId;
         this.status = status;
-        this.timeOut = timeOut;
-        this.timeUnit = timeUnit;
+        this.timeout = timeout;
+        this.timeoutUnit = timeoutUnit;
         this.createTime = LocalDateTimeUtil.now();
+    }
+
+    public DeviceStateDTO(Long deviceId, DeviceStatusEnum status, int timeout, TimeUnit timeoutUnit) {
+        this(deviceId, status == null ? null : status.getCode(), timeout, timeoutUnit);
     }
 
 }

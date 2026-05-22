@@ -96,7 +96,7 @@ title: 类注释统一完善
 
 ### Phase 6: dc3-common-driver + dc3-common-web + dc3-common-rabbitmq + dc3-common-repository + dc3-common-dal — DONE
 
-- [x] 修正 2 个空模板 Javadoc（DriverStatusScheduleJob、DriverSenderServiceImpl）
+- [x] 修正 2 个空模板 Javadoc（DriverHealthScheduleJob、DriverSenderServiceImpl）
 - [x] 其余模块已有规范注释，无需修改
 - [x] 编译验证通过
 - [x] 提交

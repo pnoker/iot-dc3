@@ -52,7 +52,7 @@ import java.util.Objects;
  * <p>A RabbitMQ TTL + DLX tick queue fires every 10 seconds. On each tick the
  * scanner queries {@code dc3_entity_state} for devices whose
  * {@code expire_time <= now()} and whose {@code state_flag} is still in the
- * online family. Each expired device is atomically claimed via
+ * heartbeat-renewed family. Each expired device is atomically claimed via
  * {@code lease_version} and an offline alarm is written.
  *
  * <p>After processing, the scanner publishes the next tick so the cycle
@@ -118,6 +118,7 @@ public class EntityStateExpiryScanner {
                 EntityTypeFlagEnum.DEVICE.getIndex(),
                 DeviceStatusEnum.ONLINE.getIndex(),
                 DeviceStatusEnum.MAINTAIN.getIndex(),
+                DeviceStatusEnum.FAULT.getIndex(),
                 DeviceStatusEnum.OFFLINE.getIndex(),
                 BATCH_LIMIT,
                 OFFLINE_RENEW_SECONDS);

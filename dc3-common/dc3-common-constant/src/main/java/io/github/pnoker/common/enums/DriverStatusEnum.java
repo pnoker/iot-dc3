@@ -33,7 +33,7 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum DriverStatusEnum {
+public enum DriverStatusEnum implements EntityStateStatus {
 
     ONLINE((byte) 0, "online", "Online"), OFFLINE((byte) 1, "offline", "Offline"),
     MAINTAIN((byte) 2, "maintain", "Maintain"), FAULT((byte) 3, "fault", "Fault"),

@@ -39,7 +39,8 @@ dc3:
       device:
         enable: true
         cron: '0/15 * * * * ?'
-        timeout-seconds: 45
+        timeout: 45
+        timeout-unit: SECONDS
     point-attribute:
       - attribute-name: Keyword
         attribute-code: key

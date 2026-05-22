@@ -33,8 +33,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Device health result returned by protocol drivers.
  *
- * <p>{@code timeout} and {@code timeUnit} are optional. When a driver leaves them
- * empty, the SDK uses {@code dc3.driver.health.device.timeout-seconds} as the fallback
+ * <p>{@code timeout} and {@code timeoutUnit} are optional. When a driver leaves them
+ * empty, the SDK uses {@code dc3.driver.health.device.timeout} and
+ * {@code dc3.driver.health.device.timeout-unit} as the fallback
  * device state lease.
  *
  * @author pnoker
@@ -64,31 +65,47 @@ public class DeviceHealthState implements Serializable {
     private Integer timeout;
 
     /**
-     * Per-device lease timeout unit. {@code null} means seconds.
+     * Per-device lease timeout unit. {@code null} means using the configured fallback unit.
      */
-    private TimeUnit timeUnit;
+    private TimeUnit timeoutUnit;
 
     public static DeviceHealthState online() {
         return of(DeviceStatusEnum.ONLINE, null, null);
     }
 
-    public static DeviceHealthState online(int timeout, TimeUnit timeUnit) {
-        return of(DeviceStatusEnum.ONLINE, timeout, timeUnit);
+    public static DeviceHealthState online(int timeout, TimeUnit timeoutUnit) {
+        return of(DeviceStatusEnum.ONLINE, timeout, timeoutUnit);
     }
 
     public static DeviceHealthState offline() {
         return of(DeviceStatusEnum.OFFLINE, null, null);
     }
 
-    public static DeviceHealthState offline(int timeout, TimeUnit timeUnit) {
-        return of(DeviceStatusEnum.OFFLINE, timeout, timeUnit);
+    public static DeviceHealthState offline(int timeout, TimeUnit timeoutUnit) {
+        return of(DeviceStatusEnum.OFFLINE, timeout, timeoutUnit);
     }
 
-    public static DeviceHealthState of(DeviceStatusEnum status, Integer timeout, TimeUnit timeUnit) {
+    public static DeviceHealthState maintain() {
+        return of(DeviceStatusEnum.MAINTAIN, null, null);
+    }
+
+    public static DeviceHealthState maintain(int timeout, TimeUnit timeoutUnit) {
+        return of(DeviceStatusEnum.MAINTAIN, timeout, timeoutUnit);
+    }
+
+    public static DeviceHealthState fault() {
+        return of(DeviceStatusEnum.FAULT, null, null);
+    }
+
+    public static DeviceHealthState fault(int timeout, TimeUnit timeoutUnit) {
+        return of(DeviceStatusEnum.FAULT, timeout, timeoutUnit);
+    }
+
+    public static DeviceHealthState of(DeviceStatusEnum status, Integer timeout, TimeUnit timeoutUnit) {
         return DeviceHealthState.builder()
                 .status(status)
                 .timeout(timeout)
-                .timeUnit(timeUnit)
+                .timeoutUnit(timeoutUnit)
                 .build();
     }
 

@@ -45,9 +45,9 @@ public class ScheduleConstant {
     public static final String DRIVER_CUSTOM_SCHEDULE_JOB = "customs-chedule-job";
 
     /**
-     * Driver status schedule job
+     * Driver health schedule job
      */
-    public static final String DRIVER_STATUS_SCHEDULE_JOB = "status-schedule-job";
+    public static final String DRIVER_HEALTH_SCHEDULE_JOB = "driver-health-schedule-job";
 
     /**
      * Device health schedule job
@@ -55,9 +55,9 @@ public class ScheduleConstant {
     public static final String DEVICE_HEALTH_SCHEDULE_JOB = "device-health-schedule-job";
 
     /**
-     * Driver status schedule cron
+     * Driver health schedule cron
      */
-    public static final String DRIVER_STATUS_SCHEDULE_CRON = "0/15 * * * * ?";
+    public static final String DRIVER_HEALTH_SCHEDULE_CRON = "0/15 * * * * ?";
 
     /**
      * Data schedule group

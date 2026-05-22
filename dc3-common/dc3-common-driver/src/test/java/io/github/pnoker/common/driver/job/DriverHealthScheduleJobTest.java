@@ -18,7 +18,9 @@
 package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
+import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.enums.DriverStatusEnum;
@@ -34,9 +36,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DriverStatusScheduleJobTest {
+class DriverHealthScheduleJobTest {
+
+    @Mock
+    private DriverCustomService driverCustomService;
 
     @Mock
     private DriverSenderService driverSenderService;
@@ -45,12 +51,12 @@ class DriverStatusScheduleJobTest {
     private JobExecutionContext jobContext;
 
     private DriverMetadata driverMetadata;
-    private DriverStatusScheduleJob job;
+    private DriverHealthScheduleJob job;
 
     @BeforeEach
     void setUp() {
         driverMetadata = new DriverMetadata();
-        job = new DriverStatusScheduleJob(driverMetadata, driverSenderService);
+        job = new DriverHealthScheduleJob(driverMetadata, driverCustomService, driverSenderService);
     }
 
     @Test
@@ -58,16 +64,17 @@ class DriverStatusScheduleJobTest {
         // driver remains null — typically the case during a DRIVER DELETE clear or
         // before initial registration completes.
         assertThatNoException().isThrownBy(() -> job.executeInternal(jobContext));
+        verifyNoInteractions(driverCustomService);
         verifyNoInteractions(driverSenderService);
     }
 
     @Test
-    void reportsCurrentDriverStateWhenInitialized() {
+    void reportsDriverHealthWhenInitialized() {
         DriverBO driver = new DriverBO();
         driver.setId(42L);
         driver.setTenantId(7L);
         driverMetadata.setDriver(driver);
-        driverMetadata.setDriverStatus(DriverStatusEnum.ONLINE);
+        when(driverCustomService.health()).thenReturn(DriverHealthState.online());
 
         job.executeInternal(jobContext);
 
@@ -77,6 +84,45 @@ class DriverStatusScheduleJobTest {
         assertThat(sent.getDriverId()).isEqualTo(42L);
         assertThat(sent.getTenantId()).isEqualTo(7L);
         assertThat(sent.getStatus()).isEqualTo(DriverStatusEnum.ONLINE.getCode());
+        assertThat(driverMetadata.getDriverStatus()).isEqualTo(DriverStatusEnum.ONLINE);
+    }
+
+    @Test
+    void reportsOfflineWhenDriverHealthReturnsOffline() {
+        DriverBO driver = new DriverBO();
+        driver.setId(43L);
+        driver.setTenantId(8L);
+        driverMetadata.setDriver(driver);
+        when(driverCustomService.health()).thenReturn(DriverHealthState.offline());
+
+        job.executeInternal(jobContext);
+
+        ArgumentCaptor<DriverStateDTO> captor = ArgumentCaptor.forClass(DriverStateDTO.class);
+        verify(driverSenderService).driverStateSender(captor.capture());
+        DriverStateDTO sent = captor.getValue();
+        assertThat(sent.getDriverId()).isEqualTo(43L);
+        assertThat(sent.getTenantId()).isEqualTo(8L);
+        assertThat(sent.getStatus()).isEqualTo(DriverStatusEnum.OFFLINE.getCode());
+        assertThat(driverMetadata.getDriverStatus()).isEqualTo(DriverStatusEnum.OFFLINE);
+    }
+
+    @Test
+    void reportsFaultWhenDriverHealthThrows() {
+        DriverBO driver = new DriverBO();
+        driver.setId(44L);
+        driver.setTenantId(9L);
+        driverMetadata.setDriver(driver);
+        when(driverCustomService.health()).thenThrow(new IllegalStateException("session down"));
+
+        job.executeInternal(jobContext);
+
+        ArgumentCaptor<DriverStateDTO> captor = ArgumentCaptor.forClass(DriverStateDTO.class);
+        verify(driverSenderService).driverStateSender(captor.capture());
+        DriverStateDTO sent = captor.getValue();
+        assertThat(sent.getDriverId()).isEqualTo(44L);
+        assertThat(sent.getTenantId()).isEqualTo(9L);
+        assertThat(sent.getStatus()).isEqualTo(DriverStatusEnum.FAULT.getCode());
+        assertThat(driverMetadata.getDriverStatus()).isEqualTo(DriverStatusEnum.FAULT);
     }
 
 }

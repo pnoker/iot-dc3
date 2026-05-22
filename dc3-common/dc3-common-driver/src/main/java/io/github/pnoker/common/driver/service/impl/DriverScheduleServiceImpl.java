@@ -20,8 +20,8 @@ package io.github.pnoker.common.driver.service.impl;
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
+import io.github.pnoker.common.driver.job.DriverHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
-import io.github.pnoker.common.driver.job.DriverStatusScheduleJob;
 import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
 import io.github.pnoker.common.exception.CronException;
@@ -59,10 +59,10 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
         }
 
         try {
-            // Create and schedule the driver status monitoring job
+            // Create and schedule the driver health monitoring job
             quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                    ScheduleConstant.DRIVER_STATUS_SCHEDULE_JOB, ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON,
-                    DriverStatusScheduleJob.class);
+                    ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB, ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON,
+                    DriverHealthScheduleJob.class);
 
             // Create and schedule the device health job if enabled
             DriverProperties.DeviceHealthProperties deviceHealth = driverProperties.getHealth().getDevice();
