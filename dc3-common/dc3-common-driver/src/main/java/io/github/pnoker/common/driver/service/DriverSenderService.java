@@ -62,10 +62,10 @@ public interface DriverSenderService {
      *
      * @param deviceId device identifier
      * @param status   device status
-     * @param timeOut  timeout value
-     * @param timeUnit timeout unit
+     * @param timeout  timeout value
+     * @param timeoutUnit timeout unit
      */
-    void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit);
+    void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeout, TimeUnit timeoutUnit);
 
     /**
      * Publishes a driver-level ALARM event. Used by protocol drivers when a connection /

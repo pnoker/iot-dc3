@@ -74,7 +74,8 @@ class DeviceHealthScheduleJobTest {
     @BeforeEach
     void setUp() {
         driverProperties = new DriverProperties();
-        driverProperties.getHealth().getDevice().setTimeoutSeconds(60);
+        driverProperties.getHealth().getDevice().setTimeout(60);
+        driverProperties.getHealth().getDevice().setTimeoutUnit(TimeUnit.SECONDS);
         driverMetadata = new DriverMetadata();
         job = new DeviceHealthScheduleJob(driverProperties, driverMetadata, deviceMetadata, driverCustomService,
                 driverSenderService);
@@ -104,6 +105,19 @@ class DeviceHealthScheduleJobTest {
         job.executeInternal(jobContext);
 
         verify(driverSenderService).deviceStatusSender(11L, DeviceStatusEnum.OFFLINE, 60, TimeUnit.SECONDS);
+    }
+
+    @Test
+    void reportsFaultWhenDeviceHealthReturnsFault() {
+        DeviceBO device = enabledDevice(16L);
+        driverMetadata.setDeviceIds(Set.of(16L));
+        when(deviceMetadata.getCache(16L)).thenReturn(device);
+        when(deviceMetadata.getDriverConfig(16L)).thenReturn(Map.of());
+        when(driverCustomService.health(Map.of(), device)).thenReturn(DeviceHealthState.fault());
+
+        job.executeInternal(jobContext);
+
+        verify(driverSenderService).deviceStatusSender(16L, DeviceStatusEnum.FAULT, 60, TimeUnit.SECONDS);
     }
 
     @Test

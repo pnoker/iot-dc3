@@ -53,8 +53,8 @@ public class DeviceStateReceiver {
             log.debug("Receive device state: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())
                     || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
-                    || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeUnit())
-                    || entityDTO.getTimeOut() <= 0) {
+                    || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())
+                    || entityDTO.getTimeout() <= 0) {
                 log.error("Invalid device state: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;

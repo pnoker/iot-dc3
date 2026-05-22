@@ -27,12 +27,13 @@ package io.github.pnoker.common.driver.service;
  * existing drivers that {@code implements DriverCustomService} keep compiling
  * unchanged, while new drivers can pick the smaller capability interfaces
  * ({@link DriverLifecycle}, {@link DriverMetadataListener},
- * {@link DeviceHealth}, {@link DriverProtocol}) when they only need a subset.
+ * {@link DriverHealth}, {@link DeviceHealth}, {@link DriverProtocol}) when they
+ * only need a subset.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface DriverCustomService extends DriverLifecycle, DriverMetadataListener, DeviceHealth, DriverProtocol {
+public interface DriverCustomService extends DriverLifecycle, DriverMetadataListener, DriverHealth, DeviceHealth, DriverProtocol {
 
 }

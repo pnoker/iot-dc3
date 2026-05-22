@@ -33,7 +33,7 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum DeviceStatusEnum {
+public enum DeviceStatusEnum implements EntityStateStatus {
 
     ONLINE((byte) 0, "online", "online"), OFFLINE((byte) 1, "offline", "offline"),
     MAINTAIN((byte) 2, "maintain", "maintenance"), FAULT((byte) 3, "fault", "fault"),

@@ -113,7 +113,7 @@
             FROM dc3_entity_state
             WHERE deleted = 0
               AND entity_type_flag = #{entityTypeFlag}
-              AND state_flag IN (#{onlineFlag}, #{maintainFlag})
+              AND state_flag IN (#{onlineFlag}, #{maintainFlag}, #{faultFlag})
               AND expire_time &lt;= CURRENT_TIMESTAMP
             ORDER BY expire_time ASC
             LIMIT #{batchSize}

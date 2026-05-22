@@ -75,6 +75,7 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
      * @param entityTypeFlag       device entity type flag
      * @param onlineFlag           online state flag
      * @param maintainFlag         maintain state flag
+     * @param faultFlag            fault state flag
      * @param offlineFlag          offline state flag
      * @param batchSize            maximum rows to claim
      * @param offlineRenewSeconds  renewal window for already-offline state rows
@@ -84,6 +85,7 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
     List<EntityStateDO> claimExpiredDevices(@Param("entityTypeFlag") byte entityTypeFlag,
                                             @Param("onlineFlag") byte onlineFlag,
                                             @Param("maintainFlag") byte maintainFlag,
+                                            @Param("faultFlag") byte faultFlag,
                                             @Param("offlineFlag") byte offlineFlag,
                                             @Param("batchSize") int batchSize,
                                             @Param("offlineRenewSeconds") int offlineRenewSeconds);

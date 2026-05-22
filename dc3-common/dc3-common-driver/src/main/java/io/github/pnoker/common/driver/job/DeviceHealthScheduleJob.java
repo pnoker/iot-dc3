@@ -103,8 +103,8 @@ public class DeviceHealthScheduleJob extends QuartzJobBean {
 
     private void reportDeviceState(Long deviceId, DeviceHealthState healthState) {
         DeviceStatusEnum status = DeviceStatusEnum.OFFLINE;
-        int timeout = driverProperties.getHealth().getDevice().getTimeoutSeconds();
-        TimeUnit timeUnit = TimeUnit.SECONDS;
+        int timeout = driverProperties.getHealth().getDevice().getTimeout();
+        TimeUnit timeoutUnit = driverProperties.getHealth().getDevice().getTimeoutUnit();
         if (Objects.nonNull(healthState)) {
             if (Objects.nonNull(healthState.getStatus())) {
                 status = healthState.getStatus();
@@ -112,11 +112,11 @@ public class DeviceHealthScheduleJob extends QuartzJobBean {
             if (Objects.nonNull(healthState.getTimeout()) && healthState.getTimeout() > 0) {
                 timeout = healthState.getTimeout();
             }
-            if (Objects.nonNull(healthState.getTimeUnit())) {
-                timeUnit = healthState.getTimeUnit();
+            if (Objects.nonNull(healthState.getTimeoutUnit())) {
+                timeoutUnit = healthState.getTimeoutUnit();
             }
         }
-        driverSenderService.deviceStatusSender(deviceId, status, timeout, timeUnit);
+        driverSenderService.deviceStatusSender(deviceId, status, timeout, timeoutUnit);
     }
 
 }

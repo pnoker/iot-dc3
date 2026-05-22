@@ -62,8 +62,8 @@ class DeviceStateServiceImplTest {
         dto.setStatus(status);
         dto.setDriverId(driverId);
         dto.setTenantId(tenantId);
-        dto.setTimeOut(ttl);
-        dto.setTimeUnit(unit);
+        dto.setTimeout(ttl);
+        dto.setTimeoutUnit(unit);
         return dto;
     }
 

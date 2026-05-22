@@ -74,7 +74,7 @@ public class EntityStateDO implements Serializable {
     private Long parentEntityId;
 
     /**
-     * Current status index (DriverStatusEnum / DeviceStatusEnum index)
+     * Current status index (EntityStateStatus index)
      */
     @TableField("state_flag")
     private Byte stateFlag;

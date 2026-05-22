@@ -18,18 +18,24 @@
 package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
+import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
+import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
- * Scheduled job that periodically evaluates and reports driver connectivity status.
+ * Scheduled job that periodically evaluates and reports driver health.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,9 +44,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DriverStatusScheduleJob extends QuartzJobBean {
+@DisallowConcurrentExecution
+public class DriverHealthScheduleJob extends QuartzJobBean {
 
     private final DriverMetadata driverMetadata;
+
+    private final DriverCustomService driverCustomService;
 
     private final DriverSenderService driverSenderService;
 
@@ -53,10 +62,28 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
             log.warn("Skip driver state report: driver metadata is not initialized");
             return;
         }
-        DriverStateDTO driverState = new DriverStateDTO(driver.getId(), driverMetadata.getDriverStatus().getCode());
+        DriverStatusEnum status = resolveDriverStatus();
+        driverMetadata.setDriverStatus(status);
+
+        DriverStateDTO driverState = new DriverStateDTO(driver.getId(), status);
         driverState.setTenantId(driver.getTenantId());
-        log.info("Report driver state: {}", JsonUtil.toJsonString(driverState));
+        log.info("Report driver health: {}", JsonUtil.toJsonString(driverState));
         driverSenderService.driverStateSender(driverState);
+    }
+
+    private DriverStatusEnum resolveDriverStatus() {
+        DriverHealthState healthState;
+        try {
+            healthState = driverCustomService.health();
+        } catch (Exception e) {
+            log.warn("Driver health check failed", e);
+            return DriverStatusEnum.FAULT;
+        }
+
+        if (Objects.isNull(healthState) || Objects.isNull(healthState.getStatus())) {
+            return DriverStatusEnum.FAULT;
+        }
+        return healthState.getStatus();
     }
 
 }

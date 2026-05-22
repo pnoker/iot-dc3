@@ -48,7 +48,7 @@ title: 设备与驱动超时管理方案
 统一使用一张表保存驱动和设备当前状态。字段风格参考现有 PostgreSQL 脚本：
 
 - 数据库对象统一使用 `state`，如 `dc3_entity_state`、`state_flag`。
-- Java DTO 和已有枚举可继续使用 `DeviceStatus` / `DriverStatus`，写入状态表时映射为 `state_flag`。
+- Java DTO 继续使用字符串 code 作为 MQ/API 负载，设备/驱动状态枚举实现统一的 `EntityStateStatus` 契约，写入状态表时映射为 `state_flag`。
 - 枚举类字段使用 `*_flag SMALLINT`，不直接存字符串。
 - 扩展字段使用 `JSON DEFAULT '{}'::JSON`。
 - 索引命名使用 `idx_*_active_unique` / `idx_*`。
@@ -107,7 +107,7 @@ CREATE TRIGGER update_operate_time_trigger
 | `entity_type_flag`    | 实体类型，沿用 `EntityTypeFlagEnum`：`3` 为 driver，`6` 为 device                                        |
 | `entity_id`           | 驱动 ID 或设备 ID                                                                                  |
 | `parent_entity_id`    | 设备所属驱动 ID；驱动为 `0`                                                                             |
-| `state_flag`          | 当前状态，沿用 `DriverStatusEnum` / `DeviceStatusEnum`：`0` online，`1` offline，`2` maintain，`3` fault |
+| `state_flag`          | 当前状态，沿用 `EntityStateStatus` 契约：`0` online，`1` offline，`2` maintain，`3` fault                     |
 | `last_state_flag`     | 上一次状态                                                                                         |
 | `last_heartbeat_time` | 最近一次心跳时间                                                                                      |
 | `expire_time`         | 当前租约到期时间                                                                                      |
@@ -161,21 +161,26 @@ timeout message
 
 ## 驱动超时流程
 
-驱动心跳由平台 SDK 控制，周期固定，适合每次心跳投递一条 45 秒检查消息。
+驱动健康心跳由平台 SDK 控制，周期固定，适合每次心跳投递一条 45 秒检查消息。心跳是否表示在线由驱动
+`DriverHealth.health()` 决定；未实现时默认返回在线。
 
 ### 心跳续租
 
-1. 驱动 SDK 每 15 秒发送一次心跳。
-2. Data Center upsert `dc3_entity_state`：
+1. 驱动 SDK 每 15 秒触发 `DriverHealth.health()`。
+2. 驱动返回 `DriverHealthState`：
+    - `status` 表示要上报的驱动状态，支持 `online`、`offline`、`maintain`、`fault`。
+    - hook 抛异常或返回空状态时，SDK 按 `fault` 上报。
+3. SDK 通过 `DriverStateDTO` 上报 `driverId`、`tenantId`、`status`。
+4. Data Center upsert `dc3_entity_state`：
     - `entity_type_flag = 3`
     - `entity_id = driverId`
     - `parent_entity_id = 0`
-    - `state_flag = 0`
+    - `state_flag` 按 `DriverStatusEnum` / `EntityStateStatus` 映射
     - `expire_time = now + 45s`
     - `lease_version = lease_version + 1`
     - `timeout_seconds = 45`
     - `timeout_source_flag = 0`
-3. 发布 `DriverTimeoutCheckDTO` 到驱动延迟队列。
+5. 发布 `DriverTimeoutCheckDTO` 到驱动延迟队列。
 
 ### 到期检查
 
@@ -185,7 +190,7 @@ timeout message
     - 状态行存在。
     - `lease_version` 等于消息中的版本。
     - `expire_time <= now()`。
-    - `state_flag` 仍是在线族。
+    - `state_flag` 仍是心跳续租状态：`online`、`maintain`、`fault`。
 4. 更新 `state_flag = 1`。
 5. 构建 DRIVER 规则事实，命中规则后写入 `dc3_entity_alarm`，告警来源为 `driver-offline`。
 
@@ -202,8 +207,8 @@ timeout message
 2. SDK 调用驱动实现的 `DeviceHealth.health(driverConfig, device)` 判断设备健康。
 3. 驱动返回 `DeviceHealthState`：
     - `status` 表示要上报的设备状态。
-    - `timeout/timeUnit` 可选；为空时使用 `dc3.driver.health.device.timeout-seconds` 作为兜底租约。
-4. SDK 通过 `DeviceStateDTO` 上报 `deviceId`、`driverId`、`tenantId`、`status`、`timeOut`、`timeUnit`。
+    - `timeout/timeoutUnit` 可选；为空时使用配置 `dc3.driver.health.device.timeout` 和 `dc3.driver.health.device.timeout-unit` 作为兜底租约。
+4. SDK 通过 `DeviceStateDTO` 上报 `deviceId`、`driverId`、`tenantId`、`status`、`timeout`、`timeoutUnit`。
 5. Data Center upsert `dc3_entity_state`：
     - `entity_type_flag = 6`
     - `entity_id = deviceId`
@@ -239,7 +244,7 @@ WITH picked AS (
     FROM dc3_entity_state
     WHERE deleted = 0
       AND entity_type_flag = 6
-      AND state_flag IN (0, 2)
+      AND state_flag IN (0, 2, 3)
       AND expire_time <= CURRENT_TIMESTAMP
     ORDER BY expire_time ASC
     LIMIT #{batchSize}
@@ -282,7 +287,7 @@ RETURNING s.*;
 
 - `lease_version` 是否仍一致。
 - `expire_time` 是否确实已过期。
-- `state_flag` 是否仍是在线族。
+- `state_flag` 是否仍是心跳续租状态：`online`、`maintain`、`fault`。
 
 只有全部满足，才能判定离线。
 
@@ -336,16 +341,17 @@ dc3:
       device:
         enable: true
         cron: '0/15 * * * * ?'
-        timeout-seconds: 45
+        timeout: 45
+        timeout-unit: SECONDS
 ```
 
-其中 `cron` 是设备健康检查频率，不是设备离线超时时间；`timeout-seconds` 是驱动未返回设备专属 TTL 时的兜底租约。
+其中 `cron` 是设备健康检查频率，不是设备离线超时时间；配置项 `timeout`/`timeout-unit` 是驱动未返回设备专属 TTL 时的兜底租约。
 
-驱动可以在 `DeviceHealth.health()` 中按设备、协议会话、最近报文时间等逻辑返回不同的 `DeviceHealthState.timeout/timeUnit`。后续产品化后，设备超时建议按以下优先级取值：
+驱动可以在 `DeviceHealth.health()` 中按设备、协议会话、最近报文时间等逻辑返回不同的 `DeviceHealthState.timeout/timeoutUnit`。后续产品化后，设备超时建议按以下优先级取值：
 
 1. `Device.device_ext.stateTimeout`。
 2. `Profile.profile_ext.defaultStateTimeout`。
-3. 驱动上报的 `DeviceHealthState.timeout/timeUnit`。
+3. 驱动上报的 `DeviceHealthState.timeout/timeoutUnit`。
 4. 系统默认值，例如 15 分钟。
 
 协议建议：

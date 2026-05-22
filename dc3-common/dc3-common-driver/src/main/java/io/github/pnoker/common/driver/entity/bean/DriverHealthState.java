@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.entity.dto;
+package io.github.pnoker.common.driver.entity.bean;
 
 import io.github.pnoker.common.enums.DriverStatusEnum;
-import io.github.pnoker.common.utils.LocalDateTimeUtil;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,54 +28,51 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
- * Driver state heartbeat payload sent over RabbitMQ.
+ * Driver health result returned by protocol drivers.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
+ * @version 2026.5.22
+ * @since 2026.5.22
  */
 @Getter
 @Setter
 @Builder
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
-public class DriverStateDTO implements Serializable {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class DriverHealthState implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * Tenant ID the driver belongs to.
+     * Driver state that should be reported.
      */
-    private Long tenantId;
+    @Builder.Default
+    private DriverStatusEnum status = DriverStatusEnum.ONLINE;
 
-    /**
-     * Driver ID
-     */
-    private Long driverId;
-
-    /**
-     * Driver status code (see {@link io.github.pnoker.common.enums.DriverStatusEnum})
-     */
-    private String status;
-
-    /**
-     * Create Time
-     */
-    private LocalDateTime createTime;
-
-    public DriverStateDTO(Long driverId, String status) {
-        this.driverId = driverId;
-        this.status = status;
-        this.createTime = LocalDateTimeUtil.now();
+    public static DriverHealthState online() {
+        return of(DriverStatusEnum.ONLINE);
     }
 
-    public DriverStateDTO(Long driverId, DriverStatusEnum status) {
-        this(driverId, status == null ? null : status.getCode());
+    public static DriverHealthState offline() {
+        return of(DriverStatusEnum.OFFLINE);
+    }
+
+    public static DriverHealthState maintain() {
+        return of(DriverStatusEnum.MAINTAIN);
+    }
+
+    public static DriverHealthState fault() {
+        return of(DriverStatusEnum.FAULT);
+    }
+
+    public static DriverHealthState of(DriverStatusEnum status) {
+        return DriverHealthState.builder()
+                .status(status)
+                .build();
     }
 
 }

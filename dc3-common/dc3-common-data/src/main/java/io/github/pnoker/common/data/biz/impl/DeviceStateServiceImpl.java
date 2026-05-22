@@ -66,12 +66,12 @@ public class DeviceStateServiceImpl implements DeviceStateService {
     public void heartbeat(DeviceStateDTO entityDTO) {
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())
                 || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
-                || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeUnit())
-                || entityDTO.getTimeOut() <= 0) {
+                || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())
+                || entityDTO.getTimeout() <= 0) {
             return;
         }
 
-        long ttlSeconds = entityDTO.getTimeUnit().toSeconds(entityDTO.getTimeOut());
+        long ttlSeconds = entityDTO.getTimeoutUnit().toSeconds(entityDTO.getTimeout());
         if (ttlSeconds <= 0 || ttlSeconds > Integer.MAX_VALUE) {
             return;
         }
