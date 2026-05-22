@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
+import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -146,6 +147,15 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.nonNull(entityDTOList)) {
             entityDTOList.forEach(this::pointValueSender);
         }
+    }
+
+    @Override
+    public void pointCommandResultSender(PointCommandResultDTO resultDTO) {
+        if (Objects.isNull(resultDTO)) {
+            return;
+        }
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT,
+                RabbitConstant.ROUTING_POINT_COMMAND_RESULT + "." + driverProperties.getService(), resultDTO);
     }
 
     private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {

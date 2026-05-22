@@ -195,4 +195,45 @@ public class DataTopicConfig {
                 .with(RabbitConstant.ROUTING_DEVICE_SCAN);
     }
 
+
+    // ===== Point command dead letter ==========================================
+
+    @Bean
+    TopicExchange pointCommandDeadExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_DEAD, true, false);
+    }
+
+    @Bean
+    Queue pointCommandDeadQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_COMMAND_DEAD).build();
+    }
+
+    @Bean
+    Binding pointCommandDeadBinding(Queue pointCommandDeadQueue, TopicExchange pointCommandDeadExchange) {
+        return BindingBuilder.bind(pointCommandDeadQueue)
+                .to(pointCommandDeadExchange)
+                .with("#");
+    }
+
+    // ===== Point command result ==============================================
+
+    @Bean
+    TopicExchange pointCommandResultExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT, true, false);
+    }
+
+    @Bean
+    Queue pointCommandResultQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_COMMAND_RESULT)
+                .ttl(60000)
+                .build();
+    }
+
+    @Bean
+    Binding pointCommandResultBinding(Queue pointCommandResultQueue, TopicExchange pointCommandResultExchange) {
+        return BindingBuilder.bind(pointCommandResultQueue)
+                .to(pointCommandResultExchange)
+                .with(RabbitConstant.ROUTING_POINT_COMMAND_RESULT + ".*");
+    }
+
 }

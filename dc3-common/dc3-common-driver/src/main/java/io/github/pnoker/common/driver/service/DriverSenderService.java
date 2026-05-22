@@ -20,6 +20,7 @@ package io.github.pnoker.common.driver.service;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
+import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 
 import java.util.List;
@@ -95,5 +96,12 @@ public interface DriverSenderService {
      * @param entityDTOList point value payloads
      */
     void pointValueSender(List<PointValue> entityDTOList);
+
+    /**
+     * Publishes a point command result receipt back to the data center.
+     *
+     * @param resultDTO command result payload
+     */
+    void pointCommandResultSender(PointCommandResultDTO resultDTO);
 
 }
