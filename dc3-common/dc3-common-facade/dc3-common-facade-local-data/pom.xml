@@ -34,7 +34,7 @@
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
         Local (in-process) Facade implementations for the data domain: PointValue /
-        PointValueCommand. Activated when dc3.facade.mode=local. Transitively pulls in
+        PointCommand. Activated when dc3.facade.mode=local. Transitively pulls in
         dc3-common-data and its dependencies.
     </description>
 

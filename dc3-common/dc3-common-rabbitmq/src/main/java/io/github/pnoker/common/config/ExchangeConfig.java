@@ -74,13 +74,13 @@ public class ExchangeConfig {
     }
 
     /**
-     * Command exchange for driver-side load balancing
+     * Point command exchange for driver-side load balancing
      *
-     * @return TopicExchange bean for command messages
+     * @return TopicExchange bean for point command messages
      */
     @Bean
-    TopicExchange commandExchange() {
-        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND, true, false);
+    TopicExchange pointCommandExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND, true, false);
     }
 
     /**

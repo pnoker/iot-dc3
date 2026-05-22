@@ -26,7 +26,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
+import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -121,14 +121,14 @@ class DriverWriteServiceImplTest {
 
     @Test
     void commandWriteIgnoresNullPayload() {
-        DeviceCommandDTO commandDTO = new DeviceCommandDTO();
+        PointCommandDTO commandDTO = new PointCommandDTO();
         commandDTO.setContent(null);
         assertThatNoException().isThrownBy(() -> service.write(commandDTO));
         verify(driverCustomService, never()).write(any(), any(), any(), any(), any(WritePointValue.class));
     }
 
     @Test
-    void commandWriteDispatchesParsedDeviceWrite() {
+    void commandWriteDispatchesParsedPointWrite() {
         Map<String, AttributeBO> driverConfig = Map.of("k", AttributeBO.builder().value("v").build());
         Map<String, AttributeBO> pointConfig = Map.of("k", AttributeBO.builder().value("v").build());
         when(deviceMetadata.getCache(10L)).thenReturn(device);
@@ -136,8 +136,8 @@ class DriverWriteServiceImplTest {
         when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
         when(pointMetadata.getCache(20L)).thenReturn(point);
 
-        DeviceCommandDTO commandDTO = new DeviceCommandDTO();
-        commandDTO.setContent(JsonUtil.toJsonString(new DeviceCommandDTO.DeviceWrite(10L, 20L, "99")));
+        PointCommandDTO commandDTO = new PointCommandDTO();
+        commandDTO.setContent(JsonUtil.toJsonString(new PointCommandDTO.PointWrite(10L, 20L, "99")));
         service.write(commandDTO);
 
         verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),

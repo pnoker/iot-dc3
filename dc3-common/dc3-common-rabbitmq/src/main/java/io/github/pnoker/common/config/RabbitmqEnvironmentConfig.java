@@ -77,10 +77,9 @@ public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
         RabbitConstant.TOPIC_EXCHANGE_METADATA = tag + RabbitConstant.TOPIC_EXCHANGE_METADATA;
         RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX = tag + RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX;
 
-        // Command related constants
-        RabbitConstant.TOPIC_EXCHANGE_COMMAND = tag + RabbitConstant.TOPIC_EXCHANGE_COMMAND;
-        RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX = tag + RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX;
-        RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX = tag + RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX;
+        // Point command related constants
+        RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND = tag + RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND;
+        RabbitConstant.QUEUE_POINT_COMMAND_PREFIX = tag + RabbitConstant.QUEUE_POINT_COMMAND_PREFIX;
 
         // Point Value related constants
         RabbitConstant.TOPIC_EXCHANGE_VALUE = tag + RabbitConstant.TOPIC_EXCHANGE_VALUE;

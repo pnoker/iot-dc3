@@ -26,10 +26,10 @@ import io.github.pnoker.api.center.data.GrpcRPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcRPointValueStringList;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.data.biz.PointValueCommandService;
+import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.biz.PointValueService;
-import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
-import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ import java.util.Objects;
 
 /**
  * gRPC server implementation for the PointValue service. Delegates to
- * {@link PointValueService} and {@link PointValueCommandService}.
+ * {@link PointValueService} and {@link PointCommandService}.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -54,7 +54,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
 
     private final PointValueService pointValueService;
 
-    private final PointValueCommandService pointValueCommandService;
+    private final PointCommandService pointCommandService;
 
     @Override
     public void lastValue(GrpcPointValueQuery request, StreamObserver<GrpcRPointValueDTO> responseObserver) {
@@ -151,10 +151,10 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
     @Override
     public void readCommand(GrpcPointValueCommandQuery request, StreamObserver<GrpcRBoolean> responseObserver) {
         try {
-            PointValueReadVO vo = new PointValueReadVO();
+            PointCommandReadVO vo = new PointCommandReadVO();
             vo.setDeviceId(request.getDeviceId());
             vo.setPointId(request.getPointId());
-            pointValueCommandService.read(request.getTenantId(), vo);
+            pointCommandService.read(request.getTenantId(), vo);
 
             responseObserver.onNext(GrpcRBoolean.newBuilder()
                     .setResult(GrpcR.newBuilder()
@@ -183,11 +183,11 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
     @Override
     public void writeCommand(GrpcPointValueWriteCommand request, StreamObserver<GrpcRBoolean> responseObserver) {
         try {
-            PointValueWriteVO vo = new PointValueWriteVO();
+            PointCommandWriteVO vo = new PointCommandWriteVO();
             vo.setDeviceId(request.getDeviceId());
             vo.setPointId(request.getPointId());
             vo.setValue(request.getValue());
-            pointValueCommandService.write(request.getTenantId(), vo);
+            pointCommandService.write(request.getTenantId(), vo);
 
             responseObserver.onNext(GrpcRBoolean.newBuilder()
                     .setResult(GrpcR.newBuilder()

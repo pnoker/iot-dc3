@@ -26,10 +26,10 @@ import io.github.pnoker.api.center.data.GrpcRBoolean;
 import io.github.pnoker.api.center.data.GrpcRPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcRPointValueStringList;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
-import io.github.pnoker.common.data.biz.PointValueCommandService;
+import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.biz.PointValueService;
-import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
-import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -61,7 +61,7 @@ class PointValueServerTest {
     private PointValueService pointValueService;
 
     @Mock
-    private PointValueCommandService pointValueCommandService;
+    private PointCommandService pointCommandService;
 
     private Server server;
     private ManagedChannel channel;
@@ -69,7 +69,7 @@ class PointValueServerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        PointValueServer pointValueServer = new PointValueServer(pointValueService, pointValueCommandService);
+        PointValueServer pointValueServer = new PointValueServer(pointValueService, pointCommandService);
         String name = "dc3-data-pointvalue-" + UUID.randomUUID();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(pointValueServer).build().start();
         channel = InProcessChannelBuilder.forName(name).directExecutor().build();
@@ -160,13 +160,13 @@ class PointValueServerTest {
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).build());
         assertThat(response.getResult().getOk()).isTrue();
         assertThat(response.getData()).isTrue();
-        verify(pointValueCommandService).read(eq(1L), any(PointValueReadVO.class));
+        verify(pointCommandService).read(eq(1L), any(PointCommandReadVO.class));
     }
 
     @Test
     void readCommandReturnsFailureOnAuthorizationError() {
         doThrow(new io.github.pnoker.common.exception.UnAuthorizedException("nope"))
-                .when(pointValueCommandService).read(any(), any());
+                .when(pointCommandService).read(any(), any());
         GrpcRBoolean response = stub.readCommand(GrpcPointValueCommandQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).build());
         assertThat(response.getResult().getOk()).isFalse();
@@ -180,13 +180,13 @@ class PointValueServerTest {
                 .build());
         assertThat(response.getResult().getOk()).isTrue();
         assertThat(response.getData()).isTrue();
-        verify(pointValueCommandService).write(eq(1L), any(PointValueWriteVO.class));
+        verify(pointCommandService).write(eq(1L), any(PointCommandWriteVO.class));
     }
 
     @Test
     void writeCommandReturnsFailureOnException() {
         doThrow(new NotFoundException("Device does not exist"))
-                .when(pointValueCommandService).write(any(), any());
+                .when(pointCommandService).write(any(), any());
         GrpcRBoolean response = stub.writeCommand(GrpcPointValueWriteCommand.newBuilder()
                 .setTenantId(1L).setDeviceId(99L).setPointId(20L).setValue("v")
                 .build());

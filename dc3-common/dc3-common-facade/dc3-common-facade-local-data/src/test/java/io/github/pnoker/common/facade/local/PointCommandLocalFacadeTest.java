@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.data.biz.PointValueCommandService;
-import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
-import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
+import io.github.pnoker.common.data.biz.PointCommandService;
+import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,38 +32,38 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class PointValueCommandLocalFacadeTest {
+class PointCommandLocalFacadeTest {
 
     @Mock
-    private PointValueCommandService pointValueCommandService;
+    private PointCommandService pointCommandService;
 
-    private PointValueCommandLocalFacade facade;
+    private PointCommandLocalFacade facade;
 
     @BeforeEach
     void setUp() {
-        facade = new PointValueCommandLocalFacade(pointValueCommandService);
+        facade = new PointCommandLocalFacade(pointCommandService);
     }
 
     @Test
     void readPopulatesDeviceAndPointIdAndReturnsTrue() {
-        boolean result = facade.dispatchRead(1L, 10L, 20L);
+        boolean result = facade.submitRead(1L, 10L, 20L);
         assertThat(result).isTrue();
 
-        ArgumentCaptor<PointValueReadVO> captor = ArgumentCaptor.forClass(PointValueReadVO.class);
-        verify(pointValueCommandService).read(eq(1L), captor.capture());
-        PointValueReadVO passed = captor.getValue();
+        ArgumentCaptor<PointCommandReadVO> captor = ArgumentCaptor.forClass(PointCommandReadVO.class);
+        verify(pointCommandService).read(eq(1L), captor.capture());
+        PointCommandReadVO passed = captor.getValue();
         assertThat(passed.getDeviceId()).isEqualTo(10L);
         assertThat(passed.getPointId()).isEqualTo(20L);
     }
 
     @Test
     void writePopulatesDeviceIdPointIdAndValueAndReturnsTrue() {
-        boolean result = facade.dispatchWrite(1L, 10L, 20L, "42");
+        boolean result = facade.submitWrite(1L, 10L, 20L, "42");
         assertThat(result).isTrue();
 
-        ArgumentCaptor<PointValueWriteVO> captor = ArgumentCaptor.forClass(PointValueWriteVO.class);
-        verify(pointValueCommandService).write(eq(1L), captor.capture());
-        PointValueWriteVO passed = captor.getValue();
+        ArgumentCaptor<PointCommandWriteVO> captor = ArgumentCaptor.forClass(PointCommandWriteVO.class);
+        verify(pointCommandService).write(eq(1L), captor.capture());
+        PointCommandWriteVO passed = captor.getValue();
         assertThat(passed.getDeviceId()).isEqualTo(10L);
         assertThat(passed.getPointId()).isEqualTo(20L);
         assertThat(passed.getValue()).isEqualTo("42");

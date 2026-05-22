@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.facade.local.config;
 
-import io.github.pnoker.common.facade.local.PointValueCommandLocalFacade;
+import io.github.pnoker.common.facade.local.PointCommandLocalFacade;
 import io.github.pnoker.common.facade.local.PointValueLocalFacade;
 import io.github.pnoker.common.facade.local.StatusHealthLocalFacade;
 import io.github.pnoker.common.facade.local.builder.FacadePointValueBuilder;
@@ -42,7 +42,7 @@ import org.springframework.context.annotation.FilterType;
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
 @ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
         includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-                PointValueLocalFacade.class, PointValueCommandLocalFacade.class, StatusHealthLocalFacade.class,
+                PointValueLocalFacade.class, PointCommandLocalFacade.class, StatusHealthLocalFacade.class,
                 FacadePointValueBuilder.class,}))
 public class LocalFacadeDataAutoConfiguration {
 

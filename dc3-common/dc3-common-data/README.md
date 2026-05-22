@@ -17,7 +17,7 @@ driver/device status tracking, and data query. It is wired into `dc3-center-data
 | Layer        | Contents                                                                                      |
 |--------------|-----------------------------------------------------------------------------------------------|
 | Controllers  | REST controllers for point value read/write, query, status                                    |
-| Services     | `PointValueCommandService`, `PointValueService`, `DriverStatusService`, `DeviceStatusService` |
+| Services     | `PointCommandService`, `PointValueService`, `DriverStatusService`, `DeviceStatusService` |
 | gRPC Clients | `@GrpcClient(ManagerConstant.SERVICE_NAME)` stubs for `DriverApi`, `PointApi`                 |
 | RabbitMQ     | Producer for `dc3.e.command`; Consumer for `dc3.e.value`, `dc3.e.event`                       |
 | Init         | `DataInitRunner` for startup preparation                                                      |
@@ -26,7 +26,7 @@ driver/device status tracking, and data query. It is wired into `dc3-center-data
 
 ```
 REST /api/v3/data/point_value/read
-  → PointValueCommandServiceImpl
+  → PointCommandServiceImpl
     → gRPC: driverApiBlockingStub.selectByDeviceId()
     → RabbitMQ: dc3.e.command / dc3.r.command.device.{serviceName}
       → Driver receives and acts

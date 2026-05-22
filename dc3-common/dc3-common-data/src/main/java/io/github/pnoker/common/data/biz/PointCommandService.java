@@ -17,33 +17,34 @@
 
 package io.github.pnoker.common.data.biz;
 
-import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
-import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
+import io.github.pnoker.common.data.entity.model.PointCommandDO;
+import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 
 /**
- * Business service for point value command operations.
+ * Business service for point command operations.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface PointValueCommandService {
+public interface PointCommandService {
 
     /**
      * Read command
      *
      * @param tenantId current tenant id
-     * @param entityVO PointValueReadVO
+     * @param entityVO PointCommandReadVO
      */
-    void read(Long tenantId, PointValueReadVO entityVO);
+    void read(Long tenantId, PointCommandReadVO entityVO);
 
     /**
      * Read command from trusted internal callers that do not carry request tenant
      * context.
      *
-     * @param entityVO PointValueReadVO
+     * @param entityVO PointCommandReadVO
      */
-    default void read(PointValueReadVO entityVO) {
+    default void read(PointCommandReadVO entityVO) {
         read(null, entityVO);
     }
 
@@ -51,18 +52,26 @@ public interface PointValueCommandService {
      * Write command
      *
      * @param tenantId current tenant id
-     * @param entityVO PointValueWriteVO
+     * @param entityVO PointCommandWriteVO
      */
-    void write(Long tenantId, PointValueWriteVO entityVO);
+    void write(Long tenantId, PointCommandWriteVO entityVO);
 
     /**
      * Write command from trusted internal callers that do not carry request tenant
      * context.
      *
-     * @param entityVO PointValueWriteVO
+     * @param entityVO PointCommandWriteVO
      */
-    default void write(PointValueWriteVO entityVO) {
+    default void write(PointCommandWriteVO entityVO) {
         write(null, entityVO);
     }
+
+    /**
+     * Query a single command by its commandId.
+     *
+     * @param commandId unique command identifier
+     * @return matching command row, or null
+     */
+    PointCommandDO getByCommandId(String commandId);
 
 }

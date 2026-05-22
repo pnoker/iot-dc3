@@ -49,9 +49,8 @@ public class RabbitConstant {
 
     public static final String ROUTING_DRIVER_METADATA_PREFIX = "dc3.r.metadata.driver.";
 
-    public static final String ROUTING_DRIVER_COMMAND_PREFIX = "dc3.r.command.driver.";
 
-    public static final String ROUTING_DEVICE_COMMAND_PREFIX = "dc3.r.command.device.";
+    public static final String ROUTING_POINT_COMMAND_PREFIX = "dc3.r.point_command.";
 
     public static final String ROUTING_POINT_VALUE_PREFIX = "dc3.r.value.point.";
 
@@ -76,12 +75,11 @@ public class RabbitConstant {
 
     public static String QUEUE_DRIVER_METADATA_PREFIX = "dc3.q.metadata.driver.";
 
-    // Command
-    public static String TOPIC_EXCHANGE_COMMAND = "dc3.e.command";
+    // Point Command
+    public static String TOPIC_EXCHANGE_POINT_COMMAND = "dc3.e.point_command";
 
-    public static String QUEUE_DRIVER_COMMAND_PREFIX = "dc3.q.command.driver.";
 
-    public static String QUEUE_DEVICE_COMMAND_PREFIX = "dc3.q.command.device.";
+    public static String QUEUE_POINT_COMMAND_PREFIX = "dc3.q.point_command.";
 
     // Value
     public static String TOPIC_EXCHANGE_VALUE = "dc3.e.value";
@@ -118,6 +116,15 @@ public class RabbitConstant {
     // Routing keys
     public static final String ROUTING_DEVICE_SCAN_TICK = "state.timeout.device.scan.tick";
     public static final String ROUTING_DEVICE_SCAN = "state.timeout.device.scan";
+
+    // Point Command Dead Letter
+    public static String TOPIC_EXCHANGE_POINT_COMMAND_DEAD = "dc3.e.point_command_dead";
+    public static String QUEUE_POINT_COMMAND_DEAD = "dc3.q.point_command_dead";
+
+    // Point Command Result
+    public static String TOPIC_EXCHANGE_POINT_COMMAND_RESULT = "dc3.e.point_command_result";
+    public static String QUEUE_POINT_COMMAND_RESULT = "dc3.q.point_command_result";
+    public static final String ROUTING_POINT_COMMAND_RESULT = "dc3.r.point_command_result";
 
     private RabbitConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);

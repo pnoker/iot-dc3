@@ -21,7 +21,7 @@ import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.service.ActionService;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.facade.api.PointValueCommandFacade;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class PointValueToolTest {
     private PointValueFacade pointValueFacade;
 
     @Mock
-    private PointValueCommandFacade pointValueCommandFacade;
+    private PointCommandFacade pointCommandFacade;
 
     @Mock
     private ActionService actionService;
@@ -58,7 +58,7 @@ class PointValueToolTest {
 
     @BeforeEach
     void setUp() {
-        tool = new PointValueTool(pointValueFacade, pointValueCommandFacade, actionService);
+        tool = new PointValueTool(pointValueFacade, pointCommandFacade, actionService);
         header = new RequestHeader.UserHeader();
         header.setTenantId(1L);
         header.setUserId(2L);
@@ -80,7 +80,7 @@ class PointValueToolTest {
         assertThat(result.data().pendingConfirmation()).isTrue();
         assertThat(result.data().actionId()).isEqualTo("action-1");
         verify(actionService).createWritePointValueAction("conv-1", 10L, 20L, "42", header);
-        verify(pointValueCommandFacade, never()).dispatchWrite(anyLong(), anyLong(), anyLong(), anyString());
+        verify(pointCommandFacade, never()).submitWrite(anyLong(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -110,8 +110,8 @@ class PointValueToolTest {
     }
 
     @Test
-    void readPointValueSendsReadCommandThroughPointValueCommandFacade() {
-        when(pointValueCommandFacade.dispatchRead(1L, 10L, 20L)).thenReturn(true);
+    void readPointValueSendsReadCommandThroughPointCommandFacade() {
+        when(pointCommandFacade.submitRead(1L, 10L, 20L)).thenReturn(true);
 
         AgenticToolResult<PointValueTool.PointCommandResult> result = tool.readPointValue(10L, 20L,
                 toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header)));
@@ -120,7 +120,7 @@ class PointValueToolTest {
         assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
         assertThat(result.data().sent()).isTrue();
         assertThat(result.data().pendingConfirmation()).isFalse();
-        verify(pointValueCommandFacade).dispatchRead(1L, 10L, 20L);
+        verify(pointCommandFacade).submitRead(1L, 10L, 20L);
     }
 
     private ToolContext toolContext(Map<String, Object> values) {

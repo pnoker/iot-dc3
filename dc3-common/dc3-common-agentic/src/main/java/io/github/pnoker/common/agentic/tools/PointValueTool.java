@@ -25,7 +25,7 @@ import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
 import io.github.pnoker.common.agentic.utils.AgenticVisualizationUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.facade.api.PointValueCommandFacade;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +55,7 @@ public class PointValueTool {
 
     private final PointValueFacade pointValueFacade;
 
-    private final PointValueCommandFacade pointValueCommandFacade;
+    private final PointCommandFacade pointCommandFacade;
 
     private final ActionService actionService;
 
@@ -123,7 +123,7 @@ public class PointValueTool {
         log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
                 deviceId, pointId);
         try {
-            boolean success = pointValueCommandFacade.dispatchRead(tenantId, deviceId, pointId);
+            boolean success = pointCommandFacade.submitRead(tenantId, deviceId, pointId);
             PointCommandResult result = new PointCommandResult(deviceId, pointId, null, success, false, null);
             if (success) {
                 return AgenticToolResult.ok("Read command sent", result);

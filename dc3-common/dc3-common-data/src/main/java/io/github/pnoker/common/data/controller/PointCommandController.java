@@ -19,21 +19,26 @@ package io.github.pnoker.common.data.controller;
 
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
-import io.github.pnoker.common.data.biz.PointValueCommandService;
-import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
-import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
+import io.github.pnoker.common.data.biz.PointCommandService;
+import io.github.pnoker.common.data.entity.model.PointCommandDO;
+import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.entity.R;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import jakarta.validation.constraints.NotBlank;
+
 /**
- * REST controller exposing point value command management endpoints.
+ * REST controller exposing point command management endpoints.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,22 +46,22 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.POINT_VALUE_COMMAND_URL_PREFIX)
+@RequestMapping(DataConstant.POINT_COMMAND_URL_PREFIX)
 @RequiredArgsConstructor
-public class PointValueCommandController implements BaseController {
+public class PointCommandController implements BaseController {
 
-    private final PointValueCommandService pointValueCommandService;
+    private final PointCommandService pointCommandService;
 
     /**
      * Read instruction
      *
-     * @param entityVO PointValueReadVO
+     * @param entityVO PointCommandReadVO
      * @return PointValue
      */
     @PostMapping("/read")
-    public Mono<R<Boolean>> read(@Validated @RequestBody PointValueReadVO entityVO) {
+    public Mono<R<Boolean>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            pointValueCommandService.read(tenantId, entityVO);
+            pointCommandService.read(tenantId, entityVO);
             return R.ok();
         }));
     }
@@ -64,15 +69,26 @@ public class PointValueCommandController implements BaseController {
     /**
      * Write instruction
      *
-     * @param entityVO PointValueWriteVO
+     * @param entityVO PointCommandWriteVO
      * @return PointValue
      */
     @PostMapping("/write")
-    public Mono<R<Boolean>> write(@Validated @RequestBody PointValueWriteVO entityVO) {
+    public Mono<R<Boolean>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            pointValueCommandService.write(tenantId, entityVO);
+            pointCommandService.write(tenantId, entityVO);
             return R.ok();
         }));
+    }
+
+    /**
+     * Query a single command by commandId
+     *
+     * @param commandId unique command identifier
+     * @return command record
+     */
+    @GetMapping("/get_by_command_id")
+    public Mono<R<PointCommandDO>> getByCommandId(@NotBlank @RequestParam(value = "commandId") String commandId) {
+        return async(() -> R.ok(pointCommandService.getByCommandId(commandId)));
     }
 
 }

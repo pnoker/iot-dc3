@@ -26,7 +26,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
+import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -157,7 +157,7 @@ class DriverReadServiceImplTest {
 
     @Test
     void commandReadIgnoresUnparseablePayload() {
-        DeviceCommandDTO commandDTO = new DeviceCommandDTO();
+        PointCommandDTO commandDTO = new PointCommandDTO();
         commandDTO.setContent("not-json");
         // JsonUtil throws on parse; surface via the catch path? It actually throws
         // because parseObject re-raises as JsonException. Verify the no-op path of
@@ -168,7 +168,7 @@ class DriverReadServiceImplTest {
     }
 
     @Test
-    void commandReadDispatchesParsedDeviceRead() {
+    void commandReadDispatchesParsedPointRead() {
         when(deviceMetadata.getCache(10L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
         when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
@@ -176,8 +176,8 @@ class DriverReadServiceImplTest {
         when(driverCustomService.read(driverConfig, pointConfig, device, point))
                 .thenReturn(new ReadPointValue(device, point, "42"));
 
-        DeviceCommandDTO commandDTO = new DeviceCommandDTO();
-        commandDTO.setContent(JsonUtil.toJsonString(new DeviceCommandDTO.DeviceRead(10L, 20L)));
+        PointCommandDTO commandDTO = new PointCommandDTO();
+        commandDTO.setContent(JsonUtil.toJsonString(new PointCommandDTO.PointRead(10L, 20L)));
         service.read(commandDTO);
         verify(driverSenderService).pointValueSender(any(PointValue.class));
     }

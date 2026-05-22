@@ -27,7 +27,7 @@ import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
+import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -100,11 +100,11 @@ public class DriverReadServiceImpl implements DriverReadService {
     }
 
     @Override
-    public void read(DeviceCommandDTO commandDTO) {
+    public void read(PointCommandDTO commandDTO) {
         // Parse device read command from command DTO
-        // Deserialize the command content into DeviceRead object
-        DeviceCommandDTO.DeviceRead deviceRead = JsonUtil.parseObject(commandDTO.getContent(),
-                DeviceCommandDTO.DeviceRead.class);
+        // Deserialize the command content into PointRead object
+        PointCommandDTO.PointRead deviceRead = JsonUtil.parseObject(commandDTO.getContent(),
+                PointCommandDTO.PointRead.class);
         if (Objects.isNull(deviceRead)) {
             return;
         }

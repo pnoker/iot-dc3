@@ -18,16 +18,16 @@
 package io.github.pnoker.common.facade.api;
 
 /**
- * Protocol-neutral point value command facade.
+ * Protocol-neutral point command facade.
  * <p>
  * Mirrors the command RPCs on {@code api.center.data.PointValueApi} but returns plain
  * types so callers never have to touch gRPC or protobuf classes. Two implementations back
  * this interface:
  * <ul>
- * <li>{@code PointValueCommandLocalFacade} — in-process call into
- * {@code PointValueCommandService}, selected when {@code dc3.facade.mode=local} (single
+ * <li>{@code PointCommandLocalFacade} — in-process call into
+ * {@code PointCommandService}, selected when {@code dc3.facade.mode=local} (single
  * deployment).</li>
- * <li>{@code PointValueCommandGrpcFacade} — gRPC call against Data Center, selected when
+ * <li>{@code PointCommandGrpcFacade} — gRPC call against Data Center, selected when
  * {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
  * </ul>
  *
@@ -35,7 +35,7 @@ package io.github.pnoker.common.facade.api;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface PointValueCommandFacade {
+public interface PointCommandFacade {
 
     /**
      * Dispatch a read command to a device for a specific point.
@@ -45,7 +45,7 @@ public interface PointValueCommandFacade {
      * @param pointId  point id
      * @return {@code true} if the command was accepted.
      */
-    boolean dispatchRead(Long tenantId, Long deviceId, Long pointId);
+    boolean submitRead(Long tenantId, Long deviceId, Long pointId);
 
     /**
      * Dispatch a write command to a device for a specific point.
@@ -56,6 +56,6 @@ public interface PointValueCommandFacade {
      * @param value    value to write
      * @return {@code true} if the command was accepted.
      */
-    boolean dispatchWrite(Long tenantId, Long deviceId, Long pointId, String value);
+    boolean submitWrite(Long tenantId, Long deviceId, Long pointId, String value);
 
 }

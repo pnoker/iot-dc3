@@ -36,7 +36,7 @@ public class DataConstant {
 
     public static final String POINT_VALUE_URL_PREFIX = "/point_value";
 
-    public static final String POINT_VALUE_COMMAND_URL_PREFIX = "/point_value_command";
+    public static final String POINT_COMMAND_URL_PREFIX = "/point_command";
 
     public static final String DASHBOARD_URL_PREFIX = "/dashboard";
 

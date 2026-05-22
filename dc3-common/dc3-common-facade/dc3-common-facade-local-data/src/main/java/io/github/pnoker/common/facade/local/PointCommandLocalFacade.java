@@ -17,17 +17,17 @@
 
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.data.biz.PointValueCommandService;
-import io.github.pnoker.common.data.entity.vo.PointValueReadVO;
-import io.github.pnoker.common.data.entity.vo.PointValueWriteVO;
-import io.github.pnoker.common.facade.api.PointValueCommandFacade;
+import io.github.pnoker.common.data.biz.PointCommandService;
+import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
  * In-process implementation: routes command calls straight into
- * {@link PointValueCommandService}.
+ * {@link PointCommandService}.
  * <p>
  * Selected when {@code dc3.facade.mode=local}. Carries zero serialization cost — the same
  * JVM handles both caller and service.
@@ -39,26 +39,26 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PointValueCommandLocalFacade implements PointValueCommandFacade {
+public class PointCommandLocalFacade implements PointCommandFacade {
 
-    private final PointValueCommandService pointValueCommandService;
+    private final PointCommandService pointCommandService;
 
     @Override
-    public boolean dispatchRead(Long tenantId, Long deviceId, Long pointId) {
-        PointValueReadVO readVO = new PointValueReadVO();
+    public boolean submitRead(Long tenantId, Long deviceId, Long pointId) {
+        PointCommandReadVO readVO = new PointCommandReadVO();
         readVO.setDeviceId(deviceId);
         readVO.setPointId(pointId);
-        pointValueCommandService.read(tenantId, readVO);
+        pointCommandService.read(tenantId, readVO);
         return true;
     }
 
     @Override
-    public boolean dispatchWrite(Long tenantId, Long deviceId, Long pointId, String value) {
-        PointValueWriteVO writeVO = new PointValueWriteVO();
+    public boolean submitWrite(Long tenantId, Long deviceId, Long pointId, String value) {
+        PointCommandWriteVO writeVO = new PointCommandWriteVO();
         writeVO.setDeviceId(deviceId);
         writeVO.setPointId(pointId);
         writeVO.setValue(value);
-        pointValueCommandService.write(tenantId, writeVO);
+        pointCommandService.write(tenantId, writeVO);
         return true;
     }
 
