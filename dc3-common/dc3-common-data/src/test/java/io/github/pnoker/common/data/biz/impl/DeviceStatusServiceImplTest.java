@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
@@ -64,7 +64,7 @@ class DeviceStatusServiceImplTest {
         EntityStateDO state = new EntityStateDO();
         state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
         state.setEntityId(entityId);
-        state.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        state.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         state.setExpireTime(LocalDateTime.now().plusSeconds(60));
         return state;
     }
@@ -73,7 +73,7 @@ class DeviceStatusServiceImplTest {
         EntityStateDO state = new EntityStateDO();
         state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
         state.setEntityId(entityId);
-        state.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        state.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         state.setExpireTime(LocalDateTime.now().minusSeconds(10));
         return state;
     }
@@ -95,7 +95,7 @@ class DeviceStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(null);
         assertThat(service.getStatusByPage(new DeviceQuery()))
-                .containsEntry(10L, DeviceStatusEnum.OFFLINE.getCode());
+                .containsEntry(10L, EntityStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -107,7 +107,7 @@ class DeviceStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(onlineState(10L));
         assertThat(service.getStatusByPage(new DeviceQuery()))
-                .containsEntry(10L, DeviceStatusEnum.ONLINE.getCode());
+                .containsEntry(10L, EntityStatusEnum.ONLINE.getCode());
     }
 
     @Test
@@ -119,7 +119,7 @@ class DeviceStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(expiredState(10L));
         assertThat(service.getStatusByPage(new DeviceQuery()))
-                .containsEntry(10L, DeviceStatusEnum.OFFLINE.getCode());
+                .containsEntry(10L, EntityStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -135,7 +135,7 @@ class DeviceStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(onlineState(10L)).thenReturn(null);
         assertThat(service.listByProfileId(1L, 5L))
-                .containsEntry(10L, DeviceStatusEnum.ONLINE.getCode())
-                .containsEntry(11L, DeviceStatusEnum.OFFLINE.getCode());
+                .containsEntry(10L, EntityStatusEnum.ONLINE.getCode())
+                .containsEntry(11L, EntityStatusEnum.OFFLINE.getCode());
     }
 }

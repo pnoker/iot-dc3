@@ -24,8 +24,7 @@ import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
@@ -188,8 +187,8 @@ public class SystemHealthServiceImpl implements SystemHealthService {
                     .eq(EntityStateDO::getEntityId, d.getId())
                     .one();
             if (Objects.nonNull(state) && !state.getExpireTime().isBefore(now)) {
-                DriverStatusEnum e = DriverStatusEnum.ofIndex(state.getStateFlag());
-                if (Objects.nonNull(e) && DriverStatusEnum.ONLINE.getCode().equals(e.getCode())) {
+                EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
+                if (Objects.nonNull(e) && EntityStatusEnum.ONLINE.getCode().equals(e.getCode())) {
                     online++;
                 }
             }
@@ -223,8 +222,8 @@ public class SystemHealthServiceImpl implements SystemHealthService {
                     .eq(EntityStateDO::getEntityId, d.getId())
                     .one();
             if (Objects.nonNull(state) && !state.getExpireTime().isBefore(now)) {
-                DeviceStatusEnum e = DeviceStatusEnum.ofIndex(state.getStateFlag());
-                if (Objects.nonNull(e) && DeviceStatusEnum.ONLINE.getCode().equals(e.getCode())) {
+                EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
+                if (Objects.nonNull(e) && EntityStatusEnum.ONLINE.getCode().equals(e.getCode())) {
                     online++;
                 }
             }

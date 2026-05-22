@@ -21,8 +21,7 @@ import io.github.pnoker.common.data.biz.SystemHealthService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
@@ -93,7 +92,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
         }
         List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(tenantId, driverId);
         long online = devices.stream()
-                .filter(device -> Objects.equals(DeviceStatusEnum.ONLINE.getCode(), deviceStatus(tenantId,
+                .filter(device -> Objects.equals(EntityStatusEnum.ONLINE.getCode(), deviceStatus(tenantId,
                         device.getId())))
                 .count();
         int offline = (int) Math.max(0, devices.size() - online);
@@ -128,10 +127,10 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
                 .eq(EntityStateDO::getEntityId, deviceId)
                 .one();
         if (Objects.isNull(state) || state.getExpireTime().isBefore(LocalDateTime.now())) {
-            return DeviceStatusEnum.OFFLINE.getCode();
+            return EntityStatusEnum.OFFLINE.getCode();
         }
-        DeviceStatusEnum e = DeviceStatusEnum.ofIndex(state.getStateFlag());
-        return Objects.nonNull(e) ? e.getCode() : DeviceStatusEnum.OFFLINE.getCode();
+        EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
+        return Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
     }
 
     private String driverStatus(Long tenantId, Long driverId) {
@@ -141,10 +140,10 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
                 .eq(EntityStateDO::getEntityId, driverId)
                 .one();
         if (Objects.isNull(state) || state.getExpireTime().isBefore(LocalDateTime.now())) {
-            return DriverStatusEnum.OFFLINE.getCode();
+            return EntityStatusEnum.OFFLINE.getCode();
         }
-        DriverStatusEnum e = DriverStatusEnum.ofIndex(state.getStateFlag());
-        return Objects.nonNull(e) ? e.getCode() : DriverStatusEnum.OFFLINE.getCode();
+        EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
+        return Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
     }
 
 }

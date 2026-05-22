@@ -28,7 +28,7 @@ import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,14 +76,20 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     }
 
     @Override
-    public void deviceStatusSender(Long deviceId, DeviceStatusEnum status) {
+    public void deviceStatusSender(Long deviceId, EntityStatusEnum status) {
         sendDeviceStatus(deviceId, status, driverProperties.getHealth().getDevice().getTimeout(),
                 driverProperties.getHealth().getDevice().getTimeoutUnit());
     }
 
     @Override
-    public void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeout, TimeUnit timeoutUnit) {
-        sendDeviceStatus(deviceId, status, timeout, timeoutUnit);
+    public void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit) {
+        sendDeviceStatus(deviceId, status, timeout, timeoutUnit, null);
+    }
+
+    @Override
+    public void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
+                                   String stateDescription) {
+        sendDeviceStatus(deviceId, status, timeout, timeoutUnit, stateDescription);
     }
 
     @Override
@@ -159,8 +165,12 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_POINT_COMMAND_RESULT + "." + driverProperties.getService(), resultDTO);
     }
 
-    private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeout, TimeUnit timeoutUnit) {
+    private void sendDeviceStatus(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
+                                   String stateDescription) {
         DeviceStateDTO deviceState = new DeviceStateDTO(deviceId, status, timeout, timeoutUnit);
+        if (Objects.nonNull(stateDescription)) {
+            deviceState.setStateDescription(stateDescription);
+        }
         DriverBO driver = driverMetadata.getDriver();
         if (Objects.nonNull(driver)) {
             deviceState.setDriverId(driver.getId());

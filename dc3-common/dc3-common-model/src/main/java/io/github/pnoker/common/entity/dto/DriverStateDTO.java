@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.entity.dto;
 
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,9 +59,15 @@ public class DriverStateDTO implements Serializable {
     private Long driverId;
 
     /**
-     * Driver status code (see {@link io.github.pnoker.common.enums.DriverStatusEnum})
+     * Driver status code (see {@link io.github.pnoker.common.enums.EntityStatusEnum})
      */
     private String status;
+
+    /**
+     * Structured description of the state (e.g. connectivity details, diagnostics).
+     * Stored in {@code dc3_entity_state.entity_state_ext.content}.
+     */
+    private String stateDescription;
 
     /**
      * Create Time
@@ -74,7 +80,7 @@ public class DriverStateDTO implements Serializable {
         this.createTime = LocalDateTimeUtil.now();
     }
 
-    public DriverStateDTO(Long driverId, DriverStatusEnum status) {
+    public DriverStateDTO(Long driverId, EntityStatusEnum status) {
         this(driverId, status == null ? null : status.getCode());
     }
 

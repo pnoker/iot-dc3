@@ -20,7 +20,7 @@ package io.github.pnoker.common.driver.metadata;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -76,7 +76,7 @@ public final class DriverMetadata {
      * Current driver status.
      */
     @Setter
-    private volatile DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
+    private volatile EntityStatusEnum driverStatus = EntityStatusEnum.OFFLINE;
     /**
      * Registered driver definition.
      */
@@ -124,7 +124,7 @@ public final class DriverMetadata {
         pointAttributeIdMap.clear();
         pointAttributeNameMap.clear();
         driver = null;
-        driverStatus = DriverStatusEnum.OFFLINE;
+        driverStatus = EntityStatusEnum.OFFLINE;
     }
 
 }

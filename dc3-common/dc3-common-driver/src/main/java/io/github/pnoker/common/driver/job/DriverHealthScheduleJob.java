@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.driver.job;
 
-import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
+import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,33 +57,33 @@ public class DriverHealthScheduleJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         DriverBO driver = driverMetadata.getDriver();
         if (driver == null) {
-            // Driver has not yet registered (or was just cleared by a DRIVER DELETE
-            // event). Skip this tick instead of NPE'ing into Quartz.
             log.warn("Skip driver state report: driver metadata is not initialized");
             return;
         }
-        DriverStatusEnum status = resolveDriverStatus();
+
+        DriverHealthState healthState = resolveDriverHealth();
+        EntityStatusEnum status = healthState.getStatus();
         driverMetadata.setDriverStatus(status);
 
         DriverStateDTO driverState = new DriverStateDTO(driver.getId(), status);
         driverState.setTenantId(driver.getTenantId());
+        if (Objects.nonNull(healthState.getDescription())) {
+            driverState.setStateDescription(healthState.getDescription());
+        }
         log.info("Report driver health: {}", JsonUtil.toJsonString(driverState));
         driverSenderService.driverStateSender(driverState);
     }
 
-    private DriverStatusEnum resolveDriverStatus() {
-        DriverHealthState healthState;
+    private DriverHealthState resolveDriverHealth() {
         try {
-            healthState = driverCustomService.health();
+            DriverHealthState healthState = driverCustomService.health();
+            if (Objects.nonNull(healthState) && Objects.nonNull(healthState.getStatus())) {
+                return healthState;
+            }
         } catch (Exception e) {
             log.warn("Driver health check failed", e);
-            return DriverStatusEnum.FAULT;
         }
-
-        if (Objects.isNull(healthState) || Objects.isNull(healthState.getStatus())) {
-            return DriverStatusEnum.FAULT;
-        }
-        return healthState.getStatus();
+        return DriverHealthState.fault();
     }
 
 }

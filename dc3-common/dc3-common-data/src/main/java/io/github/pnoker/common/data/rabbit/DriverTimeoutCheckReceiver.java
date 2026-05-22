@@ -30,7 +30,7 @@ import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +65,10 @@ public class DriverTimeoutCheckReceiver {
     private final EntityStateManager entityStateManager;
     private final EntityAlarmManager entityAlarmManager;
     private final AlarmRuleTriggerService alarmRuleTriggerService;
+
+    private static boolean statusIs(Byte stateFlag, EntityStatusEnum status) {
+        return Objects.equals(stateFlag, status.getIndex());
+    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverTimeoutCheckQueue.name}")
@@ -102,16 +106,16 @@ public class DriverTimeoutCheckReceiver {
             }
 
             // Already offline
-            Byte offlineIndex = DriverStatusEnum.OFFLINE.getIndex();
+            Byte offlineIndex = EntityStatusEnum.OFFLINE.getIndex();
             if (Objects.equals(state.getStateFlag(), offlineIndex)) {
                 RabbitAckUtil.ack(channel, deliveryTag);
                 return;
             }
 
             // Heartbeat-renewed states should become OFFLINE once their lease expires.
-            boolean heartbeatRenewed = statusIs(state.getStateFlag(), DriverStatusEnum.ONLINE)
-                    || statusIs(state.getStateFlag(), DriverStatusEnum.MAINTAIN)
-                    || statusIs(state.getStateFlag(), DriverStatusEnum.FAULT);
+            boolean heartbeatRenewed = statusIs(state.getStateFlag(), EntityStatusEnum.ONLINE)
+                    || statusIs(state.getStateFlag(), EntityStatusEnum.MAINTAIN)
+                    || statusIs(state.getStateFlag(), EntityStatusEnum.FAULT);
             if (!heartbeatRenewed) {
                 RabbitAckUtil.ack(channel, deliveryTag);
                 return;
@@ -136,7 +140,7 @@ public class DriverTimeoutCheckReceiver {
             }
 
             // Write alarm
-            DriverStatusEnum prevStatus = DriverStatusEnum.ofIndex(state.getStateFlag());
+            EntityStatusEnum prevStatus = EntityStatusEnum.ofIndex(state.getStateFlag());
             String prevCode = Objects.nonNull(prevStatus) ? prevStatus.getCode() : "unknown";
             String alarmMessage = String.format("Driver heartbeat timed out (last=%s); marked OFFLINE", prevCode);
 
@@ -170,8 +174,8 @@ public class DriverTimeoutCheckReceiver {
             DriverAlarmDTO driverAlarm = DriverAlarmDTO.builder()
                     .tenantId(dto.getTenantId())
                     .driverId(dto.getDriverId())
-                    .status(DriverStatusEnum.OFFLINE.getCode())
-                    .statusName(DriverStatusEnum.OFFLINE.name())
+                    .status(EntityStatusEnum.OFFLINE.getCode())
+                    .statusName(EntityStatusEnum.OFFLINE.name())
                     .message(alarmMessage)
                     .alarmId(alarm.getId())
                     .build();
@@ -185,9 +189,5 @@ public class DriverTimeoutCheckReceiver {
             log.error("Driver timeout check failed, deliveryTag={}", deliveryTag, e);
             RabbitAckUtil.nack(channel, deliveryTag, true);
         }
-    }
-
-    private static boolean statusIs(Byte stateFlag, DriverStatusEnum status) {
-        return Objects.equals(stateFlag, status.getIndex());
     }
 }

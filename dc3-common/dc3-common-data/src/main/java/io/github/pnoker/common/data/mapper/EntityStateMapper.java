@@ -52,6 +52,7 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
      * @param timeoutSeconds       lease timeout in seconds
      * @param timeoutSourceFlag    timeout source flag
      * @param stateExtType         state extension type for inserted rows
+     * @param stateDescription     structured description for state_ext content
      * @return inserted or updated state row
      */
     EntityStateDO upsertEntityState(@Param("id") Long id,
@@ -64,7 +65,8 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
                                     @Param("expireTime") java.time.LocalDateTime expireTime,
                                     @Param("timeoutSeconds") int timeoutSeconds,
                                     @Param("timeoutSourceFlag") byte timeoutSourceFlag,
-                                    @Param("stateExtType") String stateExtType);
+                                    @Param("stateExtType") String stateExtType,
+                                    @Param("stateDescription") String stateDescription);
 
     /**
      * Atomically claims expired online device leases and marks them offline.
@@ -72,13 +74,13 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
      * PostgreSQL {@code FOR UPDATE SKIP LOCKED} lets multiple Data Center
      * instances split expired rows without blocking or processing the same row.
      *
-     * @param entityTypeFlag       device entity type flag
-     * @param onlineFlag           online state flag
-     * @param maintainFlag         maintain state flag
-     * @param faultFlag            fault state flag
-     * @param offlineFlag          offline state flag
-     * @param batchSize            maximum rows to claim
-     * @param offlineRenewSeconds  renewal window for already-offline state rows
+     * @param entityTypeFlag      device entity type flag
+     * @param onlineFlag          online state flag
+     * @param maintainFlag        maintain state flag
+     * @param faultFlag           fault state flag
+     * @param offlineFlag         offline state flag
+     * @param batchSize           maximum rows to claim
+     * @param offlineRenewSeconds renewal window for already-offline state rows
      * @return claimed rows after the offline update; {@code lastStateFlag}
      * contains the previous state
      */

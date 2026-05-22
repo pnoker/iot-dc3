@@ -47,8 +47,9 @@ title: 设备与驱动超时管理方案
 
 统一使用一张表保存驱动和设备当前状态。字段风格参考现有 PostgreSQL 脚本：
 
-- 数据库对象统一使用 `state`，如 `dc3_entity_state`、`state_flag`。
-- Java DTO 继续使用字符串 code 作为 MQ/API 负载，设备/驱动状态枚举实现统一的 `EntityStateStatus` 契约，写入状态表时映射为 `state_flag`。
+- 数据库对象统一使用 `state`，如 `dc3_entity_state`、`entity_state_flag`。
+- Java DTO 继续使用字符串 code 作为 MQ/API 负载，设备/驱动状态枚举实现统一的 `EntityStateStatus` 契约，写入状态表时映射为
+  `entity_state_flag`。
 - 枚举类字段使用 `*_flag SMALLINT`，不直接存字符串。
 - 扩展字段使用 `JSON DEFAULT '{}'::JSON`。
 - 索引命名使用 `idx_*_active_unique` / `idx_*`。
@@ -61,7 +62,7 @@ CREATE TABLE dc3_entity_state
     entity_type_flag    SMALLINT DEFAULT 0 NOT NULL,                 -- Entity type flag, 3: driver, 6: device
     entity_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Entity ID
     parent_entity_id    BIGINT   DEFAULT 0 NOT NULL,                 -- Parent entity ID
-    state_flag          SMALLINT DEFAULT 1 NOT NULL,                 -- State flag, 0: online, 1: offline, 2: maintain, 3: fault
+    entity_state_flag          SMALLINT DEFAULT 1 NOT NULL,                 -- State flag, 0: online, 1: offline, 2: maintain, 3: fault
     last_state_flag     SMALLINT DEFAULT 1 NOT NULL,                 -- Last state flag
     last_heartbeat_time TIMESTAMPTZ NOT NULL,                        -- Latest heartbeat time
     expire_time TIMESTAMPTZ NOT NULL,                                -- Lease expiration time
@@ -69,7 +70,7 @@ CREATE TABLE dc3_entity_state
     last_alarm_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Latest alarm ID
     timeout_seconds     INTEGER  DEFAULT 0 NOT NULL,                 -- Timeout duration, seconds
     timeout_source_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Timeout source flag, 0: system, 1: driver, 2: device, 3: profile
-    state_ext           JSON     DEFAULT '{}'::JSON        NOT NULL, -- State extension information
+    entity_state_ext           JSON     DEFAULT '{}'::JSON        NOT NULL, -- State extension information
     tenant_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
     operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
@@ -80,13 +81,13 @@ CREATE UNIQUE INDEX idx_entity_state_active_unique
     ON dc3_entity_state (tenant_id, entity_type_flag, entity_id) WHERE deleted = 0;
 
 CREATE INDEX idx_entity_state_expire
-    ON dc3_entity_state (entity_type_flag, state_flag, expire_time) WHERE deleted = 0;
+    ON dc3_entity_state (entity_type_flag, entity_state_flag, expire_time) WHERE deleted = 0;
 
 CREATE INDEX idx_entity_state_tenant_status
-    ON dc3_entity_state (tenant_id, entity_type_flag, state_flag) WHERE deleted = 0;
+    ON dc3_entity_state (tenant_id, entity_type_flag, entity_state_flag) WHERE deleted = 0;
 
 CREATE INDEX idx_entity_state_parent
-    ON dc3_entity_state (tenant_id, entity_type_flag, parent_entity_id, state_flag) WHERE deleted = 0;
+    ON dc3_entity_state (tenant_id, entity_type_flag, parent_entity_id, entity_state_flag) WHERE deleted = 0;
 
 CREATE TRIGGER update_operate_time_trigger
     BEFORE UPDATE
@@ -102,20 +103,20 @@ CREATE TRIGGER update_operate_time_trigger
 
 关键字段：
 
-| 字段                    | 说明                                                                                            |
-|-----------------------|-----------------------------------------------------------------------------------------------|
-| `entity_type_flag`    | 实体类型，沿用 `EntityTypeFlagEnum`：`3` 为 driver，`6` 为 device                                        |
-| `entity_id`           | 驱动 ID 或设备 ID                                                                                  |
-| `parent_entity_id`    | 设备所属驱动 ID；驱动为 `0`                                                                             |
-| `state_flag`          | 当前状态，沿用 `EntityStateStatus` 契约：`0` online，`1` offline，`2` maintain，`3` fault                     |
-| `last_state_flag`     | 上一次状态                                                                                         |
-| `last_heartbeat_time` | 最近一次心跳时间                                                                                      |
-| `expire_time`         | 当前租约到期时间                                                                                      |
-| `lease_version`       | 每次心跳递增，用于忽略旧超时消息                                                                              |
-| `last_alarm_id`       | 最近一次关联告警 ID，便于追踪离线/故障告警                                                                       |
-| `timeout_seconds`     | 当前租约时长                                                                                        |
-| `timeout_source_flag` | 超时来源，建议新增枚举：`0` system，`1` driver，`2` device，`3` profile                                      |
-| `state_ext`           | 节点、协议状态、诊断信息等扩展                                                                               |
+| 字段                    | 说明                                                                           |
+|-----------------------|------------------------------------------------------------------------------|
+| `entity_type_flag`    | 实体类型，沿用 `EntityTypeFlagEnum`：`3` 为 driver，`6` 为 device                       |
+| `entity_id`           | 驱动 ID 或设备 ID                                                                 |
+| `parent_entity_id`    | 设备所属驱动 ID；驱动为 `0`                                                            |
+| `entity_state_flag`          | 当前状态，沿用 `EntityStateStatus` 契约：`0` online，`1` offline，`2` maintain，`3` fault |
+| `last_state_flag`     | 上一次状态                                                                        |
+| `last_heartbeat_time` | 最近一次心跳时间                                                                     |
+| `expire_time`         | 当前租约到期时间                                                                     |
+| `lease_version`       | 每次心跳递增，用于忽略旧超时消息                                                             |
+| `last_alarm_id`       | 最近一次关联告警 ID，便于追踪离线/故障告警                                                      |
+| `timeout_seconds`     | 当前租约时长                                                                       |
+| `timeout_source_flag` | 超时来源，建议新增枚举：`0` system，`1` driver，`2` device，`3` profile                     |
+| `entity_state_ext`           | 节点、协议状态、诊断信息等扩展                                                              |
 
 ## RabbitMQ 设计
 
@@ -175,7 +176,7 @@ timeout message
     - `entity_type_flag = 3`
     - `entity_id = driverId`
     - `parent_entity_id = 0`
-    - `state_flag` 按 `DriverStatusEnum` / `EntityStateStatus` 映射
+    - `entity_state_flag` 按 `DriverStatusEnum` / `EntityStateStatus` 映射
     - `expire_time = now + 45s`
     - `lease_version = lease_version + 1`
     - `timeout_seconds = 45`
@@ -190,8 +191,8 @@ timeout message
     - 状态行存在。
     - `lease_version` 等于消息中的版本。
     - `expire_time <= now()`。
-    - `state_flag` 仍是心跳续租状态：`online`、`maintain`、`fault`。
-4. 更新 `state_flag = 1`。
+    - `entity_state_flag` 仍是心跳续租状态：`online`、`maintain`、`fault`。
+4. 更新 `entity_state_flag = 1`。
 5. 构建 DRIVER 规则事实，命中规则后写入 `dc3_entity_alarm`，告警来源为 `driver-offline`。
 
 ## 设备超时流程
@@ -207,13 +208,14 @@ timeout message
 2. SDK 调用驱动实现的 `DeviceHealth.health(driverConfig, device)` 判断设备健康。
 3. 驱动返回 `DeviceHealthState`：
     - `status` 表示要上报的设备状态。
-    - `timeout/timeoutUnit` 可选；为空时使用配置 `dc3.driver.health.device.timeout` 和 `dc3.driver.health.device.timeout-unit` 作为兜底租约。
+    - `timeout/timeoutUnit` 可选；为空时使用配置 `dc3.driver.health.device.timeout` 和
+      `dc3.driver.health.device.timeout-unit` 作为兜底租约。
 4. SDK 通过 `DeviceStateDTO` 上报 `deviceId`、`driverId`、`tenantId`、`status`、`timeout`、`timeoutUnit`。
 5. Data Center upsert `dc3_entity_state`：
     - `entity_type_flag = 6`
     - `entity_id = deviceId`
     - `parent_entity_id = driverId`
-    - `state_flag = payload.status.index`
+    - `entity_state_flag = payload.status.index`
     - `expire_time = now + payload timeout`
     - `lease_version = lease_version + 1`
     - `timeout_source_flag = 1`
@@ -239,12 +241,12 @@ device_scan_tick
 WITH picked AS (
     SELECT
         id,
-        state_flag AS previous_state_flag,
+        entity_state_flag AS previous_entity_state_flag,
         lease_version AS previous_lease_version
     FROM dc3_entity_state
     WHERE deleted = 0
       AND entity_type_flag = 6
-      AND state_flag IN (0, 2, 3)
+      AND entity_state_flag IN (0, 2, 3)
       AND expire_time <= CURRENT_TIMESTAMP
     ORDER BY expire_time ASC
     LIMIT #{batchSize}
@@ -252,8 +254,8 @@ WITH picked AS (
 )
 UPDATE dc3_entity_state s
 SET lease_version = picked.previous_lease_version + 1,
-    state_flag = 1,
-    last_state_flag = picked.previous_state_flag,
+    entity_state_flag = 1,
+    last_state_flag = picked.previous_entity_state_flag,
     expire_time = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
     operate_time = CURRENT_TIMESTAMP
 FROM picked
@@ -273,7 +275,7 @@ RETURNING s.*;
 
 每条过期记录处理：
 
-1. claim SQL 已经完成过期条件确认与 `state_flag = 1` 更新。
+1. claim SQL 已经完成过期条件确认与 `entity_state_flag = 1` 更新。
 2. 根据 `RETURNING` 的状态行写入 `dc3_entity_alarm`，告警来源为 `device-offline`。
 3. 构建 DEVICE 规则事实，触发规则告警链路。
 
@@ -287,7 +289,7 @@ RETURNING s.*;
 
 - `lease_version` 是否仍一致。
 - `expire_time` 是否确实已过期。
-- `state_flag` 是否仍是心跳续租状态：`online`、`maintain`、`fault`。
+- `entity_state_flag` 是否仍是心跳续租状态：`online`、`maintain`、`fault`。
 
 只有全部满足，才能判定离线。
 
@@ -299,7 +301,7 @@ RETURNING s.*;
 
 1. 按 `tenant_id + entity_type_flag + entity_id` 查询状态行。
 2. 如果状态行不存在，返回 `offline` 或 `unknown`，具体由产品口径决定。
-3. 如果 `expire_time <= now()` 且 `state_flag` 仍是在线族，查询结果返回 `offline`。
+3. 如果 `expire_time <= now()` 且 `entity_state_flag` 仍是在线族，查询结果返回 `offline`。
 4. 查询接口不直接写离线事件，避免读接口产生副作用。
 
 初版不再增加本地读缓存。状态表已有唯一索引，先直连数据库把语义跑通；如果后续查询压力过大，再评估只读副本、索引优化或接口级短缓存。
@@ -347,7 +349,8 @@ dc3:
 
 其中 `cron` 是设备健康检查频率，不是设备离线超时时间；配置项 `timeout`/`timeout-unit` 是驱动未返回设备专属 TTL 时的兜底租约。
 
-驱动可以在 `DeviceHealth.health()` 中按设备、协议会话、最近报文时间等逻辑返回不同的 `DeviceHealthState.timeout/timeoutUnit`。后续产品化后，设备超时建议按以下优先级取值：
+驱动可以在 `DeviceHealth.health()` 中按设备、协议会话、最近报文时间等逻辑返回不同的
+`DeviceHealthState.timeout/timeoutUnit`。后续产品化后，设备超时建议按以下优先级取值：
 
 1. `Device.device_ext.stateTimeout`。
 2. `Profile.profile_ext.defaultStateTimeout`。

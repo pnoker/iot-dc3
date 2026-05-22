@@ -63,7 +63,7 @@ public class DeviceAlarmDTO implements Serializable {
     private Long deviceId;
 
     /**
-     * Device status code (see {@link io.github.pnoker.common.enums.DeviceStatusEnum}), may be null.
+     * Device status code (see {@link io.github.pnoker.common.enums.EntityStatusEnum}), may be null.
      */
     private String status;
 

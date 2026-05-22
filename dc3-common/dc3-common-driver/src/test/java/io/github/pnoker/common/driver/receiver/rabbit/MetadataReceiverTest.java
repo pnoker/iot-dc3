@@ -26,7 +26,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ServiceException;
@@ -166,7 +166,7 @@ class MetadataReceiverTest {
     @Test
     void driverDeleteClearsAllDriverSideCaches() throws Exception {
         driverMetadata.setDriver(new DriverBO());
-        driverMetadata.setDriverStatus(DriverStatusEnum.ONLINE);
+        driverMetadata.setDriverStatus(EntityStatusEnum.ONLINE);
 
         MetadataEventDTO dto = event(MetadataTypeEnum.DRIVER, MetadataOperateTypeEnum.DELETE, 7L);
         receiver.metadataReceive(channel, message, dto);
@@ -175,7 +175,7 @@ class MetadataReceiverTest {
         verify(pointMetadata).clearCache();
         assertThat(driverMetadata.getDeviceIds()).isEmpty();
         assertThat(driverMetadata.getDriver()).isNull();
-        assertThat(driverMetadata.getDriverStatus()).isEqualTo(DriverStatusEnum.OFFLINE);
+        assertThat(driverMetadata.getDriverStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
         verify(driverClient, never()).refreshMetadata(7L);
         verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
         verify(channel).basicAck(eq(7L), eq(false));

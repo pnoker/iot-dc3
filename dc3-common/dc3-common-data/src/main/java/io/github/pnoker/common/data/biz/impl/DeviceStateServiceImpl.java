@@ -24,7 +24,7 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
 import lombok.RequiredArgsConstructor;
@@ -55,11 +55,11 @@ public class DeviceStateServiceImpl implements DeviceStateService {
     }
 
     private static boolean online(byte index) {
-        return index == DeviceStatusEnum.ONLINE.getIndex() || index == DeviceStatusEnum.MAINTAIN.getIndex();
+        return index == EntityStatusEnum.ONLINE.getIndex() || index == EntityStatusEnum.MAINTAIN.getIndex();
     }
 
     private static boolean online(String code) {
-        return DeviceStatusEnum.ONLINE.getCode().equals(code) || DeviceStatusEnum.MAINTAIN.getCode().equals(code);
+        return EntityStatusEnum.ONLINE.getCode().equals(code) || EntityStatusEnum.MAINTAIN.getCode().equals(code);
     }
 
     @Override
@@ -76,9 +76,9 @@ public class DeviceStateServiceImpl implements DeviceStateService {
             return;
         }
 
-        DeviceStatusEnum statusEnum = DeviceStatusEnum.ofCode(entityDTO.getStatus());
+        EntityStatusEnum statusEnum = EntityStatusEnum.ofCode(entityDTO.getStatus());
         if (Objects.isNull(statusEnum)) {
-            statusEnum = DeviceStatusEnum.OFFLINE;
+            statusEnum = EntityStatusEnum.OFFLINE;
         }
         String current = statusEnum.getCode();
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(ttlSeconds);
@@ -89,11 +89,12 @@ public class DeviceStateServiceImpl implements DeviceStateService {
                 entityDTO.getDeviceId(),
                 entityDTO.getDriverId(),
                 (byte) statusEnum.getIndex(),
-                (byte) DeviceStatusEnum.OFFLINE.getIndex(),
+                (byte) EntityStatusEnum.OFFLINE.getIndex(),
                 expireTime,
                 (int) ttlSeconds,
                 (byte) TimeoutSourceFlagEnum.DRIVER.getIndex(),
-                "device-heartbeat");
+                "device-heartbeat",
+                entityDTO.getStateDescription());
         if (Objects.isNull(stateDO)) {
             return;
         }
@@ -101,14 +102,14 @@ public class DeviceStateServiceImpl implements DeviceStateService {
         byte lastIndex = stateDO.getLastStateFlag();
         if (isFlip(lastIndex, current)) {
             String message = String.format("Device status changed: %s -> %s",
-                    DeviceStatusEnum.ofIndex(lastIndex) != null ? DeviceStatusEnum.ofIndex(lastIndex).getCode() : "unknown",
+                    EntityStatusEnum.ofIndex(lastIndex) != null ? EntityStatusEnum.ofIndex(lastIndex).getCode() : "unknown",
                     current);
             DeviceAlarmDTO alarm = DeviceAlarmDTO.builder()
                     .driverId(entityDTO.getDriverId())
                     .tenantId(entityDTO.getTenantId())
                     .deviceId(entityDTO.getDeviceId())
                     .status(current)
-                    .statusName(DeviceStatusEnum.ofCode(current) != null ? DeviceStatusEnum.ofCode(current).name() : current)
+                    .statusName(EntityStatusEnum.ofCode(current) != null ? EntityStatusEnum.ofCode(current).name() : current)
                     .message(message)
                     .build();
             deviceAlarmService.alarm(alarm);

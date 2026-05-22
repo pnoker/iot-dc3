@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.entity.dto;
 
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,7 +65,7 @@ public class DeviceStateDTO implements Serializable {
     private Long deviceId;
 
     /**
-     * Device status code (see {@link io.github.pnoker.common.enums.DeviceStatusEnum})
+     * Device status code (see {@link io.github.pnoker.common.enums.EntityStatusEnum})
      */
     private String status;
 
@@ -82,6 +82,12 @@ public class DeviceStateDTO implements Serializable {
     private TimeUnit timeoutUnit = TimeUnit.MINUTES;
 
     /**
+     * Structured description of the state (e.g. connectivity details, diagnostics).
+     * Stored in {@code dc3_entity_state.entity_state_ext.content}.
+     */
+    private String stateDescription;
+
+    /**
      * Create Time
      */
     private LocalDateTime createTime;
@@ -92,7 +98,7 @@ public class DeviceStateDTO implements Serializable {
         this.createTime = LocalDateTimeUtil.now();
     }
 
-    public DeviceStateDTO(Long deviceId, DeviceStatusEnum status) {
+    public DeviceStateDTO(Long deviceId, EntityStatusEnum status) {
         this(deviceId, status == null ? null : status.getCode());
     }
 
@@ -104,7 +110,7 @@ public class DeviceStateDTO implements Serializable {
         this.createTime = LocalDateTimeUtil.now();
     }
 
-    public DeviceStateDTO(Long deviceId, DeviceStatusEnum status, int timeout, TimeUnit timeoutUnit) {
+    public DeviceStateDTO(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit) {
         this(deviceId, status == null ? null : status.getCode(), timeout, timeoutUnit);
     }
 

@@ -34,7 +34,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
@@ -158,7 +158,7 @@ class ModbusTcpDriverCustomServiceImplTest {
 
         DeviceHealthState health = service.health(driverConfig("h", 502), device(11L));
 
-        assertThat(health.getStatus()).isEqualTo(DeviceStatusEnum.ONLINE);
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
         verify(modbusMaster).init();
     }
 
@@ -169,7 +169,7 @@ class ModbusTcpDriverCustomServiceImplTest {
 
         DeviceHealthState health = service.health(driverConfig("h", 502), device(11L));
 
-        assertThat(health.getStatus()).isEqualTo(DeviceStatusEnum.OFFLINE);
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
     }
 
     @Test

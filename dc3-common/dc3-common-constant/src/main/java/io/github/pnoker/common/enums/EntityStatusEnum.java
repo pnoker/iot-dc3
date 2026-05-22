@@ -25,18 +25,23 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Device status enumeration.
+ * Unified entity status enumeration for drivers and devices.
+ * <p>
+ * Persisted in {@code dc3_entity_state.entity_state_flag}. The {@code code} string is
+ * used on MQ payloads and API responses.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 @Getter
 @AllArgsConstructor
-public enum DeviceStatusEnum implements EntityStateStatus {
+public enum EntityStatusEnum {
 
-    ONLINE((byte) 0, "online", "online"), OFFLINE((byte) 1, "offline", "offline"),
-    MAINTAIN((byte) 2, "maintain", "maintenance"), FAULT((byte) 3, "fault", "fault"),
+    ONLINE((byte) 0, "online", "Online"),
+    OFFLINE((byte) 1, "offline", "Offline"),
+    MAINTAIN((byte) 2, "maintain", "Maintain"),
+    FAULT((byte) 3, "fault", "Fault"),
     ;
 
     /**
@@ -46,7 +51,7 @@ public enum DeviceStatusEnum implements EntityStateStatus {
     private final Byte index;
 
     /**
-     * Status code string.
+     * Status code string used on MQ payloads and APIs.
      */
     private final String code;
 
@@ -55,39 +60,21 @@ public enum DeviceStatusEnum implements EntityStateStatus {
      */
     private final String remark;
 
-    /**
-     * Get enum by index value.
-     *
-     * @param index index value
-     * @return {@link DeviceStatusEnum} or {@code null} if not found
-     */
-    public static DeviceStatusEnum ofIndex(Byte index) {
-        Optional<DeviceStatusEnum> any = Arrays.stream(DeviceStatusEnum.values())
+    public static EntityStatusEnum ofIndex(Byte index) {
+        Optional<EntityStatusEnum> any = Arrays.stream(EntityStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by code string.
-     *
-     * @param code code string
-     * @return {@link DeviceStatusEnum} or {@code null} if not found
-     */
-    public static DeviceStatusEnum ofCode(String code) {
-        Optional<DeviceStatusEnum> any = Arrays.stream(DeviceStatusEnum.values())
+    public static EntityStatusEnum ofCode(String code) {
+        Optional<EntityStatusEnum> any = Arrays.stream(EntityStatusEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by enum name.
-     *
-     * @param name enum name
-     * @return {@link DeviceStatusEnum} or {@code null} if parsing fails
-     */
-    public static DeviceStatusEnum ofName(String name) {
+    public static EntityStatusEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

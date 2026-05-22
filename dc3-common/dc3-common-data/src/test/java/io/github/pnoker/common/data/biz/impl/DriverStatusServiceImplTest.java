@@ -21,8 +21,8 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
@@ -76,7 +76,7 @@ class DriverStatusServiceImplTest {
         EntityStateDO state = new EntityStateDO();
         state.setEntityTypeFlag((byte) typeFlag);
         state.setEntityId(entityId);
-        state.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
+        state.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         state.setExpireTime(LocalDateTime.now().plusSeconds(60));
         return state;
     }
@@ -85,7 +85,7 @@ class DriverStatusServiceImplTest {
         EntityStateDO state = new EntityStateDO();
         state.setEntityTypeFlag((byte) typeFlag);
         state.setEntityId(entityId);
-        state.setStateFlag((byte) DriverStatusEnum.ONLINE.getIndex());
+        state.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         state.setExpireTime(LocalDateTime.now().minusSeconds(10));
         return state;
     }
@@ -107,7 +107,7 @@ class DriverStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(null);
         assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, DriverStatusEnum.OFFLINE.getCode());
+                .containsEntry(1L, EntityStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -119,7 +119,7 @@ class DriverStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(onlineState(1L, EntityTypeFlagEnum.DRIVER.getIndex()));
         assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, DriverStatusEnum.ONLINE.getCode());
+                .containsEntry(1L, EntityStatusEnum.ONLINE.getCode());
     }
 
     @Test
@@ -131,7 +131,7 @@ class DriverStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(expiredState(1L, EntityTypeFlagEnum.DRIVER.getIndex()));
         assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, DriverStatusEnum.OFFLINE.getCode());
+                .containsEntry(1L, EntityStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -152,9 +152,9 @@ class DriverStatusServiceImplTest {
         when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
         when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L)));
         EntityStateDO online10 = onlineState(10L, EntityTypeFlagEnum.DEVICE.getIndex());
-        online10.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        online10.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         EntityStateDO expired11 = expiredState(11L, EntityTypeFlagEnum.DEVICE.getIndex());
-        expired11.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        expired11.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(online10).thenReturn(expired11);
@@ -166,7 +166,7 @@ class DriverStatusServiceImplTest {
         when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
         when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L), device(12L)));
         EntityStateDO online10 = onlineState(10L, EntityTypeFlagEnum.DEVICE.getIndex());
-        online10.setStateFlag((byte) DeviceStatusEnum.ONLINE.getIndex());
+        online10.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(online10).thenReturn(null).thenReturn(null);
