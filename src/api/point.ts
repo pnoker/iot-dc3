@@ -60,7 +60,7 @@ export const getPointValueHistory = (deviceId: number, pointId: number, count = 
   });
 
 export const readPointValue = (pointValueReadVO: Record<string, unknown>) =>
-  httpPost(`${API_DATA_BASE}/point_value_command/read`, pointValueReadVO);
+  httpPost(`${API_DATA_BASE}/point_command/read`, pointValueReadVO);
 
 export const writePointValue = (pointValueWriteVO: Record<string, unknown>) =>
-  httpPost(`${API_DATA_BASE}/point_value_command/write`, pointValueWriteVO);
+  httpPost(`${API_DATA_BASE}/point_command/write`, pointValueWriteVO);
