@@ -56,6 +56,13 @@ public class RabbitConstant {
 
     public static final String ROUTING_MQTT_PREFIX = "dc3.r.mqtt.";
     public static final String ROUTING_NOTIFY_TASK_PREFIX = "dc3.r.notify.task.";
+    // Routing keys
+    public static final String ROUTING_DRIVER_TIMEOUT_DELAY = "state.timeout.driver.45s";
+    public static final String ROUTING_DRIVER_TIMEOUT_CHECK = "state.timeout.driver.check";
+    // Routing keys
+    public static final String ROUTING_DEVICE_SCAN_TICK = "state.timeout.device.scan.tick";
+    public static final String ROUTING_DEVICE_SCAN = "state.timeout.device.scan";
+    public static final String ROUTING_POINT_COMMAND_RESULT = "dc3.r.point_command_result";
     // Register
     public static String TOPIC_EXCHANGE_REGISTER = "dc3.e.register";
     public static String QUEUE_REGISTER_UP = "dc3.q.register.up";
@@ -69,62 +76,36 @@ public class RabbitConstant {
     public static String QUEUE_DRIVER_ALARM = "dc3.q.alarm.driver";
     public static String QUEUE_DEVICE_ALARM = "dc3.q.alarm.device";
     public static String QUEUE_NOTIFY_TASK = "dc3.q.notify.task";
-
     // Metadata
     public static String TOPIC_EXCHANGE_METADATA = "dc3.e.metadata";
-
     public static String QUEUE_DRIVER_METADATA_PREFIX = "dc3.q.metadata.driver.";
-
     // Point Command
     public static String TOPIC_EXCHANGE_POINT_COMMAND = "dc3.e.point_command";
-
-
     public static String QUEUE_POINT_COMMAND_PREFIX = "dc3.q.point_command.";
-
     // Value
     public static String TOPIC_EXCHANGE_VALUE = "dc3.e.value";
-
     public static String QUEUE_POINT_VALUE = "dc3.q.value.point";
-
     // Mqtt
     public static String TOPIC_EXCHANGE_MQTT = "dc3.e.mqtt";
-
     public static String QUEUE_MQTT = "dc3.q.mqtt";
-
     // State Timeout - Delay Exchange (receives messages to be delayed)
     public static String TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY = "dc3.e.state_timeout_delay";
-
     // State Timeout - Check Exchange (receives expired messages from DLX)
     public static String TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK = "dc3.e.state_timeout_check";
-
     // Driver timeout delay queue (45s TTL, dead-letter to check exchange)
     public static String QUEUE_DRIVER_TIMEOUT_DELAY = "dc3.q.state_timeout.driver.45s";
-
     // Driver timeout check queue (consumed by Data Center)
     public static String QUEUE_DRIVER_TIMEOUT_CHECK = "dc3.q.state_timeout.driver_check";
-
-    // Routing keys
-    public static final String ROUTING_DRIVER_TIMEOUT_DELAY = "state.timeout.driver.45s";
-    public static final String ROUTING_DRIVER_TIMEOUT_CHECK = "state.timeout.driver.check";
-
     // Device scan tick delay queue (10s TTL, dead-letter to scan queue)
     public static String QUEUE_DEVICE_SCAN_TICK = "dc3.q.state_timeout.device_scan_tick.10s";
-
     // Device scan execution queue (consumed by Data Center)
     public static String QUEUE_DEVICE_SCAN = "dc3.q.state_timeout.device_scan";
-
-    // Routing keys
-    public static final String ROUTING_DEVICE_SCAN_TICK = "state.timeout.device.scan.tick";
-    public static final String ROUTING_DEVICE_SCAN = "state.timeout.device.scan";
-
     // Point Command Dead Letter
     public static String TOPIC_EXCHANGE_POINT_COMMAND_DEAD = "dc3.e.point_command_dead";
     public static String QUEUE_POINT_COMMAND_DEAD = "dc3.q.point_command_dead";
-
     // Point Command Result
     public static String TOPIC_EXCHANGE_POINT_COMMAND_RESULT = "dc3.e.point_command_result";
     public static String QUEUE_POINT_COMMAND_RESULT = "dc3.q.point_command_result";
-    public static final String ROUTING_POINT_COMMAND_RESULT = "dc3.r.point_command_result";
 
     private RabbitConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);

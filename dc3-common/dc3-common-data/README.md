@@ -14,13 +14,13 @@ driver/device status tracking, and data query. It is wired into `dc3-center-data
 
 ## Key Components
 
-| Layer        | Contents                                                                                      |
-|--------------|-----------------------------------------------------------------------------------------------|
-| Controllers  | REST controllers for point value read/write, query, status                                    |
+| Layer        | Contents                                                                                 |
+|--------------|------------------------------------------------------------------------------------------|
+| Controllers  | REST controllers for point value read/write, query, status                               |
 | Services     | `PointCommandService`, `PointValueService`, `DriverStatusService`, `DeviceStatusService` |
-| gRPC Clients | `@GrpcClient(ManagerConstant.SERVICE_NAME)` stubs for `DriverApi`, `PointApi`                 |
-| RabbitMQ     | Producer for `dc3.e.command`; Consumer for `dc3.e.value`, `dc3.e.event`                       |
-| Init         | `DataInitRunner` for startup preparation                                                      |
+| gRPC Clients | `@GrpcClient(ManagerConstant.SERVICE_NAME)` stubs for `DriverApi`, `PointApi`            |
+| RabbitMQ     | Producer for `dc3.e.command`; Consumer for `dc3.e.value`, `dc3.e.event`                  |
+| Init         | `DataInitRunner` for startup preparation                                                 |
 
 ## Command Dispatch Flow
 

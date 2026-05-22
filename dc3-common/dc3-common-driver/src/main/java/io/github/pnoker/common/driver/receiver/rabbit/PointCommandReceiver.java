@@ -52,12 +52,11 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointCommandReceiver {
 
+    private static final int SCHEMA_VERSION = 1;
     private final DriverReadService driverReadService;
     private final DriverWriteService driverWriteService;
     private final DriverSenderService driverSenderService;
     private final CommandDedupCache dedupCache;
-
-    private static final int SCHEMA_VERSION = 1;
 
     /**
      * Receive and process point commands from RabbitMQ queue.

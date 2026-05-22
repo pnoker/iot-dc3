@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
+import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
@@ -32,7 +33,6 @@ import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
-import com.rabbitmq.client.Channel;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

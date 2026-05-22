@@ -522,15 +522,15 @@ publisher confirm 已在
 
 - 物模型设计：[docs/design/thing-model.md](thing-model.md)
 - 现状代码定位：
-    -
-    `dc3-common/dc3-common-data/src/main/java/io/github/pnoker/common/data/controller/PointValueCommandController.java:42-78`
-    -
-    `dc3-common/dc3-common-data/src/main/java/io/github/pnoker/common/data/biz/impl/PointValueCommandServiceImpl.java:64-111`
+  -
+  `dc3-common/dc3-common-data/src/main/java/io/github/pnoker/common/data/controller/PointValueCommandController.java:42-78`
+  -
+  `dc3-common/dc3-common-data/src/main/java/io/github/pnoker/common/data/biz/impl/PointValueCommandServiceImpl.java:64-111`
     - `dc3-common/dc3-common-model/src/main/java/io/github/pnoker/common/entity/dto/DeviceCommandDTO.java:44-148`
     -
-    `dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/receiver/rabbit/DeviceCommandReceiver.java:62-108`
-    -
-    `dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/impl/DriverWriteServiceImpl.java:69-124`
+  `dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/receiver/rabbit/DeviceCommandReceiver.java:62-108`
+  -
+  `dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/impl/DriverWriteServiceImpl.java:69-124`
     - `dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/config/DriverTopicConfig.java:60-112`
     - `dc3-common/dc3-common-rabbitmq/src/main/java/io/github/pnoker/common/config/RabbitConfig.java:51-152`
     - `dc3-common/dc3-common-data/src/main/java/io/github/pnoker/common/data/grpc/server/PointValueServer.java:154-217`
