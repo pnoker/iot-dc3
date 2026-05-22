@@ -21,7 +21,7 @@ title: 位号命令链路重构方案
 | §4.3 | `dc3_point_command` 持久化 | [DONE] | — |
 | §4.4 | 同步等待 API | [PARTIAL] | POST 返回 `commandId`, GET `/{commandId}` 可轮询; CompletableFuture 同步等待未实现 |
 | §4.5 | Driver: write() 返回值 | [DONE] | `Boolean` 返回值被正确接收, 失败不 echo 假值 |
-| §4.5 | Driver: 设备级串行锁 | [TODO] | deviceLockManager 未实现 |
+| §4.5 | Driver: 设备级串行锁 | [DONE] | `DeviceLockManager.runExclusive(deviceId)` 串行化同设备命令 |
 | §4.6 | 幂等去重 | [DONE] | — |
 | §4.7 | 中心侧 enableFlag / rwFlag 校验 | [DONE] | — |
 | §4.7 | Driver 在线检查 | [DONE] | `EntityStateMapper` 查询 DRIVER 状态, 离线抛 `ServiceException` |
@@ -63,10 +63,10 @@ RabbitMQ 资源已统一为 `dc3.e.point_command` / `dc3.q.point_command.<svc>` 
 
 | 维度 | 问题 | 状态 |
 |------|------|------|
-| 唯一性 | 报文无 ID；同 device 多线程消费 | [PARTIAL] — `commandId` + 幂等去重已加, 但设备级串行锁缺失 |
-| 准确性 | 不校验 enableFlag / rwFlag / driver 在线 / 值范围; 离线 driver 命令 30s 后静默丢弃 | [PARTIAL] — enableFlag / rwFlag 校验已加, driver 在线 + 值范围校验缺失 |
-| 结果反馈 | HTTP 立即 `R.ok()`; driver SDK 忽略 `write()` 返回值并 echo 假位号值 | [TODO] — 结果回执通道已建, 但 `write()` 返回值仍被丢弃, 同步等待 API 缺失 |
-| 序列化 | DTO 字段 `content` 是二次 JSON 序列化的 `String`; 缺 tenantId / commandId / source / expireAt | [TODO] — DTO 结构未改造
+| 唯一性 | 报文无 ID；同 device 多线程消费 | [DONE] — `commandId` + 幂等去重 + `DeviceLockManager` 设备级串行锁 |
+| 准确性 | 不校验 enableFlag / rwFlag / driver 在线 / 值范围; 离线 driver 命令 30s 后静默丢弃 | [PARTIAL] — enableFlag / rwFlag / driver 在线校验已实现; 值范围仅基础非空 |
+| 结果反馈 | HTTP 立即 `R.ok()`; driver SDK 忽略 `write()` 返回值并 echo 假位号值 | [DONE] — `write()` 返回值被正确接收, POST 返回 commandId 可轮询 |
+| 序列化 | DTO 字段 `content` 是二次 JSON 序列化的 `String`; 缺 tenantId / commandId / source / expireAt | [DONE] — sealed interface + polymorphic payload + record DTO |
 
 ---
 
@@ -144,17 +144,17 @@ Phase 1 已全部完成。以下映射表保留作为历史参照。
 
 四个核心改动及实施状态：
 
-1. 报文层 [TODO]：引入 `commandId`、`tenantId`、`source`、`occurredAt`、`expireAt`、`schemaVersion`；
+1. 报文层 [DONE]：引入 `commandId`、`tenantId`、`source`、`occurredAt`、`expireAt`、`schemaVersion`；
    去掉 `content` 双重 JSON → sealed interface + polymorphic payload。
 2. 路由层 [DONE]：结果回执通道 + DLX 均已配置并运行。
 3. 存储层 [DONE]：`dc3_point_command` 表 + `PointCommandDO` + 生命周期状态机已落地。
-4. 行为层 [PARTIAL]：幂等去重已实现；`write()` 返回值 + 设备级串行锁缺失。
+4. 行为层 [DONE]：幂等去重 + `write()` 返回值 + 设备级串行锁 + `expireAt` 预判均已实现。
 
 ---
 
 ## 4. 详细设计
 
-### 4.1 命令报文（DTO）[TODO]
+### 4.1 命令报文（DTO）[DONE]
 
 > 当前实现仍使用旧模型：`PointCommandDTO` 为 `@Builder` 类，`content` 字段存放二次 JSON 序列化的 `PointRead`/`PointWrite` 字符串，时间字段为 `LocalDateTime`，且 `implements Serializable`。以下为设计目标。
 
@@ -288,7 +288,7 @@ CREATE INDEX idx_point_command_pending
 > - **简易方案（推荐先行）**：HTTP 短轮询 / SSE，前端 1s 一次查 `GET /point_command/{id}`，最长 10s。
 > - **进阶方案**：Redis pub/sub 广播 result，由持有 future 的实例 complete。
 
-### 4.5 Driver SDK 改动 [PARTIAL]
+### 4.5 Driver SDK 改动 [DONE]
 
 已实现项：`PointCommandReceiver` 替代了 `DeviceCommandReceiver`；幂等去重 + 结果回执通道可用；`write()` 返回值被正确接收；`expireAt` 预判已实现。
 
@@ -298,7 +298,7 @@ CREATE INDEX idx_point_command_pending
 |------|------|----------|
 | write() 返回值 | 必须接收 `driverCustomService.write(...)` 的 `boolean` 返回值 | [DONE] |
 | 真实读值进 result | `read()` 的真实值放入 result，不单靠 PointValue 流 | `responseValue` 始终为 null（read 是异步的） |
-| 设备级串行锁 | `deviceLockManager.runExclusive(deviceId, ...)` | 未实现，同设备多线程并发消费 |
+| 设备级串行锁 | `deviceLockManager.runExclusive(deviceId, ...)` | [DONE] `DeviceLockManager` 已集成到 `PointCommandReceiver` 分发链路 |
 | expireAt 预判 | `Instant.now().isAfter(dto.expireAt())` → 直接 EXPIRED | [DONE] |
 | PointCommandValidator | 从 `point_ext` 读取 min/max/enum/step 校验 | 基础非空已实现, 扩展校验待 `point_ext.constraints` 落地 |
 
@@ -307,7 +307,7 @@ CREATE INDEX idx_point_command_pending
 已实现 `CommandDedupCache`（Caffeine, 5min TTL, 50k max, `putIfAbsent`），位置：
 `dc3-common-driver/.../cache/CommandDedupCache.java`。Duplicate 命令发 `DUPLICATE` 回执。
 
-### 4.7 验证规则前置 [PARTIAL]
+### 4.7 验证规则前置 [DONE]
 
 | 校验 | 状态 | 失败处理 |
 |------|------|----------|
