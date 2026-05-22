@@ -26,9 +26,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
-import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +37,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -79,19 +77,54 @@ class DriverWriteServiceImplTest {
     }
 
     @Test
-    void writeSuccessfullyDispatchesToCustomService() {
+    void writeSuccessReturnsTrueAndEchoesPointValue() {
         Map<String, AttributeBO> driverConfig = Map.of("host", AttributeBO.builder().value("h").build());
         Map<String, AttributeBO> pointConfig = Map.of("address", AttributeBO.builder().value("a").build());
         when(deviceMetadata.getCache(10L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
         when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
         when(pointMetadata.getCache(20L)).thenReturn(point);
+        when(driverCustomService.write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
+                any(WritePointValue.class))).thenReturn(true);
 
-        service.write(10L, 20L, "42");
+        boolean result = service.write(10L, 20L, "42");
 
-        verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
-                any(WritePointValue.class));
+        assertThat(result).isTrue();
         verify(driverSenderService).pointValueSender(any(PointValue.class));
+    }
+
+    @Test
+    void writeFailureReturnsFalseAndDoesNotEcho() {
+        Map<String, AttributeBO> driverConfig = Map.of("host", AttributeBO.builder().value("h").build());
+        Map<String, AttributeBO> pointConfig = Map.of("address", AttributeBO.builder().value("a").build());
+        when(deviceMetadata.getCache(10L)).thenReturn(device);
+        when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
+        when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
+        when(pointMetadata.getCache(20L)).thenReturn(point);
+        when(driverCustomService.write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
+                any(WritePointValue.class))).thenReturn(false);
+
+        boolean result = service.write(10L, 20L, "42");
+
+        assertThat(result).isFalse();
+        verify(driverSenderService, never()).pointValueSender(any(PointValue.class));
+    }
+
+    @Test
+    void writeNullReturnFromCustomServiceReturnsFalse() {
+        Map<String, AttributeBO> driverConfig = Map.of("host", AttributeBO.builder().value("h").build());
+        Map<String, AttributeBO> pointConfig = Map.of("address", AttributeBO.builder().value("a").build());
+        when(deviceMetadata.getCache(10L)).thenReturn(device);
+        when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
+        when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
+        when(pointMetadata.getCache(20L)).thenReturn(point);
+        when(driverCustomService.write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
+                any(WritePointValue.class))).thenReturn(null);
+
+        boolean result = service.write(10L, 20L, "42");
+
+        assertThat(result).isFalse();
+        verify(driverSenderService, never()).pointValueSender(any(PointValue.class));
     }
 
     @Test
@@ -117,31 +150,5 @@ class DriverWriteServiceImplTest {
         when(pointMetadata.getCache(20L)).thenReturn(null);
         assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ReadPointException.class);
         verifyNoInteractions(driverSenderService);
-    }
-
-    @Test
-    void commandWriteIgnoresNullPayload() {
-        PointCommandDTO commandDTO = new PointCommandDTO();
-        commandDTO.setContent(null);
-        assertThatNoException().isThrownBy(() -> service.write(commandDTO));
-        verify(driverCustomService, never()).write(any(), any(), any(), any(), any(WritePointValue.class));
-    }
-
-    @Test
-    void commandWriteDispatchesParsedPointWrite() {
-        Map<String, AttributeBO> driverConfig = Map.of("k", AttributeBO.builder().value("v").build());
-        Map<String, AttributeBO> pointConfig = Map.of("k", AttributeBO.builder().value("v").build());
-        when(deviceMetadata.getCache(10L)).thenReturn(device);
-        when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
-        when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(pointConfig);
-        when(pointMetadata.getCache(20L)).thenReturn(point);
-
-        PointCommandDTO commandDTO = new PointCommandDTO();
-        commandDTO.setContent(JsonUtil.toJsonString(new PointCommandDTO.PointWrite(10L, 20L, "99")));
-        service.write(commandDTO);
-
-        verify(driverCustomService).write(eq(driverConfig), eq(pointConfig), eq(device), eq(point),
-                any(WritePointValue.class));
-        verify(driverSenderService).pointValueSender(any(PointValue.class));
     }
 }

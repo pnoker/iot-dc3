@@ -21,11 +21,19 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.dal.PointCommandManager;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.model.PointCommandDO;
+import io.github.pnoker.common.data.entity.vo.PointCommandQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.mapper.EntityStateMapper;
+import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
@@ -39,7 +47,6 @@ import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -52,9 +59,13 @@ import java.util.UUID;
 
 /**
  * Business service implementation for point command operations.
+ * <p>
+ * Validates command scope, checks driver online status, persists the command,
+ * publishes to the driver via RabbitMQ, and returns a {@code commandId} that
+ * callers can use to poll for the terminal result.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
@@ -72,17 +83,28 @@ public class PointCommandServiceImpl implements PointCommandService {
 
     private final PointCommandManager pointCommandManager;
 
+    private final EntityStateMapper entityStateMapper;
+
+    private final PointCommandValidator pointCommandValidator;
+
     @Override
-    public void read(Long tenantId, PointCommandReadVO entityVO) {
+    public String read(Long tenantId, PointCommandReadVO entityVO) {
         validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getPointId());
+
+        // Idempotency: if caller supplied a commandId that already exists, return it
+        String existing = checkExistingCommand(entityVO.getCommandId());
+        if (Objects.nonNull(existing)) {
+            return existing;
+        }
 
         FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
         if (Objects.isNull(driver)) {
-            return;
+            throw new ServiceException("No driver registered for this device");
         }
+        checkDriverOnline(tenantId, driver.getId());
 
-        String commandId = UUID.randomUUID().toString();
-        LocalDateTime now = LocalDateTime.now();
+        String commandId = resolveCommandId(entityVO.getCommandId());
+        LocalDateTime nowLocal = LocalDateTime.now();
 
         PointCommandDO commandDO = new PointCommandDO();
         commandDO.setCommandId(commandId);
@@ -92,38 +114,42 @@ public class PointCommandServiceImpl implements PointCommandService {
         commandDO.setPointId(entityVO.getPointId());
         commandDO.setStatus(PointCommandStatusEnum.PENDING.getCode());
         commandDO.setSource(PointCommandSourceEnum.HTTP.getCode());
-        commandDO.setOccurredAt(now);
-        commandDO.setExpireAt(now.plusSeconds(10));
+        commandDO.setOccurredAt(nowLocal);
+        commandDO.setExpireAt(nowLocal.plusSeconds(10));
         commandDO.setSchemaVersion((short) 1);
         pointCommandManager.save(commandDO);
 
-        PointCommandDTO.PointRead pointRead = new PointCommandDTO.PointRead(entityVO.getDeviceId(),
-                entityVO.getPointId());
-        PointCommandDTO pointCommandDTO = new PointCommandDTO(PointCommandTypeEnum.READ,
-                JsonUtil.toJsonString(pointRead));
-        pointCommandDTO.setCommandId(commandId);
-        pointCommandDTO.setTenantId(tenantId);
-        CorrelationData correlationData = new CorrelationData(commandId);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND,
-                RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + driver.getServiceName(), pointCommandDTO,
-                correlationData);
+        publishCommand(PointCommandDTO.ofRead(commandId, tenantId, entityVO.getDeviceId(),
+                entityVO.getPointId()), driver.getServiceName(), commandId);
 
         commandDO.setStatus(PointCommandStatusEnum.SENT.getCode());
         commandDO.setSentAt(LocalDateTime.now());
         pointCommandManager.updateById(commandDO);
+
+        return commandId;
     }
 
     @Override
-    public void write(Long tenantId, PointCommandWriteVO entityVO) {
+    public String write(Long tenantId, PointCommandWriteVO entityVO) {
         validateWriteScope(tenantId, entityVO.getDeviceId(), entityVO.getPointId());
+
+        // Idempotency: if caller supplied a commandId that already exists, return it
+        String existing = checkExistingCommand(entityVO.getCommandId());
+        if (Objects.nonNull(existing)) {
+            return existing;
+        }
 
         FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
         if (Objects.isNull(driver)) {
-            return;
+            throw new ServiceException("No driver registered for this device");
         }
+        checkDriverOnline(tenantId, driver.getId());
 
-        String commandId = UUID.randomUUID().toString();
-        LocalDateTime now = LocalDateTime.now();
+        FacadePointBO point = pointFacade.getById(tenantId, entityVO.getPointId());
+        pointCommandValidator.validateWriteValue(entityVO.getValue(), Objects.nonNull(point) ? point.getPointExt() : null);
+
+        String commandId = resolveCommandId(entityVO.getCommandId());
+        LocalDateTime nowLocal = LocalDateTime.now();
 
         PointCommandDO commandDO = new PointCommandDO();
         commandDO.setCommandId(commandId);
@@ -134,25 +160,19 @@ public class PointCommandServiceImpl implements PointCommandService {
         commandDO.setRequestValue(entityVO.getValue());
         commandDO.setStatus(PointCommandStatusEnum.PENDING.getCode());
         commandDO.setSource(PointCommandSourceEnum.HTTP.getCode());
-        commandDO.setOccurredAt(now);
-        commandDO.setExpireAt(now.plusSeconds(10));
+        commandDO.setOccurredAt(nowLocal);
+        commandDO.setExpireAt(nowLocal.plusSeconds(10));
         commandDO.setSchemaVersion((short) 1);
         pointCommandManager.save(commandDO);
 
-        PointCommandDTO.PointWrite pointWrite = new PointCommandDTO.PointWrite(entityVO.getDeviceId(),
-                entityVO.getPointId(), entityVO.getValue());
-        PointCommandDTO pointCommandDTO = new PointCommandDTO(PointCommandTypeEnum.WRITE,
-                JsonUtil.toJsonString(pointWrite));
-        pointCommandDTO.setCommandId(commandId);
-        pointCommandDTO.setTenantId(tenantId);
-        CorrelationData correlationData = new CorrelationData(commandId);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND,
-                RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + driver.getServiceName(), pointCommandDTO,
-                correlationData);
+        publishCommand(PointCommandDTO.ofWrite(commandId, tenantId, entityVO.getDeviceId(),
+                entityVO.getPointId(), entityVO.getValue()), driver.getServiceName(), commandId);
 
         commandDO.setStatus(PointCommandStatusEnum.SENT.getCode());
         commandDO.setSentAt(LocalDateTime.now());
         pointCommandManager.updateById(commandDO);
+
+        return commandId;
     }
 
     @Override
@@ -160,6 +180,29 @@ public class PointCommandServiceImpl implements PointCommandService {
         return pointCommandManager.lambdaQuery()
                 .eq(PointCommandDO::getCommandId, commandId)
                 .one();
+    }
+
+    @Override
+    public Page<PointCommandDO> list(Long tenantId, PointCommandQueryVO queryVO) {
+        LambdaQueryWrapper<PointCommandDO> wrapper = new LambdaQueryWrapper<PointCommandDO>()
+                .eq(PointCommandDO::getTenantId, tenantId)
+                .eq(Objects.nonNull(queryVO.getDeviceId()), PointCommandDO::getDeviceId, queryVO.getDeviceId())
+                .eq(Objects.nonNull(queryVO.getPointId()), PointCommandDO::getPointId, queryVO.getPointId())
+                .eq(Objects.nonNull(queryVO.getStatus()), PointCommandDO::getStatus, queryVO.getStatus())
+                .eq(Objects.nonNull(queryVO.getType()), PointCommandDO::getType, queryVO.getType())
+                .orderByDesc(PointCommandDO::getOccurredAt);
+        return pointCommandManager.page(queryVO.toPage(), wrapper);
+    }
+
+    private void checkDriverOnline(Long tenantId, Long driverId) {
+        EntityStateDO driverState = entityStateMapper.selectOne(
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<EntityStateDO>()
+                        .eq(EntityStateDO::getTenantId, tenantId)
+                        .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                        .eq(EntityStateDO::getEntityId, driverId));
+        if (Objects.isNull(driverState) || !EntityStatusEnum.ONLINE.getIndex().equals(driverState.getStateFlag())) {
+            throw new ServiceException("Driver is offline");
+        }
     }
 
     private void validateCommandScope(Long tenantId, Long deviceId, Long pointId) {
@@ -189,6 +232,38 @@ public class PointCommandServiceImpl implements PointCommandService {
         if (!RwFlagEnum.W.equals(point.getRwFlag()) && !RwFlagEnum.RW.equals(point.getRwFlag())) {
             throw new ServiceException("Point is not writable");
         }
+    }
+
+    /**
+     * Check whether a caller-supplied commandId already exists.
+     *
+     * @return the existing commandId, or null if not provided or not found
+     */
+    private String checkExistingCommand(String commandId) {
+        if (Objects.isNull(commandId) || commandId.isBlank()) {
+            return null;
+        }
+        PointCommandDO existing = getByCommandId(commandId);
+        return Objects.nonNull(existing) ? existing.getCommandId() : null;
+    }
+
+    /**
+     * Resolve the commandId to use: caller-supplied, or generate a new UUID.
+     */
+    private String resolveCommandId(String callerCommandId) {
+        if (Objects.nonNull(callerCommandId) && !callerCommandId.isBlank()) {
+            return callerCommandId;
+        }
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Publish a point command DTO to the driver via RabbitMQ.
+     */
+    private void publishCommand(PointCommandDTO dto, String serviceName, String commandId) {
+        CorrelationData correlationData = new CorrelationData(commandId);
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND,
+                RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + serviceName, dto, correlationData);
     }
 
 }

@@ -17,146 +17,65 @@
 
 package io.github.pnoker.common.entity.dto;
 
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
-import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
- * Data transfer object for point command dispatch.
+ * Data transfer object for point command dispatch via RabbitMQ.
+ * <p>
+ * Replaces the old {@code content} JSON-string pattern with a strongly-typed,
+ * polymorphic {@link PointCommandPayload} payload. Time fields use {@link Instant}
+ * (UTC) uniformly.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
-@Getter
-@Setter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class PointCommandDTO implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Unique command identifier set by the data center before publishing.
-     */
-    private String commandId;
+public record PointCommandDTO(
+        String commandId,
+        Long tenantId,
+        PointCommandTypeEnum type,
+        PointCommandPayload payload,
+        PointCommandSourceEnum source,
+        Long sourceUserId,
+        Instant occurredAt,
+        Instant expireAt,
+        int schemaVersion
+) {
 
     /**
-     * Tenant identifier for tenant-scoped result routing.
+     * Create a read command DTO with default source and timing.
      */
-    private Long tenantId;
-
-    /**
-     * Type
-     */
-    private PointCommandTypeEnum type;
-
-    /**
-     *
-     */
-    private String content;
-
-    /**
-     * Create Time
-     */
-    private LocalDateTime createTime;
-
-    public PointCommandDTO(PointCommandTypeEnum type, String content) {
-        this.type = type;
-        this.content = content;
-        this.createTime = LocalDateTimeUtil.now();
+    public static PointCommandDTO ofRead(String commandId, Long tenantId, Long deviceId, Long pointId) {
+        return new PointCommandDTO(
+                commandId,
+                tenantId,
+                PointCommandTypeEnum.READ,
+                new PointCommandPayload.ReadPayload(deviceId, pointId),
+                PointCommandSourceEnum.HTTP,
+                null,
+                Instant.now(),
+                Instant.now().plusSeconds(10),
+                1
+        );
     }
 
     /**
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2016.10.1
+     * Create a write command DTO with default source and timing.
      */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PointRead implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Device ID
-         */
-        private Long deviceId;
-
-        /**
-         * Point ID
-         */
-        private Long pointId;
-
-        /**
-         * Create Time
-         */
-        private LocalDateTime createTime;
-
-        public PointRead(Long deviceId, Long pointId) {
-            this.deviceId = deviceId;
-            this.pointId = pointId;
-            this.createTime = LocalDateTimeUtil.now();
-        }
-
+    public static PointCommandDTO ofWrite(String commandId, Long tenantId, Long deviceId, Long pointId, String value) {
+        return new PointCommandDTO(
+                commandId,
+                tenantId,
+                PointCommandTypeEnum.WRITE,
+                new PointCommandPayload.WritePayload(deviceId, pointId, value),
+                PointCommandSourceEnum.HTTP,
+                null,
+                Instant.now(),
+                Instant.now().plusSeconds(10),
+                1
+        );
     }
-
-    /**
-     * @author pnoker
-     * @version 2025.9.0
-     * @since 2016.10.1
-     */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PointWrite implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Device ID
-         */
-        private Long deviceId;
-
-        /**
-         * Point ID
-         */
-        private Long pointId;
-
-        /**
-         *
-         */
-        private String value;
-
-        /**
-         * Create Time
-         */
-        private LocalDateTime createTime;
-
-        public PointWrite(Long deviceId, Long pointId, String value) {
-            this.deviceId = deviceId;
-            this.pointId = pointId;
-            this.value = value;
-            this.createTime = LocalDateTimeUtil.now();
-        }
-
-    }
-
 }

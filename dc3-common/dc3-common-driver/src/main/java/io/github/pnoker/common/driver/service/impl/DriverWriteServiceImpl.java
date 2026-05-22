@@ -29,9 +29,7 @@ import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
-import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,10 +39,10 @@ import java.util.Objects;
 
 /**
  * Default {@link DriverWriteService} implementation that resolves metadata, delegates the
- * actual write operation to the custom driver, and handles command payload execution.
+ * actual write operation to the custom driver, and echoes the written value only on success.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
@@ -63,60 +61,36 @@ public class DriverWriteServiceImpl implements DriverWriteService {
     private final DriverSenderService driverSenderService;
 
     @Override
-    public void write(Long deviceId, Long pointId, String value) {
-        // Get device from metadata cache
+    public boolean write(Long deviceId, Long pointId, String value) {
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
             throw new ReadPointException("Failed to write point value, device[{}] is null", deviceId);
         }
 
-        // Check if device contains the specified point
         if (!device.getPointIds().contains(pointId)) {
             throw new ReadPointException("Failed to write point value, device[{}] not contained point[{}]",
                     deviceId, pointId);
         }
 
-        // Get driver and point configurations
         Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
         Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
 
-        // Get point from metadata cache
         PointBO point = pointMetadata.getCache(pointId);
         if (Objects.isNull(point)) {
             throw new ReadPointException("Failed to write point value, point is null, deviceId={}, pointId={}",
                     deviceId, pointId);
         }
 
-        // Write value to device through custom driver service. Any exception thrown by
-        // the custom driver implementation propagates to PointCommandReceiver where
-        // ack/nack policy is decided — wrapping it here would erase the cause and make
-        // a transient I/O failure look identical to a programming bug.
-        driverCustomService.write(driverConfig, pointConfig, device, point,
+        Boolean ok = driverCustomService.write(driverConfig, pointConfig, device, point,
                 new WritePointValue(value, point.getPointTypeFlag()));
 
-        // Echo the just-written value back to the platform as a synthetic point sample
-        // so dashboards see the new state without waiting for the next read scan. The
-        // value is the one the device acknowledged (echoed by the SDK from the request),
-        // not a re-read — drivers that need read-after-write semantics should layer that
-        // inside their own DriverProtocol.write implementation.
-        driverSenderService.pointValueSender(new PointValue(new ReadPointValue(device, point, value)));
-    }
-
-    @Override
-    public void write(PointCommandDTO commandDTO) {
-        // Parse device write command from DTO content
-        PointCommandDTO.PointWrite deviceWrite = JsonUtil.parseObject(commandDTO.getContent(),
-                PointCommandDTO.PointWrite.class);
-        if (Objects.isNull(deviceWrite)) {
-            return;
+        // Only echo the value back to the platform when the device acknowledged the write.
+        // Failed writes must not produce fake success signals.
+        if (Boolean.TRUE.equals(ok)) {
+            driverSenderService.pointValueSender(new PointValue(new ReadPointValue(device, point, value)));
         }
 
-        // Log command execution start
-        log.info("Start command of write: {}", JsonUtil.toJsonString(commandDTO));
-        // Execute write operation
-        write(deviceWrite.getDeviceId(), deviceWrite.getPointId(), deviceWrite.getValue());
-        // Log command execution end
-        log.info("End command of write: write");
+        return Boolean.TRUE.equals(ok);
     }
 
 }

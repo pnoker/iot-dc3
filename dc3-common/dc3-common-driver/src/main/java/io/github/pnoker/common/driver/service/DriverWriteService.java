@@ -17,13 +17,11 @@
 
 package io.github.pnoker.common.driver.service;
 
-import io.github.pnoker.common.entity.dto.PointCommandDTO;
-
 /**
  * Service contract for executing point write operations.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 public interface DriverWriteService {
@@ -34,14 +32,8 @@ public interface DriverWriteService {
      * @param deviceId device identifier
      * @param pointId  point identifier
      * @param value    raw value to write
+     * @return true if the device acknowledged the write, false otherwise
      */
-    void write(Long deviceId, Long pointId, String value);
-
-    /**
-     * Executes a write command received from the command queue.
-     *
-     * @param commandDTO point command payload
-     */
-    void write(PointCommandDTO commandDTO);
+    boolean write(Long deviceId, Long pointId, String value);
 
 }
