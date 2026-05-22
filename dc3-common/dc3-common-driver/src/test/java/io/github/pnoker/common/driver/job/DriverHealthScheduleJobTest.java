@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.driver.job;
 
-import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
+import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,8 +83,8 @@ class DriverHealthScheduleJobTest {
         DriverStateDTO sent = captor.getValue();
         assertThat(sent.getDriverId()).isEqualTo(42L);
         assertThat(sent.getTenantId()).isEqualTo(7L);
-        assertThat(sent.getStatus()).isEqualTo(DriverStatusEnum.ONLINE.getCode());
-        assertThat(driverMetadata.getDriverStatus()).isEqualTo(DriverStatusEnum.ONLINE);
+        assertThat(sent.getStatus()).isEqualTo(EntityStatusEnum.ONLINE.getCode());
+        assertThat(driverMetadata.getDriverStatus()).isEqualTo(EntityStatusEnum.ONLINE);
     }
 
     @Test
@@ -102,8 +102,8 @@ class DriverHealthScheduleJobTest {
         DriverStateDTO sent = captor.getValue();
         assertThat(sent.getDriverId()).isEqualTo(43L);
         assertThat(sent.getTenantId()).isEqualTo(8L);
-        assertThat(sent.getStatus()).isEqualTo(DriverStatusEnum.OFFLINE.getCode());
-        assertThat(driverMetadata.getDriverStatus()).isEqualTo(DriverStatusEnum.OFFLINE);
+        assertThat(sent.getStatus()).isEqualTo(EntityStatusEnum.OFFLINE.getCode());
+        assertThat(driverMetadata.getDriverStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
     }
 
     @Test
@@ -121,8 +121,8 @@ class DriverHealthScheduleJobTest {
         DriverStateDTO sent = captor.getValue();
         assertThat(sent.getDriverId()).isEqualTo(44L);
         assertThat(sent.getTenantId()).isEqualTo(9L);
-        assertThat(sent.getStatus()).isEqualTo(DriverStatusEnum.FAULT.getCode());
-        assertThat(driverMetadata.getDriverStatus()).isEqualTo(DriverStatusEnum.FAULT);
+        assertThat(sent.getStatus()).isEqualTo(EntityStatusEnum.FAULT.getCode());
+        assertThat(driverMetadata.getDriverStatus()).isEqualTo(EntityStatusEnum.FAULT);
     }
 
 }

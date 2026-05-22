@@ -25,7 +25,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -75,7 +76,7 @@ class DeviceHealthScheduleJobTest {
     void setUp() {
         driverProperties = new DriverProperties();
         driverProperties.getHealth().getDevice().setTimeout(60);
-        driverProperties.getHealth().getDevice().setTimeoutUnit(TimeUnit.SECONDS);
+        driverProperties.getHealth().getDevice().setTimeoutUnit(TimeUnit.SECONDS, isNull());
         driverMetadata = new DriverMetadata();
         job = new DeviceHealthScheduleJob(driverProperties, driverMetadata, deviceMetadata, driverCustomService,
                 driverSenderService);
@@ -91,7 +92,7 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(10L, DeviceStatusEnum.ONLINE, 60, TimeUnit.SECONDS);
+        verify(driverSenderService).deviceStatusSender(10L, EntityStatusEnum.ONLINE, 60, TimeUnit.SECONDS, isNull());
     }
 
     @Test
@@ -104,7 +105,7 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(11L, DeviceStatusEnum.OFFLINE, 60, TimeUnit.SECONDS);
+        verify(driverSenderService).deviceStatusSender(11L, EntityStatusEnum.OFFLINE, 60, TimeUnit.SECONDS, isNull());
     }
 
     @Test
@@ -117,7 +118,7 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(16L, DeviceStatusEnum.FAULT, 60, TimeUnit.SECONDS);
+        verify(driverSenderService).deviceStatusSender(16L, EntityStatusEnum.FAULT, 60, TimeUnit.SECONDS, isNull());
     }
 
     @Test
@@ -130,7 +131,7 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(12L, DeviceStatusEnum.OFFLINE, 60, TimeUnit.SECONDS);
+        verify(driverSenderService).deviceStatusSender(12L, EntityStatusEnum.OFFLINE, 60, TimeUnit.SECONDS, isNull());
     }
 
     @Test
@@ -144,7 +145,7 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(15L, DeviceStatusEnum.ONLINE, 2, TimeUnit.MINUTES);
+        verify(driverSenderService).deviceStatusSender(15L, EntityStatusEnum.ONLINE, 2, TimeUnit.MINUTES, isNull());
     }
 
     @Test

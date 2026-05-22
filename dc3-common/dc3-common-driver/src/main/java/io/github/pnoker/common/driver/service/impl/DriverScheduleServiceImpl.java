@@ -19,10 +19,10 @@ package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
 import io.github.pnoker.common.driver.job.DriverHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
-import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
 import io.github.pnoker.common.exception.CronException;
 import io.github.pnoker.common.exception.ServiceException;

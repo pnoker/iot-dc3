@@ -31,7 +31,7 @@ import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import jakarta.annotation.PostConstruct;
@@ -116,10 +116,10 @@ public class EntityStateExpiryScanner {
     private void scanExpiredDevices() {
         List<EntityStateDO> expired = entityStateMapper.claimExpiredDevices(
                 EntityTypeFlagEnum.DEVICE.getIndex(),
-                DeviceStatusEnum.ONLINE.getIndex(),
-                DeviceStatusEnum.MAINTAIN.getIndex(),
-                DeviceStatusEnum.FAULT.getIndex(),
-                DeviceStatusEnum.OFFLINE.getIndex(),
+                EntityStatusEnum.ONLINE.getIndex(),
+                EntityStatusEnum.MAINTAIN.getIndex(),
+                EntityStatusEnum.FAULT.getIndex(),
+                EntityStatusEnum.OFFLINE.getIndex(),
                 BATCH_LIMIT,
                 OFFLINE_RENEW_SECONDS);
 
@@ -138,7 +138,7 @@ public class EntityStateExpiryScanner {
 
     private void processExpiredDevice(EntityStateDO scanned) {
         // Write alarm row
-        DeviceStatusEnum prev = DeviceStatusEnum.ofIndex(scanned.getLastStateFlag());
+        EntityStatusEnum prev = EntityStatusEnum.ofIndex(scanned.getLastStateFlag());
         String prevCode = Objects.nonNull(prev) ? prev.getCode() : "unknown";
         String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", prevCode);
 
@@ -174,8 +174,8 @@ public class EntityStateExpiryScanner {
                 .driverId(scanned.getParentEntityId())
                 .tenantId(scanned.getTenantId())
                 .deviceId(scanned.getEntityId())
-                .status(DeviceStatusEnum.OFFLINE.getCode())
-                .statusName(DeviceStatusEnum.OFFLINE.name())
+                .status(EntityStatusEnum.OFFLINE.getCode())
+                .statusName(EntityStatusEnum.OFFLINE.name())
                 .message(message)
                 .alarmId(alarm.getId())
                 .build();

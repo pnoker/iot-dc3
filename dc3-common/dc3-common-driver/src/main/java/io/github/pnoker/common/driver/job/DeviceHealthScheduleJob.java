@@ -17,15 +17,15 @@
 
 package io.github.pnoker.common.driver.job;
 
-import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -102,9 +102,10 @@ public class DeviceHealthScheduleJob extends QuartzJobBean {
     }
 
     private void reportDeviceState(Long deviceId, DeviceHealthState healthState) {
-        DeviceStatusEnum status = DeviceStatusEnum.OFFLINE;
+        EntityStatusEnum status = EntityStatusEnum.OFFLINE;
         int timeout = driverProperties.getHealth().getDevice().getTimeout();
         TimeUnit timeoutUnit = driverProperties.getHealth().getDevice().getTimeoutUnit();
+        String description = null;
         if (Objects.nonNull(healthState)) {
             if (Objects.nonNull(healthState.getStatus())) {
                 status = healthState.getStatus();
@@ -115,8 +116,9 @@ public class DeviceHealthScheduleJob extends QuartzJobBean {
             if (Objects.nonNull(healthState.getTimeoutUnit())) {
                 timeoutUnit = healthState.getTimeoutUnit();
             }
+            description = healthState.getDescription();
         }
-        driverSenderService.deviceStatusSender(deviceId, status, timeout, timeoutUnit);
+        driverSenderService.deviceStatusSender(deviceId, status, timeout, timeoutUnit, description);
     }
 
 }

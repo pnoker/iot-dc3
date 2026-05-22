@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
 import org.junit.jupiter.api.Test;
@@ -88,7 +88,7 @@ class DriverStateServiceImplTest {
 
     private void stubUpsert(EntityStateDO state) {
         when(entityStateMapper.upsertEntityState(anyLong(), anyLong(), anyByte(), anyLong(), anyLong(), anyByte(),
-                anyByte(), any(), anyInt(), anyByte(), anyString())).thenReturn(state);
+                anyByte(), any(), anyInt(), anyByte(), anyString(), any())).thenReturn(state);
     }
 
     @Test
@@ -110,8 +110,8 @@ class DriverStateServiceImplTest {
 
     @Test
     void driverHeartbeatUpsertsDbRowAndPublishesTimeoutCheck() {
-        stubUpsert(persisted((byte) DriverStatusEnum.ONLINE.getIndex(),
-                (byte) DriverStatusEnum.OFFLINE.getIndex(), 6L));
+        stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
+                (byte) EntityStatusEnum.OFFLINE.getIndex(), 6L));
 
         service.heartbeat(heartbeat(1L, "online", 100L));
 
@@ -120,12 +120,13 @@ class DriverStateServiceImplTest {
                 eq((byte) EntityTypeFlagEnum.DRIVER.getIndex()),
                 eq(1L),
                 eq(0L),
-                eq((byte) DriverStatusEnum.ONLINE.getIndex()),
-                eq((byte) DriverStatusEnum.OFFLINE.getIndex()),
+                eq((byte) EntityStatusEnum.ONLINE.getIndex()),
+                eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
                 any(LocalDateTime.class),
                 eq(45),
                 eq((byte) TimeoutSourceFlagEnum.SYSTEM.getIndex()),
-                eq("driver-heartbeat"));
+                eq("driver-heartbeat"),
+                any());
 
         ArgumentCaptor<DriverTimeoutCheckDTO> captor = ArgumentCaptor.forClass(DriverTimeoutCheckDTO.class);
         verify(rabbitTemplate).convertAndSend(anyString(), anyString(), captor.capture());
@@ -136,8 +137,8 @@ class DriverStateServiceImplTest {
 
     @Test
     void statusFlipFromOnlineToOfflineTriggersAlarm() {
-        stubUpsert(persisted((byte) DriverStatusEnum.OFFLINE.getIndex(),
-                (byte) DriverStatusEnum.ONLINE.getIndex(), 4L));
+        stubUpsert(persisted((byte) EntityStatusEnum.OFFLINE.getIndex(),
+                (byte) EntityStatusEnum.ONLINE.getIndex(), 4L));
 
         service.heartbeat(heartbeat(1L, "offline", 100L));
 
@@ -146,8 +147,8 @@ class DriverStateServiceImplTest {
 
     @Test
     void sameStatusNoFlipDoesNotTriggerAlarm() {
-        stubUpsert(persisted((byte) DriverStatusEnum.ONLINE.getIndex(),
-                (byte) DriverStatusEnum.ONLINE.getIndex(), 4L));
+        stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
+                (byte) EntityStatusEnum.ONLINE.getIndex(), 4L));
 
         service.heartbeat(heartbeat(1L, "online", 100L));
 

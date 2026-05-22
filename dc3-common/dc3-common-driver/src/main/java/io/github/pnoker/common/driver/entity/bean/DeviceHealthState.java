@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.driver.entity.bean;
 
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,7 +57,7 @@ public class DeviceHealthState implements Serializable {
      * Device state that should be reported.
      */
     @Builder.Default
-    private DeviceStatusEnum status = DeviceStatusEnum.ONLINE;
+    private EntityStatusEnum status = EntityStatusEnum.ONLINE;
 
     /**
      * Per-device lease timeout value. {@code null} means use SDK fallback config.
@@ -69,39 +69,45 @@ public class DeviceHealthState implements Serializable {
      */
     private TimeUnit timeoutUnit;
 
+    /**
+     * Structured description for diagnostics (e.g. connectivity state, error details).
+     * Stored in {@code dc3_entity_state.entity_state_ext.content}.
+     */
+    private String description;
+
     public static DeviceHealthState online() {
-        return of(DeviceStatusEnum.ONLINE, null, null);
+        return of(EntityStatusEnum.ONLINE, null, null);
     }
 
     public static DeviceHealthState online(int timeout, TimeUnit timeoutUnit) {
-        return of(DeviceStatusEnum.ONLINE, timeout, timeoutUnit);
+        return of(EntityStatusEnum.ONLINE, timeout, timeoutUnit);
     }
 
     public static DeviceHealthState offline() {
-        return of(DeviceStatusEnum.OFFLINE, null, null);
+        return of(EntityStatusEnum.OFFLINE, null, null);
     }
 
     public static DeviceHealthState offline(int timeout, TimeUnit timeoutUnit) {
-        return of(DeviceStatusEnum.OFFLINE, timeout, timeoutUnit);
+        return of(EntityStatusEnum.OFFLINE, timeout, timeoutUnit);
     }
 
     public static DeviceHealthState maintain() {
-        return of(DeviceStatusEnum.MAINTAIN, null, null);
+        return of(EntityStatusEnum.MAINTAIN, null, null);
     }
 
     public static DeviceHealthState maintain(int timeout, TimeUnit timeoutUnit) {
-        return of(DeviceStatusEnum.MAINTAIN, timeout, timeoutUnit);
+        return of(EntityStatusEnum.MAINTAIN, timeout, timeoutUnit);
     }
 
     public static DeviceHealthState fault() {
-        return of(DeviceStatusEnum.FAULT, null, null);
+        return of(EntityStatusEnum.FAULT, null, null);
     }
 
     public static DeviceHealthState fault(int timeout, TimeUnit timeoutUnit) {
-        return of(DeviceStatusEnum.FAULT, timeout, timeoutUnit);
+        return of(EntityStatusEnum.FAULT, timeout, timeoutUnit);
     }
 
-    public static DeviceHealthState of(DeviceStatusEnum status, Integer timeout, TimeUnit timeoutUnit) {
+    public static DeviceHealthState of(EntityStatusEnum status, Integer timeout, TimeUnit timeoutUnit) {
         return DeviceHealthState.builder()
                 .status(status)
                 .timeout(timeout)

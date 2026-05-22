@@ -58,7 +58,7 @@ public class DriverAlarmDTO implements Serializable {
     private Long driverId;
 
     /**
-     * Driver status code (see {@link io.github.pnoker.common.enums.DriverStatusEnum}), may be null.
+     * Driver status code (see {@link io.github.pnoker.common.enums.EntityStatusEnum}), may be null.
      */
     private String status;
 

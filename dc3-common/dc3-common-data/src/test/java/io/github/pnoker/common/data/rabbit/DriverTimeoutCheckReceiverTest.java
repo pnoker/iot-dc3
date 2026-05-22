@@ -26,7 +26,7 @@ import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -129,7 +129,7 @@ class DriverTimeoutCheckReceiverTest {
 
     @Test
     void leaseMismatchMeansNewerHeartbeatArrived() throws Exception {
-        stubQuery(driverState((byte) DriverStatusEnum.ONLINE.getIndex(), 3L,
+        stubQuery(driverState((byte) EntityStatusEnum.ONLINE.getIndex(), 3L,
                 LocalDateTime.now().minusSeconds(1)));
 
         receiver.driverTimeoutCheck(channel, mockMessage(8L), timeoutCheck(7L, 100L, 2L));
@@ -141,14 +141,14 @@ class DriverTimeoutCheckReceiverTest {
 
     @Test
     void expiredFaultDriverIsClaimedOfflineAndTriggersAlarm() throws Exception {
-        stubQuery(driverState((byte) DriverStatusEnum.FAULT.getIndex(), 4L,
+        stubQuery(driverState((byte) EntityStatusEnum.FAULT.getIndex(), 4L,
                 LocalDateTime.now().minusSeconds(1)));
         stubUpdateChain();
         when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenReturn(true);
 
         receiver.driverTimeoutCheck(channel, mockMessage(9L), timeoutCheck(7L, 100L, 4L));
 
-        verify(claimUpdateWrapper).set(any(), eq(DriverStatusEnum.OFFLINE.getIndex()));
+        verify(claimUpdateWrapper).set(any(), eq(EntityStatusEnum.OFFLINE.getIndex()));
         verify(entityAlarmManager).save(any(EntityAlarmDO.class));
         verify(alarmRuleTriggerService).processDriverAlarm(any());
         verify(channel).basicAck(eq(9L), eq(false));

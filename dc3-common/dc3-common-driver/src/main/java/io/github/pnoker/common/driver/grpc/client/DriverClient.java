@@ -32,7 +32,7 @@ import io.github.pnoker.common.driver.entity.builder.GrpcPointAttributeBuilder;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.exception.RegisterException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.optional.CollectionOptional;
@@ -150,7 +150,7 @@ public class DriverClient {
         driverMetadata.setPointAttributeIdMap(pointAttributeIdMap);
         driverMetadata.setPointAttributeNameMap(pointAttributeNameMap);
 
-        driverMetadata.setDriverStatus(DriverStatusEnum.ONLINE);
+        driverMetadata.setDriverStatus(EntityStatusEnum.ONLINE);
     }
 
 }

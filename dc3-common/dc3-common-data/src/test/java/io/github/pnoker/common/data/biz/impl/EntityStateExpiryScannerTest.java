@@ -24,7 +24,7 @@ import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -126,10 +126,10 @@ class EntityStateExpiryScannerTest {
 
         verify(entityStateMapper).claimExpiredDevices(
                 eq((byte) EntityTypeFlagEnum.DEVICE.getIndex()),
-                eq((byte) DeviceStatusEnum.ONLINE.getIndex()),
-                eq((byte) DeviceStatusEnum.MAINTAIN.getIndex()),
-                eq((byte) DeviceStatusEnum.FAULT.getIndex()),
-                eq((byte) DeviceStatusEnum.OFFLINE.getIndex()),
+                eq((byte) EntityStatusEnum.ONLINE.getIndex()),
+                eq((byte) EntityStatusEnum.MAINTAIN.getIndex()),
+                eq((byte) EntityStatusEnum.FAULT.getIndex()),
+                eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
                 anyInt(),
                 anyInt());
         verify(entityAlarmManager, never()).save(any());
@@ -140,7 +140,7 @@ class EntityStateExpiryScannerTest {
     @Test
     void onlineDeviceExpiredWritesAlarmAndUpdatesState() throws Exception {
         EntityStateDO expired = deviceState(10L, 7L,
-                (byte) DeviceStatusEnum.ONLINE.getIndex(),
+                (byte) EntityStatusEnum.ONLINE.getIndex(),
                 2L, LocalDateTime.now().minusSeconds(10));
 
         stubClaimedDevices(List.of(expired));

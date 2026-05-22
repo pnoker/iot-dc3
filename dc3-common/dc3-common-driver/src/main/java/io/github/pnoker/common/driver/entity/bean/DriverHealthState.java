@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.driver.entity.bean;
 
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,25 +51,31 @@ public class DriverHealthState implements Serializable {
      * Driver state that should be reported.
      */
     @Builder.Default
-    private DriverStatusEnum status = DriverStatusEnum.ONLINE;
+    private EntityStatusEnum status = EntityStatusEnum.ONLINE;
+
+    /**
+     * Structured description for diagnostics (e.g. error details, dependency status).
+     * Stored in {@code dc3_entity_state.entity_state_ext.content}.
+     */
+    private String description;
 
     public static DriverHealthState online() {
-        return of(DriverStatusEnum.ONLINE);
+        return of(EntityStatusEnum.ONLINE);
     }
 
     public static DriverHealthState offline() {
-        return of(DriverStatusEnum.OFFLINE);
+        return of(EntityStatusEnum.OFFLINE);
     }
 
     public static DriverHealthState maintain() {
-        return of(DriverStatusEnum.MAINTAIN);
+        return of(EntityStatusEnum.MAINTAIN);
     }
 
     public static DriverHealthState fault() {
-        return of(DriverStatusEnum.FAULT);
+        return of(EntityStatusEnum.FAULT);
     }
 
-    public static DriverHealthState of(DriverStatusEnum status) {
+    public static DriverHealthState of(EntityStatusEnum status) {
         return DriverHealthState.builder()
                 .status(status)
                 .build();

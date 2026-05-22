@@ -21,8 +21,7 @@ import io.github.pnoker.common.data.biz.DriverStatusService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
@@ -86,7 +85,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         if (Objects.isNull(list)) {
             return String.valueOf(0L);
         }
-        long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
+        long count = list.stream().filter(e -> e.equals(EntityStatusEnum.ONLINE.getCode())).count();
         return String.valueOf(count);
     }
 
@@ -96,7 +95,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         if (Objects.isNull(list)) {
             return String.valueOf(0L);
         }
-        long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.OFFLINE.getCode())).count();
+        long count = list.stream().filter(e -> e.equals(EntityStatusEnum.OFFLINE.getCode())).count();
         return String.valueOf(count);
     }
 
@@ -125,10 +124,10 @@ public class DriverStatusServiceImpl implements DriverStatusService {
                     .one();
             String status;
             if (Objects.isNull(state) || state.getExpireTime().isBefore(now)) {
-                status = DeviceStatusEnum.OFFLINE.getCode();
+                status = EntityStatusEnum.OFFLINE.getCode();
             } else {
-                DeviceStatusEnum e = DeviceStatusEnum.ofIndex(state.getStateFlag());
-                status = Objects.nonNull(e) ? e.getCode() : DeviceStatusEnum.OFFLINE.getCode();
+                EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
+                status = Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
             }
             list.add(status);
         });
@@ -146,10 +145,10 @@ public class DriverStatusServiceImpl implements DriverStatusService {
                     .one();
             String status;
             if (Objects.isNull(state) || state.getExpireTime().isBefore(now)) {
-                status = DriverStatusEnum.OFFLINE.getCode();
+                status = EntityStatusEnum.OFFLINE.getCode();
             } else {
-                DriverStatusEnum e = DriverStatusEnum.ofIndex(state.getStateFlag());
-                status = Objects.nonNull(e) ? e.getCode() : DriverStatusEnum.OFFLINE.getCode();
+                EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
+                status = Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
             }
             statusMap.put(driver.getId(), status);
         });

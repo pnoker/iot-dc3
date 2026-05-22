@@ -21,7 +21,7 @@ import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -55,17 +55,29 @@ public interface DriverSenderService {
      * @param deviceId device identifier
      * @param status   device status
      */
-    void deviceStatusSender(Long deviceId, DeviceStatusEnum status);
+    void deviceStatusSender(Long deviceId, EntityStatusEnum status);
 
     /**
      * Publishes a device status event using the supplied timeout.
      *
-     * @param deviceId device identifier
-     * @param status   device status
-     * @param timeout  timeout value
-     * @param timeoutUnit timeout unit
+     * @param deviceId         device identifier
+     * @param status           device status
+     * @param timeout          timeout value
+     * @param timeoutUnit      timeout unit
      */
-    void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeout, TimeUnit timeoutUnit);
+    void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit);
+
+    /**
+     * Publishes a device status event using the supplied timeout and description.
+     *
+     * @param deviceId         device identifier
+     * @param status           device status
+     * @param timeout          timeout value
+     * @param timeoutUnit      timeout unit
+     * @param stateDescription structured diagnostics description
+     */
+    void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
+                            String stateDescription);
 
     /**
      * Publishes a driver-level ALARM event. Used by protocol drivers when a connection /

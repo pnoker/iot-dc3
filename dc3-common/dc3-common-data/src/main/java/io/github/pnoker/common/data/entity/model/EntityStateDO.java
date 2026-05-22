@@ -74,9 +74,9 @@ public class EntityStateDO implements Serializable {
     private Long parentEntityId;
 
     /**
-     * Current status index (EntityStateStatus index)
+     * Current status index ({@link io.github.pnoker.common.enums.EntityStatusEnum} index)
      */
-    @TableField("state_flag")
+    @TableField("entity_state_flag")
     private Byte stateFlag;
 
     /**
@@ -124,7 +124,7 @@ public class EntityStateDO implements Serializable {
     /**
      * JSON extension payload
      */
-    @TableField(value = "state_ext", typeHandler = JacksonTypeHandler.class)
+    @TableField(value = "entity_state_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt stateExt;
 
     @TableField("tenant_id")

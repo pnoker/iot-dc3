@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
 import org.junit.jupiter.api.Test;
@@ -84,7 +84,7 @@ class DeviceStateServiceImplTest {
 
     private void stubUpsert(EntityStateDO state) {
         when(entityStateMapper.upsertEntityState(anyLong(), anyLong(), anyByte(), anyLong(), anyLong(), anyByte(),
-                anyByte(), any(), anyInt(), anyByte(), anyString())).thenReturn(state);
+                anyByte(), any(), anyInt(), anyByte(), anyString(), any())).thenReturn(state);
     }
 
     @Test
@@ -96,8 +96,8 @@ class DeviceStateServiceImplTest {
 
     @Test
     void newDeviceUpsertsDbRowWithCustomTimeout() {
-        stubUpsert(persisted((byte) DeviceStatusEnum.ONLINE.getIndex(),
-                (byte) DeviceStatusEnum.OFFLINE.getIndex(), 1L));
+        stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
+                (byte) EntityStatusEnum.OFFLINE.getIndex(), 1L));
 
         service.heartbeat(heartbeat(10L, "online", 7L, 100L, 25, TimeUnit.SECONDS));
 
@@ -106,12 +106,13 @@ class DeviceStateServiceImplTest {
                 eq((byte) EntityTypeFlagEnum.DEVICE.getIndex()),
                 eq(10L),
                 eq(7L),
-                eq((byte) DeviceStatusEnum.ONLINE.getIndex()),
-                eq((byte) DeviceStatusEnum.OFFLINE.getIndex()),
+                eq((byte) EntityStatusEnum.ONLINE.getIndex()),
+                eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
                 any(LocalDateTime.class),
                 eq(25),
                 eq((byte) TimeoutSourceFlagEnum.DRIVER.getIndex()),
-                eq("device-heartbeat"));
+                eq("device-heartbeat"),
+                any());
     }
 
     @Test
@@ -130,8 +131,8 @@ class DeviceStateServiceImplTest {
 
     @Test
     void statusFlipTriggersAlarm() {
-        stubUpsert(persisted((byte) DeviceStatusEnum.OFFLINE.getIndex(),
-                (byte) DeviceStatusEnum.ONLINE.getIndex(), 3L));
+        stubUpsert(persisted((byte) EntityStatusEnum.OFFLINE.getIndex(),
+                (byte) EntityStatusEnum.ONLINE.getIndex(), 3L));
 
         service.heartbeat(heartbeat(10L, "offline", 7L, 100L, 25, TimeUnit.SECONDS));
 
@@ -140,8 +141,8 @@ class DeviceStateServiceImplTest {
 
     @Test
     void sameStatusNoAlarm() {
-        stubUpsert(persisted((byte) DeviceStatusEnum.ONLINE.getIndex(),
-                (byte) DeviceStatusEnum.ONLINE.getIndex(), 3L));
+        stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
+                (byte) EntityStatusEnum.ONLINE.getIndex(), 3L));
 
         service.heartbeat(heartbeat(10L, "online", 7L, 100L, 25, TimeUnit.SECONDS));
 
