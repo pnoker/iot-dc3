@@ -49,7 +49,7 @@ public class DriverTopicConfig {
 
     private final TopicExchange metadataExchange;
 
-    private final TopicExchange commandExchange;
+    private final TopicExchange pointCommandExchange;
 
     /**
      * Creates the metadata queue used to receive driver metadata synchronization events.
@@ -80,28 +80,30 @@ public class DriverTopicConfig {
     }
 
     /**
-     * Creates the device command queue used to receive device read and write commands.
+     * Creates the point command queue used to receive point read and write commands.
      *
-     * @return device command queue
+     * @return point command queue
      */
     @Bean
-    Queue deviceCommandQueue() {
-        return QueueBuilder.durable(RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX + driverProperties.getService())
+    Queue pointCommandQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_COMMAND_PREFIX + driverProperties.getService())
                 .ttl(30000)
+                .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_DEAD)
+                .deadLetterRoutingKey("#")
                 .build();
     }
 
     /**
-     * Binds the device command queue to the command exchange.
+     * Binds the point command queue to the command exchange.
      *
-     * @param deviceCommandQueue device command queue
+     * @param pointCommandQueue point command queue
      * @return queue binding
      */
     @Bean
-    Binding deviceCommandBinding(Queue deviceCommandQueue) {
-        Binding binding = BindingBuilder.bind(deviceCommandQueue)
-                .to(commandExchange)
-                .with(RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + driverProperties.getService());
+    Binding pointCommandBinding(Queue pointCommandQueue) {
+        Binding binding = BindingBuilder.bind(pointCommandQueue)
+                .to(pointCommandExchange)
+                .with(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + driverProperties.getService());
         binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }

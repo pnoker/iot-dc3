@@ -29,7 +29,7 @@ import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
-import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
+import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +88,7 @@ public class DriverWriteServiceImpl implements DriverWriteService {
         }
 
         // Write value to device through custom driver service. Any exception thrown by
-        // the custom driver implementation propagates to DeviceCommandReceiver where
+        // the custom driver implementation propagates to PointCommandReceiver where
         // ack/nack policy is decided — wrapping it here would erase the cause and make
         // a transient I/O failure look identical to a programming bug.
         driverCustomService.write(driverConfig, pointConfig, device, point,
@@ -103,10 +103,10 @@ public class DriverWriteServiceImpl implements DriverWriteService {
     }
 
     @Override
-    public void write(DeviceCommandDTO commandDTO) {
+    public void write(PointCommandDTO commandDTO) {
         // Parse device write command from DTO content
-        DeviceCommandDTO.DeviceWrite deviceWrite = JsonUtil.parseObject(commandDTO.getContent(),
-                DeviceCommandDTO.DeviceWrite.class);
+        PointCommandDTO.PointWrite deviceWrite = JsonUtil.parseObject(commandDTO.getContent(),
+                PointCommandDTO.PointWrite.class);
         if (Objects.isNull(deviceWrite)) {
             return;
         }

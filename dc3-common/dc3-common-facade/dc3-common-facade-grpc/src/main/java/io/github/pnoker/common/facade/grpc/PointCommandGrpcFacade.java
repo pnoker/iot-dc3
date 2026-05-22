@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.data.GrpcPointValueCommandQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueWriteCommand;
 import io.github.pnoker.api.center.data.GrpcRBoolean;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
-import io.github.pnoker.common.facade.api.PointValueCommandFacade;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -42,33 +42,33 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PointValueCommandGrpcFacade implements PointValueCommandFacade {
+public class PointCommandGrpcFacade implements PointCommandFacade {
 
     private final PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
 
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public boolean dispatchRead(Long tenantId, Long deviceId, Long pointId) {
+    public boolean submitRead(Long tenantId, Long deviceId, Long pointId) {
         GrpcPointValueCommandQuery request = GrpcPointValueCommandQuery.newBuilder()
                 .setTenantId(Objects.requireNonNull(tenantId, "tenantId"))
                 .setDeviceId(deviceId)
                 .setPointId(pointId)
                 .build();
-        GrpcRBoolean response = grpcFacadeSupport.call("PointValueCommandFacade.dispatchRead", pointValueApiBlockingStub,
+        GrpcRBoolean response = grpcFacadeSupport.call("PointCommandFacade.submitRead", pointValueApiBlockingStub,
                 stub -> stub.readCommand(request));
         return response.getResult().getOk() && response.getData();
     }
 
     @Override
-    public boolean dispatchWrite(Long tenantId, Long deviceId, Long pointId, String value) {
+    public boolean submitWrite(Long tenantId, Long deviceId, Long pointId, String value) {
         GrpcPointValueWriteCommand request = GrpcPointValueWriteCommand.newBuilder()
                 .setTenantId(Objects.requireNonNull(tenantId, "tenantId"))
                 .setDeviceId(deviceId)
                 .setPointId(pointId)
                 .setValue(value)
                 .build();
-        GrpcRBoolean response = grpcFacadeSupport.call("PointValueCommandFacade.dispatchWrite", pointValueApiBlockingStub,
+        GrpcRBoolean response = grpcFacadeSupport.call("PointCommandFacade.submitWrite", pointValueApiBlockingStub,
                 stub -> stub.writeCommand(request));
         return response.getResult().getOk() && response.getData();
     }

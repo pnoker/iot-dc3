@@ -23,7 +23,7 @@ import io.github.pnoker.common.agentic.entity.builder.ActionBuilder;
 import io.github.pnoker.common.agentic.entity.model.ActionDO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
-import io.github.pnoker.common.facade.api.PointValueCommandFacade;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,14 +54,14 @@ class ActionServiceImplTest {
     private ActionBuilder actionBuilder;
 
     @Mock
-    private PointValueCommandFacade pointValueCommandFacade;
+    private PointCommandFacade pointCommandFacade;
 
     private ActionServiceImpl service;
     private RequestHeader.UserHeader header;
 
     @BeforeEach
     void setUp() {
-        service = new ActionServiceImpl(actionManager, actionBuilder, pointValueCommandFacade);
+        service = new ActionServiceImpl(actionManager, actionBuilder, pointCommandFacade);
         header = new RequestHeader.UserHeader();
         header.setTenantId(1L);
         header.setUserId(2L);

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of device command types.
+ * Enumeration of point command types.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,7 +33,7 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum DeviceCommandTypeEnum {
+public enum PointCommandTypeEnum {
 
     /**
      * Read point value command
@@ -81,10 +81,10 @@ public enum DeviceCommandTypeEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link DeviceCommandTypeEnum}
+     * @return {@link PointCommandTypeEnum}
      */
-    public static DeviceCommandTypeEnum ofIndex(Byte index) {
-        Optional<DeviceCommandTypeEnum> any = Arrays.stream(DeviceCommandTypeEnum.values())
+    public static PointCommandTypeEnum ofIndex(Byte index) {
+        Optional<PointCommandTypeEnum> any = Arrays.stream(PointCommandTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -94,10 +94,10 @@ public enum DeviceCommandTypeEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link DeviceCommandTypeEnum}
+     * @return {@link PointCommandTypeEnum}
      */
-    public static DeviceCommandTypeEnum ofCode(String code) {
-        Optional<DeviceCommandTypeEnum> any = Arrays.stream(DeviceCommandTypeEnum.values())
+    public static PointCommandTypeEnum ofCode(String code) {
+        Optional<PointCommandTypeEnum> any = Arrays.stream(PointCommandTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -107,9 +107,9 @@ public enum DeviceCommandTypeEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link DeviceCommandTypeEnum}
+     * @return {@link PointCommandTypeEnum}
      */
-    public static DeviceCommandTypeEnum ofName(String name) {
+    public static PointCommandTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

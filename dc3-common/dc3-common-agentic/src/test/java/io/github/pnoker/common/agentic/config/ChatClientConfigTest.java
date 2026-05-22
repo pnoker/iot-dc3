@@ -29,7 +29,7 @@ import io.github.pnoker.common.agentic.tools.UserTool;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
-import io.github.pnoker.common.facade.api.PointValueCommandFacade;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.api.ProfileFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
@@ -71,7 +71,7 @@ class ChatClientConfigTest {
     private PointValueFacade pointValueFacade;
 
     @Mock
-    private PointValueCommandFacade pointValueCommandFacade;
+    private PointCommandFacade pointCommandFacade;
 
     @Mock
     private ActionService actionService;
@@ -94,7 +94,7 @@ class ChatClientConfigTest {
         DriverTool driverTool = new DriverTool(driverFacade, Optional.of(statusHealthFacade));
         ProfileTool profileTool = new ProfileTool(Optional.of(profileFacade));
         PointTool pointTool = new PointTool(pointFacade);
-        PointValueTool pointValueTool = new PointValueTool(pointValueFacade, pointValueCommandFacade, actionService);
+        PointValueTool pointValueTool = new PointValueTool(pointValueFacade, pointCommandFacade, actionService);
         SystemTool systemTool = new SystemTool(Optional.of(statusHealthFacade));
         provider = config.agenticToolCallbackProvider(tenantTool, userTool, deviceTool, driverTool, profileTool,
                 pointTool, pointValueTool, systemTool, new ObjectMapper());

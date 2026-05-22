@@ -15,11 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.entity.dto;
+package io.github.pnoker.common.data.entity.vo;
 
-import io.github.pnoker.common.enums.DriverCommandTypeEnum;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,10 +26,9 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
- * Data transfer object for driver command dispatch.
+ * View object for point command read API responses.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,28 +36,18 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DriverCommandDTO implements Serializable {
+public class PointCommandReadVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Type
-     */
-    private DriverCommandTypeEnum type;
+    @NotNull(message = "Device ID can't be empty")
+    private Long deviceId;
 
-    /**
-     *
-     */
-    private String content;
-
-    /**
-     * Create Time
-     */
-    private LocalDateTime createTime;
+    @NotNull(message = "Point ID can't be empty")
+    private Long pointId;
 
 }

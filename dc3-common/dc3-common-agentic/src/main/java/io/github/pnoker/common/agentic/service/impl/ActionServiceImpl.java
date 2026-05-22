@@ -28,7 +28,7 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
-import io.github.pnoker.common.facade.api.PointValueCommandFacade;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +55,7 @@ public class ActionServiceImpl implements ActionService {
     private final ActionManager actionManager;
     private final ActionBuilder actionBuilder;
 
-    private final PointValueCommandFacade pointValueCommandFacade;
+    private final PointCommandFacade pointCommandFacade;
 
     @Override
     public String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,
@@ -96,7 +96,7 @@ public class ActionServiceImpl implements ActionService {
         try {
             if (ACTION_WRITE_POINT_VALUE.equals(action.getActionType())) {
                 Map<String, Object> payload = action.getPayload();
-                boolean success = pointValueCommandFacade.dispatchWrite(header.getTenantId(),
+                boolean success = pointCommandFacade.submitWrite(header.getTenantId(),
                         longValue(payload.get("deviceId")),
                         longValue(payload.get("pointId")), Objects.toString(payload.get("value"), ""));
                 action.setStatus(success ? AgenticActionStatusEnum.EXECUTED.getIndex()

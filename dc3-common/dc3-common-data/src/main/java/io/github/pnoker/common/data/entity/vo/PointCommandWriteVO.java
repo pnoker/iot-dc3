@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.entity.vo;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * View object for point value read API responses.
+ * View object for point command write API requests.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -39,7 +40,7 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PointValueReadVO implements Serializable {
+public class PointCommandWriteVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -49,5 +50,8 @@ public class PointValueReadVO implements Serializable {
 
     @NotNull(message = "Point ID can't be empty")
     private Long pointId;
+
+    @NotBlank(message = "Value can't be empty")
+    private String value;
 
 }

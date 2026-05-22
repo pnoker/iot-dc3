@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.entity.dto;
 
-import io.github.pnoker.common.enums.DeviceCommandTypeEnum;
+import io.github.pnoker.common.enums.PointCommandTypeEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +31,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Data transfer object for device command dispatch.
+ * Data transfer object for point command dispatch.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -43,15 +43,25 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeviceCommandDTO implements Serializable {
+public class PointCommandDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
+     * Unique command identifier set by the data center before publishing.
+     */
+    private String commandId;
+
+    /**
+     * Tenant identifier for tenant-scoped result routing.
+     */
+    private Long tenantId;
+
+    /**
      * Type
      */
-    private DeviceCommandTypeEnum type;
+    private PointCommandTypeEnum type;
 
     /**
      *
@@ -63,7 +73,7 @@ public class DeviceCommandDTO implements Serializable {
      */
     private LocalDateTime createTime;
 
-    public DeviceCommandDTO(DeviceCommandTypeEnum type, String content) {
+    public PointCommandDTO(PointCommandTypeEnum type, String content) {
         this.type = type;
         this.content = content;
         this.createTime = LocalDateTimeUtil.now();
@@ -78,7 +88,7 @@ public class DeviceCommandDTO implements Serializable {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeviceRead implements Serializable {
+    public static class PointRead implements Serializable {
 
         @Serial
         private static final long serialVersionUID = 1L;
@@ -98,7 +108,7 @@ public class DeviceCommandDTO implements Serializable {
          */
         private LocalDateTime createTime;
 
-        public DeviceRead(Long deviceId, Long pointId) {
+        public PointRead(Long deviceId, Long pointId) {
             this.deviceId = deviceId;
             this.pointId = pointId;
             this.createTime = LocalDateTimeUtil.now();
@@ -115,7 +125,7 @@ public class DeviceCommandDTO implements Serializable {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeviceWrite implements Serializable {
+    public static class PointWrite implements Serializable {
 
         @Serial
         private static final long serialVersionUID = 1L;
@@ -140,7 +150,7 @@ public class DeviceCommandDTO implements Serializable {
          */
         private LocalDateTime createTime;
 
-        public DeviceWrite(Long deviceId, Long pointId, String value) {
+        public PointWrite(Long deviceId, Long pointId, String value) {
             this.deviceId = deviceId;
             this.pointId = pointId;
             this.value = value;
