@@ -13,14 +13,14 @@ title: 物模型设计方案
 
 ## 0. 实施进度总览
 
-| 阶段 | 内容 | 状态 | 说明 |
-|------|------|------|------|
-| Phase 1 | Device 加 `profile_id`，移除 ProfileBind | [DONE] | 28 文件改动，核心重构 |
-| Phase 1 | 数据迁移（多 Profile → 单 Profile） | 不做 | 已决策：新设备走新逻辑，老设备兼容过渡 |
-| Phase 2 | `dc3_command` / `dc3_command_param` 表 | [DONE] | 纯增量，无风险 |
-| Phase 2 | `dc3_event` / `dc3_event_param` 表 | [DONE] | 纯增量，无风险 |
-| Phase 3 | 指令调用链路 + 事件上报链路 | [DONE] | 包含 Driver SDK 扩展 + 告警规则触发 |
-| Phase 4 | Web UI + 导入导出 + 文档 | [TODO] | 产品化收尾 |
+| 阶段      | 内容                                    | 状态     | 说明                        |
+|---------|---------------------------------------|--------|---------------------------|
+| Phase 1 | Device 加 `profile_id`，移除 ProfileBind  | [DONE] | 28 文件改动，核心重构              |
+| Phase 1 | 数据迁移（多 Profile → 单 Profile）           | 不做     | 已决策：新设备走新逻辑，老设备兼容过渡       |
+| Phase 2 | `dc3_command` / `dc3_command_param` 表 | [DONE] | 纯增量，无风险                   |
+| Phase 2 | `dc3_event` / `dc3_event_param` 表     | [DONE] | 纯增量，无风险                   |
+| Phase 3 | 指令调用链路 + 事件上报链路                       | [DONE] | 包含 Driver SDK 扩展 + 告警规则触发 |
+| Phase 4 | Web UI + 导入导出 + 文档                    | [TODO] | 产品化收尾                     |
 
 ---
 
@@ -98,7 +98,8 @@ Runtime
 
 `Profile` 继续作为 DC3 的设备能力模型根对象。业务层、接口和前端仍使用 `Profile` 作为主概念；文档可以说明它覆盖物模型能力，但不把它改名为物模型。
 
-当前字段已具备：`profile_code`、`profile_name`、`profile_type_flag`、`profile_share_flag`、`version`、`profile_ext`、`enable_flag`、`tenant_id`。
+当前字段已具备：`profile_code`、`profile_name`、`profile_type_flag`、`profile_share_flag`、`version`、`profile_ext`、
+`enable_flag`、`tenant_id`。
 
 建议约束：
 
@@ -215,16 +216,18 @@ Point 之外的自定义指令能力，并通过 `profile_id` 归属到 `Profile
 
 ### Event 与现有运行态事件的边界
 
-当前系统已通过 `dc3_entity_alarm` 统一承载设备/驱动的运行态告警记录（`EntityAlarmDO`，含 `alarm_type_flag`、`alarm_source_flag`、`alarm_level_flag`）。
+当前系统已通过 `dc3_entity_alarm` 统一承载设备/驱动的运行态告警记录（`EntityAlarmDO`，含 `alarm_type_flag`、
+`alarm_source_flag`、`alarm_level_flag`）。
 原 `dc3_device_event` / `dc3_driver_event` 已合并到 `dc3_entity_alarm` 中。
 
-| 现有事件                         | 当前定位               | 是否属于 `dc3_event` 定义范围                                        |
-|------------------------------|--------------------|--------------------------------------------------------------|
-| `dc3_entity_alarm` 状态超时告警    | 驱动/设备在线、离线、故障等平台运行态记录 | 否，属于平台状态链路，不归属 `Profile`                                    |
-| `dc3_entity_alarm` 规则告警       | 规则引擎触发的告警记录         | 否，属于规则引擎链路                                                  |
-| `dc3_entity_alarm` 设备上报告警     | 设备侧业务告警运行记录         | 可作为模型事件实例基础，但需要补充 `event_id` 或 `event_code` 与 `dc3_event` 关联 |
+| 现有事件                      | 当前定位                  | 是否属于 `dc3_event` 定义范围                                        |
+|---------------------------|-----------------------|--------------------------------------------------------------|
+| `dc3_entity_alarm` 状态超时告警 | 驱动/设备在线、离线、故障等平台运行态记录 | 否，属于平台状态链路，不归属 `Profile`                                     |
+| `dc3_entity_alarm` 规则告警   | 规则引擎触发的告警记录           | 否，属于规则引擎链路                                                   |
+| `dc3_entity_alarm` 设备上报告警 | 设备侧业务告警运行记录           | 可作为模型事件实例基础，但需要补充 `event_id` 或 `event_code` 与 `dc3_event` 关联 |
 
-设备状态和驱动状态由 `dc3_entity_state` 维护持久化状态租约；心跳续租，状态翻转或租约过期时再派生告警事件记录到 `dc3_entity_alarm`。
+设备状态和驱动状态由 `dc3_entity_state` 维护持久化状态租约；心跳续租，状态翻转或租约过期时再派生告警事件记录到
+`dc3_entity_alarm`。
 因此，在线/离线状态不建议建成 `Profile` 下的通用 `dc3_event` 定义，避免把平台生命周期和设备业务能力混在一起。
 
 ## API 与模块落点
@@ -260,46 +263,49 @@ Point 之外的自定义指令能力，并通过 `profile_id` 归属到 `Profile
 **范围**：28 个文件，12 个类删除，16 个类修改。
 
 **DDL**：
+
 ```sql
-ALTER TABLE dc3_device ADD COLUMN profile_id BIGINT;
+ALTER TABLE dc3_device
+    ADD COLUMN profile_id BIGINT;
 CREATE INDEX idx_device_profile ON dc3_device (tenant_id, profile_id) WHERE deleted = 0;
 ```
 
 **代码改动清单**：
 
-| 操作 | 文件 | 说明 |
-|------|------|------|
-| DELETE | `ProfileBindDO.java` | 模型类 |
-| DELETE | `ProfileBindBO.java` | 业务对象 |
-| DELETE | `ProfileBindVO.java` | 视图对象 |
-| DELETE | `ProfileBindQuery.java` | 查询对象 |
-| DELETE | `ProfileBindBuilder.java` | 构建器 |
-| DELETE | `ProfileBindMapper.java` | Mapper 接口 |
-| DELETE | `ProfileBindMapper.xml` | Mapper XML |
-| DELETE | `ProfileBindManager.java` | Manager 接口 |
-| DELETE | `ProfileBindManagerImpl.java` | Manager 实现 |
-| DELETE | `ProfileBindService.java` | Service 接口 |
-| DELETE | `ProfileBindServiceImpl.java` | Service 实现 |
-| MODIFY | `ProfileBindingRow.java` | Dashboard DTO，精简为只有 profileId + deviceId |
-| MODIFY | `DeviceDO.java` | 加 `profile_id` 字段 |
-| MODIFY | `DeviceBO.java` | `Set<Long> profileIds` → `Long profileId` |
-| MODIFY | `DeviceVO.java` | 同上 |
-| MODIFY | `DeviceBuilder.java` | 适配新字段 |
-| MODIFY | `DeviceServiceImpl.java` | 移除所有 bind 调用，直接读写 `profile_id` |
-| MODIFY | `DeviceMapper.xml` | `selectPageWithProfile` 去掉 INNER JOIN |
-| MODIFY | `ProfileServiceImpl.java` | `listByDeviceId()` 改用 `device.profile_id` |
-| MODIFY | `PointServiceImpl.java` | device↔profile 解析改用 `device.profile_id` |
-| MODIFY | `DriverServiceImpl.java` | `listDeviceIdsByProfileId` 查 `dc3_device.profile_id` |
-| MODIFY | `TopicServiceImpl.java` | 点位解析链路 |
-| MODIFY | `PointAttributeConfigServiceImpl.java` | bind 校验 → profile_id 校验 |
-| MODIFY | `DashboardServiceImpl.java` | 拓扑图数据源 |
-| MODIFY | `DashboardMapper.xml` | 拓扑 SQL |
-| MODIFY | `ImportDeviceServiceImpl.java` | `importProfileBind` → 设 `profile_id` |
-| MODIFY | `driver/entity/bo/DeviceBO.java` | `profileIds` → `profileId` |
-| MODIFY | `driver/entity/builder/DeviceBuilder.java` | 适配 |
-| MODIFY | `driver/job/DriverReadScheduleJob.java` | `getProfileIds()` → `getProfileId()` |
+| 操作     | 文件                                         | 说明                                                   |
+|--------|--------------------------------------------|------------------------------------------------------|
+| DELETE | `ProfileBindDO.java`                       | 模型类                                                  |
+| DELETE | `ProfileBindBO.java`                       | 业务对象                                                 |
+| DELETE | `ProfileBindVO.java`                       | 视图对象                                                 |
+| DELETE | `ProfileBindQuery.java`                    | 查询对象                                                 |
+| DELETE | `ProfileBindBuilder.java`                  | 构建器                                                  |
+| DELETE | `ProfileBindMapper.java`                   | Mapper 接口                                            |
+| DELETE | `ProfileBindMapper.xml`                    | Mapper XML                                           |
+| DELETE | `ProfileBindManager.java`                  | Manager 接口                                           |
+| DELETE | `ProfileBindManagerImpl.java`              | Manager 实现                                           |
+| DELETE | `ProfileBindService.java`                  | Service 接口                                           |
+| DELETE | `ProfileBindServiceImpl.java`              | Service 实现                                           |
+| MODIFY | `ProfileBindingRow.java`                   | Dashboard DTO，精简为只有 profileId + deviceId             |
+| MODIFY | `DeviceDO.java`                            | 加 `profile_id` 字段                                    |
+| MODIFY | `DeviceBO.java`                            | `Set<Long> profileIds` → `Long profileId`            |
+| MODIFY | `DeviceVO.java`                            | 同上                                                   |
+| MODIFY | `DeviceBuilder.java`                       | 适配新字段                                                |
+| MODIFY | `DeviceServiceImpl.java`                   | 移除所有 bind 调用，直接读写 `profile_id`                       |
+| MODIFY | `DeviceMapper.xml`                         | `selectPageWithProfile` 去掉 INNER JOIN                |
+| MODIFY | `ProfileServiceImpl.java`                  | `listByDeviceId()` 改用 `device.profile_id`            |
+| MODIFY | `PointServiceImpl.java`                    | device↔profile 解析改用 `device.profile_id`              |
+| MODIFY | `DriverServiceImpl.java`                   | `listDeviceIdsByProfileId` 查 `dc3_device.profile_id` |
+| MODIFY | `TopicServiceImpl.java`                    | 点位解析链路                                               |
+| MODIFY | `PointAttributeConfigServiceImpl.java`     | bind 校验 → profile_id 校验                              |
+| MODIFY | `DashboardServiceImpl.java`                | 拓扑图数据源                                               |
+| MODIFY | `DashboardMapper.xml`                      | 拓扑 SQL                                               |
+| MODIFY | `ImportDeviceServiceImpl.java`             | `importProfileBind` → 设 `profile_id`                 |
+| MODIFY | `driver/entity/bo/DeviceBO.java`           | `profileIds` → `profileId`                           |
+| MODIFY | `driver/entity/builder/DeviceBuilder.java` | 适配                                                   |
+| MODIFY | `driver/job/DriverReadScheduleJob.java`    | `getProfileIds()` → `getProfileId()`                 |
 
 **出口标准**：
+
 - `dc3_device` 有 `profile_id` 列
 - `DeviceDO` / `DeviceBO` / `DeviceVO` 使用 `profileId` 单值
 - ProfileBind 全链路物理删除

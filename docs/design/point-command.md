@@ -6,30 +6,31 @@ title: 位号命令链路重构方案
 
 本文是 DC3 位号读写下行链路（HTTP/gRPC → 数据中心 → RabbitMQ → 驱动 → 设备）的重构与优化设计。
 
-> **实施状态**：方案已分阶段落地中。命名收敛 (Phase 1) 已全部完成；链路质量改造 (Phase 2-4) 部分完成，剩余项见各章节 `[DONE]` / `[PARTIAL]` / `[TODO]` 标记。
+> **实施状态**：方案已分阶段落地中。命名收敛 (Phase 1) 已全部完成；链路质量改造 (Phase 2-4) 部分完成，剩余项见各章节
+`[DONE]` / `[PARTIAL]` / `[TODO]` 标记。
 
 ---
 
 ## 0. 实施进度总览
 
-| 章节 | 模块 | 状态 | 关键缺失 |
-|------|------|------|----------|
-| §2 | 命名收敛 | [DONE] | — |
-| §2.3 | 死代码清理 | [DONE] | — |
-| §4.1 | DTO 序列化改造 | [DONE] | sealed interface + polymorphic payload + `Instant` 时间字段 + record DTO |
-| §4.2 | 路由拓扑 (DLX + result) | [DONE] | — |
-| §4.3 | `dc3_point_command` 持久化 | [DONE] | — |
-| §4.4 | 同步等待 API | [PARTIAL] | POST 返回 `commandId`, GET `/{commandId}` 可轮询; CompletableFuture 同步等待未实现 |
-| §4.5 | Driver: write() 返回值 | [DONE] | `Boolean` 返回值被正确接收, 失败不 echo 假值 |
-| §4.5 | Driver: 设备级串行锁 | [DONE] | `DeviceLockManager.runExclusive(deviceId)` 串行化同设备命令 |
-| §4.6 | 幂等去重 | [DONE] | — |
-| §4.7 | 中心侧 enableFlag / rwFlag 校验 | [DONE] | — |
-| §4.7 | Driver 在线检查 | [DONE] | `EntityStateMapper` 查询 DRIVER 状态, 离线抛 `ServiceException` |
-| §4.7 | 值范围校验 (PointCommandValidator) | [PARTIAL] | 基础非空校验已实现; min/max/enum/step 校验待 `point_ext.constraints` 落地 |
-| §4.8 | publisher confirm → SENT | [DONE] | — |
-| §4.5 | Driver: expireAt 预判 | [DONE] | `PointCommandReceiver` 入口处检查, 过期直接 EXPIRED |
-| §4.4 | 查询/列表 API | [DONE] | `GET /{commandId}` + `POST /list` 分页过滤已实现 |
-| §4.7 | commandId 幂等 | [DONE] | 调用方可选传 commandId, 重复提交返回已有状态 |
+| 章节   | 模块                            | 状态        | 关键缺失                                                                   |
+|------|-------------------------------|-----------|------------------------------------------------------------------------|
+| §2   | 命名收敛                          | [DONE]    | —                                                                      |
+| §2.3 | 死代码清理                         | [DONE]    | —                                                                      |
+| §4.1 | DTO 序列化改造                     | [DONE]    | sealed interface + polymorphic payload + `Instant` 时间字段 + record DTO   |
+| §4.2 | 路由拓扑 (DLX + result)           | [DONE]    | —                                                                      |
+| §4.3 | `dc3_point_command` 持久化       | [DONE]    | —                                                                      |
+| §4.4 | 同步等待 API                      | [PARTIAL] | POST 返回 `commandId`, GET `/{commandId}` 可轮询; CompletableFuture 同步等待未实现 |
+| §4.5 | Driver: write() 返回值           | [DONE]    | `Boolean` 返回值被正确接收, 失败不 echo 假值                                        |
+| §4.5 | Driver: 设备级串行锁                | [DONE]    | `DeviceLockManager.runExclusive(deviceId)` 串行化同设备命令                    |
+| §4.6 | 幂等去重                          | [DONE]    | —                                                                      |
+| §4.7 | 中心侧 enableFlag / rwFlag 校验    | [DONE]    | —                                                                      |
+| §4.7 | Driver 在线检查                   | [DONE]    | `EntityStateMapper` 查询 DRIVER 状态, 离线抛 `ServiceException`               |
+| §4.7 | 值范围校验 (PointCommandValidator) | [PARTIAL] | 基础非空校验已实现; min/max/enum/step 校验待 `point_ext.constraints` 落地            |
+| §4.8 | publisher confirm → SENT      | [DONE]    | —                                                                      |
+| §4.5 | Driver: expireAt 预判           | [DONE]    | `PointCommandReceiver` 入口处检查, 过期直接 EXPIRED                             |
+| §4.4 | 查询/列表 API                     | [DONE]    | `GET /{commandId}` + `POST /list` 分页过滤已实现                              |
+| §4.7 | commandId 幂等                  | [DONE]    | 调用方可选传 commandId, 重复提交返回已有状态                                           |
 
 ---
 
@@ -39,11 +40,11 @@ title: 位号命令链路重构方案
 
 原代码中同时存在三组类，经 Phase 1 已统一为 `PointCommand*`：
 
-| 组别 | 模块 | 处置 |
-|------|------|------|
-| `PointValueCommand*` | dc3-common-data / dc3-common-facade | 已重命名为 `PointCommand*` |
-| `DeviceCommand*` | dc3-common-model / dc3-common-driver | 已合并到 `PointCommand*` |
-| `DriverCommand*` (`DriverCommandDTO` / `DriverCommandTypeEnum`) | dc3-common-model / dc3-common-constant | 已删除（死代码） |
+| 组别                                                              | 模块                                     | 处置                    |
+|-----------------------------------------------------------------|----------------------------------------|-----------------------|
+| `PointValueCommand*`                                            | dc3-common-data / dc3-common-facade    | 已重命名为 `PointCommand*` |
+| `DeviceCommand*`                                                | dc3-common-model / dc3-common-driver   | 已合并到 `PointCommand*`  |
+| `DriverCommand*` (`DriverCommandDTO` / `DriverCommandTypeEnum`) | dc3-common-model / dc3-common-constant | 已删除（死代码）              |
 
 RabbitMQ 资源已统一为 `dc3.e.point_command` / `dc3.q.point_command.<svc>` / `dc3.r.point_command.<svc>`。
 
@@ -54,19 +55,19 @@ RabbitMQ 资源已统一为 `dc3.e.point_command` / `dc3.q.point_command.<svc>` 
 
 本方案的位号读写不是物模型层概念，而是属性维度的运行态访问能力。两者通过命名前缀分层：
 
-| 概念 | 命名前缀 | 队列 / 表前缀 |
-|------|----------|---------------|
+| 概念          | 命名前缀           | 队列 / 表前缀                                    |
+|-------------|----------------|---------------------------------------------|
 | 位号读写命令（本方案） | `PointCommand` | `dc3.e.point_command` / `dc3_point_command` |
-| 物模型设备服务（未来） | `Command` | `dc3.e.command` / `dc3_command` |
+| 物模型设备服务（未来） | `Command`      | `dc3.e.command` / `dc3_command`             |
 
 ### 1.3 当前下行链路问题（及已解决项）
 
-| 维度 | 问题 | 状态 |
-|------|------|------|
-| 唯一性 | 报文无 ID；同 device 多线程消费 | [DONE] — `commandId` + 幂等去重 + `DeviceLockManager` 设备级串行锁 |
-| 准确性 | 不校验 enableFlag / rwFlag / driver 在线 / 值范围; 离线 driver 命令 30s 后静默丢弃 | [PARTIAL] — enableFlag / rwFlag / driver 在线校验已实现; 值范围仅基础非空 |
-| 结果反馈 | HTTP 立即 `R.ok()`; driver SDK 忽略 `write()` 返回值并 echo 假位号值 | [DONE] — `write()` 返回值被正确接收, POST 返回 commandId 可轮询 |
-| 序列化 | DTO 字段 `content` 是二次 JSON 序列化的 `String`; 缺 tenantId / commandId / source / expireAt | [DONE] — sealed interface + polymorphic payload + record DTO |
+| 维度   | 问题                                                                                  | 状态                                                           |
+|------|-------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| 唯一性  | 报文无 ID；同 device 多线程消费                                                               | [DONE] — `commandId` + 幂等去重 + `DeviceLockManager` 设备级串行锁     |
+| 准确性  | 不校验 enableFlag / rwFlag / driver 在线 / 值范围; 离线 driver 命令 30s 后静默丢弃                   | [PARTIAL] — enableFlag / rwFlag / driver 在线校验已实现; 值范围仅基础非空   |
+| 结果反馈 | HTTP 立即 `R.ok()`; driver SDK 忽略 `write()` 返回值并 echo 假位号值                            | [DONE] — `write()` 返回值被正确接收, POST 返回 commandId 可轮询           |
+| 序列化  | DTO 字段 `content` 是二次 JSON 序列化的 `String`; 缺 tenantId / commandId / source / expireAt | [DONE] — sealed interface + polymorphic payload + record DTO |
 
 ---
 
@@ -76,28 +77,28 @@ Phase 1 已全部完成。以下映射表保留作为历史参照。
 
 ### 2.1 重命名映射表
 
-| 类别 | 旧名 | 新名 |
-|------|------|------|
-| HTTP 路径前缀 | `/point_value_command` | `/point_command` |
-| HTTP Controller | `PointValueCommandController` | `PointCommandController` |
-| Service 接口 | `PointValueCommandService` | `PointCommandService` |
-| Service 实现 | `PointValueCommandServiceImpl` | `PointCommandServiceImpl` |
-| 顶层 DTO | `DeviceCommandDTO` | `PointCommandDTO` |
-| 子结构（读） | `DeviceCommandDTO.DeviceRead` | `PointCommandDTO.PointRead` |
-| 子结构（写） | `DeviceCommandDTO.DeviceWrite` | `PointCommandDTO.PointWrite` |
-| 类型枚举 | `DeviceCommandTypeEnum` | `PointCommandTypeEnum` |
-| Exchange | `dc3.e.command` | `dc3.e.point_command` |
-| 命令 routing | `dc3.r.command.device.<svc>` | `dc3.r.point_command.<svc>` |
-| 命令队列 | `dc3.q.command.device.<svc>` | `dc3.q.point_command.<svc>` |
-| 死信 Exchange | — | `dc3.e.point_command_dead` |
-| 死信队列 | — | `dc3.q.point_command_dead` |
-| 结果 Exchange | — | `dc3.e.point_command_result` |
-| 结果队列 | — | `dc3.q.point_command_result` |
-| 常量类 | `RabbitConstant.*COMMAND*` | `RabbitConstant.*POINT_COMMAND*` |
-| Driver 监听器 | `DeviceCommandReceiver` | `PointCommandReceiver` |
-| Facade 接口 | `PointValueCommandFacade` | `PointCommandFacade` |
-| Facade 实现 | `PointValueCommandGrpcFacade` / `PointValueCommandLocalFacade` | `PointCommandGrpcFacade` / `PointCommandLocalFacade` |
-| 数据库表 | — | `dc3_point_command` |
+| 类别              | 旧名                                                             | 新名                                                   |
+|-----------------|----------------------------------------------------------------|------------------------------------------------------|
+| HTTP 路径前缀       | `/point_value_command`                                         | `/point_command`                                     |
+| HTTP Controller | `PointValueCommandController`                                  | `PointCommandController`                             |
+| Service 接口      | `PointValueCommandService`                                     | `PointCommandService`                                |
+| Service 实现      | `PointValueCommandServiceImpl`                                 | `PointCommandServiceImpl`                            |
+| 顶层 DTO          | `DeviceCommandDTO`                                             | `PointCommandDTO`                                    |
+| 子结构（读）          | `DeviceCommandDTO.DeviceRead`                                  | `PointCommandDTO.PointRead`                          |
+| 子结构（写）          | `DeviceCommandDTO.DeviceWrite`                                 | `PointCommandDTO.PointWrite`                         |
+| 类型枚举            | `DeviceCommandTypeEnum`                                        | `PointCommandTypeEnum`                               |
+| Exchange        | `dc3.e.command`                                                | `dc3.e.point_command`                                |
+| 命令 routing      | `dc3.r.command.device.<svc>`                                   | `dc3.r.point_command.<svc>`                          |
+| 命令队列            | `dc3.q.command.device.<svc>`                                   | `dc3.q.point_command.<svc>`                          |
+| 死信 Exchange     | —                                                              | `dc3.e.point_command_dead`                           |
+| 死信队列            | —                                                              | `dc3.q.point_command_dead`                           |
+| 结果 Exchange     | —                                                              | `dc3.e.point_command_result`                         |
+| 结果队列            | —                                                              | `dc3.q.point_command_result`                         |
+| 常量类             | `RabbitConstant.*COMMAND*`                                     | `RabbitConstant.*POINT_COMMAND*`                     |
+| Driver 监听器      | `DeviceCommandReceiver`                                        | `PointCommandReceiver`                               |
+| Facade 接口       | `PointValueCommandFacade`                                      | `PointCommandFacade`                                 |
+| Facade 实现       | `PointValueCommandGrpcFacade` / `PointValueCommandLocalFacade` | `PointCommandGrpcFacade` / `PointCommandLocalFacade` |
+| 数据库表            | —                                                              | `dc3_point_command`                                  |
 
 ### 2.2 死代码清理 [DONE]
 
@@ -156,7 +157,8 @@ Phase 1 已全部完成。以下映射表保留作为历史参照。
 
 ### 4.1 命令报文（DTO）[DONE]
 
-> 当前实现仍使用旧模型：`PointCommandDTO` 为 `@Builder` 类，`content` 字段存放二次 JSON 序列化的 `PointRead`/`PointWrite` 字符串，时间字段为 `LocalDateTime`，且 `implements Serializable`。以下为设计目标。
+> 当前实现仍使用旧模型：`PointCommandDTO` 为 `@Builder` 类，`content` 字段存放二次 JSON 序列化的 `PointRead`/`PointWrite`
+> 字符串，时间字段为 `LocalDateTime`，且 `implements Serializable`。以下为设计目标。
 
 完整 IDL 在落地 PR 中给出。
 
@@ -228,7 +230,8 @@ public record PointCommandResultDTO(
 
 ### 4.3 持久化：`dc3_point_command` [DONE]
 
-表已通过 MyBatis Plus 落地（`PointCommandDO`，`PointCommandManager`）。中心侧写入 PENDING → SENT，`PointCommandResultReceiver` 推进到终态，`PointCommandDeadReceiver` 处理死信。
+表已通过 MyBatis Plus 落地（`PointCommandDO`，`PointCommandManager`）。中心侧写入 PENDING → SENT，
+`PointCommandResultReceiver` 推进到终态，`PointCommandDeadReceiver` 处理死信。
 
 ```sql
 CREATE TABLE dc3_point_command
@@ -267,13 +270,13 @@ CREATE INDEX idx_point_command_pending
 
 ### 4.4 中心侧 API [DONE]
 
-| 方法 | 状态 | 说明 |
-|------|------|------|
-| `POST /point_command/read` | [DONE] | 返回 `R<String>` (commandId), 调用方可轮询结果 |
-| `POST /point_command/write` | [DONE] | 同上 |
+| 方法                                 | 状态     | 说明                                        |
+|------------------------------------|--------|-------------------------------------------|
+| `POST /point_command/read`         | [DONE] | 返回 `R<String>` (commandId), 调用方可轮询结果      |
+| `POST /point_command/write`        | [DONE] | 同上                                        |
 | `POST /point_command/submit-async` | [TODO] | 未实现（低优先级，当前 fire-and-forget 可通过 list 查状态） |
-| `GET /point_command/{commandId}` | [DONE] | RESTful 路径, 返回 `PointCommandDO` 含当前状态 |
-| `POST /point_command/list` | [DONE] | 分页查询，支持 deviceId/pointId/status/type 过滤 |
+| `GET /point_command/{commandId}`   | [DONE] | RESTful 路径, 返回 `PointCommandDO` 含当前状态     |
+| `POST /point_command/list`         | [DONE] | 分页查询，支持 deviceId/pointId/status/type 过滤   |
 
 同步等待策略（待实现）：
 
@@ -290,17 +293,18 @@ CREATE INDEX idx_point_command_pending
 
 ### 4.5 Driver SDK 改动 [DONE]
 
-已实现项：`PointCommandReceiver` 替代了 `DeviceCommandReceiver`；幂等去重 + 结果回执通道可用；`write()` 返回值被正确接收；`expireAt` 预判已实现。
+已实现项：`PointCommandReceiver` 替代了 `DeviceCommandReceiver`；幂等去重 + 结果回执通道可用；`write()` 返回值被正确接收；
+`expireAt` 预判已实现。
 
 待实现项（按优先级）：
 
-| 项 | 设计 | 当前缺陷 |
-|------|------|----------|
-| write() 返回值 | 必须接收 `driverCustomService.write(...)` 的 `boolean` 返回值 | [DONE] |
-| 真实读值进 result | `read()` 的真实值放入 result，不单靠 PointValue 流 | `responseValue` 始终为 null（read 是异步的） |
-| 设备级串行锁 | `deviceLockManager.runExclusive(deviceId, ...)` | [DONE] `DeviceLockManager` 已集成到 `PointCommandReceiver` 分发链路 |
-| expireAt 预判 | `Instant.now().isAfter(dto.expireAt())` → 直接 EXPIRED | [DONE] |
-| PointCommandValidator | 从 `point_ext` 读取 min/max/enum/step 校验 | 基础非空已实现, 扩展校验待 `point_ext.constraints` 落地 |
+| 项                     | 设计                                                    | 当前缺陷                                                        |
+|-----------------------|-------------------------------------------------------|-------------------------------------------------------------|
+| write() 返回值           | 必须接收 `driverCustomService.write(...)` 的 `boolean` 返回值 | [DONE]                                                      |
+| 真实读值进 result          | `read()` 的真实值放入 result，不单靠 PointValue 流               | `responseValue` 始终为 null（read 是异步的）                         |
+| 设备级串行锁                | `deviceLockManager.runExclusive(deviceId, ...)`       | [DONE] `DeviceLockManager` 已集成到 `PointCommandReceiver` 分发链路 |
+| expireAt 预判           | `Instant.now().isAfter(dto.expireAt())` → 直接 EXPIRED  | [DONE]                                                      |
+| PointCommandValidator | 从 `point_ext` 读取 min/max/enum/step 校验                 | 基础非空已实现, 扩展校验待 `point_ext.constraints` 落地                   |
 
 ### 4.6 幂等去重缓存 [DONE]
 
@@ -309,15 +313,15 @@ CREATE INDEX idx_point_command_pending
 
 ### 4.7 验证规则前置 [DONE]
 
-| 校验 | 状态 | 失败处理 |
-|------|------|----------|
-| `device.enableFlag = ENABLE` | [DONE] | 已在 `PointCommandServiceImpl.validateScope()` |
-| `point.enableFlag = ENABLE` | [DONE] | 同上 |
-| WRITE 时 `point.rwFlag` 包含 WRITE | [DONE] | 已在 `validateWriteScope()` |
-| `driver` 已注册且在线 | [DONE] | `EntityStateMapper` 查 DRIVER 状态, 离线抛 `ServiceException` |
-| WRITE 值基础非空 | [DONE] | `PointCommandValidator.validateWriteValue()` |
-| WRITE 值落入 `point_ext` 的 min/max/enum/step | [TODO] | 待 `point_ext.constraints` 字段落地 |
-| `commandId` 在表中已存在 | [DONE] | 调用方可选传 commandId, 重复提交返回已有 commandId |
+| 校验                                        | 状态     | 失败处理                                                    |
+|-------------------------------------------|--------|---------------------------------------------------------|
+| `device.enableFlag = ENABLE`              | [DONE] | 已在 `PointCommandServiceImpl.validateScope()`            |
+| `point.enableFlag = ENABLE`               | [DONE] | 同上                                                      |
+| WRITE 时 `point.rwFlag` 包含 WRITE           | [DONE] | 已在 `validateWriteScope()`                               |
+| `driver` 已注册且在线                           | [DONE] | `EntityStateMapper` 查 DRIVER 状态, 离线抛 `ServiceException` |
+| WRITE 值基础非空                               | [DONE] | `PointCommandValidator.validateWriteValue()`            |
+| WRITE 值落入 `point_ext` 的 min/max/enum/step | [TODO] | 待 `point_ext.constraints` 字段落地                          |
+| `commandId` 在表中已存在                        | [DONE] | 调用方可选传 commandId, 重复提交返回已有 commandId                    |
 
 ### 4.8 publisher 侧确认 [DONE]
 
@@ -366,11 +370,11 @@ Phase 1（命名一刀切）已完成并发布。旧 HTTP 路径、旧 exchange/
 
 剩余 Phase 2-4 改造对以下模块的要求：
 
-| 模块 | 影响 | 升级动作 |
-|------|------|----------|
-| iot-dc3-web | HTTP API 语义变化（同步返回真实结果） | 切换到新 API 语义；新增"命令历史"页面 |
-| dc3-center-agentic | gRPC stub 命名变化 | 重新生成 stub |
-| dc3-driver-* | SDK 行为变化（write 返回值、设备锁、值校验） | 升级 SDK 依赖 |
+| 模块                 | 影响                          | 升级动作                   |
+|--------------------|-----------------------------|------------------------|
+| iot-dc3-web        | HTTP API 语义变化（同步返回真实结果）     | 切换到新 API 语义；新增"命令历史"页面 |
+| dc3-center-agentic | gRPC stub 命名变化              | 重新生成 stub              |
+| dc3-driver-*       | SDK 行为变化（write 返回值、设备锁、值校验） | 升级 SDK 依赖              |
 
 ### 6.2 数据库变更
 
@@ -384,16 +388,16 @@ Phase 1（命名一刀切）已完成并发布。旧 HTTP 路径、旧 exchange/
 
 原 Phase 1 已全部完成。Phase 2-4 按实际进度重新划分优先级：
 
-| 优先级 | 步骤 | 范围 | 出口标准 |
-|--------|------|------|----------|
-| P0 | DTO 序列化改造 | sealed interface + polymorphic payload；`Instant` 时间字段；`commandId` / `expireAt` / `source` / `schemaVersion` | [DONE] `content` JSON 字符串字段删除；DTO 为 record 类型 |
-| P0 | write() 返回值 | `DriverWriteServiceImpl` 接收 `Boolean` 返回值；失败不 echo 假值 | [DONE] 写失败时 result.status = FAILED, responseValue 为空 |
-| P1 | 同步等待 / 轮询 API | `POST /point_command/*` 返回 commandId；`GET /point_command/{id}` 轮询 | [PARTIAL] 轮询已可用; CompletableFuture 同步等待未实现 |
-| P1 | Driver 在线 + 值范围校验 | 中心侧在线检查；`PointCommandValidator` | [PARTIAL] 在线检查已实现; 值范围仅基础非空 |
-| P2 | 设备级串行锁 | `deviceLockManager.runExclusive(deviceId)` | [DONE] 同 device 并发写无协议交错 |
-| P2 | expireAt 预判 | `PointCommandReceiver` 入口处检查 `expireAt` | [DONE] 过期命令直接 EXPIRED，不进业务逻辑 |
-| P3 | 查询/列表 API 完善 | `GET /point_command/{commandId}` 规范 URL；`GET /point_command/list` 检索 | [DONE] RESTful 查询 + 分页列表已实现 |
-| P3 | DLX 重放工具 | CLI 或后台页面消费 `dc3.q.point_command_dead` | [TODO] 运维可从死信队列恢复命令 |
+| 优先级 | 步骤                | 范围                                                                                                          | 出口标准                                                 |
+|-----|-------------------|-------------------------------------------------------------------------------------------------------------|------------------------------------------------------|
+| P0  | DTO 序列化改造         | sealed interface + polymorphic payload；`Instant` 时间字段；`commandId` / `expireAt` / `source` / `schemaVersion` | [DONE] `content` JSON 字符串字段删除；DTO 为 record 类型        |
+| P0  | write() 返回值       | `DriverWriteServiceImpl` 接收 `Boolean` 返回值；失败不 echo 假值                                                       | [DONE] 写失败时 result.status = FAILED, responseValue 为空 |
+| P1  | 同步等待 / 轮询 API     | `POST /point_command/*` 返回 commandId；`GET /point_command/{id}` 轮询                                           | [PARTIAL] 轮询已可用; CompletableFuture 同步等待未实现           |
+| P1  | Driver 在线 + 值范围校验 | 中心侧在线检查；`PointCommandValidator`                                                                             | [PARTIAL] 在线检查已实现; 值范围仅基础非空                          |
+| P2  | 设备级串行锁            | `deviceLockManager.runExclusive(deviceId)`                                                                  | [DONE] 同 device 并发写无协议交错                             |
+| P2  | expireAt 预判       | `PointCommandReceiver` 入口处检查 `expireAt`                                                                     | [DONE] 过期命令直接 EXPIRED，不进业务逻辑                         |
+| P3  | 查询/列表 API 完善      | `GET /point_command/{commandId}` 规范 URL；`GET /point_command/list` 检索                                        | [DONE] RESTful 查询 + 分页列表已实现                          |
+| P3  | DLX 重放工具          | CLI 或后台页面消费 `dc3.q.point_command_dead`                                                                      | [TODO] 运维可从死信队列恢复命令                                  |
 
 每个步骤可独立 PR，不要求同一 release。
 
@@ -411,15 +415,15 @@ Phase 1（命名一刀切）已完成并发布。旧 HTTP 路径、旧 exchange/
 
 ## 9. 风险与未决项
 
-| 项 | 状态 | 风险 | 应对 |
-|------|------|------|------|
-| 同步等待 vs 异步轮询 | 未决 | 多实例部署时同步等待需要广播 result | 简易方案：202 + 轮询；进阶方案：Redis pub/sub |
-| `commandId` 是否对前端必填 | 已决 | 前端忘填会丢失天然幂等 | 中心侧补 UUID，同时推荐前端预生成 |
-| 物模型 `Command` 何时落地 | 未决 | 需要 `dc3.e.command` / `dc3_command` 命名空间 | 物模型方案 PR 中显式约束命名前缀 |
-| DLX 重放工具 | 未决 | 无运维工具消费死信队列 | P3 单独立项 |
-| Driver 进程级 dedup | 已知约束 | driver 重启丢去重窗口 | 属于设计取舍，生产可接受 |
-| 命名切换对生产环境的冲击 | 已解决 | Phase 1 已发布，旧资源已删除 | — |
-| sealed interface + record 兼容性 | 新风险 | Jackson 2.x 对 Java record 的 parameter name 支持 | 落地前验证 `ParameterNamesModule`；不通过则降级为普通类 + `@JsonTypeInfo` |
+| 项                             | 状态   | 风险                                            | 应对                                                        |
+|-------------------------------|------|-----------------------------------------------|-----------------------------------------------------------|
+| 同步等待 vs 异步轮询                  | 未决   | 多实例部署时同步等待需要广播 result                         | 简易方案：202 + 轮询；进阶方案：Redis pub/sub                          |
+| `commandId` 是否对前端必填           | 已决   | 前端忘填会丢失天然幂等                                   | 中心侧补 UUID，同时推荐前端预生成                                       |
+| 物模型 `Command` 何时落地            | 未决   | 需要 `dc3.e.command` / `dc3_command` 命名空间       | 物模型方案 PR 中显式约束命名前缀                                        |
+| DLX 重放工具                      | 未决   | 无运维工具消费死信队列                                   | P3 单独立项                                                   |
+| Driver 进程级 dedup              | 已知约束 | driver 重启丢去重窗口                                | 属于设计取舍，生产可接受                                              |
+| 命名切换对生产环境的冲击                  | 已解决  | Phase 1 已发布，旧资源已删除                            | —                                                         |
+| sealed interface + record 兼容性 | 新风险  | Jackson 2.x 对 Java record 的 parameter name 支持 | 落地前验证 `ParameterNamesModule`；不通过则降级为普通类 + `@JsonTypeInfo` |
 
 ---
 
@@ -437,19 +441,19 @@ Phase 1（命名一刀切）已完成并发布。旧 HTTP 路径、旧 exchange/
 
 - 物模型设计：[docs/design/thing-model.md](thing-model.md)
 - 当前代码定位（Phase 1 后的命名）：
-  - `dc3-common-data/.../controller/PointCommandController.java`
-  - `dc3-common-data/.../biz/impl/PointCommandServiceImpl.java`
-  - `dc3-common-data/.../receiver/rabbit/PointCommandResultReceiver.java`
-  - `dc3-common-data/.../receiver/rabbit/PointCommandDeadReceiver.java`
-  - `dc3-common-model/.../dto/PointCommandDTO.java`
-  - `dc3-common-model/.../dto/PointCommandResultDTO.java`
-  - `dc3-common-driver/.../receiver/rabbit/PointCommandReceiver.java`
-  - `dc3-common-driver/.../service/impl/DriverWriteServiceImpl.java`
-  - `dc3-common-driver/.../service/impl/DriverReadServiceImpl.java`
-  - `dc3-common-driver/.../cache/CommandDedupCache.java`
-  - `dc3-common-driver/.../config/DriverTopicConfig.java`
-  - `dc3-common-rabbitmq/.../config/RabbitConfig.java`
-  - `dc3-common-constant/.../enums/PointCommandTypeEnum.java`
-  - `dc3-common-constant/.../enums/PointCommandStatusEnum.java`
-  - `dc3-common-constant/.../enums/PointCommandSourceEnum.java`
-  - `dc3-common-data/.../entity/model/PointCommandDO.java`
+    - `dc3-common-data/.../controller/PointCommandController.java`
+    - `dc3-common-data/.../biz/impl/PointCommandServiceImpl.java`
+    - `dc3-common-data/.../receiver/rabbit/PointCommandResultReceiver.java`
+    - `dc3-common-data/.../receiver/rabbit/PointCommandDeadReceiver.java`
+    - `dc3-common-model/.../dto/PointCommandDTO.java`
+    - `dc3-common-model/.../dto/PointCommandResultDTO.java`
+    - `dc3-common-driver/.../receiver/rabbit/PointCommandReceiver.java`
+    - `dc3-common-driver/.../service/impl/DriverWriteServiceImpl.java`
+    - `dc3-common-driver/.../service/impl/DriverReadServiceImpl.java`
+    - `dc3-common-driver/.../cache/CommandDedupCache.java`
+    - `dc3-common-driver/.../config/DriverTopicConfig.java`
+    - `dc3-common-rabbitmq/.../config/RabbitConfig.java`
+    - `dc3-common-constant/.../enums/PointCommandTypeEnum.java`
+    - `dc3-common-constant/.../enums/PointCommandStatusEnum.java`
+    - `dc3-common-constant/.../enums/PointCommandSourceEnum.java`
+    - `dc3-common-data/.../entity/model/PointCommandDO.java`

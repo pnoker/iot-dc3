@@ -154,12 +154,12 @@
     <select id="topologyProfileBindings"
             resultType="io.github.pnoker.common.manager.entity.bo.dashboard.ProfileBindingRow">
         SELECT d.profile_id AS profile_id,
-               d.id         AS device_id
+        d.id AS device_id
         FROM dc3_device d
         WHERE d.deleted = 0
-          AND d.tenant_id = #{tenantId}
-          AND d.profile_id IS NOT NULL
-          AND d.id IN
+        AND d.tenant_id = #{tenantId}
+        AND d.profile_id IS NOT NULL
+        AND d.id IN
         <foreach collection="deviceIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>

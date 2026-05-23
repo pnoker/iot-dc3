@@ -81,14 +81,14 @@
             last_heartbeat_time = CURRENT_TIMESTAMP,
             timeout_source_flag = EXCLUDED.timeout_source_flag,
             entity_state_ext = CASE
-                WHEN COALESCE(#{stateDescription}, '') != ''
-                THEN json_build_object(
-                    'type', dc3_entity_state.entity_state_ext->>'type',
-                    'content', #{stateDescription},
-                    'version', COALESCE((dc3_entity_state.entity_state_ext->>'version')::int, 0) + 1
-                )
-                ELSE dc3_entity_state.entity_state_ext
-                END,
+            WHEN COALESCE (#{stateDescription}, '') != ''
+            THEN json_build_object(
+            'type', dc3_entity_state.entity_state_ext->>'type',
+            'content', #{stateDescription},
+            'version', COALESCE ((dc3_entity_state.entity_state_ext->>'version'):: int, 0) + 1
+            )
+            ELSE dc3_entity_state.entity_state_ext
+            END,
             operate_time = CURRENT_TIMESTAMP
             RETURNING
             id,
@@ -111,8 +111,8 @@
 
     <select id="claimExpiredDevices" resultMap="EntityStateResultMap" flushCache="true" useCache="false">
         WITH picked AS (SELECT id,
-                               entity_state_flag    AS previous_state_flag,
-                               lease_version AS previous_lease_version
+                               entity_state_flag AS previous_state_flag,
+                               lease_version     AS previous_lease_version
                         FROM dc3_entity_state
                         WHERE entity_type_flag = #{entityTypeFlag}
                           AND entity_state_flag IN (#{onlineFlag}, #{maintainFlag}, #{faultFlag})
@@ -122,11 +122,11 @@
                         FOR
                         UPDATE SKIP LOCKED)
         UPDATE dc3_entity_state s
-        SET lease_version   = picked.previous_lease_version + 1,
-            entity_state_flag      = #{offlineFlag},
-            last_state_flag = picked.previous_state_flag,
-            expire_time     = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
-            operate_time    = CURRENT_TIMESTAMP
+        SET lease_version     = picked.previous_lease_version + 1,
+            entity_state_flag = #{offlineFlag},
+            last_state_flag   = picked.previous_state_flag,
+            expire_time       = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
+            operate_time      = CURRENT_TIMESTAMP
         FROM picked
         WHERE s.id = picked.id
             RETURNING

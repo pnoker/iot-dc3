@@ -12,13 +12,13 @@ title: 自定义指令调用方案
 
 ## 与 PointCommand 的区别
 
-| 概念 | PointCommand | Command (自定义指令) |
-|------|-------------|-------------------|
-| 触发方式 | 点位读写 (READ/WRITE) | 自定义服务调用 (RESTART, CALIBRATE 等) |
-| 定义归属 | `dc3_point` 的 `rw_flag` | `dc3_command` 独立表 |
-| 驱动接口 | `DriverProtocol.read()` / `write()` | `DriverCommand.execute()` |
-| 参数模型 | 单值读写 | 结构化输入/输出参数 Map |
-| DTO | `PointCommandDTO` | `CommandCallDTO` / `CommandCallResultDTO` |
+| 概念   | PointCommand                        | Command (自定义指令)                           |
+|------|-------------------------------------|-------------------------------------------|
+| 触发方式 | 点位读写 (READ/WRITE)                   | 自定义服务调用 (RESTART, CALIBRATE 等)            |
+| 定义归属 | `dc3_point` 的 `rw_flag`             | `dc3_command` 独立表                         |
+| 驱动接口 | `DriverProtocol.read()` / `write()` | `DriverCommand.execute()`                 |
+| 参数模型 | 单值读写                                | 结构化输入/输出参数 Map                            |
+| DTO  | `PointCommandDTO`                   | `CommandCallDTO` / `CommandCallResultDTO` |
 
 ---
 
@@ -28,15 +28,15 @@ title: 自定义指令调用方案
 PENDING → SENT → SUCCESS / FAILED / TIMEOUT / EXPIRED / DUPLICATE
 ```
 
-| 状态 | 说明 |
-|------|------|
-| `PENDING` | 已创建调用记录，等待投递 |
-| `SENT` | 已投递到 RabbitMQ，等待 Driver 执行 |
-| `SUCCESS` | Driver 执行成功，结果已回写 |
-| `FAILED` | Driver 执行失败，错误信息已回写 |
-| `TIMEOUT` | 超时未收到回执 |
-| `EXPIRED` | 消息 TTL 过期，经由 DLX 回收 |
-| `DUPLICATE` | 重复的消息被去重拦截 |
+| 状态          | 说明                         |
+|-------------|----------------------------|
+| `PENDING`   | 已创建调用记录，等待投递               |
+| `SENT`      | 已投递到 RabbitMQ，等待 Driver 执行 |
+| `SUCCESS`   | Driver 执行成功，结果已回写          |
+| `FAILED`    | Driver 执行失败，错误信息已回写        |
+| `TIMEOUT`   | 超时未收到回执                    |
+| `EXPIRED`   | 消息 TTL 过期，经由 DLX 回收        |
+| `DUPLICATE` | 重复的消息被去重拦截                 |
 
 ---
 
@@ -53,11 +53,13 @@ dc3.e.command_result (topic exchange)
 ```
 
 **路由键**：
+
 - 指令下发：`dc3.r.command.{service}` (service = driver service name)
 - 死信路由：`#` (所有死信消息)
 - 结果回执：`dc3.r.command_result.{service}`
 
 **消息流**：
+
 1. Data Center 通过 `CommandRecordService.call()` 持久化 `CommandRecordDO` (PENDING)
 2. 投递 `CommandCallDTO` 到 `dc3.e.command`，routing key = `dc3.r.command.{driverService}`
 3. 更新状态为 SENT
@@ -70,13 +72,14 @@ dc3.e.command_result (topic exchange)
 
 ## API 路径
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | `/data/command_record/call` | 下发自定义指令 |
-| GET | `/data/command_record/{recordId}` | 查询调用记录详情 |
-| POST | `/data/command_record/list` | 分页查询调用记录列表 |
+| 方法   | 路径                                | 说明         |
+|------|-----------------------------------|------------|
+| POST | `/data/command_record/call`       | 下发自定义指令    |
+| GET  | `/data/command_record/{recordId}` | 查询调用记录详情   |
+| POST | `/data/command_record/list`       | 分页查询调用记录列表 |
 
 gRPC API 路径（Data Center）：
+
 - `DataService.CommandCall` — 下发自定义指令
 - `DataService.CommandRecord` — 查询调用记录
 - `DataService.CommandRecordList` — 分页查询
