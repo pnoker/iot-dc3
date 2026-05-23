@@ -52,6 +52,7 @@ public interface ModelProviderBuilder {
     List<ModelProviderBO> buildBOListByVOList(List<ModelProviderVO> entityVOList);
 
     @Mapping(target = "providerType", ignore = true)
+    @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
     @Mapping(target = "creatorName", ignore = true)
     @Mapping(target = "createTime", ignore = true)

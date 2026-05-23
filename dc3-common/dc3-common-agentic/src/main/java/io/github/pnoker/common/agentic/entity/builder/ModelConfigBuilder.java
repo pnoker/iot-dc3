@@ -48,6 +48,7 @@ public interface ModelConfigBuilder {
     List<ModelConfigBO> buildBOListByVOList(List<ModelConfigVO> entityVOList);
 
     @Mapping(target = "providerName", ignore = true)
+    @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
     @Mapping(target = "creatorName", ignore = true)
     @Mapping(target = "createTime", ignore = true)
