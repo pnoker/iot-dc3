@@ -34,13 +34,14 @@ import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -67,6 +68,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class EntityStateExpiryScanner {
 
+    private static final String TICK_BODY = "tick";
     private static final int OFFLINE_RENEW_SECONDS = 300;
     private static final int BATCH_LIMIT = 500;
 
@@ -77,15 +79,17 @@ public class EntityStateExpiryScanner {
     private final RabbitTemplate rabbitTemplate;
 
     /**
-     * Bootstrap the first tick on startup. Subsequent ticks are self-sustaining:
-     * each scan cycle publishes the next tick.
+     * Bootstrap the first tick after the context is fully started.
+     * Uses {@code ApplicationReadyEvent} rather than {@code @PostConstruct}
+     * to guarantee {@code RabbitAdmin} has declared all queues and bindings
+     * before the first publish, avoiding an inevitable NO_ROUTE on startup.
      */
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     void publishInitialTick() {
         rabbitTemplate.convertAndSend(
                 RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY,
                 RabbitConstant.ROUTING_DEVICE_SCAN_TICK,
-                "tick");
+                TICK_BODY);
         log.info("Published initial device scan tick");
     }
 
@@ -104,7 +108,7 @@ public class EntityStateExpiryScanner {
             rabbitTemplate.convertAndSend(
                     RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY,
                     RabbitConstant.ROUTING_DEVICE_SCAN_TICK,
-                    "tick");
+                    TICK_BODY);
 
             RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {

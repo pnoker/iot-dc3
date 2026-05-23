@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -39,7 +40,7 @@ public class ActiveGatewayProfileConfig implements EnvironmentPostProcessor {
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         // Add gateway profile to active profiles
         // This will enable gateway-specific configurations when the application starts
-        environment.addActiveProfile("gateway");
+        environment.addActiveProfile(EnvironmentConstant.GATEWAY_PROFILE);
     }
 
 }

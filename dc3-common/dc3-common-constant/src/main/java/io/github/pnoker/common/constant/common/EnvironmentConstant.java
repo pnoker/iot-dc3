@@ -192,6 +192,46 @@ public class EnvironmentConstant {
     public static final String QUARTZ_PROFILE = "quartz";
 
     /**
+     * Spring profile name for Data center applications: "data"
+     */
+    public static final String DATA_PROFILE = "data";
+
+    /**
+     * Spring profile name for Auth center applications: "auth"
+     */
+    public static final String AUTH_PROFILE = "auth";
+
+    /**
+     * Spring profile name for Manager center applications: "manager"
+     */
+    public static final String MANAGER_PROFILE = "manager";
+
+    /**
+     * Spring profile name for Gateway applications: "gateway"
+     */
+    public static final String GATEWAY_PROFILE = "gateway";
+
+    /**
+     * Spring profile name for Agentic applications: "agentic"
+     */
+    public static final String AGENTIC_PROFILE = "agentic";
+
+    /**
+     * Spring profile name for Web (MVC) applications: "web"
+     */
+    public static final String WEB_PROFILE = "web";
+
+    /**
+     * Spring profile name for Thread pool applications: "thread"
+     */
+    public static final String THREAD_PROFILE = "thread";
+
+    /**
+     * Spring profile name for MQTT applications: "mqtt"
+     */
+    public static final String MQTT_PROFILE = "mqtt";
+
+    /**
      * Driver host configuration key: "dc3.driver.host"
      */
     public static final String DRIVER_HOST = "dc3.driver.host";

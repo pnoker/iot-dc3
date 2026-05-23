@@ -24,6 +24,7 @@ import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -77,17 +78,17 @@ public class SystemHealthServiceImpl implements SystemHealthService {
      * so a dead sibling would otherwise stall the whole banner.
      */
     private static final long PROBE_TIMEOUT_MS = 2000L;
-
+    private static final String CENTER_AUTH = "auth";
+    private static final String CENTER_DATA = "data";
+    private static final String CENTER_MANAGER = "manager";
+    private static final String INFRA_DATABASE = "database";
+    private static final String INFRA_MQ = "mq";
+    private static final String INFRA_GATEWAY = "gateway";
     private final DataSource dataSource;
-
     private final ConnectionFactory rabbitConnectionFactory;
-
     private final TenantFacade tenantFacade;
-
     private final DriverFacade driverFacade;
-
     private final DeviceFacade deviceFacade;
-
     private final EntityStateManager entityStateManager;
 
     private static Pages firstPage(int size) {
@@ -138,9 +139,9 @@ public class SystemHealthServiceImpl implements SystemHealthService {
 
     private Map<String, String> probeCenter() {
         Map<String, String> out = new LinkedHashMap<>();
-        out.put("auth", probe(() -> Objects.nonNull(tenantFacade.getByCode("default"))));
-        out.put("data", DataConstant.Health.STATUS_UP); // reaching this code == data is up
-        out.put("manager", probe(() -> {
+        out.put(CENTER_AUTH, probe(() -> Objects.nonNull(tenantFacade.getByCode(DefaultFlagEnum.DEFAULT.getCode()))));
+        out.put(CENTER_DATA, DataConstant.Health.STATUS_UP); // reaching this code == data is up
+        out.put(CENTER_MANAGER, probe(() -> {
             FacadeDriverQuery q = FacadeDriverQuery.builder().page(firstPage(1)).build();
             return Objects.nonNull(driverFacade.listByPage(q));
         }));
@@ -149,17 +150,17 @@ public class SystemHealthServiceImpl implements SystemHealthService {
 
     private Map<String, String> probeInfra() {
         Map<String, String> out = new LinkedHashMap<>();
-        out.put("database", probe(() -> {
+        out.put(INFRA_DATABASE, probe(() -> {
             try (Connection conn = dataSource.getConnection()) {
                 return conn.isValid(1);
             }
         }));
-        out.put("mq", probe(() -> {
+        out.put(INFRA_MQ, probe(() -> {
             try (var connection = rabbitConnectionFactory.createConnection()) {
                 return connection.isOpen();
             }
         }));
-        out.put("gateway", DataConstant.Health.STATUS_UP); // the request reached this server via gateway
+        out.put(INFRA_GATEWAY, DataConstant.Health.STATUS_UP); // the request reached this server via gateway
         return out;
     }
 
