@@ -185,6 +185,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         entityBO.setCreatorName(header.getUserName());
         entityBO.setOperatorId(header.getUserId());
         entityBO.setOperatorName(header.getUserName());
+        entityBO.setTenantId(header.getTenantId());
     }
 
     private void fillOperateAudit(ModelConfigBO entityBO, RequestHeader.UserHeader header) {
@@ -199,6 +200,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         }
         modelConfigManager.update(Wrappers.<ModelConfigDO>lambdaUpdate()
                 .set(ModelConfigDO::getDefaultFlag, DefaultFlagEnum.NOT_DEFAULT.getIndex())
+                .eq(ModelConfigDO::getTenantId, entityDO.getTenantId())
                 .eq(ModelConfigDO::getDefaultFlag, DefaultFlagEnum.DEFAULT.getIndex())
                 .ne(ModelConfigDO::getId, entityDO.getId()));
     }
