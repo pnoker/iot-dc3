@@ -61,6 +61,26 @@ message GrpcPointIdsQuery {
   repeated int64 point_ids = 1;
 }
 
+// Command query structure for querying command information by command ID
+message GrpcCommandQuery {
+  int64 command_id = 1;
+}
+
+// Command ids query structure for batch command lookup
+message GrpcCommandIdsQuery {
+  repeated int64 command_ids = 1;
+}
+
+// Event query structure for querying event information by event ID
+message GrpcEventQuery {
+  int64 event_id = 1;
+}
+
+// Event ids query structure for batch event lookup
+message GrpcEventIdsQuery {
+  repeated int64 event_ids = 1;
+}
+
 // Device query structure for querying device information by device ID
 message GrpcDeviceQuery {
   // Device ID that identifies specific device

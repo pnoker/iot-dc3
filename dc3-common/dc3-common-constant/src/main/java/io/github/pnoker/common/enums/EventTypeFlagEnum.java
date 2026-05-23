@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of metadata types.
+ * Enumeration of event type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,32 +33,27 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum MetadataTypeEnum {
+public enum EventTypeFlagEnum {
 
     /**
-     * Device metadata
+     * Info event
      */
-    DEVICE((byte) 0, "device", "Device metadata"),
+    INFO((byte) 0, "info", "Info event"),
 
     /**
-     * Point metadata
+     * Alert event
      */
-    POINT((byte) 1, "point", "Point metadata"),
+    ALERT((byte) 1, "alert", "Alert event"),
 
     /**
-     * Driver metadata
+     * Fault event
      */
-    DRIVER((byte) 2, "driver", "Driver metadata"),
+    FAULT((byte) 2, "fault", "Fault event"),
 
     /**
-     * Command metadata
+     * Lifecycle event
      */
-    COMMAND((byte) 3, "command", "Command metadata"),
-
-    /**
-     * Event metadata
-     */
-    EVENT((byte) 4, "event", "Event metadata"),
+    LIFECYCLE((byte) 3, "lifecycle", "Lifecycle event"),
     ;
 
     /**
@@ -81,10 +76,10 @@ public enum MetadataTypeEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link MetadataTypeEnum}
+     * @return {@link EventTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofIndex(Byte index) {
-        Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
+    public static EventTypeFlagEnum ofIndex(Byte index) {
+        Optional<EventTypeFlagEnum> any = Arrays.stream(EventTypeFlagEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -94,10 +89,10 @@ public enum MetadataTypeEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link MetadataTypeEnum}
+     * @return {@link EventTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofCode(String code) {
-        Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
+    public static EventTypeFlagEnum ofCode(String code) {
+        Optional<EventTypeFlagEnum> any = Arrays.stream(EventTypeFlagEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -107,9 +102,9 @@ public enum MetadataTypeEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link MetadataTypeEnum}
+     * @return {@link EventTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofName(String name) {
+    public static EventTypeFlagEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

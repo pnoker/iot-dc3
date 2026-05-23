@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of metadata types.
+ * Enumeration of command type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,32 +33,22 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum MetadataTypeEnum {
+public enum CommandTypeFlagEnum {
 
     /**
-     * Device metadata
+     * Custom command
      */
-    DEVICE((byte) 0, "device", "Device metadata"),
+    CUSTOM((byte) 0, "custom", "Custom command"),
 
     /**
-     * Point metadata
+     * Config command
      */
-    POINT((byte) 1, "point", "Point metadata"),
+    CONFIG((byte) 1, "config", "Config command"),
 
     /**
-     * Driver metadata
+     * Action command
      */
-    DRIVER((byte) 2, "driver", "Driver metadata"),
-
-    /**
-     * Command metadata
-     */
-    COMMAND((byte) 3, "command", "Command metadata"),
-
-    /**
-     * Event metadata
-     */
-    EVENT((byte) 4, "event", "Event metadata"),
+    ACTION((byte) 2, "action", "Action command"),
     ;
 
     /**
@@ -81,10 +71,10 @@ public enum MetadataTypeEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link MetadataTypeEnum}
+     * @return {@link CommandTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofIndex(Byte index) {
-        Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
+    public static CommandTypeFlagEnum ofIndex(Byte index) {
+        Optional<CommandTypeFlagEnum> any = Arrays.stream(CommandTypeFlagEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -94,10 +84,10 @@ public enum MetadataTypeEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link MetadataTypeEnum}
+     * @return {@link CommandTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofCode(String code) {
-        Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
+    public static CommandTypeFlagEnum ofCode(String code) {
+        Optional<CommandTypeFlagEnum> any = Arrays.stream(CommandTypeFlagEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -107,9 +97,9 @@ public enum MetadataTypeEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link MetadataTypeEnum}
+     * @return {@link CommandTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofName(String name) {
+    public static CommandTypeFlagEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {
