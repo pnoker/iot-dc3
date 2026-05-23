@@ -25,8 +25,8 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,7 +76,7 @@ class DeviceHealthScheduleJobTest {
     void setUp() {
         driverProperties = new DriverProperties();
         driverProperties.getHealth().getDevice().setTimeout(60);
-        driverProperties.getHealth().getDevice().setTimeoutUnit(TimeUnit.SECONDS, isNull());
+        driverProperties.getHealth().getDevice().setTimeoutUnit(TimeUnit.SECONDS);
         driverMetadata = new DriverMetadata();
         job = new DeviceHealthScheduleJob(driverProperties, driverMetadata, deviceMetadata, driverCustomService,
                 driverSenderService);
