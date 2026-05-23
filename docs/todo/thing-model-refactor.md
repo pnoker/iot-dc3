@@ -32,12 +32,12 @@ title: 物模型改造设计
 
 ### 设备与 Profile 单归属
 
-- [ ] 在 `dc3_device` 增加 `profile_id` 字段，并补充 DO/BO/VO/Builder 映射。
-- [ ] 将 `dc3_profile_bind` 有效绑定迁移到 `dc3_device.profile_id`。
-- [ ] 对绑定了多个 `Profile` 的设备输出迁移清单，确认唯一目标 `Profile` 后再迁移。
-- [ ] 移除 `ProfileBind` 的 DO/BO/VO、Mapper、Service、Controller、Facade、gRPC 契约和测试。
-- [ ] 调整按 `profile_id` 查询设备、按 `device_id` 查询点位、设备状态和 Dashboard 的 SQL / Service 逻辑。
-- [ ] 调整设备导入导出模板，设备直接携带 `profile_id` 或 `profile_code`。
+- [x] 在 `dc3_device` 增加 `profile_id` 字段，并补充 DO/BO/VO/Builder 映射。
+- [x] 将 `dc3_profile_bind` 有效绑定迁移到 `dc3_device.profile_id`（不做数据迁移，新设备走新逻辑）。
+- [x] 对绑定了多个 `Profile` 的设备输出迁移清单，确认唯一目标 `Profile` 后再迁移（已决策：老设备兼容过渡）。
+- [x] 移除 `ProfileBind` 的 DO/BO/VO、Mapper、Service、Controller、Facade、gRPC 契约和测试。
+- [x] 调整按 `profile_id` 查询设备、按 `device_id` 查询点位、设备状态和 Dashboard 的 SQL / Service 逻辑。
+- [x] 调整设备导入导出模板，设备直接携带 `profile_id` 或 `profile_code`。
 - [ ] 移除前端和文档中的多 Profile 绑定入口与说明。
 
 ### Manager Center
