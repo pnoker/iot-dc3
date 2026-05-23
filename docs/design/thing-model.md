@@ -15,7 +15,7 @@ title: 物模型设计方案
 
 | 阶段 | 内容 | 状态 | 说明 |
 |------|------|------|------|
-| Phase 1 | Device 加 `profile_id`，移除 ProfileBind | [TODO] | 28 文件改动，核心重构 |
+| Phase 1 | Device 加 `profile_id`，移除 ProfileBind | [DONE] | 28 文件改动，核心重构 |
 | Phase 1 | 数据迁移（多 Profile → 单 Profile） | 不做 | 已决策：新设备走新逻辑，老设备兼容过渡 |
 | Phase 2 | `dc3_command` / `dc3_command_param` 表 | [TODO] | 纯增量，无风险 |
 | Phase 2 | `dc3_event` / `dc3_event_param` 表 | [TODO] | 纯增量，无风险 |
@@ -255,7 +255,7 @@ Point 之外的自定义指令能力，并通过 `profile_id` 归属到 `Profile
 
 ## 分阶段落地
 
-### 第一阶段：设备与物模型单归属 [TODO]
+### 第一阶段：设备与物模型单归属 [DONE]
 
 **范围**：28 个文件，12 个类删除，16 个类修改。
 
@@ -280,7 +280,7 @@ CREATE INDEX idx_device_profile ON dc3_device (tenant_id, profile_id) WHERE dele
 | DELETE | `ProfileBindManagerImpl.java` | Manager 实现 |
 | DELETE | `ProfileBindService.java` | Service 接口 |
 | DELETE | `ProfileBindServiceImpl.java` | Service 实现 |
-| DELETE | `ProfileBindingRow.java` | Dashboard DTO |
+| MODIFY | `ProfileBindingRow.java` | Dashboard DTO，精简为只有 profileId + deviceId |
 | MODIFY | `DeviceDO.java` | 加 `profile_id` 字段 |
 | MODIFY | `DeviceBO.java` | `Set<Long> profileIds` → `Long profileId` |
 | MODIFY | `DeviceVO.java` | 同上 |
