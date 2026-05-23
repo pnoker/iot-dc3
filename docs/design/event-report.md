@@ -6,7 +6,8 @@ title: 事件上报方案
 
 本文描述 DC3 从设备事件上报到数据持久化再到告警规则触发的完整链路设计。
 
-> **背景**：Phase 2 完成了 `dc3_event` / `dc3_event_param` 表结构定义，Phase 4-5 补齐了事件上报运行时链路，Phase 6 补齐了告警规则触发。
+> **背景**：Phase 2 完成了 `dc3_event` / `dc3_event_param` 表结构定义，Phase 4-5 补齐了事件上报运行时链路，Phase 6
+> 补齐了告警规则触发。
 
 ---
 
@@ -16,41 +17,42 @@ title: 事件上报方案
 
 ### 事件定义表
 
-| 表 | 作用 |
-|---|------|
-| `dc3_event` | 事件主定义 |
+| 表                 | 作用       |
+|-------------------|----------|
+| `dc3_event`       | 事件主定义    |
 | `dc3_event_param` | 事件输出参数定义 |
 
 ### 事件类型
 
-| 类型 | 说明 |
-|------|------|
-| `info` | 信息事件 |
-| `alert` | 告警事件 |
-| `fault` | 故障事件 |
+| 类型          | 说明     |
+|-------------|--------|
+| `info`      | 信息事件   |
+| `alert`     | 告警事件   |
+| `fault`     | 故障事件   |
 | `lifecycle` | 生命周期事件 |
 
 ### 事件级别
 
 | 级别 | 说明 |
-|------|------|
-| 0 | 普通 |
-| 1 | 警告 |
-| 2 | 严重 |
-| 3 | 紧急 |
+|----|----|
+| 0  | 普通 |
+| 1  | 警告 |
+| 2  | 严重 |
+| 3  | 紧急 |
 
 ---
 
 ## EventRecord vs EntityAlarm
 
-| 概念 | EventRecord | EntityAlarm |
-|------|------------|-------------|
-| 定位 | 事件上报原始日志 | 告警引擎评估后的运行态告警记录 |
-| 触发方式 | 设备主动上报 | 规则引擎匹配后创建 |
-| 记录表 | `dc3_event_record` | `dc3_entity_alarm` |
-| 关联链路 | 设备 → 事件定义 | 多个来源（DEVICE/DRIVER/POINT/EVENT） |
+| 概念   | EventRecord        | EntityAlarm                     |
+|------|--------------------|---------------------------------|
+| 定位   | 事件上报原始日志           | 告警引擎评估后的运行态告警记录                 |
+| 触发方式 | 设备主动上报             | 规则引擎匹配后创建                       |
+| 记录表  | `dc3_event_record` | `dc3_entity_alarm`              |
+| 关联链路 | 设备 → 事件定义          | 多个来源（DEVICE/DRIVER/POINT/EVENT） |
 
 设备上报事件后：
+
 1. 持久化到 `dc3_event_record`（原始日志）
 2. 提交到告警规则引擎评估
 3. 匹配告警规则时，由 `AlarmEventRecordService.ensureEvent()` 在 `dc3_entity_alarm` 中创建/更新告警记录
@@ -67,6 +69,7 @@ dc3.e.event (topic exchange)
 **路由键**：`dc3.r.event.{service}`
 
 **消息流**：
+
 1. Driver 通过 `DriverSenderService.eventReportSender()` 发布 `EventReportDTO`
 2. Data Center 的 `EventReportReceiver` 消费
 3. `EventReportServiceImpl.report(EventReportDTO)` 持久化 `EventRecordDO`
@@ -77,13 +80,14 @@ dc3.e.event (topic exchange)
 
 ## API 路径
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | `/data/event_report/report` | 上报事件（REST） |
-| GET | `/data/event_report/{recordId}` | 查询事件记录详情 |
-| POST | `/data/event_report/list` | 分页查询事件记录列表 |
+| 方法   | 路径                              | 说明         |
+|------|---------------------------------|------------|
+| POST | `/data/event_report/report`     | 上报事件（REST） |
+| GET  | `/data/event_report/{recordId}` | 查询事件记录详情   |
+| POST | `/data/event_report/list`       | 分页查询事件记录列表 |
 
 gRPC API 路径（Data Center）：
+
 - `DataService.EventReport` — 上报事件
 - `DataService.EventRecord` — 查询事件记录
 - `DataService.EventRecordList` — 分页查询

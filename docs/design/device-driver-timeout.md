@@ -62,7 +62,7 @@ CREATE TABLE dc3_entity_state
     entity_type_flag    SMALLINT DEFAULT 0 NOT NULL,                 -- Entity type flag, 3: driver, 6: device
     entity_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Entity ID
     parent_entity_id    BIGINT   DEFAULT 0 NOT NULL,                 -- Parent entity ID
-    entity_state_flag          SMALLINT DEFAULT 1 NOT NULL,                 -- State flag, 0: online, 1: offline, 2: maintain, 3: fault
+    entity_state_flag   SMALLINT DEFAULT 1 NOT NULL,                 -- State flag, 0: online, 1: offline, 2: maintain, 3: fault
     last_state_flag     SMALLINT DEFAULT 1 NOT NULL,                 -- Last state flag
     last_heartbeat_time TIMESTAMPTZ NOT NULL,                        -- Latest heartbeat time
     expire_time TIMESTAMPTZ NOT NULL,                                -- Lease expiration time
@@ -70,7 +70,7 @@ CREATE TABLE dc3_entity_state
     last_alarm_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Latest alarm ID
     timeout_seconds     INTEGER  DEFAULT 0 NOT NULL,                 -- Timeout duration, seconds
     timeout_source_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Timeout source flag, 0: system, 1: driver, 2: device, 3: profile
-    entity_state_ext           JSON     DEFAULT '{}'::JSON        NOT NULL, -- State extension information
+    entity_state_ext    JSON     DEFAULT '{}'::JSON        NOT NULL, -- State extension information
     tenant_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
     operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
@@ -108,7 +108,7 @@ CREATE TRIGGER update_operate_time_trigger
 | `entity_type_flag`    | 实体类型，沿用 `EntityTypeFlagEnum`：`3` 为 driver，`6` 为 device                       |
 | `entity_id`           | 驱动 ID 或设备 ID                                                                 |
 | `parent_entity_id`    | 设备所属驱动 ID；驱动为 `0`                                                            |
-| `entity_state_flag`          | 当前状态，沿用 `EntityStateStatus` 契约：`0` online，`1` offline，`2` maintain，`3` fault |
+| `entity_state_flag`   | 当前状态，沿用 `EntityStateStatus` 契约：`0` online，`1` offline，`2` maintain，`3` fault |
 | `last_state_flag`     | 上一次状态                                                                        |
 | `last_heartbeat_time` | 最近一次心跳时间                                                                     |
 | `expire_time`         | 当前租约到期时间                                                                     |
@@ -116,7 +116,7 @@ CREATE TRIGGER update_operate_time_trigger
 | `last_alarm_id`       | 最近一次关联告警 ID，便于追踪离线/故障告警                                                      |
 | `timeout_seconds`     | 当前租约时长                                                                       |
 | `timeout_source_flag` | 超时来源，建议新增枚举：`0` system，`1` driver，`2` device，`3` profile                     |
-| `entity_state_ext`           | 节点、协议状态、诊断信息等扩展                                                              |
+| `entity_state_ext`    | 节点、协议状态、诊断信息等扩展                                                              |
 
 ## RabbitMQ 设计
 
@@ -238,29 +238,27 @@ device_scan_tick
 扫描 SQL 使用"一次性 claim 并返回"的形式，避免多实例重复处理同一批设备：
 
 ```sql
-WITH picked AS (
-    SELECT
-        id,
-        entity_state_flag AS previous_entity_state_flag,
-        lease_version AS previous_lease_version
-    FROM dc3_entity_state
-    WHERE deleted = 0
-      AND entity_type_flag = 6
-      AND entity_state_flag IN (0, 2, 3)
-      AND expire_time <= CURRENT_TIMESTAMP
-    ORDER BY expire_time ASC
-    LIMIT #{batchSize}
-    FOR UPDATE SKIP LOCKED
-)
+WITH picked AS (SELECT id,
+                       entity_state_flag AS previous_entity_state_flag,
+                       lease_version     AS previous_lease_version
+                FROM dc3_entity_state
+                WHERE deleted = 0
+                  AND entity_type_flag = 6
+                  AND entity_state_flag IN (0, 2, 3)
+                  AND expire_time <= CURRENT_TIMESTAMP
+                ORDER BY expire_time ASC
+                LIMIT #{batchSize}
+                FOR
+                UPDATE SKIP LOCKED)
 UPDATE dc3_entity_state s
-SET lease_version = picked.previous_lease_version + 1,
+SET lease_version     = picked.previous_lease_version + 1,
     entity_state_flag = 1,
-    last_state_flag = picked.previous_entity_state_flag,
-    expire_time = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
-    operate_time = CURRENT_TIMESTAMP
+    last_state_flag   = picked.previous_entity_state_flag,
+    expire_time       = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
+    operate_time      = CURRENT_TIMESTAMP
 FROM picked
 WHERE s.id = picked.id
-RETURNING s.*;
+    RETURNING s.*;
 ```
 
 示例：
