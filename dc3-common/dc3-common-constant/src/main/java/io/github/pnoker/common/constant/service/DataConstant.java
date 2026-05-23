@@ -54,6 +54,10 @@ public class DataConstant {
 
     public static final String MESSAGE_URL_PREFIX = "/message";
 
+    public static final String COMMAND_RECORD_URL_PREFIX = "/command_record";
+
+    public static final String EVENT_REPORT_URL_PREFIX = "/event_report";
+
     public static final String DRIVER_STATUS_URL_PREFIX = "/driver/status";
 
     public static final String DRIVER_EVENT_URL_PREFIX = "/driver/event";
