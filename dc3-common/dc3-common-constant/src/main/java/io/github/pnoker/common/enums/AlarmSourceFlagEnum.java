@@ -56,6 +56,11 @@ public enum AlarmSourceFlagEnum {
     DRIVER_REPORT((byte) 3, "driver-report", "Driver report"),
 
     /**
+     * Event report
+     */
+    EVENT_REPORT((byte) 5, "event-report", "Event report"),
+
+    /**
      * System
      */
     SYSTEM((byte) 4, "system", "System"),

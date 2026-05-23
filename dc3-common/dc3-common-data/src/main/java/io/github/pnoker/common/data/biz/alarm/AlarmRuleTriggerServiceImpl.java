@@ -20,6 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
+import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -135,6 +136,21 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
                 alarm.getAlarmId(),
                 factTime(alarm.getCreateTime()),
                 RuleFactValues.driverAlarm(alarm)));
+    }
+
+    @Override
+    public void processEventReport(EventReportDTO entityDTO) {
+        if (Objects.isNull(entityDTO) || !isValidId(entityDTO.tenantId()) || !isValidId(entityDTO.deviceId())) {
+            return;
+        }
+
+        process(new RuleFact(
+                entityDTO.tenantId(),
+                AlarmTargetTypeFlagEnum.EVENT,
+                entityDTO.deviceId(),
+                null,
+                LocalDateTimeUtil.now(),
+                RuleFactValues.eventReport(entityDTO)));
     }
 
     private void process(RuleFact fact) {

@@ -20,9 +20,12 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
+import io.github.pnoker.common.entity.dto.EventReportDTO;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Runtime fact value snapshots used by the rule engine.
@@ -68,6 +71,32 @@ final class RuleFactValues {
                 alarm.getMessage(),
                 alarm.getAlarmId(),
                 alarm.getCreateTime()));
+    }
+
+    static Map<String, Object> eventReport(EventReportDTO dto) {
+        LocalDateTime ts = Objects.nonNull(dto.occurTime())
+                ? LocalDateTime.ofInstant(dto.occurTime(), ZoneId.systemDefault())
+                : LocalDateTime.now();
+        return RuleValueMap.from(new EventReportSnapshot(
+                dto.deviceId(),
+                dto.eventId(),
+                dto.eventCode(),
+                dto.eventTypeFlag(),
+                dto.eventLevelFlag(),
+                dto.paramValues(),
+                dto.message(),
+                ts));
+    }
+
+    private record EventReportSnapshot(
+            Long deviceId,
+            Long eventId,
+            String eventCode,
+            Byte eventTypeFlag,
+            Byte eventLevelFlag,
+            Map<String, String> paramValues,
+            String message,
+            LocalDateTime occurTime) {
     }
 
     private record PointSnapshot(

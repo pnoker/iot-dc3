@@ -105,7 +105,9 @@ export default defineConfig({
                         {text: '位号命令链路重构方案', link: '/design/point-command'},
                         {text: '设备与驱动超时管理方案', link: '/design/device-driver-timeout'},
                         {text: '实体告警统一表设计方案', link: '/design/entity-alarm'},
-                        {text: '规则告警链路优化与缺陷修复方案', link: '/design/rule-alarm-optimization'}
+                        {text: '规则告警链路优化与缺陷修复方案', link: '/design/rule-alarm-optimization'},
+                        {text: '自定义指令调用方案', link: '/design/command-call'},
+                        {text: '事件上报方案', link: '/design/event-report'}
                     ]
                 }
             ],
