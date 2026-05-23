@@ -34,6 +34,7 @@ import io.github.pnoker.driver.coap.entity.CoapResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -54,10 +55,10 @@ import java.util.Map;
 public class CoapDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
-
     private final DriverSenderService driverSenderService;
-
     private final CoapClientManager coapClientManager;
+    @Value("${dc3.driver.code}")
+    private String driverCode;
 
     @Override
     public void initial() {
@@ -74,7 +75,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=coap, metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
                     metadataType, operateType, metadataEvent.getId());
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)) {
                 // Release the CoAP client for the deleted device
@@ -84,7 +85,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=coap, metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
                     metadataType, operateType, metadataEvent.getId());
         }
     }

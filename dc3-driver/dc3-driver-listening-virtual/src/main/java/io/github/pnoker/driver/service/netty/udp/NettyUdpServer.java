@@ -47,6 +47,8 @@ import java.net.InetSocketAddress;
 @Component
 public class NettyUdpServer {
 
+    private static final String PROTOCOL = "udp";
+
     /**
      * Starts the UDP server on the specified port.
      *
@@ -67,11 +69,11 @@ public class NettyUdpServer {
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();
-            log.info("Driver listener started, protocol=udp, port={}", port);
+            log.info("Driver listener started, protocol=" + PROTOCOL + ", port={}", port);
             future.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully().sync();
-            log.info("Driver listener stopped, protocol=udp, port={}", port);
+            log.info("Driver listener stopped, protocol=" + PROTOCOL + ", port={}", port);
         }
     }
 

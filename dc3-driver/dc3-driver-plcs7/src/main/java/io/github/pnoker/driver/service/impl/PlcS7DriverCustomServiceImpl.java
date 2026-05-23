@@ -42,6 +42,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -68,9 +69,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
-
     private final DriverSenderService driverSenderService;
-
+    @Value("${dc3.driver.code}")
+    private String driverCode;
     /**
      * Cache of device ID to S7 connector instances.
      */
@@ -92,18 +93,18 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
 
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=plcS7, metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 MyS7Connector removed = connectMap.remove(metadataEvent.getId());
-                log.info("Driver connection invalidated, protocol=plcS7, deviceId={}, operateType={}, removed={}",
+                log.info("Driver connection invalidated, protocol=" + driverCode + ", deviceId={}, operateType={}, removed={}",
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=plcS7, metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -111,7 +112,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                                PointBO point) {
-        log.debug("Driver point read requested, protocol=plcS7, deviceId={}, pointId={}, pointType={}", device.getId(),
+        log.debug("Driver point read requested, protocol=" + driverCode + ", deviceId={}, pointId={}, pointType={}", device.getId(),
                 point.getId(), point.getPointTypeFlag());
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
 
@@ -121,7 +122,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             PlcS7PointVariable plcs7PointVariable = getPointVariable(pointConfig, point.getPointTypeFlag().getCode());
             return new ReadPointValue(device, point, String.valueOf(serializer.dispense(plcs7PointVariable)));
         } catch (Exception e) {
-            log.error("Driver point read failed, protocol=plcS7, deviceId={}, pointId={}", device.getId(),
+            log.error("Driver point read failed, protocol=" + driverCode + ", deviceId={}, pointId={}", device.getId(),
                     point.getId(), e);
             return null;
         } finally {
@@ -132,7 +133,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                          PointBO point, WritePointValue writePointValue) {
-        log.debug("Driver point write requested, protocol=plcS7, deviceId={}, pointId={}, pointType={}, valueLength={}",
+        log.debug("Driver point write requested, protocol=" + driverCode + ", deviceId={}, pointId={}, pointType={}, valueLength={}",
                 device.getId(), point.getId(), writePointValue.getType(), Objects.toString(writePointValue.getValue(), "").length());
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
         myS7Connector.lock.writeLock().lock();
@@ -143,7 +144,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             store(serializer, plcs7PointVariable, writePointValue.getType().getCode(), writePointValue.getValue());
             return true;
         } catch (Exception e) {
-            log.error("Driver point write failed, protocol=plcS7, deviceId={}, pointId={}", device.getId(),
+            log.error("Driver point write failed, protocol=" + driverCode + ", deviceId={}, pointId={}", device.getId(),
                     point.getId(), e);
             return false;
         } finally {
@@ -166,7 +167,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
             String host = driverConfig.get("host").getValue(String.class);
             int port = driverConfig.get("port").getValue(Integer.class);
-            log.debug("Driver connection creating, protocol=plcS7, deviceId={}, host={}, port={}", deviceId, host,
+            log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, port={}", deviceId, host,
                     port);
             try {
                 S7Connector s7Connector = S7ConnectorFactory.buildTCPConnector()
@@ -176,13 +177,13 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
                 myS7Connector.setLock(new ReentrantReadWriteLock());
                 myS7Connector.setConnector(s7Connector);
             } catch (Exception e) {
-                log.error("Driver connection failed, protocol=plcS7, deviceId={}, host={}, port={}", deviceId, host,
+                log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}", deviceId, host,
                         port, e);
-                throw new ServiceException("Driver connection failed, protocol=plcS7, deviceId={}, host={}, port={}",
+                throw new ServiceException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}",
                         deviceId, host, port, e);
             }
             connectMap.put(deviceId, myS7Connector);
-            log.info("Driver connection established, protocol=plcS7, deviceId={}, host={}, port={}", deviceId, host,
+            log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, host={}, port={}", deviceId, host,
                     port);
         }
         return myS7Connector;
@@ -200,7 +201,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         int byteOffset = pointConfig.get("byteOffset").getValue(Integer.class);
         int bitOffset = pointConfig.get("bitOffset").getValue(Integer.class);
         int blockSize = pointConfig.get("blockSize").getValue(Integer.class);
-        log.debug("Driver point config resolved, protocol=plcS7, dbNum={}, byteOffset={}, bitOffset={}, blockSize={}",
+        log.debug("Driver point config resolved, protocol=" + driverCode + ", dbNum={}, byteOffset={}, bitOffset={}, blockSize={}",
                 dbNum, byteOffset, bitOffset, blockSize);
         return new PlcS7PointVariable(dbNum, byteOffset, bitOffset, blockSize, type);
     }

@@ -57,11 +57,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 @RequiredArgsConstructor
 public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomService {
 
+    private static final String PROTOCOL_TCP = "tcp";
+    private static final String PROTOCOL_UDP = "udp";
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final NettyTcpServer nettyTcpServer;
     private final NettyUdpServer nettyUdpServer;
     private final ThreadPoolExecutor threadPoolExecutor;
+    @Value("${dc3.driver.code}")
+    private String driverCode;
     @Value("${dc3.driver.custom.tcp.port}")
     private Integer tcpPort;
     @Value("${dc3.driver.custom.udp.port}")
@@ -77,11 +81,11 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
     @Override
     public void initial() {
         threadPoolExecutor.execute(() -> {
-            log.info("Driver listener starting, protocol=tcp, port={}", tcpPort);
+            log.info("Driver listener starting, protocol=" + PROTOCOL_TCP + ", port={}", tcpPort);
             nettyTcpServer.start(tcpPort);
         });
         threadPoolExecutor.execute(() -> {
-            log.info("Driver listener starting, protocol=udp, port={}", udpPort);
+            log.info("Driver listener starting, protocol=" + PROTOCOL_UDP + ", port={}", udpPort);
             nettyUdpServer.start(udpPort);
         });
     }
@@ -105,10 +109,10 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=listeningVirtual, metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
                     metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=listeningVirtual, metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -154,11 +158,11 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.getDeviceChannel(deviceId);
         if (Objects.nonNull(channel)) {
-            log.debug("Driver point write requested, protocol=tcp, deviceId={}, pointId={}, valueLength={}", deviceId,
+            log.debug("Driver point write requested, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}, valueLength={}", deviceId,
                     point.getId(), Objects.toString(writePointValue.getValue(), "").length());
             channel.writeAndFlush(DecodeUtil.stringToByte(writePointValue.getValue()));
         } else {
-            log.warn("Driver point write skipped, protocol=tcp, deviceId={}, pointId={}, reason=channelMissing",
+            log.warn("Driver point write skipped, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}, reason=channelMissing",
                     deviceId, point.getId());
         }
         return true;

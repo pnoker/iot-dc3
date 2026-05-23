@@ -44,6 +44,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -72,9 +73,9 @@ import java.util.concurrent.TimeoutException;
 public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
-
     private final DriverSenderService driverSenderService;
-
+    @Value("${dc3.driver.code}")
+    private String driverCode;
     /**
      * Cache of device ID to OPC UA client connections.
      */
@@ -95,18 +96,18 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=opcUa, metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 OpcUaClient removed = connectMap.remove(metadataEvent.getId());
-                log.info("Driver connection invalidated, protocol=opcUa, deviceId={}, operateType={}, removed={}",
+                log.info("Driver connection invalidated, protocol=" + driverCode + ", deviceId={}, operateType={}, removed={}",
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=opcUa, metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -139,7 +140,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             int port = driverConfig.get("port").getValue(Integer.class);
             String path = driverConfig.get("path").getValue(String.class);
             String url = String.format("opc.tcp://%s:%s%s", host, port, path);
-            log.debug("Driver connection creating, protocol=opcUa, deviceId={}, host={}, port={}, path={}", deviceId,
+            log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                     host, port, path);
             try {
                 opcUaClient = OpcUaClient.create(url, endpoints -> endpoints.stream().findFirst(),
@@ -150,13 +151,13 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                                 .setRequestTimeout(Unsigned.uint(5000))
                                 .build());
                 connectMap.put(deviceId, opcUaClient);
-                log.info("Driver connection created, protocol=opcUa, deviceId={}, host={}, port={}, path={}", deviceId,
+                log.info("Driver connection created, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                         host, port, path);
             } catch (UaException e) {
                 connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
-                log.error("Driver connection failed, protocol=opcUa, deviceId={}, host={}, port={}, path={}", deviceId,
+                log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                         host, port, path, e);
-                throw new ConnectorException("Driver connection failed, protocol=opcUa, deviceId={}, host={}, port={}, path={}, message={}",
+                throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}, message={}",
                         deviceId, host, port, path, e.getMessage(), e);
             }
         }
@@ -189,13 +190,13 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                     .thenAccept(dataValue -> value.complete(dataValue.getValue().getValue().toString()));
             return value.get(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            log.error("Driver point read interrupted, protocol=opcUa", e);
+            log.error("Driver point read interrupted, protocol=" + driverCode + "", e);
             Thread.currentThread().interrupt();
-            throw new ReadPointException("Driver point read interrupted, protocol=opcUa, message={}", e.getMessage(),
+            throw new ReadPointException("Driver point read interrupted, protocol=" + driverCode + ", message={}", e.getMessage(),
                     e);
         } catch (ExecutionException | TimeoutException e) {
-            log.error("Driver point read failed, protocol=opcUa", e);
-            throw new ReadPointException("Driver point read failed, protocol=opcUa, message={}", e.getMessage(), e);
+            log.error("Driver point read failed, protocol=" + driverCode + "", e);
+            throw new ReadPointException("Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
 
@@ -214,13 +215,13 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             client.connect().get();
             return writeNode(client, nodeId, writePointValue);
         } catch (InterruptedException e) {
-            log.error("Driver point write interrupted, protocol=opcUa", e);
+            log.error("Driver point write interrupted, protocol=" + driverCode + "", e);
             Thread.currentThread().interrupt();
-            throw new WritePointException("Driver point write interrupted, protocol=opcUa, message={}", e.getMessage(),
+            throw new WritePointException("Driver point write interrupted, protocol=" + driverCode + ", message={}", e.getMessage(),
                     e);
         } catch (ExecutionException e) {
-            log.error("Driver point write failed, protocol=opcUa", e);
-            throw new WritePointException("Driver point write failed, protocol=opcUa, message={}", e.getMessage(), e);
+            log.error("Driver point write failed, protocol=" + driverCode + "", e);
+            throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
 
