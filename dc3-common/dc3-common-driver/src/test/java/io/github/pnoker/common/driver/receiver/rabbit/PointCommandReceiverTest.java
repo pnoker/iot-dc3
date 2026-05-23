@@ -30,6 +30,7 @@ import io.github.pnoker.common.enums.PointCommandTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
@@ -40,7 +41,6 @@ import java.util.function.Supplier;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -78,7 +78,7 @@ class PointCommandReceiverTest {
                 driverSenderService, dedupCache, deviceLockManager);
 
         // DeviceLockManager executes the supplier inline
-        when(deviceLockManager.runExclusive(anyLong(), any()))
+        when(deviceLockManager.runExclusive(anyLong(), ArgumentMatchers.<Supplier<String>>any()))
                 .thenAnswer(invocation -> ((Supplier<?>) invocation.getArgument(1)).get());
 
         MessageProperties props = new MessageProperties();

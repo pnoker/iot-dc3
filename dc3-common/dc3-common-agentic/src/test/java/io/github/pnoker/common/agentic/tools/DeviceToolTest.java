@@ -145,7 +145,7 @@ class DeviceToolTest {
         device.setDriverId(driverId);
         device.setEnableFlag(EnableFlagEnum.ENABLE);
         device.setTenantId(11L);
-        device.setProfileIds(List.of(401L));
+        device.setProfileId(401L);
         return device;
     }
 
