@@ -167,6 +167,30 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/event/PointEvent.vue'),
         },
         {
+          name: 'settingsCommandDefinition',
+          path: 'command/definition',
+          meta: { title: 'Command Definitions' },
+          component: () => import('@/views/settings/command/CommandList.vue'),
+        },
+        {
+          name: 'settingsCommandHistory',
+          path: 'command/history',
+          meta: { title: 'Command Histories' },
+          component: () => import('@/views/settings/command/CommandHistory.vue'),
+        },
+        {
+          name: 'settingsEventDefinition',
+          path: 'event-def/definition',
+          meta: { title: 'Event Definitions' },
+          component: () => import('@/views/settings/event/definition/EventList.vue'),
+        },
+        {
+          name: 'settingsEventHistory',
+          path: 'event-def/history',
+          meta: { title: 'Event Histories' },
+          component: () => import('@/views/settings/event/definition/EventHistory.vue'),
+        },
+        {
           name: 'settingsAbout',
           path: 'about',
           meta: { title: 'About' },

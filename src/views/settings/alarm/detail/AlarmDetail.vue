@@ -179,7 +179,7 @@
         { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code' },
         { prop: 'alarmTargetTypeFlag', label: t('settings.alarm.targetType'), kind: 'tag' },
         { prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code' },
-        { prop: 'stateFlag', label: t('settings.alarm.state'), kind: 'tag' },
+        { prop: 'entityStateFlag', label: t('settings.alarm.state'), kind: 'tag' },
         { prop: 'fingerprint', label: 'Fingerprint', kind: 'code' },
         { prop: 'triggerCount', label: t('settings.alarm.triggerCount') },
         { prop: 'alarmId', label: 'Alarm ID', kind: 'code' },
@@ -189,7 +189,7 @@
         { prop: 'lastNotifyTime', label: t('settings.alarm.lastNotifyTime'), kind: 'time' },
         ...commonFields(),
       ],
-      extProps: ['stateExt'],
+      extProps: ['entityStateExt'],
       load: getRuleStateById,
     },
     {
@@ -272,7 +272,7 @@
       messageExt: t('settings.alarm.messageExt'),
       channelExt: t('settings.alarm.channelExt'),
       bindExt: t('settings.alarm.bindExt'),
-      stateExt: t('settings.alarm.stateExt'),
+      entityStateExt: t('settings.alarm.entityStateExt'),
       requestExt: t('settings.alarm.requestExt'),
       responseExt: t('settings.alarm.responseExt'),
     };

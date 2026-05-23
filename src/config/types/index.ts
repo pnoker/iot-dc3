@@ -56,6 +56,9 @@ export type {
   AlarmEntityRecord,
 } from './alarm';
 
+export type { CommandRecord, CommandForm, CommandHistory } from './command';
+export type { EventRecord, EventForm, EventHistory } from './event';
+
 export type {
   UserForm,
   UserRecord,

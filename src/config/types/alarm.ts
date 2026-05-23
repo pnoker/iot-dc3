@@ -91,14 +91,14 @@ export interface RuleStateRecord extends AlarmBaseRecord {
   alarmTargetTypeFlag?: AlarmTargetTypeFlag;
   entityId?: string;
   fingerprint?: string;
-  stateFlag?: RuleStateFlag;
+  entityStateFlag?: RuleStateFlag;
   firstTriggerTime?: string;
   lastTriggerTime?: string;
   lastRecoverTime?: string;
   lastNotifyTime?: string;
   triggerCount?: number | string;
   alarmId?: string;
-  stateExt?: StructuredExt;
+  entityStateExt?: StructuredExt;
 }
 
 export interface NotifyHistoryRecord extends AlarmBaseRecord {

@@ -198,6 +198,12 @@
     settingsAlarmHistoryDetail: 'nav.settingsAlarmHistoryDetail',
     settingsAgenticDetail: 'nav.settingsAgenticDetail',
     settingsAgenticProviderDetail: 'nav.settingsAgenticProviderDetail',
+    settingsCommandDefinition: 'nav.settingsCommandDefinition',
+    settingsCommandHistory: 'nav.settingsCommandHistory',
+    settingsEventDefinition: 'nav.settingsEventDefinition',
+    settingsEventHistory: 'nav.settingsEventHistory',
+    settingsCommandDefinitionDetail: 'nav.settingsCommandDefinitionDetail',
+    settingsEventDefinitionDetail: 'nav.settingsEventDefinitionDetail',
   };
 
   // Static icon fallback for route names the backend menu tree does not yet
@@ -258,6 +264,12 @@
     settingsAlarmHistoryDetail: 'DocumentChecked',
     settingsAgenticDetail: 'ChatDotRound',
     settingsAgenticProviderDetail: 'ChatLineSquare',
+    settingsCommandDefinition: 'Operation',
+    settingsCommandHistory: 'Document',
+    settingsEventDefinition: 'Warning',
+    settingsEventHistory: 'Document',
+    settingsCommandDefinitionDetail: 'Operation',
+    settingsEventDefinitionDetail: 'Warning',
   };
 
   const iconForCode = (code: string): string | undefined => {

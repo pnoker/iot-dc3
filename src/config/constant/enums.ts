@@ -122,3 +122,32 @@ export const ALARM_TYPE_OPTIONS: EnumOption[] = [
   { label: 'STATE_FLIP', value: 'STATE_FLIP' },
   { label: 'REPORT', value: 'REPORT' },
 ];
+
+// Backend: CommandTypeFlagEnum
+export const COMMAND_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'CUSTOM', value: 'CUSTOM' },
+  { label: 'CONFIG', value: 'CONFIG' },
+  { label: 'ACTION', value: 'ACTION' },
+];
+
+// Backend: CallTypeFlagEnum
+export const CALL_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'SYNC', value: 'SYNC' },
+  { label: 'ASYNC', value: 'ASYNC' },
+];
+
+// Backend: EventTypeFlagEnum
+export const EVENT_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'INFO', value: 'INFO' },
+  { label: 'ALERT', value: 'ALERT' },
+  { label: 'FAULT', value: 'FAULT' },
+  { label: 'LIFECYCLE', value: 'LIFECYCLE' },
+];
+
+// Backend: EventLevelFlagEnum
+export const EVENT_LEVEL_OPTIONS: EnumOption[] = [
+  { label: 'LOW', value: 'LOW' },
+  { label: 'MEDIUM', value: 'MEDIUM' },
+  { label: 'HIGH', value: 'HIGH' },
+  { label: 'CRITICAL', value: 'CRITICAL' },
+];

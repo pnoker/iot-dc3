@@ -28,6 +28,8 @@ import deviceCard from '@/views/device/card/DeviceCard.vue';
 import pointCard from '@/views/point/card/PointCard.vue';
 import device from '@/views/device/Device.vue';
 import point from '@/views/point/Point.vue';
+import CommandList from '@/views/settings/command/CommandList.vue';
+import EventList from '@/views/settings/event/definition/EventList.vue';
 
 import { timestamp } from '@/utils/dateUtil';
 
@@ -40,12 +42,16 @@ export default defineComponent({
     device,
     pointCard,
     point,
+    CommandList,
+    EventList,
   },
   setup() {
     const route = useRoute();
 
     const pointViewRef: any = ref<InstanceType<typeof point>>();
     const deviceViewRef: any = ref<InstanceType<typeof device>>();
+    const commandViewRef: any = ref<InstanceType<typeof CommandList>>();
+    const eventViewRef: any = ref<InstanceType<typeof EventList>>();
 
     // 定义响应式数据
     const reactiveData = reactive({
@@ -85,6 +91,12 @@ export default defineComponent({
         case 'point':
           pointViewRef.value?.refresh();
           break;
+        case 'command':
+          commandViewRef.value?.refresh();
+          break;
+        case 'event':
+          eventViewRef.value?.refresh();
+          break;
         default:
           break;
       }
@@ -95,6 +107,8 @@ export default defineComponent({
     return {
       pointViewRef,
       deviceViewRef,
+      commandViewRef,
+      eventViewRef,
       reactiveData,
       pointLength,
       deviceLength,

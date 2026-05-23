@@ -45,6 +45,12 @@
         <el-tab-pane :label="$t('profile.detail.relatedDevices')" name="device">
           <device ref="deviceViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></device>
         </el-tab-pane>
+        <el-tab-pane label="Commands" name="command">
+          <command-list ref="commandViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></command-list>
+        </el-tab-pane>
+        <el-tab-pane label="Events" name="event">
+          <event-list ref="eventViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></event-list>
+        </el-tab-pane>
       </el-tabs>
     </base-card>
   </div>
