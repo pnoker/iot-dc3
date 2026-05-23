@@ -33,13 +33,11 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.manager.dal.PointManager;
-import io.github.pnoker.common.manager.dal.ProfileBindManager;
 import io.github.pnoker.common.manager.dal.ProfileManager;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.builder.ProfileBuilder;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
-import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.common.manager.entity.model.ProfileDO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
@@ -57,7 +55,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Business service implementation for profile operations.
@@ -74,8 +71,6 @@ public class ProfileServiceImpl implements ProfileService {
     private final ProfileBuilder profileBuilder;
 
     private final ProfileManager profileManager;
-
-    private final ProfileBindManager profileBindManager;
 
     private final PointManager pointManager;
 
@@ -157,19 +152,17 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<ProfileBO> listByDeviceId(Long deviceId) {
-        DeviceDO deviceDO = deviceMapper.selectById(deviceId);
-        if (Objects.isNull(deviceDO)) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>lambdaQuery()
+                .eq(DeviceDO::getId, deviceId);
+        DeviceDO deviceDO = deviceMapper.selectOne(wrapper);
+        if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return Collections.emptyList();
         }
-        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
-                .eq(ProfileBindDO::getTenantId, deviceDO.getTenantId())
-                .eq(ProfileBindDO::getDeviceId, deviceId);
-        List<ProfileBindDO> entityDOList = wrapper.list();
-        Set<Long> profileIds = entityDOList.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
-        return listByIds(profileIds)
-                .stream()
-                .filter(profile -> Objects.equals(deviceDO.getTenantId(), profile.getTenantId()))
-                .toList();
+        ProfileBO profile = getById(deviceDO.getProfileId());
+        if (Objects.isNull(profile) || !Objects.equals(deviceDO.getTenantId(), profile.getTenantId())) {
+            return Collections.emptyList();
+        }
+        return List.of(profile);
     }
 
     @Override

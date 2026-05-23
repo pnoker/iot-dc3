@@ -292,19 +292,19 @@
     </select>
 
     <select id="peerAlarmCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow">
-        SELECT pb.profile_id AS profile_id,
-               ea.device_id  AS device_id,
-               COUNT(*)      AS alarm_count
+        SELECT d.profile_id AS profile_id,
+               ea.device_id AS device_id,
+               COUNT(*)     AS alarm_count
         FROM dc3_entity_alarm ea
-                 JOIN dc3_manager.dc3_profile_bind pb
-                      ON pb.device_id = ea.device_id
-                          AND pb.tenant_id = ea.tenant_id
-                          AND pb.deleted = 0
+                 JOIN dc3_manager.dc3_device d
+                      ON d.id = ea.device_id
+                          AND d.tenant_id = ea.tenant_id
+                          AND d.deleted = 0
         WHERE ea.deleted = 0
           AND ea.tenant_id = #{tenantId}
           AND ea.alarm_target_type_flag IN (0, 1)
           AND ea.create_time &gt;= #{from}
-        GROUP BY pb.profile_id, ea.device_id
+        GROUP BY d.profile_id, ea.device_id
     </select>
 
     <select id="agingBuckets" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow">

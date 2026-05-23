@@ -39,7 +39,6 @@ import io.github.pnoker.common.manager.entity.model.DriverDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
@@ -73,8 +72,6 @@ public class DriverServiceImpl implements DriverService {
     private final DeviceManager deviceManager;
 
     private final PointManager pointManager;
-
-    private final ProfileBindService profileBindService;
 
     @Override
     public void add(DriverBO entityBO) {
@@ -147,19 +144,20 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public List<DriverBO> listByProfileId(Long profileId) {
-        List<Long> ids = profileBindService.listDeviceIdsByProfileId(profileId);
-        if (CollectionUtils.isEmpty(ids)) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda()
+                .eq(DeviceDO::getProfileId, profileId);
+        List<DeviceDO> deviceDOList = deviceManager.list(wrapper);
+        if (CollectionUtils.isEmpty(deviceDOList)) {
             return Collections.emptyList();
         }
 
-        List<DeviceDO> deviceDOList = deviceManager.listByIds(ids);
         Set<Long> driverIds = deviceDOList.stream().map(DeviceDO::getDriverId).collect(Collectors.toSet());
-        List<DriverBO> entityDOList = listByIds(driverIds);
-        if (CollectionUtils.isEmpty(entityDOList)) {
+        List<DriverBO> driverBOList = listByIds(driverIds);
+        if (CollectionUtils.isEmpty(driverBOList)) {
             return Collections.emptyList();
         }
 
-        return entityDOList;
+        return driverBOList;
     }
 
     @Override

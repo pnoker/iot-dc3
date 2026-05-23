@@ -27,12 +27,10 @@ import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.bo.ProfileBindBO;
 import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointAttributeConfigService;
-import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.PoiUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,8 +58,6 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
 
     private final DeviceManager deviceManager;
 
-    private final ProfileBindService profileBindService;
-
     private final DriverAttributeConfigService driverAttributeConfigService;
 
     private final PointAttributeConfigService pointAttributeConfigService;
@@ -85,11 +81,9 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
         entityDO.setTenantId(deviceBO.getTenantId());
 
         // Import device
+        entityDO.setProfileId(deviceBO.getProfileId());
         entityDO = deviceManager.innerSave(entityDO);
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-
-        // Import device profile binding configuration
-        importProfileBind(entityBO, deviceBO.getProfileIds());
 
         // Import driver attribute configuration
         importDriverAttributeConfig(entityBO, driverAttributeBOList, sheet, row);
@@ -98,32 +92,6 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
         importPointAttributeConfig(entityBO, pointBOList, driverAttributeBOList, pointAttributeBOList, sheet, row);
 
         return entityBO;
-    }
-
-    /**
-     * Import device profile binding configuration
-     *
-     * @param deviceBO   Device
-     * @param profileIds Profile ID list
-     */
-    private void importProfileBind(DeviceBO deviceBO, List<Long> profileIds) {
-        if (CollectionUtils.isEmpty(profileIds)) {
-            return;
-        }
-
-        profileIds.forEach(profileId -> {
-            try {
-                ProfileBindBO entityBO = new ProfileBindBO();
-                entityBO.setProfileId(profileId);
-                entityBO.setDeviceId(deviceBO.getId());
-                entityBO.setTenantId(deviceBO.getTenantId());
-                profileBindService.add(entityBO);
-            } catch (Exception e) {
-                log.warn("Skip profile bind during device import, deviceId={}, profileId={}, error={}",
-                        deviceBO.getId(), profileId, e.getMessage(), e);
-            }
-        });
-
     }
 
     /**

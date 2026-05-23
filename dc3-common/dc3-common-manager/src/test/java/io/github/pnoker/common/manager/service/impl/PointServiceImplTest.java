@@ -26,16 +26,15 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.common.manager.dal.PointManager;
-import io.github.pnoker.common.manager.dal.ProfileBindManager;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.builder.PointBuilder;
+import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.mapper.PointMapper;
 import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,16 +66,10 @@ class PointServiceImplTest {
     private PointManager pointManager;
 
     @Mock
-    private ProfileBindManager profileBindManager;
-
-    @Mock
     private PointMapper pointMapper;
 
     @Mock
     private MetadataEventPublisher metadataEventPublisher;
-
-    @Mock
-    private ProfileBindService profileBindService;
 
     @Mock
     private ProfileService profileService;
@@ -124,7 +117,7 @@ class PointServiceImplTest {
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(pointBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointManager.save(doRow)).thenReturn(true);
-        when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of());
+        when(deviceMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
 
         assertThatNoException().isThrownBy(() -> service.add(bo));
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
@@ -170,6 +163,7 @@ class PointServiceImplTest {
     @Test
     void removeThrowsDeleteExceptionWhenManagerReturnsFalse() {
         when(pointManager.getById(1L)).thenReturn(doRow);
+        when(deviceMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
         when(pointManager.removeById(1L)).thenReturn(false);
         assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(DeleteException.class);
     }
@@ -178,7 +172,11 @@ class PointServiceImplTest {
     void removeSucceedsAndPublishesEvents() {
         when(pointManager.getById(1L)).thenReturn(doRow);
         when(pointManager.removeById(1L)).thenReturn(true);
-        when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of(10L, 11L));
+        DeviceDO device1 = new DeviceDO();
+        device1.setId(10L);
+        DeviceDO device2 = new DeviceDO();
+        device2.setId(11L);
+        when(deviceMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(device1, device2));
         assertThatNoException().isThrownBy(() -> service.delete(1L));
         // 1 DELETE for the point itself + 2 UPDATE for affected devices
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
@@ -208,6 +206,7 @@ class PointServiceImplTest {
         when(profileService.getById(5L)).thenReturn(profile);
         PointDO other = new PointDO();
         other.setId(2L);
+        when(deviceMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(other);
         assertThatThrownBy(() -> service.update(bo)).isInstanceOf(DuplicateException.class);
     }
@@ -216,6 +215,7 @@ class PointServiceImplTest {
     void updateThrowsUpdateExceptionWhenManagerReturnsFalse() {
         when(pointManager.getById(1L)).thenReturn(doRow);
         when(profileService.getById(5L)).thenReturn(profile);
+        when(deviceMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
         when(pointManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(pointBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointManager.updateById(doRow)).thenReturn(false);

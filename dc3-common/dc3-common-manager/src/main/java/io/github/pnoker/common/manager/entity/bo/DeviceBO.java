@@ -27,8 +27,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * Business object for device operations.
  *
@@ -86,8 +84,8 @@ public class DeviceBO extends BaseBO implements TenantOwned {
     //
 
     /**
-     * ID
+     * Profile ID
      */
-    private List<Long> profileIds;
+    private Long profileId;
 
 }

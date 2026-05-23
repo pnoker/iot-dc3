@@ -26,8 +26,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * Facade-level device BO.
  * <p>
@@ -62,6 +60,6 @@ public class FacadeDeviceBO extends BaseBO {
 
     private Integer version;
 
-    private List<Long> profileIds;
+    private Long profileId;
 
 }

@@ -221,7 +221,7 @@ public class PointCommandServiceImpl implements PointCommandService {
         if (EnableFlagEnum.DISABLE.equals(point.getEnableFlag())) {
             throw new ServiceException("Point is disabled");
         }
-        if (Objects.isNull(device.getProfileIds()) || !device.getProfileIds().contains(point.getProfileId())) {
+        if (Objects.isNull(device.getProfileId()) || !Objects.equals(device.getProfileId(), point.getProfileId())) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
     }

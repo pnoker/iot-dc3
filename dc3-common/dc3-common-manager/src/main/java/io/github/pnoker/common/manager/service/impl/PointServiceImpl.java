@@ -35,7 +35,6 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.common.manager.dal.PointManager;
-import io.github.pnoker.common.manager.dal.ProfileBindManager;
 import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
@@ -45,14 +44,12 @@ import io.github.pnoker.common.manager.entity.builder.PointBuilder;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
-import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.mapper.PointMapper;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -88,13 +85,9 @@ public class PointServiceImpl implements PointService {
 
     private final PointManager pointManager;
 
-    private final ProfileBindManager profileBindManager;
-
     private final PointMapper pointMapper;
 
     private final MetadataEventPublisher metadataEventPublisher;
-
-    private final ProfileBindService profileBindService;
 
     private final ProfileService profileService;
 
@@ -116,7 +109,7 @@ public class PointServiceImpl implements PointService {
         }
 
         //
-        List<Long> deviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
+        List<Long> deviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
         metadataEventPublisher.publishEvent(
                 new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD,
                         driverServiceNamesByDeviceIds(deviceIds)));
@@ -127,7 +120,7 @@ public class PointServiceImpl implements PointService {
     @Transactional
     public void delete(Long id) {
         PointDO entityDO = getDOById(id, true);
-        List<Long> deviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
+        List<Long> deviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
         Set<String> targetServices = driverServiceNamesByDeviceIds(deviceIds);
 
         if (!pointManager.removeById(id)) {
@@ -145,7 +138,7 @@ public class PointServiceImpl implements PointService {
     @Transactional
     public void update(PointBO entityBO) {
         PointDO current = getDOById(entityBO.getId(), true);
-        List<Long> oldDeviceIds = profileBindService.listDeviceIdsByProfileId(current.getProfileId());
+        List<Long> oldDeviceIds = listDeviceIdsByProfileId(current.getProfileId());
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
@@ -165,7 +158,7 @@ public class PointServiceImpl implements PointService {
                     MetadataOperateTypeEnum.UPDATE, driverServiceNamesByDeviceIds(oldDeviceIds));
             metadataEventPublisher.publishEvent(metadataEvent);
         } else {
-            List<Long> newDeviceIds = profileBindService.listDeviceIdsByProfileId(entityDO.getProfileId());
+            List<Long> newDeviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
             metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
                     MetadataOperateTypeEnum.DELETE, driverServiceNamesByDeviceIds(oldDeviceIds)));
             metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
@@ -193,15 +186,10 @@ public class PointServiceImpl implements PointService {
     @Override
     public List<PointBO> listByDeviceId(Long deviceId) {
         DeviceDO deviceDO = deviceMapper.selectById(deviceId);
-        if (Objects.isNull(deviceDO)) {
+        if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return Collections.emptyList();
         }
-        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
-                .eq(ProfileBindDO::getTenantId, deviceDO.getTenantId())
-                .eq(ProfileBindDO::getDeviceId, deviceId);
-        List<ProfileBindDO> entityDOList = wrapper.list();
-        List<Long> profileIds = entityDOList.stream().map(ProfileBindDO::getProfileId).toList();
-        return selectByProfileIds(profileIds)
+        return listByProfileId(deviceDO.getProfileId())
                 .stream()
                 .filter(point -> Objects.equals(deviceDO.getTenantId(), point.getTenantId()))
                 .toList();
@@ -248,7 +236,7 @@ public class PointServiceImpl implements PointService {
         PointBO pointBO = getById(pointId);
         Set<Long> deviceIds = new HashSet<>();
 
-        profileBindService.listDeviceIdsByProfileId(pointBO.getProfileId()).forEach(deviceId -> {
+        listDeviceIdsByProfileId(pointBO.getProfileId()).forEach(deviceId -> {
             List<PointAttributeConfigDO> dos = listByDeviceIdAndPointId(deviceId, pointId);
             if (!dos.isEmpty()) {
                 deviceIds.add(deviceId);
@@ -269,32 +257,25 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public Long getPointByDeviceId(Long deviceId) {
-        List<ProfileBindDO> bindDOList = profileBindManager
-                .list(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
-        if (CollectionUtils.isEmpty(bindDOList)) {
+        DeviceDO deviceDO = deviceMapper.selectById(deviceId);
+        if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return 0L;
         }
-        long count = 0L;
-        for (ProfileBindDO bindDO : bindDOList) {
-            count += pointManager
-                    .count(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, bindDO.getProfileId()));
-        }
-        return count;
+        return pointManager.count(new LambdaQueryWrapper<PointDO>()
+                .eq(PointDO::getProfileId, deviceDO.getProfileId()));
     }
 
     @Override
     public PointConfigByDeviceBO getPointConfigByDeviceId(Long deviceId) {
         PointConfigByDeviceBO pointConfigByDeviceBO = new PointConfigByDeviceBO();
-        List<ProfileBindDO> bindDOList = profileBindManager
-                .list(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
         pointConfigByDeviceBO.setConfigCount(0L);
-        if (CollectionUtils.isEmpty(bindDOList)) {
+        DeviceDO deviceDO = deviceMapper.selectById(deviceId);
+        if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             pointConfigByDeviceBO.setUnConfigCount(0L);
             return pointConfigByDeviceBO;
         }
-        List<Long> profileIds = bindDOList.stream().map(ProfileBindDO::getProfileId).distinct().toList();
         List<PointDO> allPoints = pointManager
-                .list(new LambdaQueryWrapper<PointDO>().in(PointDO::getProfileId, profileIds));
+                .list(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, deviceDO.getProfileId()));
         if (CollectionUtils.isEmpty(allPoints)) {
             pointConfigByDeviceBO.setUnConfigCount(0L);
             return pointConfigByDeviceBO;
@@ -419,6 +400,15 @@ public class PointServiceImpl implements PointService {
             return Collections.emptySet();
         }
         return Set.of(driverBO.getServiceName());
+    }
+
+    private List<Long> listDeviceIdsByProfileId(Long profileId) {
+        if (Objects.isNull(profileId)) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>lambdaQuery()
+                .eq(DeviceDO::getProfileId, profileId);
+        return deviceMapper.selectList(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
     /**

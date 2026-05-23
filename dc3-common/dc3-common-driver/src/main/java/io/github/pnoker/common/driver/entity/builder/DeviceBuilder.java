@@ -31,8 +31,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.HashSet;
-
 /**
  * MapStruct mapper for converting device gRPC DTOs into internal business objects.
  *
@@ -53,7 +51,7 @@ public interface DeviceBuilder {
     @Mapping(target = "operateTime", ignore = true)
     @Mapping(target = "deviceExt", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "profileIds", ignore = true)
+    @Mapping(target = "profileId", ignore = true)
     @Mapping(target = "pointIds", ignore = true)
     @Mapping(target = "driverAttributeConfigIdMap", ignore = true)
     @Mapping(target = "pointAttributeConfigIdMap", ignore = true)
@@ -64,7 +62,7 @@ public interface DeviceBuilder {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
 
         CollectionOptional.ofNullable(entityGrpc.getProfileIdsList())
-                .ifPresent(value -> entityBO.setProfileIds(new HashSet<>(value)));
+                .ifPresent(value -> entityBO.setProfileId(value.stream().findFirst().orElse(null)));
         JsonOptional.ofNullable(entityGrpc.getDeviceExt())
                 .ifPresent(value -> entityBO.setDeviceExt(JsonUtil.parseObject(value, DeviceExt.class)));
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);

@@ -70,7 +70,7 @@ public class DriverReadScheduleJob extends QuartzJobBean {
         for (Long deviceId : deviceIds) {
             DeviceBO entityBO = deviceMetadata.getCache(deviceId);
             if (Objects.nonNull(entityBO) && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
-                    && CollectionUtils.isNotEmpty(entityBO.getProfileIds())
+                    && Objects.nonNull(entityBO.getProfileId())
                     && CollectionUtils.isNotEmpty(entityBO.getPointIds())
                     && MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
                     && MapUtils.isNotEmpty(entityBO.getPointAttributeConfigIdMap())) {

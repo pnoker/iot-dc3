@@ -170,24 +170,26 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
                     || !Objects.equals(deviceBO.getTenantId(), driverBO.getTenantId())) {
                 return Collections.emptySet();
             }
-            return filterProfileId(request, deviceBO.getProfileIds());
+            return filterProfileId(request, deviceBO.getProfileId());
         }
 
         Set<Long> profileIds = deviceService.listByDriverId(driverBO.getId())
                 .stream()
                 .filter(device -> Objects.equals(driverBO.getTenantId(), device.getTenantId()))
-                .filter(device -> Objects.nonNull(device.getProfileIds()))
-                .flatMap(device -> device.getProfileIds().stream())
+                .map(DeviceBO::getProfileId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         return filterProfileId(request, profileIds);
     }
 
-    private Set<Long> filterProfileId(GrpcPagePointQuery request, List<Long> profileIds) {
-        if (Objects.isNull(profileIds)) {
+    private Set<Long> filterProfileId(GrpcPagePointQuery request, Long profileId) {
+        if (Objects.isNull(profileId)) {
             return Collections.emptySet();
         }
-        return filterProfileId(request, new LinkedHashSet<>(profileIds));
+        if (request.getProfileId() <= 0) {
+            return Set.of(profileId);
+        }
+        return Objects.equals(profileId, request.getProfileId()) ? Set.of(profileId) : Collections.emptySet();
     }
 
     private Set<Long> filterProfileId(GrpcPagePointQuery request, Set<Long> profileIds) {
@@ -201,9 +203,8 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
         return deviceService.listByDriverId(driverBO.getId())
                 .stream()
                 .filter(device -> Objects.equals(driverBO.getTenantId(), device.getTenantId()))
-                .map(DeviceBO::getProfileIds)
+                .map(DeviceBO::getProfileId)
                 .filter(Objects::nonNull)
-                .flatMap(List::stream)
                 .anyMatch(profileId -> Objects.equals(profileId, pointBO.getProfileId()));
     }
 

@@ -30,7 +30,6 @@ import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.builder.DriverBuilder;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.DriverDO;
-import io.github.pnoker.common.manager.service.ProfileBindService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,9 +62,6 @@ class DriverServiceImplTest {
 
     @Mock
     private PointManager pointManager;
-
-    @Mock
-    private ProfileBindService profileBindService;
 
     @InjectMocks
     private DriverServiceImpl service;
@@ -194,7 +190,7 @@ class DriverServiceImplTest {
 
     @Test
     void listByProfileIdReturnsEmptyWhenNoDeviceBound() {
-        when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of());
+        when(deviceManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of());
         assertThat(service.listByProfileId(5L)).isEmpty();
         verify(deviceManager, never()).listByIds(any());
     }
@@ -207,8 +203,7 @@ class DriverServiceImplTest {
         DeviceDO d2 = new DeviceDO();
         d2.setId(11L);
         d2.setDriverId(1L);
-        when(profileBindService.listDeviceIdsByProfileId(5L)).thenReturn(List.of(10L, 11L));
-        when(deviceManager.listByIds(List.of(10L, 11L))).thenReturn(List.of(d1, d2));
+        when(deviceManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of(d1, d2));
         when(driverManager.listByIds(Set.of(1L))).thenReturn(List.of(doRow));
         when(driverBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
 

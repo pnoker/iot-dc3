@@ -116,7 +116,7 @@ public interface DeviceBuilder {
      * @return EntityBO
      */
     @Mapping(target = "deviceExt", ignore = true)
-    @Mapping(target = "profileIds", ignore = true)
+    @Mapping(target = "profileId", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     DeviceBO buildBOByDO(DeviceDO entityDO);
 
