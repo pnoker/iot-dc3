@@ -52,14 +52,45 @@ public record CommandCallResultDTO(
         private Instant finishedAt;
         private int schemaVersion;
 
-        public Builder recordId(String recordId) { this.recordId = recordId; return this; }
-        public Builder tenantId(Long tenantId) { this.tenantId = tenantId; return this; }
-        public Builder status(String status) { this.status = status; return this; }
-        public Builder resultValues(Map<String, String> resultValues) { this.resultValues = resultValues; return this; }
-        public Builder errorCode(String errorCode) { this.errorCode = errorCode; return this; }
-        public Builder errorMessage(String errorMessage) { this.errorMessage = errorMessage; return this; }
-        public Builder finishedAt(Instant finishedAt) { this.finishedAt = finishedAt; return this; }
-        public Builder schemaVersion(int schemaVersion) { this.schemaVersion = schemaVersion; return this; }
+        public Builder recordId(String recordId) {
+            this.recordId = recordId;
+            return this;
+        }
+
+        public Builder tenantId(Long tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder resultValues(Map<String, String> resultValues) {
+            this.resultValues = resultValues;
+            return this;
+        }
+
+        public Builder errorCode(String errorCode) {
+            this.errorCode = errorCode;
+            return this;
+        }
+
+        public Builder errorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
+            return this;
+        }
+
+        public Builder finishedAt(Instant finishedAt) {
+            this.finishedAt = finishedAt;
+            return this;
+        }
+
+        public Builder schemaVersion(int schemaVersion) {
+            this.schemaVersion = schemaVersion;
+            return this;
+        }
 
         public CommandCallResultDTO build() {
             return new CommandCallResultDTO(recordId, tenantId, status, resultValues,

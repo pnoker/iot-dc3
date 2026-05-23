@@ -62,10 +62,10 @@ public interface DriverSenderService {
     /**
      * Publishes a device status event using the supplied timeout.
      *
-     * @param deviceId         device identifier
-     * @param status           device status
-     * @param timeout          timeout value
-     * @param timeoutUnit      timeout unit
+     * @param deviceId    device identifier
+     * @param status      device status
+     * @param timeout     timeout value
+     * @param timeoutUnit timeout unit
      */
     void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit);
 

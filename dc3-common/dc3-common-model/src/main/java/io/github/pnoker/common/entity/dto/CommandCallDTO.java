@@ -58,17 +58,60 @@ public record CommandCallDTO(
         private Instant expireAt;
         private int schemaVersion;
 
-        public Builder recordId(String recordId) { this.recordId = recordId; return this; }
-        public Builder tenantId(Long tenantId) { this.tenantId = tenantId; return this; }
-        public Builder deviceId(Long deviceId) { this.deviceId = deviceId; return this; }
-        public Builder commandId(Long commandId) { this.commandId = commandId; return this; }
-        public Builder commandCode(String commandCode) { this.commandCode = commandCode; return this; }
-        public Builder paramValues(Map<String, String> paramValues) { this.paramValues = paramValues; return this; }
-        public Builder source(String source) { this.source = source; return this; }
-        public Builder sourceUserId(Long sourceUserId) { this.sourceUserId = sourceUserId; return this; }
-        public Builder occurredAt(Instant occurredAt) { this.occurredAt = occurredAt; return this; }
-        public Builder expireAt(Instant expireAt) { this.expireAt = expireAt; return this; }
-        public Builder schemaVersion(int schemaVersion) { this.schemaVersion = schemaVersion; return this; }
+        public Builder recordId(String recordId) {
+            this.recordId = recordId;
+            return this;
+        }
+
+        public Builder tenantId(Long tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        public Builder deviceId(Long deviceId) {
+            this.deviceId = deviceId;
+            return this;
+        }
+
+        public Builder commandId(Long commandId) {
+            this.commandId = commandId;
+            return this;
+        }
+
+        public Builder commandCode(String commandCode) {
+            this.commandCode = commandCode;
+            return this;
+        }
+
+        public Builder paramValues(Map<String, String> paramValues) {
+            this.paramValues = paramValues;
+            return this;
+        }
+
+        public Builder source(String source) {
+            this.source = source;
+            return this;
+        }
+
+        public Builder sourceUserId(Long sourceUserId) {
+            this.sourceUserId = sourceUserId;
+            return this;
+        }
+
+        public Builder occurredAt(Instant occurredAt) {
+            this.occurredAt = occurredAt;
+            return this;
+        }
+
+        public Builder expireAt(Instant expireAt) {
+            this.expireAt = expireAt;
+            return this;
+        }
+
+        public Builder schemaVersion(int schemaVersion) {
+            this.schemaVersion = schemaVersion;
+            return this;
+        }
 
         public CommandCallDTO build() {
             return new CommandCallDTO(recordId, tenantId, deviceId, commandId, commandCode,
