@@ -356,25 +356,6 @@ Testcontainers strategy and CI workflow expectations.
 
 Before committing code that changes public behavior, mention what was verified and what was not verified.
 
-## Git Identity For AI Commits
-
-AI-generated commits in this repository must use:
-
-```text
-Author: Claude <209825114+claude[bot]@users.noreply.github.com>
-Committer: Claude <209825114+claude[bot]@users.noreply.github.com>
-```
-
-Use command-scoped identity instead of changing repository config:
-
-```bash
-GIT_COMMITTER_NAME='Claude' GIT_COMMITTER_EMAIL='209825114+claude[bot]@users.noreply.github.com' \
-git commit --author='Claude <209825114+claude[bot]@users.noreply.github.com>' -m '<message>'
-```
-
-Do not run `git config --local user.name` or `git config --local user.email` for this rule. Human contributors must keep
-their own identity.
-
 ## Editing Rules
 
 - Keep changes focused on the request.
