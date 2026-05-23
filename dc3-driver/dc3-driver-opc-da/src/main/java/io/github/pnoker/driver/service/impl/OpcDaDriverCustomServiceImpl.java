@@ -46,6 +46,7 @@ import org.openscada.opc.lib.da.Group;
 import org.openscada.opc.lib.da.Item;
 import org.openscada.opc.lib.da.Server;
 import org.openscada.opc.lib.da.UnknownGroupException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.UnknownHostException;
@@ -71,9 +72,9 @@ import java.util.concurrent.Executors;
 public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
-
     private final DriverSenderService driverSenderService;
-
+    @Value("${dc3.driver.code}")
+    private String driverCode;
     /**
      * Cache of device ID to OPC DA server connections.
      */
@@ -94,18 +95,18 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=opcDa, metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 Server removed = connectMap.remove(metadataEvent.getId());
-                log.info("Driver connection invalidated, protocol=opcDa, deviceId={}, operateType={}, removed={}",
+                log.info("Driver connection invalidated, protocol=" + driverCode + ", deviceId={}, operateType={}, removed={}",
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=opcDa, metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -138,20 +139,20 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
             String clsId = driverConfig.get("clsId").getValue(String.class);
             String user = driverConfig.get("username").getValue(String.class);
             String password = driverConfig.get("password").getValue(String.class);
-            log.debug("Driver connection creating, protocol=opcDa, deviceId={}, host={}, clsId={}, usernamePresent={}",
+            log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, usernamePresent={}",
                     deviceId, host, clsId, Objects.nonNull(user));
             ConnectionInformation connectionInformation = new ConnectionInformation(host, clsId, user, password);
             server = new Server(connectionInformation, Executors.newSingleThreadScheduledExecutor());
             try {
                 server.connect();
                 connectMap.put(deviceId, server);
-                log.info("Driver connection established, protocol=opcDa, deviceId={}, host={}, clsId={}", deviceId,
+                log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}", deviceId,
                         host, clsId);
             } catch (AlreadyConnectedException | UnknownHostException | JIException e) {
                 connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
-                log.error("Driver connection failed, protocol=opcDa, deviceId={}, host={}, clsId={}", deviceId, host,
+                log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}", deviceId, host,
                         clsId, e);
-                throw new ConnectorException("Driver connection failed, protocol=opcDa, deviceId={}, host={}, clsId={}, message={}",
+                throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, message={}",
                         deviceId, host, clsId, e.getMessage(), e);
             }
         }
@@ -192,8 +193,8 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         } catch (NotConnectedException | JIException | AddFailedException | DuplicateGroupException
                  | UnknownHostException e) {
             server.dispose();
-            log.error("Driver point read failed, protocol=opcDa", e);
-            throw new ReadPointException("Driver point read failed, protocol=opcDa, message={}", e.getMessage(), e);
+            log.error("Driver point read failed, protocol=" + driverCode + "", e);
+            throw new ReadPointException("Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
 
@@ -251,8 +252,8 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         } catch (NotConnectedException | AddFailedException | DuplicateGroupException | UnknownHostException
                  | JIException e) {
             server.dispose();
-            log.error("Driver point write failed, protocol=opcDa", e);
-            throw new WritePointException("Driver point write failed, protocol=opcDa, message={}", e.getMessage(), e);
+            log.error("Driver point write failed, protocol=" + driverCode + "", e);
+            throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
 

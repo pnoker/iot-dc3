@@ -31,6 +31,7 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -54,8 +55,9 @@ import java.util.Random;
 public class VirtualDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
-
     private final DriverSenderService driverSenderService;
+    @Value("${dc3.driver.code}")
+    private String driverCode;
 
     /**
      * Initializes the virtual driver.
@@ -107,11 +109,11 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             // to do something for device event
-            log.info("Driver metadata event received, protocol=virtual, metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
                     metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             // to do something for point event
-            log.info("Driver metadata event received, protocol=virtual, metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
                     metadataType, operateType, metadataEvent.getId());
         }
     }

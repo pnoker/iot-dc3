@@ -60,6 +60,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
     /**
      * Static self-reference for accessing Spring-injected beans from static context.
      */
+    private static final String PROTOCOL = "udp";
     private static NettyUdpServerHandler nettyUdpServerHandler;
 
     private final NettyServerHandler nettyServerHandler;
@@ -93,7 +94,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.warn("Driver channel error, protocol=udp, remoteAddress={}", context.channel().remoteAddress(), throwable);
+        log.warn("Driver channel error, protocol=" + PROTOCOL + ", remoteAddress={}", context.channel().remoteAddress(), throwable);
         context.disconnect();
     }
 

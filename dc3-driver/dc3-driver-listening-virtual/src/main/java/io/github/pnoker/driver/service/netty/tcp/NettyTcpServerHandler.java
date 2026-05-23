@@ -60,6 +60,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * Static self-reference for accessing Spring-injected beans from static context.
      */
+    private static final String PROTOCOL = "tcp";
     private static NettyTcpServerHandler nettyTcpServerHandler;
 
     private final NettyServerHandler nettyServerHandler;
@@ -93,7 +94,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.warn("Driver channel error, protocol=tcp, remoteAddress={}", context.channel().remoteAddress(), throwable);
+        log.warn("Driver channel error, protocol=" + PROTOCOL + ", remoteAddress={}", context.channel().remoteAddress(), throwable);
         context.disconnect();
     }
 

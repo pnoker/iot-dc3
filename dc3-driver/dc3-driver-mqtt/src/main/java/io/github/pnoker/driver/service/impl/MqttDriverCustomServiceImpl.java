@@ -31,6 +31,7 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.driver.service.MqttSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -55,10 +56,10 @@ import java.util.Objects;
 public class MqttDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
-
     private final DriverSenderService driverSenderService;
-
     private final MqttSendService mqttSendService;
+    @Value("${dc3.driver.code}")
+    private String driverCode;
 
     /**
      * Initializes the MQTT driver.
@@ -111,11 +112,11 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             // to do something for device event
-            log.info("Driver metadata event received, protocol=mqtt, metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
                     metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             // to do something for point event
-            log.info("Driver metadata event received, protocol=mqtt, metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -181,7 +182,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
          */
         String commandTopic = pointConfig.get("commandTopic").getValue(String.class);
         String value = values.getValue();
-        log.debug("Driver point write requested, protocol=mqtt, deviceId={}, pointId={}, topic={}, valueLength={}",
+        log.debug("Driver point write requested, protocol=" + driverCode + ", deviceId={}, pointId={}, topic={}, valueLength={}",
                 device.getId(), point.getId(), commandTopic, Objects.toString(value, "").length());
         try {
             int commandQos = pointConfig.get("commandQos").getValue(Integer.class);

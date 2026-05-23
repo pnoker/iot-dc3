@@ -52,6 +52,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class NettyTcpServer {
 
+    private static final String PROTOCOL = "tcp";
+
     /**
      * Mapping of device IDs to Netty channels.
      * <p>
@@ -96,11 +98,11 @@ public class NettyTcpServer {
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();
-            log.info("Driver listener started, protocol=tcp, port={}", port);
+            log.info("Driver listener started, protocol=" + PROTOCOL + ", port={}", port);
             future.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully().sync();
-            log.info("Driver listener stopped, protocol=tcp, port={}", port);
+            log.info("Driver listener stopped, protocol=" + PROTOCOL + ", port={}", port);
         }
     }
 
