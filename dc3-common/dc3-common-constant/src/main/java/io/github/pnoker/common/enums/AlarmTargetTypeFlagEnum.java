@@ -49,6 +49,11 @@ public enum AlarmTargetTypeFlagEnum {
      * Driver
      */
     DRIVER((byte) 2, "driver", "Driver"),
+
+    /**
+     * Event
+     */
+    EVENT((byte) 3, "event", "Event"),
     ;
 
     /**

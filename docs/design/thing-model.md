@@ -17,9 +17,9 @@ title: 物模型设计方案
 |------|------|------|------|
 | Phase 1 | Device 加 `profile_id`，移除 ProfileBind | [DONE] | 28 文件改动，核心重构 |
 | Phase 1 | 数据迁移（多 Profile → 单 Profile） | 不做 | 已决策：新设备走新逻辑，老设备兼容过渡 |
-| Phase 2 | `dc3_command` / `dc3_command_param` 表 | [TODO] | 纯增量，无风险 |
-| Phase 2 | `dc3_event` / `dc3_event_param` 表 | [TODO] | 纯增量，无风险 |
-| Phase 3 | 指令调用链路 + 事件上报链路 | [TODO] | 依赖 Phase 2 完成 |
+| Phase 2 | `dc3_command` / `dc3_command_param` 表 | [DONE] | 纯增量，无风险 |
+| Phase 2 | `dc3_event` / `dc3_event_param` 表 | [DONE] | 纯增量，无风险 |
+| Phase 3 | 指令调用链路 + 事件上报链路 | [DONE] | 包含 Driver SDK 扩展 + 告警规则触发 |
 | Phase 4 | Web UI + 导入导出 + 文档 | [TODO] | 产品化收尾 |
 
 ---
@@ -128,7 +128,7 @@ Runtime
 - 设备的 Point 集合只来自自身 `profile_id` 指向的 `Profile`。
 - `point_ext` 中可放点位约束，如 `min`、`max`、`enum`、`step`、`reportMode`。
 
-### Command [TODO]
+### Command [DONE]
 
 物模型语义里的服务在 DC3 中统一表达为 `Command`。这里的 `Command` 只描述读写 Point 之外的动作型能力，例如重启、校准、切换模式、下发配置。指令定义属于
 `Profile`，指令执行属于 `Device`。
@@ -187,7 +187,7 @@ Point 之外的自定义指令能力，并通过 `profile_id` 归属到 `Profile
 4. 驱动执行后返回结果；同步指令等待结果，异步指令只记录受理状态。
 5. 指令调用记录写入数据中心，便于追踪、重试和审计。
 
-### Event [TODO]
+### Event [DONE]
 
 事件表示设备主动上报或平台根据数据规则识别出的业务事件，例如故障、告警、模式切换、工况变化。事件定义属于 `Profile`，事件实例属于
 `Device`。
@@ -306,14 +306,14 @@ CREATE INDEX idx_device_profile ON dc3_device (tenant_id, profile_id) WHERE dele
 - Device/Point/Driver/Topic/Dashboard 服务不再引用 `dc3_profile_bind`
 - 现有测试通过
 
-### 第二阶段：模型定义闭环 [TODO]
+### 第二阶段：模型定义闭环 [DONE]
 
 - 保留 `Profile` 和 `Point`，新增 `dc3_command`、`dc3_command_param`、`dc3_event`、`dc3_event_param` 四张表。
 - Manager 提供自定义指令、事件 CRUD、分页、按 `profile_id` 查询。
 - Profile 详情聚合返回 Point、指令、事件。
 - 增加同一 `Profile` 下 `point_code`、`command_code`、`event_code` 唯一校验。
 
-### 第三阶段：运行链路闭环 [TODO]
+### 第三阶段：运行链路闭环 [DONE]
 
 - Data Center 扩展指令调用 API 和调用记录。
 - Driver SDK 扩展自定义指令 DTO。

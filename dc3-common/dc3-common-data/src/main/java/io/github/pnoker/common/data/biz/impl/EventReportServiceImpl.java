@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.data.biz.EventReportService;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EventRecordManager;
 import io.github.pnoker.common.data.entity.model.EventRecordDO;
 import io.github.pnoker.common.data.entity.vo.EventRecordQueryVO;
@@ -60,6 +61,8 @@ public class EventReportServiceImpl implements EventReportService {
     private final DeviceFacade deviceFacade;
 
     private final EventFacade eventFacade;
+
+    private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     private final EventRecordManager eventRecordManager;
 
@@ -113,6 +116,8 @@ public class EventReportServiceImpl implements EventReportService {
         recordDO.setAcknowledgeFlag(EventRecordAcknowledgeFlagEnum.NO.getIndex());
         recordDO.setSchemaVersion((short) entityDTO.schemaVersion());
         eventRecordManager.save(recordDO);
+
+        alarmRuleTriggerService.processEventReport(entityDTO);
 
         return entityDTO.recordId();
     }

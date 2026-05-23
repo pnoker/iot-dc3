@@ -20,6 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
+import io.github.pnoker.common.entity.dto.EventReportDTO;
 
 import java.util.List;
 
@@ -61,5 +62,12 @@ public interface AlarmRuleTriggerService {
      * @param alarm driver alarm payload
      */
     void processDriverAlarm(DriverAlarmDTO alarm);
+
+    /**
+     * Process an event report.
+     *
+     * @param entityDTO event report payload
+     */
+    void processEventReport(EventReportDTO entityDTO);
 
 }
