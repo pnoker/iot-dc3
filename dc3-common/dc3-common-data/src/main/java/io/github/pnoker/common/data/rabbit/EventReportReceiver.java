@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.biz.EventReportService;
+import io.github.pnoker.common.data.biz.EventHistoryService;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
@@ -43,7 +43,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class EventReportReceiver {
 
-    private final EventReportService eventReportService;
+    private final EventHistoryService eventHistoryService;
 
     @RabbitHandler
     @RabbitListener(queues = "#{eventReportQueue.name}")
@@ -57,7 +57,7 @@ public class EventReportReceiver {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
-            eventReportService.report(entityDTO);
+            eventHistoryService.report(entityDTO);
             RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
             log.error("Event report consume failed, deliveryTag={}", deliveryTag, e);

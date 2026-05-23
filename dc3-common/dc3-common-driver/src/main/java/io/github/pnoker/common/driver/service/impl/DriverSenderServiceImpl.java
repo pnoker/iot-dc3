@@ -164,7 +164,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             return;
         }
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT,
-                RabbitConstant.ROUTING_POINT_COMMAND_RESULT + "." + driverProperties.getService(), resultDTO);
+                RabbitConstant.ROUTING_POINT_COMMAND_RESULT_PREFIX + driverProperties.getService(), resultDTO);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             return;
         }
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
-                RabbitConstant.ROUTING_COMMAND_RESULT + "." + driverProperties.getService(), resultDTO);
+                RabbitConstant.ROUTING_COMMAND_RESULT_PREFIX + driverProperties.getService(), resultDTO);
     }
 
     @Override

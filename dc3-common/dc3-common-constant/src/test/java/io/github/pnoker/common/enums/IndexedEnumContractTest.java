@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.enums;
 
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
@@ -124,7 +125,7 @@ class IndexedEnumContractTest {
         Set<Byte> seen = new HashSet<>();
 
         Stream<DynamicTest> perConstant = Stream.of(constants).flatMap(constant -> {
-            String name = enumClass.getSimpleName() + "." + constant.name();
+            String name = enumClass.getSimpleName() + SymbolConstant.DOT + constant.name();
             return Stream.of(
                     DynamicTest.dynamicTest(name + " has non-null index", () -> {
                         Byte index = (Byte) getIndex.invoke(constant);

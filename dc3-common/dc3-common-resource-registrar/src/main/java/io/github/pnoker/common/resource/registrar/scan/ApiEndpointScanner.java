@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.resource.registrar.scan;
 
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +69,7 @@ public class ApiEndpointScanner {
 
     private static String buildApiName(HandlerMethod handler) {
         String className = handler.getBeanType().getSimpleName();
-        return className + "." + handler.getMethod().getName();
+        return className + SymbolConstant.DOT + handler.getMethod().getName();
     }
 
     /**
@@ -112,7 +113,7 @@ public class ApiEndpointScanner {
                 if (!SUPPORTED_METHODS.contains(method)) {
                     continue;
                 }
-                String key = method.name() + ":" + path;
+                String key = method.name() + SymbolConstant.COLON + path;
                 if (out.containsKey(key)) {
                     continue;
                 }

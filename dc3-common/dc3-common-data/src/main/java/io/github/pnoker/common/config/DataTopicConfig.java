@@ -243,7 +243,7 @@ public class DataTopicConfig {
     Binding pointCommandDeadBinding(Queue pointCommandDeadQueue, TopicExchange pointCommandDeadExchange) {
         return BindingBuilder.bind(pointCommandDeadQueue)
                 .to(pointCommandDeadExchange)
-                .with("#");
+                .with(SymbolConstant.HASHTAG);
     }
 
     // ===== Point command result ==============================================
@@ -264,7 +264,7 @@ public class DataTopicConfig {
     Binding pointCommandResultBinding(Queue pointCommandResultQueue, TopicExchange pointCommandResultExchange) {
         return BindingBuilder.bind(pointCommandResultQueue)
                 .to(pointCommandResultExchange)
-                .with(RabbitConstant.ROUTING_POINT_COMMAND_RESULT + ".*");
+                .with(RabbitConstant.ROUTING_POINT_COMMAND_RESULT_PREFIX + SymbolConstant.ASTERISK);
     }
 
     // ===== Custom command dead letter ========================================
@@ -278,7 +278,7 @@ public class DataTopicConfig {
     Binding commandDeadBinding(Queue commandDeadQueue, TopicExchange commandDeadExchange) {
         return BindingBuilder.bind(commandDeadQueue)
                 .to(commandDeadExchange)
-                .with("#");
+                .with(SymbolConstant.HASHTAG);
     }
 
     // ===== Custom command result =============================================
@@ -294,7 +294,7 @@ public class DataTopicConfig {
     Binding commandResultBinding(Queue commandResultQueue, TopicExchange commandResultExchange) {
         return BindingBuilder.bind(commandResultQueue)
                 .to(commandResultExchange)
-                .with(RabbitConstant.ROUTING_COMMAND_RESULT + ".*");
+                .with(RabbitConstant.ROUTING_COMMAND_RESULT_PREFIX + SymbolConstant.ASTERISK);
     }
 
     // ===== Event report ======================================================
@@ -310,7 +310,7 @@ public class DataTopicConfig {
     Binding eventReportBinding(Queue eventReportQueue, TopicExchange eventExchange) {
         return BindingBuilder.bind(eventReportQueue)
                 .to(eventExchange)
-                .with(RabbitConstant.ROUTING_EVENT_PREFIX + "*");
+                .with(RabbitConstant.ROUTING_EVENT_PREFIX + SymbolConstant.ASTERISK);
     }
 
 }

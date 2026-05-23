@@ -18,6 +18,7 @@
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.Inet4Address;
@@ -179,7 +180,8 @@ public class HostUtil {
             if (Objects.nonNull(mac)) {
                 StringBuilder stringBuilder = new StringBuilder();
                 for (int i = 0; i < mac.length; i++) {
-                    stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                    stringBuilder.append(String.format("%02X%s", mac[i],
+                            (i < mac.length - 1) ? SymbolConstant.HYPHEN : ""));
                 }
                 macList.add(stringBuilder.toString());
             }

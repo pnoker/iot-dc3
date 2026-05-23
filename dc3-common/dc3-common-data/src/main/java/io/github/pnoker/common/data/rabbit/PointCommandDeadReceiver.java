@@ -18,8 +18,8 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.dal.PointCommandManager;
-import io.github.pnoker.common.data.entity.model.PointCommandDO;
+import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
+import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointCommandDeadReceiver {
 
-    private final PointCommandManager pointCommandManager;
+    private final PointCommandHistoryManager pointCommandHistoryManager;
 
     @RabbitHandler
     @RabbitListener(queues = "#{pointCommandDeadQueue.name}")
@@ -54,15 +54,15 @@ public class PointCommandDeadReceiver {
         try {
             String correlationId = message.getMessageProperties().getCorrelationId();
             if (Objects.nonNull(correlationId)) {
-                PointCommandDO commandDO = pointCommandManager.lambdaQuery()
-                        .eq(PointCommandDO::getCommandId, correlationId)
+                PointCommandHistoryDO commandDO = pointCommandHistoryManager.lambdaQuery()
+                        .eq(PointCommandHistoryDO::getCommandId, correlationId)
                         .one();
                 if (Objects.nonNull(commandDO)) {
                     commandDO.setStatus(PointCommandStatusEnum.DEAD.getCode());
                     commandDO.setErrorCode("DLX");
                     commandDO.setErrorMessage("Message rejected to dead letter queue");
-                    commandDO.setFinishedAt(LocalDateTime.now());
-                    pointCommandManager.updateById(commandDO);
+                    commandDO.setFinishTime(LocalDateTime.now());
+                    pointCommandHistoryManager.updateById(commandDO);
                     log.info("Marked dead command: commandId={}", correlationId);
                 }
             }

@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import com.rabbitmq.client.Channel;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.data.dal.NotifyChannelManager;
 import io.github.pnoker.common.data.dal.NotifyHistoryManager;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
@@ -112,7 +113,7 @@ public class NotifyWorker {
         NotifyChannelBO channel = loadChannel(task.getChannelId(), task.getTenantId());
         if (Objects.isNull(channel)) {
             persistTerminal(task, NotifySendResult.skipped(
-                    "notify-channel:" + task.getChannelId(),
+                    "notify-channel" + SymbolConstant.COLON + task.getChannelId(),
                     "Notify channel not found or tenant mismatch"));
             return;
         }

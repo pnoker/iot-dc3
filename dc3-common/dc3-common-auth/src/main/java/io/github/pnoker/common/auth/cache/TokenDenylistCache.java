@@ -20,6 +20,7 @@ package io.github.pnoker.common.auth.cache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.constant.cache.TimeoutConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
@@ -85,7 +86,7 @@ public class TokenDenylistCache {
     }
 
     private String buildKey(String loginName, String tenantCode) {
-        return tenantCode + ":" + loginName;
+        return tenantCode + SymbolConstant.COLON + loginName;
     }
 
 }

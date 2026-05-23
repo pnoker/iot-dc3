@@ -20,6 +20,8 @@ package io.github.pnoker.common.manager.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
+import io.github.pnoker.common.constant.common.SymbolConstant;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
@@ -56,7 +58,7 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
         String topic = topicQuery.getTopic();
         Long deviceIdL = null;
         if (Objects.nonNull(topic) && topic.length() > 0) {
-            String[] parts = topic.split("/");
+            String[] parts = topic.split(SymbolConstant.SLASH);
             deviceIdL = Long.parseLong(parts[parts.length - 1]);
         }
         String dName = topicQuery.getDeviceName();
@@ -81,7 +83,8 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
                     .list();
             for (PointDO point : points) {
                 TopicVO topicVO = new TopicVO();
-                topicVO.setTopic("dc3/dc3-center-data/device/" + deviceId);
+                topicVO.setTopic(String.join(SymbolConstant.SLASH, "dc3", DataConstant.SERVICE_NAME, "device",
+                        String.valueOf(deviceId)));
                 topicVO.setDeviceName(deviceName);
                 topicVO.setPointName(point.getPointName());
                 topicVOList.add(topicVO);

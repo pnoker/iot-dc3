@@ -24,6 +24,7 @@ import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -75,6 +76,7 @@ public interface PointValueBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "hasLatestValue", ignore = true)
     PointValueBO buildBOByDO(PointValueDO entityDO);
 
     /**

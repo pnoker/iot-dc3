@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.entity.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
@@ -63,8 +62,8 @@ public class RuleStateDO implements Serializable {
     @TableField("fingerprint")
     private String fingerprint;
 
-    @TableField("state_flag")
-    private Byte stateFlag;
+    @TableField("entity_state_flag")
+    private Byte entityStateFlag;
 
     @TableField("first_trigger_time")
     private LocalDateTime firstTriggerTime;
@@ -84,8 +83,8 @@ public class RuleStateDO implements Serializable {
     @TableField("alarm_id")
     private Long alarmId;
 
-    @TableField(value = "state_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt stateExt;
+    @TableField(value = "entity_state_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt entityStateExt;
 
     @TableField("tenant_id")
     private Long tenantId;
@@ -110,9 +109,5 @@ public class RuleStateDO implements Serializable {
 
     @TableField("operate_time")
     private LocalDateTime operateTime;
-
-    @TableLogic
-    @TableField("deleted")
-    private Byte deleted;
 
 }

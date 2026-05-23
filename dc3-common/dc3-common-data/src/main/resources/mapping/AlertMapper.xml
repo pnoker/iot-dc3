@@ -30,8 +30,7 @@
         SELECT COUNT(*) AS total,
                COUNT(*)    FILTER (WHERE confirm_flag = 0) AS unconfirmed
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
     </select>
 
     <select id="countBySource" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow">
@@ -43,8 +42,7 @@
                COUNT(*) AS total,
                COUNT(*)    FILTER (WHERE confirm_flag = 0)              AS unconfirmed
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
         GROUP BY alarm_target_type_flag
         ORDER BY alarm_target_type_flag
     </select>
@@ -52,8 +50,7 @@
     <select id="countByType" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
         SELECT alarm_type_flag::text AS key, COUNT(*) AS count
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
         GROUP BY alarm_type_flag
         ORDER BY count
         DESC
@@ -73,8 +70,7 @@
                create_time,
                COALESCE(alarm_ext ->> 'content', '') AS message
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
         ORDER BY create_time DESC
         LIMIT #{limit}
     </select>
@@ -82,8 +78,7 @@
     <select id="hourlyCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow">
         SELECT date_trunc('hour', create_time) AS bucket, COUNT(*) AS count
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
         GROUP BY bucket
         ORDER BY bucket ASC
@@ -103,8 +98,7 @@
         create_time,
         COALESCE(alarm_ext ->> 'content', '') AS message
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-        AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
         <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
         <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
@@ -118,8 +112,7 @@
     <select id="countFiltered" resultType="long">
         SELECT COUNT(*)
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-        AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
         <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
         <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
@@ -137,8 +130,7 @@
                COUNT(*) AS total,
                COUNT(*)    FILTER (WHERE confirm_flag = 0)         AS unconfirmed
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
         GROUP BY alarm_target_type_flag
         ORDER BY alarm_target_type_flag
@@ -149,7 +141,6 @@
         SET confirm_flag = 1
         WHERE id = #{id}
         AND tenant_id = #{tenantId}
-        AND deleted = 0
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
         <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
         <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
@@ -160,7 +151,6 @@
         SET confirm_flag = 0
         WHERE id = #{id}
         AND tenant_id = #{tenantId}
-        AND deleted = 0
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
         <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
         <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
@@ -174,7 +164,6 @@
                                      CURRENT_DATE, '1 day') ::date AS day) d
                  LEFT JOIN dc3_entity_alarm a
                            ON date_trunc('day', a.create_time)::date = d.day
-                               AND a.deleted = 0
                                AND a.tenant_id = #{tenantId}
             AND a.create_time &gt;= #{from}
         GROUP BY d.day
@@ -190,8 +179,7 @@
                entity_id AS source_id,
                COUNT(*)  AS count
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
         GROUP BY alarm_target_type_flag, entity_id
         ORDER BY count DESC
@@ -201,8 +189,7 @@
     <select id="activityHeatmap" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow">
         SELECT EXTRACT(DOW FROM create_time)::int  AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
         GROUP BY dow, hour
     </select>
@@ -210,8 +197,7 @@
     <select id="typeDistribution" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
         SELECT alarm_ext ->> 'type' AS key, COUNT (*) AS count
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
           AND alarm_ext ->> 'type' IS NOT NULL
         GROUP BY key
@@ -228,8 +214,7 @@
                entity_id AS source_id,
                COUNT(*)  AS count
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
         GROUP BY alarm_target_type_flag, entity_id
         HAVING COUNT(*) &gt;= #{minCount}
@@ -251,8 +236,7 @@
                alarm_type_flag AS alarm_type_flag,
                COUNT(*)        AS count
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
         GROUP BY alarm_target_type_flag, entity_id, alarm_type_flag
         HAVING COUNT(*) &gt;= #{minCount}
@@ -271,8 +255,7 @@
                            create_time,
                            id
                     FROM dc3_entity_alarm
-                    WHERE deleted = 0
-                      AND tenant_id = #{tenantId}
+                    WHERE tenant_id = #{tenantId}
                       AND create_time &gt;= #{from})
         SELECT e1.source          AS a_source,
                e1.source_id       AS a_source_id,
@@ -300,8 +283,7 @@
                       ON d.id = ea.device_id
                           AND d.tenant_id = ea.tenant_id
                           AND d.deleted = 0
-        WHERE ea.deleted = 0
-          AND ea.tenant_id = #{tenantId}
+        WHERE ea.tenant_id = #{tenantId}
           AND ea.alarm_target_type_flag IN (0, 1)
           AND ea.create_time &gt;= #{from}
         GROUP BY d.profile_id, ea.device_id
@@ -317,8 +299,7 @@
                COUNT(*)                                                                    AS total
         FROM (SELECT NOW() - create_time AS age
               FROM dc3_entity_alarm
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
+              WHERE tenant_id = #{tenantId}
                 AND confirm_flag = 0) ages
     </select>
 
@@ -330,8 +311,7 @@
                                WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p95_ms,
                COUNT(*)                                                                                        AS confirmed_count
         FROM dc3_entity_alarm
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
           AND confirm_flag = 1
           AND create_time &gt;= #{from}
         GROUP BY DATE(create_time)

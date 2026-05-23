@@ -38,6 +38,8 @@ public class DataConstant {
 
     public static final String POINT_COMMAND_URL_PREFIX = "/point_command";
 
+    public static final String POINT_COMMAND_HISTORY_URL_PREFIX = "/point_command_history";
+
     public static final String DASHBOARD_URL_PREFIX = "/dashboard";
 
     public static final String RULE_URL_PREFIX = "/rule";
@@ -54,9 +56,9 @@ public class DataConstant {
 
     public static final String MESSAGE_URL_PREFIX = "/message";
 
-    public static final String COMMAND_RECORD_URL_PREFIX = "/command_record";
+    public static final String COMMAND_HISTORY_URL_PREFIX = "/command_history";
 
-    public static final String EVENT_REPORT_URL_PREFIX = "/event_report";
+    public static final String EVENT_HISTORY_URL_PREFIX = "/event_history";
 
     public static final String DRIVER_STATUS_URL_PREFIX = "/driver/status";
 

@@ -52,15 +52,14 @@ public interface RuleStateBuilder {
 
     List<RuleStateBO> buildBOListByVOList(List<RuleStateVO> entityVOList);
 
-    @Mapping(target = "stateExt", ignore = true)
+    @Mapping(target = "entityStateExt", ignore = true)
     @Mapping(target = "alarmTargetTypeFlag", ignore = true)
-    @Mapping(target = "stateFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "entityStateFlag", ignore = true)
     RuleStateDO buildDOByBO(RuleStateBO entityBO);
 
     @AfterMapping
     default void afterProcess(RuleStateBO entityBO, @MappingTarget RuleStateDO entityDO) {
-        RuleStateExt entityExt = entityBO.getStateExt();
+        RuleStateExt entityExt = entityBO.getEntityStateExt();
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
@@ -68,40 +67,40 @@ public interface RuleStateBuilder {
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
-        entityDO.setStateExt(ext);
+        entityDO.setEntityStateExt(ext);
 
         AlarmTargetTypeFlagEnum alarmTargetTypeFlag = entityBO.getAlarmTargetTypeFlag();
         Optional.ofNullable(alarmTargetTypeFlag)
                 .ifPresent(value -> entityDO.setAlarmTargetTypeFlag(value.getIndex()));
 
-        RuleStateFlagEnum stateFlag = entityBO.getStateFlag();
-        Optional.ofNullable(stateFlag).ifPresent(value -> entityDO.setStateFlag(value.getIndex()));
+        RuleStateFlagEnum entityStateFlag = entityBO.getEntityStateFlag();
+        Optional.ofNullable(entityStateFlag).ifPresent(value -> entityDO.setEntityStateFlag(value.getIndex()));
     }
 
     List<RuleStateDO> buildDOListByBOList(List<RuleStateBO> entityBOList);
 
-    @Mapping(target = "stateExt", ignore = true)
+    @Mapping(target = "entityStateExt", ignore = true)
     @Mapping(target = "alarmTargetTypeFlag", ignore = true)
-    @Mapping(target = "stateFlag", ignore = true)
+    @Mapping(target = "entityStateFlag", ignore = true)
     RuleStateBO buildBOByDO(RuleStateDO entityDO);
 
     @AfterMapping
     default void afterProcess(RuleStateDO entityDO, @MappingTarget RuleStateBO entityBO) {
-        JsonExt entityExt = entityDO.getStateExt();
+        JsonExt entityExt = entityDO.getEntityStateExt();
         if (Objects.nonNull(entityExt)) {
             RuleStateExt ext = new RuleStateExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), RuleStateExt.Content.class));
-            entityBO.setStateExt(ext);
+            entityBO.setEntityStateExt(ext);
         }
 
         Byte alarmTargetTypeFlag = entityDO.getAlarmTargetTypeFlag();
         entityBO.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.ofIndex(alarmTargetTypeFlag));
 
-        Byte stateFlag = entityDO.getStateFlag();
-        entityBO.setStateFlag(RuleStateFlagEnum.ofIndex(stateFlag));
+        Byte entityStateFlag = entityDO.getEntityStateFlag();
+        entityBO.setEntityStateFlag(RuleStateFlagEnum.ofIndex(entityStateFlag));
     }
 
     List<RuleStateBO> buildBOListByDOList(List<RuleStateDO> entityDOList);

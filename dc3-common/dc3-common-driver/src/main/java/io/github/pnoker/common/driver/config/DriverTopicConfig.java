@@ -18,6 +18,7 @@
 package io.github.pnoker.common.driver.config;
 
 import io.github.pnoker.common.config.ExchangeConfig;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import lombok.RequiredArgsConstructor;
@@ -91,7 +92,7 @@ public class DriverTopicConfig {
         return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_COMMAND_PREFIX + driverProperties.getService())
                 .ttl(30000)
                 .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_DEAD)
-                .deadLetterRoutingKey("#")
+                .deadLetterRoutingKey(SymbolConstant.HASHTAG)
                 .build();
     }
 
@@ -120,7 +121,7 @@ public class DriverTopicConfig {
         return QueueBuilder.durable(RabbitConstant.QUEUE_COMMAND_PREFIX + driverProperties.getService())
                 .ttl(30000)
                 .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND_DEAD)
-                .deadLetterRoutingKey("#")
+                .deadLetterRoutingKey(SymbolConstant.HASHTAG)
                 .build();
     }
 

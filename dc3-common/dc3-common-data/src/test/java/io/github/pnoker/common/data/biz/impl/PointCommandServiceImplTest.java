@@ -18,10 +18,14 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.driver.RabbitConstant;
-import io.github.pnoker.common.data.dal.PointCommandManager;
+import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
+import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.mapper.EntityStateMapper;
+import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.RwFlagEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -40,11 +44,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -65,7 +67,13 @@ class PointCommandServiceImplTest {
     private RabbitTemplate rabbitTemplate;
 
     @Mock
-    private PointCommandManager pointCommandManager;
+    private PointCommandHistoryManager pointCommandHistoryManager;
+
+    @Mock
+    private EntityStateMapper entityStateMapper;
+
+    @Mock
+    private PointCommandValidator pointCommandValidator;
 
     @InjectMocks
     private PointCommandServiceImpl service;
@@ -84,6 +92,7 @@ class PointCommandServiceImplTest {
         point.setEnableFlag(EnableFlagEnum.ENABLE);
         point.setRwFlag(RwFlagEnum.RW);
         driver = new FacadeDriverBO();
+        driver.setId(30L);
         driver.setServiceName("dc3-driver-modbus-tcp");
     }
 
@@ -92,6 +101,7 @@ class PointCommandServiceImplTest {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
+        mockDriverOnline();
 
         PointCommandReadVO vo = new PointCommandReadVO();
         vo.setDeviceId(10L);
@@ -103,12 +113,12 @@ class PointCommandServiceImplTest {
                 eq(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + "dc3-driver-modbus-tcp"),
                 any(Object.class),
                 any(org.springframework.amqp.rabbit.connection.CorrelationData.class));
-        verify(pointCommandManager).save(any());
-        verify(pointCommandManager).updateById(any());
+        verify(pointCommandHistoryManager).save(any());
+        verify(pointCommandHistoryManager).updateById(any());
     }
 
     @Test
-    void readSilentlyDropsCommandWhenDriverUnknown() {
+    void readRejectsCommandWhenDriverUnknown() {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(null);
@@ -116,7 +126,9 @@ class PointCommandServiceImplTest {
         PointCommandReadVO vo = new PointCommandReadVO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
-        service.read(1L, vo);
+        assertThatThrownBy(() -> service.read(1L, vo))
+                .isInstanceOf(ServiceException.class)
+                .hasMessageContaining("No driver registered");
 
         verifyNoInteractions(rabbitTemplate);
     }
@@ -175,6 +187,7 @@ class PointCommandServiceImplTest {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
+        mockDriverOnline();
 
         PointCommandWriteVO vo = new PointCommandWriteVO();
         vo.setDeviceId(10L);
@@ -187,12 +200,12 @@ class PointCommandServiceImplTest {
                 eq(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + "dc3-driver-modbus-tcp"),
                 any(Object.class),
                 any(org.springframework.amqp.rabbit.connection.CorrelationData.class));
-        verify(pointCommandManager).save(any());
-        verify(pointCommandManager).updateById(any());
+        verify(pointCommandHistoryManager).save(any());
+        verify(pointCommandHistoryManager).updateById(any());
     }
 
     @Test
-    void writeSilentlyDropsCommandWhenDriverUnknown() {
+    void writeRejectsCommandWhenDriverUnknown() {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(null);
@@ -200,10 +213,10 @@ class PointCommandServiceImplTest {
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         vo.setValue("v");
-        assertThatNoException().isThrownBy(() -> service.write(1L, vo));
-        verify(rabbitTemplate, never()).convertAndSend(
-                any(String.class), any(String.class), any(Object.class),
-                any(org.springframework.amqp.rabbit.connection.CorrelationData.class));
+        assertThatThrownBy(() -> service.write(1L, vo))
+                .isInstanceOf(ServiceException.class)
+                .hasMessageContaining("No driver registered");
+        verifyNoInteractions(rabbitTemplate);
     }
 
     @Test
@@ -262,5 +275,11 @@ class PointCommandServiceImplTest {
         assertThatThrownBy(() -> service.write(1L, vo))
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("not writable");
+    }
+
+    private void mockDriverOnline() {
+        EntityStateDO driverState = new EntityStateDO();
+        driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
+        when(entityStateMapper.selectOne(any())).thenReturn(driverState);
     }
 }

@@ -17,7 +17,9 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import io.github.pnoker.common.data.dal.NotifyHistoryManager;
 import io.github.pnoker.common.data.dal.RuleStateManager;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
@@ -39,6 +41,8 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -55,6 +59,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -90,6 +95,11 @@ class RuleNotificationServiceImplTest {
 
     @InjectMocks
     private RuleNotificationServiceImpl service;
+
+    @BeforeAll
+    static void initMybatisPlusMetadata() {
+        TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), RuleStateDO.class);
+    }
 
     // ---------- fixtures ----------
 
@@ -163,7 +173,7 @@ class RuleNotificationServiceImplTest {
         bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
         bo.setEntityId(entityId);
         bo.setFingerprint("7:1:point:11");
-        bo.setStateFlag(flag);
+        bo.setEntityStateFlag(flag);
         bo.setFirstTriggerTime(LocalDateTime.of(2026, 5, 21, 11, 0));
         bo.setLastTriggerTime(LocalDateTime.of(2026, 5, 21, 11, 0));
         bo.setTriggerCount(1L);
@@ -181,7 +191,7 @@ class RuleNotificationServiceImplTest {
         entity.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT.getIndex());
         entity.setEntityId(11L);
         entity.setFingerprint("7:1:point:11");
-        entity.setStateFlag(flag.getIndex());
+        entity.setEntityStateFlag(flag.getIndex());
         entity.setTriggerCount(triggerCount);
         entity.setAlarmId(100L);
         entity.setTenantId(7L);
@@ -210,7 +220,7 @@ class RuleNotificationServiceImplTest {
 
         // No existing rule_state row — first fire
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
-        when(ruleStateManager.save(any())).thenReturn(true);
+        stubRuleStateSaveSuccess();
         doNotExpectDuplicateKey();
 
         List<NotifyHistoryBO> histories = service.notify(match);
@@ -219,7 +229,7 @@ class RuleNotificationServiceImplTest {
         // Verify rule_state save (new row)
         ArgumentCaptor<RuleStateDO> stateCaptor = ArgumentCaptor.forClass(RuleStateDO.class);
         verify(ruleStateManager).save(stateCaptor.capture());
-        assertThat(stateCaptor.getValue().getStateFlag()).isEqualTo(RuleStateFlagEnum.FIRING.getIndex());
+        assertThat(stateCaptor.getValue().getEntityStateFlag()).isEqualTo(RuleStateFlagEnum.FIRING.getIndex());
         assertThat(stateCaptor.getValue().getTriggerCount()).isEqualTo(1L);
         // Verify PENDING history persisted
         ArgumentCaptor<NotifyHistoryDO> historyCaptor = ArgumentCaptor.forClass(NotifyHistoryDO.class);
@@ -255,8 +265,8 @@ class RuleNotificationServiceImplTest {
         ArgumentCaptor<com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<RuleStateDO>> updateCaptor =
                 ArgumentCaptor.forClass(com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper.class);
         verify(ruleStateManager).update(updateCaptor.capture());
-        // updateById must not be used for state transitions
-        verify(ruleStateManager, never()).updateById(any());
+        // State transition uses an atomic wrapper; last-notify-time is persisted separately.
+        verify(ruleStateManager).updateById(any());
     }
 
     // ---------- notify: skip conditions ----------
@@ -291,7 +301,9 @@ class RuleNotificationServiceImplTest {
     @Test
     void notifyDropsRecoveryWhenNoFiringStateExists() {
         RuleMatch match = recoveryMatch();
-        stubNotifyConfigLoaded(match);
+        NotifyBO notify = notify(match.getRule().getNotifyId());
+        notify.setNotifyExt(dedupDisabledExt());
+        when(notifyConfigCache.findNotify(match.getRule().getNotifyId())).thenReturn(notify);
 
         // No existing state at all
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
@@ -307,7 +319,6 @@ class RuleNotificationServiceImplTest {
     void notifyReturnsEmptyWhenNotifyPolicyMissing() {
         RuleMatch match = firingMatch();
         when(notifyConfigCache.findNotify(anyLong())).thenReturn(null);
-        when(alarmTemplateRenderer.renderText(any(), any())).thenReturn("7:1:point:11");
 
         // No existing state
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
@@ -333,7 +344,6 @@ class RuleNotificationServiceImplTest {
         channel.setEnableFlag(EnableFlagEnum.DISABLE);
         when(notifyConfigCache.findChannel(30L, 7L)).thenReturn(channel);
 
-        when(alarmTemplateRenderer.renderText(any(), any())).thenReturn("7:1:point:11");
         stubStateBuilderForSaveWhenNoExisting();
         stubHistoryBuilderForSave();
 
@@ -361,7 +371,6 @@ class RuleNotificationServiceImplTest {
         NotifyChannelBO channel = channel(30L, 7L);
         when(notifyConfigCache.findChannel(30L, 7L)).thenReturn(channel);
 
-        when(alarmTemplateRenderer.renderText(any(), any())).thenReturn("7:1:point:11");
         stubStateBuilderForSaveWhenNoExisting();
         stubHistoryBuilderForSave();
 
@@ -378,6 +387,8 @@ class RuleNotificationServiceImplTest {
         stubNotifyConfigLoaded(match);
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any()))
                 .thenReturn(NotifyDecision.skip("rate-limited"));
+        stubStateBuilderForSaveWhenNoExisting();
+        stubHistoryBuilderForSave();
 
         List<NotifyHistoryBO> histories = service.notify(match);
         assertThat(histories).hasSize(1);
@@ -406,7 +417,7 @@ class RuleNotificationServiceImplTest {
         List<NotifyHistoryBO> histories = service.notifyBatch(List.of(m1, m2));
         // Each match has 1 bind × 1 channel = 1 history; 2 matches = 2 histories
         assertThat(histories).hasSize(2);
-        verify(notifyTaskSender).publish(any(NotifyTaskDTO.class));
+        verify(notifyTaskSender, times(2)).publish(any(NotifyTaskDTO.class));
     }
 
     // ---------- helpers ----------
@@ -433,22 +444,15 @@ class RuleNotificationServiceImplTest {
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any())).thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any()))
                 .thenReturn(new MessagePayload(NotifyChannelTypeFlagEnum.WEBHOOK, "json", Map.of(), List.of()));
-        when(alarmTemplateRenderer.renderText(any(), any())).thenReturn("7:1:point:11");
-
-        // First load: no existing state → will try insert
-        when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        // First load: no existing state → will try insert. Reload after exception: now the row exists.
+        RuleStateDO reloadedDO = stateDO(99L, RuleStateFlagEnum.FIRING, 1L);
+        when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null, reloadedDO);
         // Insert throws DuplicateKeyException (another thread inserted first)
         when(ruleStateManager.save(any(RuleStateDO.class))).thenThrow(new DuplicateKeyException("duplicate"));
-        // Reload after exception: now the row exists
-        RuleStateDO reloadedDO = stateDO(99L, RuleStateFlagEnum.FIRING, 1L);
-        when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(reloadedDO);
-        RuleStateBO reloadedBO = state(1L, 11L, RuleStateFlagEnum.FIRING);
-        reloadedBO.setId(99L);
-        when(ruleStateBuilder.buildBOByDO(reloadedDO)).thenReturn(reloadedBO);
         // Fallback to atomic update
         when(ruleStateManager.update(any(com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper.class)))
                 .thenReturn(true);
-        when(ruleStateBuilder.buildDOByBO(any())).thenReturn(stateDO(99L, RuleStateFlagEnum.FIRING, 1L));
+        stubStateBuilder();
         stubHistoryBuilderForSave();
 
         List<NotifyHistoryBO> histories = service.notify(match);
@@ -470,7 +474,6 @@ class RuleNotificationServiceImplTest {
         NotifyChannelBO channel = channel(30L, 7L);
         when(notifyConfigCache.findChannel(30L, 7L)).thenReturn(channel);
 
-        when(alarmTemplateRenderer.renderText(any(), any())).thenReturn("7:1:point:11");
     }
 
     private void doNotExpectDuplicateKey() {
@@ -479,7 +482,7 @@ class RuleNotificationServiceImplTest {
 
     private void stubStateBuilderForSaveWhenNoExisting() {
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
-        when(ruleStateManager.save(any(RuleStateDO.class))).thenReturn(true);
+        stubRuleStateSaveSuccess();
         when(ruleStateBuilder.buildDOByBO(any())).thenAnswer(inv -> {
             RuleStateBO bo = inv.getArgument(0);
             RuleStateDO entity = new RuleStateDO();
@@ -488,7 +491,7 @@ class RuleNotificationServiceImplTest {
             entity.setAlarmTargetTypeFlag(bo.getAlarmTargetTypeFlag().getIndex());
             entity.setEntityId(bo.getEntityId());
             entity.setFingerprint(bo.getFingerprint());
-            entity.setStateFlag(bo.getStateFlag().getIndex());
+            entity.setEntityStateFlag(bo.getEntityStateFlag().getIndex());
             entity.setTriggerCount(bo.getTriggerCount());
             entity.setAlarmId(bo.getAlarmId());
             entity.setTenantId(bo.getTenantId());
@@ -502,7 +505,7 @@ class RuleNotificationServiceImplTest {
             bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
             bo.setEntityId(entity.getEntityId());
             bo.setFingerprint(entity.getFingerprint());
-            bo.setStateFlag(RuleStateFlagEnum.ofIndex(entity.getStateFlag()));
+            bo.setEntityStateFlag(RuleStateFlagEnum.ofIndex(entity.getEntityStateFlag()));
             bo.setTriggerCount(entity.getTriggerCount());
             bo.setAlarmId(entity.getAlarmId());
             bo.setTenantId(entity.getTenantId());
@@ -519,7 +522,7 @@ class RuleNotificationServiceImplTest {
             entity.setAlarmTargetTypeFlag(bo.getAlarmTargetTypeFlag().getIndex());
             entity.setEntityId(bo.getEntityId());
             entity.setFingerprint(bo.getFingerprint());
-            entity.setStateFlag(bo.getStateFlag().getIndex());
+            entity.setEntityStateFlag(bo.getEntityStateFlag().getIndex());
             entity.setTriggerCount(bo.getTriggerCount());
             entity.setAlarmId(bo.getAlarmId());
             entity.setTenantId(bo.getTenantId());
@@ -533,7 +536,7 @@ class RuleNotificationServiceImplTest {
             bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
             bo.setEntityId(entity.getEntityId());
             bo.setFingerprint(entity.getFingerprint());
-            bo.setStateFlag(RuleStateFlagEnum.ofIndex(entity.getStateFlag()));
+            bo.setEntityStateFlag(RuleStateFlagEnum.ofIndex(entity.getEntityStateFlag()));
             bo.setTriggerCount(entity.getTriggerCount());
             bo.setAlarmId(entity.getAlarmId());
             bo.setTenantId(entity.getTenantId());
@@ -543,7 +546,17 @@ class RuleNotificationServiceImplTest {
 
     private void stubStateBuilderForSave() {
         stubStateBuilder();
-        when(ruleStateManager.save(any(RuleStateDO.class))).thenReturn(true);
+        stubRuleStateSaveSuccess();
+    }
+
+    private void stubRuleStateSaveSuccess() {
+        when(ruleStateManager.save(any(RuleStateDO.class))).thenAnswer(inv -> {
+            RuleStateDO entity = inv.getArgument(0);
+            if (entity.getId() == null) {
+                entity.setId(1L);
+            }
+            return true;
+        });
     }
 
     private void stubHistoryBuilder() {

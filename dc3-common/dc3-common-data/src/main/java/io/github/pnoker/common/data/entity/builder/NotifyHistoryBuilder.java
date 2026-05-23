@@ -57,7 +57,6 @@ public interface NotifyHistoryBuilder {
     @Mapping(target = "responseExt", ignore = true)
     @Mapping(target = "channelTypeFlag", ignore = true)
     @Mapping(target = "statusFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
     NotifyHistoryDO buildDOByBO(NotifyHistoryBO entityBO);
 
     @AfterMapping

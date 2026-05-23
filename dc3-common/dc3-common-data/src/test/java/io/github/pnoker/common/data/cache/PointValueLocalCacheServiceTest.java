@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.cache;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,8 @@ class PointValueLocalCacheServiceTest {
         assertThat(hits).containsKey(20L);
         assertThat(hits.get(20L).getRawValue()).isEqualTo("42.5");
         // The internal key shape is part of the contract for cross-service consumers.
-        String key = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + "1" + "." + "10" + "." + "20";
+        String key = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + "1" + SymbolConstant.DOT + "10"
+                + SymbolConstant.DOT + "20";
         assertThat((PointValueBO) localCache.getKey(key)).isSameAs(bo);
     }
 

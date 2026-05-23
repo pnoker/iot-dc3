@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -131,7 +132,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
     }
 
     private String buildUri(String host, int port) {
-        return "coap://" + host + ":" + port;
+        return "coap:" + SymbolConstant.DOUBLE_SLASH + host + SymbolConstant.COLON + port;
     }
 
     private String getConfigValue(Map<String, AttributeBO> config, String key, String defaultValue) {

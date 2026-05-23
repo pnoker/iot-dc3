@@ -52,7 +52,7 @@ public class RuleStateBO extends BaseBO implements TenantOwned {
 
     private String fingerprint;
 
-    private RuleStateFlagEnum stateFlag;
+    private RuleStateFlagEnum entityStateFlag;
 
     private LocalDateTime firstTriggerTime;
 
@@ -66,7 +66,7 @@ public class RuleStateBO extends BaseBO implements TenantOwned {
 
     private Long alarmId;
 
-    private RuleStateExt stateExt;
+    private RuleStateExt entityStateExt;
 
     private Long tenantId;
 

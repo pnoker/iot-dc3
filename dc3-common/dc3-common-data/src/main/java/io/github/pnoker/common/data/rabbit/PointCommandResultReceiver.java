@@ -18,8 +18,8 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.dal.PointCommandManager;
-import io.github.pnoker.common.data.entity.model.PointCommandDO;
+import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
+import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ import java.util.Objects;
 
 /**
  * RabbitMQ receiver for point command result receipts sent by drivers.
- * Updates the matching {@code dc3_point_command} row with the terminal status.
+ * Updates the matching {@code dc3_point_command_history} row with the terminal status.
  *
  * @author pnoker
  * @version 2026.5.22
@@ -46,7 +46,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointCommandResultReceiver {
 
-    private final PointCommandManager pointCommandManager;
+    private final PointCommandHistoryManager pointCommandHistoryManager;
 
     @RabbitHandler
     @RabbitListener(queues = "#{pointCommandResultQueue.name}")
@@ -60,8 +60,8 @@ public class PointCommandResultReceiver {
 
             log.info("Receive point command result: commandId={}, status={}", resultDTO.commandId(), resultDTO.status());
 
-            PointCommandDO commandDO = pointCommandManager.lambdaQuery()
-                    .eq(PointCommandDO::getCommandId, resultDTO.commandId())
+            PointCommandHistoryDO commandDO = pointCommandHistoryManager.lambdaQuery()
+                    .eq(PointCommandHistoryDO::getCommandId, resultDTO.commandId())
                     .one();
 
             if (Objects.nonNull(commandDO)) {
@@ -70,11 +70,11 @@ public class PointCommandResultReceiver {
                 commandDO.setErrorMessage(resultDTO.errorMessage());
                 commandDO.setResponseValue(resultDTO.responseValue());
                 if (Objects.nonNull(resultDTO.finishedAt())) {
-                    commandDO.setFinishedAt(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
+                    commandDO.setFinishTime(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
                 } else {
-                    commandDO.setFinishedAt(LocalDateTime.now());
+                    commandDO.setFinishTime(LocalDateTime.now());
                 }
-                pointCommandManager.updateById(commandDO);
+                pointCommandHistoryManager.updateById(commandDO);
                 log.info("Updated command status: commandId={}, status={}", resultDTO.commandId(), resultDTO.status());
             } else {
                 log.warn("Command not found for result: commandId={}", resultDTO.commandId());

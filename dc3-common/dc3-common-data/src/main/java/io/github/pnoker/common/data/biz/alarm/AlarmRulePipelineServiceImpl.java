@@ -42,13 +42,13 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
 
     private final RuleNotificationService ruleNotificationService;
 
-    private final AlarmEventRecordService alarmEventRecordService;
+    private final RuleAlarmPersistenceService ruleAlarmPersistenceService;
 
     @Override
     public List<NotifyHistoryBO> process(RuleFact fact) {
         List<NotifyHistoryBO> histories = new ArrayList<>();
         for (RuleMatch match : ruleEngine.evaluate(fact)) {
-            alarmEventRecordService.ensureEvent(match);
+            ruleAlarmPersistenceService.ensureAlarm(match);
             histories.addAll(ruleNotificationService.notify(match));
         }
         return histories;
@@ -78,7 +78,7 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
         for (List<RuleFact> group : grouped.values()) {
             for (RuleFact fact : group) {
                 for (RuleMatch match : ruleEngine.evaluate(fact)) {
-                    alarmEventRecordService.ensureEvent(match);
+                    ruleAlarmPersistenceService.ensureAlarm(match);
                     allMatches.add(match);
                 }
             }
