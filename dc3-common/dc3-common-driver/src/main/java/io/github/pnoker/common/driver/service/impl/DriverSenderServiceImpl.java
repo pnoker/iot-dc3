@@ -23,10 +23,12 @@ import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.entity.dto.CommandCallResultDTO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
+import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -78,7 +80,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     @Override
     public void deviceStatusSender(Long deviceId, EntityStatusEnum status) {
         sendDeviceStatus(deviceId, status, driverProperties.getHealth().getDevice().getTimeout(),
-                driverProperties.getHealth().getDevice().getTimeoutUnit());
+                driverProperties.getHealth().getDevice().getTimeoutUnit(), null);
     }
 
     @Override
@@ -163,6 +165,24 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT,
                 RabbitConstant.ROUTING_POINT_COMMAND_RESULT + "." + driverProperties.getService(), resultDTO);
+    }
+
+    @Override
+    public void commandResultSender(CommandCallResultDTO resultDTO) {
+        if (Objects.isNull(resultDTO)) {
+            return;
+        }
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
+                RabbitConstant.ROUTING_COMMAND_RESULT + "." + driverProperties.getService(), resultDTO);
+    }
+
+    @Override
+    public void eventReportSender(EventReportDTO entityDTO) {
+        if (Objects.isNull(entityDTO)) {
+            return;
+        }
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_EVENT,
+                RabbitConstant.ROUTING_EVENT_PREFIX + driverProperties.getService(), entityDTO);
     }
 
     private void sendDeviceStatus(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,

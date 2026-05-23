@@ -34,6 +34,6 @@ package io.github.pnoker.common.driver.service;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface DriverCustomService extends DriverLifecycle, DriverMetadataListener, DriverHealth, DeviceHealth, DriverProtocol {
+public interface DriverCustomService extends DriverLifecycle, DriverMetadataListener, DriverHealth, DeviceHealth, DriverProtocol, DriverCommand {
 
 }

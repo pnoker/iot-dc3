@@ -25,6 +25,7 @@ import io.github.pnoker.common.data.dal.EventRecordManager;
 import io.github.pnoker.common.data.entity.model.EventRecordDO;
 import io.github.pnoker.common.data.entity.vo.EventRecordQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
+import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventRecordAcknowledgeFlagEnum;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -34,11 +35,13 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -86,6 +89,32 @@ public class EventReportServiceImpl implements EventReportService {
         eventRecordManager.save(recordDO);
 
         return recordId;
+    }
+
+    @Override
+    public String report(EventReportDTO entityDTO) {
+        validateEventScope(entityDTO.tenantId(), entityDTO.deviceId(), entityDTO.eventId());
+
+        LocalDateTime nowLocal = LocalDateTime.now();
+
+        EventRecordDO recordDO = new EventRecordDO();
+        recordDO.setRecordId(entityDTO.recordId());
+        recordDO.setTenantId(entityDTO.tenantId());
+        recordDO.setDeviceId(entityDTO.deviceId());
+        recordDO.setEventId(entityDTO.eventId());
+        recordDO.setEventCode(entityDTO.eventCode());
+        recordDO.setEventTypeFlag(entityDTO.eventTypeFlag());
+        recordDO.setEventLevelFlag(entityDTO.eventLevelFlag());
+        recordDO.setParamValues(Objects.isNull(entityDTO.paramValues()) ? null : JsonUtil.toJsonString(entityDTO.paramValues()));
+        recordDO.setMessage(entityDTO.message());
+        recordDO.setOccurTime(Objects.nonNull(entityDTO.occurTime())
+                ? LocalDateTime.ofInstant(entityDTO.occurTime(), ZoneId.systemDefault()) : nowLocal);
+        recordDO.setReceiveTime(nowLocal);
+        recordDO.setAcknowledgeFlag(EventRecordAcknowledgeFlagEnum.NO.getIndex());
+        recordDO.setSchemaVersion((short) entityDTO.schemaVersion());
+        eventRecordManager.save(recordDO);
+
+        return entityDTO.recordId();
     }
 
     @Override
