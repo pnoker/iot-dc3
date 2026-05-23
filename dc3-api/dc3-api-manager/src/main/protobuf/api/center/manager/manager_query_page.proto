@@ -157,3 +157,31 @@ message GrpcPageProfileQuery {
   // Device ID for querying templates bound to a specific device
   int64 device_id = 9;
 }
+
+// Command pagination query structure
+message GrpcPageCommandQuery {
+  GrpcPage page = 1;
+  int64 tenant_id = 2;
+  string command_name = 3;
+  string command_code = 4;
+  int32 command_type_flag = 5;
+  int32 call_type_flag = 6;
+  int64 profile_id = 7;
+  int32 enable_flag = 8;
+  int32 version = 9;
+  int64 device_id = 10;
+}
+
+// Event pagination query structure
+message GrpcPageEventQuery {
+  GrpcPage page = 1;
+  int64 tenant_id = 2;
+  string event_name = 3;
+  string event_code = 4;
+  int32 event_type_flag = 5;
+  int32 event_level_flag = 6;
+  int64 profile_id = 7;
+  int32 enable_flag = 8;
+  int32 version = 9;
+  int64 device_id = 10;
+}

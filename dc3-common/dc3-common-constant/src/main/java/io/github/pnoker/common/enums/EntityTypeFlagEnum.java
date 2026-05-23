@@ -69,6 +69,16 @@ public enum EntityTypeFlagEnum {
      * Device
      */
     DEVICE((byte) 6, "device", "Device"),
+
+    /**
+     * Command
+     */
+    COMMAND((byte) 7, "command", "Command"),
+
+    /**
+     * Event
+     */
+    EVENT((byte) 8, "event", "Event"),
     ;
 
     /**

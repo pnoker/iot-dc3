@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.pnoker.common.manager.mapper.CommandMapper">
+
+    <select id="selectPageWithDevice" resultType="io.github.pnoker.common.manager.entity.model.CommandDO">
+        select
+        dc.id,
+        dc.command_name,
+        dc.command_code,
+        dc.command_type_flag,
+        dc.call_type_flag,
+        dc.timeout,
+        dc.command_ext,
+        dc.profile_id,
+        dc.enable_flag,
+        dc.tenant_id,
+        dc.remark,
+        dc.signature,
+        dc.version,
+        dc.creator_id,
+        dc.creator_name,
+        dc.create_time,
+        dc.operator_id,
+        dc.operator_name,
+        dc.operate_time,
+        dc.deleted
+        from dc3_command dc
+        <if test="deviceId != null and deviceId > 0">
+            inner join dc3_device dd
+            on dd.profile_id = dc.profile_id
+            and dd.id = #{deviceId}
+            and dd.tenant_id = dc.tenant_id
+            and dd.deleted = 0
+        </if>
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

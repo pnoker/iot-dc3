@@ -283,6 +283,68 @@ message GrpcPointAttributeDTO {
   int64 tenant_id = 11;
 }
 
+// Command
+message GrpcCommandDTO {
+  GrpcBase base = 1;
+  string command_name = 2;
+  string command_code = 3;
+  int32 command_type_flag = 4;
+  int32 call_type_flag = 5;
+  int32 timeout = 6;
+  string command_ext = 7;
+  int64 profile_id = 8;
+  int32 enable_flag = 9;
+  string signature = 10;
+  int32 version = 11;
+  int64 tenant_id = 12;
+}
+
+// Command Param
+message GrpcCommandParamDTO {
+  GrpcBase base = 1;
+  string param_name = 2;
+  string param_code = 3;
+  int32 param_direction_flag = 4;
+  int32 param_type_flag = 5;
+  int32 required_flag = 6;
+  string default_value = 7;
+  string param_ext = 8;
+  int64 command_id = 9;
+  int32 enable_flag = 10;
+  string signature = 11;
+  int32 version = 12;
+  int64 tenant_id = 13;
+}
+
+// Event
+message GrpcEventDTO {
+  GrpcBase base = 1;
+  string event_name = 2;
+  string event_code = 3;
+  int32 event_type_flag = 4;
+  int32 event_level_flag = 5;
+  string event_ext = 6;
+  int64 profile_id = 7;
+  int32 enable_flag = 8;
+  string signature = 9;
+  int32 version = 10;
+  int64 tenant_id = 11;
+}
+
+// Event Param
+message GrpcEventParamDTO {
+  GrpcBase base = 1;
+  string param_name = 2;
+  string param_code = 3;
+  int32 param_type_flag = 4;
+  string param_ext = 5;
+  int64 event_id = 6;
+  int32 enable_flag = 7;
+  string signature = 8;
+  int32 version = 9;
+  int64 tenant_id = 10;
+}
+
 // Point attribute config
 message GrpcPointAttributeConfigDTO {
   // Base

@@ -68,6 +68,14 @@ public class ManagerConstant {
 
     public static final String TOPIC_URL_PREFIX = "/topic";
 
+    public static final String COMMAND_URL_PREFIX = "/command";
+
+    public static final String COMMAND_PARAM_URL_PREFIX = "/command_param";
+
+    public static final String EVENT_URL_PREFIX = "/event";
+
+    public static final String EVENT_PARAM_URL_PREFIX = "/event_param";
+
     private ManagerConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }

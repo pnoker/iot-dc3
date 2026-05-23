@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of metadata types.
+ * Enumeration of call type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,32 +33,17 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum MetadataTypeEnum {
+public enum CallTypeFlagEnum {
 
     /**
-     * Device metadata
+     * Synchronous call
      */
-    DEVICE((byte) 0, "device", "Device metadata"),
+    SYNC((byte) 0, "sync", "Synchronous call"),
 
     /**
-     * Point metadata
+     * Asynchronous call
      */
-    POINT((byte) 1, "point", "Point metadata"),
-
-    /**
-     * Driver metadata
-     */
-    DRIVER((byte) 2, "driver", "Driver metadata"),
-
-    /**
-     * Command metadata
-     */
-    COMMAND((byte) 3, "command", "Command metadata"),
-
-    /**
-     * Event metadata
-     */
-    EVENT((byte) 4, "event", "Event metadata"),
+    ASYNC((byte) 1, "async", "Asynchronous call"),
     ;
 
     /**
@@ -81,10 +66,10 @@ public enum MetadataTypeEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link MetadataTypeEnum}
+     * @return {@link CallTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofIndex(Byte index) {
-        Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
+    public static CallTypeFlagEnum ofIndex(Byte index) {
+        Optional<CallTypeFlagEnum> any = Arrays.stream(CallTypeFlagEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -94,10 +79,10 @@ public enum MetadataTypeEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link MetadataTypeEnum}
+     * @return {@link CallTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofCode(String code) {
-        Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
+    public static CallTypeFlagEnum ofCode(String code) {
+        Optional<CallTypeFlagEnum> any = Arrays.stream(CallTypeFlagEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -107,9 +92,9 @@ public enum MetadataTypeEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link MetadataTypeEnum}
+     * @return {@link CallTypeFlagEnum}
      */
-    public static MetadataTypeEnum ofName(String name) {
+    public static CallTypeFlagEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {
