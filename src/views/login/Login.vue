@@ -100,8 +100,8 @@
   const formDataRef = ref<FormInstance>();
 
   // 定义响应式数据
-  const tenant = authStore.getTenant || 'default';
-  const name = authStore.getName || 'dc3';
+  const tenant = typeof authStore.getTenant === 'string' ? authStore.getTenant : 'default';
+  const name = typeof authStore.getName === 'string' ? authStore.getName : 'dc3';
   const reactiveData = reactive<LoginViewState>({
     isHide: 'View',
     passwordType: 'password',
