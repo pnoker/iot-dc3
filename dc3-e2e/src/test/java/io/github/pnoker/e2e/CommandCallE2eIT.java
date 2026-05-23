@@ -79,8 +79,14 @@ class CommandCallE2eIT extends BaseE2eIT {
     @AfterEach
     void tearDown() throws Exception {
         if (channel.isOpen()) {
-            try { channel.queueDelete(commandQueue); } catch (Exception ignored) {}
-            try { channel.queueDelete(deadQueue); } catch (Exception ignored) {}
+            try {
+                channel.queueDelete(commandQueue);
+            } catch (Exception ignored) {
+            }
+            try {
+                channel.queueDelete(deadQueue);
+            } catch (Exception ignored) {
+            }
             channel.close();
         }
         if (conn.isOpen()) {

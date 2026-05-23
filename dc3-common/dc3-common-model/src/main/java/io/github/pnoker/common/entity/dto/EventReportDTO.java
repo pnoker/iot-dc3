@@ -58,17 +58,60 @@ public record EventReportDTO(
         private Instant occurTime;
         private int schemaVersion;
 
-        public Builder recordId(String recordId) { this.recordId = recordId; return this; }
-        public Builder tenantId(Long tenantId) { this.tenantId = tenantId; return this; }
-        public Builder deviceId(Long deviceId) { this.deviceId = deviceId; return this; }
-        public Builder eventId(Long eventId) { this.eventId = eventId; return this; }
-        public Builder eventCode(String eventCode) { this.eventCode = eventCode; return this; }
-        public Builder eventTypeFlag(Byte eventTypeFlag) { this.eventTypeFlag = eventTypeFlag; return this; }
-        public Builder eventLevelFlag(Byte eventLevelFlag) { this.eventLevelFlag = eventLevelFlag; return this; }
-        public Builder paramValues(Map<String, String> paramValues) { this.paramValues = paramValues; return this; }
-        public Builder message(String message) { this.message = message; return this; }
-        public Builder occurTime(Instant occurTime) { this.occurTime = occurTime; return this; }
-        public Builder schemaVersion(int schemaVersion) { this.schemaVersion = schemaVersion; return this; }
+        public Builder recordId(String recordId) {
+            this.recordId = recordId;
+            return this;
+        }
+
+        public Builder tenantId(Long tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        public Builder deviceId(Long deviceId) {
+            this.deviceId = deviceId;
+            return this;
+        }
+
+        public Builder eventId(Long eventId) {
+            this.eventId = eventId;
+            return this;
+        }
+
+        public Builder eventCode(String eventCode) {
+            this.eventCode = eventCode;
+            return this;
+        }
+
+        public Builder eventTypeFlag(Byte eventTypeFlag) {
+            this.eventTypeFlag = eventTypeFlag;
+            return this;
+        }
+
+        public Builder eventLevelFlag(Byte eventLevelFlag) {
+            this.eventLevelFlag = eventLevelFlag;
+            return this;
+        }
+
+        public Builder paramValues(Map<String, String> paramValues) {
+            this.paramValues = paramValues;
+            return this;
+        }
+
+        public Builder message(String message) {
+            this.message = message;
+            return this;
+        }
+
+        public Builder occurTime(Instant occurTime) {
+            this.occurTime = occurTime;
+            return this;
+        }
+
+        public Builder schemaVersion(int schemaVersion) {
+            this.schemaVersion = schemaVersion;
+            return this;
+        }
 
         public EventReportDTO build() {
             return new EventReportDTO(recordId, tenantId, deviceId, eventId, eventCode,

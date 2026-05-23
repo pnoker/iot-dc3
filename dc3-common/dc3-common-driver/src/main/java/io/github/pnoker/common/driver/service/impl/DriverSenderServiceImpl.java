@@ -186,7 +186,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     }
 
     private void sendDeviceStatus(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
-                                   String stateDescription) {
+                                  String stateDescription) {
         DeviceStateDTO deviceState = new DeviceStateDTO(deviceId, status, timeout, timeoutUnit);
         if (Objects.nonNull(stateDescription)) {
             deviceState.setStateDescription(stateDescription);
