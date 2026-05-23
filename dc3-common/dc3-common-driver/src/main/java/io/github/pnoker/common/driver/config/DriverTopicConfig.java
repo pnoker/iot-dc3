@@ -51,6 +51,8 @@ public class DriverTopicConfig {
 
     private final TopicExchange pointCommandExchange;
 
+    private final TopicExchange commandExchange;
+
     /**
      * Creates the metadata queue used to receive driver metadata synchronization events.
      *
@@ -104,6 +106,35 @@ public class DriverTopicConfig {
         Binding binding = BindingBuilder.bind(pointCommandQueue)
                 .to(pointCommandExchange)
                 .with(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + driverProperties.getService());
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
+        return binding;
+    }
+
+    /**
+     * Creates the custom command queue used to receive custom command calls.
+     *
+     * @return command queue
+     */
+    @Bean
+    Queue commandQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_COMMAND_PREFIX + driverProperties.getService())
+                .ttl(30000)
+                .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND_DEAD)
+                .deadLetterRoutingKey("#")
+                .build();
+    }
+
+    /**
+     * Binds the custom command queue to the command exchange.
+     *
+     * @param commandQueue command queue
+     * @return queue binding
+     */
+    @Bean
+    Binding commandBinding(Queue commandQueue) {
+        Binding binding = BindingBuilder.bind(commandQueue)
+                .to(commandExchange)
+                .with(RabbitConstant.ROUTING_COMMAND_PREFIX + driverProperties.getService());
         binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }

@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.EventRecordDO;
 import io.github.pnoker.common.data.entity.vo.EventRecordQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
+import io.github.pnoker.common.entity.dto.EventReportDTO;
 
 /**
  * Business service for event report operations.
@@ -32,6 +33,8 @@ import io.github.pnoker.common.data.entity.vo.EventReportVO;
 public interface EventReportService {
 
     String report(Long tenantId, EventReportVO entityVO);
+
+    String report(EventReportDTO entityDTO);
 
     EventRecordDO getByRecordId(String recordId);
 
