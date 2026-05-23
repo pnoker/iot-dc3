@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.validator;
 
+import io.github.pnoker.common.entity.ext.PointExt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +44,7 @@ public class PointCommandValidator {
      * @param pointExt point extension JSON (may contain constraints for future use)
      * @throws IllegalArgumentException if the value fails validation
      */
-    public void validateWriteValue(String value, String pointExt) {
+    public void validateWriteValue(String value, PointExt pointExt) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Write value must not be blank");
         }

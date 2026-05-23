@@ -106,6 +106,21 @@ public class RabbitConstant {
     // Point Command Result
     public static String TOPIC_EXCHANGE_POINT_COMMAND_RESULT = "dc3.e.point_command_result";
     public static String QUEUE_POINT_COMMAND_RESULT = "dc3.q.point_command_result";
+    // Custom Command
+    public static String TOPIC_EXCHANGE_COMMAND = "dc3.e.command";
+    public static String QUEUE_COMMAND_PREFIX = "dc3.q.command.";
+    public static String ROUTING_COMMAND_PREFIX = "dc3.r.command.";
+    // Custom Command Result
+    public static String TOPIC_EXCHANGE_COMMAND_RESULT = "dc3.e.command_result";
+    public static String QUEUE_COMMAND_RESULT = "dc3.q.command_result";
+    public static String ROUTING_COMMAND_RESULT = "dc3.r.command_result";
+    // Custom Command Dead Letter
+    public static String TOPIC_EXCHANGE_COMMAND_DEAD = "dc3.e.command_dead";
+    public static String QUEUE_COMMAND_DEAD = "dc3.q.command_dead";
+    // Event Report
+    public static String TOPIC_EXCHANGE_EVENT = "dc3.e.event";
+    public static String QUEUE_EVENT_PREFIX = "dc3.q.event.";
+    public static String ROUTING_EVENT_PREFIX = "dc3.r.event.";
 
     private RabbitConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);

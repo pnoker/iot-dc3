@@ -1,0 +1,95 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package api.common.data;
+
+import "api/common/r.proto";
+import "api/common/page.proto";
+
+option java_package = "io.github.pnoker.api.center.data";
+option java_outer_classname = "CommandRecordProto";
+option objc_class_prefix = "Data";
+option java_multiple_files = true;
+
+service CommandRecordApi {
+  rpc Call (GrpcCommandCallVO) returns (GrpcRString);
+  rpc GetByRecordId (GrpcStringQuery) returns (GrpcRCommandRecordDTO);
+  rpc List (GrpcCommandRecordQuery) returns (GrpcRPageCommandRecordDTO);
+}
+
+message GrpcCommandCallVO {
+  int64 device_id = 1;
+  int64 command_id = 2;
+  map<string, string> param_values = 3;
+  int64 tenant_id = 4;
+}
+
+message GrpcCommandRecordDTO {
+  int64 id = 1;
+  string record_id = 2;
+  int64 tenant_id = 3;
+  int64 device_id = 4;
+  int64 command_id = 5;
+  string command_code = 6;
+  map<string, string> param_values = 7;
+  map<string, string> result_values = 8;
+  string status = 9;
+  string error_code = 10;
+  string error_message = 11;
+  string source = 12;
+  int64 source_user_id = 13;
+  int64 occurred_at = 14;
+  int64 sent_at = 15;
+  int64 finished_at = 16;
+  int32 schema_version = 17;
+  int64 create_time = 18;
+  int64 update_time = 19;
+}
+
+message GrpcCommandRecordQuery {
+  int64 device_id = 1;
+  int64 command_id = 2;
+  string status = 3;
+  int64 tenant_id = 4;
+  GrpcPage page = 5;
+}
+
+message GrpcRCommandRecordDTO {
+  GrpcR result = 1;
+  GrpcCommandRecordDTO data = 2;
+}
+
+message GrpcPageCommandRecordDTO {
+  GrpcPage page = 1;
+  repeated GrpcCommandRecordDTO data = 2;
+}
+
+message GrpcRPageCommandRecordDTO {
+  GrpcR result = 1;
+  GrpcPageCommandRecordDTO data = 2;
+}
+
+message GrpcStringQuery {
+  string value = 1;
+}
+
+message GrpcRString {
+  GrpcR result = 1;
+  string data = 2;
+}

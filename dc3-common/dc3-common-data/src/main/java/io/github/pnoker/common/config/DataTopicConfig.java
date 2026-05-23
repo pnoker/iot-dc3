@@ -267,4 +267,50 @@ public class DataTopicConfig {
                 .with(RabbitConstant.ROUTING_POINT_COMMAND_RESULT + ".*");
     }
 
+    // ===== Custom command dead letter ========================================
+
+    @Bean
+    Queue commandDeadQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_COMMAND_DEAD).build();
+    }
+
+    @Bean
+    Binding commandDeadBinding(Queue commandDeadQueue, TopicExchange commandDeadExchange) {
+        return BindingBuilder.bind(commandDeadQueue)
+                .to(commandDeadExchange)
+                .with("#");
+    }
+
+    // ===== Custom command result =============================================
+
+    @Bean
+    Queue commandResultQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_COMMAND_RESULT)
+                .ttl(60000)
+                .build();
+    }
+
+    @Bean
+    Binding commandResultBinding(Queue commandResultQueue, TopicExchange commandResultExchange) {
+        return BindingBuilder.bind(commandResultQueue)
+                .to(commandResultExchange)
+                .with(RabbitConstant.ROUTING_COMMAND_RESULT + ".*");
+    }
+
+    // ===== Event report ======================================================
+
+    @Bean
+    Queue eventReportQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_EVENT_PREFIX + "report")
+                .ttl(60000)
+                .build();
+    }
+
+    @Bean
+    Binding eventReportBinding(Queue eventReportQueue, TopicExchange eventExchange) {
+        return BindingBuilder.bind(eventReportQueue)
+                .to(eventExchange)
+                .with(RabbitConstant.ROUTING_EVENT_PREFIX + "*");
+    }
+
 }

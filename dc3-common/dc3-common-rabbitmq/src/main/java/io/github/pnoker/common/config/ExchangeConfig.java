@@ -123,4 +123,24 @@ public class ExchangeConfig {
         return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK, true, false);
     }
 
+    @Bean
+    TopicExchange commandExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND, true, false);
+    }
+
+    @Bean
+    TopicExchange commandResultExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT, true, false);
+    }
+
+    @Bean
+    TopicExchange commandDeadExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND_DEAD, true, false);
+    }
+
+    @Bean
+    TopicExchange eventExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_EVENT, true, false);
+    }
+
 }
