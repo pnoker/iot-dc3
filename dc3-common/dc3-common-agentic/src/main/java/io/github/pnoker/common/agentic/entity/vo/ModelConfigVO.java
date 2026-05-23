@@ -59,4 +59,6 @@ public class ModelConfigVO extends BaseVO {
 
     private EnableFlagEnum enableFlag;
 
+    private Long tenantId;
+
 }

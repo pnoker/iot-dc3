@@ -67,6 +67,9 @@ public class ModelProviderDO implements Serializable {
     @TableField("enable_flag")
     private Byte enableFlag;
 
+    @TableField("tenant_id")
+    private Long tenantId;
+
     @TableField("remark")
     private String remark;
 

@@ -46,4 +46,6 @@ public class ModelProviderVO extends BaseVO {
 
     private EnableFlagEnum enableFlag;
 
+    private Long tenantId;
+
 }

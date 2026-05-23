@@ -136,6 +136,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         entityBO.setCreatorName(header.getUserName());
         entityBO.setOperatorId(header.getUserId());
         entityBO.setOperatorName(header.getUserName());
+        entityBO.setTenantId(header.getTenantId());
     }
 
     private void fillOperateAudit(ModelProviderBO entityBO, RequestHeader.UserHeader header) {
@@ -150,6 +151,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         }
         modelProviderManager.update(Wrappers.<ModelProviderDO>lambdaUpdate()
                 .set(ModelProviderDO::getDefaultFlag, DefaultFlagEnum.NOT_DEFAULT.getIndex())
+                .eq(ModelProviderDO::getTenantId, entityDO.getTenantId())
                 .eq(ModelProviderDO::getDefaultFlag, DefaultFlagEnum.DEFAULT.getIndex())
                 .ne(ModelProviderDO::getId, entityDO.getId()));
     }
