@@ -37,6 +37,13 @@ import java.util.Objects;
 @Slf4j
 public class RequestUtil {
 
+    private static final String[] PROXY_IP_HEADERS = {
+            "X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP",
+            "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"
+    };
+    private static final String UNKNOWN_IP = "unknown";
+    private static final String COMMA = ",";
+
     private RequestUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
@@ -52,10 +59,10 @@ public class RequestUtil {
         if (Objects.isNull(ip)) {
             return null;
         }
-        String[] ips = ip.split(",");
+        String[] ips = ip.split(COMMA);
         for (String s : ips) {
             s = s.trim();
-            if (!s.isEmpty() && !"unknown".equalsIgnoreCase(s)) {
+            if (!s.isEmpty() && !UNKNOWN_IP.equalsIgnoreCase(s)) {
                 return s;
             }
         }
@@ -73,11 +80,9 @@ public class RequestUtil {
      */
     public static String getRemoteIp(ServerHttpRequest request) {
         String ip = StringUtils.EMPTY;
-        String[] headers = {"X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP",
-                "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
-        for (String header : headers) {
+        for (String header : PROXY_IP_HEADERS) {
             ip = request.getHeaders().getFirst(header);
-            if (!(Objects.isNull(ip) || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))) {
+            if (!(Objects.isNull(ip) || ip.isEmpty() || UNKNOWN_IP.equalsIgnoreCase(ip))) {
                 return getMultistageReverseProxyIp(ip);
             }
         }

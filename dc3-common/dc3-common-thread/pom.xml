@@ -78,6 +78,12 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- DC3 Common -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-constant</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

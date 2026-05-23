@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -37,7 +38,7 @@ public class ActiveAgenticProfileConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("agentic");
+        environment.addActiveProfile(EnvironmentConstant.AGENTIC_PROFILE);
     }
 
 }
