@@ -18,7 +18,6 @@
 package io.github.pnoker.common.data.entity.vo;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

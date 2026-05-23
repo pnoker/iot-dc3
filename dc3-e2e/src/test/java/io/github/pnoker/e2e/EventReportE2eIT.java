@@ -17,7 +17,6 @@
 
 package io.github.pnoker.e2e;
 
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
