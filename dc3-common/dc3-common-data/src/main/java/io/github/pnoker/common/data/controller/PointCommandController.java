@@ -19,26 +19,18 @@ package io.github.pnoker.common.data.controller;
 
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.biz.PointCommandService;
-import io.github.pnoker.common.data.entity.model.PointCommandDO;
-import io.github.pnoker.common.data.entity.vo.PointCommandQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.entity.R;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * REST controller exposing point command management endpoints.
@@ -80,31 +72,6 @@ public class PointCommandController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             String commandId = pointCommandService.write(tenantId, entityVO);
             return R.ok(commandId);
-        }));
-    }
-
-    /**
-     * Query a single command by commandId.
-     *
-     * @param commandId unique command identifier
-     * @return command record with current status
-     */
-    @GetMapping("/{commandId}")
-    public Mono<R<PointCommandDO>> getByCommandId(@NotBlank @PathVariable String commandId) {
-        return async(() -> R.ok(pointCommandService.getByCommandId(commandId)));
-    }
-
-    /**
-     * Query commands with pagination and optional filters.
-     *
-     * @param queryVO query filters
-     * @return paginated command records
-     */
-    @PostMapping("/list")
-    public Mono<R<Page<PointCommandDO>>> list(@RequestBody(required = false) PointCommandQueryVO queryVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            PointCommandQueryVO query = Objects.isNull(queryVO) ? new PointCommandQueryVO() : queryVO;
-            return R.ok(pointCommandService.list(tenantId, query));
         }));
     }
 

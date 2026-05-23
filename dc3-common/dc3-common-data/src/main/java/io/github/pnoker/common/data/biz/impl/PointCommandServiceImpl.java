@@ -19,13 +19,14 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.data.biz.PointCommandHistoryService;
 import io.github.pnoker.common.data.biz.PointCommandService;
-import io.github.pnoker.common.data.dal.PointCommandManager;
+import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.entity.model.PointCommandDO;
-import io.github.pnoker.common.data.entity.vo.PointCommandQueryVO;
+import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
+import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
@@ -71,7 +72,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PointCommandServiceImpl implements PointCommandService {
+public class PointCommandServiceImpl implements PointCommandService, PointCommandHistoryService {
 
     private final DeviceFacade deviceFacade;
 
@@ -81,7 +82,7 @@ public class PointCommandServiceImpl implements PointCommandService {
 
     private final RabbitTemplate rabbitTemplate;
 
-    private final PointCommandManager pointCommandManager;
+    private final PointCommandHistoryManager pointCommandHistoryManager;
 
     private final EntityStateMapper entityStateMapper;
 
@@ -106,7 +107,7 @@ public class PointCommandServiceImpl implements PointCommandService {
         String commandId = resolveCommandId(entityVO.getCommandId());
         LocalDateTime nowLocal = LocalDateTime.now();
 
-        PointCommandDO commandDO = new PointCommandDO();
+        PointCommandHistoryDO commandDO = new PointCommandHistoryDO();
         commandDO.setCommandId(commandId);
         commandDO.setTenantId(tenantId);
         commandDO.setType(PointCommandTypeEnum.READ.getCode());
@@ -114,17 +115,17 @@ public class PointCommandServiceImpl implements PointCommandService {
         commandDO.setPointId(entityVO.getPointId());
         commandDO.setStatus(PointCommandStatusEnum.PENDING.getCode());
         commandDO.setSource(PointCommandSourceEnum.HTTP.getCode());
-        commandDO.setOccurredAt(nowLocal);
-        commandDO.setExpireAt(nowLocal.plusSeconds(10));
+        commandDO.setOccurTime(nowLocal);
+        commandDO.setExpireTime(nowLocal.plusSeconds(10));
         commandDO.setSchemaVersion((short) 1);
-        pointCommandManager.save(commandDO);
+        pointCommandHistoryManager.save(commandDO);
 
         publishCommand(PointCommandDTO.ofRead(commandId, tenantId, entityVO.getDeviceId(),
                 entityVO.getPointId()), driver.getServiceName(), commandId);
 
         commandDO.setStatus(PointCommandStatusEnum.SENT.getCode());
-        commandDO.setSentAt(LocalDateTime.now());
-        pointCommandManager.updateById(commandDO);
+        commandDO.setSendTime(LocalDateTime.now());
+        pointCommandHistoryManager.updateById(commandDO);
 
         return commandId;
     }
@@ -151,7 +152,7 @@ public class PointCommandServiceImpl implements PointCommandService {
         String commandId = resolveCommandId(entityVO.getCommandId());
         LocalDateTime nowLocal = LocalDateTime.now();
 
-        PointCommandDO commandDO = new PointCommandDO();
+        PointCommandHistoryDO commandDO = new PointCommandHistoryDO();
         commandDO.setCommandId(commandId);
         commandDO.setTenantId(tenantId);
         commandDO.setType(PointCommandTypeEnum.WRITE.getCode());
@@ -160,38 +161,38 @@ public class PointCommandServiceImpl implements PointCommandService {
         commandDO.setRequestValue(entityVO.getValue());
         commandDO.setStatus(PointCommandStatusEnum.PENDING.getCode());
         commandDO.setSource(PointCommandSourceEnum.HTTP.getCode());
-        commandDO.setOccurredAt(nowLocal);
-        commandDO.setExpireAt(nowLocal.plusSeconds(10));
+        commandDO.setOccurTime(nowLocal);
+        commandDO.setExpireTime(nowLocal.plusSeconds(10));
         commandDO.setSchemaVersion((short) 1);
-        pointCommandManager.save(commandDO);
+        pointCommandHistoryManager.save(commandDO);
 
         publishCommand(PointCommandDTO.ofWrite(commandId, tenantId, entityVO.getDeviceId(),
                 entityVO.getPointId(), entityVO.getValue()), driver.getServiceName(), commandId);
 
         commandDO.setStatus(PointCommandStatusEnum.SENT.getCode());
-        commandDO.setSentAt(LocalDateTime.now());
-        pointCommandManager.updateById(commandDO);
+        commandDO.setSendTime(LocalDateTime.now());
+        pointCommandHistoryManager.updateById(commandDO);
 
         return commandId;
     }
 
     @Override
-    public PointCommandDO getByCommandId(String commandId) {
-        return pointCommandManager.lambdaQuery()
-                .eq(PointCommandDO::getCommandId, commandId)
+    public PointCommandHistoryDO getByCommandId(String commandId) {
+        return pointCommandHistoryManager.lambdaQuery()
+                .eq(PointCommandHistoryDO::getCommandId, commandId)
                 .one();
     }
 
     @Override
-    public Page<PointCommandDO> list(Long tenantId, PointCommandQueryVO queryVO) {
-        LambdaQueryWrapper<PointCommandDO> wrapper = new LambdaQueryWrapper<PointCommandDO>()
-                .eq(PointCommandDO::getTenantId, tenantId)
-                .eq(Objects.nonNull(queryVO.getDeviceId()), PointCommandDO::getDeviceId, queryVO.getDeviceId())
-                .eq(Objects.nonNull(queryVO.getPointId()), PointCommandDO::getPointId, queryVO.getPointId())
-                .eq(Objects.nonNull(queryVO.getStatus()), PointCommandDO::getStatus, queryVO.getStatus())
-                .eq(Objects.nonNull(queryVO.getType()), PointCommandDO::getType, queryVO.getType())
-                .orderByDesc(PointCommandDO::getOccurredAt);
-        return pointCommandManager.page(queryVO.toPage(), wrapper);
+    public Page<PointCommandHistoryDO> list(Long tenantId, PointCommandHistoryQueryVO queryVO) {
+        LambdaQueryWrapper<PointCommandHistoryDO> wrapper = new LambdaQueryWrapper<PointCommandHistoryDO>()
+                .eq(PointCommandHistoryDO::getTenantId, tenantId)
+                .eq(Objects.nonNull(queryVO.getDeviceId()), PointCommandHistoryDO::getDeviceId, queryVO.getDeviceId())
+                .eq(Objects.nonNull(queryVO.getPointId()), PointCommandHistoryDO::getPointId, queryVO.getPointId())
+                .eq(Objects.nonNull(queryVO.getStatus()), PointCommandHistoryDO::getStatus, queryVO.getStatus())
+                .eq(Objects.nonNull(queryVO.getType()), PointCommandHistoryDO::getType, queryVO.getType())
+                .orderByDesc(PointCommandHistoryDO::getOccurTime);
+        return pointCommandHistoryManager.page(queryVO.toPage(), wrapper);
     }
 
     private void checkDriverOnline(Long tenantId, Long driverId) {
@@ -243,7 +244,7 @@ public class PointCommandServiceImpl implements PointCommandService {
         if (Objects.isNull(commandId) || commandId.isBlank()) {
             return null;
         }
-        PointCommandDO existing = getByCommandId(commandId);
+        PointCommandHistoryDO existing = getByCommandId(commandId);
         return Objects.nonNull(existing) ? existing.getCommandId() : null;
     }
 

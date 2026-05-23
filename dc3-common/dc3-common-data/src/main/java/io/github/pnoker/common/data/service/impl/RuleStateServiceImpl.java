@@ -117,8 +117,8 @@ public class RuleStateServiceImpl implements RuleStateService {
                 entityQuery.getEntityId());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getFingerprint()), RuleStateDO::getFingerprint,
                 entityQuery.getFingerprint());
-        wrapper.eq(Objects.nonNull(entityQuery.getStateFlag()), RuleStateDO::getStateFlag,
-                Objects.isNull(entityQuery.getStateFlag()) ? null : entityQuery.getStateFlag().getIndex());
+        wrapper.eq(Objects.nonNull(entityQuery.getEntityStateFlag()), RuleStateDO::getEntityStateFlag,
+                Objects.isNull(entityQuery.getEntityStateFlag()) ? null : entityQuery.getEntityStateFlag().getIndex());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAlarmId()), RuleStateDO::getAlarmId,
                 entityQuery.getAlarmId());
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleStateDO::getTenantId, entityQuery.getTenantId());

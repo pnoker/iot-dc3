@@ -48,7 +48,7 @@ class AlarmRulePipelineServiceImplTest {
     private RuleNotificationService ruleNotificationService;
 
     @Mock
-    private AlarmEventRecordService alarmEventRecordService;
+    private RuleAlarmPersistenceService ruleAlarmPersistenceService;
 
     @InjectMocks
     private AlarmRulePipelineServiceImpl service;
@@ -85,7 +85,7 @@ class AlarmRulePipelineServiceImplTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId()).isEqualTo(1L);
-        verify(alarmEventRecordService).ensureEvent(m);
+        verify(ruleAlarmPersistenceService).ensureAlarm(m);
     }
 
     @Test
@@ -96,7 +96,7 @@ class AlarmRulePipelineServiceImplTest {
         List<NotifyHistoryBO> result = service.process(fact);
 
         assertThat(result).isEmpty();
-        verify(alarmEventRecordService, never()).ensureEvent(any());
+        verify(ruleAlarmPersistenceService, never()).ensureAlarm(any());
         verify(ruleNotificationService, never()).notify(any());
     }
 
@@ -150,7 +150,7 @@ class AlarmRulePipelineServiceImplTest {
 
         assertThat(result).hasSize(3);
         verify(ruleEngine, times(3)).evaluate(any());
-        verify(alarmEventRecordService, times(3)).ensureEvent(any());
+        verify(ruleAlarmPersistenceService, times(3)).ensureAlarm(any());
         // Single notifyBatch call amortizes writes
         verify(ruleNotificationService).notifyBatch(anyList());
         verify(ruleNotificationService, never()).notify(any());
@@ -164,7 +164,7 @@ class AlarmRulePipelineServiceImplTest {
         List<NotifyHistoryBO> result = service.processBatch(List.of(fact));
 
         assertThat(result).isEmpty();
-        verify(alarmEventRecordService, never()).ensureEvent(any());
+        verify(ruleAlarmPersistenceService, never()).ensureAlarm(any());
         verify(ruleNotificationService, never()).notifyBatch(any());
     }
 
@@ -172,7 +172,7 @@ class AlarmRulePipelineServiceImplTest {
 
     private void verifyNoPipelineInteraction() {
         verify(ruleEngine, never()).evaluate(any());
-        verify(alarmEventRecordService, never()).ensureEvent(any());
+        verify(ruleAlarmPersistenceService, never()).ensureAlarm(any());
         verify(ruleNotificationService, never()).notify(any());
         verify(ruleNotificationService, never()).notifyBatch(any());
     }

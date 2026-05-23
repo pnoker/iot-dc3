@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.contract;
 
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -58,13 +59,13 @@ class ApiRouteNamingContractTest {
     }
 
     private static void assertRoute(Path source, String route, List<String> violations) {
-        if (!route.contains("/")) {
+        if (!route.contains(SymbolConstant.SLASH)) {
             return;
         }
         if (route.contains("/{")) {
             violations.add("%s uses path variable route %s".formatted(source, route));
         }
-        for (String segment : route.split("/")) {
+        for (String segment : route.split(SymbolConstant.SLASH)) {
             if (segment.isBlank() || segment.startsWith("{")) {
                 continue;
             }

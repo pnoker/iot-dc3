@@ -18,6 +18,7 @@
 package io.github.pnoker.common.constant.driver;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 
 
 /**
@@ -63,6 +64,8 @@ public class RabbitConstant {
     public static final String ROUTING_DEVICE_SCAN_TICK = "state.timeout.device.scan.tick";
     public static final String ROUTING_DEVICE_SCAN = "state.timeout.device.scan";
     public static final String ROUTING_POINT_COMMAND_RESULT = "dc3.r.point_command_result";
+
+    public static final String ROUTING_POINT_COMMAND_RESULT_PREFIX = ROUTING_POINT_COMMAND_RESULT + SymbolConstant.DOT;
     // Register
     public static String TOPIC_EXCHANGE_REGISTER = "dc3.e.register";
     public static String QUEUE_REGISTER_UP = "dc3.q.register.up";
@@ -114,6 +117,8 @@ public class RabbitConstant {
     public static String TOPIC_EXCHANGE_COMMAND_RESULT = "dc3.e.command_result";
     public static String QUEUE_COMMAND_RESULT = "dc3.q.command_result";
     public static String ROUTING_COMMAND_RESULT = "dc3.r.command_result";
+
+    public static String ROUTING_COMMAND_RESULT_PREFIX = ROUTING_COMMAND_RESULT + SymbolConstant.DOT;
     // Custom Command Dead Letter
     public static String TOPIC_EXCHANGE_COMMAND_DEAD = "dc3.e.command_dead";
     public static String QUEUE_COMMAND_DEAD = "dc3.q.command_dead";

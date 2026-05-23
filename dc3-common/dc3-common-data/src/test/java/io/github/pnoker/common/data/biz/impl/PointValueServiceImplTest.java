@@ -84,7 +84,7 @@ class PointValueServiceImplTest {
     private static FacadeDeviceBO stubDevice(Long tenantId, Long profileId) {
         FacadeDeviceBO device = new FacadeDeviceBO();
         device.setTenantId(tenantId);
-        device.setProfileIds(List.of(profileId));
+        device.setProfileId(profileId);
         return device;
     }
 

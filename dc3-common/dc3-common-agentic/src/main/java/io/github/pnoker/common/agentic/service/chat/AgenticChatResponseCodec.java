@@ -25,6 +25,7 @@ import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkRespon
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +77,8 @@ public class AgenticChatResponseCodec {
     }
 
     public String newChatId() {
-        return AgenticConstant.Chat.ID_PREFIX + UUID.randomUUID().toString().replace("-", "").substring(0, 24);
+        return AgenticConstant.Chat.ID_PREFIX
+                + UUID.randomUUID().toString().replace(SymbolConstant.HYPHEN, StringUtils.EMPTY).substring(0, 24);
     }
 
     public String formatFinalChunk(String id, long created, String model, String finishReason) {

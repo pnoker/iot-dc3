@@ -18,9 +18,10 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.dal.CommandRecordManager;
-import io.github.pnoker.common.data.entity.model.CommandRecordDO;
+import io.github.pnoker.common.data.dal.CommandHistoryManager;
+import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.entity.dto.CommandCallResultDTO;
+import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CommandResultReceiver {
 
-    private final CommandRecordManager commandRecordManager;
+    private final CommandHistoryManager commandHistoryManager;
 
     @RabbitHandler
     @RabbitListener(queues = "#{commandResultQueue.name}")
@@ -59,8 +60,8 @@ public class CommandResultReceiver {
 
             log.info("Receive command result: recordId={}, status={}", resultDTO.recordId(), resultDTO.status());
 
-            CommandRecordDO recordDO = commandRecordManager.lambdaQuery()
-                    .eq(CommandRecordDO::getRecordId, resultDTO.recordId())
+            CommandHistoryDO recordDO = commandHistoryManager.lambdaQuery()
+                    .eq(CommandHistoryDO::getRecordId, resultDTO.recordId())
                     .one();
 
             if (Objects.nonNull(recordDO)) {
@@ -68,14 +69,14 @@ public class CommandResultReceiver {
                 recordDO.setErrorCode(resultDTO.errorCode());
                 recordDO.setErrorMessage(resultDTO.errorMessage());
                 if (Objects.nonNull(resultDTO.resultValues())) {
-                    recordDO.setResultValues(resultDTO.resultValues().toString());
+                    recordDO.setResultValues(JsonUtil.toJsonString(resultDTO.resultValues()));
                 }
                 if (Objects.nonNull(resultDTO.finishedAt())) {
-                    recordDO.setFinishedAt(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
+                    recordDO.setFinishTime(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
                 } else {
-                    recordDO.setFinishedAt(LocalDateTime.now());
+                    recordDO.setFinishTime(LocalDateTime.now());
                 }
-                commandRecordManager.updateById(recordDO);
+                commandHistoryManager.updateById(recordDO);
                 log.info("Updated command record status: recordId={}, status={}", resultDTO.recordId(), resultDTO.status());
             } else {
                 log.warn("Command record not found for result: recordId={}", resultDTO.recordId());

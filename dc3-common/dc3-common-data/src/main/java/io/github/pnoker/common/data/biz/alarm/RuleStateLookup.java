@@ -53,7 +53,7 @@ public class RuleStateLookup {
                 .eq(RuleStateDO::getRuleId, ruleId)
                 .eq(RuleStateDO::getAlarmTargetTypeFlag, alarmTargetTypeFlag)
                 .eq(RuleStateDO::getEntityId, entityId)
-                .eq(RuleStateDO::getStateFlag, RuleStateFlagEnum.FIRING.getIndex())
+                .eq(RuleStateDO::getEntityStateFlag, RuleStateFlagEnum.FIRING.getIndex())
                 .exists();
     }
 
@@ -69,7 +69,7 @@ public class RuleStateLookup {
                 .eq(RuleStateDO::getRuleId, ruleId)
                 .eq(RuleStateDO::getAlarmTargetTypeFlag, alarmTargetTypeFlag)
                 .eq(RuleStateDO::getEntityId, entityId)
-                .eq(RuleStateDO::getStateFlag, RuleStateFlagEnum.FIRING.getIndex())
+                .eq(RuleStateDO::getEntityStateFlag, RuleStateFlagEnum.FIRING.getIndex())
                 .gt(RuleStateDO::getAlarmId, DefaultConstant.DEFAULT_ID)
                 .orderByDesc(RuleStateDO::getLastTriggerTime)
                 .last("limit 1")

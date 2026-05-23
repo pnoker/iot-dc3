@@ -17,9 +17,6 @@
 
 package io.github.pnoker.common.data.biz;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.model.PointCommandDO;
-import io.github.pnoker.common.data.entity.vo.PointCommandQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 
@@ -69,22 +66,5 @@ public interface PointCommandService {
     default String write(PointCommandWriteVO entityVO) {
         return write(null, entityVO);
     }
-
-    /**
-     * Query a single command by its commandId.
-     *
-     * @param commandId unique command identifier
-     * @return matching command row, or null
-     */
-    PointCommandDO getByCommandId(String commandId);
-
-    /**
-     * Query commands with pagination and optional filters.
-     *
-     * @param tenantId current tenant id
-     * @param queryVO  query filters (deviceId, pointId, status, type, page, size)
-     * @return paginated command rows
-     */
-    Page<PointCommandDO> list(Long tenantId, PointCommandQueryVO queryVO);
 
 }

@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.entity.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
@@ -135,9 +134,5 @@ public class EntityStateDO implements Serializable {
 
     @TableField("operate_time")
     private LocalDateTime operateTime;
-
-    @TableLogic
-    @TableField("deleted")
-    private Byte deleted;
 
 }

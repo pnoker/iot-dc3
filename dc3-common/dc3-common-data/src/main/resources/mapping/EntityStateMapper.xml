@@ -37,7 +37,6 @@
         <result column="tenant_id" property="tenantId"/>
         <result column="create_time" property="createTime"/>
         <result column="operate_time" property="operateTime"/>
-        <result column="deleted" property="deleted"/>
     </resultMap>
 
     <select id="upsertEntityState" resultMap="EntityStateResultMap" flushCache="true" useCache="false">
@@ -72,7 +71,6 @@
                 #{tenantId})
         ON CONFLICT
             (tenant_id, entity_type_flag, entity_id)
-            WHERE deleted = 0
         DO UPDATE SET
             parent_entity_id = EXCLUDED.parent_entity_id,
             entity_state_flag = EXCLUDED.entity_state_flag,
@@ -108,8 +106,7 @@
             entity_state_ext,
             tenant_id,
             create_time,
-            operate_time,
-            deleted
+            operate_time
     </select>
 
     <select id="claimExpiredDevices" resultMap="EntityStateResultMap" flushCache="true" useCache="false">
@@ -117,8 +114,7 @@
                                entity_state_flag    AS previous_state_flag,
                                lease_version AS previous_lease_version
                         FROM dc3_entity_state
-                        WHERE deleted = 0
-                          AND entity_type_flag = #{entityTypeFlag}
+                        WHERE entity_type_flag = #{entityTypeFlag}
                           AND entity_state_flag IN (#{onlineFlag}, #{maintainFlag}, #{faultFlag})
                           AND expire_time &lt;= CURRENT_TIMESTAMP
                         ORDER BY expire_time ASC
@@ -150,7 +146,6 @@
             , s.tenant_id
             , s.create_time
             , s.operate_time
-            , s.deleted
     </select>
 
 </mapper>

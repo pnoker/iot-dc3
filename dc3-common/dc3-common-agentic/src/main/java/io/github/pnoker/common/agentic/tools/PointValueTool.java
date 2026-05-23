@@ -23,6 +23,7 @@ import io.github.pnoker.common.agentic.service.ActionService;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
 import io.github.pnoker.common.agentic.utils.AgenticVisualizationUtil;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
@@ -197,7 +198,7 @@ public class PointValueTool {
                 ? List.of(AgenticVisualizationUtil.yAnnotation(series.summary().average(), "Average"))
                 : List.of();
         AgenticVisualizationSpec line = AgenticVisualizationUtil.line(
-                "point-value-history-" + deviceId + "-" + pointId,
+                "point-value-history" + SymbolConstant.HYPHEN + deviceId + SymbolConstant.HYPHEN + pointId,
                 "Device " + deviceId + " / Point " + pointId,
                 "Point value history",
                 series.dataset(),
@@ -205,7 +206,7 @@ public class PointValueTool {
                 meta,
                 annotations);
         AgenticVisualizationSpec stat = AgenticVisualizationUtil.stat(
-                "point-value-history-summary-" + deviceId + "-" + pointId,
+                "point-value-history-summary" + SymbolConstant.HYPHEN + deviceId + SymbolConstant.HYPHEN + pointId,
                 "Point value summary",
                 "Numeric summary of the returned history window",
                 AgenticVisualizationUtil.statRow(series.summary()),

@@ -55,7 +55,7 @@ public class RuleStateVO extends BaseVO {
 
     private String fingerprint;
 
-    private RuleStateFlagEnum stateFlag;
+    private RuleStateFlagEnum entityStateFlag;
 
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime firstTriggerTime;
@@ -73,6 +73,6 @@ public class RuleStateVO extends BaseVO {
 
     private Long alarmId;
 
-    private RuleStateExt stateExt;
+    private RuleStateExt entityStateExt;
 
 }

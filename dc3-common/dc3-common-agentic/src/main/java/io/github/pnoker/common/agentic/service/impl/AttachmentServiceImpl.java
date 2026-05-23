@@ -24,6 +24,7 @@ import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
 import io.github.pnoker.common.agentic.entity.builder.AttachmentBuilder;
 import io.github.pnoker.common.agentic.entity.model.AttachmentDO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
 import lombok.RequiredArgsConstructor;
@@ -149,7 +150,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new RequestException("Attachment directory create failed: {}", directory, e);
         }
 
-        Path filePath = directory.resolve(UUID.randomUUID() + "-" + safePathPart(fileName)).normalize();
+        Path filePath = directory.resolve(UUID.randomUUID() + SymbolConstant.HYPHEN + safePathPart(fileName)).normalize();
         if (!filePath.startsWith(storageRoot)) {
             throw new RequestException("Attachment file path is invalid");
         }
@@ -173,7 +174,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private String safePathPart(String value) {
         String sanitized = StringUtils.defaultIfBlank(value, "attachment")
-                .replaceAll("[^a-zA-Z0-9._-]", "_");
+                .replaceAll("[^a-zA-Z0-9._-]", SymbolConstant.UNDERSCORE);
         return StringUtils.defaultIfBlank(sanitized, "attachment");
     }
 

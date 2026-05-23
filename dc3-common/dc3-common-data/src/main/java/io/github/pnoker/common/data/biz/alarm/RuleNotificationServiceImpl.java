@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.constant.common.DefaultConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.dal.NotifyHistoryManager;
 import io.github.pnoker.common.data.dal.RuleStateManager;
@@ -247,7 +248,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         String fingerprint = fingerprint(match, notify, variables);
         RuleStateBO state = loadState(rule, fact, fingerprint);
         boolean isRecovery = StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
-        if (isRecovery && (Objects.isNull(state) || !RuleStateFlagEnum.FIRING.equals(state.getStateFlag()))) {
+        if (isRecovery && (Objects.isNull(state) || !RuleStateFlagEnum.FIRING.equals(state.getEntityStateFlag()))) {
             log.debug("Skip recovery state transition because no FIRING fingerprint exists, ruleId={}, entityId={}",
                     rule.getId(), fact.getEntityId());
             return null;
@@ -265,13 +266,13 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
             state.setTenantId(fact.getTenantId());
         }
         state.setAlarmId(Objects.requireNonNullElse(fact.getAlarmId(), DefaultConstant.DEFAULT_ID));
-        state.setStateExt(ruleStateExt(match));
+        state.setEntityStateExt(ruleStateExt(match));
 
         if (isRecovery) {
-            state.setStateFlag(RuleStateFlagEnum.RECOVERED);
+            state.setEntityStateFlag(RuleStateFlagEnum.RECOVERED);
             state.setLastRecoverTime(now);
         } else {
-            state.setStateFlag(RuleStateFlagEnum.FIRING);
+            state.setEntityStateFlag(RuleStateFlagEnum.FIRING);
             state.setLastTriggerTime(now);
             if (Objects.isNull(state.getFirstTriggerTime())) {
                 state.setFirstTriggerTime(now);
@@ -325,11 +326,11 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         } else {
             LambdaUpdateWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>lambdaUpdate()
                     .eq(RuleStateDO::getId, state.getId())
-                    .set(RuleStateDO::getStateFlag, state.getStateFlag().getIndex())
+                    .set(RuleStateDO::getEntityStateFlag, state.getEntityStateFlag().getIndex())
                     .set(RuleStateDO::getLastTriggerTime, state.getLastTriggerTime())
                     .set(RuleStateDO::getLastRecoverTime, state.getLastRecoverTime())
                     .set(RuleStateDO::getAlarmId, state.getAlarmId())
-                    .set(RuleStateDO::getStateExt, entityDO.getStateExt());
+                    .set(RuleStateDO::getEntityStateExt, entityDO.getEntityStateExt());
             if (recovery) {
                 wrapper.setSql("trigger_count = trigger_count");
             } else {
@@ -382,8 +383,8 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         }
         RuleBO rule = match.getRule();
         RuleFact fact = match.getFact();
-        return fact.getTenantId() + ":" + rule.getId() + ":" + rule.getAlarmTargetTypeFlag().getCode() + ":"
-                + fact.getEntityId();
+        return fact.getTenantId() + SymbolConstant.COLON + rule.getId() + SymbolConstant.COLON
+                + rule.getAlarmTargetTypeFlag().getCode() + SymbolConstant.COLON + fact.getEntityId();
     }
 
     private NotifyHistoryBO historySkipped(RuleMatch match, NotifyBO notify, MessageBO message, NotifyChannelBindBO bind,
@@ -394,7 +395,8 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                 Map.of(),
                 List.of());
         NotifySendResult result = NotifySendResult.skipped(
-                Objects.nonNull(channel) ? channel.getCredentialRef() : "notify-channel:" + bind.getChannelId(),
+                Objects.nonNull(channel) ? channel.getCredentialRef()
+                        : "notify-channel" + SymbolConstant.COLON + bind.getChannelId(),
                 reason);
         NotifyHistoryBO history = buildHistory(match, notify, message, bind, channel, payload, variables);
         history.setStatusFlag(result.getStatusFlag());

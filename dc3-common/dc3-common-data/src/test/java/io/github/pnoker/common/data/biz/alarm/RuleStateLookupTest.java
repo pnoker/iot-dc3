@@ -31,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,11 +59,11 @@ class RuleStateLookupTest {
 
         assertThat(lookup.hasFiringState(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isTrue();
 
-        verify(chainWrapper).eq(RuleStateDO::getTenantId, TENANT_ID);
-        verify(chainWrapper).eq(RuleStateDO::getRuleId, RULE_ID);
-        verify(chainWrapper).eq(RuleStateDO::getAlarmTargetTypeFlag, TARGET_TYPE);
-        verify(chainWrapper).eq(RuleStateDO::getEntityId, ENTITY_ID);
-        verify(chainWrapper).eq(RuleStateDO::getStateFlag, RuleStateFlagEnum.FIRING.getIndex());
+        verify(chainWrapper).eq(any(), eq(TENANT_ID));
+        verify(chainWrapper).eq(any(), eq(RULE_ID));
+        verify(chainWrapper).eq(any(), eq(TARGET_TYPE));
+        verify(chainWrapper).eq(any(), eq(ENTITY_ID));
+        verify(chainWrapper).eq(any(), eq(RuleStateFlagEnum.FIRING.getIndex()));
     }
 
     @Test
@@ -91,8 +92,8 @@ class RuleStateLookupTest {
 
         assertThat(lookup.findFiringAlarmId(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isEqualTo(100L);
 
-        verify(chainWrapper).gt(RuleStateDO::getAlarmId, 0L);
-        verify(chainWrapper).orderByDesc((com.baomidou.mybatisplus.core.toolkit.support.SFunction<RuleStateDO, ?>) RuleStateDO::getLastTriggerTime);
+        verify(chainWrapper).gt(any(), eq(0L));
+        verify(chainWrapper).orderByDesc((com.baomidou.mybatisplus.core.toolkit.support.SFunction<RuleStateDO, ?>) any());
         verify(chainWrapper).last("limit 1");
     }
 

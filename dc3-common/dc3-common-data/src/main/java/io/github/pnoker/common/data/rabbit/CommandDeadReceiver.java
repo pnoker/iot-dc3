@@ -18,8 +18,8 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.dal.CommandRecordManager;
-import io.github.pnoker.common.data.entity.model.CommandRecordDO;
+import io.github.pnoker.common.data.dal.CommandHistoryManager;
+import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CommandDeadReceiver {
 
-    private final CommandRecordManager commandRecordManager;
+    private final CommandHistoryManager commandHistoryManager;
 
     @RabbitHandler
     @RabbitListener(queues = "#{commandDeadQueue.name}")
@@ -53,15 +53,15 @@ public class CommandDeadReceiver {
         try {
             String correlationId = message.getMessageProperties().getCorrelationId();
             if (Objects.nonNull(correlationId)) {
-                CommandRecordDO recordDO = commandRecordManager.lambdaQuery()
-                        .eq(CommandRecordDO::getRecordId, correlationId)
+                CommandHistoryDO recordDO = commandHistoryManager.lambdaQuery()
+                        .eq(CommandHistoryDO::getRecordId, correlationId)
                         .one();
                 if (Objects.nonNull(recordDO)) {
                     recordDO.setStatus(PointCommandStatusEnum.DEAD.getCode());
                     recordDO.setErrorCode("DLX");
                     recordDO.setErrorMessage("Message rejected to dead letter queue");
-                    recordDO.setFinishedAt(LocalDateTime.now());
-                    commandRecordManager.updateById(recordDO);
+                    recordDO.setFinishTime(LocalDateTime.now());
+                    commandHistoryManager.updateById(recordDO);
                     log.info("Marked dead command record: recordId={}", correlationId);
                 }
             }

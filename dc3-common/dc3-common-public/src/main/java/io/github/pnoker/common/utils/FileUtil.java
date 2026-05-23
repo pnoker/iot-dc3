@@ -19,6 +19,7 @@ package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.FolderConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -65,7 +66,7 @@ public class FileUtil {
                 log.error("Failed to create temp directory: {}", dir, e);
             }
         }
-        return dir.toString() + "/";
+        return dir.toString() + SymbolConstant.SLASH;
     }
 
     /**
@@ -85,7 +86,7 @@ public class FileUtil {
      * @return Random XLSX file name with UUID
      */
     public static String getRandomXlsxName() {
-        return UUID.randomUUID().toString() + ".xlsx";
+        return UUID.randomUUID() + SymbolConstant.DOT + "xlsx";
     }
 
     private static String[] safePathSegments(String... segments) {
@@ -103,7 +104,7 @@ public class FileUtil {
         if (value == null || value.isBlank()) {
             return "upload";
         }
-        String sanitized = value.replaceAll("[^a-zA-Z0-9._-]", "_");
+        String sanitized = value.replaceAll("[^a-zA-Z0-9._-]", SymbolConstant.UNDERSCORE);
         return sanitized.isBlank() ? "upload" : sanitized;
     }
 

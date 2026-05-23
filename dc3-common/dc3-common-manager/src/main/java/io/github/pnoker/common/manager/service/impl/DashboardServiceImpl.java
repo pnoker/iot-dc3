@@ -265,7 +265,7 @@ public class DashboardServiceImpl implements DashboardService {
         String normMode = TopologyLimits.MODE_VOLUME.equalsIgnoreCase(mode) ? TopologyLimits.MODE_VOLUME
                 : TopologyLimits.MODE_CARDINALITY;
         String normRange = normaliseRange(rangeKey);
-        String cacheKey = tenantId + ":" + normMode + ":" + normRange;
+        String cacheKey = tenantId + SymbolConstant.COLON + normMode + SymbolConstant.COLON + normRange;
         TopologyVO hit = topologyCache.getIfPresent(cacheKey);
         if (Objects.nonNull(hit))
             return hit;

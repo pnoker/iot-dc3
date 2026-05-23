@@ -28,6 +28,7 @@ import io.github.pnoker.common.auth.entity.model.ApiDO;
 import io.github.pnoker.common.auth.entity.model.MenuDO;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import io.github.pnoker.common.auth.mapper.ResourceRegistryLockMapper;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.ext.ApiExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.ApiTypeFlagEnum;
@@ -75,7 +76,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private final ResourceRegistryLockMapper resourceRegistryLockMapper;
 
     private static String apiCodeOf(String serviceName, String method, String path) {
-        return serviceName + ":" + methodToTypeFlag(method).name() + ":" + path;
+        return serviceName + SymbolConstant.COLON + methodToTypeFlag(method).name() + SymbolConstant.COLON + path;
     }
 
     private static ApiTypeFlagEnum methodToTypeFlag(String method) {
@@ -424,7 +425,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private Map<String, Long> ensureGroupNodes(String serviceName, Long serviceNodeId, Set<String> targetGroups) {
         Map<String, Long> result = new HashMap<>(targetGroups.size());
         for (String group : targetGroups) {
-            String code = API_GROUP_NODE_CODE_PREFIX + serviceName + ":" + group;
+            String code = API_GROUP_NODE_CODE_PREFIX + serviceName + SymbolConstant.COLON + group;
             ResourceDO existing = findByResourceCode(code);
             if (Objects.isNull(existing)) {
                 ResourceDO node = new ResourceDO();
@@ -509,7 +510,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private int cleanupOrphanGroupingNodes(String serviceName) {
         int removed = 0;
         List<ResourceDO> groupNodes = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
-                .likeRight(ResourceDO::getResourceCode, API_GROUP_NODE_CODE_PREFIX + serviceName + ":")
+                .likeRight(ResourceDO::getResourceCode, API_GROUP_NODE_CODE_PREFIX + serviceName + SymbolConstant.COLON)
                 .eq(ResourceDO::getEntityId, 0L));
         List<Long> idsToDrop = new ArrayList<>();
         for (ResourceDO node : groupNodes) {

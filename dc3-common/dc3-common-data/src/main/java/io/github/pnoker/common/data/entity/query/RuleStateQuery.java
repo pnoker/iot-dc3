@@ -62,7 +62,7 @@ public class RuleStateQuery implements Serializable {
 
     private String fingerprint;
 
-    private RuleStateFlagEnum stateFlag;
+    private RuleStateFlagEnum entityStateFlag;
 
     private Long alarmId;
 
