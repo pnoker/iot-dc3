@@ -53,31 +53,31 @@ public class PointCommandResultReceiver {
     public void onResult(Channel channel, Message message, PointCommandResultDTO resultDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.getCommandId())) {
+            if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.commandId())) {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
-            log.info("Receive point command result: commandId={}, status={}", resultDTO.getCommandId(), resultDTO.getStatus());
+            log.info("Receive point command result: commandId={}, status={}", resultDTO.commandId(), resultDTO.status());
 
             PointCommandDO commandDO = pointCommandManager.lambdaQuery()
-                    .eq(PointCommandDO::getCommandId, resultDTO.getCommandId())
+                    .eq(PointCommandDO::getCommandId, resultDTO.commandId())
                     .one();
 
             if (Objects.nonNull(commandDO)) {
-                commandDO.setStatus(resultDTO.getStatus());
-                commandDO.setErrorCode(resultDTO.getErrorCode());
-                commandDO.setErrorMessage(resultDTO.getErrorMessage());
-                commandDO.setResponseValue(resultDTO.getResponseValue());
-                if (Objects.nonNull(resultDTO.getFinishedAt())) {
-                    commandDO.setFinishedAt(LocalDateTime.ofInstant(resultDTO.getFinishedAt(), ZoneId.systemDefault()));
+                commandDO.setStatus(resultDTO.status());
+                commandDO.setErrorCode(resultDTO.errorCode());
+                commandDO.setErrorMessage(resultDTO.errorMessage());
+                commandDO.setResponseValue(resultDTO.responseValue());
+                if (Objects.nonNull(resultDTO.finishedAt())) {
+                    commandDO.setFinishedAt(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
                 } else {
                     commandDO.setFinishedAt(LocalDateTime.now());
                 }
                 pointCommandManager.updateById(commandDO);
-                log.info("Updated command status: commandId={}, status={}", resultDTO.getCommandId(), resultDTO.getStatus());
+                log.info("Updated command status: commandId={}, status={}", resultDTO.commandId(), resultDTO.status());
             } else {
-                log.warn("Command not found for result: commandId={}", resultDTO.getCommandId());
+                log.warn("Command not found for result: commandId={}", resultDTO.commandId());
             }
 
             RabbitAckUtil.ack(channel, deliveryTag);

@@ -75,6 +75,12 @@ public class DeviceDO implements Serializable {
     private Long driverId;
 
     /**
+     * Profile ID
+     */
+    @TableField("profile_id")
+    private Long profileId;
+
+    /**
      *
      */
     @TableField(value = "device_ext", typeHandler = JacksonTypeHandler.class)

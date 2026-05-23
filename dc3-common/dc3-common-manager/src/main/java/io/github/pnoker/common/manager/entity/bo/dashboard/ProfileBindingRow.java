@@ -19,10 +19,9 @@ package io.github.pnoker.common.manager.entity.bo.dashboard;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * One (profile, device) link from dc3_profile_bind — M:N edge in the topology.
+ * One (device, profile) link from dc3_device — 1:1 edge in the topology.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -30,11 +29,10 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 public class ProfileBindingRow {
 
-    private long profileId;
+    private Long profileId;
 
-    private long deviceId;
+    private Long deviceId;
 
 }

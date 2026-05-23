@@ -23,7 +23,6 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.manager.dal.PointManager;
-import io.github.pnoker.common.manager.dal.ProfileBindManager;
 import io.github.pnoker.common.manager.dal.ProfileManager;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.builder.ProfileBuilder;
@@ -56,9 +55,6 @@ class ProfileServiceImplTest {
 
     @Mock
     private ProfileManager profileManager;
-
-    @Mock
-    private ProfileBindManager profileBindManager;
 
     @Mock
     private PointManager pointManager;
@@ -186,7 +182,7 @@ class ProfileServiceImplTest {
 
     @Test
     void listByDeviceIdReturnsEmptyWhenDeviceMissing() {
-        when(deviceMapper.selectById(99L)).thenReturn(null);
+        when(deviceMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         assertThat(service.listByDeviceId(99L)).isEmpty();
     }
 

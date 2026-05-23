@@ -221,7 +221,7 @@ public class PointAttributeConfigController implements BaseController {
     private void requirePointConfigRelations(Long tenantId, Long deviceId, Long pointId, Long attributeId) {
         DeviceBO deviceBO = requireTenant(tenantId, deviceService.getById(deviceId));
         PointBO pointBO = requireTenant(tenantId, pointService.getById(pointId));
-        if (Objects.isNull(deviceBO.getProfileIds()) || !deviceBO.getProfileIds().contains(pointBO.getProfileId())) {
+        if (Objects.isNull(deviceBO.getProfileId()) || !Objects.equals(deviceBO.getProfileId(), pointBO.getProfileId())) {
             throw new NotFoundException("Resource does not exist");
         }
 

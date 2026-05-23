@@ -95,7 +95,7 @@ public class FacadeGrpcDeviceBuilder {
                 .ifPresent(value -> bo.setDeviceExt(JsonUtil.parseObject(value, DeviceExt.class)));
 
         if (dto.getProfileIdsCount() > 0) {
-            bo.setProfileIds(new ArrayList<>(dto.getProfileIdsList()));
+            bo.setProfileId(dto.getProfileIdsList().stream().findFirst().orElse(null));
         }
 
         return bo;

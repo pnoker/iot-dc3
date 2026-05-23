@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.extension.toolkit.Db;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
-import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.common.manager.entity.query.TopicQuery;
 import io.github.pnoker.common.manager.entity.vo.TopicVO;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
@@ -70,25 +69,22 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
         for (DeviceDO device : deviceList) {
             String deviceName = device.getDeviceName();
             Long deviceId = device.getId();
-            List<ProfileBindDO> profileBinds = Db.lambdaQuery(ProfileBindDO.class)
-                    .eq(ProfileBindDO::getDeviceId, deviceId)
-                    .eq(Objects.nonNull(topicQuery.getTenantId()), ProfileBindDO::getTenantId, topicQuery.getTenantId())
+            Long profileId = device.getProfileId();
+            if (Objects.isNull(profileId)) {
+                continue;
+            }
+            List<PointDO> points = Db.lambdaQuery(PointDO.class)
+                    .eq(PointDO::getProfileId, profileId)
+                    .eq(Objects.nonNull(topicQuery.getTenantId()), PointDO::getTenantId, topicQuery.getTenantId())
+                    // .eq(PointDO::getEnableFlag, 1)
+                    .eq(PointDO::getDeleted, 0)
                     .list();
-            for (ProfileBindDO profileBind : profileBinds) {
-                Long profileBindId = profileBind.getProfileId();
-                List<PointDO> points = Db.lambdaQuery(PointDO.class)
-                        .eq(PointDO::getProfileId, profileBindId)
-                        .eq(Objects.nonNull(topicQuery.getTenantId()), PointDO::getTenantId, topicQuery.getTenantId())
-                        // .eq(PointDO::getEnableFlag, 1)
-                        .eq(PointDO::getDeleted, 0)
-                        .list();
-                for (PointDO point : points) {
-                    TopicVO topicVO = new TopicVO();
-                    topicVO.setTopic("dc3/dc3-center-data/device/" + deviceId);
-                    topicVO.setDeviceName(deviceName);
-                    topicVO.setPointName(point.getPointName());
-                    topicVOList.add(topicVO);
-                }
+            for (PointDO point : points) {
+                TopicVO topicVO = new TopicVO();
+                topicVO.setTopic("dc3/dc3-center-data/device/" + deviceId);
+                topicVO.setDeviceName(deviceName);
+                topicVO.setPointName(point.getPointName());
+                topicVOList.add(topicVO);
             }
         }
         int totalItems = topicVOList.size();

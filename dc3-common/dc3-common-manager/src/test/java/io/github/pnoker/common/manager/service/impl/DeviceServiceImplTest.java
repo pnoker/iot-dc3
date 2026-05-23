@@ -27,6 +27,7 @@ import io.github.pnoker.common.manager.biz.ImportDeviceService;
 import io.github.pnoker.common.manager.dal.DeviceManager;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
@@ -35,7 +36,6 @@ import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,13 +44,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,9 +66,6 @@ class DeviceServiceImplTest {
 
     @Mock
     private PointService pointService;
-
-    @Mock
-    private ProfileBindService profileBindService;
 
     @Mock
     private DriverService driverService;
@@ -106,7 +100,7 @@ class DeviceServiceImplTest {
         bo.setDeviceCode("boiler-a");
         bo.setDriverId(7L);
         bo.setTenantId(100L);
-        bo.setProfileIds(new ArrayList<>());
+        bo.setProfileId(5L);
 
         doRow = new DeviceDO();
         doRow.setId(1L);
@@ -121,7 +115,10 @@ class DeviceServiceImplTest {
 
     @Test
     void saveSucceedsForUniqueDeviceWithMatchingTenantDriver() {
+        ProfileBO profile = new ProfileBO();
+        profile.setTenantId(100L);
         when(driverService.getById(7L)).thenReturn(driver);
+        when(profileService.getById(5L)).thenReturn(profile);
         when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(deviceBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(deviceManager.save(doRow)).thenReturn(true);
@@ -146,7 +143,10 @@ class DeviceServiceImplTest {
 
     @Test
     void saveRejectsDuplicateDeviceName() {
+        ProfileBO profile = new ProfileBO();
+        profile.setTenantId(100L);
         when(driverService.getById(7L)).thenReturn(driver);
+        when(profileService.getById(5L)).thenReturn(profile);
         when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         assertThatThrownBy(() -> service.add(bo)).isInstanceOf(DuplicateException.class);
         verify(deviceManager, never()).save(any(DeviceDO.class));
@@ -154,7 +154,10 @@ class DeviceServiceImplTest {
 
     @Test
     void saveThrowsAddExceptionWhenManagerReturnsFalse() {
+        ProfileBO profile = new ProfileBO();
+        profile.setTenantId(100L);
         when(driverService.getById(7L)).thenReturn(driver);
+        when(profileService.getById(5L)).thenReturn(profile);
         when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(deviceBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(deviceManager.save(doRow)).thenReturn(false);
@@ -165,15 +168,6 @@ class DeviceServiceImplTest {
     void removeRejectsUnknownId() {
         when(deviceManager.getById(1L)).thenReturn(null);
         assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(NotFoundException.class);
-    }
-
-    @Test
-    void removeRollsBackWhenProfileBindRemovalFails() {
-        when(deviceManager.getById(1L)).thenReturn(doRow);
-        doThrow(new DeleteException("Failed to remove profile bind"))
-                .when(profileBindService).removeByDeviceId(1L);
-        assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(DeleteException.class);
-        verify(deviceManager, never()).removeById(any(Long.class));
     }
 
     @Test

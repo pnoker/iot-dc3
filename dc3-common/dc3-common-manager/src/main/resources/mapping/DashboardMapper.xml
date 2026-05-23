@@ -80,16 +80,17 @@
     </select>
 
     <!--
-        One device can bind to multiple profiles, so the total here can
-        exceed the device count. Only active bindings participate.
+        Device count grouped by profile_id. Only devices with a non-null
+        profile_id are counted.
     -->
     <select id="countDeviceByProfile"
             resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
-        SELECT b.profile_id AS key, COUNT(*) AS count
-        FROM dc3_profile_bind b
-        WHERE b.deleted = 0
-          AND b.tenant_id = #{tenantId}
-        GROUP BY b.profile_id
+        SELECT d.profile_id AS key, COUNT(*) AS count
+        FROM dc3_device d
+        WHERE d.deleted = 0
+          AND d.tenant_id = #{tenantId}
+          AND d.profile_id IS NOT NULL
+        GROUP BY d.profile_id
         ORDER BY count
         DESC
             LIMIT #{limit}
@@ -140,11 +141,7 @@
         SELECT dev.id AS id,
         dev.device_name AS device_name,
         dev.driver_id AS driver_id,
-        (SELECT COUNT(*)
-        FROM dc3_profile_bind pb
-        WHERE pb.device_id = dev.id
-        AND pb.tenant_id = dev.tenant_id
-        AND pb.deleted = 0) AS profile_count
+        (CASE WHEN dev.profile_id IS NOT NULL THEN 1 ELSE 0 END) AS profile_count
         FROM dc3_device dev
         WHERE dev.deleted = 0
         AND dev.tenant_id = #{tenantId}
@@ -156,12 +153,13 @@
 
     <select id="topologyProfileBindings"
             resultType="io.github.pnoker.common.manager.entity.bo.dashboard.ProfileBindingRow">
-        SELECT pb.profile_id AS profile_id,
-        pb.device_id AS device_id
-        FROM dc3_profile_bind pb
-        WHERE pb.deleted = 0
-        AND pb.tenant_id = #{tenantId}
-        AND pb.device_id IN
+        SELECT d.profile_id AS profile_id,
+               d.id         AS device_id
+        FROM dc3_device d
+        WHERE d.deleted = 0
+          AND d.tenant_id = #{tenantId}
+          AND d.profile_id IS NOT NULL
+          AND d.id IN
         <foreach collection="deviceIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>

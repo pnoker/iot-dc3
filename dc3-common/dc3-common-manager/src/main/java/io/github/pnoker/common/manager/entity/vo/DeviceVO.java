@@ -33,8 +33,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Set;
-
 /**
  * View object for device API responses.
  *
@@ -89,8 +87,9 @@ public class DeviceVO extends BaseVO {
      */
     private Integer version;
 
-    //
-    @NotNull(message = "ID", groups = {Upload.class})
-    private Set<Long> profileIds;
+    /**
+     * Profile ID
+     */
+    private Long profileId;
 
 }

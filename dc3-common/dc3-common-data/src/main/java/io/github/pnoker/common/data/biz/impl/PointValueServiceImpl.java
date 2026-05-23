@@ -252,7 +252,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         if (Objects.nonNull(device) && Objects.nonNull(point)
-                && (Objects.isNull(device.getProfileIds()) || !device.getProfileIds().contains(point.getProfileId()))) {
+                && (Objects.isNull(device.getProfileId()) || !Objects.equals(device.getProfileId(), point.getProfileId()))) {
             throw new NotFoundException("Point does not exist");
         }
     }

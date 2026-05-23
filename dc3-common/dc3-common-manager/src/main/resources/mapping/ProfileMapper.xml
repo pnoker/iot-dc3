@@ -39,13 +39,9 @@
         dp.operate_time,
         dp.deleted
         from dc3_profile dp
-        <if test="deviceId != null and deviceId != '' and deviceId > 0">
-            inner join dc3_profile_bind dpb
-            on dp.id = dpb.profile_id
-            and dpb.tenant_id = dp.tenant_id
-            and dpb.deleted = 0
+        <if test="deviceId != null and deviceId > 0">
             inner join dc3_device dd
-            on dpb.device_id = dd.id
+            on dd.profile_id = dp.id
             and dd.id = #{deviceId}
             and dd.tenant_id = dp.tenant_id
             and dd.deleted = 0

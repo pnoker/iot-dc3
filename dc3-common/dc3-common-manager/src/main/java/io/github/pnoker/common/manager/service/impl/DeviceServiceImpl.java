@@ -43,7 +43,6 @@ import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
-import io.github.pnoker.common.manager.entity.bo.ProfileBindBO;
 import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
@@ -54,7 +53,6 @@ import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -80,7 +78,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -106,8 +103,6 @@ public class DeviceServiceImpl implements DeviceService {
     private final DeviceMapper deviceMapper;
 
     private final PointService pointService;
-
-    private final ProfileBindService profileBindService;
 
     private final DriverService driverService;
 
@@ -136,8 +131,6 @@ public class DeviceServiceImpl implements DeviceService {
             throw new AddException("Failed to create device");
         }
 
-        addProfileBind(entityDO, entityBO.getProfileIds());
-
         //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.ADD, driverServiceNames(entityDO.getDriverId()));
@@ -151,8 +144,6 @@ public class DeviceServiceImpl implements DeviceService {
         Set<String> targetServices = driverServiceNames(entityDO.getDriverId());
 
         //
-        profileBindService.removeByDeviceId(id);
-
         if (!deviceManager.removeById(id)) {
             throw new DeleteException("Failed to remove device");
         }
@@ -178,19 +169,6 @@ public class DeviceServiceImpl implements DeviceService {
             throw new DuplicateException("Failed to update device: device has been duplicated");
         }
 
-        List<Long> newProfileIds = entityBO.getProfileIds();
-        List<Long> oldProfileIds = profileBindService.listProfileIdsByDeviceId(entityBO.getId());
-
-        //
-        ArrayList<Long> addIds = new ArrayList<>(newProfileIds);
-        addIds.removeAll(oldProfileIds);
-        addProfileBind(entityDO, addIds);
-
-        //
-        ArrayList<Long> deleteIds = new ArrayList<>(oldProfileIds);
-        deleteIds.removeAll(newProfileIds);
-        deleteIds.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
-
         entityDO = deviceBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!deviceManager.updateById(entityDO)) {
@@ -198,7 +176,6 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         DeviceBO deviceBO = getById(entityBO.getId());
-        deviceBO.setProfileIds(CollectionUtils.isEmpty(newProfileIds) ? oldProfileIds : newProfileIds);
         entityBO.setDeviceName(deviceBO.getDeviceName());
 
         //
@@ -217,9 +194,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public DeviceBO getById(Long id) {
         DeviceDO entityDO = getDOById(id, true);
-        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        entityBO.setProfileIds(profileBindService.listProfileIdsByDeviceId(id));
-        return entityBO;
+        return deviceBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -229,9 +204,7 @@ public class DeviceServiceImpl implements DeviceService {
         wrapper.eq(DeviceDO::getTenantId, tenantId);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO entityDO = deviceManager.getOne(wrapper);
-        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        entityBO.setProfileIds(profileBindService.listProfileIdsByDeviceId(entityDO.getId()));
-        return entityBO;
+        return deviceBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -241,9 +214,7 @@ public class DeviceServiceImpl implements DeviceService {
                 .eq(DeviceDO::getTenantId, tenantId)
                 .last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO entityDO = wrapper.one();
-        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        entityBO.setProfileIds(profileBindService.listProfileIdsByDeviceId(entityDO.getId()));
-        return entityBO;
+        return deviceBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -251,10 +222,7 @@ public class DeviceServiceImpl implements DeviceService {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDriverId, driverId);
         List<DeviceDO> entityDOList = deviceManager.list(wrapper);
-        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOList);
-        deviceBOList
-                .forEach(device -> device.setProfileIds(profileBindService.listProfileIdsByDeviceId(device.getId())));
-        return deviceBOList;
+        return deviceBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
@@ -266,7 +234,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public List<DeviceBO> listByProfileId(Long profileId) {
-        return listByIds(profileBindService.listDeviceIdsByProfileId(profileId));
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getProfileId, profileId);
+        List<DeviceDO> entityDOList = deviceManager.list(wrapper);
+        return deviceBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
@@ -275,10 +246,7 @@ public class DeviceServiceImpl implements DeviceService {
             return Collections.emptyList();
         }
         List<DeviceDO> entityDOList = deviceManager.listByIds(ids);
-        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOList);
-        deviceBOList
-                .forEach(device -> device.setProfileIds(profileBindService.listProfileIdsByDeviceId(device.getId())));
-        return deviceBOList;
+        return deviceBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
@@ -288,17 +256,14 @@ public class DeviceServiceImpl implements DeviceService {
         }
         Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()),
                 fuzzyQuery(entityQuery), entityQuery.getProfileId());
-        Page<DeviceBO> entityPageBO = deviceBuilder.buildBOPageByDOPage(entityPageDO);
-        entityPageBO.getRecords()
-                .forEach(device -> device.setProfileIds(profileBindService.listProfileIdsByDeviceId(device.getId())));
-        return entityPageBO;
+        return deviceBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     @Override
     public void importDevice(DeviceBO entityBO, File file) {
         validateTenantRelations(entityBO);
 
-        List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds()).stream()
+        List<PointBO> pointBOList = pointService.listByProfileId(entityBO.getProfileId()).stream()
                 .filter(pointBO -> Objects.equals(entityBO.getTenantId(), pointBO.getTenantId()))
                 .toList();
         List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.listByDriverId(entityBO.getDriverId())
@@ -359,7 +324,7 @@ public class DeviceServiceImpl implements DeviceService {
                 .stream()
                 .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
                 .toList();
-        List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds()).stream()
+        List<PointBO> pointBOList = pointService.listByProfileId(entityBO.getProfileId()).stream()
                 .filter(pointBO -> Objects.equals(entityBO.getTenantId(), pointBO.getTenantId()))
                 .toList();
 
@@ -516,26 +481,6 @@ public class DeviceServiceImpl implements DeviceService {
         return path;
     }
 
-    private void addProfileBind(DeviceDO entityDO, List<Long> profileIds) {
-        if (CollectionUtils.isEmpty(profileIds)) {
-            return;
-        }
-
-        profileIds.forEach(profileId -> {
-            try {
-                ProfileBindBO entityBO = new ProfileBindBO();
-                entityBO.setProfileId(profileId);
-                entityBO.setDeviceId(entityDO.getId());
-                entityBO.setTenantId(entityDO.getTenantId());
-                profileBindService.add(entityBO);
-            } catch (Exception e) {
-                log.warn("Skip profile bind during device save, deviceId={}, profileId={}, error={}",
-                        entityDO.getId(), profileId, e.getMessage(), e);
-            }
-        });
-
-    }
-
     private void validateTenantRelations(DeviceBO entityBO) {
         Long tenantId = entityBO.getTenantId();
         DriverBO driverBO = driverService.getById(entityBO.getDriverId());
@@ -543,18 +488,12 @@ public class DeviceServiceImpl implements DeviceService {
             throw new NotFoundException("Resource does not exist");
         }
 
-        if (CollectionUtils.isEmpty(entityBO.getProfileIds())) {
+        if (Objects.isNull(entityBO.getProfileId())) {
             return;
         }
 
-        Set<Long> profileIds = new HashSet<>(entityBO.getProfileIds());
-        if (profileIds.remove(null)) {
-            throw new NotFoundException("Resource does not exist");
-        }
-
-        List<ProfileBO> profileBOList = profileService.listByIds(profileIds);
-        if (profileBOList.size() != profileIds.size() || profileBOList.stream()
-                .anyMatch(profileBO -> !Objects.equals(tenantId, profileBO.getTenantId()))) {
+        ProfileBO profileBO = profileService.getById(entityBO.getProfileId());
+        if (Objects.isNull(profileBO) || !Objects.equals(tenantId, profileBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
     }

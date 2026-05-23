@@ -34,6 +34,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -117,7 +119,9 @@ public interface GrpcDeviceBuilder {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
         entityGrpc.setBase(grpcBase);
 
-        CollectionOptional.ofNullable(entityBO.getProfileIds()).ifPresent(entityGrpc::addAllProfileIds);
+        if (Objects.nonNull(entityBO.getProfileId())) {
+            entityGrpc.addAllProfileIds(List.of(entityBO.getProfileId()));
+        }
         Optional.ofNullable(entityBO.getDeviceExt())
                 .ifPresent(value -> entityGrpc.setDeviceExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getEnableFlag())

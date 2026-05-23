@@ -87,9 +87,9 @@ public class DeviceBO extends BaseBO {
     private Integer version;
 
     /**
-     * Assigned profile identifiers.
+     * Assigned profile identifier.
      */
-    private Set<Long> profileIds;
+    private Long profileId;
 
     /**
      * Identifiers of points owned by the device.

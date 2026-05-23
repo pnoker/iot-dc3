@@ -40,8 +40,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,7 +77,7 @@ class PointCommandServiceImplTest {
     @BeforeEach
     void setUp() {
         device = new FacadeDeviceBO();
-        device.setProfileIds(List.of(5L));
+        device.setProfileId(5L);
         device.setEnableFlag(EnableFlagEnum.ENABLE);
         point = new FacadePointBO();
         point.setProfileId(5L);
@@ -149,7 +147,7 @@ class PointCommandServiceImplTest {
     @Test
     void readRejectsCrossProfileBindingAsUnauthorized() {
         FacadeDeviceBO mismatchedDevice = new FacadeDeviceBO();
-        mismatchedDevice.setProfileIds(List.of(99L));
+        mismatchedDevice.setProfileId(99L);
         mismatchedDevice.setEnableFlag(EnableFlagEnum.ENABLE);
         when(deviceFacade.getById(1L, 10L)).thenReturn(mismatchedDevice);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
@@ -162,7 +160,7 @@ class PointCommandServiceImplTest {
     @Test
     void readRejectsDeviceWithoutAnyProfileBinding() {
         FacadeDeviceBO bareDevice = new FacadeDeviceBO();
-        bareDevice.setProfileIds(null);
+        bareDevice.setProfileId(null);
         bareDevice.setEnableFlag(EnableFlagEnum.ENABLE);
         when(deviceFacade.getById(1L, 10L)).thenReturn(bareDevice);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
@@ -220,7 +218,7 @@ class PointCommandServiceImplTest {
     @Test
     void readRejectsDisabledDevice() {
         FacadeDeviceBO disabledDevice = new FacadeDeviceBO();
-        disabledDevice.setProfileIds(List.of(5L));
+        disabledDevice.setProfileId(5L);
         disabledDevice.setEnableFlag(EnableFlagEnum.DISABLE);
         when(deviceFacade.getById(1L, 10L)).thenReturn(disabledDevice);
 
