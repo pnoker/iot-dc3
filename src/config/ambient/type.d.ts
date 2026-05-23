@@ -19,7 +19,7 @@
  */
 declare type R<T = any> = {
   ok: boolean;
-  code: number;
+  code: string;
   message: string;
   data: T;
 };

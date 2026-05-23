@@ -27,6 +27,12 @@ import { seedAuthStorage } from '../fixtures/auth';
 // We replace the heavy real route configs with stub records so the router
 // can be instantiated in jsdom without dragging in the entire view tree.
 
+const tokenMocks = vi.hoisted(() => ({
+  checkTokenValid: vi.fn(() => Promise.resolve({ data: true })),
+}));
+
+vi.mock('@/api/token', () => tokenMocks);
+
 const routeStubs = vi.hoisted(() => {
   const stubComponent = { render: () => null };
   const common: RouteRecordRaw[] = [
