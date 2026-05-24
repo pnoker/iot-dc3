@@ -18,13 +18,14 @@ Primary runtime layers:
 - **Manager Center**: driver, device, point, profile, and metadata coordination.
 - **Data Center**: point value ingestion, query, command dispatch, and data dashboards.
 - **Agentic Center**: AI-assisted operations backed by OpenAI-compatible APIs.
-- **Drivers**: protocol adapters for Modbus TCP, MQTT, OPC DA/UA, PLC S7, and virtual drivers.
+- **Drivers**: protocol adapters for Modbus TCP, MQTT, OPC DA/UA, PLC S7, CoAP, listening-virtual, and virtual drivers.
 
 Core stack:
 
 - Java 21
 - Maven 3.9+
-- Spring Boot 4.0.6 / Spring Framework 7
+- Spring Boot / Spring Cloud (versions managed by the `dc3-parent` POM — check `pom.xml`)
+- Spring Framework 7
 - PostgreSQL, RabbitMQ, optional EMQX, optional Grafana/Elasticsearch stacks
 - Spring gRPC with generated protobuf APIs
 - Compose runtime, wrapped by the root `Makefile` (`COMPOSE=podman compose` by default)
@@ -72,7 +73,7 @@ path. CI should prefer public Maven Central defaults.
 - `dc3/env/dev.env`: IDE-friendly local Java process variables without `export`.
 - `dc3/env/dev.env.sh`: shell-friendly local Java process variables with `export`.
 
-Do not treat these files as interchangeable. See `dc3/doc/ENVIRONMENT.md` before changing environment variables.
+Do not treat these files as interchangeable. See `docs/quickstart/environment.md` before changing environment variables.
 
 ## Compose Rules
 
@@ -213,17 +214,11 @@ Keep persistence, business, and web representations deliberately separated.
 - Services built on `dc3-common-web` use WebFlux; configure request base paths with `spring.webflux.base-path`, not
   `server.servlet.context-path`.
 
-Current custom prefixes:
-
-- `dc3.agentic`
-- `dc3.driver`
-- `dc3.driver.mqtt`
-- `dc3.resource-registrar`
-- `dc3.thread`
+All custom prefixes use `dc3.*`. Check `@ConfigurationProperties` annotations in the codebase for the current set — do not hardcode a prefix list in documentation.
 
 ### Logging
 
-Use the repository logging convention in `dc3/doc/LOGGING.md`.
+Use the repository logging convention in `docs/guide/logging.md`.
 
 - Use English, stable event names, and parameterized SLF4J placeholders.
 - Prefer key-value fields such as `tenantId={}, userId={}, deviceId={}` over prose-only messages.
@@ -351,7 +346,7 @@ Run checks proportional to the change:
 - YAML syntax: parse changed YAML after normalizing Maven placeholders such as `@project.artifactId@`
 - Agent or docs changes: check links, command examples, stale filenames, and current workflow names
 
-See `dc3/doc/TESTING.md` for the full test pyramid, naming conventions,
+See `docs/development/testing.md` for the full test pyramid, naming conventions,
 Testcontainers strategy and CI workflow expectations.
 
 Before committing code that changes public behavior, mention what was verified and what was not verified.
@@ -369,8 +364,8 @@ Before committing code that changes public behavior, mention what was verified a
 ## Documentation Rules
 
 - Root README files in multiple languages should stay structurally aligned.
-- Runtime and environment changes should update `dc3/doc/ENVIRONMENT.md`.
-- Driver authoring changes should update `dc3/doc/DRIVER-AUTHORING.md`.
+- Runtime and environment changes should update `docs/quickstart/environment.md`.
+- Driver authoring changes should update `docs/development/driver-authoring.md`.
 - Container changes should update compose examples and `.env.example` if variables change.
-- Test strategy, harness or coverage gate changes should update `dc3/doc/TESTING.md`.
+- Test strategy, harness or coverage gate changes should update `docs/development/testing.md`.
 - Release workflow changes should update `CONTRIBUTING.md` and this file.
