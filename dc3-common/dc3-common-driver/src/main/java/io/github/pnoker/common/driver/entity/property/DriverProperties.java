@@ -18,6 +18,8 @@
 package io.github.pnoker.common.driver.entity.property;
 
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
+import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
+import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import jakarta.validation.Valid;
@@ -107,6 +109,16 @@ public class DriverProperties {
      * Point-level attribute definitions declared in configuration.
      */
     private List<@Valid PointAttributeDTO> pointAttribute;
+
+    /**
+     * Command-level attribute definitions declared in configuration.
+     */
+    private List<@Valid CommandAttributeDTO> commandAttribute;
+
+    /**
+     * Event-level attribute definitions declared in configuration.
+     */
+    private List<@Valid EventAttributeDTO> eventAttribute;
 
     /**
      * Generated or configured driver node identifier.

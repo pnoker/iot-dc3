@@ -41,6 +41,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -90,7 +91,7 @@ public class CommandReceiver {
             if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
                 log.warn("Command already expired: recordId={}, expireAt={}", recordId, entityDTO.expireAt());
                 sendResult(recordId, tenantId, PointCommandStatusEnum.EXPIRED.getCode(),
-                        null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
+                        null, null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
                 return;
             }
 
@@ -98,12 +99,12 @@ public class CommandReceiver {
             if (!dedupCache.tryAcquire(recordId)) {
                 log.warn("Duplicate command detected: recordId={}", recordId);
                 sendResult(recordId, tenantId, PointCommandStatusEnum.DUPLICATE.getCode(),
-                        null, "DUPLICATE", "Command already processed", channel, deliveryTag);
+                        null, null, "DUPLICATE", "Command already processed", channel, deliveryTag);
                 return;
             }
 
             // Dispatch under per-device lock to prevent protocol interleaving
-            Map<String, String> resultValues = deviceLockManager.runExclusive(deviceId, () -> {
+            CommandExecutionResult executionResult = deviceLockManager.runExclusive(deviceId, () -> {
                 DeviceBO device = deviceMetadata.getCache(deviceId);
                 if (Objects.isNull(device)) {
                     throw new IllegalStateException("Device not found in cache: " + deviceId);
@@ -113,12 +114,14 @@ public class CommandReceiver {
                     throw new IllegalStateException("Command not found: " + commandId);
                 }
                 Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
-                return driverCustomService.execute(driverConfig, device, command,
+                Map<String, AttributeBO> commandConfig = deviceMetadata.getCommandConfig(deviceId, commandId);
+                Map<String, String> resultValues = driverCustomService.execute(driverConfig, commandConfig, device, command,
                         Objects.nonNull(entityDTO.paramValues()) ? entityDTO.paramValues() : Collections.emptyMap());
+                return new CommandExecutionResult(resultValues, buildConfigSnapshot(commandConfig));
             });
 
             sendResult(recordId, tenantId, PointCommandStatusEnum.SUCCESS.getCode(),
-                    resultValues, null, null, channel, deliveryTag);
+                    executionResult.resultValues(), executionResult.configSnapshot(), null, null, channel, deliveryTag);
 
         } catch (Exception e) {
             if (redelivered) {
@@ -126,7 +129,7 @@ public class CommandReceiver {
                 String recordId = Objects.nonNull(entityDTO) ? entityDTO.recordId() : null;
                 Long tenantId = Objects.nonNull(entityDTO) ? entityDTO.tenantId() : null;
                 sendResult(recordId, tenantId, PointCommandStatusEnum.FAILED.getCode(),
-                        null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
+                        null, null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
             } else {
                 log.warn("Custom command failed, requeueing. deliveryTag={}", deliveryTag, e);
                 RabbitAckUtil.nack(channel, deliveryTag, true);
@@ -135,7 +138,8 @@ public class CommandReceiver {
     }
 
     private void sendResult(String recordId, Long tenantId, String status,
-                            Map<String, String> resultValues, String errorCode, String errorMessage,
+                            Map<String, String> resultValues, String configSnapshot,
+                            String errorCode, String errorMessage,
                             Channel channel, long deliveryTag) {
         try {
             if (Objects.nonNull(recordId)) {
@@ -144,6 +148,7 @@ public class CommandReceiver {
                         .tenantId(tenantId)
                         .status(status)
                         .resultValues(resultValues)
+                        .configSnapshot(configSnapshot)
                         .errorCode(errorCode)
                         .errorMessage(errorMessage)
                         .finishedAt(Instant.now())
@@ -155,6 +160,26 @@ public class CommandReceiver {
             log.error("Failed to send command result, recordId={}", recordId, ex);
         }
         RabbitAckUtil.ack(channel, deliveryTag);
+    }
+
+    private String buildConfigSnapshot(Map<String, AttributeBO> commandConfig) {
+        if (Objects.isNull(commandConfig) || commandConfig.isEmpty()) {
+            return null;
+        }
+
+        Map<String, Map<String, String>> snapshot = new LinkedHashMap<>();
+        commandConfig.forEach((attributeCode, attribute) -> {
+            Map<String, String> item = new LinkedHashMap<>();
+            if (Objects.nonNull(attribute)) {
+                item.put("type", Objects.nonNull(attribute.getType()) ? attribute.getType().getCode() : null);
+                item.put("configValue", attribute.getValue());
+            }
+            snapshot.put(attributeCode, item);
+        });
+        return JsonUtil.toJsonString(snapshot);
+    }
+
+    private record CommandExecutionResult(Map<String, String> resultValues, String configSnapshot) {
     }
 
 }

@@ -79,4 +79,10 @@ message GrpcRDeviceAttachDTO {
 
   // Point attribute configuration list
   repeated GrpcPointAttributeConfigDTO point_configs = 4;
+
+  // Command attribute configuration list
+  repeated GrpcCommandAttributeConfigDTO command_configs = 5;
+
+  // Event attribute configuration list
+  repeated GrpcEventAttributeConfigDTO event_configs = 6;
 }

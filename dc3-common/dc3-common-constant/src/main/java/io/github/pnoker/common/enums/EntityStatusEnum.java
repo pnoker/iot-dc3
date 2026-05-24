@@ -38,10 +38,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum EntityStatusEnum {
 
-    ONLINE((byte) 0, "online", "Online"),
-    OFFLINE((byte) 1, "offline", "Offline"),
-    MAINTAIN((byte) 2, "maintain", "Maintain"),
-    FAULT((byte) 3, "fault", "Fault"),
+    ONLINE((byte) 0, "ONLINE", "Online"),
+    OFFLINE((byte) 1, "OFFLINE", "Offline"),
+    MAINTAIN((byte) 2, "MAINTAIN", "Maintain"),
+    FAULT((byte) 3, "FAULT", "Fault"),
     ;
 
     /**

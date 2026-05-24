@@ -101,7 +101,7 @@ class DriverStateServiceImplTest {
     @Test
     void nullDriverIdDoesNothing() {
         DriverStateDTO dto = new DriverStateDTO();
-        dto.setStatus("online");
+        dto.setStatus(EntityStatusEnum.ONLINE.getCode());
 
         service.heartbeat(dto);
 
@@ -113,7 +113,7 @@ class DriverStateServiceImplTest {
         stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
                 (byte) EntityStatusEnum.OFFLINE.getIndex(), 6L));
 
-        service.heartbeat(heartbeat(1L, "online", 100L));
+        service.heartbeat(heartbeat(1L, EntityStatusEnum.ONLINE.getCode(), 100L));
 
         verify(entityStateMapper).upsertEntityState(anyLong(),
                 eq(100L),
@@ -140,7 +140,7 @@ class DriverStateServiceImplTest {
         stubUpsert(persisted((byte) EntityStatusEnum.OFFLINE.getIndex(),
                 (byte) EntityStatusEnum.ONLINE.getIndex(), 4L));
 
-        service.heartbeat(heartbeat(1L, "offline", 100L));
+        service.heartbeat(heartbeat(1L, EntityStatusEnum.OFFLINE.getCode(), 100L));
 
         verify(driverAlarmService).alarm(any());
     }
@@ -150,7 +150,7 @@ class DriverStateServiceImplTest {
         stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
                 (byte) EntityStatusEnum.ONLINE.getIndex(), 4L));
 
-        service.heartbeat(heartbeat(1L, "online", 100L));
+        service.heartbeat(heartbeat(1L, EntityStatusEnum.ONLINE.getCode(), 100L));
 
         verify(driverAlarmService, never()).alarm(any());
     }

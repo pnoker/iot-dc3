@@ -18,7 +18,9 @@
 package io.github.pnoker.common.driver.metadata;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
+import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
+import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import lombok.Getter;
@@ -38,9 +40,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>The {@code deviceIds} set and the four attribute maps are mutated from multiple
  * threads at the same time — RabbitMQ consumer threads add/remove entries as
  * metadata events arrive while Quartz worker threads iterate the same collections
- * during read scans. The fields therefore use thread-safe implementations and the
- * setters copy contents into the existing collection instead of swapping the
- * reference, so callers that already hold a reference (e.g. via
+ * during read scans. Attribute maps are also mutated during driver metadata refresh.
+ * The fields therefore use thread-safe implementations and the setters copy contents
+ * into the existing collection instead of swapping the reference, so callers that
+ * already hold a reference (e.g. via
  * {@code getDeviceIds()}) continue to see the live state.
  *
  * @author pnoker
@@ -72,6 +75,22 @@ public final class DriverMetadata {
      * Point attributes keyed by attribute code.
      */
     private final Map<String, PointAttributeDTO> pointAttributeNameMap = new ConcurrentHashMap<>();
+    /**
+     * Command attributes keyed by attribute identifier.
+     */
+    private final Map<Long, CommandAttributeDTO> commandAttributeIdMap = new ConcurrentHashMap<>();
+    /**
+     * Command attributes keyed by attribute code.
+     */
+    private final Map<String, CommandAttributeDTO> commandAttributeNameMap = new ConcurrentHashMap<>();
+    /**
+     * Event attributes keyed by attribute identifier.
+     */
+    private final Map<Long, EventAttributeDTO> eventAttributeIdMap = new ConcurrentHashMap<>();
+    /**
+     * Event attributes keyed by attribute code.
+     */
+    private final Map<String, EventAttributeDTO> eventAttributeNameMap = new ConcurrentHashMap<>();
     /**
      * Current driver status.
      */
@@ -117,12 +136,32 @@ public final class DriverMetadata {
         replaceContents(this.pointAttributeNameMap, pointAttributeNameMap);
     }
 
+    public void setCommandAttributeIdMap(Map<Long, CommandAttributeDTO> commandAttributeIdMap) {
+        replaceContents(this.commandAttributeIdMap, commandAttributeIdMap);
+    }
+
+    public void setCommandAttributeNameMap(Map<String, CommandAttributeDTO> commandAttributeNameMap) {
+        replaceContents(this.commandAttributeNameMap, commandAttributeNameMap);
+    }
+
+    public void setEventAttributeIdMap(Map<Long, EventAttributeDTO> eventAttributeIdMap) {
+        replaceContents(this.eventAttributeIdMap, eventAttributeIdMap);
+    }
+
+    public void setEventAttributeNameMap(Map<String, EventAttributeDTO> eventAttributeNameMap) {
+        replaceContents(this.eventAttributeNameMap, eventAttributeNameMap);
+    }
+
     public void clear() {
         deviceIds.clear();
         driverAttributeIdMap.clear();
         driverAttributeNameMap.clear();
         pointAttributeIdMap.clear();
         pointAttributeNameMap.clear();
+        commandAttributeIdMap.clear();
+        commandAttributeNameMap.clear();
+        eventAttributeIdMap.clear();
+        eventAttributeNameMap.clear();
         driver = null;
         driverStatus = EntityStatusEnum.OFFLINE;
     }

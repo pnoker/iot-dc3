@@ -255,7 +255,7 @@ public class DeviceServiceImpl implements DeviceService {
             entityQuery.setPage(new Pages());
         }
         Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()),
-                fuzzyQuery(entityQuery), entityQuery.getProfileId());
+                fuzzyQuery(entityQuery));
         return deviceBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
@@ -520,6 +520,7 @@ public class DeviceServiceImpl implements DeviceService {
             wrapper.eq(StringUtils.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code",
                     entityQuery.getDeviceCode());
             wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
+            wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dd.profile_id", entityQuery.getProfileId());
             wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dd.enable_flag",
                     Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
             wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dd.tenant_id", entityQuery.getTenantId());

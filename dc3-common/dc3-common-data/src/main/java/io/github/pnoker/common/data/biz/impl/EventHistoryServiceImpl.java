@@ -109,6 +109,7 @@ public class EventHistoryServiceImpl implements EventHistoryService {
         recordDO.setEventTypeFlag(entityDTO.eventTypeFlag());
         recordDO.setEventLevelFlag(entityDTO.eventLevelFlag());
         recordDO.setParamValues(Objects.isNull(entityDTO.paramValues()) ? null : JsonUtil.toJsonString(entityDTO.paramValues()));
+        recordDO.setConfigSnapshot(entityDTO.configSnapshot());
         recordDO.setMessage(entityDTO.message());
         recordDO.setOccurTime(Objects.nonNull(entityDTO.occurTime())
                 ? LocalDateTime.ofInstant(entityDTO.occurTime(), ZoneId.systemDefault()) : nowLocal);

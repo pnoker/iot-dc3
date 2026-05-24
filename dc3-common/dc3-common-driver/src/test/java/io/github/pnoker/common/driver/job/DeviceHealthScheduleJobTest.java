@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -92,7 +93,8 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(10L, EntityStatusEnum.ONLINE, 60, TimeUnit.SECONDS, isNull());
+        verify(driverSenderService).deviceStatusSender(eq(10L), eq(EntityStatusEnum.ONLINE), eq(60),
+                eq(TimeUnit.SECONDS), isNull());
     }
 
     @Test
@@ -105,7 +107,8 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(11L, EntityStatusEnum.OFFLINE, 60, TimeUnit.SECONDS, isNull());
+        verify(driverSenderService).deviceStatusSender(eq(11L), eq(EntityStatusEnum.OFFLINE), eq(60),
+                eq(TimeUnit.SECONDS), isNull());
     }
 
     @Test
@@ -118,7 +121,8 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(16L, EntityStatusEnum.FAULT, 60, TimeUnit.SECONDS, isNull());
+        verify(driverSenderService).deviceStatusSender(eq(16L), eq(EntityStatusEnum.FAULT), eq(60),
+                eq(TimeUnit.SECONDS), isNull());
     }
 
     @Test
@@ -131,7 +135,8 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(12L, EntityStatusEnum.OFFLINE, 60, TimeUnit.SECONDS, isNull());
+        verify(driverSenderService).deviceStatusSender(eq(12L), eq(EntityStatusEnum.OFFLINE), eq(60),
+                eq(TimeUnit.SECONDS), isNull());
     }
 
     @Test
@@ -145,7 +150,8 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(15L, EntityStatusEnum.ONLINE, 2, TimeUnit.MINUTES, isNull());
+        verify(driverSenderService).deviceStatusSender(eq(15L), eq(EntityStatusEnum.ONLINE), eq(2),
+                eq(TimeUnit.MINUTES), isNull());
     }
 
     @Test

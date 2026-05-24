@@ -33,6 +33,7 @@ import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -135,8 +136,7 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
             if (request.getEventTypeFlag() != 0) {
                 queryVO.setEventTypeFlag((byte) request.getEventTypeFlag());
             }
-            queryVO.setPage(Math.toIntExact(request.getPage().getCurrent()));
-            queryVO.setSize(Math.toIntExact(request.getPage().getSize()));
+            queryVO.setPage(GrpcBuilderUtil.buildPagesByGrpcPage(request.getPage()));
 
             Page<EventHistoryDO> page = eventHistoryService.list(request.getTenantId(), queryVO);
 
@@ -182,6 +182,7 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
                 .setEventTypeFlag(Objects.nonNull(recordDO.getEventTypeFlag()) ? recordDO.getEventTypeFlag() : 0)
                 .setEventLevelFlag(Objects.nonNull(recordDO.getEventLevelFlag()) ? recordDO.getEventLevelFlag() : 0)
                 .putAllParamValues(toStringMap(recordDO.getParamValues()))
+                .setConfigSnapshot(Objects.nonNull(recordDO.getConfigSnapshot()) ? recordDO.getConfigSnapshot() : "")
                 .setMessage(Objects.nonNull(recordDO.getMessage()) ? recordDO.getMessage() : "")
                 .setOccurTime(toEpochSecond(recordDO.getOccurTime()))
                 .setReceiveTime(toEpochSecond(recordDO.getReceiveTime()))

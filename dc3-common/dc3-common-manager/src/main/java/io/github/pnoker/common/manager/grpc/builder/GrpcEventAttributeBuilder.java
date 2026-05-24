@@ -1,0 +1,117 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.github.pnoker.common.manager.grpc.builder;
+
+import io.github.pnoker.api.common.GrpcBase;
+import io.github.pnoker.api.common.GrpcEventAttributeDTO;
+import io.github.pnoker.common.constant.common.DefaultConstant;
+import io.github.pnoker.common.entity.ext.EventAttributeExt;
+import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
+import io.github.pnoker.common.optional.EnableOptional;
+import io.github.pnoker.common.optional.JsonOptional;
+import io.github.pnoker.common.utils.GrpcBuilderUtil;
+import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
+import java.util.Optional;
+
+/**
+ * MapStruct builder for event attribute gRPC message conversion.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+public interface GrpcEventAttributeBuilder {
+
+    /**
+     * Grpc DTO to BO
+     *
+     * @param entityGrpc GrpcEventAttributeDTO
+     * @return EventAttributeBO
+     */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "remark", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
+    @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "attributeTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    EventAttributeBO buildBOByGrpcDTO(GrpcEventAttributeDTO entityGrpc);
+
+    @AfterMapping
+    default void afterProcess(GrpcEventAttributeDTO entityGrpc, @MappingTarget EventAttributeBO entityBO) {
+        GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
+
+        JsonOptional.ofNullable(entityGrpc.getAttributeExt())
+                .ifPresent(value -> entityBO.setAttributeExt(JsonUtil.parseObject(value, EventAttributeExt.class)));
+        Optional.ofNullable(AttributeTypeFlagEnum.ofIndex((byte) entityGrpc.getAttributeTypeFlag()))
+                .ifPresent(entityBO::setAttributeTypeFlag);
+        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
+    }
+
+    /**
+     * BO to Grpc DTO
+     *
+     * @param entityBO EventAttributeBO
+     * @return GrpcEventAttributeDTO
+     */
+    @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "attributeTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "attributeNameBytes", ignore = true)
+    @Mapping(target = "attributeCodeBytes", ignore = true)
+    @Mapping(target = "defaultValueBytes", ignore = true)
+    @Mapping(target = "attributeExtBytes", ignore = true)
+    @Mapping(target = "signatureBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
+    GrpcEventAttributeDTO buildGrpcDTOByBO(EventAttributeBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(EventAttributeBO entityBO, @MappingTarget GrpcEventAttributeDTO.Builder entityGrpc) {
+        GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
+        entityGrpc.setBase(grpcBase);
+
+        Optional.ofNullable(entityBO.getAttributeExt())
+                .ifPresent(value -> entityGrpc.setAttributeExt(JsonUtil.toJsonString(value)));
+        Optional.ofNullable(entityBO.getAttributeTypeFlag())
+                .ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
+                        () -> entityGrpc.setAttributeTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(entityBO.getEnableFlag())
+                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                        () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
+    }
+
+}

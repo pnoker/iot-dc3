@@ -34,7 +34,7 @@ import org.springframework.grpc.client.GrpcChannelFactory;
  * @since 2016.10.1
  */
 @Configuration
-public class GrpcStubConfig {
+public class DriverClientStubConfig {
 
     @Bean
     public DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub(GrpcChannelFactory channels) {

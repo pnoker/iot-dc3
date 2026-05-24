@@ -29,18 +29,24 @@ import io.github.pnoker.api.common.driver.GrpcRDeviceAttachDTO;
 import io.github.pnoker.api.common.driver.GrpcRDeviceDTO;
 import io.github.pnoker.api.common.driver.GrpcRPageDeviceDTO;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.manager.entity.bo.CommandAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.entity.bo.EventAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
+import io.github.pnoker.common.manager.grpc.builder.GrpcCommandAttributeConfigBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDeviceBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverAttributeConfigBuilder;
+import io.github.pnoker.common.manager.grpc.builder.GrpcEventAttributeConfigBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeConfigBuilder;
+import io.github.pnoker.common.manager.service.CommandAttributeConfigService;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.service.EventAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.optional.CollectionOptional;
@@ -70,6 +76,10 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
     private final GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
 
+    private final GrpcCommandAttributeConfigBuilder grpcCommandAttributeConfigBuilder;
+
+    private final GrpcEventAttributeConfigBuilder grpcEventAttributeConfigBuilder;
+
     private final DeviceService deviceService;
 
     private final DriverService driverService;
@@ -79,6 +89,10 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     private final DriverAttributeConfigService driverAttributeConfigService;
 
     private final PointAttributeConfigService pointAttributeConfigService;
+
+    private final CommandAttributeConfigService commandAttributeConfigService;
+
+    private final EventAttributeConfigService eventAttributeConfigService;
 
     @Override
     public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
@@ -188,6 +202,18 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         CollectionOptional.ofNullable(pointAttributeConfigBOList)
                 .ifPresent(value -> builder
                         .addAllPointConfigs(value.stream().map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
+
+        List<CommandAttributeConfigBO> commandAttributeConfigBOList = commandAttributeConfigService
+                .listByDeviceId(entityBO.getId());
+        CollectionOptional.ofNullable(commandAttributeConfigBOList)
+                .ifPresent(value -> builder
+                        .addAllCommandConfigs(value.stream().map(grpcCommandAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
+
+        List<EventAttributeConfigBO> eventAttributeConfigBOList = eventAttributeConfigService
+                .listByDeviceId(entityBO.getId());
+        CollectionOptional.ofNullable(eventAttributeConfigBOList)
+                .ifPresent(value -> builder
+                        .addAllEventConfigs(value.stream().map(grpcEventAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
         return builder;
     }
 

@@ -17,21 +17,29 @@
 
 package io.github.pnoker.common.manager.biz.impl;
 
+import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
+import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
+import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
+import io.github.pnoker.common.manager.grpc.builder.GrpcCommandAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
+import io.github.pnoker.common.manager.grpc.builder.GrpcEventAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeBuilder;
+import io.github.pnoker.common.manager.service.CommandAttributeService;
 import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.service.EventAttributeService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -65,11 +73,19 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
 
     private final GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
+    private final GrpcCommandAttributeBuilder grpcCommandAttributeBuilder;
+
+    private final GrpcEventAttributeBuilder grpcEventAttributeBuilder;
+
     private final DriverService driverService;
 
     private final DriverAttributeService driverAttributeService;
 
     private final PointAttributeService pointAttributeService;
+
+    private final CommandAttributeService commandAttributeService;
+
+    private final EventAttributeService eventAttributeService;
 
     private final TenantFacade tenantFacade;
 
@@ -180,6 +196,92 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         pointAttributeService.removeByIds(pointToRemoveIds);
 
         return pointAttributeService.listByDriverId(entityBO.getId()).stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .toList();
+    }
+
+    @Override
+    public List<CommandAttributeBO> registerCommandAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO) {
+        Map<String, CommandAttributeBO> newCommandAttributeMap = entityGrpc.getCommandAttributesList()
+                .stream()
+                .collect(Collectors.toMap(GrpcCommandAttributeDTO::getAttributeCode,
+                        grpcCommandAttributeBuilder::buildBOByGrpcDTO));
+
+        Map<String, CommandAttributeBO> oldCommandAttributeMap = commandAttributeService.listByDriverId(entityBO.getId())
+                .stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .collect(Collectors.toMap(CommandAttributeBO::getAttributeCode, Function.identity()));
+
+        List<CommandAttributeBO> commandToInsert = new ArrayList<>();
+        List<CommandAttributeBO> commandToUpdate = new ArrayList<>();
+        for (Map.Entry<String, CommandAttributeBO> entry : newCommandAttributeMap.entrySet()) {
+            CommandAttributeBO attribute = entry.getValue();
+            attribute.setDriverId(entityBO.getId());
+            attribute.setTenantId(entityBO.getTenantId());
+            CommandAttributeBO existing = oldCommandAttributeMap.get(entry.getKey());
+            if (Objects.nonNull(existing)) {
+                attribute.setId(existing.getId());
+                commandToUpdate.add(attribute);
+            } else {
+                commandToInsert.add(attribute);
+            }
+        }
+        Set<Long> commandToRemoveIds = new HashSet<>();
+        for (Map.Entry<String, CommandAttributeBO> entry : oldCommandAttributeMap.entrySet()) {
+            if (!newCommandAttributeMap.containsKey(entry.getKey())) {
+                commandToRemoveIds.add(entry.getValue().getId());
+            }
+        }
+        log.debug("Command attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+                commandToInsert.size(), commandToUpdate.size(), commandToRemoveIds.size());
+        commandAttributeService.saveBatch(commandToInsert);
+        commandAttributeService.updateBatch(commandToUpdate);
+        commandAttributeService.removeByIds(commandToRemoveIds);
+
+        return commandAttributeService.listByDriverId(entityBO.getId()).stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .toList();
+    }
+
+    @Override
+    public List<EventAttributeBO> registerEventAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO) {
+        Map<String, EventAttributeBO> newEventAttributeMap = entityGrpc.getEventAttributesList()
+                .stream()
+                .collect(Collectors.toMap(GrpcEventAttributeDTO::getAttributeCode,
+                        grpcEventAttributeBuilder::buildBOByGrpcDTO));
+
+        Map<String, EventAttributeBO> oldEventAttributeMap = eventAttributeService.listByDriverId(entityBO.getId())
+                .stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .collect(Collectors.toMap(EventAttributeBO::getAttributeCode, Function.identity()));
+
+        List<EventAttributeBO> eventToInsert = new ArrayList<>();
+        List<EventAttributeBO> eventToUpdate = new ArrayList<>();
+        for (Map.Entry<String, EventAttributeBO> entry : newEventAttributeMap.entrySet()) {
+            EventAttributeBO attribute = entry.getValue();
+            attribute.setDriverId(entityBO.getId());
+            attribute.setTenantId(entityBO.getTenantId());
+            EventAttributeBO existing = oldEventAttributeMap.get(entry.getKey());
+            if (Objects.nonNull(existing)) {
+                attribute.setId(existing.getId());
+                eventToUpdate.add(attribute);
+            } else {
+                eventToInsert.add(attribute);
+            }
+        }
+        Set<Long> eventToRemoveIds = new HashSet<>();
+        for (Map.Entry<String, EventAttributeBO> entry : oldEventAttributeMap.entrySet()) {
+            if (!newEventAttributeMap.containsKey(entry.getKey())) {
+                eventToRemoveIds.add(entry.getValue().getId());
+            }
+        }
+        log.debug("Event attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+                eventToInsert.size(), eventToUpdate.size(), eventToRemoveIds.size());
+        eventAttributeService.saveBatch(eventToInsert);
+        eventAttributeService.updateBatch(eventToUpdate);
+        eventAttributeService.removeByIds(eventToRemoveIds);
+
+        return eventAttributeService.listByDriverId(entityBO.getId()).stream()
                 .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
                 .toList();
     }

@@ -18,8 +18,10 @@
 package io.github.pnoker.common.manager.biz;
 
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
+import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 
 import java.util.List;
@@ -55,5 +57,21 @@ public interface DriverRegisterService {
      * @param entityBO   DriverBO
      */
     List<PointAttributeBO> registerPointAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
+
+    /**
+     * Register command attributes
+     *
+     * @param entityGrpc GrpcDriverRegisterDTO
+     * @param entityBO   DriverBO
+     */
+    List<CommandAttributeBO> registerCommandAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
+
+    /**
+     * Register event attributes
+     *
+     * @param entityGrpc GrpcDriverRegisterDTO
+     * @param entityBO   DriverBO
+     */
+    List<EventAttributeBO> registerEventAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
 
 }

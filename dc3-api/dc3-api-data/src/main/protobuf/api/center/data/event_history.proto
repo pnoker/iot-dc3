@@ -61,6 +61,7 @@ message GrpcEventHistoryDTO {
   int64 operate_time = 16;
   int64 acknowledge_time = 17;
   int64 acknowledge_user_id = 18;
+  string config_snapshot = 19;
 }
 
 message GrpcEventHistoryQuery {

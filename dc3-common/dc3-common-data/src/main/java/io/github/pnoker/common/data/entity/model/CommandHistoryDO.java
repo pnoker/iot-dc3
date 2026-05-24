@@ -69,6 +69,9 @@ public class CommandHistoryDO implements Serializable {
     @TableField("result_values")
     private String resultValues;
 
+    @TableField("config_snapshot")
+    private String configSnapshot;
+
     @TableField("status")
     private String status;
 

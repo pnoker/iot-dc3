@@ -55,4 +55,10 @@ message GrpcRDriverRegisterDTO {
 
   // List of point attribute configurations supported by the driver
   repeated GrpcPointAttributeDTO point_attributes = 5;
+
+  // List of command attribute configurations supported by the driver
+  repeated GrpcCommandAttributeDTO command_attributes = 6;
+
+  // List of event attribute configurations supported by the driver
+  repeated GrpcEventAttributeDTO event_attributes = 7;
 }
