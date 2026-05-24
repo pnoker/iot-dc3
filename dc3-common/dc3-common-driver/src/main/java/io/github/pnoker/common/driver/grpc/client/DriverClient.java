@@ -19,6 +19,8 @@ package io.github.pnoker.common.driver.grpc.client;
 
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
+import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
+import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverQuery;
@@ -27,9 +29,13 @@ import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bo.RegisterBO;
 import io.github.pnoker.common.driver.entity.builder.DriverBuilder;
+import io.github.pnoker.common.driver.entity.builder.GrpcCommandAttributeBuilder;
 import io.github.pnoker.common.driver.entity.builder.GrpcDriverAttributeBuilder;
+import io.github.pnoker.common.driver.entity.builder.GrpcEventAttributeBuilder;
 import io.github.pnoker.common.driver.entity.builder.GrpcPointAttributeBuilder;
+import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
+import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.enums.EntityStatusEnum;
@@ -70,6 +76,10 @@ public class DriverClient {
 
     private final GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
+    private final GrpcCommandAttributeBuilder grpcCommandAttributeBuilder;
+
+    private final GrpcEventAttributeBuilder grpcEventAttributeBuilder;
+
     /**
      * Registers the current driver and stores the returned metadata in the shared driver
      * cache.
@@ -93,6 +103,18 @@ public class DriverClient {
                     .map(grpcPointAttributeBuilder::buildGrpcDTOByDTO)
                     .toList();
             builder.addAllPointAttributes(grpcPointAttributeDTOList);
+        });
+        CollectionOptional.ofNullable(entityBO.getCommandAttributes()).ifPresent(value -> {
+            List<GrpcCommandAttributeDTO> grpcCommandAttributeDTOList = value.stream()
+                    .map(grpcCommandAttributeBuilder::buildGrpcDTOByDTO)
+                    .toList();
+            builder.addAllCommandAttributes(grpcCommandAttributeDTOList);
+        });
+        CollectionOptional.ofNullable(entityBO.getEventAttributes()).ifPresent(value -> {
+            List<GrpcEventAttributeDTO> grpcEventAttributeDTOList = value.stream()
+                    .map(grpcEventAttributeBuilder::buildGrpcDTOByDTO)
+                    .toList();
+            builder.addAllEventAttributes(grpcEventAttributeDTOList);
         });
 
         // Initiate driver registration
@@ -149,6 +171,26 @@ public class DriverClient {
                         grpcPointAttributeBuilder::buildDTOByGrpcDTO));
         driverMetadata.setPointAttributeIdMap(pointAttributeIdMap);
         driverMetadata.setPointAttributeNameMap(pointAttributeNameMap);
+
+        List<GrpcCommandAttributeDTO> commandAttributesList = rDriverRegisterDTO.getCommandAttributesList();
+        Map<Long, CommandAttributeDTO> commandAttributeIdMap = commandAttributesList.stream()
+                .collect(Collectors.toMap(entity -> entity.getBase().getId(),
+                        grpcCommandAttributeBuilder::buildDTOByGrpcDTO));
+        Map<String, CommandAttributeDTO> commandAttributeNameMap = commandAttributesList.stream()
+                .collect(Collectors.toMap(GrpcCommandAttributeDTO::getAttributeCode,
+                        grpcCommandAttributeBuilder::buildDTOByGrpcDTO));
+        driverMetadata.setCommandAttributeIdMap(commandAttributeIdMap);
+        driverMetadata.setCommandAttributeNameMap(commandAttributeNameMap);
+
+        List<GrpcEventAttributeDTO> eventAttributesList = rDriverRegisterDTO.getEventAttributesList();
+        Map<Long, EventAttributeDTO> eventAttributeIdMap = eventAttributesList.stream()
+                .collect(Collectors.toMap(entity -> entity.getBase().getId(),
+                        grpcEventAttributeBuilder::buildDTOByGrpcDTO));
+        Map<String, EventAttributeDTO> eventAttributeNameMap = eventAttributesList.stream()
+                .collect(Collectors.toMap(GrpcEventAttributeDTO::getAttributeCode,
+                        grpcEventAttributeBuilder::buildDTOByGrpcDTO));
+        driverMetadata.setEventAttributeIdMap(eventAttributeIdMap);
+        driverMetadata.setEventAttributeNameMap(eventAttributeNameMap);
 
         driverMetadata.setDriverStatus(EntityStatusEnum.ONLINE);
     }

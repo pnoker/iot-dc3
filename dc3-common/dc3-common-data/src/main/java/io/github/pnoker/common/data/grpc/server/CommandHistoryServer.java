@@ -33,6 +33,7 @@ import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -132,8 +133,7 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
             queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
             queryVO.setCommandId(request.getCommandId() != 0 ? request.getCommandId() : null);
             queryVO.setStatus(Objects.isNull(request.getStatus()) || request.getStatus().isEmpty() ? null : request.getStatus());
-            queryVO.setPage(Math.toIntExact(request.getPage().getCurrent()));
-            queryVO.setSize(Math.toIntExact(request.getPage().getSize()));
+            queryVO.setPage(GrpcBuilderUtil.buildPagesByGrpcPage(request.getPage()));
 
             Page<CommandHistoryDO> page = commandHistoryService.list(request.getTenantId(), queryVO);
 
@@ -178,6 +178,7 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                 .setCommandCode(Objects.nonNull(recordDO.getCommandCode()) ? recordDO.getCommandCode() : "")
                 .putAllParamValues(toStringMap(recordDO.getParamValues()))
                 .putAllResultValues(toStringMap(recordDO.getResultValues()))
+                .setConfigSnapshot(Objects.nonNull(recordDO.getConfigSnapshot()) ? recordDO.getConfigSnapshot() : "")
                 .setStatus(Objects.nonNull(recordDO.getStatus()) ? recordDO.getStatus() : "")
                 .setErrorCode(Objects.nonNull(recordDO.getErrorCode()) ? recordDO.getErrorCode() : "")
                 .setErrorMessage(Objects.nonNull(recordDO.getErrorMessage()) ? recordDO.getErrorMessage() : "")

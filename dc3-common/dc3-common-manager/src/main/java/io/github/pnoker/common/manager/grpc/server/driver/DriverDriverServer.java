@@ -17,8 +17,10 @@
 
 package io.github.pnoker.common.manager.grpc.server.driver;
 
+import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
+import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
@@ -27,15 +29,21 @@ import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
+import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
+import io.github.pnoker.common.manager.grpc.builder.GrpcCommandAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
+import io.github.pnoker.common.manager.grpc.builder.GrpcEventAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeBuilder;
+import io.github.pnoker.common.manager.service.CommandAttributeService;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.service.EventAttributeService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +72,10 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     private final GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
+    private final GrpcCommandAttributeBuilder grpcCommandAttributeBuilder;
+
+    private final GrpcEventAttributeBuilder grpcEventAttributeBuilder;
+
     private final DriverRegisterService driverRegisterService;
 
     private final DriverService driverService;
@@ -71,6 +83,10 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
     private final DriverAttributeService driverAttributeService;
 
     private final PointAttributeService pointAttributeService;
+
+    private final CommandAttributeService commandAttributeService;
+
+    private final EventAttributeService eventAttributeService;
 
     private final DeviceService deviceService;
 
@@ -100,6 +116,22 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                     .map(grpcPointAttributeBuilder::buildGrpcDTOByBO)
                     .toList();
             builder.addAllPointAttributes(grpcPointAttributeDTOList);
+
+            //
+            List<CommandAttributeBO> commandAttributeBOList = driverRegisterService.registerCommandAttribute(request,
+                    entityBO);
+            List<GrpcCommandAttributeDTO> grpcCommandAttributeDTOList = commandAttributeBOList.stream()
+                    .map(grpcCommandAttributeBuilder::buildGrpcDTOByBO)
+                    .toList();
+            builder.addAllCommandAttributes(grpcCommandAttributeDTOList);
+
+            //
+            List<EventAttributeBO> eventAttributeBOList = driverRegisterService.registerEventAttribute(request,
+                    entityBO);
+            List<GrpcEventAttributeDTO> grpcEventAttributeDTOList = eventAttributeBOList.stream()
+                    .map(grpcEventAttributeBuilder::buildGrpcDTOByBO)
+                    .toList();
+            builder.addAllEventAttributes(grpcEventAttributeDTOList);
 
             //
             List<Long> idList = deviceService.listIdsByDriverId(entityBO.getId());
@@ -173,6 +205,24 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                 .map(grpcPointAttributeBuilder::buildGrpcDTOByBO)
                 .toList();
         builder.addAllPointAttributes(pointAttributeDTOList);
+
+        List<GrpcCommandAttributeDTO> commandAttributeDTOList = Optional
+                .ofNullable(commandAttributeService.listByDriverId(entityBO.getId()))
+                .orElseGet(List::of)
+                .stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .map(grpcCommandAttributeBuilder::buildGrpcDTOByBO)
+                .toList();
+        builder.addAllCommandAttributes(commandAttributeDTOList);
+
+        List<GrpcEventAttributeDTO> eventAttributeDTOList = Optional
+                .ofNullable(eventAttributeService.listByDriverId(entityBO.getId()))
+                .orElseGet(List::of)
+                .stream()
+                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                .map(grpcEventAttributeBuilder::buildGrpcDTOByBO)
+                .toList();
+        builder.addAllEventAttributes(eventAttributeDTOList);
 
         List<Long> idList = Optional.ofNullable(deviceService.listIdsByDriverId(entityBO.getId())).orElseGet(List::of);
         builder.addAllDeviceIds(idList);

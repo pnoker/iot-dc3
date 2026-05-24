@@ -32,6 +32,7 @@ public record CommandCallResultDTO(
         Long tenantId,
         String status,
         Map<String, String> resultValues,
+        String configSnapshot,
         String errorCode,
         String errorMessage,
         Instant finishedAt,
@@ -47,6 +48,7 @@ public record CommandCallResultDTO(
         private Long tenantId;
         private String status;
         private Map<String, String> resultValues;
+        private String configSnapshot;
         private String errorCode;
         private String errorMessage;
         private Instant finishedAt;
@@ -72,6 +74,11 @@ public record CommandCallResultDTO(
             return this;
         }
 
+        public Builder configSnapshot(String configSnapshot) {
+            this.configSnapshot = configSnapshot;
+            return this;
+        }
+
         public Builder errorCode(String errorCode) {
             this.errorCode = errorCode;
             return this;
@@ -93,7 +100,7 @@ public record CommandCallResultDTO(
         }
 
         public CommandCallResultDTO build() {
-            return new CommandCallResultDTO(recordId, tenantId, status, resultValues,
+            return new CommandCallResultDTO(recordId, tenantId, status, resultValues, configSnapshot,
                     errorCode, errorMessage, finishedAt, schemaVersion);
         }
     }

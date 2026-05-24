@@ -41,14 +41,16 @@ public interface DriverCommand {
     /**
      * Execute a custom command on a device.
      *
-     * @param driverConfig driver-level attribute configurations
-     * @param device       device metadata
-     * @param command      command metadata (code, type flags, timeout, ext)
-     * @param paramValues  input parameter name-value pairs
+     * @param driverConfig  driver-level attribute configurations
+     * @param commandConfig command-level attribute configurations
+     * @param device        device metadata
+     * @param command       command metadata (code, type flags, timeout, ext)
+     * @param paramValues   input parameter name-value pairs
      * @return output parameter name-value pairs; empty map if command has no outputs
      */
     default Map<String, String> execute(
             Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> commandConfig,
             DeviceBO device,
             FacadeCommandBO command,
             Map<String, String> paramValues) {

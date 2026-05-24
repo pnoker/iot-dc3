@@ -71,6 +71,9 @@ public class CommandResultReceiver {
                 if (Objects.nonNull(resultDTO.resultValues())) {
                     recordDO.setResultValues(JsonUtil.toJsonString(resultDTO.resultValues()));
                 }
+                if (Objects.nonNull(resultDTO.configSnapshot())) {
+                    recordDO.setConfigSnapshot(resultDTO.configSnapshot());
+                }
                 if (Objects.nonNull(resultDTO.finishedAt())) {
                     recordDO.setFinishTime(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
                 } else {

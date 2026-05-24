@@ -283,6 +283,80 @@ message GrpcPointAttributeDTO {
   int64 tenant_id = 11;
 }
 
+// Command Attribute
+message GrpcCommandAttributeDTO {
+  // Base
+  // Common base fields (e.g., ID, creation time, etc.)
+  GrpcBase base = 1;
+
+  // Attribute name
+  string attribute_name = 2;
+
+  // Attribute code
+  string attribute_code = 3;
+
+  // Attribute type flag
+  int32 attribute_type_flag = 4;
+
+  // Default value
+  string default_value = 5;
+
+  // Driver ID
+  int64 driver_id = 6;
+
+  // Command attribute extension info
+  string attribute_ext = 7;
+
+  // Enable flag
+  int32 enable_flag = 8;
+
+  // Signature
+  string signature = 9;
+
+  // Version
+  int32 version = 10;
+
+  // Tenant ID
+  int64 tenant_id = 11;
+}
+
+// Event Attribute
+message GrpcEventAttributeDTO {
+  // Base
+  // Common base fields (e.g., ID, creation time, etc.)
+  GrpcBase base = 1;
+
+  // Attribute name
+  string attribute_name = 2;
+
+  // Attribute code
+  string attribute_code = 3;
+
+  // Attribute type flag
+  int32 attribute_type_flag = 4;
+
+  // Default value
+  string default_value = 5;
+
+  // Driver ID
+  int64 driver_id = 6;
+
+  // Event attribute extension info
+  string attribute_ext = 7;
+
+  // Enable flag
+  int32 enable_flag = 8;
+
+  // Signature
+  string signature = 9;
+
+  // Version
+  int32 version = 10;
+
+  // Tenant ID
+  int64 tenant_id = 11;
+}
+
 // Command
 message GrpcCommandDTO {
   GrpcBase base = 1;
@@ -376,4 +450,65 @@ message GrpcPointAttributeConfigDTO {
   int64 tenant_id = 9;
 }
 
+// Command attribute config
+message GrpcCommandAttributeConfigDTO {
+  // Base
+  // Common base fields (e.g., ID, creation time, etc.)
+  GrpcBase base = 1;
+
+  // Command attribute ID
+  int64 attribute_id = 2;
+
+  // Command config value
+  string config_value = 3;
+
+  // Device ID
+  int64 device_id = 4;
+
+  // Command ID
+  int64 command_id = 5;
+
+  // Enable flag
+  int32 enable_flag = 6;
+
+  // Signature
+  string signature = 7;
+
+  // Version
+  int32 version = 8;
+
+  // Tenant ID
+  int64 tenant_id = 9;
+}
+
+// Event attribute config
+message GrpcEventAttributeConfigDTO {
+  // Base
+  // Common base fields (e.g., ID, creation time, etc.)
+  GrpcBase base = 1;
+
+  // Event attribute ID
+  int64 attribute_id = 2;
+
+  // Event config value
+  string config_value = 3;
+
+  // Device ID
+  int64 device_id = 4;
+
+  // Event ID
+  int64 event_id = 5;
+
+  // Enable flag
+  int32 enable_flag = 6;
+
+  // Signature
+  string signature = 7;
+
+  // Version
+  int32 version = 8;
+
+  // Tenant ID
+  int64 tenant_id = 9;
+}
 

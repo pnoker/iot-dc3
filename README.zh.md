@@ -20,7 +20,7 @@ IoT DC3 是一个完全开源、AI 就绪的分布式物联网平台。
 
 ---
 
-![iot-dc3-architecture](dc3/images/architecture-cn.png)
+![iot-dc3-architecture](dc3/images/iot-dc3-architecture-zh.svg)
 
 # 1 架构
 

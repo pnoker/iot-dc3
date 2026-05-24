@@ -47,6 +47,38 @@ dc3:
         attribute-type-flag: INT
         default-value: 2
         remark: QoS level for the downstream command topic
+    command-attribute:
+      - attribute-name: Command Topic
+        attribute-code: commandTopic
+        attribute-type-flag: STRING
+        default-value: commandTopic
+        remark: MQTT topic used by the command to publish downstream payload
+      - attribute-name: Command QoS
+        attribute-code: commandQos
+        attribute-type-flag: INT
+        default-value: 2
+        remark: QoS level for the command publish topic
+      - attribute-name: Payload Template
+        attribute-code: payloadTemplate
+        attribute-type-flag: STRING
+        default-value: '{}'
+        remark: Payload template rendered with command params
+    event-attribute:
+      - attribute-name: Source Topic
+        attribute-code: sourceTopic
+        attribute-type-flag: STRING
+        default-value: eventTopic
+        remark: MQTT topic used to receive event payload
+      - attribute-name: Event Code Path
+        attribute-code: eventCodePath
+        attribute-type-flag: STRING
+        default-value: $.eventCode
+        remark: JSON path used to resolve event code
+      - attribute-name: Payload Path
+        attribute-code: payloadPath
+        attribute-type-flag: STRING
+        default-value: $.payload
+        remark: JSON path used to resolve event payload
 
 spring:
   application:

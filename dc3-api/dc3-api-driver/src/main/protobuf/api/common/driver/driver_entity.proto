@@ -43,4 +43,10 @@ message GrpcDriverRegisterDTO {
 
   // List of point (tag) configuration parameters supported by the driver
   repeated GrpcPointAttributeDTO point_attributes = 5;
+
+  // List of command configuration parameters supported by the driver
+  repeated GrpcCommandAttributeDTO command_attributes = 6;
+
+  // List of event configuration parameters supported by the driver
+  repeated GrpcEventAttributeDTO event_attributes = 7;
 }

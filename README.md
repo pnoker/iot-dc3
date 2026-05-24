@@ -20,7 +20,7 @@ It connects devices, collects data organized for AI, and orchestrates the closed
 
 ---
 
-![iot-dc3-architecture](dc3/images/architecture-en.png)
+![iot-dc3-architecture](dc3/images/iot-dc3-architecture-en.svg)
 
 # 1 Architecture
 

@@ -18,6 +18,8 @@
 package io.github.pnoker.common.data.entity.vo;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -46,12 +48,10 @@ public class EventHistoryQueryVO implements Serializable {
 
     private Byte eventTypeFlag;
 
-    private Integer page = 1;
-
-    private Integer size = 20;
+    private Pages page;
 
     public <T> Page<T> toPage() {
-        return new Page<>(page, size);
+        return PageUtil.page(page);
     }
 
 }

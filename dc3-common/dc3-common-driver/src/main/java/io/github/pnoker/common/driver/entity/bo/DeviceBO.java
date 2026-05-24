@@ -17,7 +17,9 @@
 
 package io.github.pnoker.common.driver.entity.bo;
 
+import io.github.pnoker.common.driver.entity.dto.CommandAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeConfigDTO;
+import io.github.pnoker.common.driver.entity.dto.EventAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeConfigDTO;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.DeviceExt;
@@ -106,5 +108,17 @@ public class DeviceBO extends BaseBO {
      * identifier.
      */
     private Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigIdMap;
+
+    /**
+     * Command attribute configuration map keyed by command identifier and then
+     * attribute identifier.
+     */
+    private Map<Long, Map<Long, CommandAttributeConfigDTO>> commandAttributeConfigIdMap;
+
+    /**
+     * Event attribute configuration map keyed by event identifier and then attribute
+     * identifier.
+     */
+    private Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigIdMap;
 
 }

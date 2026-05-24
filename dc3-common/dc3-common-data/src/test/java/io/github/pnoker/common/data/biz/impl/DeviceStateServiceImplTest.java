@@ -99,7 +99,7 @@ class DeviceStateServiceImplTest {
         stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
                 (byte) EntityStatusEnum.OFFLINE.getIndex(), 1L));
 
-        service.heartbeat(heartbeat(10L, "online", 7L, 100L, 25, TimeUnit.SECONDS));
+        service.heartbeat(heartbeat(10L, EntityStatusEnum.ONLINE.getCode(), 7L, 100L, 25, TimeUnit.SECONDS));
 
         verify(entityStateMapper).upsertEntityState(anyLong(),
                 eq(100L),
@@ -117,14 +117,14 @@ class DeviceStateServiceImplTest {
 
     @Test
     void nullDriverIdDoesNothing() {
-        service.heartbeat(heartbeat(10L, "online", null, 100L, 25, TimeUnit.SECONDS));
+        service.heartbeat(heartbeat(10L, EntityStatusEnum.ONLINE.getCode(), null, 100L, 25, TimeUnit.SECONDS));
 
         verifyNoInteractions(entityStateMapper);
     }
 
     @Test
     void nonPositiveTimeoutDoesNothing() {
-        service.heartbeat(heartbeat(10L, "online", 7L, 100L, 0, TimeUnit.SECONDS));
+        service.heartbeat(heartbeat(10L, EntityStatusEnum.ONLINE.getCode(), 7L, 100L, 0, TimeUnit.SECONDS));
 
         verifyNoInteractions(entityStateMapper);
     }
@@ -134,7 +134,7 @@ class DeviceStateServiceImplTest {
         stubUpsert(persisted((byte) EntityStatusEnum.OFFLINE.getIndex(),
                 (byte) EntityStatusEnum.ONLINE.getIndex(), 3L));
 
-        service.heartbeat(heartbeat(10L, "offline", 7L, 100L, 25, TimeUnit.SECONDS));
+        service.heartbeat(heartbeat(10L, EntityStatusEnum.OFFLINE.getCode(), 7L, 100L, 25, TimeUnit.SECONDS));
 
         verify(deviceAlarmService).alarm(any());
     }
@@ -144,7 +144,7 @@ class DeviceStateServiceImplTest {
         stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
                 (byte) EntityStatusEnum.ONLINE.getIndex(), 3L));
 
-        service.heartbeat(heartbeat(10L, "online", 7L, 100L, 25, TimeUnit.SECONDS));
+        service.heartbeat(heartbeat(10L, EntityStatusEnum.ONLINE.getCode(), 7L, 100L, 25, TimeUnit.SECONDS));
 
         verify(deviceAlarmService, never()).alarm(any());
     }

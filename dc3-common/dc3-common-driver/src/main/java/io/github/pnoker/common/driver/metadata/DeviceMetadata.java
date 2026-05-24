@@ -19,8 +19,12 @@ package io.github.pnoker.common.driver.metadata;
 
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.dto.CommandAttributeConfigDTO;
+import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
+import io.github.pnoker.common.driver.entity.dto.EventAttributeConfigDTO;
+import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
@@ -185,6 +189,181 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
             log.warn("Point config incomplete, deviceId={}, pointId={}, required={}, configured={}",
                     deviceId, pointId, attributeMap.keySet(),
+                    attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
+            return Map.of();
+        }
+
+        return attributeMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+                        entry -> AttributeBO.builder()
+                                .type(entry.getValue().getAttributeTypeFlag())
+                                .value(attributeConfigMap.get(entry.getKey()).getConfigValue())
+                                .build()));
+    }
+
+    /**
+     * Resolves command attribute configuration for all commands of the specified device.
+     * Commands with incomplete configuration are filtered out silently; an empty map is
+     * returned when the device or its command-config map is unavailable.
+     *
+     * @param deviceId device identifier
+     * @return command configuration map keyed by command identifier and attribute code
+     */
+    public Map<Long, Map<String, AttributeBO>> getCommandConfig(long deviceId) {
+        Map<Long, CommandAttributeDTO> attributeMap = driverMetadata.getCommandAttributeIdMap();
+        if (MapUtils.isEmpty(attributeMap)) {
+            return Map.of();
+        }
+
+        DeviceBO device = getCache(deviceId);
+        if (device == null) {
+            log.warn("Command config unavailable, deviceId={}, reason=device cache miss", deviceId);
+            return Map.of();
+        }
+
+        Map<Long, Map<Long, CommandAttributeConfigDTO>> commandAttributeConfigMap =
+                device.getCommandAttributeConfigIdMap();
+        if (MapUtils.isEmpty(commandAttributeConfigMap)) {
+            log.warn("Command config unavailable, deviceId={}, reason=empty command-attribute-config map", deviceId);
+            return Map.of();
+        }
+
+        return commandAttributeConfigMap.entrySet()
+                .stream()
+                .filter(entry -> MapUtils.isNotEmpty(entry.getValue())
+                        && entry.getValue().keySet().containsAll(attributeMap.keySet()))
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entryMap -> attributeMap.entrySet()
+                                .stream()
+                                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+                                        entry -> AttributeBO.builder()
+                                                .type(entry.getValue().getAttributeTypeFlag())
+                                                .value(entryMap.getValue().get(entry.getKey()).getConfigValue())
+                                                .build()))));
+    }
+
+    /**
+     * Resolves command attribute configuration for a single command of the specified
+     * device.
+     *
+     * @param deviceId  device identifier
+     * @param commandId command identifier
+     * @return command configuration map keyed by attribute code, or an empty map
+     */
+    public Map<String, AttributeBO> getCommandConfig(long deviceId, long commandId) {
+        Map<Long, CommandAttributeDTO> attributeMap = driverMetadata.getCommandAttributeIdMap();
+        if (MapUtils.isEmpty(attributeMap)) {
+            return Map.of();
+        }
+
+        DeviceBO device = getCache(deviceId);
+        if (device == null) {
+            log.warn("Command config unavailable, deviceId={}, commandId={}, reason=device cache miss",
+                    deviceId, commandId);
+            return Map.of();
+        }
+
+        Map<Long, Map<Long, CommandAttributeConfigDTO>> commandAttributeConfigMap =
+                device.getCommandAttributeConfigIdMap();
+        if (MapUtils.isEmpty(commandAttributeConfigMap)) {
+            log.warn("Command config unavailable, deviceId={}, commandId={}, reason=empty command-attribute-config map",
+                    deviceId, commandId);
+            return Map.of();
+        }
+
+        Map<Long, CommandAttributeConfigDTO> attributeConfigMap = commandAttributeConfigMap.get(commandId);
+        if (MapUtils.isEmpty(attributeConfigMap)
+                || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
+            log.warn("Command config incomplete, deviceId={}, commandId={}, required={}, configured={}",
+                    deviceId, commandId, attributeMap.keySet(),
+                    attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
+            return Map.of();
+        }
+
+        return attributeMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+                        entry -> AttributeBO.builder()
+                                .type(entry.getValue().getAttributeTypeFlag())
+                                .value(attributeConfigMap.get(entry.getKey()).getConfigValue())
+                                .build()));
+    }
+
+    /**
+     * Resolves event attribute configuration for all events of the specified device.
+     * Events with incomplete configuration are filtered out silently; an empty map is
+     * returned when the device or its event-config map is unavailable.
+     *
+     * @param deviceId device identifier
+     * @return event configuration map keyed by event identifier and attribute code
+     */
+    public Map<Long, Map<String, AttributeBO>> getEventConfig(long deviceId) {
+        Map<Long, EventAttributeDTO> attributeMap = driverMetadata.getEventAttributeIdMap();
+        if (MapUtils.isEmpty(attributeMap)) {
+            return Map.of();
+        }
+
+        DeviceBO device = getCache(deviceId);
+        if (device == null) {
+            log.warn("Event config unavailable, deviceId={}, reason=device cache miss", deviceId);
+            return Map.of();
+        }
+
+        Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigMap =
+                device.getEventAttributeConfigIdMap();
+        if (MapUtils.isEmpty(eventAttributeConfigMap)) {
+            log.warn("Event config unavailable, deviceId={}, reason=empty event-attribute-config map", deviceId);
+            return Map.of();
+        }
+
+        return eventAttributeConfigMap.entrySet()
+                .stream()
+                .filter(entry -> MapUtils.isNotEmpty(entry.getValue())
+                        && entry.getValue().keySet().containsAll(attributeMap.keySet()))
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entryMap -> attributeMap.entrySet()
+                                .stream()
+                                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+                                        entry -> AttributeBO.builder()
+                                                .type(entry.getValue().getAttributeTypeFlag())
+                                                .value(entryMap.getValue().get(entry.getKey()).getConfigValue())
+                                                .build()))));
+    }
+
+    /**
+     * Resolves event attribute configuration for a single event of the specified
+     * device.
+     *
+     * @param deviceId device identifier
+     * @param eventId  event identifier
+     * @return event configuration map keyed by attribute code, or an empty map
+     */
+    public Map<String, AttributeBO> getEventConfig(long deviceId, long eventId) {
+        Map<Long, EventAttributeDTO> attributeMap = driverMetadata.getEventAttributeIdMap();
+        if (MapUtils.isEmpty(attributeMap)) {
+            return Map.of();
+        }
+
+        DeviceBO device = getCache(deviceId);
+        if (device == null) {
+            log.warn("Event config unavailable, deviceId={}, eventId={}, reason=device cache miss", deviceId, eventId);
+            return Map.of();
+        }
+
+        Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigMap =
+                device.getEventAttributeConfigIdMap();
+        if (MapUtils.isEmpty(eventAttributeConfigMap)) {
+            log.warn("Event config unavailable, deviceId={}, eventId={}, reason=empty event-attribute-config map",
+                    deviceId, eventId);
+            return Map.of();
+        }
+
+        Map<Long, EventAttributeConfigDTO> attributeConfigMap = eventAttributeConfigMap.get(eventId);
+        if (MapUtils.isEmpty(attributeConfigMap)
+                || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
+            log.warn("Event config incomplete, deviceId={}, eventId={}, required={}, configured={}",
+                    deviceId, eventId, attributeMap.keySet(),
                     attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
             return Map.of();
         }

@@ -45,8 +45,8 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
 
     public static final String DRIVER_ID = "driverId";
     public static final String TOTAL = "total";
-    public static final String ONLINE = "online";
-    public static final String OFFLINE = "offline";
+    public static final String ONLINE = "ONLINE";
+    public static final String OFFLINE = "OFFLINE";
     @Serial
     private static final long serialVersionUID = 1L;
     private Long driverId;

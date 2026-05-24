@@ -66,8 +66,8 @@
                 CURRENT_TIMESTAMP,
                 0,
                 #{timeoutSourceFlag},
-                json_build_object('type', #{stateExtType}, 'content',
-                                  COALESCE(#{stateDescription}, ''), 'version', 1),
+                json_build_object('type', #{stateExtType}::text, 'content',
+                                  COALESCE(#{stateDescription}::text, ''), 'version', 1),
                 #{tenantId})
         ON CONFLICT
             (tenant_id, entity_type_flag, entity_id)
@@ -81,10 +81,10 @@
             last_heartbeat_time = CURRENT_TIMESTAMP,
             timeout_source_flag = EXCLUDED.timeout_source_flag,
             entity_state_ext = CASE
-            WHEN COALESCE (#{stateDescription}, '') != ''
+            WHEN COALESCE (#{stateDescription}::text, '') != ''
             THEN json_build_object(
             'type', dc3_entity_state.entity_state_ext->>'type',
-            'content', #{stateDescription},
+            'content', #{stateDescription}::text,
             'version', COALESCE ((dc3_entity_state.entity_state_ext->>'version'):: int, 0) + 1
             )
             ELSE dc3_entity_state.entity_state_ext

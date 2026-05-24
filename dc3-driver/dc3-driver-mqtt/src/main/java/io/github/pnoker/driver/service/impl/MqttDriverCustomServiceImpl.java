@@ -28,12 +28,15 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.driver.service.MqttSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,6 +57,10 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class MqttDriverCustomServiceImpl implements DriverCustomService {
+
+    private static final String COMMAND_TOPIC = "commandTopic";
+    private static final String COMMAND_QOS = "commandQos";
+    private static final String PAYLOAD_TEMPLATE = "payloadTemplate";
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
@@ -193,6 +200,69 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
             mqttSendService.sendToMqtt(commandTopic, value);
         }
         return true;
+    }
+
+    @Override
+    public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
+                                       DeviceBO device, FacadeCommandBO command, Map<String, String> paramValues) {
+        String commandTopic = getConfigValue(commandConfig, COMMAND_TOPIC);
+        if (StringUtils.isBlank(commandTopic)) {
+            throw new IllegalStateException("MQTT command topic is blank, deviceId=" + device.getId()
+                    + ", commandId=" + command.getId());
+        }
+
+        Map<String, String> context = new LinkedHashMap<>();
+        if (Objects.nonNull(paramValues)) {
+            context.putAll(paramValues);
+        }
+        context.put("deviceId", String.valueOf(device.getId()));
+        context.put("deviceCode", device.getDeviceCode());
+        context.put("deviceName", device.getDeviceName());
+        context.put("commandId", String.valueOf(command.getId()));
+        context.put("commandCode", command.getCommandCode());
+        context.put("commandName", command.getCommandName());
+
+        String payloadTemplate = StringUtils.defaultIfBlank(getConfigValue(commandConfig, PAYLOAD_TEMPLATE), "{}");
+        String payload = render(payloadTemplate, context);
+
+        Integer commandQos = getConfigValue(commandConfig, COMMAND_QOS, Integer.class);
+        if (Objects.nonNull(commandQos)) {
+            mqttSendService.sendToMqtt(commandTopic, commandQos, payload);
+        } else {
+            mqttSendService.sendToMqtt(commandTopic, payload);
+        }
+
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("topic", commandTopic);
+        if (Objects.nonNull(commandQos)) {
+            result.put("qos", String.valueOf(commandQos));
+        }
+        result.put("payload", payload);
+        log.info("MQTT command executed, deviceId={}, commandId={}, topic={}, qos={}, payloadLength={}",
+                device.getId(), command.getId(), commandTopic, commandQos, payload.length());
+        return result;
+    }
+
+    private String getConfigValue(Map<String, AttributeBO> config, String code) {
+        if (Objects.isNull(config) || Objects.isNull(config.get(code))) {
+            return null;
+        }
+        return config.get(code).getValue();
+    }
+
+    private <T> T getConfigValue(Map<String, AttributeBO> config, String code, Class<T> clazz) {
+        if (Objects.isNull(config) || Objects.isNull(config.get(code))) {
+            return null;
+        }
+        return config.get(code).getValue(clazz);
+    }
+
+    private String render(String template, Map<String, String> context) {
+        String rendered = template;
+        for (Map.Entry<String, String> entry : context.entrySet()) {
+            rendered = rendered.replace("${" + entry.getKey() + "}", StringUtils.defaultString(entry.getValue()));
+        }
+        return rendered;
     }
 
 }

@@ -20,7 +20,7 @@ Nó kết nối thiết bị, thu thập dữ liệu được tổ chức cho AI
 
 ---
 
-![iot-dc3-architecture](dc3/images/architecture-en.png)
+![iot-dc3-architecture](dc3/images/iot-dc3-architecture-vi.svg)
 
 # 1 Kiến trúc
 
@@ -84,6 +84,22 @@ make dev-all REGISTRY=cn
 make app-all REGISTRY=cn
 make compose-up STACK=optional REGISTRY=cn
 make compose-logs STACK=dev REGISTRY=global
+```
+
+Lệnh tắt cấp dịch vụ cho kiểm thử frontend và API:
+
+```bash
+# Khởi động các phụ thuộc cơ bản trước
+make dev-db REGISTRY=cn
+
+# Khởi động một dịch vụ, nhiều dịch vụ hoặc nhóm định sẵn
+make up SERVICES=agentic REGISTRY=cn
+make up SERVICES="gateway agentic" REGISTRY=cn
+make up GROUP=core REGISTRY=cn
+make up GROUP=drivers REGISTRY=cn
+
+# Theo dõi log của các dịch vụ đang kiểm thử
+make logs SERVICES="gateway agentic"
 ```
 
 ### Ghi đè biến môi trường cho Compose

@@ -53,6 +53,28 @@ dc3:
         attribute-type-flag: STRING
         default-value: TAG
         remark: Point tag name
+    command-attribute:
+      - attribute-name: Payload Template
+        attribute-code: payloadTemplate
+        attribute-type-flag: STRING
+        default-value: '${value}'
+        remark: Template rendered with command params
+      - attribute-name: Response Template
+        attribute-code: responseTemplate
+        attribute-type-flag: STRING
+        default-value: '{}'
+        remark: Mock response template
+    event-attribute:
+      - attribute-name: Event Code Path
+        attribute-code: eventCodePath
+        attribute-type-flag: STRING
+        default-value: $.eventCode
+        remark: JSON path used to resolve event code
+      - attribute-name: Payload Path
+        attribute-code: payloadPath
+        attribute-type-flag: STRING
+        default-value: $.payload
+        remark: JSON path used to resolve event payload
 
 spring:
   application:

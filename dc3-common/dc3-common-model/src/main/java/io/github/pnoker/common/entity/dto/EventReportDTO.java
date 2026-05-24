@@ -36,6 +36,7 @@ public record EventReportDTO(
         Byte eventTypeFlag,
         Byte eventLevelFlag,
         Map<String, String> paramValues,
+        String configSnapshot,
         String message,
         Instant occurTime,
         int schemaVersion
@@ -54,6 +55,7 @@ public record EventReportDTO(
         private Byte eventTypeFlag;
         private Byte eventLevelFlag;
         private Map<String, String> paramValues;
+        private String configSnapshot;
         private String message;
         private Instant occurTime;
         private int schemaVersion;
@@ -98,6 +100,11 @@ public record EventReportDTO(
             return this;
         }
 
+        public Builder configSnapshot(String configSnapshot) {
+            this.configSnapshot = configSnapshot;
+            return this;
+        }
+
         public Builder message(String message) {
             this.message = message;
             return this;
@@ -115,7 +122,7 @@ public record EventReportDTO(
 
         public EventReportDTO build() {
             return new EventReportDTO(recordId, tenantId, deviceId, eventId, eventCode,
-                    eventTypeFlag, eventLevelFlag, paramValues, message, occurTime, schemaVersion);
+                    eventTypeFlag, eventLevelFlag, paramValues, configSnapshot, message, occurTime, schemaVersion);
         }
     }
 }

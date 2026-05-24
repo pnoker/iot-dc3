@@ -42,6 +42,10 @@ public class ManagerConstant {
 
     public static final String POINT_ATTRIBUTE_URL_PREFIX = "/point_attribute";
 
+    public static final String COMMAND_ATTRIBUTE_URL_PREFIX = "/command_attribute";
+
+    public static final String EVENT_ATTRIBUTE_URL_PREFIX = "/event_attribute";
+
     public static final String PROFILE_URL_PREFIX = "/profile";
 
     public static final String POINT_URL_PREFIX = "/point";
@@ -59,6 +63,10 @@ public class ManagerConstant {
     public static final String POINT_ATTRIBUTE_CONFIG_URL_PREFIX = "/point_attribute_config";
 
     public static final String DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX = "/driver_attribute_config";
+
+    public static final String COMMAND_ATTRIBUTE_CONFIG_URL_PREFIX = "/command_attribute_config";
+
+    public static final String EVENT_ATTRIBUTE_CONFIG_URL_PREFIX = "/event_attribute_config";
 
     public static final String LABEL_URL_PREFIX = "/label";
 

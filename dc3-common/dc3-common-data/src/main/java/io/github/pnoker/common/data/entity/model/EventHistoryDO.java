@@ -72,6 +72,9 @@ public class EventHistoryDO implements Serializable {
     @TableField("param_values")
     private String paramValues;
 
+    @TableField("config_snapshot")
+    private String configSnapshot;
+
     @TableField("message")
     private String message;
 

@@ -17,7 +17,9 @@
 
 package io.github.pnoker.common.driver.grpc.client;
 
+import io.github.pnoker.api.common.GrpcCommandAttributeConfigDTO;
 import io.github.pnoker.api.common.GrpcDriverAttributeConfigDTO;
+import io.github.pnoker.api.common.GrpcEventAttributeConfigDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointAttributeConfigDTO;
 import io.github.pnoker.api.common.driver.DeviceApiGrpc;
@@ -29,9 +31,13 @@ import io.github.pnoker.api.common.driver.GrpcRDeviceDTO;
 import io.github.pnoker.api.common.driver.GrpcRPageDeviceDTO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.builder.DeviceBuilder;
+import io.github.pnoker.common.driver.entity.builder.GrpcCommandAttributeConfigBuilder;
 import io.github.pnoker.common.driver.entity.builder.GrpcDriverAttributeConfigBuilder;
+import io.github.pnoker.common.driver.entity.builder.GrpcEventAttributeConfigBuilder;
 import io.github.pnoker.common.driver.entity.builder.GrpcPointAttributeConfigBuilder;
+import io.github.pnoker.common.driver.entity.dto.CommandAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeConfigDTO;
+import io.github.pnoker.common.driver.entity.dto.EventAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeConfigDTO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.exception.ServiceException;
@@ -69,6 +75,10 @@ public class DeviceClient {
     private final GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
 
     private final GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
+
+    private final GrpcCommandAttributeConfigBuilder grpcCommandAttributeConfigBuilder;
+
+    private final GrpcEventAttributeConfigBuilder grpcEventAttributeConfigBuilder;
 
     public List<DeviceBO> list() {
         long current = 1;
@@ -141,6 +151,22 @@ public class DeviceClient {
                             Collectors.toMap(GrpcPointAttributeConfigDTO::getAttributeId,
                                     grpcPointAttributeConfigBuilder::buildDTOByGrpcDTO)));
             deviceBO.setPointAttributeConfigIdMap(pointAttributeConfigMap);
+        });
+
+        CollectionOptional.ofNullable(rDeviceAttachDTO.getCommandConfigsList()).ifPresent(value -> {
+            Map<Long, Map<Long, CommandAttributeConfigDTO>> commandAttributeConfigMap = value.stream()
+                    .collect(Collectors.groupingBy(GrpcCommandAttributeConfigDTO::getCommandId,
+                            Collectors.toMap(GrpcCommandAttributeConfigDTO::getAttributeId,
+                                    grpcCommandAttributeConfigBuilder::buildDTOByGrpcDTO)));
+            deviceBO.setCommandAttributeConfigIdMap(commandAttributeConfigMap);
+        });
+
+        CollectionOptional.ofNullable(rDeviceAttachDTO.getEventConfigsList()).ifPresent(value -> {
+            Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigMap = value.stream()
+                    .collect(Collectors.groupingBy(GrpcEventAttributeConfigDTO::getEventId,
+                            Collectors.toMap(GrpcEventAttributeConfigDTO::getAttributeId,
+                                    grpcEventAttributeConfigBuilder::buildDTOByGrpcDTO)));
+            deviceBO.setEventAttributeConfigIdMap(eventAttributeConfigMap);
         });
 
         return deviceBO;

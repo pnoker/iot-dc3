@@ -18,6 +18,8 @@
 package io.github.pnoker.common.driver.entity.bo;
 
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
+import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
+import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -73,5 +75,15 @@ public class RegisterBO implements Serializable {
      * Point-level attribute definitions.
      */
     private List<PointAttributeDTO> pointAttributes;
+
+    /**
+     * Command-level attribute definitions.
+     */
+    private List<CommandAttributeDTO> commandAttributes;
+
+    /**
+     * Event-level attribute definitions.
+     */
+    private List<EventAttributeDTO> eventAttributes;
 
 }

@@ -90,6 +90,7 @@ public class DeviceVO extends BaseVO {
     /**
      * Profile ID
      */
+    @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Upload.class})
     private Long profileId;
 
 }

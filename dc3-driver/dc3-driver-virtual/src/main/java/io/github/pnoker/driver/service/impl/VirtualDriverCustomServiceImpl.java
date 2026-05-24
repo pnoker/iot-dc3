@@ -22,20 +22,38 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
+import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.dto.EventReportDTO;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.facade.api.EventFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Custom driver service implementation for the Virtual Driver.
@@ -54,8 +72,18 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class VirtualDriverCustomServiceImpl implements DriverCustomService {
 
+    private static final String PAYLOAD_TEMPLATE = "payloadTemplate";
+    private static final String RESPONSE_TEMPLATE = "responseTemplate";
+    private static final String EVENT_CODE_PATH = "eventCodePath";
+    private static final String PAYLOAD_PATH = "payloadPath";
+    private static final long EVENT_REPORT_INTERVAL_MILLIS = 30_000L;
+    private static final int SCHEMA_VERSION = 1;
+
     private final DriverMetadata driverMetadata;
+    private final DeviceMetadata deviceMetadata;
     private final DriverSenderService driverSenderService;
+    private final EventFacade eventFacade;
+    private final AtomicLong lastEventReportMillis = new AtomicLong();
     @Value("${dc3.driver.code}")
     private String driverCode;
 
@@ -80,7 +108,11 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void schedule() {
-        // Device state lease renewal is owned by the SDK device health job.
+        if (!shouldReportEvent()) {
+            return;
+        }
+
+        driverMetadata.getDeviceIds().forEach(this::reportDeviceEvents);
     }
 
     /**
@@ -189,6 +221,195 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
          * indicating that the write operation was not executed or failed.
          */
         return false;
+    }
+
+    @Override
+    public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
+                                       DeviceBO device, FacadeCommandBO command, Map<String, String> paramValues) {
+        Map<String, String> context = new LinkedHashMap<>();
+        if (Objects.nonNull(paramValues)) {
+            context.putAll(paramValues);
+        }
+        context.put("deviceId", String.valueOf(device.getId()));
+        context.put("deviceCode", device.getDeviceCode());
+        context.put("deviceName", device.getDeviceName());
+        context.put("commandId", String.valueOf(command.getId()));
+        context.put("commandCode", command.getCommandCode());
+        context.put("commandName", command.getCommandName());
+
+        String payloadTemplate = getConfigValue(commandConfig, PAYLOAD_TEMPLATE);
+        String payload = render(StringUtils.defaultString(payloadTemplate), context);
+        context.put("payload", payload);
+
+        String responseTemplate = getConfigValue(commandConfig, RESPONSE_TEMPLATE);
+        String response = render(StringUtils.defaultIfBlank(responseTemplate, "{}"), context);
+
+        Map<String, String> result = parseResponse(response);
+        result.putIfAbsent("payload", payload);
+        result.putIfAbsent("response", response);
+        log.info("Virtual command executed, deviceId={}, commandId={}, payload={}, response={}",
+                device.getId(), command.getId(), payload, response);
+        return result;
+    }
+
+    private String getConfigValue(Map<String, AttributeBO> config, String code) {
+        if (Objects.isNull(config) || Objects.isNull(config.get(code))) {
+            return null;
+        }
+        return config.get(code).getValue();
+    }
+
+    private String render(String template, Map<String, String> context) {
+        String rendered = template;
+        for (Map.Entry<String, String> entry : context.entrySet()) {
+            rendered = rendered.replace("${" + entry.getKey() + "}", StringUtils.defaultString(entry.getValue()));
+        }
+        return rendered;
+    }
+
+    private Map<String, String> parseResponse(String response) {
+        Map<String, String> result = new LinkedHashMap<>();
+        if (!JsonUtil.isJson(response)) {
+            result.put("response", response);
+            return result;
+        }
+
+        Object parsed = JsonUtil.parseObject(response, Object.class);
+        if (parsed instanceof Map<?, ?> parsedMap) {
+            parsedMap.forEach((key, value) -> result.put(String.valueOf(key), valueToString(value)));
+        } else {
+            result.put("response", valueToString(parsed));
+        }
+        return result;
+    }
+
+    private String valueToString(Object value) {
+        if (Objects.isNull(value)) {
+            return "";
+        }
+        if (value instanceof String stringValue) {
+            return stringValue;
+        }
+        if (value instanceof Number || value instanceof Boolean) {
+            return String.valueOf(value);
+        }
+        return JsonUtil.toJsonString(value);
+    }
+
+    private boolean shouldReportEvent() {
+        long now = System.currentTimeMillis();
+        long previous = lastEventReportMillis.get();
+        return now - previous >= EVENT_REPORT_INTERVAL_MILLIS
+                && lastEventReportMillis.compareAndSet(previous, now);
+    }
+
+    private void reportDeviceEvents(Long deviceId) {
+        DeviceBO device = deviceMetadata.getCache(deviceId);
+        if (Objects.isNull(device)) {
+            return;
+        }
+
+        List<FacadeEventBO> events = listDeviceEvents(device);
+        for (FacadeEventBO event : events) {
+            Map<String, AttributeBO> eventConfig = deviceMetadata.getEventConfig(device.getId(), event.getId());
+            if (eventConfig.isEmpty()) {
+                continue;
+            }
+
+            EventReportDTO report = buildEventReport(device, event, eventConfig);
+            driverSenderService.eventReportSender(report);
+            log.info("Virtual event reported, deviceId={}, eventId={}, eventCode={}, paramValues={}",
+                    device.getId(), event.getId(), report.eventCode(), JsonUtil.toJsonString(report.paramValues()));
+        }
+    }
+
+    private List<FacadeEventBO> listDeviceEvents(DeviceBO device) {
+        Pages page = new Pages();
+        page.setSize(100);
+        FacadeEventQuery query = FacadeEventQuery.builder()
+                .page(page)
+                .tenantId(device.getTenantId())
+                .deviceId(device.getId())
+                .enableFlag(EnableFlagEnum.ENABLE)
+                .build();
+        FacadePage<FacadeEventBO> eventPage = eventFacade.listByPage(query);
+        if (Objects.isNull(eventPage) || Objects.isNull(eventPage.getRecords())) {
+            return List.of();
+        }
+        return eventPage.getRecords();
+    }
+
+    private EventReportDTO buildEventReport(DeviceBO device, FacadeEventBO event, Map<String, AttributeBO> eventConfig) {
+        Map<String, Object> rawEvent = new LinkedHashMap<>();
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("value", String.valueOf(ThreadLocalRandom.current().nextInt(0, 100)));
+        payload.put("deviceCode", device.getDeviceCode());
+        payload.put("source", "virtual");
+        rawEvent.put("eventCode", event.getEventCode());
+        rawEvent.put("payload", payload);
+
+        String eventCode = valueToString(resolvePath(rawEvent,
+                StringUtils.defaultIfBlank(getConfigValue(eventConfig, EVENT_CODE_PATH), "$.eventCode")));
+        Object payloadValue = resolvePath(rawEvent,
+                StringUtils.defaultIfBlank(getConfigValue(eventConfig, PAYLOAD_PATH), "$.payload"));
+
+        return EventReportDTO.builder()
+                .recordId(UUID.randomUUID().toString())
+                .tenantId(device.getTenantId())
+                .deviceId(device.getId())
+                .eventId(event.getId())
+                .eventCode(StringUtils.defaultIfBlank(eventCode, event.getEventCode()))
+                .eventTypeFlag(event.getEventTypeFlag().getIndex())
+                .eventLevelFlag(event.getEventLevelFlag().getIndex())
+                .paramValues(toParamValues(payloadValue))
+                .configSnapshot(buildConfigSnapshot(eventConfig))
+                .message("Virtual event " + event.getEventCode() + " from " + device.getDeviceCode())
+                .occurTime(Instant.now())
+                .schemaVersion(SCHEMA_VERSION)
+                .build();
+    }
+
+    private Object resolvePath(Object root, String path) {
+        if (Objects.isNull(root) || StringUtils.isBlank(path)) {
+            return null;
+        }
+        String normalized = path.startsWith("$.") ? path.substring(2) : path;
+        Object current = root;
+        for (String segment : normalized.split("\\.")) {
+            if (current instanceof Map<?, ?> map) {
+                current = map.get(segment);
+            } else {
+                return null;
+            }
+        }
+        return current;
+    }
+
+    private Map<String, String> toParamValues(Object payloadValue) {
+        Map<String, String> paramValues = new LinkedHashMap<>();
+        if (payloadValue instanceof Map<?, ?> payloadMap) {
+            payloadMap.forEach((key, value) -> paramValues.put(String.valueOf(key), valueToString(value)));
+        } else {
+            paramValues.put("value", valueToString(payloadValue));
+        }
+        return paramValues;
+    }
+
+    private String buildConfigSnapshot(Map<String, AttributeBO> eventConfig) {
+        if (Objects.isNull(eventConfig) || eventConfig.isEmpty()) {
+            return null;
+        }
+
+        Map<String, Map<String, String>> snapshot = new LinkedHashMap<>();
+        eventConfig.forEach((attributeCode, attribute) -> {
+            Map<String, String> item = new LinkedHashMap<>();
+            if (Objects.nonNull(attribute)) {
+                item.put("type", Objects.nonNull(attribute.getType()) ? attribute.getType().getCode() : null);
+                item.put("configValue", attribute.getValue());
+            }
+            snapshot.put(attributeCode, item);
+        });
+        return JsonUtil.toJsonString(snapshot);
     }
 
 }

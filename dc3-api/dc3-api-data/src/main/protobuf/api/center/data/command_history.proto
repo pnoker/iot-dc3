@@ -61,6 +61,7 @@ message GrpcCommandHistoryDTO {
   int64 create_time = 18;
   int64 operate_time = 19;
   int64 expire_time = 20;
+  string config_snapshot = 21;
 }
 
 message GrpcCommandHistoryQuery {
