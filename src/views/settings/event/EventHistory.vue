@@ -66,9 +66,12 @@
         <el-descriptions-item label="Type">{{ detailRow.eventTypeFlag }}</el-descriptions-item>
         <el-descriptions-item label="Level">{{ detailRow.eventLevelFlag }}</el-descriptions-item>
         <el-descriptions-item :span="2" label="Message">{{ detailRow.message || '-' }}</el-descriptions-item>
-        <el-descriptions-item :span="2" label="Param Values">{{
-          JSON.stringify(detailRow.paramValues) || '-'
-        }}</el-descriptions-item>
+        <el-descriptions-item :span="2" label="Param Values">
+          <pre class="json-preview">{{ formatJson(detailRow.paramValues) }}</pre>
+        </el-descriptions-item>
+        <el-descriptions-item :span="2" label="Config Snapshot">
+          <pre class="json-preview">{{ formatJson(detailRow.configSnapshot) }}</pre>
+        </el-descriptions-item>
         <el-descriptions-item :formatter="timestampColumn" label="Occur Time">{{
           detailRow.occurTime
         }}</el-descriptions-item>
@@ -109,6 +112,20 @@
   const formData = reactive<Record<string, any>>({});
   const detailVisible = ref(false);
   const detailRow = ref<EventHistory | null>(null);
+
+  const formatJson = (value: unknown) => {
+    if (!value) {
+      return '-';
+    }
+    if (typeof value === 'string') {
+      try {
+        return JSON.stringify(JSON.parse(value), null, 2);
+      } catch {
+        return value;
+      }
+    }
+    return JSON.stringify(value, null, 2);
+  };
 
   const load = () => {
     reactiveData.loading = true;
@@ -166,5 +183,19 @@
   .settings-table {
     margin-top: 1px;
     border-radius: 4px;
+  }
+
+  .json-preview {
+    max-height: 220px;
+    margin: 0;
+    padding: 8px;
+    overflow: auto;
+    border-radius: 4px;
+    background: var(--el-fill-color-light);
+    color: var(--el-text-color-primary);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 </style>

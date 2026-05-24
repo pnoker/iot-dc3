@@ -82,6 +82,8 @@ export type {
   ProfileRecord,
   PointForm,
   PointRecord,
+  CommandInfoForm,
   DriverInfoForm,
+  EventInfoForm,
   PointInfoForm,
 } from './manager';

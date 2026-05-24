@@ -74,6 +74,7 @@
               filterable
               remote
               reserve-keyword
+              @change="changeProfile"
               @visible-change="profileDictionaryVisible"
             >
               <el-option
@@ -304,21 +305,280 @@
       </el-card>
       <el-card v-if="reactiveData.active === 3" shadow="hover">
         <el-divider content-position="left">{{ $t('device.edit.commandConfig') }}</el-divider>
-        <command-list
-          :embedded="'device'"
-          :profile-id="String(reactiveData.deviceFormData.profileId || '')"
-        ></command-list>
+        <el-alert
+          :closable="false"
+          :description="$t('device.edit.commandConfigTip')"
+          :title="$t('device.edit.commandConfig')"
+          type="success"
+        />
+        <div class="point-matrix-toolbar">
+          <div class="point-matrix-toolbar__filters">
+            <el-input
+              v-model="reactiveData.commandMatrixKeyword"
+              :placeholder="$t('device.edit.commandSearchPlaceholder')"
+              :prefix-icon="Search"
+              clearable
+              size="small"
+            />
+            <el-segmented
+              v-model="reactiveData.commandMatrixStatus"
+              :options="[
+                { label: $t('common.all'), value: '' },
+                { label: $t('device.edit.pointStatus.missing'), value: 'missing' },
+                { label: $t('device.edit.pointStatus.configured'), value: 'configured' },
+                { label: $t('device.edit.pointStatus.dirty'), value: 'dirty' },
+                { label: $t('device.edit.pointStatus.error'), value: 'error' },
+              ]"
+              size="small"
+            />
+          </div>
+          <div class="point-matrix-toolbar__actions">
+            <el-tag :type="commandDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
+              {{ $t('device.edit.changedCount', { count: commandDirtyCount }) }}
+            </el-tag>
+            <el-button :disabled="commandDirtyCount < 1" :icon="RefreshLeft" size="small" @click="commandInfoReset">
+              {{ $t('device.edit.discardChanges') }}
+            </el-button>
+            <el-button
+              :disabled="commandDirtyCount < 1"
+              :icon="Check"
+              :loading="reactiveData.commandSaving"
+              size="small"
+              type="primary"
+              @click="saveCommandMatrix"
+            >
+              {{ $t('device.edit.saveAll') }}
+            </el-button>
+          </div>
+        </div>
+
+        <el-empty v-if="!hasCommandAttributes" :description="$t('device.edit.commandAttributeEmpty')" />
+        <el-table
+          v-else
+          v-loading="reactiveData.loading"
+          :data="filteredCommandInfoData"
+          :row-class-name="commandMatrixRowClassName"
+          border
+          class="point-matrix-table"
+          max-height="560"
+          size="small"
+          stripe
+        >
+          <el-table-column :label="$t('device.edit.commandName')" fixed min-width="220">
+            <template #default="{ row }">
+              <div class="point-matrix-point">
+                <div class="point-matrix-point__name">{{ row.commandName }}</div>
+                <div class="point-matrix-point__code">{{ row.commandCode || row.id }}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('device.edit.configStatus')" fixed min-width="120">
+            <template #default="{ row }">
+              <el-tag :type="commandRowStatusTag(row)" effect="plain" size="small">
+                {{ commandRowStatusLabel(row) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column v-for="attribute in reactiveData.commandAttributes" :key="attribute.id" min-width="220">
+            <template #header>
+              <div class="point-matrix-attribute-header">
+                <span>{{ attribute.attributeName }}</span>
+                <el-tag effect="plain" size="small">{{ attribute.attributeTypeFlag || 'STRING' }}</el-tag>
+              </div>
+            </template>
+            <template #default="{ row }">
+              <div
+                :class="[
+                  'point-matrix-cell',
+                  commandCellDirty(row, attribute) ? 'is-dirty' : '',
+                  commandCellError(row, attribute) ? 'is-error' : '',
+                ]"
+              >
+                <el-switch
+                  v-if="isBooleanAttribute(attribute)"
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  :active-value="true"
+                  :inactive-value="false"
+                  size="small"
+                  @change="markCommandCellDirty(row, attribute)"
+                />
+                <el-input
+                  v-else-if="isNumberAttribute(attribute)"
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  inputmode="decimal"
+                  :placeholder="attributePlaceholder(attribute)"
+                  class="point-matrix-input"
+                  clearable
+                  size="small"
+                  @input="markCommandCellDirty(row, attribute)"
+                />
+                <el-input
+                  v-else
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  :placeholder="attributePlaceholder(attribute)"
+                  clearable
+                  size="small"
+                  @input="markCommandCellDirty(row, attribute)"
+                />
+                <div v-if="commandCellDirty(row, attribute) || attribute.defaultValue" class="point-matrix-cell__meta">
+                  <span v-if="commandCellDirty(row, attribute)" class="point-matrix-cell__dirty">
+                    {{ $t('device.edit.modified') }}
+                  </span>
+                  <span v-if="attribute.defaultValue" class="point-matrix-cell__default">
+                    {{ $t('device.edit.defaultValue', { value: attribute.defaultValue }) }}
+                  </span>
+                </div>
+                <div v-if="commandCellError(row, attribute)" class="point-matrix-cell__error">
+                  {{ commandCellError(row, attribute) }}
+                </div>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
         <el-form-item class="edit-form-button">
           <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+          <el-button :icon="Right" :loading="reactiveData.commandSaving" plain type="warning" @click="next">
+            {{ $t('common.next') }}
+          </el-button>
         </el-form-item>
       </el-card>
       <el-card v-if="reactiveData.active === 4" shadow="hover">
         <el-divider content-position="left">{{ $t('device.edit.eventConfig') }}</el-divider>
-        <event-list :embedded="'device'" :profile-id="String(reactiveData.deviceFormData.profileId || '')"></event-list>
+        <el-alert
+          :closable="false"
+          :description="$t('device.edit.eventConfigTip')"
+          :title="$t('device.edit.eventConfig')"
+          type="success"
+        />
+        <div class="point-matrix-toolbar">
+          <div class="point-matrix-toolbar__filters">
+            <el-input
+              v-model="reactiveData.eventMatrixKeyword"
+              :placeholder="$t('device.edit.eventSearchPlaceholder')"
+              :prefix-icon="Search"
+              clearable
+              size="small"
+            />
+            <el-segmented
+              v-model="reactiveData.eventMatrixStatus"
+              :options="[
+                { label: $t('common.all'), value: '' },
+                { label: $t('device.edit.pointStatus.missing'), value: 'missing' },
+                { label: $t('device.edit.pointStatus.configured'), value: 'configured' },
+                { label: $t('device.edit.pointStatus.dirty'), value: 'dirty' },
+                { label: $t('device.edit.pointStatus.error'), value: 'error' },
+              ]"
+              size="small"
+            />
+          </div>
+          <div class="point-matrix-toolbar__actions">
+            <el-tag :type="eventDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
+              {{ $t('device.edit.changedCount', { count: eventDirtyCount }) }}
+            </el-tag>
+            <el-button :disabled="eventDirtyCount < 1" :icon="RefreshLeft" size="small" @click="eventInfoReset">
+              {{ $t('device.edit.discardChanges') }}
+            </el-button>
+            <el-button
+              :disabled="eventDirtyCount < 1"
+              :icon="Check"
+              :loading="reactiveData.eventSaving"
+              size="small"
+              type="primary"
+              @click="saveEventMatrix"
+            >
+              {{ $t('device.edit.saveAll') }}
+            </el-button>
+          </div>
+        </div>
+
+        <el-empty v-if="!hasEventAttributes" :description="$t('device.edit.eventAttributeEmpty')" />
+        <el-table
+          v-else
+          v-loading="reactiveData.loading"
+          :data="filteredEventInfoData"
+          :row-class-name="eventMatrixRowClassName"
+          border
+          class="point-matrix-table"
+          max-height="560"
+          size="small"
+          stripe
+        >
+          <el-table-column :label="$t('device.edit.eventName')" fixed min-width="220">
+            <template #default="{ row }">
+              <div class="point-matrix-point">
+                <div class="point-matrix-point__name">{{ row.eventName }}</div>
+                <div class="point-matrix-point__code">{{ row.eventCode || row.id }}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('device.edit.configStatus')" fixed min-width="120">
+            <template #default="{ row }">
+              <el-tag :type="eventRowStatusTag(row)" effect="plain" size="small">
+                {{ eventRowStatusLabel(row) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column v-for="attribute in reactiveData.eventAttributes" :key="attribute.id" min-width="220">
+            <template #header>
+              <div class="point-matrix-attribute-header">
+                <span>{{ attribute.attributeName }}</span>
+                <el-tag effect="plain" size="small">{{ attribute.attributeTypeFlag || 'STRING' }}</el-tag>
+              </div>
+            </template>
+            <template #default="{ row }">
+              <div
+                :class="[
+                  'point-matrix-cell',
+                  eventCellDirty(row, attribute) ? 'is-dirty' : '',
+                  eventCellError(row, attribute) ? 'is-error' : '',
+                ]"
+              >
+                <el-switch
+                  v-if="isBooleanAttribute(attribute)"
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  :active-value="true"
+                  :inactive-value="false"
+                  size="small"
+                  @change="markEventCellDirty(row, attribute)"
+                />
+                <el-input
+                  v-else-if="isNumberAttribute(attribute)"
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  inputmode="decimal"
+                  :placeholder="attributePlaceholder(attribute)"
+                  class="point-matrix-input"
+                  clearable
+                  size="small"
+                  @input="markEventCellDirty(row, attribute)"
+                />
+                <el-input
+                  v-else
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  :placeholder="attributePlaceholder(attribute)"
+                  clearable
+                  size="small"
+                  @input="markEventCellDirty(row, attribute)"
+                />
+                <div v-if="eventCellDirty(row, attribute) || attribute.defaultValue" class="point-matrix-cell__meta">
+                  <span v-if="eventCellDirty(row, attribute)" class="point-matrix-cell__dirty">
+                    {{ $t('device.edit.modified') }}
+                  </span>
+                  <span v-if="attribute.defaultValue" class="point-matrix-cell__default">
+                    {{ $t('device.edit.defaultValue', { value: attribute.defaultValue }) }}
+                  </span>
+                </div>
+                <div v-if="eventCellError(row, attribute)" class="point-matrix-cell__error">
+                  {{ eventCellError(row, attribute) }}
+                </div>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
         <el-form-item class="edit-form-button">
           <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+          <el-button :icon="Right" :loading="reactiveData.eventSaving" plain type="warning" @click="next">
+            {{ $t('common.next') }}
+          </el-button>
         </el-form-item>
       </el-card>
       <el-card v-if="reactiveData.active === 5" shadow="hover">

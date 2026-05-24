@@ -141,6 +141,24 @@ export interface PointInfoForm {
   [key: string]: unknown;
 }
 
+export interface CommandInfoForm {
+  id?: string;
+  deviceId?: string;
+  commandId?: string;
+  attributeId?: string;
+  configValue?: string;
+  [key: string]: unknown;
+}
+
+export interface EventInfoForm {
+  id?: string;
+  deviceId?: string;
+  eventId?: string;
+  attributeId?: string;
+  configValue?: string;
+  [key: string]: unknown;
+}
+
 // ─── Group / Label ──────────────────────────────────────────────────
 
 export interface GroupForm {

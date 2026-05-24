@@ -64,6 +64,7 @@ export interface EventHistory {
   eventTypeFlag?: number;
   eventLevelFlag?: number;
   paramValues?: Record<string, string>;
+  configSnapshot?: string;
   message?: string;
   occurTime?: string;
   receiveTime?: string;

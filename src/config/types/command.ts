@@ -68,6 +68,7 @@ export interface CommandHistory {
   errorCode?: string;
   errorMessage?: string;
   resultValues?: Record<string, string>;
+  configSnapshot?: string;
   source?: string;
   sourceUserId?: string;
   occurTime?: string;

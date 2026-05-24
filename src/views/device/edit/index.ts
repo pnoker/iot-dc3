@@ -23,26 +23,46 @@ import router from '@/config/router';
 
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
 import { getDeviceById, updateDevice } from '@/api/device';
-import { listDriverAttributeByDriverId, listPointAttributeByDriverId } from '@/api/attribute';
 import {
+  listCommandAttributeByDriverId,
+  listDriverAttributeByDriverId,
+  listEventAttributeByDriverId,
+  listPointAttributeByDriverId,
+} from '@/api/attribute';
+import {
+  addCommandInfo,
   addDriverInfo,
+  addEventInfo,
   addPointInfo,
+  listCommandInfoByDeviceId,
   listDriverInfoByDeviceId,
+  listEventInfoByDeviceId,
   listPointInfoByDeviceId,
+  updateCommandInfo,
   updateDriverInfo,
+  updateEventInfo,
   updatePointInfo,
 } from '@/api/info';
 
-import type { Attribute, Dictionary, PointInfoForm, PointRecord } from '@/config/types';
+import type {
+  Attribute,
+  CommandInfoForm,
+  CommandRecord,
+  Dictionary,
+  EventInfoForm,
+  EventRecord,
+  PointInfoForm,
+  PointRecord,
+} from '@/config/types';
 
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-import CommandList from '@/views/settings/command/CommandList.vue';
-import EventList from '@/views/settings/event/definition/EventList.vue';
 import { isNull } from '@/utils/validationUtil';
 import { failMessage, successMessage } from '@/utils/notificationUtil';
 import { getDriverById } from '@/api/driver';
 import { getProfileById } from '@/api/profile';
 import { listPointByDeviceId } from '@/api/point';
+import { listCommandByProfileId } from '@/api/command';
+import { listEventByProfileId } from '@/api/event';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
 
@@ -72,6 +92,27 @@ interface PointInfoMatrixRow {
   rwFlag?: string;
   enableFlag?: string;
   attributes: Record<string, PointAttributeCell>;
+}
+
+type CommandAttributeCell = PointAttributeCell;
+type EventAttributeCell = PointAttributeCell;
+
+interface CommandInfoMatrixRow {
+  id: string;
+  commandName: string;
+  commandCode?: string;
+  commandTypeFlag?: string | number;
+  callTypeFlag?: string | number;
+  attributes: Record<string, CommandAttributeCell>;
+}
+
+interface EventInfoMatrixRow {
+  id: string;
+  eventName: string;
+  eventCode?: string;
+  eventTypeFlag?: string | number;
+  eventLevelFlag?: string | number;
+  attributes: Record<string, EventAttributeCell>;
 }
 
 const INTEGER_ATTRIBUTE_TYPES = new Set(['BYTE', 'SHORT', 'INT', 'LONG']);
@@ -177,9 +218,7 @@ function activeStep(value: unknown): number {
 export default defineComponent({
   name: 'DeviceEdit',
   components: {
-    CommandList,
     EnableFlagSegmented,
-    EventList,
   },
   setup() {
     const route = useRoute();
@@ -216,6 +255,20 @@ export default defineComponent({
       pointMatrixKeyword: '',
       pointMatrixStatus: '' as PointMatrixStatus,
       pointSaving: false,
+      commandAttributes: [] as Attribute[],
+      commandAttributeTable: {} as Record<string, any>,
+      commandInfoData: [] as CommandInfoMatrixRow[],
+      oldCommandInfoData: [] as CommandInfoMatrixRow[],
+      commandMatrixKeyword: '',
+      commandMatrixStatus: '' as PointMatrixStatus,
+      commandSaving: false,
+      eventAttributes: [] as Attribute[],
+      eventAttributeTable: {} as Record<string, any>,
+      eventInfoData: [] as EventInfoMatrixRow[],
+      oldEventInfoData: [] as EventInfoMatrixRow[],
+      eventMatrixKeyword: '',
+      eventMatrixStatus: '' as PointMatrixStatus,
+      eventSaving: false,
       driverDictionary: [] as Dictionary[],
       driverLoading: false,
       profileDictionary: [] as Dictionary[],
@@ -250,9 +303,23 @@ export default defineComponent({
     });
 
     const hasPointAttributes = computed(() => reactiveData.pointAttributes.length > 0);
+    const hasCommandAttributes = computed(() => reactiveData.commandAttributes.length > 0);
+    const hasEventAttributes = computed(() => reactiveData.eventAttributes.length > 0);
 
     const pointDirtyCount = computed(() => {
       return reactiveData.pointInfoData.reduce((sum, row) => {
+        return sum + Object.values(row.attributes).filter((cell) => cell.dirty).length;
+      }, 0);
+    });
+
+    const commandDirtyCount = computed(() => {
+      return reactiveData.commandInfoData.reduce((sum, row) => {
+        return sum + Object.values(row.attributes).filter((cell) => cell.dirty).length;
+      }, 0);
+    });
+
+    const eventDirtyCount = computed(() => {
+      return reactiveData.eventInfoData.reduce((sum, row) => {
         return sum + Object.values(row.attributes).filter((cell) => cell.dirty).length;
       }, 0);
     });
@@ -274,6 +341,48 @@ export default defineComponent({
         if ('error' === status) return isPointRowError(row);
         if ('configured' === status) return isPointRowConfigured(row);
         if ('missing' === status) return !isPointRowConfigured(row);
+        return true;
+      });
+    });
+
+    const filteredCommandInfoData = computed(() => {
+      const keyword = reactiveData.commandMatrixKeyword.trim().toLowerCase();
+      return reactiveData.commandInfoData.filter((row) => {
+        const matchesKeyword =
+          !keyword ||
+          row.commandName.toLowerCase().includes(keyword) ||
+          String(row.commandCode || '')
+            .toLowerCase()
+            .includes(keyword);
+        if (!matchesKeyword) return false;
+
+        const status = reactiveData.commandMatrixStatus;
+        if (!status) return true;
+        if ('dirty' === status) return isCommandRowDirty(row);
+        if ('error' === status) return isCommandRowError(row);
+        if ('configured' === status) return isCommandRowConfigured(row);
+        if ('missing' === status) return !isCommandRowConfigured(row);
+        return true;
+      });
+    });
+
+    const filteredEventInfoData = computed(() => {
+      const keyword = reactiveData.eventMatrixKeyword.trim().toLowerCase();
+      return reactiveData.eventInfoData.filter((row) => {
+        const matchesKeyword =
+          !keyword ||
+          row.eventName.toLowerCase().includes(keyword) ||
+          String(row.eventCode || '')
+            .toLowerCase()
+            .includes(keyword);
+        if (!matchesKeyword) return false;
+
+        const status = reactiveData.eventMatrixStatus;
+        if (!status) return true;
+        if ('dirty' === status) return isEventRowDirty(row);
+        if ('error' === status) return isEventRowError(row);
+        if ('configured' === status) return isEventRowConfigured(row);
+        if ('missing' === status) return !isEventRowConfigured(row);
         return true;
       });
     });
@@ -410,6 +519,46 @@ export default defineComponent({
           reactiveData.oldPointInfoData = [];
           reactiveData.loading = false;
         });
+
+      listCommandAttributeByDriverId(driverId)
+        .then((res) => {
+          reactiveData.commandAttributes = res.data;
+          reactiveData.commandAttributeTable = reactiveData.commandAttributes.reduce(
+            (pre, cur) => {
+              pre[cur.id] = cur.attributeCode;
+              return pre;
+            },
+            {} as Record<string, any>
+          );
+
+          commandInfo();
+        })
+        .catch(() => {
+          reactiveData.commandAttributes = [];
+          reactiveData.commandAttributeTable = {};
+          reactiveData.commandInfoData = [];
+          reactiveData.oldCommandInfoData = [];
+        });
+
+      listEventAttributeByDriverId(driverId)
+        .then((res) => {
+          reactiveData.eventAttributes = res.data;
+          reactiveData.eventAttributeTable = reactiveData.eventAttributes.reduce(
+            (pre, cur) => {
+              pre[cur.id] = cur.attributeCode;
+              return pre;
+            },
+            {} as Record<string, any>
+          );
+
+          eventInfo();
+        })
+        .catch(() => {
+          reactiveData.eventAttributes = [];
+          reactiveData.eventAttributeTable = {};
+          reactiveData.eventInfoData = [];
+          reactiveData.oldEventInfoData = [];
+        });
     };
 
     const driverInfo = () => {
@@ -488,6 +637,128 @@ export default defineComponent({
         })
         .finally(() => {
           reactiveData.loading = false;
+        });
+    };
+
+    const commandInfo = () => {
+      const profileId = String(reactiveData.deviceFormData.profileId || '');
+      if (isNull(profileId)) {
+        reactiveData.commandInfoData = [];
+        reactiveData.oldCommandInfoData = [];
+        return;
+      }
+
+      listCommandByProfileId(profileId)
+        .then((res) => {
+          const rows: CommandInfoMatrixRow[] = (res.data || []).map((command: CommandRecord) => {
+            const attributes: Record<string, CommandAttributeCell> = {};
+
+            reactiveData.commandAttributes.forEach((attribute) => {
+              attributes[attribute.attributeCode] = createPointAttributeCell(attribute);
+            });
+
+            return {
+              id: command.id,
+              commandName: command.commandName || '',
+              commandCode: command.commandCode,
+              commandTypeFlag: command.commandTypeFlag,
+              callTypeFlag: command.callTypeFlag,
+              attributes,
+            };
+          });
+
+          const rowTable = rows.reduce(
+            (table, row) => {
+              table[row.id] = row;
+              return table;
+            },
+            {} as Record<string, CommandInfoMatrixRow>
+          );
+
+          return listCommandInfoByDeviceId(reactiveData.id)
+            .then((infoRes) => {
+              (infoRes.data || []).forEach(
+                (info: { commandId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                  const attributeCode = reactiveData.commandAttributeTable[info.attributeId];
+                  const attribute = reactiveData.commandAttributes.find((item) => item.attributeCode === attributeCode);
+                  const row = rowTable[String(info.commandId)];
+                  if (row && attribute) {
+                    row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id, info.configValue);
+                  }
+                }
+              );
+              reactiveData.commandInfoData = rows;
+              reactiveData.oldCommandInfoData = clone(rows);
+            })
+            .catch(() => {
+              reactiveData.commandInfoData = rows;
+              reactiveData.oldCommandInfoData = clone(rows);
+            });
+        })
+        .catch(() => {
+          reactiveData.commandInfoData = [];
+          reactiveData.oldCommandInfoData = [];
+        });
+    };
+
+    const eventInfo = () => {
+      const profileId = String(reactiveData.deviceFormData.profileId || '');
+      if (isNull(profileId)) {
+        reactiveData.eventInfoData = [];
+        reactiveData.oldEventInfoData = [];
+        return;
+      }
+
+      listEventByProfileId(profileId)
+        .then((res) => {
+          const rows: EventInfoMatrixRow[] = (res.data || []).map((event: EventRecord) => {
+            const attributes: Record<string, EventAttributeCell> = {};
+
+            reactiveData.eventAttributes.forEach((attribute) => {
+              attributes[attribute.attributeCode] = createPointAttributeCell(attribute);
+            });
+
+            return {
+              id: event.id,
+              eventName: event.eventName || '',
+              eventCode: event.eventCode,
+              eventTypeFlag: event.eventTypeFlag,
+              eventLevelFlag: event.eventLevelFlag,
+              attributes,
+            };
+          });
+
+          const rowTable = rows.reduce(
+            (table, row) => {
+              table[row.id] = row;
+              return table;
+            },
+            {} as Record<string, EventInfoMatrixRow>
+          );
+
+          return listEventInfoByDeviceId(reactiveData.id)
+            .then((infoRes) => {
+              (infoRes.data || []).forEach(
+                (info: { eventId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                  const attributeCode = reactiveData.eventAttributeTable[info.attributeId];
+                  const attribute = reactiveData.eventAttributes.find((item) => item.attributeCode === attributeCode);
+                  const row = rowTable[String(info.eventId)];
+                  if (row && attribute) {
+                    row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id, info.configValue);
+                  }
+                }
+              );
+              reactiveData.eventInfoData = rows;
+              reactiveData.oldEventInfoData = clone(rows);
+            })
+            .catch(() => {
+              reactiveData.eventInfoData = rows;
+              reactiveData.oldEventInfoData = clone(rows);
+            });
+        })
+        .catch(() => {
+          reactiveData.eventInfoData = [];
+          reactiveData.oldEventInfoData = [];
         });
     };
 
@@ -651,6 +922,228 @@ export default defineComponent({
       return true;
     };
 
+    const commandCell = (row: CommandInfoMatrixRow, attribute: Attribute): CommandAttributeCell => {
+      if (!row.attributes[attribute.attributeCode]) {
+        row.attributes[attribute.attributeCode] = createPointAttributeCell(attribute);
+      }
+      return row.attributes[attribute.attributeCode] as CommandAttributeCell;
+    };
+
+    const markCommandCellDirty = (row: CommandInfoMatrixRow, attribute: Attribute) => {
+      const cell = commandCell(row, attribute);
+      cell.dirty = serializeAttributeValue(cell.configValue) !== serializeAttributeValue(cell.originalValue);
+      cell.error = '';
+    };
+
+    const commandCellDirty = (row: CommandInfoMatrixRow, attribute: Attribute): boolean => {
+      return commandCell(row, attribute).dirty;
+    };
+
+    const commandCellError = (row: CommandInfoMatrixRow, attribute: Attribute): string => {
+      return commandCell(row, attribute).error;
+    };
+
+    const isCommandRowDirty = (row: CommandInfoMatrixRow): boolean => {
+      return Object.values(row.attributes).some((cell) => cell.dirty);
+    };
+
+    const isCommandRowError = (row: CommandInfoMatrixRow): boolean => {
+      return Object.values(row.attributes).some((cell) => !isNull(cell.error));
+    };
+
+    const isCommandRowConfigured = (row: CommandInfoMatrixRow): boolean => {
+      if (reactiveData.commandAttributes.length < 1) return false;
+      return reactiveData.commandAttributes.every((attribute) =>
+        hasConfigValue(commandCell(row, attribute).configValue)
+      );
+    };
+
+    const commandRowStatus = (row: CommandInfoMatrixRow): PointMatrixStatus => {
+      if (isCommandRowError(row)) return 'error';
+      if (isCommandRowDirty(row)) return 'dirty';
+      if (isCommandRowConfigured(row)) return 'configured';
+      return 'missing';
+    };
+
+    const commandRowStatusLabel = (row: CommandInfoMatrixRow): string => {
+      return t(`device.edit.pointStatus.${commandRowStatus(row)}`);
+    };
+
+    const commandRowStatusTag = (row: CommandInfoMatrixRow) => {
+      const status = commandRowStatus(row);
+      if ('configured' === status) return 'success';
+      if ('dirty' === status) return 'warning';
+      if ('error' === status) return 'danger';
+      return 'info';
+    };
+
+    const commandMatrixRowClassName = ({ row }: { row: CommandInfoMatrixRow }) => {
+      return isCommandRowDirty(row) ? 'point-matrix-row-dirty' : '';
+    };
+
+    const saveCommandMatrix = async (): Promise<boolean> => {
+      const dirtyCells = reactiveData.commandInfoData.flatMap((row) =>
+        reactiveData.commandAttributes
+          .map((attribute) => ({ row, cell: commandCell(row, attribute) }))
+          .filter(({ cell }) => cell.dirty)
+      );
+      if (dirtyCells.length < 1) {
+        return true;
+      }
+
+      reactiveData.commandSaving = true;
+      let failedCount = 0;
+      await Promise.all(
+        dirtyCells.map(async ({ row, cell }) => {
+          cell.saving = true;
+          cell.error = '';
+
+          const payload: CommandInfoForm = {
+            id: cell.id || undefined,
+            attributeId: cell.attributeId,
+            deviceId: reactiveData.id,
+            commandId: row.id,
+            configValue: serializeAttributeValue(cell.configValue),
+          };
+
+          try {
+            const res = cell.id ? await updateCommandInfo(payload) : await addCommandInfo(payload);
+            cell.id = String(res?.data?.id || cell.id || '');
+            cell.originalValue = cell.configValue;
+            cell.dirty = false;
+          } catch (error) {
+            failedCount++;
+            cell.error = t('device.edit.commandSaveCellFailed');
+            if ('dev' === import.meta.env.MODE) {
+              console.error(error);
+            }
+          } finally {
+            cell.saving = false;
+          }
+        })
+      );
+      reactiveData.commandSaving = false;
+
+      if (failedCount > 0) {
+        failMessage(t('device.edit.commandSaveFailed', { count: failedCount }));
+        return false;
+      }
+
+      reactiveData.oldCommandInfoData = clone(reactiveData.commandInfoData);
+      successMessage(t('device.edit.commandSaveSuccess', { count: dirtyCells.length }));
+      return true;
+    };
+
+    const eventCell = (row: EventInfoMatrixRow, attribute: Attribute): EventAttributeCell => {
+      if (!row.attributes[attribute.attributeCode]) {
+        row.attributes[attribute.attributeCode] = createPointAttributeCell(attribute);
+      }
+      return row.attributes[attribute.attributeCode] as EventAttributeCell;
+    };
+
+    const markEventCellDirty = (row: EventInfoMatrixRow, attribute: Attribute) => {
+      const cell = eventCell(row, attribute);
+      cell.dirty = serializeAttributeValue(cell.configValue) !== serializeAttributeValue(cell.originalValue);
+      cell.error = '';
+    };
+
+    const eventCellDirty = (row: EventInfoMatrixRow, attribute: Attribute): boolean => {
+      return eventCell(row, attribute).dirty;
+    };
+
+    const eventCellError = (row: EventInfoMatrixRow, attribute: Attribute): string => {
+      return eventCell(row, attribute).error;
+    };
+
+    const isEventRowDirty = (row: EventInfoMatrixRow): boolean => {
+      return Object.values(row.attributes).some((cell) => cell.dirty);
+    };
+
+    const isEventRowError = (row: EventInfoMatrixRow): boolean => {
+      return Object.values(row.attributes).some((cell) => !isNull(cell.error));
+    };
+
+    const isEventRowConfigured = (row: EventInfoMatrixRow): boolean => {
+      if (reactiveData.eventAttributes.length < 1) return false;
+      return reactiveData.eventAttributes.every((attribute) => hasConfigValue(eventCell(row, attribute).configValue));
+    };
+
+    const eventRowStatus = (row: EventInfoMatrixRow): PointMatrixStatus => {
+      if (isEventRowError(row)) return 'error';
+      if (isEventRowDirty(row)) return 'dirty';
+      if (isEventRowConfigured(row)) return 'configured';
+      return 'missing';
+    };
+
+    const eventRowStatusLabel = (row: EventInfoMatrixRow): string => {
+      return t(`device.edit.pointStatus.${eventRowStatus(row)}`);
+    };
+
+    const eventRowStatusTag = (row: EventInfoMatrixRow) => {
+      const status = eventRowStatus(row);
+      if ('configured' === status) return 'success';
+      if ('dirty' === status) return 'warning';
+      if ('error' === status) return 'danger';
+      return 'info';
+    };
+
+    const eventMatrixRowClassName = ({ row }: { row: EventInfoMatrixRow }) => {
+      return isEventRowDirty(row) ? 'point-matrix-row-dirty' : '';
+    };
+
+    const saveEventMatrix = async (): Promise<boolean> => {
+      const dirtyCells = reactiveData.eventInfoData.flatMap((row) =>
+        reactiveData.eventAttributes
+          .map((attribute) => ({ row, cell: eventCell(row, attribute) }))
+          .filter(({ cell }) => cell.dirty)
+      );
+      if (dirtyCells.length < 1) {
+        return true;
+      }
+
+      reactiveData.eventSaving = true;
+      let failedCount = 0;
+      await Promise.all(
+        dirtyCells.map(async ({ row, cell }) => {
+          cell.saving = true;
+          cell.error = '';
+
+          const payload: EventInfoForm = {
+            id: cell.id || undefined,
+            attributeId: cell.attributeId,
+            deviceId: reactiveData.id,
+            eventId: row.id,
+            configValue: serializeAttributeValue(cell.configValue),
+          };
+
+          try {
+            const res = cell.id ? await updateEventInfo(payload) : await addEventInfo(payload);
+            cell.id = String(res?.data?.id || cell.id || '');
+            cell.originalValue = cell.configValue;
+            cell.dirty = false;
+          } catch (error) {
+            failedCount++;
+            cell.error = t('device.edit.eventSaveCellFailed');
+            if ('dev' === import.meta.env.MODE) {
+              console.error(error);
+            }
+          } finally {
+            cell.saving = false;
+          }
+        })
+      );
+      reactiveData.eventSaving = false;
+
+      if (failedCount > 0) {
+        failMessage(t('device.edit.eventSaveFailed', { count: failedCount }));
+        return false;
+      }
+
+      reactiveData.oldEventInfoData = clone(reactiveData.eventInfoData);
+      successMessage(t('device.edit.eventSaveSuccess', { count: dirtyCells.length }));
+      return true;
+    };
+
     const pre = () => {
       let step = 1;
       if (reactiveData.active === 2 && reactiveData.driverAttributes?.length < 1) {
@@ -675,6 +1168,18 @@ export default defineComponent({
       }
       if (reactiveData.active === 2) {
         const ok = await savePointMatrix();
+        if (!ok) {
+          return;
+        }
+      }
+      if (reactiveData.active === 3) {
+        const ok = await saveCommandMatrix();
+        if (!ok) {
+          return;
+        }
+      }
+      if (reactiveData.active === 4) {
+        const ok = await saveEventMatrix();
         if (!ok) {
           return;
         }
@@ -706,6 +1211,19 @@ export default defineComponent({
       reactiveData.pointInfoData = clone(reactiveData.oldPointInfoData);
     };
 
+    const commandInfoReset = () => {
+      reactiveData.commandInfoData = clone(reactiveData.oldCommandInfoData);
+    };
+
+    const eventInfoReset = () => {
+      reactiveData.eventInfoData = clone(reactiveData.oldEventInfoData);
+    };
+
+    const changeProfile = () => {
+      commandInfo();
+      eventInfo();
+    };
+
     const changeActive = (step: number) => {
       const query = route.query;
       router.push({ query: { ...query, active: step } }).catch(() => {
@@ -732,6 +1250,10 @@ export default defineComponent({
           reactiveData.oldDriverFormData = {};
           reactiveData.pointInfoData = [];
           reactiveData.oldPointInfoData = [];
+          reactiveData.commandInfoData = [];
+          reactiveData.oldCommandInfoData = [];
+          reactiveData.eventInfoData = [];
+          reactiveData.oldEventInfoData = [];
           device();
         }
       }
@@ -745,28 +1267,51 @@ export default defineComponent({
       deviceFormRule,
       reactiveData,
       hasPointAttributes,
+      hasCommandAttributes,
+      hasEventAttributes,
       hasDriverAttributes,
       filteredPointInfoData,
+      filteredCommandInfoData,
+      filteredEventInfoData,
       pointDirtyCount,
+      commandDirtyCount,
+      eventDirtyCount,
       driverDictionary,
       driverDictionaryVisible,
       profileDictionary,
       profileDictionaryVisible,
+      changeProfile,
       changeAttribute,
       driverUpdate,
       savePointMatrix,
+      saveCommandMatrix,
+      saveEventMatrix,
       markPointCellDirty,
+      markCommandCellDirty,
+      markEventCellDirty,
       pointCellDirty,
+      commandCellDirty,
+      eventCellDirty,
       pointCellError,
+      commandCellError,
+      eventCellError,
       pointRowStatusLabel,
+      commandRowStatusLabel,
+      eventRowStatusLabel,
       pointRowStatusTag,
+      commandRowStatusTag,
+      eventRowStatusTag,
       pointMatrixRowClassName,
+      commandMatrixRowClassName,
+      eventMatrixRowClassName,
       pre,
       next,
       done,
       deviceReset,
       driverInfoReset,
       pointInfoReset,
+      commandInfoReset,
+      eventInfoReset,
       changeActive,
       attributeFormItem,
       attributePlaceholder,
