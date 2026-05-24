@@ -79,8 +79,9 @@
 
   const formRef = ref<FormInstance>();
 
-  const createEmptyForm = () => ({
+  const createEmptyForm = (profileId = '') => ({
     id: '' as string,
+    profileId,
     commandName: '',
     commandCode: '',
     commandTypeFlag: 'CUSTOM' as string,
@@ -104,15 +105,16 @@
   };
 
   const reset = () => {
-    reactiveData.form = reactiveData.mode === 'edit' ? { ...reactiveData.originalForm } : createEmptyForm();
+    reactiveData.form = { ...reactiveData.originalForm };
     reactiveData.submitting = false;
     formRef.value?.clearValidate();
   };
 
-  const show = () => {
+  const show = (profileId = '') => {
     reactiveData.mode = 'add';
-    reactiveData.originalForm = createEmptyForm();
-    reactiveData.form = createEmptyForm();
+    const emptyForm = createEmptyForm(profileId);
+    reactiveData.originalForm = { ...emptyForm };
+    reactiveData.form = { ...emptyForm };
     reactiveData.visible = true;
   };
 
@@ -122,6 +124,7 @@
     const initial = {
       ...emptyForm,
       ...row,
+      profileId: String(row.profileId ?? emptyForm.profileId),
       commandTypeFlag: String(row.commandTypeFlag ?? emptyForm.commandTypeFlag),
       callTypeFlag: String(row.callTypeFlag ?? emptyForm.callTypeFlag),
       enableFlag: String(row.enableFlag ?? emptyForm.enableFlag),

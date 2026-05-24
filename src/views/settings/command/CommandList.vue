@@ -17,89 +17,129 @@
 <template>
   <div>
     <command-tool
+      :editable="canManage"
+      :next="next"
       :page="reactiveData.page"
+      :pre="pre"
       @add="openAdd"
       @refresh="refresh"
       @reset="reset"
       @search="search"
       @sort="sort"
+      @pre-handle="preHandle"
+      @next-handle="nextHandle"
       @size-change="sizeChange"
       @current-change="currentChange"
     />
 
     <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="$t('common.name')" min-width="160" prop="commandName" />
-        <el-table-column label="Code" min-width="150" prop="commandCode" show-overflow-tooltip />
-        <el-table-column label="Type" prop="commandTypeFlag" width="110" />
-        <el-table-column label="Call Type" prop="callTypeFlag" width="110" />
-        <el-table-column label="Timeout (ms)" prop="timeout" width="120" />
-        <el-table-column :label="$t('common.enable')" width="90">
-          <template #default="{ row }">
-            <el-tag :type="String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0 ? 'success' : 'info'">
-              {{
-                String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0
-                  ? $t('common.enable')
-                  : $t('common.disable')
-              }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('common.remark')" min-width="180" prop="remark" show-overflow-tooltip />
-        <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165" />
-        <el-table-column :label="$t('common.operation')" fixed="right" width="180">
-          <template #default="{ row }">
-            <el-button link type="primary" @click="openDetail(row)">{{ $t('common.detail') }}</el-button>
-            <el-button link type="primary" @click="openEdit(row)">{{ $t('common.edit') }}</el-button>
-            <el-popconfirm
-              :cancel-button-text="$t('common.cancel')"
-              :confirm-button-text="$t('common.confirm')"
-              :title="$t('common.confirm') + ' ' + $t('common.delete') + '?'"
-              @confirm="remove(row.id)"
-            >
-              <template #reference>
-                <el-button link type="danger">{{ $t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="$t('common.description')" />
-        </template>
-      </el-table>
+      <el-row>
+        <el-col v-for="data in 12" :key="data" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
+          <skeleton-card :footer="canManage" :loading="reactiveData.loading"></skeleton-card>
+        </el-col>
+        <el-col v-if="hasData">
+          <el-empty :description="$t('command.empty')" />
+        </el-col>
+        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
+          <command-card
+            :data="data"
+            :embedded="embedded !== '' && embedded !== 'edit'"
+            @delete-thing="remove"
+            @detail-thing="openDetail"
+            @disable-thing="disableThing"
+            @edit-thing="openEdit"
+            @enable-thing="enableThing"
+          ></command-card>
+        </el-col>
+      </el-row>
     </blank-card>
 
     <command-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
+
+    <el-drawer v-model="reactiveData.detailVisible" title="Command Detail" size="520px">
+      <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
+        <el-descriptions-item :label="$t('common.name')">{{
+          reactiveData.detailRecord.commandName || '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="Code">{{ reactiveData.detailRecord.commandCode || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="Command Type">{{
+          reactiveData.detailRecord.commandTypeFlag || '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="Call Type">{{
+          reactiveData.detailRecord.callTypeFlag || '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="Timeout (ms)">{{ reactiveData.detailRecord.timeout ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('common.enableFlag')">
+          <el-tag
+            :type="
+              String(reactiveData.detailRecord.enableFlag) === 'ENABLE' ||
+              Number(reactiveData.detailRecord.enableFlag) === 0
+                ? 'success'
+                : 'info'
+            "
+          >
+            {{
+              String(reactiveData.detailRecord.enableFlag) === 'ENABLE' ||
+              Number(reactiveData.detailRecord.enableFlag) === 0
+                ? $t('common.enable')
+                : $t('common.disable')
+            }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('common.remark')">{{
+          reactiveData.detailRecord.remark || '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="Profile ID">{{ reactiveData.detailRecord.profileId || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="Tenant ID">{{ reactiveData.detailRecord.tenantId || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="Create Time">{{
+          formatTime(reactiveData.detailRecord.createTime)
+        }}</el-descriptions-item>
+        <el-descriptions-item label="Operate Time">{{
+          formatTime(reactiveData.detailRecord.operateTime)
+        }}</el-descriptions-item>
+      </el-descriptions>
+      <el-empty v-else :description="$t('common.description')" />
+    </el-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { computed, reactive, ref, watch } from 'vue';
   import { addCommand, deleteCommand, listCommand, updateCommand } from '@/api/command';
-  import { timestampColumn } from '@/utils/dateUtil';
+  import { timestamp } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
   import { isNull } from '@/utils/validationUtil';
   import type { CommandForm, CommandRecord, Order } from '@/config/types';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
+  import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+  import CommandCard from './card/CommandCard.vue';
   import CommandTool from './tool/CommandTool.vue';
   import CommandEditForm from './edit/CommandEditForm.vue';
 
   const props = withDefaults(
     defineProps<{
       embedded?: string;
+      pre?: boolean;
+      next?: boolean;
       profileId?: string;
     }>(),
-    { embedded: '', profileId: '' }
+    { embedded: '', pre: false, next: false, profileId: '' }
   );
 
-  const router = useRouter();
+  const emit = defineEmits<{
+    (e: 'pre-handle'): void;
+    (e: 'next-handle'): void;
+  }>();
 
   const editRef = ref<InstanceType<typeof CommandEditForm>>();
+  const canManage = computed(() => props.embedded === '' || props.embedded === 'edit');
+  const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
 
   const reactiveData = reactive({
     loading: false,
     listData: [] as CommandRecord[],
+    detailVisible: false,
+    detailRecord: null as CommandRecord | null,
     query: {} as Record<string, unknown>,
     order: false,
     page: {
@@ -115,6 +155,13 @@
     if (!isNull(props.profileId)) q.profileId = props.profileId;
     return q;
   };
+
+  const withFixedProfile = (form: CommandForm) => {
+    const profileId = !isNull(props.profileId) ? props.profileId : form.profileId;
+    return isNull(profileId) ? { ...form } : { ...form, profileId };
+  };
+
+  const formatTime = (value: unknown) => (isNull(value) ? '-' : timestamp(String(value)));
 
   const load = () => {
     reactiveData.loading = true;
@@ -150,14 +197,15 @@
     load();
   };
 
-  const openAdd = () => editRef.value?.show();
+  const openAdd = () => editRef.value?.show(props.profileId);
   const openDetail = (row: CommandRecord) => {
-    router.push({ name: 'settingsCommandDefinitionDetail', query: { id: String(row.id) } }).catch(() => {});
+    reactiveData.detailRecord = row;
+    reactiveData.detailVisible = true;
   };
   const openEdit = (row: CommandRecord) => editRef.value?.showEdit(row);
 
   const onAdd = (form: CommandForm, done: () => void) => {
-    addCommand(form).then(() => {
+    addCommand(withFixedProfile(form)).then(() => {
       successMessage();
       load();
       done();
@@ -165,17 +213,35 @@
   };
 
   const onUpdate = (form: CommandForm, done: () => void) => {
-    updateCommand(form).then(() => {
+    updateCommand(withFixedProfile(form)).then(() => {
       successMessage();
       load();
       done();
     });
   };
 
-  const remove = (id: string) => {
-    deleteCommand(id).then(() => {
-      successMessage();
+  const disableThing = (id: string, profileId: string, done: () => void) => {
+    updateCommand({ id, profileId, enableFlag: 'DISABLE' }).then(() => {
       load();
+      done();
+    });
+  };
+
+  const enableThing = (id: string, profileId: string, done: () => void) => {
+    updateCommand({ id, profileId, enableFlag: 'ENABLE' }).then(() => {
+      load();
+      done();
+    });
+  };
+
+  const remove = (id: string, done?: () => void) => {
+    deleteCommand(id).then(() => {
+      load();
+      if (done) {
+        done();
+      } else {
+        successMessage();
+      }
     });
   };
 
@@ -189,12 +255,25 @@
     load();
   };
 
+  const preHandle = () => {
+    emit('pre-handle');
+  };
+
+  const nextHandle = () => {
+    emit('next-handle');
+  };
+
+  watch(
+    () => props.profileId,
+    () => {
+      reset();
+    }
+  );
+
+  defineExpose({
+    reactiveData,
+    refresh,
+  });
+
   load();
 </script>
-
-<style lang="scss" scoped>
-  .settings-table {
-    margin-top: 1px;
-    border-radius: 4px;
-  }
-</style>

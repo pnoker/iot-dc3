@@ -207,11 +207,14 @@
       }
 
       .tool-card-body-button {
-        align-self: flex-end;
+        width: 100%;
+        align-self: center;
         margin: 0;
 
         :deep(.el-form-item__content) {
           display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
           gap: 8px;
         }
       }

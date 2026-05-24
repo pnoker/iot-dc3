@@ -20,7 +20,6 @@ import { useRoute } from 'vue-router';
 import router from '@/config/router';
 
 import { listDeviceStatusByDriverId } from '@/api/device';
-import { listProfileByIds } from '@/api/profile';
 import { listDriverByIds } from '@/api/driver';
 import { getPointById, listDeviceByPointId } from '@/api/point';
 
@@ -46,7 +45,6 @@ export default defineComponent({
       id: route.query.id as string,
       active: (route.query.active as string) || 'detail',
       driverTable: {} as Record<string, any>,
-      profileTable: {} as Record<string, any>,
       statusTable: {} as Record<string, any>,
       data: {} as any,
       listDeviceData: [] as any[],
@@ -92,27 +90,6 @@ export default defineComponent({
           } else {
             reactiveData.driverTable = {};
             reactiveData.statusTable = {};
-          }
-
-          // profile
-          const profileIds = Array.from(
-            new Set(
-              reactiveData.listDeviceData.reduce<string[]>((pre, cur) => {
-                pre.push(...(cur.profileIds || []));
-                return pre;
-              }, [])
-            )
-          ).filter(Boolean);
-          if (profileIds.length > 0) {
-            listProfileByIds(profileIds)
-              .then((res) => {
-                reactiveData.profileTable = res.data;
-              })
-              .catch(() => {
-                // nothing to do
-              });
-          } else {
-            reactiveData.profileTable = {};
           }
         })
         .catch(() => {

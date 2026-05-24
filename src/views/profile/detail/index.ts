@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, ref } from 'vue';
+import { computed, defineComponent, reactive, ref, watch } from 'vue';
 
 import router from '@/config/router';
 import { useRoute } from 'vue-router';
@@ -75,6 +75,14 @@ export default defineComponent({
       return deviceViewRef.value?.reactiveData?.page?.total || 0;
     });
 
+    const commandLength = computed(() => {
+      return commandViewRef.value?.reactiveData?.page?.total || 0;
+    });
+
+    const eventLength = computed(() => {
+      return eventViewRef.value?.reactiveData?.page?.total || 0;
+    });
+
     const profile = () => {
       getProfileById(reactiveData.id).then((res) => {
         reactiveData.data = res.data;
@@ -82,6 +90,7 @@ export default defineComponent({
     };
 
     const changeActive = (tab: any) => {
+      reactiveData.active = tab.props.name;
       const query = route.query;
       router.push({ query: { ...query, active: tab.props.name } });
       switch (tab.props.name) {
@@ -102,6 +111,18 @@ export default defineComponent({
       }
     };
 
+    watch(
+      () => [route.query.id, route.query.active],
+      ([id, active]) => {
+        const nextId = id as string;
+        if (nextId && nextId !== reactiveData.id) {
+          reactiveData.id = nextId;
+          profile();
+        }
+        reactiveData.active = (active as string) || 'detail';
+      }
+    );
+
     profile();
 
     return {
@@ -112,6 +133,8 @@ export default defineComponent({
       reactiveData,
       pointLength,
       deviceLength,
+      commandLength,
+      eventLength,
       changeActive,
       timestamp,
     };

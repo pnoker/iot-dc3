@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, ref, unref } from 'vue';
+import { computed, defineComponent, reactive, ref, unref, watch } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Check, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
 
@@ -38,9 +38,11 @@ import type { Attribute, Dictionary } from '@/config/types';
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue';
+import CommandList from '@/views/settings/command/CommandList.vue';
+import EventList from '@/views/settings/event/definition/EventList.vue';
 import { isNull } from '@/utils/validationUtil';
 import { getDriverById } from '@/api/driver';
-import { listProfileByIds } from '@/api/profile';
+import { getProfileById } from '@/api/profile';
 import { listPointByDeviceId } from '@/api/point';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
@@ -129,10 +131,20 @@ function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
 }
 
+function activeStep(value: unknown): number {
+  const step = Number(value ?? 0);
+  if (!Number.isFinite(step)) {
+    return 0;
+  }
+  return Math.min(Math.max(Math.trunc(step), 0), 5);
+}
+
 export default defineComponent({
   name: 'DeviceEdit',
   components: {
+    CommandList,
     EnableFlagSegmented,
+    EventList,
     skeletonCard,
     pointInfoCard,
   },
@@ -157,7 +169,7 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
-      active: +(route.query.active || 0),
+      active: activeStep(route.query.active),
       loading: true,
       oldDeviceFormData: {} as Record<string, any>,
       deviceFormData: {} as any,
@@ -186,10 +198,10 @@ export default defineComponent({
           trigger: 'change',
         },
       ],
-      profileIds: [
+      profileId: [
         {
           required: true,
-          message: () => t('device.add.profileRequired'),
+          message: () => t('device.edit.profileRequired'),
           trigger: 'change',
         },
       ],
@@ -270,17 +282,16 @@ export default defineComponent({
             } as Dictionary);
           });
 
-          listProfileByIds(reactiveData.deviceFormData.profileIds).then((res) => {
-            const profiles = res.data;
-            for (const key in profiles) {
-              const profile = profiles[key];
-              if (!profile) continue;
+          if (reactiveData.deviceFormData.profileId) {
+            getProfileById(String(reactiveData.deviceFormData.profileId)).then((res) => {
+              const profile = res.data;
+              if (!profile) return;
               reactiveData.profileDictionary.push({
                 label: profile.profileName,
                 value: profile.id,
               } as Dictionary);
-            }
-          });
+            });
+          }
 
           changeAttribute(reactiveData.deviceFormData.driverId);
         })
@@ -568,6 +579,31 @@ export default defineComponent({
         // nothing to do
       });
     };
+
+    watch(
+      () => [route.query.id, route.query.active],
+      ([id, active]) => {
+        const nextId = id as string;
+        const nextActive = activeStep(active);
+
+        if (reactiveData.active !== nextActive) {
+          reactiveData.active = nextActive;
+        }
+
+        if (nextId && nextId !== reactiveData.id) {
+          reactiveData.id = nextId;
+          reactiveData.loading = true;
+          reactiveData.deviceFormData = {};
+          reactiveData.oldDeviceFormData = {};
+          reactiveData.driverFormData = {};
+          reactiveData.oldDriverFormData = {};
+          reactiveData.pointFormData = {};
+          reactiveData.oldPointFormData = {};
+          reactiveData.pointInfoData = [];
+          device();
+        }
+      }
+    );
 
     device();
 

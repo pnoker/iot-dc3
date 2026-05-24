@@ -73,7 +73,7 @@ const deleteCases: DeleteCase[] = [
       deviceName: n,
       deviceCode: n,
       driverId: deps.driverId,
-      profileIds: [deps.profileId],
+      profileId: deps.profileId,
       enableFlag: 'ENABLE',
       remark: 'e2e destructive',
     }),

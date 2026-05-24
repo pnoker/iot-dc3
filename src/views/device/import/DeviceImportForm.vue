@@ -56,11 +56,10 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('device.add.profiles')" prop="profileIds">
+      <el-form-item :label="$t('device.add.profile')" prop="profileId">
         <el-select
-          v-model="reactiveData.formData.profileIds"
+          v-model="reactiveData.formData.profileId"
           :loading="reactiveData.profileLoading"
-          :multiple="true"
           :placeholder="$t('device.add.profilePlaceholder')"
           :remote-method="profileDictionary"
           clearable
@@ -129,7 +128,7 @@
 
   interface DeviceImportFormData {
     driverId: string;
-    profileIds: string[];
+    profileId: string;
     file?: UploadRawFile;
   }
 
@@ -147,7 +146,7 @@
   const reactiveData = reactive({
     formData: {
       driverId: '',
-      profileIds: [],
+      profileId: '',
     } as DeviceImportFormData,
     formVisible: false,
     formLoading: false,
@@ -165,7 +164,7 @@
         trigger: 'change',
       },
     ],
-    profileIds: [
+    profileId: [
       {
         required: true,
         message: () => t('device.add.profileRequired'),

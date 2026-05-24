@@ -92,7 +92,7 @@ export async function ensureE2eData(page, routeIds) {
         deviceName: suffix,
         deviceCode: suffix,
         driverId,
-        profileIds: [profileId],
+        profileId,
         enableFlag: 'ENABLE',
         remark: 'created by e2e route fixture',
       },

@@ -46,18 +46,14 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsModel: 'nav.settingsModel',
   settingsAgentic: 'nav.settingsAgentic',
   settingsAgenticProvider: 'nav.settingsAgenticProvider',
-  // settingsEvent is both the Event group and the Overview route. The route
-  // title is the leaf label; the group title is supplied by eventParent below.
-  settingsEvent: 'nav.settingsEventOverview',
+  settingsEvent: 'nav.settingsEvent',
   settingsEventOverview: 'nav.settingsEventOverview',
   settingsDeviceEvent: 'nav.settingsDeviceEvent',
   settingsDriverEvent: 'nav.settingsDriverEvent',
   settingsPointEvent: 'nav.settingsPointEvent',
   settingsCommand: 'nav.settingsCommand',
-  settingsCommandDefinition: 'nav.settingsCommandDefinition',
-  settingsCommandHistory: 'nav.settingsCommandHistory',
-  settingsEventDefinition: 'nav.settingsEventDefinition',
-  settingsEventHistory: 'nav.settingsEventHistory',
+  settingsCommandRecord: 'nav.settingsCommandRecord',
+  settingsEventReport: 'nav.settingsEventReport',
   settingsAbout: 'nav.settingsAbout',
   settingsUserDetail: 'nav.settingsUserDetail',
   settingsRoleDetail: 'nav.settingsRoleDetail',
@@ -103,10 +99,8 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsDriverEvent: 'Promotion',
   settingsPointEvent: 'TrendCharts',
   settingsCommand: 'Operation',
-  settingsCommandDefinition: 'Operation',
-  settingsCommandHistory: 'Document',
-  settingsEventDefinition: 'Warning',
-  settingsEventHistory: 'Document',
+  settingsCommandRecord: 'Document',
+  settingsEventReport: 'Document',
   settingsAbout: 'InfoFilled',
   settingsUserDetail: 'User',
   settingsRoleDetail: 'UserFilled',
@@ -146,16 +140,11 @@ export const SETTINGS_EVENT_CHILDREN: SettingsNavNode[] = [
   { name: 'settingsDriverEvent', titleKey: 'nav.settingsDriverEvent', icon: 'Promotion' },
   { name: 'settingsDeviceEvent', titleKey: 'nav.settingsDeviceEvent', icon: 'Management' },
   { name: 'settingsPointEvent', titleKey: 'nav.settingsPointEvent', icon: 'TrendCharts' },
+  { name: 'settingsEventReport', titleKey: 'nav.settingsEventReport', icon: 'Document' },
 ];
 
 export const SETTINGS_COMMAND_CHILDREN: SettingsNavNode[] = [
-  { name: 'settingsCommandDefinition', titleKey: 'nav.settingsCommandDefinition', icon: 'Operation' },
-  { name: 'settingsCommandHistory', titleKey: 'nav.settingsCommandHistory', icon: 'Document' },
-];
-
-export const SETTINGS_EVENT_DEFINITION_CHILDREN: SettingsNavNode[] = [
-  { name: 'settingsEventDefinition', titleKey: 'nav.settingsEventDefinition', icon: 'Warning' },
-  { name: 'settingsEventHistory', titleKey: 'nav.settingsEventHistory', icon: 'Document' },
+  { name: 'settingsCommandRecord', titleKey: 'nav.settingsCommandRecord', icon: 'Document' },
 ];
 
 export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
@@ -170,16 +159,10 @@ export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
   { name: 'settingsModel', titleKey: 'nav.settingsModel', icon: 'Cpu', children: SETTINGS_MODEL_CHILDREN },
   { name: 'settingsEvent', titleKey: 'nav.settingsEvent', icon: 'Bell', children: SETTINGS_EVENT_CHILDREN },
   {
-    name: 'settingsCommandGroup',
+    name: 'settingsCommand',
     titleKey: 'nav.settingsCommand',
     icon: 'Operation',
     children: SETTINGS_COMMAND_CHILDREN,
-  },
-  {
-    name: 'settingsEventDefGroup',
-    titleKey: 'nav.settingsEventDefinition',
-    icon: 'Warning',
-    children: SETTINGS_EVENT_DEFINITION_CHILDREN,
   },
 ];
 
@@ -195,17 +178,15 @@ export const SETTINGS_ACTIVE_ALIAS: Record<string, string> = {
   settingsAlarmBindDetail: 'settingsAlarmBind',
   settingsAlarmStateDetail: 'settingsAlarmState',
   settingsAlarmHistoryDetail: 'settingsAlarmHistory',
-  settingsEvent: 'settingsEventOverview',
-  settingsCommandGroup: 'settingsCommandDefinition',
-  settingsEventDefGroup: 'settingsEventDefinition',
+  settingsCommand: 'settingsCommandRecord',
   settingsGroupDetail: 'settingsGroup',
   settingsLabelDetail: 'settingsLabel',
 };
 
 export const SETTINGS_ROUTE_ALIAS: Record<string, string> = {
-  settingsEventOverview: 'settingsEvent',
   settingsAlarm: 'settingsAlarmRule',
   settingsModel: 'settingsAgentic',
+  settingsCommand: 'settingsCommandRecord',
 };
 
 export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
@@ -222,10 +203,8 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   settingsDeviceEvent: 'settingsEvent',
   settingsDriverEvent: 'settingsEvent',
   settingsPointEvent: 'settingsEvent',
-  settingsCommandDefinition: 'settingsCommandGroup',
-  settingsCommandHistory: 'settingsCommandGroup',
-  settingsEventDefinition: 'settingsEventDefGroup',
-  settingsEventHistory: 'settingsEventDefGroup',
+  settingsCommandRecord: 'settingsCommand',
+  settingsEventReport: 'settingsEvent',
 };
 
 export const getSettingsRouteName = (name: string): string => SETTINGS_ROUTE_ALIAS[name] || name;
@@ -239,19 +218,12 @@ export const getSettingsDefaultOpeneds = (activeName: string): string[] => {
 
 export const getSettingsTitleKey = (name: string): string | undefined => SETTINGS_TITLE_KEYS[name];
 
-export const getSettingsLeafIconCode = (name: string): string =>
-  name === 'settingsEvent' ? 'settingsEventOverview' : name;
+export const getSettingsLeafIconCode = (name: string): string => name;
 
 const commandParent: SettingsBreadcrumbParent = {
-  path: '/settings/command',
+  path: '/settings/command/record',
   titleKey: 'nav.settingsCommand',
-  code: 'settingsCommandGroup',
-};
-
-const eventDefParent: SettingsBreadcrumbParent = {
-  path: '/settings/event-def',
-  titleKey: 'nav.settingsEventDefinition',
-  code: 'settingsEventDefGroup',
+  code: 'settingsCommand',
 };
 
 const alarmParent: SettingsBreadcrumbParent = {
@@ -325,28 +297,10 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
     modelParent,
     { path: '/settings/agentic/provider', titleKey: 'nav.settingsAgenticProvider', code: 'settingsAgenticProvider' },
   ],
-  settingsEvent: [eventParent],
+  settingsEventOverview: [eventParent],
   settingsDeviceEvent: [eventParent],
   settingsDriverEvent: [eventParent],
   settingsPointEvent: [eventParent],
-  settingsCommandDefinition: [commandParent],
-  settingsCommandHistory: [commandParent],
-  settingsCommandDefinitionDetail: [
-    commandParent,
-    {
-      path: '/settings/command/definition',
-      titleKey: 'nav.settingsCommandDefinition',
-      code: 'settingsCommandDefinition',
-    },
-  ],
-  settingsEventDefinition: [eventDefParent],
-  settingsEventHistory: [eventDefParent],
-  settingsEventDefinitionDetail: [
-    eventDefParent,
-    {
-      path: '/settings/event-def/definition',
-      titleKey: 'nav.settingsEventDefinition',
-      code: 'settingsEventDefinition',
-    },
-  ],
+  settingsCommandRecord: [commandParent],
+  settingsEventReport: [eventParent],
 };

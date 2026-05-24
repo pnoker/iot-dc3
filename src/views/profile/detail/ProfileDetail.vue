@@ -27,6 +27,12 @@
               <el-descriptions-item :label="$t('profile.detail.pointCount')"
                 >{{ pointLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
               >
+              <el-descriptions-item :label="$t('profile.detail.commandCount')"
+                >{{ commandLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
+              >
+              <el-descriptions-item :label="$t('profile.detail.eventCount')"
+                >{{ eventLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
+              >
               <el-descriptions-item :label="$t('profile.detail.deviceCount')"
                 >{{ deviceLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
               >
@@ -42,14 +48,14 @@
         <el-tab-pane :label="$t('profile.detail.relatedPoints')" name="point">
           <point ref="pointViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></point>
         </el-tab-pane>
-        <el-tab-pane :label="$t('profile.detail.relatedDevices')" name="device">
-          <device ref="deviceViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></device>
-        </el-tab-pane>
-        <el-tab-pane label="Commands" name="command">
+        <el-tab-pane :label="$t('profile.detail.relatedCommands')" name="command">
           <command-list ref="commandViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></command-list>
         </el-tab-pane>
-        <el-tab-pane label="Events" name="event">
+        <el-tab-pane :label="$t('profile.detail.relatedEvents')" name="event">
           <event-list ref="eventViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></event-list>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('profile.detail.relatedDevices')" name="device">
+          <device ref="deviceViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></device>
         </el-tab-pane>
       </el-tabs>
     </base-card>

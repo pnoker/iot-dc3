@@ -22,6 +22,8 @@
           <el-step :title="$t('device.edit.deviceConfig')"></el-step>
           <el-step :title="$t('device.edit.driverConfig')"></el-step>
           <el-step :title="$t('device.edit.pointConfig')"></el-step>
+          <el-step :title="$t('device.edit.commandConfig')"></el-step>
+          <el-step :title="$t('device.edit.eventConfig')"></el-step>
           <el-step :title="$t('device.edit.complete')"></el-step>
         </el-steps>
       </el-card>
@@ -62,12 +64,11 @@
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
             <enable-flag-segmented v-model="reactiveData.deviceFormData.enableFlag" />
           </el-form-item>
-          <el-form-item :label="$t('device.edit.profiles')" prop="profileIds">
+          <el-form-item :label="$t('device.edit.profile')" prop="profileId">
             <el-select
-              v-model="reactiveData.deviceFormData.profileIds"
+              v-model="reactiveData.deviceFormData.profileId"
               :loading="reactiveData.profileLoading"
-              :multiple="true"
-              :placeholder="$t('device.edit.driverPlaceholder')"
+              :placeholder="$t('device.edit.profilePlaceholder')"
               :remote-method="profileDictionary"
               clearable
               filterable
@@ -233,6 +234,25 @@
         </el-row>
       </el-card>
       <el-card v-if="reactiveData.active === 3" shadow="hover">
+        <el-divider content-position="left">{{ $t('device.edit.commandConfig') }}</el-divider>
+        <command-list
+          :embedded="'device'"
+          :profile-id="String(reactiveData.deviceFormData.profileId || '')"
+        ></command-list>
+        <el-form-item class="edit-form-button">
+          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+        </el-form-item>
+      </el-card>
+      <el-card v-if="reactiveData.active === 4" shadow="hover">
+        <el-divider content-position="left">{{ $t('device.edit.eventConfig') }}</el-divider>
+        <event-list :embedded="'device'" :profile-id="String(reactiveData.deviceFormData.profileId || '')"></event-list>
+        <el-form-item class="edit-form-button">
+          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+        </el-form-item>
+      </el-card>
+      <el-card v-if="reactiveData.active === 5" shadow="hover">
         <el-divider content-position="left">{{ $t('device.edit.complete') }}</el-divider>
         <el-result
           :sub-title="$t('device.edit.completeSubTitle')"

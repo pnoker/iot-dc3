@@ -26,11 +26,21 @@
     @current-change="$emit('current-change', $event)"
   >
     <template #filters>
-      <el-form-item :label="$t('common.name')" prop="commandName">
-        <el-input v-model="formData.commandName" :placeholder="$t('common.name')" class="edit-form-default" clearable />
+      <el-form-item :label="$t('command.tool.commandName')" prop="commandName">
+        <el-input
+          v-model="formData.commandName"
+          :placeholder="$t('command.tool.commandNamePlaceholder')"
+          class="edit-form-default"
+          clearable
+        />
       </el-form-item>
-      <el-form-item label="Code" prop="commandCode">
-        <el-input v-model="formData.commandCode" class="edit-form-default" clearable placeholder="Code" />
+      <el-form-item :label="$t('command.card.code')" prop="commandCode">
+        <el-input
+          v-model="formData.commandCode"
+          :placeholder="$t('command.card.code')"
+          class="edit-form-default"
+          clearable
+        />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
         <el-segmented
@@ -43,8 +53,18 @@
         />
       </el-form-item>
     </template>
+    <template v-if="pre || next" #buttons="{ search, reset }">
+      <el-button v-if="pre" :icon="Back" plain type="success" @click="$emit('pre-handle')">
+        {{ $t('common.previous') }}
+      </el-button>
+      <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
+      <el-button :icon="RefreshLeft" @click="reset">{{ $t('common.reset') }}</el-button>
+      <el-button v-if="next" :icon="Check" plain type="warning" @click="$emit('next-handle')">
+        {{ $t('common.next') }}
+      </el-button>
+    </template>
     <template #actions>
-      <el-button :icon="Plus" type="success" @click="$emit('add')">
+      <el-button v-if="editable" :icon="Plus" type="success" @click="$emit('add')">
         {{ $t('common.add') }}
       </el-button>
     </template>
@@ -53,15 +73,28 @@
 
 <script lang="ts" setup>
   import { reactive } from 'vue';
-  import { Plus } from '@element-plus/icons-vue';
+  import { Back, Check, Plus, RefreshLeft, Search } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
     page: { type: Object, required: true },
+    editable: { type: Boolean, default: true },
+    pre: { type: Boolean, default: false },
+    next: { type: Boolean, default: false },
   });
 
-  const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'add', 'size-change', 'current-change']);
+  const emit = defineEmits([
+    'search',
+    'reset',
+    'refresh',
+    'sort',
+    'add',
+    'size-change',
+    'current-change',
+    'pre-handle',
+    'next-handle',
+  ]);
 
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
 

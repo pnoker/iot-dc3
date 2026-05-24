@@ -71,13 +71,13 @@
         />
       </el-form-item>
     </template>
-    <template #buttons="{ search, reset }">
+    <template v-if="pre || next" #buttons="{ search, reset }">
       <el-button v-if="pre" :icon="Back" plain type="success" @click="$emit('pre-handle')">
         {{ $t('common.previous') }}
       </el-button>
       <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
       <el-button :icon="RefreshLeft" @click="reset">{{ $t('common.reset') }}</el-button>
-      <el-button v-if="pre" :icon="Check" plain type="warning" @click="$emit('next-handle')">
+      <el-button v-if="next" :icon="Check" plain type="warning" @click="$emit('next-handle')">
         {{ $t('common.next') }}
       </el-button>
     </template>

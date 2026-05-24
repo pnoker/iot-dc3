@@ -66,7 +66,7 @@
     });
 
   const jumpTo = (tab: 'sla' | 'availability') => {
-    router.push({ name: 'settingsEvent', query: { tab } }).catch(() => {});
+    router.push({ name: 'settingsEventOverview', query: { tab } }).catch(() => {});
   };
 
   onMounted(load);

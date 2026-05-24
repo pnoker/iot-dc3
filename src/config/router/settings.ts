@@ -143,9 +143,9 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/agentic/ProviderSettings.vue'),
         },
         {
-          name: 'settingsEvent',
+          name: 'settingsEventOverview',
           path: 'event',
-          meta: { title: 'Events' },
+          meta: { title: 'Event Overview' },
           component: () => import('@/views/settings/event/Overview.vue'),
         },
         {
@@ -167,28 +167,16 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/event/PointEvent.vue'),
         },
         {
-          name: 'settingsCommandDefinition',
-          path: 'command/definition',
-          meta: { title: 'Command Definitions' },
-          component: () => import('@/views/settings/command/CommandList.vue'),
-        },
-        {
-          name: 'settingsCommandHistory',
-          path: 'command/history',
-          meta: { title: 'Command Histories' },
+          name: 'settingsCommandRecord',
+          path: 'command/record',
+          meta: { title: 'Command Record' },
           component: () => import('@/views/settings/command/CommandHistory.vue'),
         },
         {
-          name: 'settingsEventDefinition',
-          path: 'event-def/definition',
-          meta: { title: 'Event Definitions' },
-          component: () => import('@/views/settings/event/definition/EventList.vue'),
-        },
-        {
-          name: 'settingsEventHistory',
-          path: 'event-def/history',
-          meta: { title: 'Event Histories' },
-          component: () => import('@/views/settings/event/definition/EventHistory.vue'),
+          name: 'settingsEventReport',
+          path: 'event/report',
+          meta: { title: 'Event Report' },
+          component: () => import('@/views/settings/event/EventHistory.vue'),
         },
         {
           name: 'settingsAbout',

@@ -76,8 +76,9 @@
 
   const formRef = ref<FormInstance>();
 
-  const createEmptyForm = () => ({
+  const createEmptyForm = (profileId = '') => ({
     id: '' as string,
+    profileId,
     eventName: '',
     eventCode: '',
     eventTypeFlag: 'INFO' as string,
@@ -100,15 +101,16 @@
   };
 
   const reset = () => {
-    reactiveData.form = reactiveData.mode === 'edit' ? { ...reactiveData.originalForm } : createEmptyForm();
+    reactiveData.form = { ...reactiveData.originalForm };
     reactiveData.submitting = false;
     formRef.value?.clearValidate();
   };
 
-  const show = () => {
+  const show = (profileId = '') => {
     reactiveData.mode = 'add';
-    reactiveData.originalForm = createEmptyForm();
-    reactiveData.form = createEmptyForm();
+    const emptyForm = createEmptyForm(profileId);
+    reactiveData.originalForm = { ...emptyForm };
+    reactiveData.form = { ...emptyForm };
     reactiveData.visible = true;
   };
 
@@ -118,6 +120,7 @@
     const initial = {
       ...emptyForm,
       ...row,
+      profileId: String(row.profileId ?? emptyForm.profileId),
       eventTypeFlag: String(row.eventTypeFlag ?? emptyForm.eventTypeFlag),
       eventLevelFlag: String(row.eventLevelFlag ?? emptyForm.eventLevelFlag),
       enableFlag: String(row.enableFlag ?? emptyForm.enableFlag),

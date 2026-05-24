@@ -219,7 +219,7 @@ export function buildDestructiveDeleteCases(routeIds) {
         deviceName: name,
         deviceCode: name,
         driverId: routeIds.driverId,
-        profileIds: [routeIds.profileId],
+        profileId: routeIds.profileId,
         enableFlag: 'ENABLE',
         remark: 'codex e2e delete',
       }),

@@ -177,7 +177,8 @@
     settingsModel: 'nav.settingsModel',
     settingsAgentic: 'nav.settingsAgentic',
     settingsAgenticProvider: 'nav.settingsAgenticProvider',
-    settingsEvent: 'nav.settingsEventOverview',
+    settingsEvent: 'nav.settingsEvent',
+    settingsEventOverview: 'nav.settingsEventOverview',
     settingsDeviceEvent: 'nav.settingsDeviceEvent',
     settingsDriverEvent: 'nav.settingsDriverEvent',
     settingsPointEvent: 'nav.settingsPointEvent',
@@ -198,12 +199,9 @@
     settingsAlarmHistoryDetail: 'nav.settingsAlarmHistoryDetail',
     settingsAgenticDetail: 'nav.settingsAgenticDetail',
     settingsAgenticProviderDetail: 'nav.settingsAgenticProviderDetail',
-    settingsCommandDefinition: 'nav.settingsCommandDefinition',
-    settingsCommandHistory: 'nav.settingsCommandHistory',
-    settingsEventDefinition: 'nav.settingsEventDefinition',
-    settingsEventHistory: 'nav.settingsEventHistory',
-    settingsCommandDefinitionDetail: 'nav.settingsCommandDefinitionDetail',
-    settingsEventDefinitionDetail: 'nav.settingsEventDefinitionDetail',
+    settingsCommand: 'nav.settingsCommand',
+    settingsCommandRecord: 'nav.settingsCommandRecord',
+    settingsEventReport: 'nav.settingsEventReport',
   };
 
   // Static icon fallback for route names the backend menu tree does not yet
@@ -264,12 +262,9 @@
     settingsAlarmHistoryDetail: 'DocumentChecked',
     settingsAgenticDetail: 'ChatDotRound',
     settingsAgenticProviderDetail: 'ChatLineSquare',
-    settingsCommandDefinition: 'Operation',
-    settingsCommandHistory: 'Document',
-    settingsEventDefinition: 'Warning',
-    settingsEventHistory: 'Document',
-    settingsCommandDefinitionDetail: 'Operation',
-    settingsEventDefinitionDetail: 'Warning',
+    settingsCommand: 'Operation',
+    settingsCommandRecord: 'Document',
+    settingsEventReport: 'Document',
   };
 
   const iconForCode = (code: string): string | undefined => {

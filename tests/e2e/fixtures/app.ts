@@ -421,7 +421,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
           deviceName: suffix,
           deviceCode: suffix,
           driverId,
-          profileIds: [profileId],
+          profileId,
           enableFlag: 'ENABLE',
           remark: 'created by e2e route fixture',
         },

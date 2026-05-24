@@ -259,36 +259,6 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: '/settings/command',
-    component: Layout,
-    children: [
-      {
-        name: 'settingsCommandDefinitionDetail',
-        path: '/settings/command/definition/detail',
-        meta: {
-          icon: 'el-icon-operation',
-          title: 'Command Definition Detail',
-        },
-        component: () => import('@/views/settings/command/detail/CommandDetail.vue'),
-      },
-    ],
-  },
-  {
-    path: '/settings/event-def',
-    component: Layout,
-    children: [
-      {
-        name: 'settingsEventDefinitionDetail',
-        path: '/settings/event-def/definition/detail',
-        meta: {
-          icon: 'el-icon-warning',
-          title: 'Event Definition Detail',
-        },
-        component: () => import('@/views/settings/event/definition/EventDetail.vue'),
-      },
-    ],
-  },
-  {
     path: '/settings/resource',
     component: Layout,
     children: [

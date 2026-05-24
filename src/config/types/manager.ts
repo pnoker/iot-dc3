@@ -31,7 +31,7 @@ export interface DeviceForm {
   deviceName?: string;
   deviceCode?: string;
   driverId?: string;
-  profileIds?: string[];
+  profileId?: string;
   deviceExt?: DeviceExt;
   enableFlag?: string;
   signature?: string;

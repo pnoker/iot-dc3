@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from 'vue';
+import { defineComponent, reactive, ref, unref, watch } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
@@ -27,9 +27,19 @@ import { getProfileById, updateProfile } from '@/api/profile';
 
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import point from '@/views/point/Point.vue';
+import CommandList from '@/views/settings/command/CommandList.vue';
+import EventList from '@/views/settings/event/definition/EventList.vue';
+
+function activeStep(value: unknown): number {
+  const step = Number(value ?? 0);
+  if (!Number.isFinite(step)) {
+    return 0;
+  }
+  return Math.min(Math.max(Math.trunc(step), 0), 4);
+}
 
 export default defineComponent({
-  components: { EnableFlagSegmented, point },
+  components: { EnableFlagSegmented, point, CommandList, EventList },
   setup() {
     const route = useRoute();
     const { t } = useI18n();
@@ -48,7 +58,7 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id,
-      active: +(route.query.active || 0),
+      active: activeStep(route.query.active),
       oldProfileFormData: {},
       profileFormData: {} as any,
     });
@@ -67,8 +77,7 @@ export default defineComponent({
     });
 
     const profile = () => {
-      const id = route.query.id as string;
-      getProfileById(id).then((res) => {
+      getProfileById(reactiveData.id as string).then((res) => {
         reactiveData.profileFormData = res.data;
         reactiveData.oldProfileFormData = { ...res.data };
       });
@@ -121,6 +130,25 @@ export default defineComponent({
       const query = route.query;
       router.push({ query: { ...query, active: step } });
     };
+
+    watch(
+      () => [route.query.id, route.query.active],
+      ([id, active]) => {
+        const nextId = id as string;
+        const nextActive = activeStep(active);
+
+        if (reactiveData.active !== nextActive) {
+          reactiveData.active = nextActive;
+        }
+
+        if (nextId && nextId !== reactiveData.id) {
+          reactiveData.id = nextId;
+          reactiveData.profileFormData = {};
+          reactiveData.oldProfileFormData = {};
+          profile();
+        }
+      }
+    );
 
     profile();
 

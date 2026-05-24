@@ -53,11 +53,10 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('device.add.profiles')" prop="profileIds">
+      <el-form-item :label="$t('device.add.profile')" prop="profileId">
         <el-select
-          v-model="reactiveData.formData.profileIds"
+          v-model="reactiveData.formData.profileId"
           :loading="reactiveData.profileLoading"
-          :multiple="true"
           :placeholder="$t('device.add.profilePlaceholder')"
           :remote-method="profileDictionary"
           clearable
@@ -109,7 +108,7 @@
   interface DeviceAddFormData {
     deviceName: string;
     driverId: string;
-    profileIds: string[];
+    profileId: string;
     remark: string;
   }
 
@@ -130,7 +129,7 @@
     formData: {
       deviceName: '',
       driverId: '',
-      profileIds: [],
+      profileId: '',
       remark: '',
     } as DeviceAddFormData,
     formVisible: false,
@@ -146,6 +145,13 @@
       {
         required: true,
         message: () => t('device.add.driverRequired'),
+        trigger: 'change',
+      },
+    ],
+    profileId: [
+      {
+        required: true,
+        message: () => t('device.add.profileRequired'),
         trigger: 'change',
       },
     ],
@@ -215,18 +221,11 @@
 
     try {
       await form.validate();
-      emit(
-        'add-thing',
-        {
-          ...reactiveData.formData,
-          profileIds: [...reactiveData.formData.profileIds],
-        },
-        () => {
-          cancel();
-          reset();
-          successMessage();
-        }
-      );
+      emit('add-thing', { ...reactiveData.formData }, () => {
+        cancel();
+        reset();
+        successMessage();
+      });
     } catch {
       // validation errors are displayed by Element Plus
     }
