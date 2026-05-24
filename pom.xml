@@ -32,12 +32,9 @@
     <inceptionYear>2016</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IoT DC3 is a fully open-source distributed Internet of Things (IoT) platform built on Spring Cloud.
-        It accelerates IoT project development and simplifies IoT device management, providing comprehensive solutions
-        for building robust IoT systems.
-        It is AI-ready, enabling seamless integration of AI capabilities for intelligent device connectivity,
-        automation, and data-driven operations.
-        All components and code are open-source, ensuring transparency, flexibility, and community-driven innovation.
+        IoT DC3 is a fully open-source, AI-ready distributed IoT platform.
+        It connects devices, collects data organized for AI, and orchestrates the closed loop —
+        turning intelligence into action, not just insight.
     </description>
 
     <developers>

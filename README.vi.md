@@ -13,10 +13,8 @@
 </a>
 <br>
 <strong>
-IoT DC3 là nền tảng Internet vạn vật (IoT) phân tán, hoàn toàn mã nguồn mở, được xây dựng trên Spring Cloud.
-Nền tảng giúp tăng tốc triển khai giải pháp IoT, đơn giản hóa quản lý toàn bộ vòng đời thiết bị và cung cấp kiến trúc toàn diện cho hệ thống IoT bền vững, sẵn sàng vận hành thực tế.
-IoT DC3 cũng AI-Ready, cho phép tích hợp liền mạch kết nối thông minh, tự động hóa và vận hành dựa trên dữ liệu.
-Toàn bộ thành phần và mã nguồn đều mở, đảm bảo tính minh bạch, linh hoạt và đổi mới do cộng đồng thúc đẩy.
+IoT DC3 là nền tảng IoT phân tán, hoàn toàn mã nguồn mở và AI-Ready.
+Nó kết nối thiết bị, thu thập dữ liệu được tổ chức cho AI, và điều phối vòng lặp khép kín — biến trí tuệ thành hành động, không chỉ là phân tích.
 </strong>
 </p>
 
