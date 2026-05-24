@@ -1,15 +1,19 @@
 {
-  "name": "iot-dc3-docs",
-  "version": "0.0.0",
+  "name": "iot-dc3",
   "private": true,
-  "description": "VitePress documentation site for IoT DC3",
+  "description": "IoT DC3 is a fully open-source distributed Internet of Things (IoT) platform built on Spring Cloud.",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pnoker/iot-dc3"
+  },
   "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
   },
   "devDependencies": {
     "vitepress": "^1.6.4"
   },
-  "packageManager": "pnpm@11.1.3"
+  "packageManager": "pnpm@11.2.2"
 }
