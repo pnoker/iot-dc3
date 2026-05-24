@@ -79,8 +79,7 @@
   import { timestampColumn } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
   import { isNull } from '@/utils/validationUtil';
-  import type { Order } from '@/config/types';
-  import type { EventRecord, EventForm } from '@/config/types';
+  import type { EventForm, EventRecord, Order } from '@/config/types';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import EventTool from './tool/EventTool.vue';
   import EventEditForm from './edit/EventEditForm.vue';

@@ -28,7 +28,7 @@
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
       <el-form-item :label="$t('settings.agentic.providerName')" prop="name">
-        <el-input v-model="form.name" clearable :placeholder="$t('settings.agentic.providerNamePlaceholder')" />
+        <el-input v-model="form.name" :placeholder="$t('settings.agentic.providerNamePlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.providerType')" prop="providerType">
         <el-select
@@ -40,13 +40,13 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.baseUrl')" prop="baseUrl">
-        <el-input v-model="form.baseUrl" clearable :placeholder="$t('settings.agentic.baseUrlPlaceholder')" />
+        <el-input v-model="form.baseUrl" :placeholder="$t('settings.agentic.baseUrlPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.apiKey')" prop="apiKey">
         <el-input
           v-model="form.apiKey"
-          clearable
           :placeholder="$t('settings.agentic.apiKeyPlaceholder')"
+          clearable
           show-password
           type="password"
         />
@@ -55,8 +55,8 @@
         <el-switch
           v-model="form.defaultFlag"
           :active-text="$t('common.yes')"
-          active-value="DEFAULT"
           :inactive-text="$t('common.no')"
+          active-value="DEFAULT"
           inactive-value="NOT_DEFAULT"
         />
       </el-form-item>

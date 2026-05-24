@@ -17,7 +17,7 @@
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 import type { PageQuery, PageResult } from '@/config/types';
-import type { CommandRecord, CommandHistory } from '@/config/types/command';
+import type { CommandHistory, CommandRecord } from '@/config/types/command';
 
 const endpoints = {
   command: `${API_MANAGER_BASE}/command`,

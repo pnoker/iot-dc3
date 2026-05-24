@@ -46,11 +46,13 @@ level of the application.
 
 1. Pick the right layer (`tests/{unit,component,views,api,e2e}`).
 2. Copy the matching template from `tests/_templates/`:
-   - `store.test.template.ts` for Pinia stores
-   - `composable.test.template.ts` for `src/composables/*`
-   - `component.test.template.ts` for `src/components/*` (and views)
-   - `api.test.template.ts` for new API wrappers (which actually means
-     extending `tests/api/api-contracts.test.ts`)
+
+- `store.test.template.ts` for Pinia stores
+- `composable.test.template.ts` for `src/composables/*`
+- `component.test.template.ts` for `src/components/*` (and views)
+- `api.test.template.ts` for new API wrappers (which actually means
+  extending `tests/api/api-contracts.test.ts`)
+
 3. Reuse fixtures from `tests/fixtures/` when the data shape already exists
    there — don't inline a duplicate `sampleMenuTree` / credentials block.
 4. Reuse stubs from `tests/setup/stubs/element-plus.ts` for any Element

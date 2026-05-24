@@ -27,13 +27,13 @@
     >
       <template #filters>
         <el-form-item label="Device ID" prop="deviceId">
-          <el-input v-model="formData.deviceId" placeholder="Device ID" class="edit-form-default" clearable />
+          <el-input v-model="formData.deviceId" class="edit-form-default" clearable placeholder="Device ID" />
         </el-form-item>
         <el-form-item label="Command Code" prop="commandCode">
-          <el-input v-model="formData.commandCode" placeholder="Command Code" class="edit-form-default" clearable />
+          <el-input v-model="formData.commandCode" class="edit-form-default" clearable placeholder="Command Code" />
         </el-form-item>
         <el-form-item label="Status" prop="status">
-          <el-input v-model="formData.status" placeholder="Status" class="edit-form-default" clearable />
+          <el-input v-model="formData.status" class="edit-form-default" clearable placeholder="Status" />
         </el-form-item>
       </template>
     </tool-card>
@@ -43,7 +43,7 @@
         <el-table-column label="Record ID" min-width="180" prop="recordId" show-overflow-tooltip />
         <el-table-column label="Device ID" min-width="160" prop="deviceId" show-overflow-tooltip />
         <el-table-column label="Command Code" min-width="140" prop="commandCode" />
-        <el-table-column label="Status" width="100" prop="status" />
+        <el-table-column label="Status" prop="status" width="100" />
         <el-table-column label="Error" min-width="180" prop="errorMessage" show-overflow-tooltip />
         <el-table-column :formatter="timestampColumn" label="Occur Time" prop="occurTime" width="165" />
         <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165" />
@@ -58,9 +58,9 @@
       </el-table>
     </blank-card>
 
-    <el-dialog v-model="detailVisible" :append-to-body="true" title="Record Detail" width="700px" draggable>
+    <el-dialog v-model="detailVisible" :append-to-body="true" draggable title="Record Detail" width="700px">
       <el-descriptions v-if="detailRow" :column="2" border>
-        <el-descriptions-item label="Record ID" :span="2">{{ detailRow.recordId }}</el-descriptions-item>
+        <el-descriptions-item :span="2" label="Record ID">{{ detailRow.recordId }}</el-descriptions-item>
         <el-descriptions-item label="Device ID">{{ detailRow.deviceId }}</el-descriptions-item>
         <el-descriptions-item label="Command ID">{{ detailRow.commandId }}</el-descriptions-item>
         <el-descriptions-item label="Command Code">{{ detailRow.commandCode }}</el-descriptions-item>
@@ -69,10 +69,10 @@
         <el-descriptions-item label="Error Message">{{ detailRow.errorMessage || '-' }}</el-descriptions-item>
         <el-descriptions-item label="Source">{{ detailRow.source || '-' }}</el-descriptions-item>
         <el-descriptions-item label="Source User ID">{{ detailRow.sourceUserId || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Param Values" :span="2">{{
+        <el-descriptions-item :span="2" label="Param Values">{{
           JSON.stringify(detailRow.paramValues) || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="Result Values" :span="2">{{
+        <el-descriptions-item :span="2" label="Result Values">{{
           JSON.stringify(detailRow.resultValues) || '-'
         }}</el-descriptions-item>
         <el-descriptions-item :formatter="timestampColumn" label="Occur Time">{{
@@ -102,8 +102,7 @@
   import { reactive, ref } from 'vue';
   import { getCommandHistoryById, listCommandHistory } from '@/api/command';
   import { timestampColumn } from '@/utils/dateUtil';
-  import type { Order } from '@/config/types';
-  import type { CommandHistory } from '@/config/types';
+  import type { CommandHistory, Order } from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';

@@ -28,10 +28,10 @@
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
       <el-form-item :label="$t('settings.agentic.model')" prop="model">
-        <el-input v-model="form.model" clearable :placeholder="$t('settings.agentic.modelPlaceholder')" />
+        <el-input v-model="form.model" :placeholder="$t('settings.agentic.modelPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.label')" prop="label">
-        <el-input v-model="form.label" clearable :placeholder="$t('settings.agentic.labelPlaceholder')" />
+        <el-input v-model="form.label" :placeholder="$t('settings.agentic.labelPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.provider')" prop="providerId">
         <el-select
@@ -60,8 +60,8 @@
         <el-switch
           v-model="form.defaultFlag"
           :active-text="$t('common.yes')"
-          active-value="DEFAULT"
           :inactive-text="$t('common.no')"
+          active-value="DEFAULT"
           inactive-value="NOT_DEFAULT"
         />
       </el-form-item>

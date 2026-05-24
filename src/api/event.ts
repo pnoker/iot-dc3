@@ -17,7 +17,7 @@
 import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 import type { PageQuery, PageResult } from '@/config/types';
-import type { EventRecord, EventHistory } from '@/config/types/event';
+import type { EventHistory, EventRecord } from '@/config/types/event';
 
 const endpoints = {
   event: `${API_MANAGER_BASE}/event`,

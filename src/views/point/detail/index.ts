@@ -22,7 +22,7 @@ import router from '@/config/router';
 import { listDeviceStatusByDriverId } from '@/api/device';
 import { listProfileByIds } from '@/api/profile';
 import { listDriverByIds } from '@/api/driver';
-import { listDeviceByPointId, getPointById } from '@/api/point';
+import { getPointById, listDeviceByPointId } from '@/api/point';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';

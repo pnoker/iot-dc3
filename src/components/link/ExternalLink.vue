@@ -15,7 +15,7 @@
   -->
 
 <template>
-  <el-link :href="href" rel="noopener noreferrer" target="_blank" :type="type">
+  <el-link :href="href" :type="type" rel="noopener noreferrer" target="_blank">
     <slot>{{ href }}</slot>
   </el-link>
 </template>

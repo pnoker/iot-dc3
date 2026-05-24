@@ -27,13 +27,13 @@
   >
     <template #filters>
       <el-form-item :label="$t('settings.agentic.model')" prop="model">
-        <el-input v-model="formData.model" clearable :placeholder="$t('settings.agentic.modelPlaceholder')" />
+        <el-input v-model="formData.model" :placeholder="$t('settings.agentic.modelPlaceholder')" clearable />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.provider')" prop="providerId">
         <el-select
           v-model="formData.providerId"
-          clearable
           :placeholder="$t('settings.agentic.providerAllPlaceholder')"
+          clearable
           style="width: 100%"
         >
           <el-option v-for="p in providers" :key="p.id" :label="p.name" :value="p.id!" />

@@ -80,8 +80,7 @@
   import { timestampColumn } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
   import { isNull } from '@/utils/validationUtil';
-  import type { Order } from '@/config/types';
-  import type { CommandRecord, CommandForm } from '@/config/types';
+  import type { CommandForm, CommandRecord, Order } from '@/config/types';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import CommandTool from './tool/CommandTool.vue';
   import CommandEditForm from './edit/CommandEditForm.vue';

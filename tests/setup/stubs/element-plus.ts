@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, h, type ComponentOptions } from 'vue';
+import { type ComponentOptions, defineComponent, h } from 'vue';
 import { vi } from 'vitest';
 
 /**

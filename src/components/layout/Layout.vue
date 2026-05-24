@@ -116,10 +116,10 @@
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
   import {
-    SETTINGS_BREADCRUMB_PARENTS,
-    SETTINGS_FALLBACK_ICON,
     getSettingsLeafIconCode,
     getSettingsTitleKey,
+    SETTINGS_BREADCRUMB_PARENTS,
+    SETTINGS_FALLBACK_ICON,
   } from '@/config/settingsNav';
   import { useAuthStore, useMenuStore } from '@/store';
   import { resolveMenuTitle } from '@/utils/menuUtil';

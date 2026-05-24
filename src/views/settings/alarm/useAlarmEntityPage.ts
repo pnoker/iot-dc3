@@ -26,10 +26,10 @@ import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
 import {
   ALARM_DETAIL_ROUTE_MAP,
-  createAlarmEntityConfigs,
   type AlarmColumnConfig,
   type AlarmEntityConfig,
   type AlarmTabKey,
+  createAlarmEntityConfigs,
 } from './alarmEntityConfig';
 
 export interface AlarmEntityPageProps {

@@ -80,10 +80,10 @@
   import {
     addDevice,
     deleteDevice,
-    listDevice,
     getDeviceStatus,
     importDevice,
     importDeviceTemplate,
+    listDevice,
     updateDevice,
   } from '@/api/device';
   import { listDriverByIds } from '@/api/driver';

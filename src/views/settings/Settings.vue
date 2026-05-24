@@ -57,6 +57,9 @@
   import { useRoute, useRouter } from 'vue-router';
 
   import {
+    getSettingsActiveName,
+    getSettingsDefaultOpeneds,
+    getSettingsRouteName,
     SETTINGS_ALARM_CHILDREN,
     SETTINGS_EVENT_CHILDREN,
     SETTINGS_FALLBACK_ICON,
@@ -64,9 +67,6 @@
     SETTINGS_MODEL_CHILDREN,
     SETTINGS_TITLE_KEYS,
     type SettingsNavNode,
-    getSettingsActiveName,
-    getSettingsDefaultOpeneds,
-    getSettingsRouteName,
   } from '@/config/settingsNav';
   import { useMenuStore } from '@/store';
   import { resolveMenuTitle } from '@/utils/menuUtil';

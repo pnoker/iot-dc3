@@ -46,7 +46,7 @@
 <script lang="ts" setup>
   import { computed, reactive } from 'vue';
 
-  import { listDriver, getDriverStatus } from '@/api/driver';
+  import { getDriverStatus, listDriver } from '@/api/driver';
 
   import type { Order } from '@/config/types';
 

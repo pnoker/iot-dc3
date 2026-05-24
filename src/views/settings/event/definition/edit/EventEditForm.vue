@@ -31,7 +31,7 @@
         <el-input v-model="reactiveData.form.eventName" :placeholder="$t('common.name')" clearable />
       </el-form-item>
       <el-form-item label="Code" prop="eventCode">
-        <el-input v-model="reactiveData.form.eventCode" placeholder="Code" clearable />
+        <el-input v-model="reactiveData.form.eventCode" clearable placeholder="Code" />
       </el-form-item>
       <el-form-item label="Event Type" prop="eventTypeFlag">
         <el-select v-model="reactiveData.form.eventTypeFlag" clearable>
@@ -65,7 +65,7 @@
   import type { FormInstance, FormRules } from 'element-plus';
   import { useI18n } from 'vue-i18n';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import { EVENT_TYPE_OPTIONS, EVENT_LEVEL_OPTIONS } from '@/config/constant/enums';
+  import { EVENT_LEVEL_OPTIONS, EVENT_TYPE_OPTIONS } from '@/config/constant/enums';
   import type { EventRecord } from '@/config/types';
 
   type FormMode = 'add' | 'edit';

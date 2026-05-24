@@ -30,7 +30,7 @@
         <el-input v-model="formData.commandName" :placeholder="$t('common.name')" class="edit-form-default" clearable />
       </el-form-item>
       <el-form-item label="Code" prop="commandCode">
-        <el-input v-model="formData.commandCode" placeholder="Code" class="edit-form-default" clearable />
+        <el-input v-model="formData.commandCode" class="edit-form-default" clearable placeholder="Code" />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
         <el-segmented

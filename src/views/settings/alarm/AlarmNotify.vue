@@ -29,7 +29,7 @@
     >
       <template #filters>
         <el-form-item :label="activeConfig.searchLabel" prop="keyword">
-          <el-input v-model="searchForm.keyword" clearable :placeholder="activeConfig.searchPlaceholder" />
+          <el-input v-model="searchForm.keyword" :placeholder="activeConfig.searchPlaceholder" clearable />
         </el-form-item>
         <el-form-item v-if="activeConfig.filterProp" :label="activeConfig.filterLabel" prop="filterValue">
           <el-segmented
@@ -37,7 +37,7 @@
             v-model="searchForm.filterValue"
             :options="enableFilterOptions"
           />
-          <el-select v-else v-model="searchForm.filterValue" clearable :placeholder="activeConfig.filterPlaceholder">
+          <el-select v-else v-model="searchForm.filterValue" :placeholder="activeConfig.filterPlaceholder" clearable>
             <el-option v-for="option in activeConfig.filterOptions" :key="option.value" v-bind="option" />
           </el-select>
         </el-form-item>
@@ -71,7 +71,7 @@
             <span v-else>{{ formatCell(row, column) }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.operation')" fixed="right" :width="activeConfig.editable ? 180 : 100">
+        <el-table-column :label="t('common.operation')" :width="activeConfig.editable ? 180 : 100" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button v-if="activeConfig.editable" link type="primary" @click="openEdit(row)">
@@ -115,18 +115,18 @@
               <el-select
                 v-if="field.kind === 'select'"
                 v-model="formModel[field.prop]"
+                :placeholder="field.placeholder"
                 clearable
                 filterable
-                :placeholder="field.placeholder"
               >
                 <el-option v-for="option in field.options || []" :key="option.value" v-bind="option" />
               </el-select>
               <el-input-number
                 v-else-if="field.kind === 'number'"
                 v-model="formModel[field.prop]"
-                controls-position="right"
                 :min="0"
                 :precision="field.precision || 0"
+                controls-position="right"
                 style="width: 100%"
               />
               <enable-flag-segmented v-else-if="field.kind === 'enableFlag'" v-model="formModel[field.prop]" />
@@ -138,7 +138,7 @@
                 resize="vertical"
                 type="textarea"
               />
-              <el-input v-else v-model="formModel[field.prop]" clearable :placeholder="field.placeholder" />
+              <el-input v-else v-model="formModel[field.prop]" :placeholder="field.placeholder" clearable />
             </el-form-item>
           </el-col>
         </el-row>

@@ -18,7 +18,7 @@ import { describe, expect, it } from 'vitest';
 
 import { usePagedList } from '@/composables/usePagedList';
 
-import { pagedRows, type PagedRow as Row } from '../fixtures/rows';
+import { type PagedRow as Row, pagedRows } from '../fixtures/rows';
 
 // 25 produces exactly two full pages of 12 plus a 1-row tail — exercises
 // start/middle/end paging math without ceremony.

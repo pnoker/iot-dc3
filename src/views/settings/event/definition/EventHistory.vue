@@ -27,10 +27,10 @@
     >
       <template #filters>
         <el-form-item label="Device ID" prop="deviceId">
-          <el-input v-model="formData.deviceId" placeholder="Device ID" class="edit-form-default" clearable />
+          <el-input v-model="formData.deviceId" class="edit-form-default" clearable placeholder="Device ID" />
         </el-form-item>
         <el-form-item label="Event Code" prop="eventCode">
-          <el-input v-model="formData.eventCode" placeholder="Event Code" class="edit-form-default" clearable />
+          <el-input v-model="formData.eventCode" class="edit-form-default" clearable placeholder="Event Code" />
         </el-form-item>
       </template>
     </tool-card>
@@ -57,16 +57,16 @@
       </el-table>
     </blank-card>
 
-    <el-dialog v-model="detailVisible" :append-to-body="true" title="Event History Detail" width="700px" draggable>
+    <el-dialog v-model="detailVisible" :append-to-body="true" draggable title="Event History Detail" width="700px">
       <el-descriptions v-if="detailRow" :column="2" border>
-        <el-descriptions-item label="Record ID" :span="2">{{ detailRow.recordId }}</el-descriptions-item>
+        <el-descriptions-item :span="2" label="Record ID">{{ detailRow.recordId }}</el-descriptions-item>
         <el-descriptions-item label="Device ID">{{ detailRow.deviceId }}</el-descriptions-item>
         <el-descriptions-item label="Event ID">{{ detailRow.eventId }}</el-descriptions-item>
         <el-descriptions-item label="Event Code">{{ detailRow.eventCode }}</el-descriptions-item>
         <el-descriptions-item label="Type">{{ detailRow.eventTypeFlag }}</el-descriptions-item>
         <el-descriptions-item label="Level">{{ detailRow.eventLevelFlag }}</el-descriptions-item>
-        <el-descriptions-item label="Message" :span="2">{{ detailRow.message || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Param Values" :span="2">{{
+        <el-descriptions-item :span="2" label="Message">{{ detailRow.message || '-' }}</el-descriptions-item>
+        <el-descriptions-item :span="2" label="Param Values">{{
           JSON.stringify(detailRow.paramValues) || '-'
         }}</el-descriptions-item>
         <el-descriptions-item :formatter="timestampColumn" label="Occur Time">{{
@@ -94,8 +94,7 @@
   import { reactive, ref } from 'vue';
   import { getEventHistoryById, listEventHistory } from '@/api/event';
   import { timestampColumn } from '@/utils/dateUtil';
-  import type { Order } from '@/config/types';
-  import type { EventHistory } from '@/config/types';
+  import type { EventHistory, Order } from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';

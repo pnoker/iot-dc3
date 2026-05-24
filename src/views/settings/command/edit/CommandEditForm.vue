@@ -31,7 +31,7 @@
         <el-input v-model="reactiveData.form.commandName" :placeholder="$t('common.name')" clearable />
       </el-form-item>
       <el-form-item label="Code" prop="commandCode">
-        <el-input v-model="reactiveData.form.commandCode" placeholder="Code" clearable />
+        <el-input v-model="reactiveData.form.commandCode" clearable placeholder="Code" />
       </el-form-item>
       <el-form-item label="Command Type" prop="commandTypeFlag">
         <el-select v-model="reactiveData.form.commandTypeFlag" clearable>
@@ -68,7 +68,7 @@
   import type { FormInstance, FormRules } from 'element-plus';
   import { useI18n } from 'vue-i18n';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import { COMMAND_TYPE_OPTIONS, CALL_TYPE_OPTIONS } from '@/config/constant/enums';
+  import { CALL_TYPE_OPTIONS, COMMAND_TYPE_OPTIONS } from '@/config/constant/enums';
   import type { CommandRecord } from '@/config/types';
 
   type FormMode = 'add' | 'edit';

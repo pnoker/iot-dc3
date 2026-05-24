@@ -16,10 +16,10 @@
 
 <template>
   <el-segmented
-    class="enable-flag-segmented"
     :model-value="modelValue"
     :options="options"
     :size="size"
+    class="enable-flag-segmented"
     @update:model-value="onChange"
   />
 </template>

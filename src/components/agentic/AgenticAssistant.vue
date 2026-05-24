@@ -474,6 +474,7 @@
     ChatDotRound,
     ChatLineSquare,
     Check,
+    CircleCheck,
     CircleClose,
     Clock,
     Close,
@@ -483,14 +484,13 @@
     DocumentCopy,
     EditPen,
     Lightning,
+    Loading,
     Paperclip,
     Plus,
     Promotion,
     Setting,
     VideoPause,
     Warning,
-    Loading,
-    CircleCheck,
   } from '@element-plus/icons-vue';
   import { ElMessage, ElMessageBox } from 'element-plus';
   import { storeToRefs } from 'pinia';
