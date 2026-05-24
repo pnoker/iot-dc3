@@ -25,7 +25,7 @@
           :status-title="$t('eventDefinition.card.level')"
           @copy-id="copy(data.id, 'Event ID')"
         >
-          <el-tag :type="eventLevelTag(data.eventLevelFlag)">
+          <el-tag v-if="!embedded" :type="eventLevelTag(data.eventLevelFlag)">
             {{ eventLevelLabel(data.eventLevelFlag) }}
           </el-tag>
         </things-card-header>
@@ -130,6 +130,6 @@
   @use '@/styles/things-card.scss';
 
   .things-body-content-item-column-2 {
-    width: 200px;
+    max-width: 200px;
   }
 </style>

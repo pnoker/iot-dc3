@@ -57,6 +57,8 @@
     .things-card-body-content {
       display: flex;
       justify-content: space-around;
+      gap: 8px;
+      min-width: 0;
 
       p.nowrap-description {
         text-align: center;
@@ -66,22 +68,31 @@
 
   .nowrap-name {
     @include text-ellipsis;
-    width: 200px;
+    width: 100%;
+    max-width: 200px;
   }
 
   .nowrap-item {
     @include text-ellipsis;
-    width: 300px;
+    width: 100%;
+    max-width: 300px;
   }
 
   .nowrap-description {
     @include text-ellipsis;
-    width: 350px;
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .things-body-content-item-column-2 {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 200px;
   }
 
   .el-card {
     width: 100%;
-    min-width: 300px;
+    min-width: 0;
     min-height: 230px;
     box-sizing: border-box;
   }

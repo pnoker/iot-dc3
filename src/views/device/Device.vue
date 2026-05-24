@@ -35,7 +35,7 @@
           <el-col v-if="hasData">
             <el-empty :description="$t('device.empty')" />
           </el-col>
-          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
+          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
             <device-card
               :data="data"
               :driver="reactiveData.driverTable[data.driverId]"

@@ -16,7 +16,7 @@
 
 import { computed, defineComponent, reactive, ref, unref, watch } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
-import { Back, Check, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
+import { Back, Check, RefreshLeft, Right, Search } from '@element-plus/icons-vue';
 
 import { useRoute } from 'vue-router';
 import router from '@/config/router';
@@ -33,14 +33,13 @@ import {
   updatePointInfo,
 } from '@/api/info';
 
-import type { Attribute, Dictionary } from '@/config/types';
+import type { Attribute, Dictionary, PointInfoForm, PointRecord } from '@/config/types';
 
-import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-import pointInfoCard from '@/views/point/info/PointInfoCard.vue';
 import CommandList from '@/views/settings/command/CommandList.vue';
 import EventList from '@/views/settings/event/definition/EventList.vue';
 import { isNull } from '@/utils/validationUtil';
+import { failMessage, successMessage } from '@/utils/notificationUtil';
 import { getDriverById } from '@/api/driver';
 import { getProfileById } from '@/api/profile';
 import { listPointByDeviceId } from '@/api/point';
@@ -55,6 +54,25 @@ interface AttributeFormItem {
 }
 
 type AttributeFormData = Record<string, AttributeFormItem>;
+type PointMatrixStatus = '' | 'missing' | 'configured' | 'dirty' | 'error';
+
+interface PointAttributeCell extends AttributeFormItem {
+  attributeId: string;
+  originalValue: AttributeConfigValue;
+  dirty: boolean;
+  saving: boolean;
+  error: string;
+}
+
+interface PointInfoMatrixRow {
+  id: string;
+  pointName: string;
+  pointCode?: string;
+  pointTypeFlag?: string;
+  rwFlag?: string;
+  enableFlag?: string;
+  attributes: Record<string, PointAttributeCell>;
+}
 
 const INTEGER_ATTRIBUTE_TYPES = new Set(['BYTE', 'SHORT', 'INT', 'LONG']);
 const DECIMAL_ATTRIBUTE_TYPES = new Set(['FLOAT', 'DOUBLE']);
@@ -116,6 +134,23 @@ function createAttributeFormItem(attribute: Attribute, id?: string, value?: unkn
   };
 }
 
+function hasConfigValue(value: unknown): boolean {
+  return value !== '' && value !== null && value !== undefined;
+}
+
+function createPointAttributeCell(attribute: Attribute, id?: string, value?: unknown): PointAttributeCell {
+  const configValue = hasConfigValue(value) ? coerceAttributeValue(attribute, value) : null;
+  return {
+    id: id || undefined,
+    attributeId: attribute.id,
+    configValue,
+    originalValue: configValue,
+    dirty: false,
+    saving: false,
+    error: '',
+  };
+}
+
 function serializeAttributeValue(value: AttributeConfigValue): string {
   return value === null || value === undefined ? '' : String(value);
 }
@@ -145,8 +180,6 @@ export default defineComponent({
     CommandList,
     EnableFlagSegmented,
     EventList,
-    skeletonCard,
-    pointInfoCard,
   },
   setup() {
     const route = useRoute();
@@ -155,15 +188,14 @@ export default defineComponent({
     // 定义表单引用
     const deviceFormRef = ref<FormInstance>();
     const driverFormRef = ref<FormInstance>();
-    const pointFormRef = ref<FormInstance>();
 
     // 图标
     const Icon = {
-      Edit,
       RefreshLeft,
       Right,
       Back,
       Check,
+      Search,
     };
 
     // 定义响应式数据
@@ -179,9 +211,11 @@ export default defineComponent({
       driverFormData: {} as AttributeFormData,
       pointAttributes: [] as Attribute[],
       pointAttributeTable: {} as Record<string, any>,
-      oldPointFormData: {} as Record<string, any>,
-      pointFormData: {} as any,
-      pointInfoData: [] as any[],
+      pointInfoData: [] as PointInfoMatrixRow[],
+      oldPointInfoData: [] as PointInfoMatrixRow[],
+      pointMatrixKeyword: '',
+      pointMatrixStatus: '' as PointMatrixStatus,
+      pointSaving: false,
       driverDictionary: [] as Dictionary[],
       driverLoading: false,
       profileDictionary: [] as Dictionary[],
@@ -215,8 +249,33 @@ export default defineComponent({
       remark: remarkRules(t),
     });
 
-    const hasPointFormData = computed(() => {
-      return !isNull(reactiveData.pointFormData);
+    const hasPointAttributes = computed(() => reactiveData.pointAttributes.length > 0);
+
+    const pointDirtyCount = computed(() => {
+      return reactiveData.pointInfoData.reduce((sum, row) => {
+        return sum + Object.values(row.attributes).filter((cell) => cell.dirty).length;
+      }, 0);
+    });
+
+    const filteredPointInfoData = computed(() => {
+      const keyword = reactiveData.pointMatrixKeyword.trim().toLowerCase();
+      return reactiveData.pointInfoData.filter((row) => {
+        const matchesKeyword =
+          !keyword ||
+          row.pointName.toLowerCase().includes(keyword) ||
+          String(row.pointCode || '')
+            .toLowerCase()
+            .includes(keyword);
+        if (!matchesKeyword) return false;
+
+        const status = reactiveData.pointMatrixStatus;
+        if (!status) return true;
+        if ('dirty' === status) return isPointRowDirty(row);
+        if ('error' === status) return isPointRowError(row);
+        if ('configured' === status) return isPointRowConfigured(row);
+        if ('missing' === status) return !isPointRowConfigured(row);
+        return true;
+      });
     });
 
     // Some drivers don't expose any configurable attributes. In that case we
@@ -302,8 +361,10 @@ export default defineComponent({
 
     const changeAttribute = (driverId: string) => {
       if (isNull(driverId)) {
+        reactiveData.loading = false;
         return;
       }
+      reactiveData.loading = true;
 
       listDriverAttributeByDriverId(driverId)
         .then((res) => {
@@ -343,9 +404,10 @@ export default defineComponent({
           pointInfo();
         })
         .catch(() => {
-          // nothing to do
-        })
-        .finally(() => {
+          reactiveData.pointAttributes = [];
+          reactiveData.pointAttributeTable = {};
+          reactiveData.pointInfoData = [];
+          reactiveData.oldPointInfoData = [];
           reactiveData.loading = false;
         });
     };
@@ -371,42 +433,61 @@ export default defineComponent({
     };
 
     const pointInfo = () => {
+      reactiveData.loading = true;
       listPointByDeviceId(reactiveData.id)
         .then((res) => {
-          reactiveData.pointInfoData = res.data.map((point: { id: any; pointName: any }) => {
-            const pointInfo: Record<string, any> = {
-              id: point.id,
-              pointName: point.pointName,
-              shadow: 'hover',
-            };
+          const rows: PointInfoMatrixRow[] = (res.data || []).map((point: PointRecord) => {
+            const attributes: Record<string, PointAttributeCell> = {};
 
             reactiveData.pointAttributes.forEach((attribute) => {
-              pointInfo[attribute.attributeCode] = createAttributeFormItem(attribute);
+              attributes[attribute.attributeCode] = createPointAttributeCell(attribute);
             });
-            return pointInfo;
+
+            return {
+              id: point.id,
+              pointName: point.pointName || '',
+              pointCode: point.pointCode,
+              pointTypeFlag: point.pointTypeFlag,
+              rwFlag: point.rwFlag,
+              enableFlag: point.enableFlag,
+              attributes,
+            };
           });
 
-          listPointInfoByDeviceId(reactiveData.id)
-            .then((res) => {
-              res.data.forEach((info: { pointId: any; attributeId: string | number; id: any; configValue: any }) => {
-                reactiveData.pointInfoData.forEach((pointInfo) => {
-                  if (pointInfo.id === info.pointId) {
-                    const attributeCode = reactiveData.pointAttributeTable[info.attributeId];
-                    const attribute = reactiveData.pointAttributes.find((item) => item.attributeCode === attributeCode);
-                    if (attribute) {
-                      pointInfo[attributeCode] = createAttributeFormItem(attribute, info.id, info.configValue);
-                    }
+          const rowTable = rows.reduce(
+            (table, row) => {
+              table[row.id] = row;
+              return table;
+            },
+            {} as Record<string, PointInfoMatrixRow>
+          );
+
+          return listPointInfoByDeviceId(reactiveData.id)
+            .then((infoRes) => {
+              (infoRes.data || []).forEach(
+                (info: { pointId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                  const attributeCode = reactiveData.pointAttributeTable[info.attributeId];
+                  const attribute = reactiveData.pointAttributes.find((item) => item.attributeCode === attributeCode);
+                  const row = rowTable[info.pointId];
+                  if (row && attribute) {
+                    row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id, info.configValue);
                   }
-                  return pointInfo;
-                });
-              });
+                }
+              );
+              reactiveData.pointInfoData = rows;
+              reactiveData.oldPointInfoData = clone(rows);
             })
             .catch(() => {
-              // nothing to do
+              reactiveData.pointInfoData = rows;
+              reactiveData.oldPointInfoData = clone(rows);
             });
         })
         .catch(() => {
-          // nothing to do
+          reactiveData.pointInfoData = [];
+          reactiveData.oldPointInfoData = [];
+        })
+        .finally(() => {
+          reactiveData.loading = false;
         });
     };
 
@@ -460,68 +541,114 @@ export default defineComponent({
       }
     };
 
-    const pointUpdate = async (): Promise<boolean> => {
-      const form = unref(pointFormRef);
-      if (!form) {
-        return false;
+    const pointCell = (row: PointInfoMatrixRow, attribute: Attribute): PointAttributeCell => {
+      if (!row.attributes[attribute.attributeCode]) {
+        row.attributes[attribute.attributeCode] = createPointAttributeCell(attribute);
       }
-
-      try {
-        await form.validate();
-        await Promise.all(
-          reactiveData.pointAttributes.map((attribute) => {
-            const formItem = reactiveData.pointFormData[attribute.attributeCode];
-            if (!formItem) {
-              return Promise.resolve();
-            }
-            const pointInfo = {
-              id: formItem.id || undefined,
-              attributeId: attribute.id,
-              deviceId: reactiveData.id,
-              pointId: reactiveData.pointFormData.id,
-              configValue: serializeAttributeValue(formItem.configValue),
-            };
-
-            const persist = pointInfo.id ? updatePointInfo(pointInfo) : addPointInfo(pointInfo);
-            return persist
-              .then(() => {
-                reactiveData.pointInfoData.forEach((row) => {
-                  if (row.id === reactiveData.pointFormData.id) {
-                    row[attribute.attributeCode] = {
-                      id: pointInfo.id,
-                      configValue: reactiveData.pointFormData[attribute.attributeCode].configValue,
-                    };
-                    reactiveData.oldPointFormData = clone(row);
-                  }
-                  return row;
-                });
-              })
-              .catch(() => {
-                // nothing to do
-              });
-          })
-        );
-        return true;
-      } catch {
-        return false;
-      }
+      return row.attributes[attribute.attributeCode] as PointAttributeCell;
     };
 
-    const selectPoint = (row: { [x: string]: AttributeFormItem | any; id: any }) => {
-      reactiveData.pointAttributes.forEach((attribute) => {
-        if (!row[attribute.attributeCode]) {
-          row[attribute.attributeCode] = createAttributeFormItem(attribute);
-        }
-      });
-      reactiveData.pointFormData = clone(row);
-      reactiveData.oldPointFormData = clone(row);
+    const markPointCellDirty = (row: PointInfoMatrixRow, attribute: Attribute) => {
+      const cell = pointCell(row, attribute);
+      cell.dirty = serializeAttributeValue(cell.configValue) !== serializeAttributeValue(cell.originalValue);
+      cell.error = '';
+    };
 
-      reactiveData.pointInfoData.forEach((pointInfo) => {
-        pointInfo.shadow = 'hover';
-        if (row.id === pointInfo.id) {
-          pointInfo.shadow = 'always';
-        }
-      });
+    const pointCellDirty = (row: PointInfoMatrixRow, attribute: Attribute): boolean => {
+      return pointCell(row, attribute).dirty;
+    };
+
+    const pointCellError = (row: PointInfoMatrixRow, attribute: Attribute): string => {
+      return pointCell(row, attribute).error;
+    };
+
+    const isPointRowDirty = (row: PointInfoMatrixRow): boolean => {
+      return Object.values(row.attributes).some((cell) => cell.dirty);
+    };
+
+    const isPointRowError = (row: PointInfoMatrixRow): boolean => {
+      return Object.values(row.attributes).some((cell) => !isNull(cell.error));
+    };
+
+    const isPointRowConfigured = (row: PointInfoMatrixRow): boolean => {
+      if (reactiveData.pointAttributes.length < 1) return false;
+      return reactiveData.pointAttributes.every((attribute) => hasConfigValue(pointCell(row, attribute).configValue));
+    };
+
+    const pointRowStatus = (row: PointInfoMatrixRow): PointMatrixStatus => {
+      if (isPointRowError(row)) return 'error';
+      if (isPointRowDirty(row)) return 'dirty';
+      if (isPointRowConfigured(row)) return 'configured';
+      return 'missing';
+    };
+
+    const pointRowStatusLabel = (row: PointInfoMatrixRow): string => {
+      return t(`device.edit.pointStatus.${pointRowStatus(row)}`);
+    };
+
+    const pointRowStatusTag = (row: PointInfoMatrixRow) => {
+      const status = pointRowStatus(row);
+      if ('configured' === status) return 'success';
+      if ('dirty' === status) return 'warning';
+      if ('error' === status) return 'danger';
+      return 'info';
+    };
+
+    const pointMatrixRowClassName = ({ row }: { row: PointInfoMatrixRow }) => {
+      return isPointRowDirty(row) ? 'point-matrix-row-dirty' : '';
+    };
+
+    const savePointMatrix = async (): Promise<boolean> => {
+      const dirtyCells = reactiveData.pointInfoData.flatMap((row) =>
+        reactiveData.pointAttributes
+          .map((attribute) => ({ row, cell: pointCell(row, attribute) }))
+          .filter(({ cell }) => cell.dirty)
+      );
+      if (dirtyCells.length < 1) {
+        return true;
+      }
+
+      reactiveData.pointSaving = true;
+      let failedCount = 0;
+      await Promise.all(
+        dirtyCells.map(async ({ row, cell }) => {
+          cell.saving = true;
+          cell.error = '';
+
+          const payload: PointInfoForm = {
+            id: cell.id || undefined,
+            attributeId: cell.attributeId,
+            deviceId: reactiveData.id,
+            pointId: row.id,
+            configValue: serializeAttributeValue(cell.configValue),
+          };
+
+          try {
+            const res = cell.id ? await updatePointInfo(payload) : await addPointInfo(payload);
+            cell.id = String(res?.data?.id || cell.id || '');
+            cell.originalValue = cell.configValue;
+            cell.dirty = false;
+          } catch (error) {
+            failedCount++;
+            cell.error = t('device.edit.pointSaveCellFailed');
+            if ('dev' === import.meta.env.MODE) {
+              console.error(error);
+            }
+          } finally {
+            cell.saving = false;
+          }
+        })
+      );
+      reactiveData.pointSaving = false;
+
+      if (failedCount > 0) {
+        failMessage(t('device.edit.pointSaveFailed', { count: failedCount }));
+        return false;
+      }
+
+      reactiveData.oldPointInfoData = clone(reactiveData.pointInfoData);
+      successMessage(t('device.edit.pointSaveSuccess', { count: dirtyCells.length }));
+      return true;
     };
 
     const pre = () => {
@@ -542,6 +669,12 @@ export default defineComponent({
       }
       if (reactiveData.active === 1) {
         const ok = await driverUpdate();
+        if (!ok) {
+          return;
+        }
+      }
+      if (reactiveData.active === 2) {
+        const ok = await savePointMatrix();
         if (!ok) {
           return;
         }
@@ -570,7 +703,7 @@ export default defineComponent({
     };
 
     const pointInfoReset = () => {
-      reactiveData.pointFormData = clone(reactiveData.oldPointFormData);
+      reactiveData.pointInfoData = clone(reactiveData.oldPointInfoData);
     };
 
     const changeActive = (step: number) => {
@@ -597,9 +730,8 @@ export default defineComponent({
           reactiveData.oldDeviceFormData = {};
           reactiveData.driverFormData = {};
           reactiveData.oldDriverFormData = {};
-          reactiveData.pointFormData = {};
-          reactiveData.oldPointFormData = {};
           reactiveData.pointInfoData = [];
+          reactiveData.oldPointInfoData = [];
           device();
         }
       }
@@ -610,19 +742,25 @@ export default defineComponent({
     return {
       deviceFormRef,
       driverFormRef,
-      pointFormRef,
       deviceFormRule,
       reactiveData,
-      hasPointFormData,
+      hasPointAttributes,
       hasDriverAttributes,
+      filteredPointInfoData,
+      pointDirtyCount,
       driverDictionary,
       driverDictionaryVisible,
       profileDictionary,
       profileDictionaryVisible,
       changeAttribute,
       driverUpdate,
-      pointUpdate,
-      selectPoint,
+      savePointMatrix,
+      markPointCellDirty,
+      pointCellDirty,
+      pointCellError,
+      pointRowStatusLabel,
+      pointRowStatusTag,
+      pointMatrixRowClassName,
       pre,
       next,
       done,

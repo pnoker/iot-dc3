@@ -29,13 +29,13 @@
 
     <blank-card>
       <el-row>
-        <el-col v-for="data in 12" :key="data" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
+        <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
           <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
         </el-col>
         <el-col v-if="hasData">
           <el-empty :description="$t('driver.empty')"></el-empty>
         </el-col>
-        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
+        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
           <driver-card :data="data" :status-table="reactiveData.statusTable"></driver-card>
         </el-col>
       </el-row>

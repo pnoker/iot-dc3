@@ -170,68 +170,137 @@
           :title="$t('device.edit.pointConfig')"
           type="success"
         />
-        <el-form v-if="hasPointFormData" ref="pointFormRef" :model="reactiveData.pointFormData" label-position="top">
-          <el-form-item :label="$t('device.edit.pointName')" prop="pointName">
-            <el-input v-model="reactiveData.pointFormData.pointName" disabled />
-          </el-form-item>
-          <el-form-item
-            v-for="attribute in reactiveData.pointAttributes"
-            :key="attribute.id"
-            :prop="`${attribute.attributeCode}.configValue`"
-          >
-            <template #label>
-              <span>{{ attribute.attributeName }}</span>
-              <el-tag class="attribute-type" effect="plain" size="small">{{ attribute.attributeTypeFlag }}</el-tag>
-            </template>
-            <el-switch
-              v-if="isBooleanAttribute(attribute)"
-              v-model="attributeFormItem(reactiveData.pointFormData, attribute).configValue"
-              :active-value="true"
-              :inactive-value="false"
-            />
-            <el-input-number
-              v-else-if="isNumberAttribute(attribute)"
-              v-model="attributeFormItem(reactiveData.pointFormData, attribute).configValue"
-              :placeholder="attributePlaceholder(attribute)"
-              :precision="attributePrecision(attribute)"
-              class="attribute-number-input"
-              controls-position="right"
-            />
+        <div class="point-matrix-toolbar">
+          <div class="point-matrix-toolbar__filters">
             <el-input
-              v-else
-              v-model="attributeFormItem(reactiveData.pointFormData, attribute).configValue"
-              :placeholder="attributePlaceholder(attribute)"
+              v-model="reactiveData.pointMatrixKeyword"
+              :placeholder="$t('device.edit.pointSearchPlaceholder')"
+              :prefix-icon="Search"
               clearable
-              @keyup.enter="pointUpdate"
+              size="small"
             />
-            <div v-if="attribute.remark || attribute.defaultValue" class="attribute-hint">
-              <span v-if="attribute.remark">{{ attribute.remark }}</span>
-              <span v-if="attribute.defaultValue">Default: {{ attribute.defaultValue }}</span>
-            </div>
-          </el-form-item>
-        </el-form>
+            <el-segmented
+              v-model="reactiveData.pointMatrixStatus"
+              :options="[
+                { label: $t('common.all'), value: '' },
+                { label: $t('device.edit.pointStatus.missing'), value: 'missing' },
+                { label: $t('device.edit.pointStatus.configured'), value: 'configured' },
+                { label: $t('device.edit.pointStatus.dirty'), value: 'dirty' },
+                { label: $t('device.edit.pointStatus.error'), value: 'error' },
+              ]"
+              size="small"
+            />
+          </div>
+          <div class="point-matrix-toolbar__actions">
+            <el-tag :type="pointDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
+              {{ $t('device.edit.changedCount', { count: pointDirtyCount }) }}
+            </el-tag>
+            <el-button :disabled="pointDirtyCount < 1" :icon="RefreshLeft" size="small" @click="pointInfoReset">
+              {{ $t('device.edit.discardChanges') }}
+            </el-button>
+            <el-button
+              :disabled="pointDirtyCount < 1"
+              :icon="Check"
+              :loading="reactiveData.pointSaving"
+              size="small"
+              type="primary"
+              @click="savePointMatrix"
+            >
+              {{ $t('device.edit.saveAll') }}
+            </el-button>
+          </div>
+        </div>
+
+        <el-empty v-if="!hasPointAttributes" :description="$t('device.edit.pointAttributeEmpty')" />
+        <el-table
+          v-else
+          v-loading="reactiveData.loading"
+          :data="filteredPointInfoData"
+          :row-class-name="pointMatrixRowClassName"
+          border
+          class="point-matrix-table"
+          max-height="560"
+          size="small"
+          stripe
+        >
+          <el-table-column :label="$t('device.edit.pointName')" fixed min-width="220">
+            <template #default="{ row }">
+              <div class="point-matrix-point">
+                <div class="point-matrix-point__name">{{ row.pointName }}</div>
+                <div class="point-matrix-point__code">{{ row.pointCode || row.id }}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('device.edit.configStatus')" fixed min-width="120">
+            <template #default="{ row }">
+              <el-tag :type="pointRowStatusTag(row)" effect="plain" size="small">
+                {{ pointRowStatusLabel(row) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column v-for="attribute in reactiveData.pointAttributes" :key="attribute.id" min-width="220">
+            <template #header>
+              <div class="point-matrix-attribute-header">
+                <span>{{ attribute.attributeName }}</span>
+                <el-tag effect="plain" size="small">{{ attribute.attributeTypeFlag || 'STRING' }}</el-tag>
+              </div>
+            </template>
+            <template #default="{ row }">
+              <div
+                :class="[
+                  'point-matrix-cell',
+                  pointCellDirty(row, attribute) ? 'is-dirty' : '',
+                  pointCellError(row, attribute) ? 'is-error' : '',
+                ]"
+              >
+                <el-switch
+                  v-if="isBooleanAttribute(attribute)"
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  :active-value="true"
+                  :inactive-value="false"
+                  size="small"
+                  @change="markPointCellDirty(row, attribute)"
+                />
+                <el-input
+                  v-else-if="isNumberAttribute(attribute)"
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  inputmode="decimal"
+                  :placeholder="attributePlaceholder(attribute)"
+                  class="point-matrix-input"
+                  clearable
+                  size="small"
+                  @input="markPointCellDirty(row, attribute)"
+                />
+                <el-input
+                  v-else
+                  v-model="row.attributes[attribute.attributeCode].configValue"
+                  :placeholder="attributePlaceholder(attribute)"
+                  clearable
+                  size="small"
+                  @input="markPointCellDirty(row, attribute)"
+                />
+                <div v-if="pointCellDirty(row, attribute) || attribute.defaultValue" class="point-matrix-cell__meta">
+                  <span v-if="pointCellDirty(row, attribute)" class="point-matrix-cell__dirty">
+                    {{ $t('device.edit.modified') }}
+                  </span>
+                  <span v-if="attribute.defaultValue" class="point-matrix-cell__default">
+                    {{ $t('device.edit.defaultValue', { value: attribute.defaultValue }) }}
+                  </span>
+                </div>
+                <div v-if="pointCellError(row, attribute)" class="point-matrix-cell__error">
+                  {{ pointCellError(row, attribute) }}
+                </div>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+
         <el-form-item class="edit-form-button">
           <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :disabled="!hasPointFormData" :icon="Edit" type="primary" @click="pointUpdate">
-            {{ $t('common.edit') }}
+          <el-button :icon="Right" :loading="reactiveData.pointSaving" plain type="warning" @click="next">
+            {{ $t('common.next') }}
           </el-button>
-          <el-button :disabled="!hasPointFormData" :icon="RefreshLeft" @click="pointInfoReset">
-            {{ $t('common.reset') }}
-          </el-button>
-          <el-button :icon="Check" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
         </el-form-item>
-        <el-row>
-          <el-col v-for="data in 12" :key="data" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
-            <skeleton-card :footer="false" :loading="reactiveData.loading"></skeleton-card>
-          </el-col>
-          <el-col v-for="data in reactiveData.pointInfoData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
-            <point-info-card
-              :attributes="reactiveData.pointAttributes"
-              :data="data"
-              @select="selectPoint"
-            ></point-info-card>
-          </el-col>
-        </el-row>
       </el-card>
       <el-card v-if="reactiveData.active === 3" shadow="hover">
         <el-divider content-position="left">{{ $t('device.edit.commandConfig') }}</el-divider>
@@ -290,5 +359,112 @@
     line-height: 18px;
     color: var(--el-text-color-secondary);
     font-size: 12px;
+  }
+
+  .point-matrix-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+  }
+
+  .point-matrix-toolbar__filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .el-input {
+      width: 260px;
+    }
+  }
+
+  .point-matrix-toolbar__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .point-matrix-table {
+    width: 100%;
+    font-size: 13px;
+
+    :deep(.point-matrix-row-dirty) {
+      --el-table-tr-bg-color: var(--el-color-warning-light-9);
+    }
+
+    :deep(.el-table__cell) {
+      padding: 6px 0;
+      vertical-align: top;
+    }
+  }
+
+  .point-matrix-point__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+  }
+
+  .point-matrix-point__code {
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--el-text-color-secondary);
+  }
+
+  .point-matrix-attribute-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .point-matrix-cell {
+    min-height: 42px;
+    padding: 1px 0;
+
+    &.is-dirty {
+      :deep(.el-input__wrapper),
+      :deep(.el-input-number .el-input__wrapper) {
+        box-shadow: 0 0 0 1px var(--el-color-warning) inset;
+      }
+    }
+
+    &.is-error {
+      :deep(.el-input__wrapper),
+      :deep(.el-input-number .el-input__wrapper) {
+        box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+      }
+    }
+  }
+
+  .point-matrix-input {
+    width: 100%;
+  }
+
+  .point-matrix-cell__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 3px;
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  .point-matrix-cell__dirty {
+    color: var(--el-color-warning);
+  }
+
+  .point-matrix-cell__default {
+    color: var(--el-text-color-secondary);
+  }
+
+  .point-matrix-cell__error {
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--el-color-danger);
   }
 </style>

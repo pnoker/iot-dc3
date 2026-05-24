@@ -25,7 +25,7 @@
           :status-title="$t('common.enableFlag')"
           @copy-id="copy(data.id, 'Command ID')"
         >
-          <el-tag :type="enabled ? 'success' : 'info'">
+          <el-tag v-if="!embedded" :type="enabled ? 'success' : 'info'">
             {{ enabled ? $t('common.enable') : $t('common.disable') }}
           </el-tag>
         </things-card-header>
@@ -130,6 +130,6 @@
   @use '@/styles/things-card.scss';
 
   .things-body-content-item-column-2 {
-    width: 200px;
+    max-width: 200px;
   }
 </style>

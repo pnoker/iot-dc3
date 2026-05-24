@@ -25,14 +25,7 @@
           :status-title="$t('common.name')"
           @copy-id="copy(data.id, 'Driver ID')"
         >
-          <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
-          <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
-          <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
-          <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
-          <el-tag v-else-if="status === 'REGISTERING'" effect="plain" type="info">
-            {{ $t('status.registering') }}
-          </el-tag>
-          <el-tag v-else effect="plain" type="info">{{ $t('status.offline') }}</el-tag>
+          <el-tag :type="statusTagType" effect="plain">{{ $t(statusLabelKey) }}</el-tag>
         </things-card-header>
         <div class="things-card__body">
           <div class="things-card-body-content">
@@ -91,7 +84,21 @@
 
   const status = computed(() => {
     const id = props.data.id;
-    return id && props.statusTable[id] ? props.statusTable[id] : '';
+    return id && props.statusTable[id] ? String(props.statusTable[id]).trim() : 'OFFLINE';
+  });
+
+  const statusTagType = computed(() => {
+    if (status.value === 'ONLINE') return 'success';
+    if (status.value === 'MAINTAIN') return 'warning';
+    if (status.value === 'FAULT') return 'danger';
+    return 'info';
+  });
+
+  const statusLabelKey = computed(() => {
+    if (status.value === 'ONLINE') return 'status.online';
+    if (status.value === 'MAINTAIN') return 'status.maintain';
+    if (status.value === 'FAULT') return 'status.fault';
+    return 'status.offline';
   });
 
   const detail = () => {
