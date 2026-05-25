@@ -265,10 +265,10 @@
                 <el-input
                   v-else-if="isNumberAttribute(attribute)"
                   v-model="row.attributes[attribute.attributeCode].configValue"
-                  inputmode="decimal"
                   :placeholder="attributePlaceholder(attribute)"
                   class="point-matrix-input"
                   clearable
+                  inputmode="decimal"
                   size="small"
                   @input="markPointCellDirty(row, attribute)"
                 />
@@ -405,10 +405,10 @@
                 <el-input
                   v-else-if="isNumberAttribute(attribute)"
                   v-model="row.attributes[attribute.attributeCode].configValue"
-                  inputmode="decimal"
                   :placeholder="attributePlaceholder(attribute)"
                   class="point-matrix-input"
                   clearable
+                  inputmode="decimal"
                   size="small"
                   @input="markCommandCellDirty(row, attribute)"
                 />
@@ -544,10 +544,10 @@
                 <el-input
                   v-else-if="isNumberAttribute(attribute)"
                   v-model="row.attributes[attribute.attributeCode].configValue"
-                  inputmode="decimal"
                   :placeholder="attributePlaceholder(attribute)"
                   class="point-matrix-input"
                   clearable
+                  inputmode="decimal"
                   size="small"
                   @input="markEventCellDirty(row, attribute)"
                 />

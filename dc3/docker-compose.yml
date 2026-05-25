@@ -18,7 +18,7 @@ services:
   web:
     # Switch registry/tag via env:
     #   DC3_WEB_IMAGE=registry.cn-beijing.aliyuncs.com/dc3/dc3-web \
-    #   DC3_WEB_VERSION=2026.5.5 docker compose up
+    #   DC3_WEB_VERSION=2026.5.22 docker compose up
     image: ${DC3_WEB_IMAGE:-pnoker/dc3-web}:${DC3_WEB_VERSION:-latest}
     restart: unless-stopped
     ports:

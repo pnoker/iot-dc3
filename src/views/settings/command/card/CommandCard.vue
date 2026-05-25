@@ -96,8 +96,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
   import type { PropType } from 'vue';
+  import { computed } from 'vue';
   import { Edit, List, Location, Sunset } from '@element-plus/icons-vue';
   import { copy } from '@/utils/commonUtil';
   import { timestamp } from '@/utils/dateUtil';
