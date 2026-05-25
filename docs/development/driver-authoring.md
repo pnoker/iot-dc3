@@ -68,7 +68,7 @@ Your module's own `pom.xml` only needs:
 <parent>
   <groupId>io.github.pnoker</groupId>
   <artifactId>dc3-driver</artifactId>
-  <version>2026.5.18</version>
+  <version>2026.5.22</version>
 </parent>
 <artifactId>dc3-driver-bacnet</artifactId>
 <packaging>jar</packaging>

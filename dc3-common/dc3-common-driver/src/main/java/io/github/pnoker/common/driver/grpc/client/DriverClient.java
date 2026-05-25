@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.driver.grpc.client;
 
+import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
-import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
 import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;

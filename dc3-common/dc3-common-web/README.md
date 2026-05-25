@@ -10,7 +10,7 @@ filters, and reactive response utilities for all REST-based center services.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-web
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 
 ## Key Components
 

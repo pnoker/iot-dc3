@@ -10,7 +10,7 @@ objects used across all services and drivers.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-model
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -44,10 +44,10 @@ Used with `@Validated(...)` in controllers:
 ```java
 // Validation groups in controller
 @PostMapping("/add")
-public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) { ... }
+public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) { ...}
 
 @PostMapping("/update")
-public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) { ... }
+public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) { ...}
 ```
 
 ## Build Instructions

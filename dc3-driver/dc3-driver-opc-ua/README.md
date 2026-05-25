@@ -10,7 +10,7 @@ automation systems using the OPC UA binary protocol.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-opc-ua
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 - **Driver Name**: OPC UA Driver
 
 ## Driver Attributes (Device-level)

@@ -10,7 +10,7 @@ subscription used by the MQTT driver and any service requiring MQTT connectivity
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-mqtt
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 
 ## Key Components
 

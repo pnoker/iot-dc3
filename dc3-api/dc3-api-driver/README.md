@@ -10,7 +10,7 @@ manager service, enabling device registration, metadata synchronization, and poi
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-api-driver
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.api.common.driver`
 
 ## Proto Definitions
@@ -110,7 +110,7 @@ This module depends on common proto definitions:
 <dependency>
     <groupId>io.github.pnoker</groupId>
     <artifactId>dc3-api-driver</artifactId>
-    <version>2026.5.18</version>
+  <version>2026.5.22</version>
 </dependency>
 ```
 

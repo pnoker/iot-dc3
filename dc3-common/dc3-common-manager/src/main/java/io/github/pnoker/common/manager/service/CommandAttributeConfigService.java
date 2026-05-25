@@ -18,8 +18,8 @@
 package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.base.service.BaseService;
-import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeConfigBO;
+import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.query.CommandAttributeConfigQuery;
 
 import java.util.List;
@@ -52,8 +52,8 @@ public interface CommandAttributeConfigService extends BaseService<CommandAttrib
     /**
      * Device ID Command ID
      *
-     * @param deviceId Device ID
-     * @param commandId  Command ID
+     * @param deviceId  Device ID
+     * @param commandId Command ID
      * @return CommandConfig
      */
     List<CommandAttributeConfigBO> listByDeviceIdAndCommandId(Long deviceId, Long commandId);
@@ -63,7 +63,7 @@ public interface CommandAttributeConfigService extends BaseService<CommandAttrib
      *
      * @param attributeId ID
      * @param deviceId    Device ID
-     * @param commandId     Command ID
+     * @param commandId   Command ID
      * @return CommandConfig
      */
     CommandAttributeConfigBO getByAttributeIdAndDeviceIdAndCommandId(Long attributeId, Long deviceId, Long commandId);

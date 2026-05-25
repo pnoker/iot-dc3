@@ -10,7 +10,7 @@ write commands for register control.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-modbus-tcp
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 - **Driver Name**: Modbus TCP Driver
 
 ## Driver Attributes (Device-level)

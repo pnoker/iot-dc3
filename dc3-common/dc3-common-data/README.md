@@ -10,7 +10,7 @@ driver/device status tracking, and data query. It is wired into `dc3-center-data
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-data
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 
 ## Key Components
 

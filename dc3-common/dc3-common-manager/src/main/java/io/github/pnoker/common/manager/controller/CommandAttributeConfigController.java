@@ -23,17 +23,17 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
+import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.builder.CommandAttributeConfigBuilder;
 import io.github.pnoker.common.manager.entity.query.CommandAttributeConfigQuery;
 import io.github.pnoker.common.manager.entity.vo.CommandAttributeConfigVO;
-import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.CommandAttributeConfigService;
 import io.github.pnoker.common.manager.service.CommandAttributeService;
 import io.github.pnoker.common.manager.service.CommandService;
+import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
@@ -142,7 +142,7 @@ public class CommandAttributeConfigController implements BaseController {
      *
      * @param attributeId Attribute ID
      * @param deviceId    Device ID
-     * @param commandId     Command ID
+     * @param commandId   Command ID
      * @return CommandConfig
      */
     @GetMapping("/get_by_attribute_id_and_device_id_and_command_id")
@@ -163,8 +163,8 @@ public class CommandAttributeConfigController implements BaseController {
     /**
      * Device ID Command ID CommandConfig
      *
-     * @param deviceId Device ID
-     * @param commandId  Command ID
+     * @param deviceId  Device ID
+     * @param commandId Command ID
      * @return CommandConfig
      */
     @GetMapping("/list_by_device_id_and_command_id")
