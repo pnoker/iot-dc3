@@ -24,17 +24,25 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.manager.dal.EventParamManager;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.manager.entity.bo.EventParamBO;
 import io.github.pnoker.common.manager.entity.builder.EventParamBuilder;
+import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.EventParamDO;
 import io.github.pnoker.common.manager.entity.query.EventParamQuery;
+import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
+import io.github.pnoker.common.manager.mapper.DeviceMapper;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.EventParamService;
 import io.github.pnoker.common.manager.service.EventService;
 import io.github.pnoker.common.utils.PageUtil;
@@ -45,10 +53,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Business service implementation for event param operations.
@@ -68,6 +78,12 @@ public class EventParamServiceImpl implements EventParamService {
 
     private final EventService eventService;
 
+    private final MetadataEventPublisher metadataEventPublisher;
+
+    private final DeviceMapper deviceMapper;
+
+    private final DriverService driverService;
+
     @Override
     @Transactional
     public void add(EventParamBO entityBO) {
@@ -78,6 +94,7 @@ public class EventParamServiceImpl implements EventParamService {
         if (!eventParamManager.save(entityDO)) {
             throw new AddException("Failed to create event param");
         }
+        publishEventUpdate(entityBO.getEventId());
     }
 
     @Override
@@ -87,12 +104,14 @@ public class EventParamServiceImpl implements EventParamService {
         if (!eventParamManager.removeById(id)) {
             throw new DeleteException("Failed to remove event param");
         }
+        publishEventUpdate(entityDO.getEventId());
     }
 
     @Override
     @Transactional
     public void update(EventParamBO entityBO) {
         EventParamDO current = getDOById(entityBO.getId(), true);
+        Long oldEventId = current.getEventId();
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
@@ -104,6 +123,10 @@ public class EventParamServiceImpl implements EventParamService {
         entityDO.setOperateTime(null);
         if (!eventParamManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update event param");
+        }
+        publishEventUpdate(oldEventId);
+        if (!Objects.equals(oldEventId, entityBO.getEventId())) {
+            publishEventUpdate(entityBO.getEventId());
         }
     }
 
@@ -178,6 +201,66 @@ public class EventParamServiceImpl implements EventParamService {
         if (Objects.isNull(eventBO) || !Objects.equals(entityBO.getTenantId(), eventBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+    }
+
+    private void publishEventUpdate(Long eventId) {
+        if (Objects.isNull(eventId)) {
+            return;
+        }
+        EventBO eventBO;
+        try {
+            eventBO = eventService.getById(eventId);
+        } catch (NotFoundException e) {
+            return;
+        }
+        if (Objects.isNull(eventBO)) {
+            return;
+        }
+
+        List<Long> deviceIds = listDeviceIdsByProfileId(eventBO.getProfileId());
+        metadataEventPublisher.publishEvent(
+                new MetadataEvent(this, eventId, MetadataTypeEnum.EVENT, MetadataOperateTypeEnum.UPDATE,
+                        driverServiceNamesByDeviceIds(deviceIds)));
+        publishDeviceUpdateEvents(deviceIds);
+    }
+
+    private void publishDeviceUpdateEvents(Collection<Long> deviceIds) {
+        if (CollectionUtils.isEmpty(deviceIds)) {
+            return;
+        }
+        deviceIds.forEach(deviceId -> metadataEventPublisher.publishEvent(
+                new MetadataEvent(this, deviceId, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE,
+                        driverServiceNamesByDeviceId(deviceId))));
+    }
+
+    private Set<String> driverServiceNamesByDeviceIds(Collection<Long> deviceIds) {
+        if (CollectionUtils.isEmpty(deviceIds)) {
+            return Collections.emptySet();
+        }
+        return deviceIds.stream()
+                .map(this::driverServiceNamesByDeviceId)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> driverServiceNamesByDeviceId(Long deviceId) {
+        if (Objects.isNull(deviceId)) {
+            return Collections.emptySet();
+        }
+        DriverBO driverBO = driverService.listByDeviceId(deviceId);
+        if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
+            return Collections.emptySet();
+        }
+        return Set.of(driverBO.getServiceName());
+    }
+
+    private List<Long> listDeviceIdsByProfileId(Long profileId) {
+        if (Objects.isNull(profileId)) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>lambdaQuery()
+                .eq(DeviceDO::getProfileId, profileId);
+        return deviceMapper.selectList(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
     private EventParamDO getDOById(Long id, boolean throwException) {

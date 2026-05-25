@@ -19,9 +19,13 @@ package io.github.pnoker.common.manager.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.AssociatedException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.manager.dal.CommandManager;
+import io.github.pnoker.common.manager.dal.DeviceManager;
+import io.github.pnoker.common.manager.dal.EventManager;
 import io.github.pnoker.common.manager.dal.PointManager;
 import io.github.pnoker.common.manager.dal.ProfileManager;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
@@ -58,6 +62,15 @@ class ProfileServiceImplTest {
 
     @Mock
     private PointManager pointManager;
+
+    @Mock
+    private CommandManager commandManager;
+
+    @Mock
+    private EventManager eventManager;
+
+    @Mock
+    private DeviceManager deviceManager;
 
     @Mock
     private ProfileMapper profileMapper;
@@ -114,6 +127,59 @@ class ProfileServiceImplTest {
     void removeRejectsUnknownId() {
         when(profileManager.getById(1L)).thenReturn(null);
         assertThatThrownBy(() -> service.delete(1L)).isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void removeRejectsProfileReferencedByDevices() {
+        when(profileManager.getById(1L)).thenReturn(doRow);
+        when(deviceManager.count(any(LambdaQueryWrapper.class))).thenReturn(1L);
+
+        assertThatThrownBy(() -> service.delete(1L))
+                .isInstanceOf(AssociatedException.class)
+                .hasMessageContaining("devices");
+        verify(profileManager, never()).removeById(1L);
+    }
+
+    @Test
+    void removeRejectsProfileWithPoints() {
+        when(profileManager.getById(1L)).thenReturn(doRow);
+        when(pointManager.count(any(LambdaQueryWrapper.class))).thenReturn(1L);
+
+        assertThatThrownBy(() -> service.delete(1L))
+                .isInstanceOf(AssociatedException.class)
+                .hasMessageContaining("points");
+        verify(profileManager, never()).removeById(1L);
+    }
+
+    @Test
+    void removeRejectsProfileWithCommands() {
+        when(profileManager.getById(1L)).thenReturn(doRow);
+        when(commandManager.count(any(LambdaQueryWrapper.class))).thenReturn(1L);
+
+        assertThatThrownBy(() -> service.delete(1L))
+                .isInstanceOf(AssociatedException.class)
+                .hasMessageContaining("commands");
+        verify(profileManager, never()).removeById(1L);
+    }
+
+    @Test
+    void removeRejectsProfileWithEvents() {
+        when(profileManager.getById(1L)).thenReturn(doRow);
+        when(eventManager.count(any(LambdaQueryWrapper.class))).thenReturn(1L);
+
+        assertThatThrownBy(() -> service.delete(1L))
+                .isInstanceOf(AssociatedException.class)
+                .hasMessageContaining("events");
+        verify(profileManager, never()).removeById(1L);
+    }
+
+    @Test
+    void removeSucceedsWhenNoAssociatedResourcesExist() {
+        when(profileManager.getById(1L)).thenReturn(doRow);
+        when(profileManager.removeById(1L)).thenReturn(true);
+
+        assertThatNoException().isThrownBy(() -> service.delete(1L));
+        verify(profileManager).removeById(1L);
     }
 
     @Test

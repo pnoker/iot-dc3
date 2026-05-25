@@ -73,7 +73,7 @@ public class CommandController implements BaseController {
             CommandBO entityBO = commandBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             commandService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(String.valueOf(entityBO.getId()));
         }));
     }
 

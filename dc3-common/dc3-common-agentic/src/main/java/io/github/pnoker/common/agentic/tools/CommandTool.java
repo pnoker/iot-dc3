@@ -48,7 +48,7 @@ public class CommandTool {
 
     private final CommandFacade commandFacade;
 
-    @Tool(description = "Look up a command (custom instruction) by its numeric ID. Returns command name, code, type (custom/config/action), call type (sync/async), timeout, and bound profile ID.")
+    @Tool(description = "Look up a command (custom instruction) by its numeric ID. Returns command name, code, type (custom/config/action), call type (sync/async), timeout in seconds, and bound profile ID.")
     @AgenticToolMetadata(domain = "command", title = "Query command by ID")
     public AgenticToolResult<FacadeCommandBO> lookupCommandById(
             @ToolParam(description = "The numeric command ID") Long commandId,

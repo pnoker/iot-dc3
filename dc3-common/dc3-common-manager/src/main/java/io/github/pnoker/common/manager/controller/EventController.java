@@ -73,7 +73,7 @@ public class EventController implements BaseController {
             EventBO entityBO = eventBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             eventService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(String.valueOf(entityBO.getId()));
         }));
     }
 
