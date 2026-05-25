@@ -10,7 +10,7 @@ drivers, storing them in the time-series repository, and exposing data query API
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-data
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.center.data`
 
 ## Service Ports

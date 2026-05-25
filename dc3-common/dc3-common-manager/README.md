@@ -10,7 +10,7 @@ mappers, and event handling logic for the Manager Center. It is wired into `dc3-
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-manager
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 
 ## Key Components
 

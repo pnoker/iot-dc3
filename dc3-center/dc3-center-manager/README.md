@@ -10,7 +10,7 @@ profile management, point configuration, permission management, and command inte
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-manager
-- **Version**: 2026.5.18
+- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.center.manager`
 
 ## Service Ports

@@ -214,7 +214,8 @@ Keep persistence, business, and web representations deliberately separated.
 - Services built on `dc3-common-web` use WebFlux; configure request base paths with `spring.webflux.base-path`, not
   `server.servlet.context-path`.
 
-All custom prefixes use `dc3.*`. Check `@ConfigurationProperties` annotations in the codebase for the current set — do not hardcode a prefix list in documentation.
+All custom prefixes use `dc3.*`. Check `@ConfigurationProperties` annotations in the codebase for the current set — do
+not hardcode a prefix list in documentation.
 
 ### Logging
 

@@ -73,6 +73,23 @@ class MqttReceiveServiceImplTest {
         return msg;
     }
 
+    private static EventAttributeDTO eventAttribute(Long id, String code) {
+        EventAttributeDTO attribute = new EventAttributeDTO();
+        attribute.setId(id);
+        attribute.setAttributeCode(code);
+        attribute.setAttributeTypeFlag(AttributeTypeFlagEnum.STRING);
+        return attribute;
+    }
+
+    private static EventAttributeConfigDTO eventConfig(Long attributeId, Long deviceId, Long eventId, String value) {
+        EventAttributeConfigDTO config = new EventAttributeConfigDTO();
+        config.setAttributeId(attributeId);
+        config.setDeviceId(deviceId);
+        config.setEventId(eventId);
+        config.setConfigValue(value);
+        return config;
+    }
+
     @BeforeEach
     void setUp() {
         driverMetadata = new DriverMetadata();
@@ -168,22 +185,5 @@ class MqttReceiveServiceImplTest {
         assertThat(report.eventCode()).isEqualTo("alarm");
         assertThat(report.paramValues()).containsEntry("temperature", "92").containsEntry("source", "mqtt");
         assertThat(report.configSnapshot()).contains("sourceTopic").contains("eventCodePath").contains("payloadPath");
-    }
-
-    private static EventAttributeDTO eventAttribute(Long id, String code) {
-        EventAttributeDTO attribute = new EventAttributeDTO();
-        attribute.setId(id);
-        attribute.setAttributeCode(code);
-        attribute.setAttributeTypeFlag(AttributeTypeFlagEnum.STRING);
-        return attribute;
-    }
-
-    private static EventAttributeConfigDTO eventConfig(Long attributeId, Long deviceId, Long eventId, String value) {
-        EventAttributeConfigDTO config = new EventAttributeConfigDTO();
-        config.setAttributeId(attributeId);
-        config.setDeviceId(deviceId);
-        config.setEventId(eventId);
-        config.setConfigValue(value);
-        return config;
     }
 }

@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 695">
     <defs>
         <marker id="arrow-down" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -175,7 +192,8 @@
 
         <rect x="268" y="394" width="160" height="40" rx="5" fill="rgba(129, 140, 248, 0.08)" stroke="#818cf8"
               stroke-width="0.5"/>
-        <text x="348" y="419" fill="#e2e8f0" font-size="10" font-weight="600" text-anchor="middle">データストレージ</text>
+        <text x="348" y="419" fill="#e2e8f0" font-size="10" font-weight="600" text-anchor="middle">データストレージ
+        </text>
 
         <rect x="444" y="394" width="160" height="40" rx="5" fill="rgba(129, 140, 248, 0.08)" stroke="#818cf8"
               stroke-width="0.5"/>

@@ -81,10 +81,10 @@
             last_heartbeat_time = CURRENT_TIMESTAMP,
             timeout_source_flag = EXCLUDED.timeout_source_flag,
             entity_state_ext = CASE
-            WHEN COALESCE (#{stateDescription}::text, '') != ''
+            WHEN COALESCE (#{stateDescription}:: text, '') != ''
             THEN json_build_object(
             'type', dc3_entity_state.entity_state_ext->>'type',
-            'content', #{stateDescription}::text,
+            'content', #{stateDescription}:: text,
             'version', COALESCE ((dc3_entity_state.entity_state_ext->>'version'):: int, 0) + 1
             )
             ELSE dc3_entity_state.entity_state_ext

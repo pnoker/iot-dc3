@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.driver.entity.bo;
 
-import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
+import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import lombok.AllArgsConstructor;
