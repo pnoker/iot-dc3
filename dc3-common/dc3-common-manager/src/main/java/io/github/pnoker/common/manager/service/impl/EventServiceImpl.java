@@ -102,6 +102,7 @@ public class EventServiceImpl implements EventService {
         if (!eventManager.save(entityDO)) {
             throw new AddException("Failed to create event");
         }
+        entityBO.setId(entityDO.getId());
 
         List<Long> deviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
         metadataEventPublisher.publishEvent(

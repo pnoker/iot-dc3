@@ -28,8 +28,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Listens for internal metadata events and forwards the relevant device and point changes
- * to the custom driver service.
+ * Listens for internal metadata events and forwards supported metadata changes to the
+ * custom driver service.
  *
  * @author zhangzi
  * @version 2025.9.0
@@ -62,6 +62,12 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
             MetadataEventDTO entityEvent = new MetadataEventDTO();
             entityEvent.setId(metadataEvent.getId());
             entityEvent.setMetadataType(MetadataTypeEnum.DRIVER);
+            entityEvent.setOperateType(metadataEvent.getOperateType());
+            driverCustomService.event(entityEvent);
+        } else if (MetadataTypeEnum.COMMAND.equals(metadataType) || MetadataTypeEnum.EVENT.equals(metadataType)) {
+            MetadataEventDTO entityEvent = new MetadataEventDTO();
+            entityEvent.setId(metadataEvent.getId());
+            entityEvent.setMetadataType(metadataType);
             entityEvent.setOperateType(metadataEvent.getOperateType());
             driverCustomService.event(entityEvent);
         }

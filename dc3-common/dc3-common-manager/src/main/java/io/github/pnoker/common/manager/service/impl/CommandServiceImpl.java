@@ -102,6 +102,7 @@ public class CommandServiceImpl implements CommandService {
         if (!commandManager.save(entityDO)) {
             throw new AddException("Failed to create command");
         }
+        entityBO.setId(entityDO.getId());
 
         List<Long> deviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
         metadataEventPublisher.publishEvent(

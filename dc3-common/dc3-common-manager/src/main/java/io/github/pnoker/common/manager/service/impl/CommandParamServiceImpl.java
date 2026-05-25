@@ -24,6 +24,9 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -32,11 +35,16 @@ import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.manager.dal.CommandParamManager;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
 import io.github.pnoker.common.manager.entity.bo.CommandParamBO;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.builder.CommandParamBuilder;
 import io.github.pnoker.common.manager.entity.model.CommandParamDO;
+import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.query.CommandParamQuery;
+import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
+import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.service.CommandParamService;
 import io.github.pnoker.common.manager.service.CommandService;
+import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +53,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Business service implementation for command param operations.
@@ -68,6 +78,12 @@ public class CommandParamServiceImpl implements CommandParamService {
 
     private final CommandService commandService;
 
+    private final MetadataEventPublisher metadataEventPublisher;
+
+    private final DeviceMapper deviceMapper;
+
+    private final DriverService driverService;
+
     @Override
     @Transactional
     public void add(CommandParamBO entityBO) {
@@ -78,6 +94,7 @@ public class CommandParamServiceImpl implements CommandParamService {
         if (!commandParamManager.save(entityDO)) {
             throw new AddException("Failed to create command param");
         }
+        publishCommandUpdate(entityBO.getCommandId());
     }
 
     @Override
@@ -87,12 +104,14 @@ public class CommandParamServiceImpl implements CommandParamService {
         if (!commandParamManager.removeById(id)) {
             throw new DeleteException("Failed to remove command param");
         }
+        publishCommandUpdate(entityDO.getCommandId());
     }
 
     @Override
     @Transactional
     public void update(CommandParamBO entityBO) {
         CommandParamDO current = getDOById(entityBO.getId(), true);
+        Long oldCommandId = current.getCommandId();
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
@@ -104,6 +123,10 @@ public class CommandParamServiceImpl implements CommandParamService {
         entityDO.setOperateTime(null);
         if (!commandParamManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update command param");
+        }
+        publishCommandUpdate(oldCommandId);
+        if (!Objects.equals(oldCommandId, entityBO.getCommandId())) {
+            publishCommandUpdate(entityBO.getCommandId());
         }
     }
 
@@ -180,6 +203,66 @@ public class CommandParamServiceImpl implements CommandParamService {
         if (Objects.isNull(commandBO) || !Objects.equals(entityBO.getTenantId(), commandBO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+    }
+
+    private void publishCommandUpdate(Long commandId) {
+        if (Objects.isNull(commandId)) {
+            return;
+        }
+        CommandBO commandBO;
+        try {
+            commandBO = commandService.getById(commandId);
+        } catch (NotFoundException e) {
+            return;
+        }
+        if (Objects.isNull(commandBO)) {
+            return;
+        }
+
+        List<Long> deviceIds = listDeviceIdsByProfileId(commandBO.getProfileId());
+        metadataEventPublisher.publishEvent(
+                new MetadataEvent(this, commandId, MetadataTypeEnum.COMMAND, MetadataOperateTypeEnum.UPDATE,
+                        driverServiceNamesByDeviceIds(deviceIds)));
+        publishDeviceUpdateEvents(deviceIds);
+    }
+
+    private void publishDeviceUpdateEvents(Collection<Long> deviceIds) {
+        if (CollectionUtils.isEmpty(deviceIds)) {
+            return;
+        }
+        deviceIds.forEach(deviceId -> metadataEventPublisher.publishEvent(
+                new MetadataEvent(this, deviceId, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE,
+                        driverServiceNamesByDeviceId(deviceId))));
+    }
+
+    private Set<String> driverServiceNamesByDeviceIds(Collection<Long> deviceIds) {
+        if (CollectionUtils.isEmpty(deviceIds)) {
+            return Collections.emptySet();
+        }
+        return deviceIds.stream()
+                .map(this::driverServiceNamesByDeviceId)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> driverServiceNamesByDeviceId(Long deviceId) {
+        if (Objects.isNull(deviceId)) {
+            return Collections.emptySet();
+        }
+        DriverBO driverBO = driverService.listByDeviceId(deviceId);
+        if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
+            return Collections.emptySet();
+        }
+        return Set.of(driverBO.getServiceName());
+    }
+
+    private List<Long> listDeviceIdsByProfileId(Long profileId) {
+        if (Objects.isNull(profileId)) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>lambdaQuery()
+                .eq(DeviceDO::getProfileId, profileId);
+        return deviceMapper.selectList(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
     private CommandParamDO getDOById(Long id, boolean throwException) {

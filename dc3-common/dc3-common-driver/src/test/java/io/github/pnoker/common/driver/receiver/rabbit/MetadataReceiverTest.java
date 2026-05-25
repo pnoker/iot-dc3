@@ -182,6 +182,30 @@ class MetadataReceiverTest {
     }
 
     @Test
+    void commandMetadataEventIsForwardedWithoutCacheMutation() throws Exception {
+        MetadataEventDTO dto = event(MetadataTypeEnum.COMMAND, MetadataOperateTypeEnum.UPDATE, 30L);
+
+        receiver.metadataReceive(channel, message, dto);
+
+        verify(deviceMetadata, never()).loadCache(30L);
+        verify(pointMetadata, never()).loadCache(30L);
+        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
+        verify(channel).basicAck(eq(7L), eq(false));
+    }
+
+    @Test
+    void eventMetadataEventIsForwardedWithoutCacheMutation() throws Exception {
+        MetadataEventDTO dto = event(MetadataTypeEnum.EVENT, MetadataOperateTypeEnum.UPDATE, 40L);
+
+        receiver.metadataReceive(channel, message, dto);
+
+        verify(deviceMetadata, never()).loadCache(40L);
+        verify(pointMetadata, never()).loadCache(40L);
+        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
+        verify(channel).basicAck(eq(7L), eq(false));
+    }
+
+    @Test
     void nacksAndRequeuesOnPublisherFailure() throws Exception {
         MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 10L);
         doThrow(new RuntimeException("downstream offline"))

@@ -17,23 +17,31 @@
 
 package io.github.pnoker.common.manager.grpc.server.driver;
 
+import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
+import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverQuery;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
+import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
+import io.github.pnoker.common.manager.grpc.builder.GrpcCommandAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
+import io.github.pnoker.common.manager.grpc.builder.GrpcEventAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeBuilder;
+import io.github.pnoker.common.manager.service.CommandAttributeService;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.service.EventAttributeService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -65,6 +73,12 @@ class DriverDriverServerTest {
     private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
     @Mock
+    private GrpcCommandAttributeBuilder grpcCommandAttributeBuilder;
+
+    @Mock
+    private GrpcEventAttributeBuilder grpcEventAttributeBuilder;
+
+    @Mock
     private DriverRegisterService driverRegisterService;
 
     @Mock
@@ -77,6 +91,12 @@ class DriverDriverServerTest {
     private PointAttributeService pointAttributeService;
 
     @Mock
+    private CommandAttributeService commandAttributeService;
+
+    @Mock
+    private EventAttributeService eventAttributeService;
+
+    @Mock
     private DeviceService deviceService;
 
     private Server server;
@@ -86,8 +106,9 @@ class DriverDriverServerTest {
     @BeforeEach
     void setUp() throws Exception {
         DriverDriverServer driverServer = new DriverDriverServer(grpcDriverBuilder, grpcDriverAttributeBuilder,
-                grpcPointAttributeBuilder, driverRegisterService, driverService, driverAttributeService,
-                pointAttributeService, deviceService);
+                grpcPointAttributeBuilder, grpcCommandAttributeBuilder, grpcEventAttributeBuilder,
+                driverRegisterService, driverService, driverAttributeService, pointAttributeService,
+                commandAttributeService, eventAttributeService, deviceService);
 
         String name = "dc3-driver-metadata-" + UUID.randomUUID();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(driverServer).build().start();
@@ -115,15 +136,25 @@ class DriverDriverServerTest {
         driverAttribute.setTenantId(100L);
         PointAttributeBO pointAttribute = new PointAttributeBO();
         pointAttribute.setTenantId(100L);
+        CommandAttributeBO commandAttribute = new CommandAttributeBO();
+        commandAttribute.setTenantId(100L);
+        EventAttributeBO eventAttribute = new EventAttributeBO();
+        eventAttribute.setTenantId(100L);
 
         when(driverService.getById(7L)).thenReturn(driver);
         when(grpcDriverBuilder.buildGrpcDTOByBO(driver)).thenReturn(GrpcDriverDTO.newBuilder().build());
         when(driverAttributeService.listByDriverId(7L)).thenReturn(List.of(driverAttribute));
         when(pointAttributeService.listByDriverId(7L)).thenReturn(List.of(pointAttribute));
+        when(commandAttributeService.listByDriverId(7L)).thenReturn(List.of(commandAttribute));
+        when(eventAttributeService.listByDriverId(7L)).thenReturn(List.of(eventAttribute));
         when(grpcDriverAttributeBuilder.buildGrpcDTOByBO(driverAttribute))
                 .thenReturn(GrpcDriverAttributeDTO.newBuilder().build());
         when(grpcPointAttributeBuilder.buildGrpcDTOByBO(pointAttribute))
                 .thenReturn(GrpcPointAttributeDTO.newBuilder().build());
+        when(grpcCommandAttributeBuilder.buildGrpcDTOByBO(commandAttribute))
+                .thenReturn(GrpcCommandAttributeDTO.newBuilder().build());
+        when(grpcEventAttributeBuilder.buildGrpcDTOByBO(eventAttribute))
+                .thenReturn(GrpcEventAttributeDTO.newBuilder().build());
         when(deviceService.listIdsByDriverId(7L)).thenReturn(List.of(1L, 2L));
 
         GrpcRDriverRegisterDTO response = stub.getById(GrpcDriverQuery.newBuilder().setDriverId(7L).build());
@@ -132,6 +163,8 @@ class DriverDriverServerTest {
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.OK.getCode());
         assertThat(response.getDriverAttributesCount()).isEqualTo(1);
         assertThat(response.getPointAttributesCount()).isEqualTo(1);
+        assertThat(response.getCommandAttributesCount()).isEqualTo(1);
+        assertThat(response.getEventAttributesCount()).isEqualTo(1);
         assertThat(response.getDeviceIdsList()).containsExactly(1L, 2L);
     }
 

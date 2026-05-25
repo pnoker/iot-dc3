@@ -50,6 +50,7 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -66,6 +67,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CommandHistoryServiceImpl implements CommandHistoryService {
 
+    private static final int DEFAULT_COMMAND_TIMEOUT_SECONDS = 30;
+
+    private static final int LEGACY_MILLISECONDS_THRESHOLD = 1000;
+
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+
     private final DeviceFacade deviceFacade;
 
     private final DriverFacade driverFacade;
@@ -80,7 +87,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
 
     @Override
     public String call(Long tenantId, CommandCallVO entityVO) {
-        validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getCommandId());
+        FacadeCommandBO command = validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getCommandId());
 
         FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
         if (Objects.isNull(driver)) {
@@ -88,10 +95,11 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         }
         checkDriverOnline(tenantId, driver.getId());
 
-        FacadeCommandBO command = commandFacade.getById(tenantId, entityVO.getCommandId());
+        int timeoutSeconds = resolveCommandTimeout(command);
 
         String recordId = UUID.randomUUID().toString();
         LocalDateTime nowLocal = LocalDateTime.now();
+        Instant now = Instant.now();
 
         CommandHistoryDO recordDO = new CommandHistoryDO();
         recordDO.setRecordId(recordId);
@@ -103,7 +111,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         recordDO.setStatus(PointCommandStatusEnum.PENDING.getCode());
         recordDO.setSource(CommandHistorySourceEnum.HTTP.getCode());
         recordDO.setOccurTime(nowLocal);
-        recordDO.setExpireTime(nowLocal.plusSeconds(30));
+        recordDO.setExpireTime(nowLocal.plusSeconds(timeoutSeconds));
         recordDO.setSchemaVersion((short) 1);
         commandHistoryManager.save(recordDO);
 
@@ -115,8 +123,8 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
                 .commandCode(command.getCommandCode())
                 .paramValues(entityVO.getParamValues())
                 .source(CommandHistorySourceEnum.HTTP.getCode())
-                .occurredAt(java.time.Instant.now())
-                .expireAt(java.time.Instant.now().plusSeconds(30))
+                .occurredAt(now)
+                .expireAt(now.plusSeconds(timeoutSeconds))
                 .schemaVersion(1)
                 .build(), driver.getServiceName(), recordId);
 
@@ -156,7 +164,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         }
     }
 
-    private void validateCommandScope(Long tenantId, Long deviceId, Long commandId) {
+    private FacadeCommandBO validateCommandScope(Long tenantId, Long deviceId, Long commandId) {
         FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
         if (Objects.isNull(device)) {
             throw new NotFoundException("Device does not exist");
@@ -175,6 +183,21 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         if (Objects.isNull(device.getProfileId()) || !Objects.equals(device.getProfileId(), command.getProfileId())) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
+        return command;
+    }
+
+    private int resolveCommandTimeout(FacadeCommandBO command) {
+        if (Objects.isNull(command) || Objects.isNull(command.getTimeout()) || command.getTimeout() <= 0) {
+            return DEFAULT_COMMAND_TIMEOUT_SECONDS;
+        }
+        int timeout = command.getTimeout();
+        if (timeout >= LEGACY_MILLISECONDS_THRESHOLD && timeout % MILLISECONDS_PER_SECOND == 0) {
+            int timeoutSeconds = timeout / MILLISECONDS_PER_SECOND;
+            log.warn("Interpreting command timeout as legacy milliseconds: commandId={}, rawTimeout={}, timeoutSeconds={}",
+                    command.getId(), timeout, timeoutSeconds);
+            return timeoutSeconds;
+        }
+        return timeout;
     }
 
     private void publishCommand(CommandCallDTO dto, String serviceName, String recordId) {

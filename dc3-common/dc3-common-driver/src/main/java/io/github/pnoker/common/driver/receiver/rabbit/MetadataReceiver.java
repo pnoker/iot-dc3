@@ -135,6 +135,11 @@ public class MetadataReceiver {
 
                 metadataEventPublisher.publishEvent(
                         new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DRIVER, entityDTO.getOperateType()));
+            } else if (MetadataTypeEnum.COMMAND.equals(entityDTO.getMetadataType())
+                    || MetadataTypeEnum.EVENT.equals(entityDTO.getMetadataType())) {
+                log.info("Forward {} metadata event: {}", entityDTO.getMetadataType(), entityDTO.getId());
+                metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), entityDTO.getMetadataType(),
+                        entityDTO.getOperateType()));
             } else {
                 log.error("Unsupported metadata type: {}", entityDTO.getMetadataType());
                 RabbitAckUtil.reject(channel, deliveryTag);

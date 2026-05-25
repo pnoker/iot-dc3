@@ -161,7 +161,7 @@ Point 之外的自定义指令能力，并通过 `profile_id` 归属到 `Profile
 | `command_code` | 指令标识符，同一 `profile_id` 下唯一         |
 | `command_type` | 指令类型，如 `custom`、`config`、`action` |
 | `call_type`    | 调用方式，如 `sync`、`async`             |
-| `timeout`      | 调用超时时间                            |
+| `timeout`      | 调用超时时间，单位秒                         |
 | `command_ext`  | 协议映射、驱动指令模板、幂等配置等扩展               |
 | `enable_flag`  | 启停状态                              |
 | `tenant_id`    | 租户                                |

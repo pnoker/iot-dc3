@@ -20,7 +20,6 @@ package io.github.pnoker.common.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -32,11 +31,16 @@ import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.manager.dal.CommandManager;
+import io.github.pnoker.common.manager.dal.DeviceManager;
+import io.github.pnoker.common.manager.dal.EventManager;
 import io.github.pnoker.common.manager.dal.PointManager;
 import io.github.pnoker.common.manager.dal.ProfileManager;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.builder.ProfileBuilder;
+import io.github.pnoker.common.manager.entity.model.CommandDO;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
+import io.github.pnoker.common.manager.entity.model.EventDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.github.pnoker.common.manager.entity.model.ProfileDO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
@@ -74,6 +78,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final PointManager pointManager;
 
+    private final CommandManager commandManager;
+
+    private final EventManager eventManager;
+
+    private final DeviceManager deviceManager;
+
     private final ProfileMapper profileMapper;
 
     private final DeviceMapper deviceMapper;
@@ -94,12 +104,7 @@ public class ProfileServiceImpl implements ProfileService {
     public void delete(Long id) {
         getDOById(id, true);
 
-        //
-        LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, id);
-        long count = wrapper.count();
-        if (count > 0) {
-            throw new AssociatedException("Failed to remove profile: some points exists in the template");
-        }
+        validateNoAssociations(id);
 
         if (!profileManager.removeById(id)) {
             throw new DeleteException("Failed to remove profile");
@@ -229,6 +234,28 @@ public class ProfileServiceImpl implements ProfileService {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
+
+    private void validateNoAssociations(Long profileId) {
+        long deviceCount = deviceManager.count(Wrappers.<DeviceDO>lambdaQuery().eq(DeviceDO::getProfileId, profileId));
+        if (deviceCount > 0) {
+            throw new AssociatedException("Failed to remove profile: some devices still reference the profile");
+        }
+
+        long pointCount = pointManager.count(Wrappers.<PointDO>lambdaQuery().eq(PointDO::getProfileId, profileId));
+        if (pointCount > 0) {
+            throw new AssociatedException("Failed to remove profile: some points exist in the profile");
+        }
+
+        long commandCount = commandManager.count(Wrappers.<CommandDO>lambdaQuery().eq(CommandDO::getProfileId, profileId));
+        if (commandCount > 0) {
+            throw new AssociatedException("Failed to remove profile: some commands exist in the profile");
+        }
+
+        long eventCount = eventManager.count(Wrappers.<EventDO>lambdaQuery().eq(EventDO::getProfileId, profileId));
+        if (eventCount > 0) {
+            throw new AssociatedException("Failed to remove profile: some events exist in the profile");
+        }
     }
 
     /**
