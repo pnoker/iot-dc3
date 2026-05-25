@@ -95,7 +95,7 @@
     <div class="things-dialog-footer">
       <slot name="footer">
         <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-        <el-button plain type="success" @click="reset">{{ $t('common.reset') }}</el-button>
+        <el-button plain @click="reset">{{ $t('common.reset') }}</el-button>
         <el-button plain type="warning" @click="importTemplate">{{ $t('device.import.template') }}</el-button>
         <el-button type="primary" @click="importThing">{{ $t('common.confirm') }}</el-button>
       </slot>
@@ -293,7 +293,3 @@
     importThing,
   });
 </script>
-
-<style lang="scss" scoped>
-  @use '@/styles/things-dialog.scss';
-</style>

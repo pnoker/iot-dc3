@@ -27,6 +27,7 @@ import type { Order } from '@/config/types';
 import type { RoleForm, RoleRecord } from '@/config/types/auth';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
 import roleTool from './tool/RoleTool.vue';
 import roleEditForm from './edit/RoleEditForm.vue';
 import roleAssignResources from './assign/RoleAssignResources.vue';
@@ -35,6 +36,7 @@ export default defineComponent({
   name: 'SettingsRole',
   components: {
     BlankCard,
+    EnableTag,
     roleTool,
     roleEditForm,
     roleAssignResources,

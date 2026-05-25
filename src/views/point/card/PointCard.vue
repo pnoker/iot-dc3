@@ -19,7 +19,7 @@
     <el-card shadow="hover">
       <div class="things-card-content">
         <things-card-header
-          :enabled="data.enableFlag === 'ENABLE'"
+          :enabled="enabled"
           :icon="icon"
           :name="data.pointName"
           :status-title="$t('common.name')"
@@ -103,7 +103,7 @@
           :delete-title="$t('point.card.confirmDelete')"
           :disable-title="$t('point.card.confirmDisable')"
           :enable-title="$t('point.card.confirmEnable')"
-          :enabled="data.enableFlag === 'ENABLE'"
+          :enabled="enabled"
           detail-disabled
           @delete="emitDelete"
           @detail="detail"
@@ -117,13 +117,14 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
+  import { computed, type PropType } from 'vue';
   import { Edit, List, Location, Sunset } from '@element-plus/icons-vue';
   import router from '@/config/router';
   import { copy } from '@/utils/commonUtil';
   import { timestamp } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
   import { pointTypeKey, rwFlagKey } from '@/utils/pointFormatUtil';
+  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
   import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
 
@@ -135,6 +136,7 @@
   });
 
   const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
+  const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
   const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
     emit(name, props.data.id, props.data.profileId, () => successMessage());
@@ -163,8 +165,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-
   // PointCard 用双栏列表展示字段,200px 固定宽度是为了和卡片尺寸匹配。
   .things-body-content-item-column-2 {
     width: 200px;

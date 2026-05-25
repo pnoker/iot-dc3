@@ -82,7 +82,3 @@
     load();
   });
 </script>
-
-<style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-</style>

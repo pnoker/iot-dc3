@@ -19,7 +19,7 @@
     <el-card shadow="hover">
       <div class="things-card-content">
         <things-card-header
-          :enabled="data.enableFlag === 'ENABLE'"
+          :enabled="enabled"
           :icon="icon"
           :name="data.profileName"
           :status-title="$t('common.name')"
@@ -49,7 +49,7 @@
           :delete-title="$t('profile.card.confirmDelete')"
           :disable-title="$t('profile.card.confirmDisable')"
           :enable-title="$t('profile.card.confirmEnable')"
-          :enabled="data.enableFlag === 'ENABLE'"
+          :enabled="enabled"
           @delete="emitAction('delete-thing')"
           @detail="detail"
           @disable="emitAction('disable-thing')"
@@ -62,12 +62,13 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
+  import { computed, type PropType } from 'vue';
   import { Edit, Sunset } from '@element-plus/icons-vue';
   import router from '@/config/router';
   import { copy } from '@/utils/commonUtil';
   import { timestamp } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
+  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
   import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
 
@@ -78,6 +79,7 @@
   });
 
   const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
+  const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
   const emitAction = (name: 'disable-thing' | 'enable-thing' | 'delete-thing') => {
     emit(name, props.data.id, () => successMessage());
@@ -95,7 +97,3 @@
     });
   };
 </script>
-
-<style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-</style>

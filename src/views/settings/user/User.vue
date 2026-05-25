@@ -35,9 +35,7 @@
         <el-table-column :label="t('settings.user.email')" min-width="180" prop="email" show-overflow-tooltip />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
-            <el-tag :type="Number(row.enableFlag) === 0 ? 'success' : 'info'">
-              {{ Number(row.enableFlag) === 0 ? t('common.enable') : t('common.disable') }}
-            </el-tag>
+            <enable-tag :value="row.enableFlag" />
           </template>
         </el-table-column>
         <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
@@ -72,9 +70,3 @@
 </template>
 
 <script lang="ts" src="./index.ts"></script>
-
-<style lang="scss" scoped>
-  .settings-table {
-    border-radius: 4px;
-  }
-</style>

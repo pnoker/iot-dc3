@@ -56,7 +56,7 @@
                 <span>
                   <el-icon><Location /></el-icon> {{ $t('command.card.timeout') }}:
                 </span>
-                {{ data.timeout ?? '-' }}
+                {{ commandTimeoutLabel(data.timeout) }}
               </li>
               <li class="nowrap-item">
                 <span>
@@ -102,7 +102,7 @@
   import { copy } from '@/utils/commonUtil';
   import { timestamp } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
-  import { callTypeLabel, commandTypeLabel, isEnabledFlag } from '@/utils/thingModelFormatUtil';
+  import { callTypeLabel, commandTimeoutLabel, commandTypeLabel, isEnabledFlag } from '@/utils/thingModelFormatUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
   import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
   import type { CommandRecord } from '@/config/types';
@@ -127,8 +127,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-
   .things-body-content-item-column-2 {
     max-width: 200px;
   }

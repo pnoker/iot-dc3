@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@use '@/styles/things-dialog.scss';
+@use '@/styles/things-card.scss';
+
 // 真正的全局样式,在 main.ts 里一次性 import。
 // 不能放到 element-variables.scss 里,因为后者是 Vite additionalData,
 // 会被预置到每个 scoped <style> 块,所有选择器都会被附加 scope hash,
@@ -23,6 +26,50 @@ body {
   margin: 0;
   min-width: 1280px;
   min-height: 768px;
+}
+
+// Form width helper classes are real CSS, so they live in the one-time global
+// stylesheet. The Sass variables behind them are still injected everywhere for
+// token reuse.
+.el-select.edit-form-small,
+.el-input.edit-form-small {
+  width: $form-width-small;
+}
+
+.el-select.edit-form-medium {
+  width: $form-width-medium;
+}
+
+.el-select.edit-form-default {
+  width: $form-width-default;
+}
+
+.el-select.edit-form-special,
+.el-input.edit-form-special {
+  width: $form-width-special;
+}
+
+.el-select.edit-form-large {
+  width: $form-width-large;
+}
+
+.settings-table {
+  margin-top: 1px;
+  border-radius: 4px;
+}
+
+.json-preview {
+  max-height: 220px;
+  margin: 0;
+  padding: 8px;
+  overflow: auto;
+  border-radius: 4px;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-primary);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 // el-popconfirm 的 popper 也通过 teleport 挂到 body,作用域外样式必须放在全局。

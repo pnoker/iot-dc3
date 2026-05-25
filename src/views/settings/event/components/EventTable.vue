@@ -447,11 +447,6 @@
 </script>
 
 <style lang="scss" scoped>
-  .settings-table {
-    margin-top: 1px;
-    border-radius: 4px;
-  }
-
   .settings-table__sub {
     margin-left: 6px;
     color: #909399;

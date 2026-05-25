@@ -16,6 +16,7 @@
 
 import request from '@/config/axios';
 import type { AxiosRequestConfig } from 'axios';
+import type { PageQuery, PageResult } from '@/config/types';
 
 /**
  * Shared HTTP helpers so every `src/api/*.ts` module stays a one-liner per
@@ -28,3 +29,18 @@ export const httpGet = <T = R>(url: string, config?: AxiosRequestConfig) =>
 
 export const httpPost = <T = R, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) =>
   request<T>({ ...config, url, method: 'post', data });
+
+export const crudAdd = <TPayload, TResponse = string>(base: string, payload: TPayload) =>
+  httpPost<R<TResponse>, TPayload>(`${base}/add`, payload);
+
+export const crudUpdate = <TPayload, TResponse = string>(base: string, payload: TPayload) =>
+  httpPost<R<TResponse>, TPayload>(`${base}/update`, payload);
+
+export const crudDelete = (base: string, id: string) =>
+  httpPost<R<string>>(`${base}/delete`, undefined, { params: { id } });
+
+export const crudGetById = <TRecord>(base: string, id: string) =>
+  httpGet<R<TRecord>>(`${base}/get_by_id`, { params: { id } });
+
+export const crudList = <TRecord>(base: string, query: PageQuery) =>
+  httpPost<R<PageResult<TRecord>>, PageQuery>(`${base}/list`, query);

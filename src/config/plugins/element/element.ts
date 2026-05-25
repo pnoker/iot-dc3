@@ -17,7 +17,6 @@
 import type { App } from 'vue';
 import * as ElementIcons from '@element-plus/icons-vue';
 import 'element-plus/dist/index.css';
-import './element-variables.scss';
 
 /**
  * Registers every icon exported by `@element-plus/icons-vue` globally so

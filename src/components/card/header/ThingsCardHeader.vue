@@ -63,7 +63,7 @@
       line-height: 48px;
       font-size: 14px;
       font-weight: bold;
-      color: rgba(0, 0, 0, 0.85);
+      color: var(--el-text-color-primary);
       cursor: pointer;
       display: block;
       overflow: hidden;
@@ -72,7 +72,7 @@
       width: 200px;
 
       &:hover {
-        color: #1890ff;
+        color: var(--el-color-primary);
       }
     }
 
@@ -89,10 +89,10 @@
   }
 
   .header-enable {
-    border-bottom: 1px solid #c2e7b0;
+    border-bottom: 1px solid var(--el-color-success-light-5);
   }
 
   .header-disable {
-    border-bottom: 1px solid #fbc4c4;
+    border-bottom: 1px solid var(--el-color-danger-light-5);
   }
 </style>

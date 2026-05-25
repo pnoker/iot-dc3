@@ -63,7 +63,3 @@
 </template>
 
 <script lang="ts" src="./index.ts" />
-
-<style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-</style>

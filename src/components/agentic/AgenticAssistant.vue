@@ -745,7 +745,7 @@
       try {
         await agenticStore.uploadAttachment(file);
       } catch (error) {
-        ElMessage.error(error instanceof Error ? error.message : 'Upload failed');
+        ElMessage.error(error instanceof Error ? error.message : t('agentic.uploadFailed'));
       }
     }
   };
@@ -757,12 +757,12 @@
       cancelButtonText: t('agentic.dialogCancel'),
     });
     await agenticStore.confirmAction(actionId);
-    ElMessage.success('Action confirmed');
+    ElMessage.success(t('agentic.actionConfirmed'));
   };
 
   const handleRejectAction = async (actionId: string) => {
     await agenticStore.rejectAction(actionId);
-    ElMessage.success('Action rejected');
+    ElMessage.success(t('agentic.actionRejected'));
   };
 
   const handleCopyMessage = async (message: AgenticMessage) => {

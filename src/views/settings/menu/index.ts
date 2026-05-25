@@ -25,6 +25,7 @@ import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
 import menuTool from './tool/MenuTool.vue';
 import menuEditForm from './edit/MenuEditForm.vue';
 
@@ -32,6 +33,7 @@ export default defineComponent({
   name: 'SettingsMenu',
   components: {
     BlankCard,
+    EnableTag,
     menuTool,
     menuEditForm,
   },

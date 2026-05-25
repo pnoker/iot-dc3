@@ -57,45 +57,37 @@
 
     <event-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
 
-    <el-drawer v-model="reactiveData.detailVisible" title="Event Detail" size="520px">
+    <el-drawer v-model="reactiveData.detailVisible" :title="$t('eventDefinition.detail.title')" size="520px">
       <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
         <el-descriptions-item :label="$t('common.name')">{{
           reactiveData.detailRecord.eventName || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="Code">{{ reactiveData.detailRecord.eventCode || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Event Type">{{
+        <el-descriptions-item :label="$t('eventDefinition.detail.code')">
+          {{ reactiveData.detailRecord.eventCode || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventDefinition.detail.eventType')">{{
           reactiveData.detailRecord.eventTypeFlag || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="Event Level">{{
+        <el-descriptions-item :label="$t('eventDefinition.detail.eventLevel')">{{
           reactiveData.detailRecord.eventLevelFlag || '-'
         }}</el-descriptions-item>
         <el-descriptions-item :label="$t('common.enableFlag')">
-          <el-tag
-            :type="
-              String(reactiveData.detailRecord.enableFlag) === 'ENABLE' ||
-              Number(reactiveData.detailRecord.enableFlag) === 0
-                ? 'success'
-                : 'info'
-            "
-          >
-            {{
-              String(reactiveData.detailRecord.enableFlag) === 'ENABLE' ||
-              Number(reactiveData.detailRecord.enableFlag) === 0
-                ? $t('common.enable')
-                : $t('common.disable')
-            }}
-          </el-tag>
+          <enable-tag :value="reactiveData.detailRecord.enableFlag" />
         </el-descriptions-item>
         <el-descriptions-item :label="$t('common.remark')">{{
           reactiveData.detailRecord.remark || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="Profile ID">{{ reactiveData.detailRecord.profileId || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Tenant ID">{{ reactiveData.detailRecord.tenantId || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Create Time">{{
-          formatTime(reactiveData.detailRecord.createTime)
+        <el-descriptions-item :label="$t('eventDefinition.detail.profileId')">
+          {{ reactiveData.detailRecord.profileId || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventDefinition.detail.tenantId')">
+          {{ reactiveData.detailRecord.tenantId || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('common.createTime')">{{
+          timestampLabel(reactiveData.detailRecord.createTime)
         }}</el-descriptions-item>
-        <el-descriptions-item label="Operate Time">{{
-          formatTime(reactiveData.detailRecord.operateTime)
+        <el-descriptions-item :label="$t('common.operationTime')">{{
+          timestampLabel(reactiveData.detailRecord.operateTime)
         }}</el-descriptions-item>
       </el-descriptions>
       <el-empty v-else :description="$t('common.description')" />
@@ -105,13 +97,23 @@
 
 <script lang="ts" setup>
   import { computed, reactive, ref, watch } from 'vue';
-  import { addEvent, deleteEvent, listEvent, updateEvent } from '@/api/event';
-  import { timestamp } from '@/utils/dateUtil';
-  import { successMessage } from '@/utils/notificationUtil';
+  import { useI18n } from 'vue-i18n';
+  import {
+    addEvent,
+    addEventParam,
+    deleteEvent,
+    deleteEventParam,
+    listEvent,
+    updateEvent,
+    updateEventParam,
+  } from '@/api/event';
+  import { timestampLabel } from '@/utils/dateUtil';
+  import { failMessage, successMessage } from '@/utils/notificationUtil';
   import { isNull } from '@/utils/validationUtil';
-  import type { EventForm, EventRecord, Order } from '@/config/types';
+  import type { EventForm, EventParamRecord, EventRecord, Order } from '@/config/types';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+  import EnableTag from '@/components/tag/EnableTag.vue';
   import EventCard from './card/EventCard.vue';
   import EventTool from './tool/EventTool.vue';
   import EventEditForm from './edit/EventEditForm.vue';
@@ -132,6 +134,7 @@
   }>();
 
   const editRef = ref<InstanceType<typeof EventEditForm>>();
+  const { t } = useI18n();
   const canManage = computed(() => props.embedded === '' || props.embedded === 'edit');
   const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
 
@@ -160,8 +163,6 @@
     const profileId = !isNull(props.profileId) ? props.profileId : form.profileId;
     return isNull(profileId) ? { ...form } : { ...form, profileId };
   };
-
-  const formatTime = (value: unknown) => (isNull(value) ? '-' : timestamp(String(value)));
 
   const load = () => {
     reactiveData.loading = true;
@@ -204,20 +205,65 @@
   };
   const openEdit = (row: EventRecord) => editRef.value?.showEdit(row);
 
-  const onAdd = (form: EventForm, done: () => void) => {
-    addEvent(withFixedProfile(form)).then(() => {
-      successMessage();
-      load();
-      done();
+  type DoneCallback = (close?: boolean) => void;
+
+  const isValidCreatedId = (id: string) => /^\d+$/.test(id);
+
+  const syncEventParams = (eventId: string, params: EventParamRecord[], originalParams: EventParamRecord[] = []) => {
+    const currentIds = new Set(params.map((item) => String(item.id || '')).filter(Boolean));
+    const deleteTasks = originalParams
+      .filter((item) => item.id && !currentIds.has(String(item.id)))
+      .map((item) => deleteEventParam(String(item.id)));
+
+    const saveTasks = params.map((item) => {
+      const payload = { ...item, eventId };
+      return item.id ? updateEventParam(payload) : addEventParam({ ...payload, id: undefined });
     });
+
+    return Promise.all(deleteTasks).then(() => Promise.all(saveTasks));
   };
 
-  const onUpdate = (form: EventForm, done: () => void) => {
-    updateEvent(withFixedProfile(form)).then(() => {
-      successMessage();
-      load();
-      done();
-    });
+  const onAdd = (form: EventForm, params: EventParamRecord[], done: DoneCallback) => {
+    addEvent(withFixedProfile(form))
+      .then((res) => {
+        const eventId = String(res.data || '');
+        if (!isValidCreatedId(eventId)) {
+          failMessage(t('eventDefinition.errors.idNotReturned'));
+          return Promise.reject(new Error(t('eventDefinition.errors.idNotReturned')));
+        }
+        return syncEventParams(eventId, params).then(() => {
+          successMessage();
+          load();
+          done();
+        });
+      })
+      .catch(() => {
+        done(false);
+      });
+  };
+
+  const onUpdate = (
+    form: EventForm,
+    params: EventParamRecord[],
+    originalParams: EventParamRecord[],
+    done: DoneCallback
+  ) => {
+    updateEvent(withFixedProfile(form))
+      .then(() => {
+        const eventId = String(form.id || '');
+        if (!isValidCreatedId(eventId)) {
+          failMessage(t('eventDefinition.errors.idMissing'));
+          return Promise.reject(new Error(t('eventDefinition.errors.idMissing')));
+        }
+        return syncEventParams(eventId, params, originalParams).then(() => {
+          successMessage();
+          load();
+          done();
+        });
+      })
+      .catch(() => {
+        done(false);
+      });
   };
 
   const disableThing = (id: string, profileId: string, done: () => void) => {

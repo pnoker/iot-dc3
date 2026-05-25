@@ -43,22 +43,29 @@
             :embedded="embedded"
             :point="reactiveData.pointTable[data.pointId]"
             :unit="reactiveData.unitTable[data.pointId]"
+            @detail-thing="openDetail"
+            @write-thing="openWrite"
           ></point-value-card>
         </el-col>
       </el-row>
     </blank-card>
+
+    <point-value-edit-form ref="editRef" @update-thing="writeValue" />
+    <point-value-detail ref="detailRef" :detail-data="reactiveData.detailData" />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive } from 'vue';
-  import { getPointByIds, getPointUnit, getPointValueLatest, listPointValue } from '@/api/point';
+  import { computed, onMounted, reactive, ref } from 'vue';
+  import { getPointByIds, getPointUnit, getPointValueLatest, listPointValue, writePointValue } from '@/api/point';
   import { listDeviceByIds } from '@/api/device';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
   import pointValueTool from './tool/PointValueTool.vue';
   import pointValueCard from './card/PointValueCard.vue';
+  import pointValueEditForm from './edit/PointValueEditForm.vue';
+  import pointValueDetail from './detail/PointValueDetail.vue';
 
   import { isNull } from '@/utils/validationUtil';
 
@@ -83,6 +90,7 @@
     pointTable: {} as Record<string, any>,
     unitTable: {} as Record<string, any>,
     listData: [] as any[],
+    detailData: {} as Record<string, unknown>,
     query: {},
     page: {
       total: 0,
@@ -90,6 +98,9 @@
       current: 1,
     },
   });
+
+  const editRef = ref<InstanceType<typeof pointValueEditForm>>();
+  const detailRef = ref<InstanceType<typeof pointValueDetail>>();
 
   const hasData = computed(() => {
     return !reactiveData.loading && reactiveData.listData?.length < 1;
@@ -199,6 +210,40 @@
     list();
   };
 
+  const openWrite = (row: Record<string, unknown>) => {
+    editRef.value?.show({
+      ...row,
+      value: String(row.calValue ?? ''),
+    });
+  };
+
+  const writeValue = (formData: Record<string, unknown>, done: () => void) => {
+    writePointValue({
+      deviceId: formData.deviceId,
+      pointId: formData.pointId,
+      value: String(formData.value ?? ''),
+    })
+      .then(() => {
+        refresh();
+        done();
+      })
+      .catch(() => {
+        // handled globally
+      });
+  };
+
+  const openDetail = (row: Record<string, unknown>) => {
+    const deviceId = String(row.deviceId || '');
+    const pointId = String(row.pointId || '');
+    reactiveData.detailData = {
+      ...row,
+      device: reactiveData.deviceTable[deviceId],
+      point: reactiveData.pointTable[pointId],
+      unit: reactiveData.unitTable[pointId],
+    };
+    detailRef.value?.show();
+  };
+
   const sizeChange = (size: number) => {
     reactiveData.page.size = size;
     list();
@@ -218,5 +263,3 @@
     list,
   });
 </script>
-
-<style lang="scss" scoped></style>

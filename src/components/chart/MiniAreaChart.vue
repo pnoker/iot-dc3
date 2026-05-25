@@ -44,7 +44,7 @@
     /** Accent colour for the line stroke and the gradient's inner stop. */
     color: {
       type: String,
-      default: '#409eff',
+      default: 'var(--el-color-primary)',
     },
     /** Chart height in px. Container is stretched to the parent width. */
     height: {
@@ -70,6 +70,13 @@
 
   const containerRef = ref<HTMLElement>();
   let chart: Chart | undefined;
+
+  const resolveCssColor = (color: string) => {
+    const match = color.match(/^var\((--[^),]+)(?:,[^)]+)?\)$/);
+    const token = match?.[1];
+    if (!token) return color;
+    return getComputedStyle(document.documentElement).getPropertyValue(token).trim() || color;
+  };
 
   const draw = (attempt = 0) => {
     const el = containerRef.value;
@@ -98,7 +105,8 @@
         paddingRight: 2,
       });
 
-      const fillGradient = `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${props.color} 100%)`;
+      const color = resolveCssColor(props.color);
+      const fillGradient = `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${color} 100%)`;
 
       const area = chart
         .area()
@@ -132,7 +140,7 @@
           .encode('x', 'x')
           .encode('y', 'y')
           .encode('shape', 'smooth')
-          .style('stroke', props.color)
+          .style('stroke', color)
           .style('lineWidth', 2)
           .axis(false)
           .legend(false);

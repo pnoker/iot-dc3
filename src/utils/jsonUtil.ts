@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue';
-
-export default defineComponent({
-  name: 'PointValueDetail',
-  props: {
-    detailData: {
-      type: Object,
-      default: () => {
-        return {};
-      },
-    },
-  },
-  setup() {
-    const detailVisible = ref(false);
-
-    return {
-      detailVisible,
-    };
-  },
-});
+export const prettyJson = (value: unknown, fallback = '-'): string => {
+  if (value == null || value === '') return fallback;
+  if (typeof value === 'string') {
+    try {
+      return JSON.stringify(JSON.parse(value), null, 2);
+    } catch {
+      return value;
+    }
+  }
+  return JSON.stringify(value, null, 2);
+};

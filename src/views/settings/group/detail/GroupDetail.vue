@@ -40,9 +40,7 @@
                 {{ reactiveData.data.groupIndex ?? '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.enable')">
-                <el-tag :type="enableTagType(reactiveData.data.enableFlag)">
-                  {{ enableLabel(reactiveData.data.enableFlag) }}
-                </el-tag>
+                <enable-tag :value="reactiveData.data.enableFlag" />
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.remark')" :span="2">
                 {{ reactiveData.data.remark || '-' }}
@@ -51,13 +49,13 @@
                 {{ reactiveData.data.creatorName || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')">
-                {{ reactiveData.data.createTime ? timestamp(reactiveData.data.createTime) : '-' }}
+                {{ timestampLabel(reactiveData.data.createTime) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operatorName')">
                 {{ reactiveData.data.operatorName || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')">
-                {{ reactiveData.data.operateTime ? timestamp(reactiveData.data.operateTime) : '-' }}
+                {{ timestampLabel(reactiveData.data.operateTime) }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>
@@ -75,7 +73,8 @@
   import { getGroupById, listGroup } from '@/api/group';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
-  import { timestamp } from '@/utils/dateUtil';
+  import EnableTag from '@/components/tag/EnableTag.vue';
+  import { timestampLabel } from '@/utils/dateUtil';
 
   const route = useRoute();
   const { t } = useI18n();
@@ -92,14 +91,6 @@
     if (!id || String(id) === '0') return t('settings.group.rootGroup');
     return reactiveData.parentMap[String(id)] || String(id);
   });
-
-  const enableTagType = (value: unknown) => {
-    return String(value) === 'ENABLE' || Number(value) === 0 ? 'success' : 'info';
-  };
-
-  const enableLabel = (value: unknown) => {
-    return String(value) === 'ENABLE' || Number(value) === 0 ? t('common.enable') : t('common.disable');
-  };
 
   const loadParents = () => {
     listGroup({ page: { current: 1, size: 5000 } })
@@ -130,7 +121,3 @@
     load();
   });
 </script>
-
-<style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-</style>

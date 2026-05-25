@@ -35,13 +35,7 @@
         <el-table-column :label="t('settings.api.apiType')" min-width="100" prop="apiTypeFlag" />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
-            <el-tag :type="String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0 ? 'success' : 'info'">
-              {{
-                String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0
-                  ? t('common.enable')
-                  : t('common.disable')
-              }}
-            </el-tag>
+            <enable-tag :value="row.enableFlag" />
           </template>
         </el-table-column>
         <el-table-column :label="t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
@@ -66,10 +60,3 @@
 </template>
 
 <script lang="ts" src="./index.ts"></script>
-
-<style lang="scss" scoped>
-  .settings-table {
-    margin-top: 1px;
-    border-radius: 4px;
-  }
-</style>

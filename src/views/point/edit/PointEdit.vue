@@ -105,9 +105,9 @@
             />
           </el-form-item>
           <el-form-item class="edit-form-button">
-            <el-button :icon="Back" plain type="success" @click="done">{{ $t('common.return') }}</el-button>
+            <el-button :icon="Back" plain @click="done">{{ $t('common.return') }}</el-button>
             <el-button :icon="RefreshLeft" @click="pointReset">{{ $t('common.reset') }}</el-button>
-            <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+            <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
           </el-form-item>
         </el-form>
       </el-card>

@@ -118,19 +118,19 @@
   // --stat-card-accent values declared in the scoped styles below so a
   // palette change only needs updating in one place conceptually.
   const TONE_ACCENT: Record<string, string> = {
-    blue: '#409eff',
-    green: '#67c23a',
-    orange: '#e6a23c',
+    blue: 'var(--el-color-primary)',
+    green: 'var(--el-color-success)',
+    orange: 'var(--el-color-warning)',
     purple: '#9059f6',
-    red: '#f56c6c',
+    red: 'var(--el-color-danger)',
   };
   const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
 </script>
 
 <style lang="scss" scoped>
   .stat-card {
-    --stat-card-accent: #409eff;
-    --stat-card-bg: rgba(64, 158, 255, 0.08);
+    --stat-card-accent: var(--el-color-primary);
+    --stat-card-bg: var(--el-color-primary-light-9);
     cursor: pointer;
     transition: transform 0.15s ease;
     height: 100%;
@@ -149,24 +149,24 @@
     }
 
     &--blue {
-      --stat-card-accent: #409eff;
-      --stat-card-bg: rgba(64, 158, 255, 0.1);
+      --stat-card-accent: var(--el-color-primary);
+      --stat-card-bg: var(--el-color-primary-light-9);
     }
     &--green {
-      --stat-card-accent: #67c23a;
-      --stat-card-bg: rgba(103, 194, 58, 0.1);
+      --stat-card-accent: var(--el-color-success);
+      --stat-card-bg: var(--el-color-success-light-9);
     }
     &--orange {
-      --stat-card-accent: #e6a23c;
-      --stat-card-bg: rgba(230, 162, 60, 0.1);
+      --stat-card-accent: var(--el-color-warning);
+      --stat-card-bg: var(--el-color-warning-light-9);
     }
     &--purple {
       --stat-card-accent: #9059f6;
       --stat-card-bg: rgba(144, 89, 246, 0.1);
     }
     &--red {
-      --stat-card-accent: #f56c6c;
-      --stat-card-bg: rgba(245, 108, 108, 0.1);
+      --stat-card-accent: var(--el-color-danger);
+      --stat-card-bg: var(--el-color-danger-light-9);
     }
 
     :deep(.el-card__body) {
@@ -211,7 +211,7 @@
 
     .stat-card__title {
       font-size: 13px;
-      color: #909399;
+      color: var(--el-text-color-secondary);
       margin-bottom: 2px;
     }
 
@@ -225,7 +225,7 @@
     .stat-card__value-text {
       font-size: 24px;
       font-weight: 600;
-      color: #303133;
+      color: var(--el-text-color-primary);
     }
 
     .stat-card__trend {
@@ -236,18 +236,18 @@
     }
 
     .stat-card__trend--up {
-      color: #67c23a;
+      color: var(--el-color-success);
     }
     .stat-card__trend--down {
-      color: #f56c6c;
+      color: var(--el-color-danger);
     }
     .stat-card__trend--flat {
-      color: #909399;
+      color: var(--el-text-color-secondary);
     }
 
     .stat-card__subtitle {
       font-size: 12px;
-      color: #909399;
+      color: var(--el-text-color-secondary);
       margin-top: 4px;
     }
 

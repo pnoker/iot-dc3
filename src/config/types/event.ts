@@ -51,6 +51,19 @@ export interface EventForm {
   [key: string]: unknown;
 }
 
+export interface EventParamRecord {
+  id?: string;
+  paramName?: string;
+  paramCode?: string;
+  paramTypeFlag?: string | number;
+  paramExt?: Record<string, unknown>;
+  eventId?: string;
+  enableFlag?: string | number;
+  signature?: string;
+  version?: number;
+  [key: string]: unknown;
+}
+
 /**
  * Event report history (dc3_event_history).
  */

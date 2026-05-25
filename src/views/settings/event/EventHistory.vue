@@ -26,25 +26,40 @@
       @current-change="currentChange"
     >
       <template #filters>
-        <el-form-item label="Device ID" prop="deviceId">
-          <el-input v-model="formData.deviceId" class="edit-form-default" clearable placeholder="Device ID" />
+        <el-form-item :label="$t('eventHistory.deviceId')" prop="deviceId">
+          <el-input
+            v-model="formData.deviceId"
+            :placeholder="$t('eventHistory.deviceId')"
+            class="edit-form-default"
+            clearable
+          />
         </el-form-item>
-        <el-form-item label="Event Code" prop="eventCode">
-          <el-input v-model="formData.eventCode" class="edit-form-default" clearable placeholder="Event Code" />
+        <el-form-item :label="$t('eventHistory.eventCode')" prop="eventCode">
+          <el-input
+            v-model="formData.eventCode"
+            :placeholder="$t('eventHistory.eventCode')"
+            class="edit-form-default"
+            clearable
+          />
         </el-form-item>
       </template>
     </tool-card>
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column label="Record ID" min-width="180" prop="recordId" show-overflow-tooltip />
-        <el-table-column label="Device ID" min-width="160" prop="deviceId" show-overflow-tooltip />
-        <el-table-column label="Event Code" min-width="140" prop="eventCode" />
-        <el-table-column label="Type" prop="eventTypeFlag" width="110" />
-        <el-table-column label="Level" prop="eventLevelFlag" width="100" />
-        <el-table-column label="Ack" prop="acknowledgeFlag" width="90" />
-        <el-table-column label="Message" min-width="200" prop="message" show-overflow-tooltip />
-        <el-table-column :formatter="timestampColumn" label="Occur Time" prop="occurTime" width="165" />
+        <el-table-column :label="$t('eventHistory.recordId')" min-width="180" prop="recordId" show-overflow-tooltip />
+        <el-table-column :label="$t('eventHistory.deviceId')" min-width="160" prop="deviceId" show-overflow-tooltip />
+        <el-table-column :label="$t('eventHistory.eventCode')" min-width="140" prop="eventCode" />
+        <el-table-column :label="$t('eventHistory.type')" prop="eventTypeFlag" width="110" />
+        <el-table-column :label="$t('eventHistory.level')" prop="eventLevelFlag" width="100" />
+        <el-table-column :label="$t('eventHistory.ack')" prop="acknowledgeFlag" width="90" />
+        <el-table-column :label="$t('eventHistory.message')" min-width="200" prop="message" show-overflow-tooltip />
+        <el-table-column
+          :formatter="timestampColumn"
+          :label="$t('eventHistory.occurTime')"
+          prop="occurTime"
+          width="165"
+        />
         <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165" />
         <el-table-column :label="$t('common.operation')" fixed="right" width="100">
           <template #default="{ row }">
@@ -57,37 +72,49 @@
       </el-table>
     </blank-card>
 
-    <el-dialog v-model="detailVisible" :append-to-body="true" draggable title="Event History Detail" width="700px">
+    <el-dialog
+      v-model="detailVisible"
+      :append-to-body="true"
+      :title="$t('eventHistory.detailTitle')"
+      draggable
+      width="700px"
+    >
       <el-descriptions v-if="detailRow" :column="2" border>
-        <el-descriptions-item :span="2" label="Record ID">{{ detailRow.recordId }}</el-descriptions-item>
-        <el-descriptions-item label="Device ID">{{ detailRow.deviceId }}</el-descriptions-item>
-        <el-descriptions-item label="Event ID">{{ detailRow.eventId }}</el-descriptions-item>
-        <el-descriptions-item label="Event Code">{{ detailRow.eventCode }}</el-descriptions-item>
-        <el-descriptions-item label="Type">{{ detailRow.eventTypeFlag }}</el-descriptions-item>
-        <el-descriptions-item label="Level">{{ detailRow.eventLevelFlag }}</el-descriptions-item>
-        <el-descriptions-item :span="2" label="Message">{{ detailRow.message || '-' }}</el-descriptions-item>
-        <el-descriptions-item :span="2" label="Param Values">
+        <el-descriptions-item :label="$t('eventHistory.recordId')" :span="2">
+          {{ detailRow.recordId }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.deviceId')">{{ detailRow.deviceId }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.eventId')">{{ detailRow.eventId }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.eventCode')">{{ detailRow.eventCode }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.type')">{{ detailRow.eventTypeFlag }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.level')">{{ detailRow.eventLevelFlag }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.message')" :span="2">
+          {{ detailRow.message || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.paramValues')" :span="2">
           <pre class="json-preview">{{ formatJson(detailRow.paramValues) }}</pre>
         </el-descriptions-item>
-        <el-descriptions-item :span="2" label="Config Snapshot">
+        <el-descriptions-item :label="$t('eventHistory.configSnapshot')" :span="2">
           <pre class="json-preview">{{ formatJson(detailRow.configSnapshot) }}</pre>
         </el-descriptions-item>
-        <el-descriptions-item :formatter="timestampColumn" label="Occur Time">{{
-          detailRow.occurTime
-        }}</el-descriptions-item>
-        <el-descriptions-item :formatter="timestampColumn" label="Receive Time">{{
-          detailRow.receiveTime
-        }}</el-descriptions-item>
-        <el-descriptions-item label="Acknowledge Flag">{{ detailRow.acknowledgeFlag }}</el-descriptions-item>
-        <el-descriptions-item label="Acknowledge User ID">{{
-          detailRow.acknowledgeUserId || '-'
-        }}</el-descriptions-item>
-        <el-descriptions-item :formatter="timestampColumn" label="Acknowledge Time">{{
-          detailRow.acknowledgeTime || '-'
-        }}</el-descriptions-item>
-        <el-descriptions-item :formatter="timestampColumn" label="Operate Time">{{
-          detailRow.operateTime || '-'
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.occurTime')">
+          {{ timestampLabel(detailRow.occurTime) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.receiveTime')">
+          {{ timestampLabel(detailRow.receiveTime) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.acknowledgeFlag')">
+          {{ detailRow.acknowledgeFlag }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.acknowledgeUserId')">
+          {{ detailRow.acknowledgeUserId || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.acknowledgeTime')">
+          {{ timestampLabel(detailRow.acknowledgeTime) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('common.operationTime')">
+          {{ timestampLabel(detailRow.operateTime) }}
+        </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -96,7 +123,8 @@
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
   import { getEventHistoryById, listEventHistory } from '@/api/event';
-  import { timestampColumn } from '@/utils/dateUtil';
+  import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
+  import { prettyJson } from '@/utils/jsonUtil';
   import type { EventHistory, Order } from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -109,23 +137,11 @@
     page: { total: 0, size: 12, current: 1, orders: [] as Order[] },
   });
 
-  const formData = reactive<Record<string, any>>({});
+  const formData = reactive<Record<string, string>>({});
   const detailVisible = ref(false);
   const detailRow = ref<EventHistory | null>(null);
 
-  const formatJson = (value: unknown) => {
-    if (!value) {
-      return '-';
-    }
-    if (typeof value === 'string') {
-      try {
-        return JSON.stringify(JSON.parse(value), null, 2);
-      } catch {
-        return value;
-      }
-    }
-    return JSON.stringify(value, null, 2);
-  };
+  const formatJson = (value: unknown) => prettyJson(value);
 
   const load = () => {
     reactiveData.loading = true;
@@ -140,7 +156,7 @@
       });
   };
 
-  const onSearch = (data: Record<string, any>) => {
+  const onSearch = (data: Record<string, string>) => {
     reactiveData.query = cleanSearchParams(data);
     reactiveData.page.current = 1;
     load();
@@ -178,24 +194,3 @@
 
   load();
 </script>
-
-<style lang="scss" scoped>
-  .settings-table {
-    margin-top: 1px;
-    border-radius: 4px;
-  }
-
-  .json-preview {
-    max-height: 220px;
-    margin: 0;
-    padding: 8px;
-    overflow: auto;
-    border-radius: 4px;
-    background: var(--el-fill-color-light);
-    color: var(--el-text-color-primary);
-    font-size: 12px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-</style>

@@ -95,7 +95,7 @@
     width: 100%;
     height: 55px;
     display: flex;
-    border-bottom: 1px solid #dcdfe6;
+    border-bottom: 1px solid var(--el-border-color);
   }
 
   .skeleton-card-icon {
@@ -152,7 +152,7 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    border-top: 1px solid #dcdfe6;
+    border-top: 1px solid var(--el-border-color);
   }
 
   .skeleton-card-operation {

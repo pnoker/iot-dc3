@@ -74,7 +74,7 @@
     </el-form>
     <div class="things-dialog-footer">
       <el-button @click="visible = false">{{ $t('common.cancel') }}</el-button>
-      <el-button plain type="success" @click="onReset">{{ $t('common.reset') }}</el-button>
+      <el-button plain @click="onReset">{{ $t('common.reset') }}</el-button>
       <el-button :loading="submitting" type="primary" @click="onSubmit">
         {{ $t('common.confirm') }}
       </el-button>
@@ -165,8 +165,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-dialog.scss';
-
   .agentic-form-flags {
     display: flex;
     flex-wrap: wrap;

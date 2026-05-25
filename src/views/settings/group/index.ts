@@ -26,6 +26,7 @@ import type { Order } from '@/config/types';
 import type { GroupForm, GroupRecord } from '@/config/types/manager';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
 import groupTool from './tool/GroupTool.vue';
 import groupEditForm from './edit/GroupEditForm.vue';
 
@@ -33,6 +34,7 @@ export default defineComponent({
   name: 'SettingsGroup',
   components: {
     BlankCard,
+    EnableTag,
     groupTool,
     groupEditForm,
   },

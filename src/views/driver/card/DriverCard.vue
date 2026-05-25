@@ -19,7 +19,7 @@
     <el-card shadow="hover">
       <div class="things-card-content">
         <things-card-header
-          :enabled="data.enableFlag === 'ENABLE'"
+          :enabled="enabled"
           :icon="icon"
           :name="data.driverName"
           :status-title="$t('common.name')"
@@ -71,6 +71,7 @@
   import router from '@/config/router';
   import { copy } from '@/utils/commonUtil';
   import { timestamp } from '@/utils/dateUtil';
+  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 
   const props = defineProps({
@@ -81,6 +82,7 @@
   });
 
   defineEmits(['select-change']);
+  const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
   const status = computed(() => {
     const id = props.data.id;
@@ -112,7 +114,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
   @use '@/views/driver/card/style.scss';
 
   // DriverCard 的 footer 只有单个 detail 按钮,不使用 ThingsCardActions,在此补齐样式。

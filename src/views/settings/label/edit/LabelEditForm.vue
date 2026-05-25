@@ -58,7 +58,7 @@
     </el-form>
     <div class="things-dialog-footer">
       <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
-      <el-button plain type="success" @click="reset">{{ t('common.reset') }}</el-button>
+      <el-button plain @click="reset">{{ t('common.reset') }}</el-button>
       <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
         {{ t('common.confirm') }}
       </el-button>
@@ -67,7 +67,3 @@
 </template>
 
 <script lang="ts" src="./index.ts"></script>
-
-<style lang="scss" scoped>
-  @use '@/styles/things-dialog.scss';
-</style>

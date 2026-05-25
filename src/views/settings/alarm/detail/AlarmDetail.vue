@@ -36,7 +36,7 @@
 
         <el-tab-pane v-for="prop in activeConfig.extProps" :key="prop" :label="extLabel(prop)" :name="prop">
           <detail-card>
-            <pre class="alarm-detail__json">{{ prettyJson(reactiveData.data[prop]) }}</pre>
+            <pre class="alarm-detail__json">{{ prettyJson(reactiveData.data[prop], '{}') }}</pre>
           </detail-card>
         </el-tab-pane>
       </el-tabs>
@@ -61,7 +61,8 @@
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
   import type { AlarmEntityRecord } from '@/config/types';
-  import { timestamp } from '@/utils/dateUtil';
+  import { timestampLabel } from '@/utils/dateUtil';
+  import { prettyJson } from '@/utils/jsonUtil';
 
   type AlarmEntity = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'history';
   type FieldKind = 'text' | 'tag' | 'time' | 'code';
@@ -259,7 +260,7 @@
 
   const formatDetail = (field: DetailField) => {
     const value = reactiveData.data[field.prop];
-    if (field.kind === 'time' || field.prop.endsWith('Time')) return value ? timestamp(String(value)) : '-';
+    if (field.kind === 'time' || field.prop.endsWith('Time')) return timestampLabel(value);
     if (field.kind === 'tag') return enumLabel(value);
     if (value == null || value === '') return '-';
     return String(value);
@@ -277,18 +278,6 @@
       responseExt: t('settings.alarm.responseExt'),
     };
     return map[prop] || prop;
-  };
-
-  const prettyJson = (value: unknown) => {
-    if (value == null || value === '') return '{}';
-    if (typeof value === 'string') {
-      try {
-        return JSON.stringify(JSON.parse(value), null, 2);
-      } catch {
-        return value;
-      }
-    }
-    return JSON.stringify(value, null, 2);
   };
 
   const load = () => {
@@ -309,8 +298,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-
   .alarm-detail__inline-code {
     padding: 2px 5px;
     border-radius: 4px;

@@ -47,7 +47,7 @@
     <div class="things-dialog-footer">
       <slot name="footer">
         <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-        <el-button plain type="success" @click="reset">{{ $t('common.reset') }}</el-button>
+        <el-button plain @click="reset">{{ $t('common.reset') }}</el-button>
         <el-button type="primary" @click="updateThing">{{ $t('common.confirm') }}</el-button>
       </slot>
     </div>
@@ -100,12 +100,12 @@
     ],
   });
 
-  const syncFormData = () => {
-    reactiveData.formData = { ...props.formData };
+  const syncFormData = (value = props.formData) => {
+    reactiveData.formData = { ...value };
   };
 
-  const show = () => {
-    syncFormData();
+  const show = (value?: PointValueFormData) => {
+    syncFormData(value);
     reactiveData.formVisible = true;
   };
 
@@ -143,7 +143,3 @@
     updateThing,
   });
 </script>
-
-<style lang="scss" scoped>
-  @use '@/styles/things-dialog.scss';
-</style>

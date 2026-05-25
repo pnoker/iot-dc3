@@ -14,41 +14,10 @@
  * limitations under the License.
  */
 
-/**
- * Element Plus form component size variables
- * Used to define consistent widths for form inputs and selects
- */
-
-// Form size widths
+// Element Plus form component size tokens. Keep this file token-only because
+// Vite injects it into every SCSS block via additionalData.
 $form-width-small: 120px;
 $form-width-medium: 150px;
 $form-width-default: 250px;
 $form-width-special: 300px;
 $form-width-large: 500px;
-
-// Small form elements
-.el-select.edit-form-small,
-.el-input.edit-form-small {
-  width: $form-width-small;
-}
-
-// Medium form elements
-.el-select.edit-form-medium {
-  width: $form-width-medium;
-}
-
-// Default form elements
-.el-select.edit-form-default {
-  width: $form-width-default;
-}
-
-// Special form elements
-.el-select.edit-form-special,
-.el-input.edit-form-special {
-  width: $form-width-special;
-}
-
-// Large form elements
-.el-select.edit-form-large {
-  width: $form-width-large;
-}

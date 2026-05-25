@@ -21,9 +21,10 @@ import { useRouter } from 'vue-router';
 import { listApi } from '@/api/api';
 import { timestampColumn } from '@/utils/dateUtil';
 
-import type { Order } from '@/config/types';
+import type { ApiRecord, Order } from '@/config/types';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
 import apiTool from './tool/ApiTool.vue';
 
 // APIs are auto-registered by each service on startup — editing them from
@@ -33,6 +34,7 @@ export default defineComponent({
   name: 'SettingsApi',
   components: {
     BlankCard,
+    EnableTag,
     apiTool,
   },
   setup() {
@@ -41,8 +43,8 @@ export default defineComponent({
 
     const reactiveData = reactive({
       loading: false,
-      listData: [] as any[],
-      query: {} as Record<string, any>,
+      listData: [] as ApiRecord[],
+      query: {} as Record<string, unknown>,
       order: false,
       page: {
         total: 0,
@@ -55,7 +57,7 @@ export default defineComponent({
     const load = () => {
       reactiveData.loading = true;
       listApi({ page: reactiveData.page, ...reactiveData.query })
-        .then((res: any) => {
+        .then((res) => {
           const data = res.data || {};
           reactiveData.listData = data.records || [];
           reactiveData.page.total = data.total || 0;
@@ -68,7 +70,7 @@ export default defineComponent({
         });
     };
 
-    const search = (params: any) => {
+    const search = (params: Record<string, unknown>) => {
       reactiveData.query = params || {};
       reactiveData.page.current = 1;
       load();
@@ -88,7 +90,7 @@ export default defineComponent({
       load();
     };
 
-    const openDetail = (row: any) => {
+    const openDetail = (row: ApiRecord) => {
       router.push({ name: 'settingsApiDetail', query: { id: String(row.id) } }).catch(() => {
         // handled globally
       });

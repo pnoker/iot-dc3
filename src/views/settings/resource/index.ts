@@ -28,14 +28,29 @@ import { useMenuStore } from '@/store';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
+import type {
+  ApiRecord,
+  DeviceRecord,
+  DriverRecord,
+  Order,
+  PointRecord,
+  ProfileRecord,
+  ResourceForm,
+  ResourceRecord,
+} from '@/config/types';
 import BlankCard from '@/components/card/blank/BlankCard.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
 import resourceTool from './tool/ResourceTool.vue';
 import resourceEditForm from './edit/ResourceEditForm.vue';
+
+type LinkableResourceType = 'DRIVER' | 'DEVICE' | 'POINT' | 'PROFILE' | 'API' | 'MENU';
+type EntityRecord = DriverRecord | DeviceRecord | PointRecord | ProfileRecord | ApiRecord;
 
 export default defineComponent({
   name: 'SettingsResource',
   components: {
     BlankCard,
+    EnableTag,
     resourceTool,
     resourceEditForm,
   },
@@ -48,32 +63,32 @@ export default defineComponent({
 
     const reactiveData = reactive({
       loading: false,
-      listData: [] as any[],
-      query: {} as Record<string, any>,
+      listData: [] as ResourceRecord[],
+      query: {} as Record<string, unknown>,
       page: {
         total: 0,
         size: 12,
         current: 1,
-        orders: [] as any[],
+        orders: [] as Order[],
       },
     });
 
     const entityNameMap = reactive<Record<string, string>>({});
 
-    const isGroupingNode = (row: any): boolean => {
+    const isGroupingNode = (row: ResourceRecord): boolean => {
       // Virtual grouping nodes registered by ResourceRegistrySync carry entity_id=0.
       return !row.entityId || String(row.entityId) === '0';
     };
 
-    const formatEntityId = (row: any) => {
+    const formatEntityId = (row: ResourceRecord) => {
       if (isGroupingNode(row)) return '—';
       const id = String(row.entityId);
       return entityNameMap[id] || id;
     };
 
-    const LINKABLE_TYPES = ['DRIVER', 'DEVICE', 'POINT', 'PROFILE', 'API', 'MENU'];
+    const LINKABLE_TYPES: LinkableResourceType[] = ['DRIVER', 'DEVICE', 'POINT', 'PROFILE', 'API', 'MENU'];
 
-    const ENTITY_ROUTE_MAP: Record<string, string> = {
+    const ENTITY_ROUTE_MAP: Record<LinkableResourceType, string> = {
       DRIVER: 'driverDetail',
       DEVICE: 'deviceDetail',
       POINT: 'pointDetail',
@@ -82,27 +97,34 @@ export default defineComponent({
       MENU: 'settingsMenuDetail',
     };
 
-    const isEntityLinkable = (row: any) => {
-      if (isGroupingNode(row)) return false;
-      return LINKABLE_TYPES.includes(row.resourceTypeFlag);
+    const resourceType = (row: ResourceRecord): LinkableResourceType | undefined => {
+      const type = String(row.resourceTypeFlag || '') as LinkableResourceType;
+      return LINKABLE_TYPES.includes(type) ? type : undefined;
     };
 
-    const goEntityDetail = (row: any) => {
-      const routeName = ENTITY_ROUTE_MAP[row.resourceTypeFlag];
+    const isEntityLinkable = (row: ResourceRecord) => {
+      if (isGroupingNode(row)) return false;
+      return Boolean(resourceType(row));
+    };
+
+    const goEntityDetail = (row: ResourceRecord) => {
+      const type = resourceType(row);
+      if (!type) return;
+      const routeName = ENTITY_ROUTE_MAP[type];
       if (!routeName) return;
       router.push({ name: routeName, query: { id: String(row.entityId) } }).catch(() => {
         // handled globally
       });
     };
 
-    const openDetail = (row: any) => {
+    const openDetail = (row: ResourceRecord) => {
       router.push({ name: 'settingsResourceDetail', query: { id: String(row.id) } }).catch(() => {
         // handled globally
       });
     };
 
     // Flatten tree rows into a list for post-load entity-name resolution.
-    const flatten = (nodes: any[], acc: any[] = []): any[] => {
+    const flatten = (nodes: ResourceRecord[], acc: ResourceRecord[] = []): ResourceRecord[] => {
       for (const n of nodes || []) {
         acc.push(n);
         if (n.children && n.children.length > 0) {
@@ -112,7 +134,7 @@ export default defineComponent({
       return acc;
     };
 
-    const resolveEntityNames = (records: any[]) => {
+    const resolveEntityNames = (records: ResourceRecord[]) => {
       const driverIds: string[] = [];
       const deviceIds: string[] = [];
       const pointIds: string[] = [];
@@ -144,11 +166,12 @@ export default defineComponent({
         }
       }
 
-      const fill = (ids: string[], res: any, nameKey: string) => {
+      const fill = (ids: string[], res: R<Record<string, EntityRecord>>, nameKey: keyof EntityRecord) => {
         const data = res.data || {};
         ids.forEach((id) => {
           const item = data[id];
-          if (item) entityNameMap[id] = item[nameKey] || id;
+          const name = item?.[nameKey];
+          if (name) entityNameMap[id] = String(name);
         });
       };
 
@@ -183,8 +206,8 @@ export default defineComponent({
       if (apiIds.length)
         promises.push(
           listApi({ page: { size: 1000, current: 1 } })
-            .then((r: any) => {
-              const records = (r.data?.records as any[]) || [];
+            .then((r) => {
+              const records = r.data?.records || [];
               const byId = new Map(records.map((a) => [String(a.id), a.apiName]));
               apiIds.forEach((id) => {
                 const name = byId.get(id);
@@ -211,7 +234,7 @@ export default defineComponent({
         // names — fetchTree is idempotent and skips the network if already
         // loaded (Layout mounts it on startup, so this is usually a no-op).
         await menuStore.fetchTree();
-        const res: any = await listResourceTree(reactiveData.query);
+        const res = await listResourceTree(reactiveData.query);
         const tree = res.data || [];
         reactiveData.listData = tree;
         reactiveData.page.total = tree.length;
@@ -223,7 +246,7 @@ export default defineComponent({
       }
     };
 
-    const search = (params: any) => {
+    const search = (params: Record<string, unknown>) => {
       reactiveData.query = params || {};
       load();
     };
@@ -241,9 +264,9 @@ export default defineComponent({
     };
 
     const openAdd = () => editRef.value?.show();
-    const openEdit = (row: any) => editRef.value?.showEdit(row);
+    const openEdit = (row: ResourceRecord) => editRef.value?.showEdit(row);
 
-    const onAdd = (form: any, done: () => void) => {
+    const onAdd = (form: ResourceForm, done: () => void) => {
       addResource(form)
         .then(() => {
           successMessage();
@@ -255,7 +278,7 @@ export default defineComponent({
         });
     };
 
-    const onUpdate = (form: any, done: () => void) => {
+    const onUpdate = (form: ResourceForm, done: () => void) => {
       updateResource(form)
         .then(() => {
           successMessage();

@@ -30,11 +30,13 @@ import userTool from './tool/UserTool.vue';
 import userEditForm from './edit/UserEditForm.vue';
 import userAssignRoles from './assign/UserAssignRoles.vue';
 import BlankCard from '@/components/card/blank/BlankCard.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
 
 export default defineComponent({
   name: 'SettingsUser',
   components: {
     BlankCard,
+    EnableTag,
     userTool,
     userEditForm,
     userAssignRoles,

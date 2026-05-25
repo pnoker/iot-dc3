@@ -96,9 +96,9 @@
             />
           </el-form-item>
           <el-form-item class="edit-form-button">
-            <el-button :icon="Back" plain type="success" @click="done">{{ $t('common.return') }}</el-button>
+            <el-button :icon="Back" plain @click="done">{{ $t('common.return') }}</el-button>
             <el-button :icon="RefreshLeft" @click="deviceReset">{{ $t('common.reset') }}</el-button>
-            <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+            <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -155,11 +155,11 @@
         </el-form>
         <el-empty v-else :description="$t('device.edit.driverConfigEmpty')" />
         <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
           <el-button v-if="hasDriverAttributes" :icon="RefreshLeft" @click="driverInfoReset">
             {{ $t('common.reset') }}
           </el-button>
-          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+          <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
         </el-form-item>
       </el-card>
 
@@ -297,8 +297,8 @@
         </el-table>
 
         <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" :loading="reactiveData.pointSaving" plain type="warning" @click="next">
+          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Right" :loading="reactiveData.pointSaving" plain type="primary" @click="next">
             {{ $t('common.next') }}
           </el-button>
         </el-form-item>
@@ -436,8 +436,8 @@
           </el-table-column>
         </el-table>
         <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" :loading="reactiveData.commandSaving" plain type="warning" @click="next">
+          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Right" :loading="reactiveData.commandSaving" plain type="primary" @click="next">
             {{ $t('common.next') }}
           </el-button>
         </el-form-item>
@@ -575,8 +575,8 @@
           </el-table-column>
         </el-table>
         <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" :loading="reactiveData.eventSaving" plain type="warning" @click="next">
+          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Right" :loading="reactiveData.eventSaving" plain type="primary" @click="next">
             {{ $t('common.next') }}
           </el-button>
         </el-form-item>

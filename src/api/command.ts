@@ -14,33 +14,38 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
+import { crudAdd, crudDelete, crudGetById, crudList, crudUpdate, httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 import type { PageQuery, PageResult } from '@/config/types';
-import type { CommandHistory, CommandRecord } from '@/config/types/command';
+import type { CommandHistory, CommandParamRecord, CommandRecord } from '@/config/types/command';
 
 const endpoints = {
   command: `${API_MANAGER_BASE}/command`,
+  commandParam: `${API_MANAGER_BASE}/command_param`,
   commandHistory: `${API_DATA_BASE}/command_history`,
 } as const;
 
-const add = <T>(base: string, payload: T) => httpPost(`${base}/add`, payload);
-const update = <T>(base: string, payload: T) => httpPost(`${base}/update`, payload);
-const remove = (base: string, id: string) => httpPost(`${base}/delete`, undefined, { params: { id } });
-const selectById = <T>(base: string, id: string) => httpGet<R<T>>(`${base}/get_by_id`, { params: { id } });
-const list = <T>(base: string, query: PageQuery) => httpPost<R<PageResult<T>>>(`${base}/list`, query);
+// Command Definition CRUD
 
-// ─── Command Definition CRUD ─────────────────────────────────────────
-
-export const addCommand = (payload: Partial<CommandRecord>) => add(endpoints.command, payload);
-export const updateCommand = (payload: Partial<CommandRecord>) => update(endpoints.command, payload);
-export const deleteCommand = (id: string) => remove(endpoints.command, id);
-export const getCommandById = (id: string) => selectById<CommandRecord>(endpoints.command, id);
-export const listCommand = (query: PageQuery) => list<CommandRecord>(endpoints.command, query);
+export const addCommand = (payload: Partial<CommandRecord>) => crudAdd(endpoints.command, payload);
+export const updateCommand = (payload: Partial<CommandRecord>) => crudUpdate(endpoints.command, payload);
+export const deleteCommand = (id: string) => crudDelete(endpoints.command, id);
+export const getCommandById = (id: string) => crudGetById<CommandRecord>(endpoints.command, id);
+export const listCommand = (query: PageQuery) => crudList<CommandRecord>(endpoints.command, query);
 export const listCommandByProfileId = (profileId: string) =>
   httpGet<R<CommandRecord[]>>(`${endpoints.command}/list_by_profile_id`, { params: { profile_id: profileId } });
 
-// ─── Command History Queries ──────────────────────────────────────────
+// Command Param CRUD
+
+export const addCommandParam = (payload: Partial<CommandParamRecord>) => crudAdd(endpoints.commandParam, payload);
+export const updateCommandParam = (payload: Partial<CommandParamRecord>) => crudUpdate(endpoints.commandParam, payload);
+export const deleteCommandParam = (id: string) => crudDelete(endpoints.commandParam, id);
+export const listCommandParamByCommandId = (commandId: string) =>
+  httpGet<R<CommandParamRecord[]>>(`${endpoints.commandParam}/list_by_command_id`, {
+    params: { command_id: commandId },
+  });
+
+// Command History Queries
 
 export const getCommandHistoryById = (recordId: string) =>
   httpGet<R<CommandHistory>>(`${endpoints.commandHistory}/${recordId}`);

@@ -23,10 +23,27 @@
     direction="rtl"
     size="40%"
   >
-    <pre v-highlightjs>
-      <code class="json">{{ detailData }}</code>
-    </pre>
+    <pre class="json-preview">{{ formatJson(detailData) }}</pre>
   </el-drawer>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import type { PropType } from 'vue';
+  import { ref } from 'vue';
+  import { prettyJson } from '@/utils/jsonUtil';
+
+  defineProps({
+    detailData: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: () => ({}),
+    },
+  });
+
+  const detailVisible = ref(false);
+  const formatJson = (value: unknown) => prettyJson(value);
+  const show = () => {
+    detailVisible.value = true;
+  };
+
+  defineExpose({ show });
+</script>

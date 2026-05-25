@@ -40,9 +40,7 @@
                 </span>
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.enable')">
-                <el-tag :type="enableTagType(reactiveData.data.enableFlag)">
-                  {{ enableLabel(reactiveData.data.enableFlag) }}
-                </el-tag>
+                <enable-tag :value="reactiveData.data.enableFlag" />
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.remark')" :span="2">
                 {{ reactiveData.data.remark || '-' }}
@@ -51,13 +49,13 @@
                 {{ reactiveData.data.creatorName || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')">
-                {{ reactiveData.data.createTime ? timestamp(reactiveData.data.createTime) : '-' }}
+                {{ timestampLabel(reactiveData.data.createTime) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operatorName')">
                 {{ reactiveData.data.operatorName || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')">
-                {{ reactiveData.data.operateTime ? timestamp(reactiveData.data.operateTime) : '-' }}
+                {{ timestampLabel(reactiveData.data.operateTime) }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>
@@ -69,30 +67,21 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
 
   import { getLabelById } from '@/api/label';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
-  import { timestamp } from '@/utils/dateUtil';
+  import EnableTag from '@/components/tag/EnableTag.vue';
+  import { timestampLabel } from '@/utils/dateUtil';
 
   const route = useRoute();
-  const { t } = useI18n();
 
   const reactiveData = reactive({
     id: route.query.id as string,
     active: (route.query.active as string) || 'detail',
     data: {} as Record<string, any>,
   });
-
-  const enableTagType = (value: unknown) => {
-    return String(value) === 'ENABLE' || Number(value) === 0 ? 'success' : 'info';
-  };
-
-  const enableLabel = (value: unknown) => {
-    return String(value) === 'ENABLE' || Number(value) === 0 ? t('common.enable') : t('common.disable');
-  };
 
   const load = () => {
     if (!reactiveData.id) return;
@@ -111,8 +100,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-
   .label-color {
     display: inline-flex;
     align-items: center;

@@ -136,6 +136,12 @@ export const CALL_TYPE_OPTIONS: EnumOption[] = [
   { label: 'ASYNC', value: 'ASYNC' },
 ];
 
+// Backend: ParamDirectionFlagEnum
+export const PARAM_DIRECTION_OPTIONS: EnumOption[] = [
+  { label: 'INPUT', value: 'INPUT' },
+  { label: 'OUTPUT', value: 'OUTPUT' },
+];
+
 // Backend: EventTypeFlagEnum
 export const EVENT_TYPE_OPTIONS: EnumOption[] = [
   { label: 'INFO', value: 'INFO' },

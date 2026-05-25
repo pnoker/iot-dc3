@@ -57,46 +57,40 @@
 
     <command-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
 
-    <el-drawer v-model="reactiveData.detailVisible" title="Command Detail" size="520px">
+    <el-drawer v-model="reactiveData.detailVisible" :title="$t('command.detail.title')" size="520px">
       <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
         <el-descriptions-item :label="$t('common.name')">{{
           reactiveData.detailRecord.commandName || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="Code">{{ reactiveData.detailRecord.commandCode || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Command Type">{{
+        <el-descriptions-item :label="$t('command.detail.code')">
+          {{ reactiveData.detailRecord.commandCode || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('command.detail.commandType')">{{
           reactiveData.detailRecord.commandTypeFlag || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="Call Type">{{
+        <el-descriptions-item :label="$t('command.detail.callType')">{{
           reactiveData.detailRecord.callTypeFlag || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="Timeout (ms)">{{ reactiveData.detailRecord.timeout ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('command.detail.timeout')">{{
+          commandTimeoutLabel(reactiveData.detailRecord.timeout)
+        }}</el-descriptions-item>
         <el-descriptions-item :label="$t('common.enableFlag')">
-          <el-tag
-            :type="
-              String(reactiveData.detailRecord.enableFlag) === 'ENABLE' ||
-              Number(reactiveData.detailRecord.enableFlag) === 0
-                ? 'success'
-                : 'info'
-            "
-          >
-            {{
-              String(reactiveData.detailRecord.enableFlag) === 'ENABLE' ||
-              Number(reactiveData.detailRecord.enableFlag) === 0
-                ? $t('common.enable')
-                : $t('common.disable')
-            }}
-          </el-tag>
+          <enable-tag :value="reactiveData.detailRecord.enableFlag" />
         </el-descriptions-item>
         <el-descriptions-item :label="$t('common.remark')">{{
           reactiveData.detailRecord.remark || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="Profile ID">{{ reactiveData.detailRecord.profileId || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Tenant ID">{{ reactiveData.detailRecord.tenantId || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Create Time">{{
-          formatTime(reactiveData.detailRecord.createTime)
+        <el-descriptions-item :label="$t('command.detail.profileId')">
+          {{ reactiveData.detailRecord.profileId || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('command.detail.tenantId')">
+          {{ reactiveData.detailRecord.tenantId || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('common.createTime')">{{
+          timestampLabel(reactiveData.detailRecord.createTime)
         }}</el-descriptions-item>
-        <el-descriptions-item label="Operate Time">{{
-          formatTime(reactiveData.detailRecord.operateTime)
+        <el-descriptions-item :label="$t('common.operationTime')">{{
+          timestampLabel(reactiveData.detailRecord.operateTime)
         }}</el-descriptions-item>
       </el-descriptions>
       <el-empty v-else :description="$t('common.description')" />
@@ -106,13 +100,24 @@
 
 <script lang="ts" setup>
   import { computed, reactive, ref, watch } from 'vue';
-  import { addCommand, deleteCommand, listCommand, updateCommand } from '@/api/command';
-  import { timestamp } from '@/utils/dateUtil';
-  import { successMessage } from '@/utils/notificationUtil';
+  import { useI18n } from 'vue-i18n';
+  import {
+    addCommand,
+    addCommandParam,
+    deleteCommand,
+    deleteCommandParam,
+    listCommand,
+    updateCommand,
+    updateCommandParam,
+  } from '@/api/command';
+  import { timestampLabel } from '@/utils/dateUtil';
+  import { failMessage, successMessage } from '@/utils/notificationUtil';
+  import { commandTimeoutLabel } from '@/utils/thingModelFormatUtil';
   import { isNull } from '@/utils/validationUtil';
-  import type { CommandForm, CommandRecord, Order } from '@/config/types';
+  import type { CommandForm, CommandParamRecord, CommandRecord, Order } from '@/config/types';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+  import EnableTag from '@/components/tag/EnableTag.vue';
   import CommandCard from './card/CommandCard.vue';
   import CommandTool from './tool/CommandTool.vue';
   import CommandEditForm from './edit/CommandEditForm.vue';
@@ -133,6 +138,7 @@
   }>();
 
   const editRef = ref<InstanceType<typeof CommandEditForm>>();
+  const { t } = useI18n();
   const canManage = computed(() => props.embedded === '' || props.embedded === 'edit');
   const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
 
@@ -161,8 +167,6 @@
     const profileId = !isNull(props.profileId) ? props.profileId : form.profileId;
     return isNull(profileId) ? { ...form } : { ...form, profileId };
   };
-
-  const formatTime = (value: unknown) => (isNull(value) ? '-' : timestamp(String(value)));
 
   const load = () => {
     reactiveData.loading = true;
@@ -205,20 +209,69 @@
   };
   const openEdit = (row: CommandRecord) => editRef.value?.showEdit(row);
 
-  const onAdd = (form: CommandForm, done: () => void) => {
-    addCommand(withFixedProfile(form)).then(() => {
-      successMessage();
-      load();
-      done();
+  type DoneCallback = (close?: boolean) => void;
+
+  const isValidCreatedId = (id: string) => /^\d+$/.test(id);
+
+  const syncCommandParams = (
+    commandId: string,
+    params: CommandParamRecord[],
+    originalParams: CommandParamRecord[] = []
+  ) => {
+    const currentIds = new Set(params.map((item) => String(item.id || '')).filter(Boolean));
+    const deleteTasks = originalParams
+      .filter((item) => item.id && !currentIds.has(String(item.id)))
+      .map((item) => deleteCommandParam(String(item.id)));
+
+    const saveTasks = params.map((item) => {
+      const payload = { ...item, commandId };
+      return item.id ? updateCommandParam(payload) : addCommandParam({ ...payload, id: undefined });
     });
+
+    return Promise.all(deleteTasks).then(() => Promise.all(saveTasks));
   };
 
-  const onUpdate = (form: CommandForm, done: () => void) => {
-    updateCommand(withFixedProfile(form)).then(() => {
-      successMessage();
-      load();
-      done();
-    });
+  const onAdd = (form: CommandForm, params: CommandParamRecord[], done: DoneCallback) => {
+    addCommand(withFixedProfile(form))
+      .then((res) => {
+        const commandId = String(res.data || '');
+        if (!isValidCreatedId(commandId)) {
+          failMessage(t('command.errors.idNotReturned'));
+          return Promise.reject(new Error(t('command.errors.idNotReturned')));
+        }
+        return syncCommandParams(commandId, params).then(() => {
+          successMessage();
+          load();
+          done();
+        });
+      })
+      .catch(() => {
+        done(false);
+      });
+  };
+
+  const onUpdate = (
+    form: CommandForm,
+    params: CommandParamRecord[],
+    originalParams: CommandParamRecord[],
+    done: DoneCallback
+  ) => {
+    updateCommand(withFixedProfile(form))
+      .then(() => {
+        const commandId = String(form.id || '');
+        if (!isValidCreatedId(commandId)) {
+          failMessage(t('command.errors.idMissing'));
+          return Promise.reject(new Error(t('command.errors.idMissing')));
+        }
+        return syncCommandParams(commandId, params, originalParams).then(() => {
+          successMessage();
+          load();
+          done();
+        });
+      })
+      .catch(() => {
+        done(false);
+      });
   };
 
   const disableThing = (id: string, profileId: string, done: () => void) => {

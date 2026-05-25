@@ -34,18 +34,16 @@
                 {{ reactiveData.data.email || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.enable')">
-                <el-tag :type="Number(reactiveData.data.enableFlag) === 0 ? 'success' : 'info'">
-                  {{ Number(reactiveData.data.enableFlag) === 0 ? $t('common.enable') : $t('common.disable') }}
-                </el-tag>
+                <enable-tag :value="reactiveData.data.enableFlag" />
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.remark')">
                 {{ reactiveData.data.remark || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')">
-                {{ reactiveData.data.createTime ? timestamp(reactiveData.data.createTime) : '-' }}
+                {{ timestampLabel(reactiveData.data.createTime) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')">
-                {{ reactiveData.data.operateTime ? timestamp(reactiveData.data.operateTime) : '-' }}
+                {{ timestampLabel(reactiveData.data.operateTime) }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>
@@ -57,9 +55,7 @@
             <el-table-column :label="$t('settings.role.roleCode')" min-width="180" prop="roleCode" />
             <el-table-column :label="$t('common.enable')" width="90">
               <template #default="{ row }">
-                <el-tag :type="Number(row.enableFlag) === 0 ? 'success' : 'info'">
-                  {{ Number(row.enableFlag) === 0 ? $t('common.enable') : $t('common.disable') }}
-                </el-tag>
+                <enable-tag :value="row.enableFlag" />
               </template>
             </el-table-column>
             <el-table-column :label="$t('common.remark')" min-width="220" prop="remark" show-overflow-tooltip />
@@ -94,10 +90,11 @@
   import { getResourceListByUserId } from '@/api/roleResourceBind';
   import { getRoleListByUserId } from '@/api/roleUserBind';
   import { getUserById } from '@/api/user';
-  import { timestamp } from '@/utils/dateUtil';
+  import { timestampLabel } from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';
+  import EnableTag from '@/components/tag/EnableTag.vue';
 
   const route = useRoute();
   const router = useRouter();
@@ -170,7 +167,3 @@
     if (reactiveData.active === 'resource') loadResources();
   });
 </script>
-
-<style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-</style>

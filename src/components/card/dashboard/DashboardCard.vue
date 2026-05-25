@@ -247,13 +247,13 @@
 
     .dashboard-card__title-text {
       font-weight: 600;
-      color: #303133;
+      color: var(--el-text-color-primary);
     }
 
     .dashboard-card__subtitle {
       font-size: 12px;
       font-weight: normal;
-      color: #909399;
+      color: var(--el-text-color-secondary);
     }
 
     // Badge sits inline with the title — override the default floating
@@ -332,7 +332,7 @@
 
     // ---- footer ----------------------------------------------------------
     // Opt-in bar beneath the body. Matches LiveFeed's "updated at + rows"
-    // look: 8/16 padding, 12px/#909399 text, light top border, #fafafa bg.
+    // look: 8/16 padding, secondary text, light top border and subtle bg.
     // Consumers lay out content with a pair of <span>s — flex space-between
     // handles the rest.
     .dashboard-card__footer {
@@ -342,9 +342,9 @@
       gap: 8px;
       padding: 8px 16px;
       font-size: 12px;
-      color: #909399;
+      color: var(--el-text-color-secondary);
       border-top: 1px solid var(--el-border-color-lighter);
-      background: #fafafa;
+      background: var(--el-fill-color-lighter);
       flex-shrink: 0;
     }
 

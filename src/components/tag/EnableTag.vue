@@ -23,6 +23,7 @@
 <script lang="ts" setup>
   import { computed } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
 
   const props = withDefaults(
     defineProps<{
@@ -36,10 +37,5 @@
   );
 
   const { t } = useI18n();
-  const enabled = computed(() => {
-    if (props.value === true) return true;
-    if (props.value === false) return false;
-    const value = String(props.value ?? '').toUpperCase();
-    return value === 'ENABLE' || value === 'ENABLED' || value === 'TRUE' || value === '0';
-  });
+  const enabled = computed(() => isEnabledFlag(props.value));
 </script>

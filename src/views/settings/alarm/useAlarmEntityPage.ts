@@ -20,7 +20,8 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import type { AlarmEntityRecord, Order, PageQuery } from '@/config/types';
-import { timestamp } from '@/utils/dateUtil';
+import { timestampLabel } from '@/utils/dateUtil';
+import { prettyJson } from '@/utils/jsonUtil';
 import { failMessage, successMessage } from '@/utils/notificationUtil';
 import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
@@ -148,25 +149,13 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     load();
   };
 
-  const prettyJson = (value: unknown) => {
-    if (value == null || value === '') return '{}';
-    if (typeof value === 'string') {
-      try {
-        return JSON.stringify(JSON.parse(value), null, 2);
-      } catch {
-        return value;
-      }
-    }
-    return JSON.stringify(value, null, 2);
-  };
-
   const assignForm = (value: Record<string, unknown>) => {
     Object.keys(formModel).forEach((key) => delete formModel[key]);
     Object.assign(formModel, value);
     activeConfig.value.fields
       .filter((field) => field.kind === 'json')
       .forEach((field) => {
-        formModel[field.prop] = prettyJson(formModel[field.prop]);
+        formModel[field.prop] = prettyJson(formModel[field.prop], '{}');
       });
   };
 
@@ -261,11 +250,6 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
       });
   };
 
-  const formatTime = (value: unknown) => {
-    if (!value) return '-';
-    return timestamp(String(value)) || '-';
-  };
-
   const enumLabel = (value: unknown) => {
     const text = String(value || '');
     const map: Record<string, string> = {
@@ -306,7 +290,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
 
   const formatCell = (row: AlarmEntityRecord, column: AlarmColumnConfig) => {
     const value = row[column.prop];
-    if (column.kind === 'time') return formatTime(value);
+    if (column.kind === 'time') return timestampLabel(value);
     if (column.kind === 'tag') return enumLabel(value);
     if (value == null || value === '') return '-';
     return String(value);

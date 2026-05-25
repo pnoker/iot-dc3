@@ -95,25 +95,19 @@
               :height="80"
               :tooltip-unit="unit"
               animate
-              color="#409eff"
+              color="var(--el-color-primary)"
             />
             <div v-else class="point-value-empty-chart">{{ $t('pointValue.card.noHistory') }}</div>
           </div>
         </div>
         <div v-if="embedded == ''" class="things-card__footer">
           <div class="things-card-footer-operation">
-            <el-popconfirm
-              :icon="CircleClose"
-              :title="$t('pointValue.card.confirmDelete')"
-              icon-color="#f56c6c"
-              placement="top"
-            >
-              <template #reference>
-                <el-button link type="primary">{{ $t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-button link type="primary">{{ $t('common.edit') }}</el-button>
-            <el-button link type="primary">{{ $t('common.detail') }}</el-button>
+            <el-button :disabled="writeDisabled" link type="primary" @click="$emit('write-thing', data)">
+              {{ $t('pointValue.card.write') }}
+            </el-button>
+            <el-button link type="primary" @click="$emit('detail-thing', data)">
+              {{ $t('common.detail') }}
+            </el-button>
           </div>
         </div>
       </div>
@@ -123,7 +117,7 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, ref, watch } from 'vue';
-  import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue';
+  import { Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
 
   import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
@@ -168,6 +162,8 @@
     },
   });
 
+  defineEmits(['write-thing', 'detail-thing']);
+
   const copyValue = (data: any) => {
     const content = {
       deviceId: data.deviceId,
@@ -189,6 +185,7 @@
   const displayDelay = computed(() => {
     return typeof props.data?.interval === 'number' ? `${props.data.interval} ms` : '--';
   });
+  const writeDisabled = computed(() => !['W', 'RW'].includes(String(props.data?.rwFlag || '').toUpperCase()));
 
   const displayTime = (value: string | null | undefined) => {
     if (!hasLatestValue.value || !value) {
@@ -241,8 +238,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-
   // PointValueCard 内联了 header / footer / 实时数值展示区,不使用 ThingsCardHeader / ThingsCardActions,
   // 因此在此补齐对应样式。`header-enable` / `header-disable` 语义不同:基于 data.interval 表示延时是否正常。
 
@@ -269,11 +264,11 @@
       line-height: 48px;
       font-size: 14px;
       font-weight: bold;
-      color: rgba(0, 0, 0, 0.85);
+      color: var(--el-text-color-primary);
       cursor: pointer;
 
       &:hover {
-        color: #1890ff;
+        color: var(--el-color-primary);
       }
     }
 
@@ -294,15 +289,15 @@
   }
 
   .header-enable {
-    border-bottom: 1px solid #c2e7b0;
+    border-bottom: 1px solid var(--el-color-success-light-5);
   }
 
   .header-disable {
-    border-bottom: 1px solid #fbc4c4;
+    border-bottom: 1px solid var(--el-color-danger-light-5);
   }
 
   .header-missing {
-    border-bottom: 1px solid #dcdfe6;
+    border-bottom: 1px solid var(--el-border-color);
   }
 
   .things-card__body {
@@ -326,7 +321,7 @@
       }
 
       .value-missing {
-        color: #909399;
+        color: var(--el-text-color-secondary);
         animation: none;
       }
 
@@ -342,7 +337,7 @@
       .point-value-empty-chart {
         height: 80px;
         line-height: 80px;
-        color: #909399;
+        color: var(--el-text-color-secondary);
         font-size: 12px;
       }
     }
@@ -353,7 +348,7 @@
     margin-top: 2px;
     display: flex;
     justify-content: flex-end;
-    border-top: 1px solid #dcdfe6;
+    border-top: 1px solid var(--el-border-color);
 
     .things-card-footer-operation {
       height: 35px;
@@ -363,13 +358,13 @@
 
   @keyframes hue {
     0% {
-      color: #409eff;
+      color: var(--el-color-primary);
     }
     50% {
-      color: #f3f4fe;
+      color: var(--el-color-primary-light-9);
     }
     100% {
-      color: #409eff;
+      color: var(--el-color-primary);
     }
   }
 </style>

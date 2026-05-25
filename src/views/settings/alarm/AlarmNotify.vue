@@ -146,7 +146,7 @@
       <template #footer>
         <div class="things-dialog-footer">
           <el-button @click="formVisible = false">{{ t('common.cancel') }}</el-button>
-          <el-button plain type="success" @click="resetForm">{{ t('common.reset') }}</el-button>
+          <el-button plain @click="resetForm">{{ t('common.reset') }}</el-button>
           <el-button :loading="state.saving" type="primary" @click="submit">{{ t('common.confirm') }}</el-button>
         </div>
       </template>
@@ -194,8 +194,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-dialog.scss';
-
   .alarm-notify {
     min-width: 0;
 

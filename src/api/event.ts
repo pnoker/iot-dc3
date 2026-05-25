@@ -14,33 +14,36 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
+import { crudAdd, crudDelete, crudGetById, crudList, crudUpdate, httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 import type { PageQuery, PageResult } from '@/config/types';
-import type { EventHistory, EventRecord } from '@/config/types/event';
+import type { EventHistory, EventParamRecord, EventRecord } from '@/config/types/event';
 
 const endpoints = {
   event: `${API_MANAGER_BASE}/event`,
+  eventParam: `${API_MANAGER_BASE}/event_param`,
   eventHistory: `${API_DATA_BASE}/event_history`,
 } as const;
 
-const add = <T>(base: string, payload: T) => httpPost(`${base}/add`, payload);
-const update = <T>(base: string, payload: T) => httpPost(`${base}/update`, payload);
-const remove = (base: string, id: string) => httpPost(`${base}/delete`, undefined, { params: { id } });
-const selectById = <T>(base: string, id: string) => httpGet<R<T>>(`${base}/get_by_id`, { params: { id } });
-const list = <T>(base: string, query: PageQuery) => httpPost<R<PageResult<T>>>(`${base}/list`, query);
+// Event Definition CRUD
 
-// ─── Event Definition CRUD ────────────────────────────────────────────
-
-export const addEvent = (payload: Partial<EventRecord>) => add(endpoints.event, payload);
-export const updateEvent = (payload: Partial<EventRecord>) => update(endpoints.event, payload);
-export const deleteEvent = (id: string) => remove(endpoints.event, id);
-export const getEventById = (id: string) => selectById<EventRecord>(endpoints.event, id);
-export const listEvent = (query: PageQuery) => list<EventRecord>(endpoints.event, query);
+export const addEvent = (payload: Partial<EventRecord>) => crudAdd(endpoints.event, payload);
+export const updateEvent = (payload: Partial<EventRecord>) => crudUpdate(endpoints.event, payload);
+export const deleteEvent = (id: string) => crudDelete(endpoints.event, id);
+export const getEventById = (id: string) => crudGetById<EventRecord>(endpoints.event, id);
+export const listEvent = (query: PageQuery) => crudList<EventRecord>(endpoints.event, query);
 export const listEventByProfileId = (profileId: string) =>
   httpGet<R<EventRecord[]>>(`${endpoints.event}/list_by_profile_id`, { params: { profile_id: profileId } });
 
-// ─── Event History Queries ────────────────────────────────────────────
+// Event Param CRUD
+
+export const addEventParam = (payload: Partial<EventParamRecord>) => crudAdd(endpoints.eventParam, payload);
+export const updateEventParam = (payload: Partial<EventParamRecord>) => crudUpdate(endpoints.eventParam, payload);
+export const deleteEventParam = (id: string) => crudDelete(endpoints.eventParam, id);
+export const listEventParamByEventId = (eventId: string) =>
+  httpGet<R<EventParamRecord[]>>(`${endpoints.eventParam}/list_by_event_id`, { params: { event_id: eventId } });
+
+// Event History Queries
 
 export const getEventHistoryById = (recordId: string) =>
   httpGet<R<EventHistory>>(`${endpoints.eventHistory}/${recordId}`);

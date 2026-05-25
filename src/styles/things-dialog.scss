@@ -15,9 +15,7 @@
  */
 
 // Vertically centre things-dialog + cap its height so tall forms scroll
-// inside the dialog rather than bleed past the viewport bottom. Applied
-// via the wrapper .el-overlay-dialog because el-dialog teleports to body
-// and its direct container controls vertical alignment.
+// inside the dialog rather than bleed past the viewport bottom.
 .el-overlay-dialog:has(.things-dialog) {
   display: flex;
   align-items: center;
@@ -35,8 +33,13 @@
   }
 
   .el-dialog__body {
-    overflow-y: auto;
     flex: 1 1 auto;
+    padding: 30px 30px 15px 30px;
+    overflow-y: auto;
+
+    pre {
+      margin: auto;
+    }
   }
 
   // Opt-in helper: put `class="things-dialog things-dialog--wide"` on a
@@ -101,6 +104,17 @@
     margin-bottom: 10px;
   }
 
+  .param-editor {
+    margin-top: 12px;
+  }
+
+  .param-editor__toolbar {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
   .things-dialog-footer {
     display: flex;
     justify-content: flex-end;
@@ -109,14 +123,6 @@
   .el-dialog__title {
     font-size: 16px;
     font-weight: bold;
-  }
-
-  .el-dialog__body {
-    padding: 30px 30px 15px 30px;
-
-    pre {
-      margin: auto;
-    }
   }
 
   .el-form-item__content {

@@ -65,10 +65,10 @@
                 {{ reactiveData.data.remark || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')">
-                {{ reactiveData.data.createTime ? timestamp(reactiveData.data.createTime) : '-' }}
+                {{ timestampLabel(reactiveData.data.createTime) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')">
-                {{ reactiveData.data.operateTime ? timestamp(reactiveData.data.operateTime) : '-' }}
+                {{ timestampLabel(reactiveData.data.operateTime) }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>
@@ -88,7 +88,7 @@
   import DefaultTag from '@/components/tag/DefaultTag.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
   import type { AgenticModelConfig } from '@/config/types';
-  import { timestamp } from '@/utils/dateUtil';
+  import { timestampLabel } from '@/utils/dateUtil';
 
   const route = useRoute();
 
@@ -116,8 +116,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-
   .agentic-tags {
     display: flex;
     flex-wrap: wrap;

@@ -36,6 +36,11 @@ export const timestampColumn = (_row: unknown, _col: unknown, cellValue: unknown
   return timestamp(String(cellValue));
 };
 
+export const timestampLabel = (value: unknown, fallback = '-'): string => {
+  if (value == null || value === '') return fallback;
+  return timestamp(String(value)) || fallback;
+};
+
 /**
  * Format date to string
  *

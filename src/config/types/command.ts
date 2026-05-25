@@ -53,6 +53,22 @@ export interface CommandForm {
   [key: string]: unknown;
 }
 
+export interface CommandParamRecord {
+  id?: string;
+  paramName?: string;
+  paramCode?: string;
+  paramDirectionFlag?: string | number;
+  paramTypeFlag?: string | number;
+  requiredFlag?: boolean;
+  defaultValue?: string;
+  paramExt?: Record<string, unknown>;
+  commandId?: string;
+  enableFlag?: string | number;
+  signature?: string;
+  version?: number;
+  [key: string]: unknown;
+}
+
 /**
  * Command call history (dc3_command_history).
  */

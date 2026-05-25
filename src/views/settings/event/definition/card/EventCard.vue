@@ -127,8 +127,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/styles/things-card.scss';
-
   .things-body-content-item-column-2 {
     max-width: 200px;
   }

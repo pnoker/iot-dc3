@@ -26,6 +26,7 @@ import type { Order } from '@/config/types';
 import type { LabelForm, LabelRecord } from '@/config/types/manager';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
 import labelTool from './tool/LabelTool.vue';
 import labelEditForm from './edit/LabelEditForm.vue';
 
@@ -33,6 +34,7 @@ export default defineComponent({
   name: 'SettingsLabel',
   components: {
     BlankCard,
+    EnableTag,
     labelTool,
     labelEditForm,
   },

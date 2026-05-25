@@ -53,9 +53,9 @@
             />
           </el-form-item>
           <el-form-item class="edit-form-button">
-            <el-button :icon="Back" plain type="success" @click="done">{{ $t('common.return') }}</el-button>
+            <el-button :icon="Back" plain @click="done">{{ $t('common.return') }}</el-button>
             <el-button :icon="RefreshLeft" @click="profileReset">{{ $t('common.reset') }}</el-button>
-            <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+            <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -63,24 +63,24 @@
         <el-divider content-position="left">{{ $t('profile.edit.pointConfig') }}</el-divider>
         <point :embedded="'edit'" :profile-id="reactiveData.id"></point>
         <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
         </el-form-item>
       </el-card>
       <el-card v-if="reactiveData.active === 2" shadow="hover">
         <el-divider content-position="left">{{ $t('profile.edit.commandConfig') }}</el-divider>
         <command-list :embedded="'edit'" :profile-id="reactiveData.id"></command-list>
         <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
         </el-form-item>
       </el-card>
       <el-card v-if="reactiveData.active === 3" shadow="hover">
         <el-divider content-position="left">{{ $t('profile.edit.eventConfig') }}</el-divider>
         <event-list :embedded="'edit'" :profile-id="reactiveData.id"></event-list>
         <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
         </el-form-item>
       </el-card>
       <el-card v-if="reactiveData.active === 4" shadow="hover">
