@@ -20,6 +20,7 @@ package io.github.pnoker.common.driver.command;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -28,9 +29,9 @@ import java.util.function.Supplier;
  * Per-device serialization lock to prevent concurrent command execution on
  * the same device, avoiding protocol-level interleaving.
  * <p>
- * Lock instances are created lazily per deviceId and kept in memory. The
- * number of locks is bounded by the number of devices served by this driver
- * process, so there is no unbounded growth risk.
+ * Lock instances are created lazily per deviceId and removed when no caller is
+ * using or waiting on them. This keeps malformed command ids from growing the
+ * lock table permanently.
  *
  * @author pnoker
  * @version 2026.5.22
@@ -40,7 +41,7 @@ import java.util.function.Supplier;
 @Component
 public class DeviceLockManager {
 
-    private final ConcurrentHashMap<Long, ReentrantLock> locks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, LockRef> locks = new ConcurrentHashMap<>();
 
     /**
      * Execute an action under the per-device exclusive lock.
@@ -49,13 +50,10 @@ public class DeviceLockManager {
      * @param action   the I/O action to execute
      */
     public void runExclusive(Long deviceId, Runnable action) {
-        ReentrantLock lock = locks.computeIfAbsent(deviceId, k -> new ReentrantLock());
-        lock.lock();
-        try {
+        runExclusive(deviceId, () -> {
             action.run();
-        } finally {
-            lock.unlock();
-        }
+            return null;
+        });
     }
 
     /**
@@ -67,13 +65,43 @@ public class DeviceLockManager {
      * @return the result of {@code action}
      */
     public <T> T runExclusive(Long deviceId, Supplier<T> action) {
-        ReentrantLock lock = locks.computeIfAbsent(deviceId, k -> new ReentrantLock());
-        lock.lock();
+        if (Objects.isNull(deviceId)) {
+            throw new IllegalArgumentException("deviceId must not be null");
+        }
+        LockRef ref = acquire(deviceId);
+        ref.lock.lock();
         try {
             return action.get();
         } finally {
-            lock.unlock();
+            try {
+                ref.lock.unlock();
+            } finally {
+                release(deviceId, ref);
+            }
         }
+    }
+
+    private LockRef acquire(Long deviceId) {
+        return locks.compute(deviceId, (id, current) -> {
+            LockRef ref = Objects.nonNull(current) ? current : new LockRef();
+            ref.references++;
+            return ref;
+        });
+    }
+
+    private void release(Long deviceId, LockRef ref) {
+        locks.computeIfPresent(deviceId, (id, current) -> {
+            if (current != ref) {
+                return current;
+            }
+            current.references--;
+            return current.references == 0 ? null : current;
+        });
+    }
+
+    private static class LockRef {
+        private final ReentrantLock lock = new ReentrantLock();
+        private int references;
     }
 
 }

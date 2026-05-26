@@ -49,4 +49,15 @@ public class CommandDedupCache {
     public boolean tryAcquire(String commandId) {
         return cache.asMap().putIfAbsent(commandId, Boolean.TRUE) == null;
     }
+
+    /**
+     * Release a previously acquired commandId when a command is going to be retried.
+     *
+     * @param commandId unique command identifier
+     */
+    public void release(String commandId) {
+        if (commandId != null) {
+            cache.invalidate(commandId);
+        }
+    }
 }

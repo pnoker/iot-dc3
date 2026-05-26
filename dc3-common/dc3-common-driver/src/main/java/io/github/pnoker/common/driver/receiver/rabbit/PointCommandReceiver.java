@@ -68,9 +68,15 @@ public class PointCommandReceiver {
         try {
             log.info("Receive point command: {}", JsonUtil.toJsonString(entityDTO));
 
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.type())
+            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.commandId())
+                    || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.type())
                     || Objects.isNull(entityDTO.payload())) {
                 log.error("Invalid point command: {}", entityDTO);
+                RabbitAckUtil.reject(channel, deliveryTag);
+                return;
+            }
+            if (isInvalidPayload(entityDTO.payload())) {
+                log.error("Invalid point command payload: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
@@ -87,7 +93,7 @@ public class PointCommandReceiver {
             }
 
             // Dedup check
-            if (Objects.nonNull(commandId) && !dedupCache.tryAcquire(commandId)) {
+            if (!dedupCache.tryAcquire(commandId)) {
                 log.warn("Duplicate command detected: commandId={}", commandId);
                 sendResult(commandId, tenantId, PointCommandStatusEnum.DUPLICATE.getCode(),
                         null, "DUPLICATE", "Command already processed", channel, deliveryTag);
@@ -136,8 +142,23 @@ public class PointCommandReceiver {
                         null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
             } else {
                 log.warn("Point command failed, requeueing. deliveryTag={}", deliveryTag, e);
+                releaseDedup(entityDTO);
                 RabbitAckUtil.nack(channel, deliveryTag, true);
             }
+        }
+    }
+
+    private boolean isInvalidPayload(PointCommandPayload payload) {
+        return switch (payload) {
+            case PointCommandPayload.ReadPayload r -> Objects.isNull(r.deviceId()) || Objects.isNull(r.pointId());
+            case PointCommandPayload.WritePayload w -> Objects.isNull(w.deviceId()) || Objects.isNull(w.pointId())
+                    || Objects.isNull(w.value());
+        };
+    }
+
+    private void releaseDedup(PointCommandDTO entityDTO) {
+        if (Objects.nonNull(entityDTO) && Objects.nonNull(entityDTO.commandId())) {
+            dedupCache.release(entityDTO.commandId());
         }
     }
 

@@ -29,7 +29,7 @@ import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
-import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -64,20 +64,27 @@ public class DriverWriteServiceImpl implements DriverWriteService {
     public boolean write(Long deviceId, Long pointId, String value) {
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
-            throw new ReadPointException("Failed to write point value, device[{}] is null", deviceId);
+            throw new WritePointException("Failed to write point value, device[{}] is null", deviceId);
         }
 
-        if (!device.getPointIds().contains(pointId)) {
-            throw new ReadPointException("Failed to write point value, device[{}] not contained point[{}]",
+        if (Objects.isNull(pointId) || Objects.isNull(device.getPointIds()) || !device.getPointIds().contains(pointId)) {
+            throw new WritePointException("Failed to write point value, device[{}] not contained point[{}]",
                     deviceId, pointId);
         }
 
         Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
+        if (Objects.isNull(driverConfig) || driverConfig.isEmpty()) {
+            throw new WritePointException("Failed to write point value, driver config is empty, deviceId={}", deviceId);
+        }
         Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
+        if (Objects.isNull(pointConfig) || pointConfig.isEmpty()) {
+            throw new WritePointException("Failed to write point value, point config is empty, deviceId={}, pointId={}",
+                    deviceId, pointId);
+        }
 
         PointBO point = pointMetadata.getCache(pointId);
         if (Objects.isNull(point)) {
-            throw new ReadPointException("Failed to write point value, point is null, deviceId={}, pointId={}",
+            throw new WritePointException("Failed to write point value, point is null, deviceId={}, pointId={}",
                     deviceId, pointId);
         }
 

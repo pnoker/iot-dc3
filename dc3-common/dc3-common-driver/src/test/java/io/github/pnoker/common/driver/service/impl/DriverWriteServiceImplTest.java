@@ -26,7 +26,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -130,7 +130,7 @@ class DriverWriteServiceImplTest {
     @Test
     void writeRejectsUnknownDevice() {
         when(deviceMetadata.getCache(10L)).thenReturn(null);
-        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ReadPointException.class);
+        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(WritePointException.class);
         verifyNoInteractions(driverSenderService);
     }
 
@@ -138,7 +138,7 @@ class DriverWriteServiceImplTest {
     void writeRejectsPointNotBoundToDevice() {
         device.setPointIds(new HashSet<>(java.util.List.of(99L)));
         when(deviceMetadata.getCache(10L)).thenReturn(device);
-        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ReadPointException.class);
+        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(WritePointException.class);
         verifyNoInteractions(driverCustomService, driverSenderService);
     }
 
@@ -148,7 +148,30 @@ class DriverWriteServiceImplTest {
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(Map.of("k", AttributeBO.builder().build()));
         when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(Map.of("k", AttributeBO.builder().build()));
         when(pointMetadata.getCache(20L)).thenReturn(null);
-        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(ReadPointException.class);
+        assertThatThrownBy(() -> service.write(10L, 20L, "v")).isInstanceOf(WritePointException.class);
         verifyNoInteractions(driverSenderService);
+    }
+
+    @Test
+    void writeRejectsEmptyDriverConfig() {
+        when(deviceMetadata.getCache(10L)).thenReturn(device);
+        when(deviceMetadata.getDriverConfig(10L)).thenReturn(Map.of());
+
+        assertThatThrownBy(() -> service.write(10L, 20L, "v"))
+                .isInstanceOf(WritePointException.class)
+                .hasMessageContaining("driver config is empty");
+        verifyNoInteractions(driverCustomService, driverSenderService);
+    }
+
+    @Test
+    void writeRejectsEmptyPointConfig() {
+        when(deviceMetadata.getCache(10L)).thenReturn(device);
+        when(deviceMetadata.getDriverConfig(10L)).thenReturn(Map.of("k", AttributeBO.builder().build()));
+        when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(Map.of());
+
+        assertThatThrownBy(() -> service.write(10L, 20L, "v"))
+                .isInstanceOf(WritePointException.class)
+                .hasMessageContaining("point config is empty");
+        verifyNoInteractions(driverCustomService, driverSenderService);
     }
 }
