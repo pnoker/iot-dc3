@@ -50,7 +50,7 @@
           <el-checkbox v-model="form.reasoning">{{ $t('agentic.capReasoning') }}</el-checkbox>
         </div>
       </el-form-item>
-      <el-form-item :label="$t('settings.agentic.temperature')">
+      <el-form-item :label="$t('settings.agentic.temperature')" prop="temperature">
         <el-slider v-model="form.temperature" :max="2" :min="0" :step="0.1" />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.maxTokens')" prop="maxTokens">
@@ -125,6 +125,15 @@
     model: [{ required: true, message: t('settings.agentic.modelRequired'), trigger: 'blur' }],
     providerId: [{ required: true, message: t('settings.agentic.providerRequired'), trigger: 'change' }],
     maxTokens: [{ required: true, message: t('settings.agentic.maxTokensRequired'), trigger: 'blur' }],
+    temperature: [
+      {
+        type: 'number',
+        min: 0,
+        max: 2,
+        message: t('settings.agentic.temperatureRange'),
+        trigger: 'change',
+      },
+    ],
   }));
 
   const show = () => {

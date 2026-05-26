@@ -17,7 +17,14 @@
 import type { FormItemRule } from 'element-plus';
 import type { ComposerTranslation } from 'vue-i18n';
 
-export const NAME_PATTERN = /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/;
+/** Backend Pattern: ^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_#@/.|]{1,31}$ */
+export const NAME_PATTERN = /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5\-_#@/.|]{1,31}$/;
+/** Backend Pattern: ^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$ (no Chinese) */
+export const AUTH_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9\-_#@/.|]{1,31}$/;
+/** Backend Pattern: ^1([3-9])\d{9}$ */
+export const PHONE_PATTERN = /^1([3-9])\d{9}$/;
+/** Backend Pattern: ^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\.[A-Za-z0-9]+$ */
+export const EMAIL_PATTERN = /^[A-Za-z0-9_.\-]+@[A-Za-z0-9]+\.[A-Za-z0-9]+$/;
 export const DECIMAL_PATTERN = /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/;
 
 export function nameRules(t: ComposerTranslation, entityName: string): FormItemRule[] {

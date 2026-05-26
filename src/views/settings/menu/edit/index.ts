@@ -22,6 +22,7 @@ import { useI18n } from 'vue-i18n';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import { MENU_LEVEL_OPTIONS, MENU_TYPE_OPTIONS } from '@/config/constant/enums';
 import { iconMap, iconNames, resolveIcon } from '@/config/constant/icons';
+import { AUTH_NAME_PATTERN } from '@/utils/formRuleUtil';
 
 type FormMode = 'add' | 'edit';
 
@@ -65,12 +66,17 @@ export default defineComponent({
     });
 
     const rules: FormRules = {
-      menuName: [{ required: true, message: t('settings.menu.menuNamePlaceholder'), trigger: 'blur' }],
+      menuName: [
+        { required: true, message: t('settings.menu.menuNamePlaceholder'), trigger: 'blur' },
+        { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
+        { pattern: AUTH_NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+      ],
       menuCode: [{ required: true, message: t('settings.menu.menuCodePlaceholder'), trigger: 'blur' }],
       titleZh: [{ required: true, message: t('settings.menu.titleZhPlaceholder'), trigger: 'blur' }],
       titleEn: [{ required: true, message: t('settings.menu.titleEnPlaceholder'), trigger: 'blur' }],
-      menuTypeFlag: [{ required: true, trigger: 'change' }],
-      menuLevel: [{ required: true, trigger: 'change' }],
+      menuTypeFlag: [{ required: true, message: t('settings.menu.menuTypeRequired'), trigger: 'change' }],
+      menuLevel: [{ required: true, message: t('settings.menu.menuLevelRequired'), trigger: 'change' }],
+      parentMenuId: [{ required: true, message: t('settings.menu.parentMenuIdPlaceholder'), trigger: 'change' }],
     };
 
     const parentTreeOptions = computed(() => [{ id: 0, menuName: 'Root', children: props.treeData || [] }]);

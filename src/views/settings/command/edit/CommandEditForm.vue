@@ -157,6 +157,7 @@
     POINT_TYPE_OPTIONS,
   } from '@/config/constant/enums';
   import type { CommandForm, CommandParamRecord, CommandRecord } from '@/config/types';
+  import { NAME_PATTERN } from '@/utils/formRuleUtil';
   import { failMessage } from '@/utils/notificationUtil';
   import {
     callTypeValue,
@@ -210,10 +211,15 @@
     paramLoading: false,
   });
 
-  const PARAM_NAME_RE = /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥\-_#@/.|]{1,31}$/;
-
   const rules: FormRules = {
-    commandName: [{ required: true, message: t('command.form.nameRequired'), trigger: 'blur' }],
+    commandName: [
+      { required: true, message: t('command.form.nameRequired'), trigger: 'blur' },
+      { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
+      { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+    ],
+    commandTypeFlag: [{ required: true, message: t('command.form.commandTypeRequired'), trigger: 'change' }],
+    callTypeFlag: [{ required: true, message: t('command.form.callTypeRequired'), trigger: 'change' }],
+    timeout: [{ required: true, message: t('command.form.timeoutRequired'), trigger: 'blur' }],
   };
 
   type RowErrors = { paramName?: string; paramCode?: string };
@@ -227,7 +233,7 @@
     const code = String(row.paramCode || '').trim();
     if (!name) {
       errors.paramName = t('command.form.paramRequired');
-    } else if (!PARAM_NAME_RE.test(name)) {
+    } else if (!NAME_PATTERN.test(name)) {
       errors.paramName = t('command.form.paramNamePattern');
     }
     if (!code) {
@@ -301,7 +307,7 @@
         failMessage(t('command.form.paramRequired'));
         valid = false;
       }
-      if (item.paramName && !PARAM_NAME_RE.test(item.paramName)) {
+      if (item.paramName && !NAME_PATTERN.test(item.paramName)) {
         failMessage(t('command.form.paramNamePattern'));
         valid = false;
       }

@@ -21,6 +21,7 @@ import { useI18n } from 'vue-i18n';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import { ENTITY_TYPE_OPTIONS } from '@/config/constant/enums';
 import type { LabelRecord } from '@/config/types/manager';
+import { NAME_PATTERN } from '@/utils/formRuleUtil';
 
 type FormMode = 'add' | 'edit';
 
@@ -53,7 +54,11 @@ export default defineComponent({
 
     const rules: FormRules = {
       entityTypeFlag: [{ required: true, message: t('settings.common.entityTypePlaceholder'), trigger: 'change' }],
-      labelName: [{ required: true, message: t('settings.label.labelNamePlaceholder'), trigger: 'blur' }],
+      labelName: [
+        { required: true, message: t('settings.label.labelNamePlaceholder'), trigger: 'blur' },
+        { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
+        { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+      ],
     };
 
     const reset = () => {

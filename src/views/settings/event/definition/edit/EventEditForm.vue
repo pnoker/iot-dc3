@@ -127,6 +127,7 @@
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import { EVENT_LEVEL_OPTIONS, EVENT_TYPE_OPTIONS, POINT_TYPE_OPTIONS } from '@/config/constant/enums';
   import type { EventForm, EventParamRecord, EventRecord } from '@/config/types';
+  import { NAME_PATTERN } from '@/utils/formRuleUtil';
   import { failMessage } from '@/utils/notificationUtil';
   import { enableFlagValue, eventLevelValue, eventTypeValue, pointTypeValue } from '@/utils/thingModelFormatUtil';
 
@@ -172,10 +173,14 @@
     paramLoading: false,
   });
 
-  const PARAM_NAME_RE = /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥\-_#@/.|]{1,31}$/;
-
   const rules: FormRules = {
-    eventName: [{ required: true, message: t('eventDefinition.form.nameRequired'), trigger: 'blur' }],
+    eventName: [
+      { required: true, message: t('eventDefinition.form.nameRequired'), trigger: 'blur' },
+      { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
+      { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+    ],
+    eventTypeFlag: [{ required: true, message: t('eventDefinition.form.eventTypeRequired'), trigger: 'change' }],
+    eventLevelFlag: [{ required: true, message: t('eventDefinition.form.eventLevelRequired'), trigger: 'change' }],
   };
 
   type RowErrors = { paramName?: string; paramCode?: string };
@@ -189,7 +194,7 @@
     const code = String(row.paramCode || '').trim();
     if (!name) {
       errors.paramName = t('eventDefinition.form.paramRequired');
-    } else if (!PARAM_NAME_RE.test(name)) {
+    } else if (!NAME_PATTERN.test(name)) {
       errors.paramName = t('eventDefinition.form.paramNamePattern');
     }
     if (!code) {
@@ -256,7 +261,7 @@
         failMessage(t('eventDefinition.form.paramRequired'));
         valid = false;
       }
-      if (item.paramName && !PARAM_NAME_RE.test(item.paramName)) {
+      if (item.paramName && !NAME_PATTERN.test(item.paramName)) {
         failMessage(t('eventDefinition.form.paramNamePattern'));
         valid = false;
       }

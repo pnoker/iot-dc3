@@ -19,6 +19,7 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+import { AUTH_NAME_PATTERN, EMAIL_PATTERN, NAME_PATTERN, PHONE_PATTERN } from '@/utils/formRuleUtil';
 
 type FormMode = 'add' | 'edit';
 
@@ -49,8 +50,18 @@ export default defineComponent({
     });
 
     const rules: FormRules = {
-      userName: [{ required: true, message: t('settings.user.userNamePlaceholder'), trigger: 'blur' }],
-      nickName: [{ required: true, message: t('settings.user.nickNamePlaceholder'), trigger: 'blur' }],
+      userName: [
+        { required: true, message: t('settings.user.userNamePlaceholder'), trigger: 'blur' },
+        { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
+        { pattern: AUTH_NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+      ],
+      nickName: [
+        { required: true, message: t('settings.user.nickNamePlaceholder'), trigger: 'blur' },
+        { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
+        { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+      ],
+      phone: [{ pattern: PHONE_PATTERN, message: t('settings.user.phoneFormat'), trigger: 'blur' }],
+      email: [{ pattern: EMAIL_PATTERN, message: t('settings.user.emailFormat'), trigger: 'blur' }],
     };
 
     const reset = () => {
