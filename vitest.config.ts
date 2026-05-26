@@ -36,6 +36,13 @@ export default defineConfig({
     clearMocks: true,
     mockReset: false,
     css: false,
+    // List-page view tests mount the full route subtree with 5+ mocked APIs
+    // and a fresh Pinia per test; under parallel execution against the
+    // ~470-test suite, transform+import can stretch beyond the default
+    // 5000ms cap. 30000ms covers the slowest mounts (PointValue) without
+    // masking real hangs — anything legitimately stuck still fails fast
+    // because the mount path itself doesn't poll.
+    testTimeout: 30000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary', 'html'],
