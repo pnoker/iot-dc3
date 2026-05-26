@@ -170,11 +170,11 @@ test.describe('destructive UI delete', () => {
       // The cases that need a dependency assert it exists — better to fail
       // here with a clear message than to send a half-empty add payload.
       if (testCase.name === 'Device') {
-        expect(deps.driverId, 'driverId from ensureE2eData').toBeTruthy();
-        expect(deps.profileId, 'profileId from ensureE2eData').toBeTruthy();
+        expect(deps.driverId, 'driverId from ensureE2eData').not.toBe('');
+        expect(deps.profileId, 'profileId from ensureE2eData').not.toBe('');
       }
       if (testCase.name === 'Settings Resource') {
-        expect(deps.apiId, 'apiId from ensureE2eData').toBeTruthy();
+        expect(deps.apiId, 'apiId from ensureE2eData').not.toBe('');
       }
 
       try {

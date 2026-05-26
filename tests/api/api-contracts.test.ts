@@ -27,9 +27,11 @@ import * as alertApi from '@/api/dashboard/alert';
 import * as statsApi from '@/api/dashboard/stats';
 import * as systemApi from '@/api/dashboard/system';
 import * as topologyApi from '@/api/dashboard/topology';
+import * as commandApi from '@/api/command';
 import * as deviceApi from '@/api/device';
 import * as dictionaryApi from '@/api/dictionary';
 import * as driverApi from '@/api/driver';
+import * as eventApi from '@/api/event';
 import * as groupApi from '@/api/group';
 import * as infoApi from '@/api/info';
 import * as labelApi from '@/api/label';
@@ -65,6 +67,11 @@ const apiSpies = vi.hoisted(() => ({
 vi.mock('@/api/common', () => ({
   httpGet: apiSpies.httpGet,
   httpPost: apiSpies.httpPost,
+  crudAdd: (base: string, payload: unknown) => apiSpies.httpPost(`${base}/add`, payload),
+  crudUpdate: (base: string, payload: unknown) => apiSpies.httpPost(`${base}/update`, payload),
+  crudDelete: (base: string, id: string) => apiSpies.httpPost(`${base}/delete`, undefined, { params: { id } }),
+  crudGetById: (base: string, id: string) => apiSpies.httpGet(`${base}/get_by_id`, { params: { id } }),
+  crudList: (base: string, query: unknown) => apiSpies.httpPost(`${base}/list`, query),
 }));
 
 vi.mock('@/config/axios', () => ({
@@ -84,9 +91,11 @@ const modules: Record<string, ApiModule> = {
   stats: statsApi,
   system: systemApi,
   topology: topologyApi,
+  command: commandApi,
   device: deviceApi,
   dictionary: dictionaryApi,
   driver: driverApi,
+  event: eventApi,
   group: groupApi,
   info: infoApi,
   label: labelApi,
@@ -106,6 +115,7 @@ const coveredApiSourceFiles = new Set([
   'alarm',
   'api',
   'attribute',
+  'command',
   'dashboard/alert',
   'dashboard/stats',
   'dashboard/system',
@@ -113,6 +123,7 @@ const coveredApiSourceFiles = new Set([
   'device',
   'dictionary',
   'driver',
+  'event',
   'group',
   'info',
   'label',
@@ -147,20 +158,47 @@ function exportedFunctions(moduleApi: ApiModule) {
   ) as Array<[string, ApiFunction]>;
 }
 
+// Explicit registry — preferred path. Add new wrappers HERE rather than
+// extending the heuristic fallback below; the heuristic exists only for
+// legacy modules whose call shapes were already well-covered when the
+// registry was introduced. New entries should pass the exact arguments
+// the function expects, in declaration order.
+const sampleArgsRegistry: Record<string, unknown[]> = {
+  // Multi-arg or non-pattern shapes that can't be derived from the name.
+  updateAgenticSession: ['conversation-1', { title: 'Renamed session' }],
+  uploadAgenticAttachment: ['conversation-1', new File(['demo'], 'demo.txt', { type: 'text/plain' })],
+  alertConfirm: ['driver', 'alert-1'],
+  alertUnconfirm: ['driver', 'alert-1'],
+  alertBulkConfirm: [[{ source: 'driver', id: 'alert-1' }], true],
+  getPointValueHistory: [1001, 2002, 30],
+  listRoleByUserId: ['user-1', 1000],
+  getDriverInfoByDeviceIdAndAttributeId: ['device-1', 'attribute-1'],
+  getPointInfoByDeviceIdAndPointId: ['device-1', 'point-1'],
+  listCommandInfoByDeviceIdAndCommandId: ['device-1', 'command-1'],
+  listEventInfoByDeviceIdAndEventId: ['device-1', 'event-1'],
+  getCommandHistoryById: ['record-1'],
+  getEventHistoryById: ['record-1'],
+  // Page-query callers whose names don't match the heuristic prefixes.
+  getAgenticSessions: [pageQuery],
+  alertPage: [pageQuery],
+  // Array-id callers without `ByIds` suffix.
+  getPointUnit: [['id-1', 'id-2']],
+};
+
 function sampleArgs(name: string): unknown[] {
-  if (name === 'updateAgenticSession') return ['conversation-1', { title: 'Renamed session' }];
-  if (name === 'uploadAgenticAttachment')
-    return ['conversation-1', new File(['demo'], 'demo.txt', { type: 'text/plain' })];
-  if (name === 'alertConfirm' || name === 'alertUnconfirm') return ['driver', 'alert-1'];
-  if (name === 'alertBulkConfirm') return [[{ source: 'driver', id: 'alert-1' }], true];
-  if (name === 'getPointValueHistory') return [1001, 2002, 30];
-  if (name === 'getRoleListByUserId') return ['user-1', 1000];
-  if (name === 'getDriverInfoByDeviceIdAndAttributeId') return ['device-1', 'attribute-1'];
-  if (name === 'getPointInfoByDeviceIdAndPointId') return ['device-1', 'point-1'];
-  if (name === 'getAgenticSessions' || name === 'alertPage') return [pageQuery];
-  if (/ByIds$/.test(name) || name === 'getPointUnit') return [['id-1', 'id-2']];
+  // 1. Explicit registry wins.
+  if (Object.prototype.hasOwnProperty.call(sampleArgsRegistry, name)) {
+    return sampleArgsRegistry[name];
+  }
+
+  // 2. Heuristic fallback — most-specific first to avoid short-circuit
+  //    ambiguity (e.g. `listFooByBarId` matches both `/^list[A-Z]/` and
+  //    `/By[A-Z].*Id$/`; the byId case must win because it takes a string,
+  //    not a page query).
+  if (/ByIds$/.test(name)) return [['id-1', 'id-2']];
   if (/ListBy|By[A-Z].*Id$|ByName$/.test(name)) return ['id-1'];
   if (/Tree$/.test(name)) return [pageQuery];
+  if (/^list[A-Z]/.test(name)) return [pageQuery];
   if (/List$|Dictionary$/.test(name)) return [pageQuery];
   if (/^(add|update|import|upload|read|write)/.test(name) || /Status$/.test(name)) return [payload];
   if (/^(delete|get|confirm|reject)/.test(name)) return ['id-1'];
@@ -217,7 +255,11 @@ function expectStandardUrl(call: TransportCall) {
   expect(url).not.toContain('undefined');
   expect(url).not.toContain('?');
 
-  for (const segment of url.split('/').filter(Boolean)) {
+  const segments = url.split('/').filter(Boolean);
+  const allowsTrailingPathParam = /^api\/v3\/data\/(?:command_history|event_history)\/[^/]+$/.test(url);
+  const staticSegments = allowsTrailingPathParam ? segments.slice(0, -1) : segments;
+
+  for (const segment of staticSegments) {
     expect(segment).not.toMatch(/[A-Z-]/);
     expect(segment).not.toMatch(/^\{.+\}$/);
     expect(segment).not.toMatch(/^(id|ids|name|code|service|[a-z0-9]+_id)$/);

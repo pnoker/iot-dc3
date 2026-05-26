@@ -75,6 +75,7 @@ describe('AI coding guardrails', () => {
       expect.objectContaining({
         'lint:check': expect.any(String),
         check: expect.any(String),
+        'type-check': expect.any(String),
         test: expect.any(String),
         'test:unit': expect.any(String),
         'test:api': expect.any(String),
@@ -82,6 +83,7 @@ describe('AI coding guardrails', () => {
         'test:guard': expect.any(String),
         'test:impact': expect.any(String),
         'test:ci': expect.any(String),
+        'test:coverage': expect.any(String),
         'test:e2e': expect.any(String),
         'test:e2e:headed': expect.any(String),
         'test:e2e:sweep': expect.any(String),
@@ -209,7 +211,7 @@ describe('AI coding guardrails', () => {
     // concrete shape: toBe(true), toBe(0), toEqual([…]), etc.
     const weakAssertion = /\.(?:toBeTruthy|toBeFalsy)\s*\(/;
     const offenders = walk(join(root, 'tests'))
-      .filter((path) => /\.test\.ts$/.test(path))
+      .filter((path) => /\.(?:test|spec)\.ts$/.test(path))
       .filter((path) => !path.includes('tests/guardrails/'))
       .filter((path) => weakAssertion.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
@@ -250,6 +252,20 @@ describe('AI coding guardrails', () => {
     expect(existsSync(join(root, 'tests/fixtures'))).toBe(true);
     const files = readdirSync(join(root, 'tests/fixtures'));
     expect(files.length).toBeGreaterThan(0);
+  });
+
+  it('forbids getXxxList* naming in src/api — collections must use list* prefix', () => {
+    // CLAUDE.md §"API verb convention": `getXxx` returns a single record,
+    // `listXxx` returns a collection. `getXxxList`, `getXxxListByYyy`, and
+    // `getXxxByIds` are explicitly forbidden — they describe a collection
+    // but read like a single-record fetch, which churns at the call site.
+    const forbiddenPattern = /^export\s+const\s+get[A-Z][A-Za-z0-9]*(?:List(?:By[A-Z]|\b)|ByIds\b)/m;
+    const offenders = walk(join(root, 'src/api'))
+      .filter((path) => /\.ts$/.test(path))
+      .filter((path) => forbiddenPattern.test(readFileSync(path, 'utf8')))
+      .map(relativeProjectPath);
+
+    expect(offenders).toEqual([]);
   });
 
   it('documents the mandatory AI testing policy', () => {
