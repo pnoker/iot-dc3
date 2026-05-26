@@ -22,6 +22,7 @@ import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -43,6 +44,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@DisallowConcurrentExecution
 public class PointValueJob extends QuartzJobBean {
 
     private static final ReentrantReadWriteLock VALUE_LOCK = new ReentrantReadWriteLock();

@@ -1,0 +1,112 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: Modbus RTU Driver
+    code: ModbusRtuDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Port
+        attribute-code: port
+        attribute-type-flag: STRING
+        default-value: /dev/ttyUSB0
+        remark: Serial port name (e.g. /dev/ttyUSB0, COM3)
+      - attribute-name: Baud Rate
+        attribute-code: baudRate
+        attribute-type-flag: INT
+        default-value: 9600
+        remark: Serial baud rate (e.g. 9600, 19200, 115200)
+      - attribute-name: Data Bits
+        attribute-code: dataBits
+        attribute-type-flag: INT
+        default-value: 8
+        remark: Data bits (7 or 8)
+      - attribute-name: Stop Bits
+        attribute-code: stopBits
+        attribute-type-flag: INT
+        default-value: 1
+        remark: Stop bits (1 or 2)
+      - attribute-name: Parity
+        attribute-code: parity
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Parity (0=None, 1=Odd, 2=Even, 3=Mark, 4=Space)
+    point-attribute:
+      - attribute-name: Slave ID
+        attribute-code: slaveId
+        attribute-type-flag: INT
+        default-value: 1
+        remark: Modbus slave unit ID
+      - attribute-name: Function Code
+        attribute-code: functionCode
+        attribute-type-flag: INT
+        default-value: 1
+        remark: Modbus function code [1, 2, 3, 4]
+      - attribute-name: Offset
+        attribute-code: offset
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Register or coil address offset
+    command-attribute:
+      - attribute-name: Slave ID
+        attribute-code: slaveId
+        attribute-type-flag: INT
+        default-value: 1
+        remark: Modbus slave unit ID
+      - attribute-name: Function Code
+        attribute-code: functionCode
+        attribute-type-flag: INT
+        default-value: 6
+        remark: Modbus write function code [5, 6, 15, 16]
+      - attribute-name: Offset
+        attribute-code: offset
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Register or coil address offset
+      - attribute-name: Value Template
+        attribute-code: valueTemplate
+        attribute-type-flag: STRING
+        default-value: '${value}'
+        remark: Value template rendered with command params
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/modbus-rtu/${spring.application.name}.log

@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Per-entity ring of recent samples used for short-window alarm evaluation.
@@ -160,9 +159,9 @@ public class WindowSampleBuffer {
 
         // Trim by count. Concurrent removes here are benign — at most we under-
         // shoot maxSamples for a moment.
-        AtomicInteger drift = new AtomicInteger(deque.size());
-        while (drift.get() > maxSamples && Objects.nonNull(deque.pollFirst())) {
-            drift.decrementAndGet();
+        int drift = deque.size();
+        while (drift > maxSamples && Objects.nonNull(deque.pollFirst())) {
+            drift--;
         }
     }
 

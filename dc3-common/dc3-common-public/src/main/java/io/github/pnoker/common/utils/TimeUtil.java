@@ -113,6 +113,7 @@ public class TimeUtil {
         try {
             return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
         } catch (ParseException e) {
+            log.debug("Failed to parse date string '{}' with default format", dateString);
             return null;
         }
     }
@@ -127,6 +128,7 @@ public class TimeUtil {
         try {
             return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
         } catch (ParseException e) {
+            log.debug("Failed to parse date string '{}' with complete format", dateString);
             return null;
         }
     }

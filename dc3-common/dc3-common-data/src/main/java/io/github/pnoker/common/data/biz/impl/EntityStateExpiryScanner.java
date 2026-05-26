@@ -44,6 +44,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -131,17 +132,33 @@ public class EntityStateExpiryScanner {
             return;
         }
 
+        List<EntityAlarmDO> alarms = new ArrayList<>();
+        List<ExpiredDeviceContext> contexts = new ArrayList<>();
+
         for (EntityStateDO state : expired) {
             try {
-                processExpiredDevice(state);
+                EntityAlarmDO alarm = buildOfflineAlarm(state);
+                alarms.add(alarm);
+                contexts.add(new ExpiredDeviceContext(state, alarm));
             } catch (Exception e) {
                 log.warn("Device expiry processing failed, deviceId={}", state.getEntityId(), e);
             }
         }
+
+        if (!alarms.isEmpty()) {
+            entityAlarmManager.saveBatch(alarms);
+        }
+
+        for (ExpiredDeviceContext ctx : contexts) {
+            try {
+                completeExpiredDevice(ctx);
+            } catch (Exception e) {
+                log.warn("Device expiry completion failed, deviceId={}", ctx.state.getEntityId(), e);
+            }
+        }
     }
 
-    private void processExpiredDevice(EntityStateDO scanned) {
-        // Write alarm row
+    private EntityAlarmDO buildOfflineAlarm(EntityStateDO scanned) {
         EntityStatusEnum prev = EntityStatusEnum.ofIndex(scanned.getLastStateFlag());
         String prevCode = Objects.nonNull(prev) ? prev.getCode() : "unknown";
         String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", prevCode);
@@ -161,7 +178,14 @@ public class EntityStateExpiryScanner {
         alarm.setExpiredTime(0L);
         alarm.setConfirmFlag((byte) 0);
         alarm.setTenantId(scanned.getTenantId());
-        entityAlarmManager.save(alarm);
+        return alarm;
+    }
+
+    private void completeExpiredDevice(ExpiredDeviceContext ctx) {
+        EntityStateDO scanned = ctx.state;
+        EntityAlarmDO alarm = ctx.alarm;
+        EntityStatusEnum prev = EntityStatusEnum.ofIndex(scanned.getLastStateFlag());
+        String prevCode = Objects.nonNull(prev) ? prev.getCode() : "unknown";
 
         // Update lastAlarmId
         entityStateManager.lambdaUpdate()
@@ -174,6 +198,7 @@ public class EntityStateExpiryScanner {
                 .update();
 
         // Trigger alarm rule pipeline
+        String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", prevCode);
         DeviceAlarmDTO dto = DeviceAlarmDTO.builder()
                 .driverId(scanned.getParentEntityId())
                 .tenantId(scanned.getTenantId())
@@ -187,5 +212,8 @@ public class EntityStateExpiryScanner {
 
         log.info("Device scan marked OFFLINE: deviceId={}, tenantId={}, prevStatus={}",
                 scanned.getEntityId(), scanned.getTenantId(), prevCode);
+    }
+
+    private record ExpiredDeviceContext(EntityStateDO state, EntityAlarmDO alarm) {
     }
 }

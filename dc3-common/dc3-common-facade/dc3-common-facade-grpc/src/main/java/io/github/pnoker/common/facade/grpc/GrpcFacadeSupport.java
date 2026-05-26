@@ -48,7 +48,7 @@ public class GrpcFacadeSupport {
         } catch (StatusRuntimeException e) {
             Status status = e.getStatus();
             String description = Objects.requireNonNullElse(status.getDescription(), e.getMessage());
-            throw new ServiceException("{} transport failed: [{}] {}", operation, status.getCode(), description);
+            throw new ServiceException(operation + " transport failed: [" + status.getCode() + "] " + description);
         }
     }
 

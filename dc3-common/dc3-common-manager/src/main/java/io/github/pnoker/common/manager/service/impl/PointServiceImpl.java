@@ -247,7 +247,7 @@ public class PointServiceImpl implements PointService {
             List<DeviceDO> deviceDOList = deviceMapper
                     .selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
             deviceByPointBO.setDevices(deviceDOList);
-            deviceByPointBO.setCount(deviceDOList.stream().count());
+            deviceByPointBO.setCount((long) deviceDOList.size());
         } else {
             deviceByPointBO.setDevices(Collections.emptyList());
             deviceByPointBO.setCount(0L);

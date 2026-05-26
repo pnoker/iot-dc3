@@ -134,8 +134,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
      * @throws ConnectorException if client creation fails
      */
     private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        OpcUaClient opcUaClient = connectMap.get(deviceId);
-        if (Objects.isNull(opcUaClient)) {
+        return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
             int port = driverConfig.get("port").getValue(Integer.class);
             String path = driverConfig.get("path").getValue(String.class);
@@ -143,25 +142,23 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                     host, port, path);
             try {
-                opcUaClient = OpcUaClient.create(url, endpoints -> endpoints.stream().findFirst(),
+                OpcUaClient opcUaClient = OpcUaClient.create(url, endpoints -> endpoints.stream().findFirst(),
                         configBuilder -> configBuilder
                                 // Use anonymous authentication
                                 .setIdentityProvider(new AnonymousProvider())
                                 // Set request timeout to 5000 ms
                                 .setRequestTimeout(Unsigned.uint(5000))
                                 .build());
-                connectMap.put(deviceId, opcUaClient);
                 log.info("Driver connection created, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                         host, port, path);
+                return opcUaClient;
             } catch (UaException e) {
-                connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
                 log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                         host, port, path, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}, message={}",
                         deviceId, host, port, path, e.getMessage(), e);
             }
-        }
-        return opcUaClient;
+        });
     }
 
     /**
@@ -184,7 +181,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
         try {
             NodeId nodeId = getNode(pointConfig);
-            client.connect().get();
+            client.connect().get(5, TimeUnit.SECONDS);
             CompletableFuture<String> value = new CompletableFuture<>();
             client.readValue(0.0, TimestampsToReturn.Both, nodeId)
                     .thenAccept(dataValue -> value.complete(dataValue.getValue().getValue().toString()));
@@ -212,14 +209,14 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
         try {
             NodeId nodeId = getNode(pointConfig);
-            client.connect().get();
+            client.connect().get(5, TimeUnit.SECONDS);
             return writeNode(client, nodeId, writePointValue);
         } catch (InterruptedException e) {
             log.error("Driver point write interrupted, protocol=" + driverCode + "", e);
             Thread.currentThread().interrupt();
             throw new WritePointException("Driver point write interrupted, protocol=" + driverCode + ", message={}", e.getMessage(),
                     e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException | TimeoutException e) {
             log.error("Driver point write failed, protocol=" + driverCode + "", e);
             throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }

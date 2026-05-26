@@ -248,6 +248,26 @@ services:
         aliases:
           - dc3-driver-modbus-tcp
 
+  modbus-rtu:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.5}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=test
+      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
+      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+    container_name: dc3-driver-modbus-rtu
+    hostname: dc3-driver-modbus-rtu
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-rtu/dc3/logs
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-modbus-rtu
+
   mqtt:
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.5}
     restart: always

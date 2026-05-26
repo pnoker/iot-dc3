@@ -233,6 +233,20 @@ ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-modbus-tcp.jar"]
 
 
+# ---------- dc3-driver-modbus-rtu ----------
+FROM runtime-base AS dc3-driver-modbus-rtu
+ENV SERVER_NAME=dc3-driver-modbus-rtu
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/modbus-rtu/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/modbus-rtu/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-modbus-rtu
+RUN mkdir -p /dc3-driver/dc3-driver-modbus-rtu/dc3/logs/driver/modbus-rtu/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-modbus-rtu/target/dc3-driver-modbus-rtu.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-modbus-rtu/dc3/logs
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-modbus-rtu.jar"]
+
+
 # ---------- dc3-driver-mqtt ----------
 FROM runtime-base AS dc3-driver-mqtt
 ENV SERVER_NAME=dc3-driver-mqtt

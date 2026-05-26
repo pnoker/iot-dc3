@@ -47,6 +47,11 @@ dc3:
         attribute-type-flag: INT
         default-value: 102
         remark: Port
+      - attribute-name: PLC Type
+        attribute-code: plcType
+        attribute-type-flag: STRING
+        default-value: S1200
+        remark: PLC model (S200/S200_SMART/S300/S400/S1200/S1500/SINUMERIK_828D)
     point-attribute:
       - attribute-name: DB Number
         attribute-code: dbNum
@@ -62,12 +67,7 @@ dc3:
         attribute-code: bitOffset
         attribute-type-flag: INT
         default-value: 0
-        remark: Bit offset
-      - attribute-name: Data Block Length
-        attribute-code: blockSize
-        attribute-type-flag: INT
-        default-value: 8
-        remark: Data block length
+        remark: Bit offset (only used for boolean type)
 
 spring:
   application:

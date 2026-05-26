@@ -199,6 +199,14 @@ public class KeyUtil {
         return DecodeUtil.byteToString(cipher.doFinal(inputByte));
     }
 
+    private static String getSecurityKey() {
+        String key = System.getenv("DC3_SECURITY_KEY");
+        if (key == null || key.isBlank()) {
+            key = System.getProperty("dc3.security.key", AlgorithmConstant.DEFAULT_KEY);
+        }
+        return key;
+    }
+
     /**
      * Generate a JWT token.
      *
@@ -208,11 +216,12 @@ public class KeyUtil {
      * @return Token string
      */
     public static String generateToken(String userName, String salt, Long tenantId) {
+        String securityKey = getSecurityKey();
         SecretKey key = io.jsonwebtoken.security.Keys
-                .hmacShaKeyFor(DecodeUtil.stringToByte(AlgorithmConstant.DEFAULT_KEY + SymbolConstant.COLON + salt));
+                .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey + SymbolConstant.COLON + salt));
         JwtBuilder builder = Jwts.builder()
-                .issuer(AlgorithmConstant.DEFAULT_KEY + SymbolConstant.COLON + tenantId)
-                .subject(AlgorithmConstant.DEFAULT_KEY + SymbolConstant.COLON + userName)
+                .issuer(securityKey + SymbolConstant.COLON + tenantId)
+                .subject(securityKey + SymbolConstant.COLON + userName)
                 .issuedAt(new Date())
                 .signWith(key, Jwts.SIG.HS256)
                 .expiration(TimeUtil.expireTime(TimeoutConstant.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
@@ -229,11 +238,12 @@ public class KeyUtil {
      * @return Claims
      */
     public static Claims parserToken(String userName, String salt, String token, Long tenantId) {
+        String securityKey = getSecurityKey();
         SecretKey key = io.jsonwebtoken.security.Keys
-                .hmacShaKeyFor(DecodeUtil.stringToByte(AlgorithmConstant.DEFAULT_KEY + SymbolConstant.COLON + salt));
+                .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey + SymbolConstant.COLON + salt));
         JwtParser parser = Jwts.parser()
-                .requireIssuer(AlgorithmConstant.DEFAULT_KEY + SymbolConstant.COLON + tenantId)
-                .requireSubject(AlgorithmConstant.DEFAULT_KEY + SymbolConstant.COLON + userName)
+                .requireIssuer(securityKey + SymbolConstant.COLON + tenantId)
+                .requireSubject(securityKey + SymbolConstant.COLON + userName)
                 .verifyWith(key)
                 .build();
         return parser.parseSignedClaims(token).getPayload();

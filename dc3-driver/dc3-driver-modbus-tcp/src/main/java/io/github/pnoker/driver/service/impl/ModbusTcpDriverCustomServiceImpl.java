@@ -124,8 +124,11 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 ModbusMaster removed = connectMap.remove(metadataEvent.getId());
-                log.info("Driver connection invalidated, protocol=" + driverCode + ", deviceId={}, operateType={}, removed={}",
-                        metadataEvent.getId(), operateType, Objects.nonNull(removed));
+                if (Objects.nonNull(removed)) {
+                    removed.destroy();
+                    log.info("Driver connection destroyed, protocol=" + driverCode + ", deviceId={}, operateType={}",
+                            metadataEvent.getId(), operateType);
+                }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
@@ -156,8 +159,7 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      * @throws ConnectorException if connection initialization fails
      */
     private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        ModbusMaster modbusMaster = connectMap.get(deviceId);
-        if (Objects.isNull(modbusMaster)) {
+        return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
             int port = driverConfig.get("port").getValue(Integer.class);
             log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, port={}", deviceId, host,
@@ -165,21 +167,19 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             IpParameters params = new IpParameters();
             params.setHost(host);
             params.setPort(port);
-            modbusMaster = modbusFactory.createTcpMaster(params, true);
+            ModbusMaster modbusMaster = modbusFactory.createTcpMaster(params, true);
             try {
                 modbusMaster.init();
-                connectMap.put(deviceId, modbusMaster);
                 log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, host={}, port={}", deviceId,
                         host, port);
             } catch (ModbusInitException e) {
-                connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
                 log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}", deviceId,
                         host, port, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, message={}",
                         deviceId, host, port, e.getMessage(), e);
             }
-        }
-        return modbusMaster;
+            return modbusMaster;
+        });
     }
 
     /**
@@ -318,13 +318,24 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      *
      * @param modbusMaster    active Modbus connection
      * @param locator         identifies the target register
-     * @param writePointValue value to write (read as Float)
+     * @param writePointValue value to write
      * @param <T>             value type determined by the locator
      * @throws WritePointException if a transport or error response occurs
      */
     private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WritePointValue writePointValue) {
         try {
-            modbusMaster.setValue(locator, writePointValue.getValue(Float.class));
+            PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(writePointValue.getType().getCode());
+            if (Objects.isNull(valueType)) {
+                throw new UnSupportException("Unsupported type of " + writePointValue.getType());
+            }
+            Number value = switch (valueType) {
+                case INT -> writePointValue.getValue(Integer.class);
+                case LONG -> writePointValue.getValue(Long.class);
+                case FLOAT -> writePointValue.getValue(Float.class);
+                case DOUBLE -> writePointValue.getValue(Double.class);
+                default -> writePointValue.getValue(Float.class);
+            };
+            modbusMaster.setValue(locator, value);
         } catch (ModbusTransportException | ErrorResponseException e) {
             log.error("Driver point write failed, protocol=" + driverCode + "", e);
             throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(),

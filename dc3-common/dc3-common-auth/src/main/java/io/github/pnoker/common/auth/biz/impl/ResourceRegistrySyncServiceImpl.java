@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.github.pnoker.common.constant.service.AuthConstant.API_GROUP_NODE_CODE_PREFIX;
 import static io.github.pnoker.common.constant.service.AuthConstant.API_RESOURCE_CODE_PREFIX;
@@ -424,9 +425,32 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
 
     private Map<String, Long> ensureGroupNodes(String serviceName, Long serviceNodeId, Set<String> targetGroups) {
         Map<String, Long> result = new HashMap<>(targetGroups.size());
+
+        // Build code→group lookup for both the batch query and the result
+        Map<String, String> codeToGroup = new HashMap<>(targetGroups.size());
+        List<String> allCodes = new ArrayList<>(targetGroups.size());
         for (String group : targetGroups) {
             String code = API_GROUP_NODE_CODE_PREFIX + serviceName + SymbolConstant.COLON + group;
-            ResourceDO existing = findByResourceCode(code);
+            codeToGroup.put(code, group);
+            allCodes.add(code);
+        }
+
+        // Batch-load all existing group nodes
+        Map<String, ResourceDO> existingByCode = new HashMap<>();
+        if (!allCodes.isEmpty()) {
+            List<ResourceDO> existingList = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
+                    .in(ResourceDO::getResourceCode, allCodes));
+            for (ResourceDO node : existingList) {
+                existingByCode.put(node.getResourceCode(), node);
+            }
+        }
+
+        List<ResourceDO> toInsert = new ArrayList<>();
+        List<ResourceDO> toUpdate = new ArrayList<>();
+
+        for (String group : targetGroups) {
+            String code = API_GROUP_NODE_CODE_PREFIX + serviceName + SymbolConstant.COLON + group;
+            ResourceDO existing = existingByCode.get(code);
             if (Objects.isNull(existing)) {
                 ResourceDO node = new ResourceDO();
                 node.setParentResourceId(serviceNodeId);
@@ -438,17 +462,29 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
                 node.setResourceExt(new JsonExt());
                 node.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
                 node.setRemark("API grouping node (auto-registered)");
-                resourceManager.save(node);
-                result.put(group, node.getId());
+                toInsert.add(node);
             } else {
                 String name = group.isEmpty() ? "(ungrouped)" : group;
                 if (needsGroupingNodeUpdate(existing, serviceNodeId, name, code, "API grouping node (auto-registered)")) {
                     applyGroupingNodeUpdates(existing, serviceNodeId, name, code, "API grouping node (auto-registered)");
-                    resourceManager.updateById(existing);
+                    toUpdate.add(existing);
                 }
-                result.put(group, existing.getId());
             }
         }
+
+        if (!toInsert.isEmpty()) {
+            resourceManager.saveBatch(toInsert);
+            for (ResourceDO node : toInsert) {
+                result.put(codeToGroup.get(node.getResourceCode()), node.getId());
+            }
+        }
+        if (!toUpdate.isEmpty()) {
+            resourceManager.updateBatchById(toUpdate);
+        }
+        for (ResourceDO existing : existingByCode.values()) {
+            result.put(codeToGroup.get(existing.getResourceCode()), existing.getId());
+        }
+
         return result;
     }
 
@@ -512,17 +548,25 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         List<ResourceDO> groupNodes = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
                 .likeRight(ResourceDO::getResourceCode, API_GROUP_NODE_CODE_PREFIX + serviceName + SymbolConstant.COLON)
                 .eq(ResourceDO::getEntityId, 0L));
-        List<Long> idsToDrop = new ArrayList<>();
-        for (ResourceDO node : groupNodes) {
-            long children = resourceManager
-                    .count(Wrappers.<ResourceDO>lambdaQuery().eq(ResourceDO::getParentResourceId, node.getId()));
-            if (children == 0) {
-                idsToDrop.add(node.getId());
+        if (!groupNodes.isEmpty()) {
+            // Single query to find which parents have children, instead of per-node COUNT
+            List<Long> parentIds = groupNodes.stream().map(ResourceDO::getId).toList();
+            Set<Long> parentsWithChildren = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
+                            .select(ResourceDO::getParentResourceId)
+                            .in(ResourceDO::getParentResourceId, parentIds))
+                    .stream()
+                    .map(ResourceDO::getParentResourceId)
+                    .collect(Collectors.toSet());
+            List<Long> idsToDrop = new ArrayList<>();
+            for (ResourceDO node : groupNodes) {
+                if (!parentsWithChildren.contains(node.getId())) {
+                    idsToDrop.add(node.getId());
+                }
             }
-        }
-        if (!idsToDrop.isEmpty()) {
-            resourceManager.removeByIds(idsToDrop);
-            removed += idsToDrop.size();
+            if (!idsToDrop.isEmpty()) {
+                resourceManager.removeByIds(idsToDrop);
+                removed += idsToDrop.size();
+            }
         }
         ResourceDO serviceNode = findByResourceCode(API_SERVICE_NODE_CODE_PREFIX + serviceName);
         if (Objects.nonNull(serviceNode)) {

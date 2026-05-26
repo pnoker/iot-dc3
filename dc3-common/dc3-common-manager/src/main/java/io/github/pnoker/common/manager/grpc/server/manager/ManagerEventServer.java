@@ -30,6 +30,7 @@ import io.github.pnoker.api.common.GrpcEventDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.manager.entity.query.EventQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcEventBuilder;
@@ -130,7 +131,12 @@ public class ManagerEventServer extends EventApiGrpc.EventApiImplBase {
         GrpcREventDTO.Builder builder = GrpcREventDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        EventBO entityBO = eventService.getById(request.getEventId());
+        EventBO entityBO;
+        try {
+            entityBO = eventService.getById(request.getEventId());
+        } catch (NotFoundException e) {
+            entityBO = null;
+        }
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

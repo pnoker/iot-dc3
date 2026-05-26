@@ -119,6 +119,9 @@ public class HostUtil {
         ArrayList<String> macList = new ArrayList<>(16);
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            if (Objects.isNull(interfaces)) {
+                return macList;
+            }
             while (interfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = interfaces.nextElement();
                 lookupLocalMac(macList, networkInterface);
@@ -143,6 +146,9 @@ public class HostUtil {
      */
     private static void loopBackAddresses(Set<String> hostNames, boolean includeLoopBack) throws SocketException {
         Enumeration<NetworkInterface> interfaceEnumeration = NetworkInterface.getNetworkInterfaces();
+        if (Objects.isNull(interfaceEnumeration)) {
+            return;
+        }
 
         for (NetworkInterface networkInterface : Collections.list(interfaceEnumeration)) {
             Collections.list(networkInterface.getInetAddresses()).forEach(inetAddress -> {

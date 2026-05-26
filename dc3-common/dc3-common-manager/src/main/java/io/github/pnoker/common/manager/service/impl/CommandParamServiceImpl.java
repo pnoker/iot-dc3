@@ -165,18 +165,18 @@ public class CommandParamServiceImpl implements CommandParamService {
 
     private LambdaQueryWrapper<CommandParamDO> fuzzyQuery(CommandParamQuery entityQuery) {
         QueryWrapper<CommandParamDO> wrapper = Wrappers.query();
-        wrapper.eq("dcp.deleted", 0);
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getParamName()), "dcp.param_name", entityQuery.getParamName());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getParamCode()), "dcp.param_code", entityQuery.getParamCode());
-        wrapper.eq(Objects.nonNull(entityQuery.getParamDirection()), "dcp.param_direction_flag",
+        wrapper.eq("deleted", 0);
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getParamName()), "param_name", entityQuery.getParamName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getParamCode()), "param_code", entityQuery.getParamCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getParamDirection()), "param_direction_flag",
                 Objects.isNull(entityQuery.getParamDirection()) ? null : entityQuery.getParamDirection().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getParamTypeFlag()), "dcp.param_type_flag",
+        wrapper.eq(Objects.nonNull(entityQuery.getParamTypeFlag()), "param_type_flag",
                 Objects.isNull(entityQuery.getParamTypeFlag()) ? null : entityQuery.getParamTypeFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getCommandId()), "dcp.command_id", entityQuery.getCommandId());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dcp.enable_flag",
+        wrapper.eq(Objects.nonNull(entityQuery.getCommandId()), "command_id", entityQuery.getCommandId());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "enable_flag",
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dcp.tenant_id", entityQuery.getTenantId());
-        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dcp.version", entityQuery.getVersion());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "tenant_id", entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "version", entityQuery.getVersion());
         return wrapper.lambda();
     }
 

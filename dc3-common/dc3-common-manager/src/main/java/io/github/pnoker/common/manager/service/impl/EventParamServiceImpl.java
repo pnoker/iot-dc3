@@ -165,16 +165,16 @@ public class EventParamServiceImpl implements EventParamService {
 
     private LambdaQueryWrapper<EventParamDO> fuzzyQuery(EventParamQuery entityQuery) {
         QueryWrapper<EventParamDO> wrapper = Wrappers.query();
-        wrapper.eq("dep.deleted", 0);
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getParamName()), "dep.param_name", entityQuery.getParamName());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getParamCode()), "dep.param_code", entityQuery.getParamCode());
-        wrapper.eq(Objects.nonNull(entityQuery.getParamTypeFlag()), "dep.param_type_flag",
+        wrapper.eq("deleted", 0);
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getParamName()), "param_name", entityQuery.getParamName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getParamCode()), "param_code", entityQuery.getParamCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getParamTypeFlag()), "param_type_flag",
                 Objects.isNull(entityQuery.getParamTypeFlag()) ? null : entityQuery.getParamTypeFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getEventId()), "dep.event_id", entityQuery.getEventId());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dep.enable_flag",
+        wrapper.eq(Objects.nonNull(entityQuery.getEventId()), "event_id", entityQuery.getEventId());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "enable_flag",
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dep.tenant_id", entityQuery.getTenantId());
-        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dep.version", entityQuery.getVersion());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "tenant_id", entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "version", entityQuery.getVersion());
         return wrapper.lambda();
     }
 

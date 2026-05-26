@@ -67,22 +67,24 @@ public class CoapClientManager implements DisposableBean {
      */
     public CoapResult get(String uri, String path) {
         CoapClient client = getClient(uri);
-        client.setURI(uri + path);
-        try {
-            Configuration config = client.getEndpoint().getConfig();
-            config.set(CoapConfig.EXCHANGE_LIFETIME, coapProperties.getClientTimeout(), TimeUnit.MILLISECONDS);
-            config.set(CoapConfig.ACK_TIMEOUT, coapProperties.getClientAckTimeout(), TimeUnit.MILLISECONDS);
-            config.set(CoapConfig.MAX_RETRANSMIT, coapProperties.getClientMaxRetransmit());
+        synchronized (client) {
+            client.setURI(uri + path);
+            try {
+                Configuration config = client.getEndpoint().getConfig();
+                config.set(CoapConfig.EXCHANGE_LIFETIME, coapProperties.getClientTimeout(), TimeUnit.MILLISECONDS);
+                config.set(CoapConfig.ACK_TIMEOUT, coapProperties.getClientAckTimeout(), TimeUnit.MILLISECONDS);
+                config.set(CoapConfig.MAX_RETRANSMIT, coapProperties.getClientMaxRetransmit());
 
-            org.eclipse.californium.core.CoapResponse response = client.get();
-            if (response == null) {
-                log.warn("CoAP GET timeout: {}{}", uri, path);
+                org.eclipse.californium.core.CoapResponse response = client.get();
+                if (response == null) {
+                    log.warn("CoAP GET timeout: {}{}", uri, path);
+                    return null;
+                }
+                return toResult(response);
+            } catch (Exception e) {
+                log.error("CoAP GET failed: {}{}", uri, path, e);
                 return null;
             }
-            return toResult(response);
-        } catch (Exception e) {
-            log.error("CoAP GET failed: {}{}", uri, path, e);
-            return null;
         }
     }
 
@@ -96,17 +98,19 @@ public class CoapClientManager implements DisposableBean {
      */
     public CoapResult put(String uri, String path, String payload) {
         CoapClient client = getClient(uri);
-        client.setURI(uri + path);
-        try {
-            org.eclipse.californium.core.CoapResponse response = client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
-            if (response == null) {
-                log.warn("CoAP PUT timeout: {}{}", uri, path);
+        synchronized (client) {
+            client.setURI(uri + path);
+            try {
+                org.eclipse.californium.core.CoapResponse response = client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
+                if (response == null) {
+                    log.warn("CoAP PUT timeout: {}{}", uri, path);
+                    return null;
+                }
+                return toResult(response);
+            } catch (Exception e) {
+                log.error("CoAP PUT failed: {}{}", uri, path, e);
                 return null;
             }
-            return toResult(response);
-        } catch (Exception e) {
-            log.error("CoAP PUT failed: {}{}", uri, path, e);
-            return null;
         }
     }
 
