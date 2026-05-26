@@ -72,13 +72,16 @@ import java.util.concurrent.TimeoutException;
 @RequiredArgsConstructor
 public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
 
+    /**
+     * Cache of device ID to OPC UA client connections.
+     */
+    private static final long CONNECT_TIMEOUT_SECONDS = 5;
+    private static final long REQUEST_TIMEOUT_MS = 5000;
+    private static final long READ_TIMEOUT_SECONDS = 1;
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     @Value("${dc3.driver.code}")
     private String driverCode;
-    /**
-     * Cache of device ID to OPC UA client connections.
-     */
     private Map<Long, OpcUaClient> connectMap;
 
     @Override
@@ -103,6 +106,9 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 OpcUaClient removed = connectMap.remove(metadataEvent.getId());
+                if (Objects.nonNull(removed)) {
+                    removed.disconnect();
+                }
                 log.info("Driver connection invalidated, protocol=" + driverCode + ", deviceId={}, operateType={}, removed={}",
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
@@ -147,7 +153,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                                 // Use anonymous authentication
                                 .setIdentityProvider(new AnonymousProvider())
                                 // Set request timeout to 5000 ms
-                                .setRequestTimeout(Unsigned.uint(5000))
+                                .setRequestTimeout(Unsigned.uint(REQUEST_TIMEOUT_MS))
                                 .build());
                 log.info("Driver connection created, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                         host, port, path);
@@ -181,18 +187,18 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
         try {
             NodeId nodeId = getNode(pointConfig);
-            client.connect().get(5, TimeUnit.SECONDS);
+            client.connect().get(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             CompletableFuture<String> value = new CompletableFuture<>();
             client.readValue(0.0, TimestampsToReturn.Both, nodeId)
                     .thenAccept(dataValue -> value.complete(dataValue.getValue().getValue().toString()));
-            return value.get(1, TimeUnit.SECONDS);
+            return value.get(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            log.error("Driver point read interrupted, protocol=" + driverCode + "", e);
+            log.error("Driver point read interrupted, protocol={}", driverCode, e);
             Thread.currentThread().interrupt();
             throw new ReadPointException("Driver point read interrupted, protocol=" + driverCode + ", message={}", e.getMessage(),
                     e);
         } catch (ExecutionException | TimeoutException e) {
-            log.error("Driver point read failed, protocol=" + driverCode + "", e);
+            log.error("Driver point read failed, protocol={}", driverCode, e);
             throw new ReadPointException("Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
@@ -209,15 +215,15 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
         try {
             NodeId nodeId = getNode(pointConfig);
-            client.connect().get(5, TimeUnit.SECONDS);
+            client.connect().get(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             return writeNode(client, nodeId, writePointValue);
         } catch (InterruptedException e) {
-            log.error("Driver point write interrupted, protocol=" + driverCode + "", e);
+            log.error("Driver point write interrupted, protocol={}", driverCode, e);
             Thread.currentThread().interrupt();
             throw new WritePointException("Driver point write interrupted, protocol=" + driverCode + ", message={}", e.getMessage(),
                     e);
         } catch (ExecutionException | TimeoutException e) {
-            log.error("Driver point write failed, protocol=" + driverCode + "", e);
+            log.error("Driver point write failed, protocol={}", driverCode, e);
             throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }

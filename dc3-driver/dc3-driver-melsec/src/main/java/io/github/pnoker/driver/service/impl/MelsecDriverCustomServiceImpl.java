@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import com.github.xingshuangs.iot.protocol.s7.enums.EPlcType;
-import com.github.xingshuangs.iot.protocol.s7.service.S7PLC;
+import com.github.xingshuangs.iot.protocol.melsec.enums.EMcSeries;
+import com.github.xingshuangs.iot.protocol.melsec.service.McPLC;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -32,7 +32,7 @@ import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.driver.bean.PlcS7PointVariable;
+import io.github.pnoker.driver.bean.MelsecPointVariable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * S7 PLC driver service backed by the iot-communication library.
+ * Melsec MC driver service backed by the iot-communication library.
  *
  * @author pnoker
  * @version 2026.5.22
@@ -54,7 +54,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
+public class MelsecDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
@@ -62,7 +62,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, MyS7PLC> connectMap;
+    private Map<Long, MyMcPLC> connectMap;
 
     @Override
     public void initial() {
@@ -84,7 +84,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                MyS7PLC removed = connectMap.remove(metadataEvent.getId());
+                MyMcPLC removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.getPlc().close();
                 }
@@ -102,19 +102,19 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
                                DeviceBO device, PointBO point) {
         log.debug("Driver point read requested, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                 point.getId());
-        MyS7PLC myS7PLC = getS7PLC(device.getId(), driverConfig);
-        PlcS7PointVariable variable = buildVariable(pointConfig, point.getPointTypeFlag().getCode());
+        MyMcPLC myMcPLC = getMcPLC(device.getId(), driverConfig);
+        MelsecPointVariable variable = buildVariable(pointConfig, point.getPointTypeFlag().getCode());
 
-        myS7PLC.lock.lock();
+        myMcPLC.lock.lock();
         try {
-            Object value = readByType(myS7PLC.getPlc(), variable);
+            Object value = readByType(myMcPLC.getPlc(), variable);
             return new ReadPointValue(device, point, String.valueOf(value));
         } catch (Exception e) {
             log.error("Driver point read failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                     point.getId(), e);
             return null;
         } finally {
-            myS7PLC.lock.unlock();
+            myMcPLC.lock.unlock();
         }
     }
 
@@ -123,19 +123,19 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
                          DeviceBO device, PointBO point, WritePointValue writePointValue) {
         log.debug("Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}",
                 driverCode, device.getId(), point.getId(), Objects.toString(writePointValue.getValue(), "").length());
-        MyS7PLC myS7PLC = getS7PLC(device.getId(), driverConfig);
-        PlcS7PointVariable variable = buildVariable(pointConfig, writePointValue.getType().getCode());
+        MyMcPLC myMcPLC = getMcPLC(device.getId(), driverConfig);
+        MelsecPointVariable variable = buildVariable(pointConfig, writePointValue.getType().getCode());
 
-        myS7PLC.lock.lock();
+        myMcPLC.lock.lock();
         try {
-            writeByType(myS7PLC.getPlc(), variable, writePointValue.getValue());
+            writeByType(myMcPLC.getPlc(), variable, writePointValue.getValue());
             return true;
         } catch (Exception e) {
             log.error("Driver point write failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                     point.getId(), e);
             return false;
         } finally {
-            myS7PLC.lock.unlock();
+            myMcPLC.lock.unlock();
         }
     }
 
@@ -143,30 +143,29 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     //  private helpers
     // ------------------------------------------------------------------------
 
-    private MyS7PLC getS7PLC(Long deviceId, Map<String, AttributeBO> driverConfig) {
+    private MyMcPLC getMcPLC(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
             int port = driverConfig.get("port").getValue(Integer.class);
-            String plcType = driverConfig.containsKey("plcType")
-                    ? driverConfig.get("plcType").getValue(String.class)
-                    : "S1200";
+            String series = driverConfig.containsKey("series")
+                    ? driverConfig.get("series").getValue(String.class)
+                    : "QnA";
 
-            EPlcType ePlcType;
+            EMcSeries eMcSeries;
             try {
-                ePlcType = EPlcType.valueOf(plcType);
+                eMcSeries = EMcSeries.valueOf(series);
             } catch (IllegalArgumentException e) {
-                log.warn("Unknown plcType '{}', fallback to S1200", plcType);
-                ePlcType = EPlcType.S1200;
+                log.warn("Unknown series '{}', fallback to QnA", series);
+                eMcSeries = EMcSeries.QnA;
             }
 
-            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, port={}, plcType={}",
-                    driverCode, deviceId, host, port, plcType);
+            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, port={}, series={}",
+                    driverCode, deviceId, host, port, series);
             try {
-                S7PLC s7PLC = new S7PLC(ePlcType, host, port);
-                s7PLC.setEnableReconnect(true);
-                log.info("Driver connection established, protocol={}, deviceId={}, host={}, port={}, plcType={}",
-                        driverCode, deviceId, host, port, plcType);
-                return new MyS7PLC(new ReentrantLock(), s7PLC);
+                McPLC mcPLC = new McPLC(eMcSeries, host, port);
+                log.info("Driver connection established, protocol={}, deviceId={}, host={}, port={}, series={}",
+                        driverCode, deviceId, host, port, series);
+                return new MyMcPLC(new ReentrantLock(), mcPLC);
             } catch (Exception e) {
                 log.error("Driver connection failed, protocol={}, deviceId={}, host={}, port={}", driverCode, deviceId,
                         host, port, e);
@@ -176,71 +175,69 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         });
     }
 
-    private PlcS7PointVariable buildVariable(Map<String, AttributeBO> pointConfig, String type) {
-        int dbNum = pointConfig.get("dbNum").getValue(Integer.class);
-        int byteOffset = pointConfig.get("byteOffset").getValue(Integer.class);
-        int bitOffset = pointConfig.get("bitOffset").getValue(Integer.class);
-        return new PlcS7PointVariable(dbNum, byteOffset, bitOffset, type);
+    private MelsecPointVariable buildVariable(Map<String, AttributeBO> pointConfig, String type) {
+        String address = pointConfig.get("address").getValue(String.class);
+        int length = pointConfig.containsKey("length") ? pointConfig.get("length").getValue(Integer.class) : 0;
+        return new MelsecPointVariable(address, type, length);
     }
 
-    private Object readByType(S7PLC plc, PlcS7PointVariable variable) {
-        String address = variable.getAddress();
+    private Object readByType(McPLC plc, MelsecPointVariable variable) {
         AttributeTypeFlagEnum type = AttributeTypeFlagEnum.ofCode(variable.getType());
         if (Objects.isNull(type)) {
             throw new IllegalArgumentException("Unknown type: " + variable.getType());
         }
         switch (type) {
             case BOOLEAN:
-                return plc.readBoolean(address);
+                return plc.readBoolean(variable.getAddress());
             case BYTE:
-                return plc.readByte(address);
+                return plc.readByte(variable.getAddress());
             case SHORT:
-                return plc.readInt16(address);
+                return plc.readInt16(variable.getAddress());
             case INT:
-                return plc.readInt32(address);
+                return plc.readInt32(variable.getAddress());
             case LONG:
-                return plc.readInt64(address);
+                return plc.readInt64(variable.getAddress());
             case FLOAT:
-                return plc.readFloat32(address);
+                return plc.readFloat32(variable.getAddress());
             case DOUBLE:
-                return plc.readFloat64(address);
+                return plc.readFloat64(variable.getAddress());
             case STRING:
-                return plc.readString(address);
+                int length = variable.getLength() > 0 ? variable.getLength() : 64;
+                return plc.readString(variable.getAddress(), length);
             default:
                 throw new IllegalArgumentException("Unsupported read type: " + type);
         }
     }
 
-    private void writeByType(S7PLC plc, PlcS7PointVariable variable, String value) {
-        String address = variable.getAddress();
+    private void writeByType(McPLC plc, MelsecPointVariable variable, String value) {
         AttributeTypeFlagEnum type = AttributeTypeFlagEnum.ofCode(variable.getType());
         if (Objects.isNull(type)) {
             throw new IllegalArgumentException("Unknown type: " + variable.getType());
         }
         switch (type) {
             case BOOLEAN:
-                plc.writeBoolean(address, Boolean.parseBoolean(value));
+                plc.writeBoolean(variable.getAddress(), Boolean.parseBoolean(value));
                 break;
             case BYTE:
-                plc.writeByte(address, Byte.parseByte(value));
+                plc.writeByte(variable.getAddress(), Byte.parseByte(value));
                 break;
             case SHORT:
-                plc.writeInt16(address, Short.parseShort(value));
+                plc.writeInt16(variable.getAddress(), Short.parseShort(value));
                 break;
             case INT:
-                plc.writeInt32(address, Integer.parseInt(value));
+                plc.writeInt32(variable.getAddress(), Integer.parseInt(value));
                 break;
             case LONG:
-                plc.writeInt64(address, Long.parseLong(value));
+                plc.writeInt64(variable.getAddress(), Long.parseLong(value));
                 break;
             case FLOAT:
-                plc.writeFloat32(address, Float.parseFloat(value));
+                plc.writeFloat32(variable.getAddress(), Float.parseFloat(value));
                 break;
             case DOUBLE:
-                plc.writeFloat64(address, Double.parseDouble(value));
+                plc.writeFloat64(variable.getAddress(), Double.parseDouble(value));
                 break;
             case STRING:
-                plc.writeString(address, value);
+                plc.writeString(variable.getAddress(), value);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported write type: " + type);
@@ -249,11 +246,11 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     @Getter
     @RequiredArgsConstructor
-    private static class MyS7PLC {
+    private static class MyMcPLC {
 
         private final ReentrantLock lock;
 
-        private final S7PLC plc;
+        private final McPLC plc;
 
     }
 

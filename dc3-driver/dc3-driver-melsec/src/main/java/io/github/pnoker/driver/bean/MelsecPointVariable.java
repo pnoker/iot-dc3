@@ -20,27 +20,29 @@ package io.github.pnoker.driver.bean;
 import lombok.Getter;
 
 /**
- * Simplified S7 point variable holding an S7 address string and type code.
+ * Melsec point variable holding a device address string and type code.
  *
  * @author pnoker
  * @version 2026.5.22
  * @since 2016.10.1
  */
 @Getter
-public class PlcS7PointVariable {
+public class MelsecPointVariable {
 
     private final String address;
 
     private final String type;
 
-    public PlcS7PointVariable(int dbNum, int byteOffset, int bitOffset, String type) {
+    private final int length;
+
+    public MelsecPointVariable(String address, String type) {
+        this(address, type, 0);
+    }
+
+    public MelsecPointVariable(String address, String type, int length) {
+        this.address = address;
         this.type = type;
-        boolean isBitAccess = ("boolean".equals(type) || "bool".equals(type)) && bitOffset > 0;
-        if (isBitAccess) {
-            this.address = String.format("DB%d.%d.%d", dbNum, byteOffset, bitOffset);
-        } else {
-            this.address = String.format("DB%d.%d", dbNum, byteOffset);
-        }
+        this.length = length;
     }
 
 }

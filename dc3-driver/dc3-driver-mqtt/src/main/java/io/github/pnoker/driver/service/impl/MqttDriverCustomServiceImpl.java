@@ -195,7 +195,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
             int commandQos = pointConfig.get("commandQos").getValue(Integer.class);
             mqttSendService.sendToMqtt(commandTopic, commandQos, value);
         } catch (Exception e) {
-            log.warn("MQTT command QoS unavailable, fallback to default, deviceId={}, pointId={}, topic={}",
+            log.debug("MQTT command QoS unavailable, fallback to default, deviceId={}, pointId={}, topic={}",
                     device.getId(), point.getId(), commandTopic, e);
             mqttSendService.sendToMqtt(commandTopic, value);
         }

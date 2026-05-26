@@ -25,10 +25,10 @@
         <version>2026.5.22</version>
     </parent>
 
-    <artifactId>dc3-driver-plcs7</artifactId>
+    <artifactId>dc3-driver-melsec</artifactId>
     <packaging>jar</packaging>
 
-    <description>The Plc S7 Tcp driver for the IoT DC3 platform.</description>
+    <description>The Mitsubishi Melsec MC driver for the IoT DC3 platform.</description>
 
     <dependencies>
         <dependency>

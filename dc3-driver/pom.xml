@@ -40,9 +40,25 @@
         <module>dc3-driver-mqtt</module>
         <module>dc3-driver-opc-da</module>
         <module>dc3-driver-opc-ua</module>
+        <module>dc3-driver-melsec</module>
         <module>dc3-driver-plcs7</module>
+        <module>dc3-driver-sl651</module>
         <module>dc3-driver-virtual</module>
     </modules>
+
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>ias-releases</id>
+            <name>Infinite Automation Release Repository</name>
+            <url>https://maven.mangoautomation.net/repository/ias-release/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
 

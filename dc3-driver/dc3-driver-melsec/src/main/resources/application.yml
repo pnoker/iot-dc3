@@ -1,0 +1,76 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: Mitsubishi Melsec Driver
+    code: MelsecDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Host
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: 192.168.0.20
+        remark: Ip
+      - attribute-name: Port
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 6000
+        remark: Port
+      - attribute-name: PLC Series
+        attribute-code: series
+        attribute-type-flag: STRING
+        default-value: QnA
+        remark: PLC series (A/QnA/Q_L/IQ_R)
+    point-attribute:
+      - attribute-name: Device Address
+        attribute-code: address
+        attribute-type-flag: STRING
+        default-value: D100
+        remark: Device memory address (D100, M0, X10, W200 etc.)
+      - attribute-name: String Length
+        attribute-code: length
+        attribute-type-flag: INT
+        default-value: 0
+        remark: String read length (0 for non-string types)
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/melsec/${spring.application.name}.log

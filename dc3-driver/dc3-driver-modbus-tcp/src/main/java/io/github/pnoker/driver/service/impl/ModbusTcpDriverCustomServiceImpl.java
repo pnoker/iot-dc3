@@ -72,11 +72,7 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Modbus factory for creating ModbusMaster instances.
      */
-    static ModbusFactory modbusFactory;
-
-    static {
-        modbusFactory = new ModbusFactory();
-    }
+    private static final ModbusFactory modbusFactory = new ModbusFactory();
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
@@ -233,7 +229,7 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
         try {
             return modbusMaster.getValue(locator);
         } catch (ModbusTransportException | ErrorResponseException e) {
-            log.error("Driver point read failed, protocol=" + driverCode + "", e);
+            log.error("Driver point read failed, protocol={}", driverCode, e);
             throw new ReadPointException("Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(),
                     e);
         }
@@ -331,13 +327,12 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             Number value = switch (valueType) {
                 case INT -> writePointValue.getValue(Integer.class);
                 case LONG -> writePointValue.getValue(Long.class);
-                case FLOAT -> writePointValue.getValue(Float.class);
                 case DOUBLE -> writePointValue.getValue(Double.class);
                 default -> writePointValue.getValue(Float.class);
             };
             modbusMaster.setValue(locator, value);
         } catch (ModbusTransportException | ErrorResponseException e) {
-            log.error("Driver point write failed, protocol=" + driverCode + "", e);
+            log.error("Driver point write failed, protocol={}", driverCode, e);
             throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(),
                     e);
         }
