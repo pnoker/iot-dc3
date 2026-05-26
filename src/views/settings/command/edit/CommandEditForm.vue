@@ -30,9 +30,6 @@
       <el-form-item :label="$t('common.name')" prop="commandName">
         <el-input v-model="reactiveData.form.commandName" :placeholder="$t('common.name')" clearable />
       </el-form-item>
-      <el-form-item :label="$t('command.form.code')" prop="commandCode">
-        <el-input v-model="reactiveData.form.commandCode" :placeholder="$t('command.form.code')" clearable />
-      </el-form-item>
       <el-form-item :label="$t('command.form.commandType')" prop="commandTypeFlag">
         <el-select v-model="reactiveData.form.commandTypeFlag" clearable>
           <el-option v-for="opt in COMMAND_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
@@ -193,7 +190,6 @@
 
   const rules: FormRules = {
     commandName: [{ required: true, message: t('command.form.nameRequired'), trigger: 'blur' }],
-    commandCode: [{ required: true, message: t('command.form.codeRequired'), trigger: 'blur' }],
   };
 
   const reset = () => {

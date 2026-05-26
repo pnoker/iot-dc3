@@ -60,7 +60,7 @@ import { isNull } from '@/utils/validationUtil';
 import { failMessage, successMessage } from '@/utils/notificationUtil';
 import { getDriverById } from '@/api/driver';
 import { getProfileById } from '@/api/profile';
-import { listPointByDeviceId } from '@/api/point';
+import { listPointByProfileId } from '@/api/point';
 import { listCommandByProfileId } from '@/api/command';
 import { listEventByProfileId } from '@/api/event';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
@@ -582,8 +582,16 @@ export default defineComponent({
     };
 
     const pointInfo = () => {
+      const profileId = String(reactiveData.deviceFormData.profileId || '');
+      if (isNull(profileId)) {
+        reactiveData.pointInfoData = [];
+        reactiveData.oldPointInfoData = [];
+        reactiveData.loading = false;
+        return;
+      }
+
       reactiveData.loading = true;
-      listPointByDeviceId(reactiveData.id)
+      listPointByProfileId(profileId)
         .then((res) => {
           const rows: PointInfoMatrixRow[] = (res.data || []).map((point: PointRecord) => {
             const attributes: Record<string, PointAttributeCell> = {};
@@ -1220,6 +1228,7 @@ export default defineComponent({
     };
 
     const changeProfile = () => {
+      pointInfo();
       commandInfo();
       eventInfo();
     };

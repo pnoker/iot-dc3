@@ -30,9 +30,6 @@
       <el-form-item :label="$t('common.name')" prop="eventName">
         <el-input v-model="reactiveData.form.eventName" :placeholder="$t('common.name')" clearable />
       </el-form-item>
-      <el-form-item :label="$t('eventDefinition.form.code')" prop="eventCode">
-        <el-input v-model="reactiveData.form.eventCode" :placeholder="$t('eventDefinition.form.code')" clearable />
-      </el-form-item>
       <el-form-item :label="$t('eventDefinition.form.eventType')" prop="eventTypeFlag">
         <el-select v-model="reactiveData.form.eventTypeFlag" clearable>
           <el-option v-for="opt in EVENT_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
@@ -155,7 +152,6 @@
 
   const rules: FormRules = {
     eventName: [{ required: true, message: t('eventDefinition.form.nameRequired'), trigger: 'blur' }],
-    eventCode: [{ required: true, message: t('eventDefinition.form.codeRequired'), trigger: 'blur' }],
   };
 
   const reset = () => {
