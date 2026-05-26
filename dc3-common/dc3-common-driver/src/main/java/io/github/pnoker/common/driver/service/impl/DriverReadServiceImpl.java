@@ -63,18 +63,19 @@ public class DriverReadServiceImpl implements DriverReadService {
             throw new ReadPointException("Failed to read point value, device[{}] is null", deviceId);
         }
 
-        if (!device.getPointIds().contains(pointId)) {
+        if (Objects.isNull(pointId) || Objects.isNull(device.getPointIds()) || !device.getPointIds().contains(pointId)) {
             throw new ReadPointException("Failed to read point value, device[{}] not contained point[{}]", deviceId,
                     pointId);
         }
 
         Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
-        if (driverConfig.isEmpty()) {
-            return;
+        if (Objects.isNull(driverConfig) || driverConfig.isEmpty()) {
+            throw new ReadPointException("Failed to read point value, driver config is empty, deviceId={}", deviceId);
         }
         Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
-        if (pointConfig.isEmpty()) {
-            return;
+        if (Objects.isNull(pointConfig) || pointConfig.isEmpty()) {
+            throw new ReadPointException("Failed to read point value, point config is empty, deviceId={}, pointId={}",
+                    deviceId, pointId);
         }
 
         PointBO point = pointMetadata.getCache(pointId);

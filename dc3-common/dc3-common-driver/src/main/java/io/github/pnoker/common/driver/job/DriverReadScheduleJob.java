@@ -33,16 +33,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Quartz job that iterates through enabled devices and points and triggers periodic
  * reads.
  *
- * <p>The scan walks every device and every point sequentially, so a single slow
- * point can stretch one execution past the next trigger. {@link DisallowConcurrentExecution}
- * stops Quartz from launching overlapping fires when that happens — the next
- * trigger waits for the in-flight scan to finish instead of stacking up worker
- * threads on the same metadata structures.
+ * <p>The scan submits eligible devices to the shared bounded driver thread
+ * pool and reads each device's points sequentially inside that task. This
+ * preserves device-level protocol serialization while preventing one slow
+ * device from blocking all other devices. {@link DisallowConcurrentExecution}
+ * still prevents overlapping Quartz fires for the same job.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -60,6 +62,8 @@ public class DriverReadScheduleJob extends QuartzJobBean {
 
     private final DriverReadService driverReadService;
 
+    private final ThreadPoolExecutor threadPoolExecutor;
+
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         Set<Long> deviceIds = driverMetadata.getDeviceIds();
@@ -67,22 +71,31 @@ public class DriverReadScheduleJob extends QuartzJobBean {
             return;
         }
 
-        for (Long deviceId : deviceIds) {
-            DeviceBO entityBO = deviceMetadata.getCache(deviceId);
-            if (Objects.nonNull(entityBO) && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
-                    && Objects.nonNull(entityBO.getProfileId())
-                    && CollectionUtils.isNotEmpty(entityBO.getPointIds())
-                    && MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
-                    && MapUtils.isNotEmpty(entityBO.getPointAttributeConfigIdMap())) {
-                Set<Long> pointIds = entityBO.getPointIds();
-                for (Long pointId : pointIds) {
-                    try {
-                        driverReadService.read(deviceId, pointId);
-                    } catch (Exception e) {
-                        log.error("Driver point read schedule failed, deviceId={}, pointId={}", deviceId, pointId, e);
-                    }
-                }
-            }
+        CompletableFuture<?>[] tasks = deviceIds.stream()
+                .map(deviceMetadata::getCache)
+                .filter(this::isReadableDevice)
+                .map(device -> CompletableFuture.runAsync(() -> readDevice(device), threadPoolExecutor))
+                .toArray(CompletableFuture[]::new);
+        CompletableFuture.allOf(tasks).join();
+    }
+
+    private boolean isReadableDevice(DeviceBO entityBO) {
+        return Objects.nonNull(entityBO) && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
+                && Objects.nonNull(entityBO.getProfileId())
+                && CollectionUtils.isNotEmpty(entityBO.getPointIds())
+                && MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
+                && MapUtils.isNotEmpty(entityBO.getPointAttributeConfigIdMap());
+    }
+
+    private void readDevice(DeviceBO device) {
+        device.getPointIds().forEach(pointId -> readPoint(device.getId(), pointId));
+    }
+
+    private void readPoint(Long deviceId, Long pointId) {
+        try {
+            driverReadService.read(deviceId, pointId);
+        } catch (Exception e) {
+            log.error("Driver point read schedule failed, deviceId={}, pointId={}", deviceId, pointId, e);
         }
     }
 

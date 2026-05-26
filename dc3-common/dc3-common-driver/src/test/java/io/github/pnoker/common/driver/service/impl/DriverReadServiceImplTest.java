@@ -37,7 +37,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -113,19 +112,23 @@ class DriverReadServiceImplTest {
     }
 
     @Test
-    void readShortCircuitsForEmptyDriverConfig() {
+    void readRejectsEmptyDriverConfig() {
         when(deviceMetadata.getCache(10L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(Map.of());
-        assertThatNoException().isThrownBy(() -> service.read(10L, 20L));
+        assertThatThrownBy(() -> service.read(10L, 20L))
+                .isInstanceOf(ReadPointException.class)
+                .hasMessageContaining("driver config is empty");
         verifyNoInteractions(driverCustomService, driverSenderService);
     }
 
     @Test
-    void readShortCircuitsForEmptyPointConfig() {
+    void readRejectsEmptyPointConfig() {
         when(deviceMetadata.getCache(10L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
         when(deviceMetadata.getPointConfig(10L, 20L)).thenReturn(Map.of());
-        assertThatNoException().isThrownBy(() -> service.read(10L, 20L));
+        assertThatThrownBy(() -> service.read(10L, 20L))
+                .isInstanceOf(ReadPointException.class)
+                .hasMessageContaining("point config is empty");
         verifyNoInteractions(driverCustomService, driverSenderService);
     }
 

@@ -43,6 +43,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -78,7 +79,7 @@ class PointCommandReceiverTest {
                 driverSenderService, dedupCache, deviceLockManager);
 
         // DeviceLockManager executes the supplier inline
-        when(deviceLockManager.runExclusive(anyLong(), ArgumentMatchers.<Supplier<String>>any()))
+        lenient().when(deviceLockManager.runExclusive(anyLong(), ArgumentMatchers.<Supplier<String>>any()))
                 .thenAnswer(invocation -> ((Supplier<?>) invocation.getArgument(1)).get());
 
         MessageProperties props = new MessageProperties();
@@ -141,13 +142,48 @@ class PointCommandReceiverTest {
     }
 
     @Test
+    void rejectsPayloadWithNullCommandId() throws Exception {
+        receiver.pointCommandReceive(channel, message, readCommand(null));
+
+        verify(channel).basicReject(eq(7L), eq(false));
+        verifyNoInteractions(driverReadService, driverWriteService);
+    }
+
+    @Test
+    void rejectsPayloadWithNullTenantId() throws Exception {
+        PointCommandDTO dto = new PointCommandDTO("id", null, PointCommandTypeEnum.READ,
+                new PointCommandPayload.ReadPayload(10L, 20L),
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
+                Instant.now(), Instant.now().plusSeconds(10), 1);
+
+        receiver.pointCommandReceive(channel, message, dto);
+
+        verify(channel).basicReject(eq(7L), eq(false));
+        verifyNoInteractions(driverReadService, driverWriteService);
+    }
+
+    @Test
     void nacksAndRequeuesOnServiceFailure() throws Exception {
         when(dedupCache.tryAcquire("test-cmd-4")).thenReturn(true);
         doThrow(new RuntimeException("driver offline")).when(driverReadService).read(anyLong(), anyLong());
 
         receiver.pointCommandReceive(channel, message, readCommand("test-cmd-4"));
 
+        verify(dedupCache).release("test-cmd-4");
         verify(channel).basicNack(eq(7L), eq(false), eq(true));
+    }
+
+    @Test
+    void rejectsReadPayloadWithNullDeviceId() throws Exception {
+        PointCommandDTO dto = new PointCommandDTO("bad-read", 100L, PointCommandTypeEnum.READ,
+                new PointCommandPayload.ReadPayload(null, 20L),
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
+                Instant.now(), Instant.now().plusSeconds(10), 1);
+
+        receiver.pointCommandReceive(channel, message, dto);
+
+        verify(channel).basicReject(eq(7L), eq(false));
+        verifyNoInteractions(driverReadService, driverWriteService);
     }
 
     @Test
@@ -163,8 +199,6 @@ class PointCommandReceiverTest {
 
     @Test
     void expiredCommandSendsExpiredResult() throws Exception {
-        when(dedupCache.tryAcquire("exp-cmd")).thenReturn(true);
-
         PointCommandDTO expired = new PointCommandDTO("exp-cmd", 100L, PointCommandTypeEnum.READ,
                 new PointCommandPayload.ReadPayload(10L, 20L),
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,

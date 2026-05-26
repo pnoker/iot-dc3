@@ -76,6 +76,7 @@ public class CommandReceiver {
             log.info("Receive custom command: {}", JsonUtil.toJsonString(entityDTO));
 
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
+                    || Objects.isNull(entityDTO.tenantId())
                     || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.commandId())) {
                 log.error("Invalid custom command: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);
@@ -132,8 +133,15 @@ public class CommandReceiver {
                         null, null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
             } else {
                 log.warn("Custom command failed, requeueing. deliveryTag={}", deliveryTag, e);
+                releaseDedup(entityDTO);
                 RabbitAckUtil.nack(channel, deliveryTag, true);
             }
+        }
+    }
+
+    private void releaseDedup(CommandCallDTO entityDTO) {
+        if (Objects.nonNull(entityDTO) && Objects.nonNull(entityDTO.recordId())) {
+            dedupCache.release(entityDTO.recordId());
         }
     }
 
