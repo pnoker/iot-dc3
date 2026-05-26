@@ -92,7 +92,14 @@ const passthrough = (tag: string, className: string): ComponentOptions => ({
  * Use as `stubs: { ...layoutStubs }`.
  */
 export const layoutStubs: Record<string, ComponentOptions> = {
-  ElCard: passthrough('section', 'el-card-stub'),
+  // ElCard exposes a named `header` slot in real Element Plus; the
+  // passthrough form would silently drop it. Render both header and
+  // default slots so cards using `<template #header>` (DashboardCard,
+  // TitleCard) keep their header markup discoverable in tests.
+  ElCard: {
+    template:
+      '<section class="el-card-stub"><div class="el-card__header-stub" v-if="$slots.header"><slot name="header" /></div><div class="el-card__body-stub"><slot /></div></section>',
+  },
   ElFormItem: passthrough('div', 'el-form-item-stub'),
   ElTooltip: passthrough('span', 'el-tooltip-stub'),
   ElCol: passthrough('div', 'el-col-stub'),
@@ -119,4 +126,41 @@ export const layoutStubs: Record<string, ComponentOptions> = {
   ElLink: passthrough('a', 'el-link-stub'),
   ElDatePicker: { template: '<input class="el-date-picker-stub" />' },
   ElTimePicker: { template: '<input class="el-time-picker-stub" />' },
+  ElResult: {
+    props: ['title', 'subTitle', 'icon'],
+    template:
+      '<section class="el-result-stub" :data-icon="icon" :data-title="title" :data-sub-title="subTitle"><slot /><slot name="extra" /></section>',
+  },
+  ElAlert: passthrough('div', 'el-alert-stub'),
+  ElSteps: passthrough('div', 'el-steps-stub'),
+  ElStep: passthrough('div', 'el-step-stub'),
+  ElBadge: passthrough('span', 'el-badge-stub'),
+  ElMenu: passthrough('nav', 'el-menu-stub'),
+  ElMenuItem: passthrough('a', 'el-menu-item-stub'),
+  ElSubMenu: passthrough('div', 'el-sub-menu-stub'),
+  ElDropdown: passthrough('div', 'el-dropdown-stub'),
+  ElDropdownMenu: passthrough('div', 'el-dropdown-menu-stub'),
+  ElDropdownItem: passthrough('div', 'el-dropdown-item-stub'),
+  ElIcon: passthrough('span', 'el-icon-stub'),
+  ElAvatar: passthrough('span', 'el-avatar-stub'),
+  ElScrollbar: passthrough('div', 'el-scrollbar-stub'),
+  ElBreadcrumb: passthrough('nav', 'el-breadcrumb-stub'),
+  ElBreadcrumbItem: passthrough('span', 'el-breadcrumb-item-stub'),
+  ElContainer: passthrough('div', 'el-container-stub'),
+  ElHeader: passthrough('header', 'el-header-stub'),
+  ElAside: passthrough('aside', 'el-aside-stub'),
+  ElMain: passthrough('main', 'el-main-stub'),
+  ElLoading: passthrough('div', 'el-loading-stub'),
+  ElTreeSelect: passthrough('div', 'el-tree-select-stub'),
+  ElTree: passthrough('div', 'el-tree-stub'),
+  ElColorPicker: { template: '<input class="el-color-picker-stub" />' },
+  ElTabs: passthrough('div', 'el-tabs-stub'),
+  ElTabPane: passthrough('div', 'el-tab-pane-stub'),
+  ElCollapse: passthrough('div', 'el-collapse-stub'),
+  ElCollapseItem: passthrough('div', 'el-collapse-item-stub'),
+  ElCheckboxGroup: passthrough('div', 'el-checkbox-group-stub'),
+  ElTransfer: passthrough('div', 'el-transfer-stub'),
+  ElUpload: passthrough('div', 'el-upload-stub'),
+  ElPopover: passthrough('div', 'el-popover-stub'),
+  ElImage: { template: '<img class="el-image-stub" />' },
 };
