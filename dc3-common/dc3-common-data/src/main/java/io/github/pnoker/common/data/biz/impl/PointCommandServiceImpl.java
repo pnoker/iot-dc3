@@ -177,8 +177,9 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     }
 
     @Override
-    public PointCommandHistoryDO getByCommandId(String commandId) {
+    public PointCommandHistoryDO getByCommandId(Long tenantId, String commandId) {
         return pointCommandHistoryManager.lambdaQuery()
+                .eq(Objects.nonNull(tenantId), PointCommandHistoryDO::getTenantId, tenantId)
                 .eq(PointCommandHistoryDO::getCommandId, commandId)
                 .one();
     }

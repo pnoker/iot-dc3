@@ -64,7 +64,7 @@ public class EventHistoryController implements BaseController {
 
     @GetMapping("/{recordId}")
     public Mono<R<EventHistoryDO>> getByRecordId(@NotBlank @PathVariable String recordId) {
-        return async(() -> R.ok(eventHistoryService.getByRecordId(recordId)));
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(eventHistoryService.getByRecordId(tenantId, recordId))));
     }
 
     @PostMapping("/list")
