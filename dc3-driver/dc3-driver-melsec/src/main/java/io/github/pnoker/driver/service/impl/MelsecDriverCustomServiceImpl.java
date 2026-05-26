@@ -86,7 +86,7 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 MyMcPLC removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
-                    removed.getPlc().close();
+                    closeConnection(metadataEvent.getId(), removed);
                 }
                 log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}",
                         driverCode, metadataEvent.getId(), operateType, Objects.nonNull(removed));
@@ -110,6 +110,7 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
             Object value = readByType(myMcPLC.getPlc(), variable);
             return new ReadPointValue(device, point, String.valueOf(value));
         } catch (Exception e) {
+            invalidateConnection(device.getId(), myMcPLC);
             log.error("Driver point read failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                     point.getId(), e);
             return null;
@@ -131,6 +132,7 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
             writeByType(myMcPLC.getPlc(), variable, writePointValue.getValue());
             return true;
         } catch (Exception e) {
+            invalidateConnection(device.getId(), myMcPLC);
             log.error("Driver point write failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                     point.getId(), e);
             return false;
@@ -241,6 +243,22 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported write type: " + type);
+        }
+    }
+
+    private void invalidateConnection(Long deviceId, MyMcPLC myMcPLC) {
+        connectMap.remove(deviceId, myMcPLC);
+        closeConnection(deviceId, myMcPLC);
+    }
+
+    private void closeConnection(Long deviceId, MyMcPLC myMcPLC) {
+        myMcPLC.lock.lock();
+        try {
+            myMcPLC.getPlc().close();
+        } catch (Exception e) {
+            log.warn("Driver connection close failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+        } finally {
+            myMcPLC.lock.unlock();
         }
     }
 

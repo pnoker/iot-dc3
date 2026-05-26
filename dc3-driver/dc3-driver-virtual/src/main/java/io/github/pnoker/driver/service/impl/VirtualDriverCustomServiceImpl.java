@@ -50,7 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
@@ -112,7 +112,11 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
             return;
         }
 
-        driverMetadata.getDeviceIds().forEach(this::reportDeviceEvents);
+        Set<Long> deviceIds = driverMetadata.getDeviceIds();
+        if (Objects.isNull(deviceIds) || deviceIds.isEmpty()) {
+            return;
+        }
+        deviceIds.forEach(this::reportDeviceEvents);
     }
 
     /**

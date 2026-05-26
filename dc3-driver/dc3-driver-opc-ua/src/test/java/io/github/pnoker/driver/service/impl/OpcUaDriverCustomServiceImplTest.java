@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -30,6 +31,9 @@ import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.stack.core.UaException;
+import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
+import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -202,6 +207,22 @@ class OpcUaDriverCustomServiceImplTest {
                     any(Function.class)), times(1));
             assertThat(connectionMap()).containsKey(1L);
         }
+    }
+
+    @Test
+    void writeNodeTreatsGoodStatusAsSuccess() throws Exception {
+        OpcUaClient client = Mockito.mock(OpcUaClient.class);
+        Mockito.when(client.writeValue(any(NodeId.class), any(DataValue.class)))
+                .thenReturn(CompletableFuture.completedFuture(new StatusCode(0L)));
+
+        java.lang.reflect.Method method = OpcUaDriverCustomServiceImpl.class.getDeclaredMethod(
+                "writeNode", OpcUaClient.class, NodeId.class, WritePointValue.class);
+        method.setAccessible(true);
+
+        Boolean ok = (Boolean) method.invoke(service, client, new NodeId(2, "tag.x"),
+                WritePointValue.builder().value("7").type(PointTypeFlagEnum.INT).build());
+
+        assertThat(ok).isTrue();
     }
 
     private void invokeGetConnector(Long deviceId, Map<String, AttributeBO> driverConfig) throws Exception {

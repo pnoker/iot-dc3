@@ -32,6 +32,7 @@ import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.github.pnoker.driver.service.netty.udp.NettyUdpServer;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of custom driver service for the listening virtual driver.
@@ -59,6 +61,7 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
 
     private static final String PROTOCOL_TCP = "tcp";
     private static final String PROTOCOL_UDP = "udp";
+    private static final long WRITE_FLUSH_TIMEOUT_SECONDS = 5;
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final NettyTcpServer nettyTcpServer;
@@ -157,13 +160,31 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
                          PointBO point, WritePointValue writePointValue) {
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.getDeviceChannel(deviceId);
-        if (Objects.nonNull(channel)) {
-            log.debug("Driver point write requested, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}, valueLength={}", deviceId,
-                    point.getId(), Objects.toString(writePointValue.getValue(), "").length());
-            channel.writeAndFlush(DecodeUtil.stringToByte(writePointValue.getValue()));
-        } else {
+        if (Objects.isNull(channel) || !channel.isActive()) {
             log.warn("Driver point write skipped, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}, reason=channelMissing",
                     deviceId, point.getId());
+            return false;
+        }
+
+        log.debug("Driver point write requested, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}, valueLength={}", deviceId,
+                point.getId(), Objects.toString(writePointValue.getValue(), "").length());
+        ChannelFuture future = channel.writeAndFlush(DecodeUtil.stringToByte(writePointValue.getValue()));
+        if (Objects.isNull(future)) {
+            return false;
+        }
+        try {
+            boolean completed = future.await(WRITE_FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            if (!completed || !future.isSuccess()) {
+                log.warn("Driver point write flush failed, protocol=" + PROTOCOL_TCP
+                                + ", deviceId={}, pointId={}, completed={}",
+                        deviceId, point.getId(), completed, future.cause());
+                return false;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Driver point write interrupted, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}",
+                    deviceId, point.getId(), e);
+            return false;
         }
         return true;
     }

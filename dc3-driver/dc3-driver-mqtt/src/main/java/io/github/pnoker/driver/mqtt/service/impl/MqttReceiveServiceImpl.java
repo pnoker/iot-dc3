@@ -85,9 +85,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         // do something to process your mqtt messages
         log.debug("MQTT message received, topic={}, qos={}, payloadLength={}", topicOf(mqttMessage), qosOf(mqttMessage),
                 payloadLengthOf(mqttMessage));
-        if (reportConfiguredEvents(mqttMessage) > 0) {
-            return;
-        }
+        reportConfiguredEvents(mqttMessage);
 
         PointValue pointValue = toPointValue(mqttMessage);
         if (Objects.isNull(pointValue)) {
@@ -112,7 +110,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         // do something to process your mqtt messages
         log.debug("MQTT message batch received, count={}", mqttMessageList.size());
         List<PointValue> pointValues = mqttMessageList.stream()
-                .filter(mqttMessage -> reportConfiguredEvents(mqttMessage) == 0)
+                .peek(this::reportConfiguredEvents)
                 .map(this::toPointValue)
                 .filter(Objects::nonNull)
                 .toList();
@@ -123,6 +121,16 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     }
 
     private int reportConfiguredEvents(MqttMessage mqttMessage) {
+        try {
+            return doReportConfiguredEvents(mqttMessage);
+        } catch (Exception e) {
+            log.warn("MQTT event report failed, topic={}, payloadLength={}", topicOf(mqttMessage),
+                    payloadLengthOf(mqttMessage), e);
+            return 0;
+        }
+    }
+
+    private int doReportConfiguredEvents(MqttMessage mqttMessage) {
         if (driverMetadata.getEventAttributeIdMap().isEmpty()) {
             return 0;
         }
@@ -198,9 +206,11 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     private PointValue toPointValue(MqttMessage mqttMessage) {
         try {
             PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
-            if (Objects.nonNull(pointValue)) {
-                pointValue.setCreateTime(LocalDateTimeUtil.now());
+            if (Objects.isNull(pointValue) || Objects.isNull(pointValue.getDeviceId())
+                    || Objects.isNull(pointValue.getPointId())) {
+                return null;
             }
+            pointValue.setCreateTime(LocalDateTimeUtil.now());
             return pointValue;
         } catch (Exception e) {
             log.warn("MQTT point value parse failed, topic={}, payloadLength={}", topicOf(mqttMessage),

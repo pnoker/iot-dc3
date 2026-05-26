@@ -53,7 +53,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Custom driver service implementation for the OPC DA driver.
@@ -73,6 +73,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
     @Value("${dc3.driver.code}")
     private String driverCode;
     /**
@@ -104,7 +105,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
                 Server removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     try {
-                        removed.disconnect();
+                        removed.dispose();
                     } catch (Exception e) {
                         log.warn("Driver connection disconnect failed, protocol=" + driverCode + ", deviceId={}",
                                 metadataEvent.getId(), e);
@@ -122,14 +123,15 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                                PointBO point) {
-        return new ReadPointValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
+        Server server = getConnector(device.getId(), driverConfig);
+        return new ReadPointValue(device, point, readValue(device.getId(), server, pointConfig));
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                          PointBO point, WritePointValue writePointValue) {
         Server server = getConnector(device.getId(), driverConfig);
-        return writeValue(server, pointConfig, writePointValue);
+        return writeValue(device.getId(), server, pointConfig, writePointValue);
     }
 
     /**
@@ -149,12 +151,18 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
             log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, usernamePresent={}",
                     deviceId, host, clsId, Objects.nonNull(user));
             ConnectionInformation connectionInformation = new ConnectionInformation(host, clsId, user, password);
-            Server server = new Server(connectionInformation, Executors.newSingleThreadScheduledExecutor());
+            Server server = new Server(connectionInformation, scheduledThreadPoolExecutor);
             try {
                 server.connect();
                 log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}", deviceId,
                         host, clsId);
             } catch (AlreadyConnectedException | UnknownHostException | JIException e) {
+                try {
+                    server.dispose();
+                } catch (Exception disposeException) {
+                    log.warn("Driver connection dispose failed after connect error, protocol=" + driverCode
+                            + ", deviceId={}, host={}, clsId={}", deviceId, host, clsId, disposeException);
+                }
                 log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}", deviceId, host,
                         clsId, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, message={}",
@@ -191,13 +199,13 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      * @return the tag value as a string
      * @throws ReadPointException if reading fails (server is disposed on error)
      */
-    private String readValue(Server server, Map<String, AttributeBO> pointConfig) {
+    private String readValue(Long deviceId, Server server, Map<String, AttributeBO> pointConfig) {
         try {
             Item item = getItem(server, pointConfig);
             return readItem(item);
         } catch (NotConnectedException | JIException | AddFailedException | DuplicateGroupException
                  | UnknownHostException e) {
-            server.dispose();
+            invalidateConnector(deviceId, server);
             log.error("Driver point read failed, protocol={}", driverCode, e);
             throw new ReadPointException("Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
@@ -250,13 +258,13 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      * @return true if the write succeeded
      * @throws WritePointException if writing fails (server is disposed on error)
      */
-    private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
+    private boolean writeValue(Long deviceId, Server server, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
         try {
             Item item = getItem(server, pointConfig);
             return writeItem(item, writePointValue);
         } catch (NotConnectedException | AddFailedException | DuplicateGroupException | UnknownHostException
                  | JIException e) {
-            server.dispose();
+            invalidateConnector(deviceId, server);
             log.error("Driver point write failed, protocol={}", driverCode, e);
             throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
@@ -312,6 +320,15 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
                 break;
         }
         return writeResult > 0;
+    }
+
+    private void invalidateConnector(Long deviceId, Server server) {
+        connectMap.remove(deviceId, server);
+        try {
+            server.dispose();
+        } catch (Exception e) {
+            log.warn("Driver connection dispose failed, protocol=" + driverCode + ", deviceId={}", deviceId, e);
+        }
     }
 
 }

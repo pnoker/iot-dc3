@@ -26,6 +26,7 @@ import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -45,9 +46,11 @@ import java.net.InetSocketAddress;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class NettyUdpServer {
 
     private static final String PROTOCOL = "udp";
+    private final NettyUdpServerHandler nettyUdpServerHandler;
 
     /**
      * Starts the UDP server on the specified port.
@@ -65,7 +68,7 @@ public class NettyUdpServer {
                     .handler(new ChannelInitializer<Channel>() {
                         @Override
                         protected void initChannel(Channel channel) {
-                            channel.pipeline().addLast(new WriteTimeoutHandler(30), new NettyUdpServerHandler(null));
+                            channel.pipeline().addLast(new WriteTimeoutHandler(30), nettyUdpServerHandler);
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();

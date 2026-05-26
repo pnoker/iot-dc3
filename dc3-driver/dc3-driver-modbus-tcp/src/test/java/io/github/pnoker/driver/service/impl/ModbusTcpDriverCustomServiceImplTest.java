@@ -40,6 +40,7 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -219,6 +220,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         assertThatThrownBy(() -> service.read(driverConfig("host", 1502), pointConfig(1, 1, 0), device(7L),
                 point(PointTypeFlagEnum.INT))).isInstanceOf(ConnectorException.class)
                 .hasMessageContaining("offline");
+        verify(modbusMaster).destroy();
     }
 
     @Test
@@ -241,11 +243,12 @@ class ModbusTcpDriverCustomServiceImplTest {
     }
 
     @Test
-    void readUnsupportedFunctionCodeReturnsZero() throws Exception {
+    void readUnsupportedFunctionCodeThrows() throws Exception {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
         // Function code 99 is not handled.
-        assertThat(service.read(driverConfig("h", 1), pointConfig(1, 99, 0), device(2L), point(PointTypeFlagEnum.INT))
-                .getValue()).isEqualTo("0");
+        assertThatThrownBy(() -> service.read(driverConfig("h", 1), pointConfig(1, 99, 0),
+                device(2L), point(PointTypeFlagEnum.INT))).isInstanceOf(UnSupportException.class)
+                .hasMessageContaining("function code");
         verify(modbusMaster, never()).getValue(any(BaseLocator.class));
     }
 
@@ -257,6 +260,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         assertThatThrownBy(() -> service.read(driverConfig("h", 1), pointConfig(1, 3, 0), device(3L),
                 point(PointTypeFlagEnum.INT))).isInstanceOf(ReadPointException.class)
                 .hasMessageContaining("rs485 down");
+        verify(modbusMaster).destroy();
     }
 
     @Test
@@ -306,6 +310,7 @@ class ModbusTcpDriverCustomServiceImplTest {
                 point(PointTypeFlagEnum.BOOLEAN), writePointValue("true", PointTypeFlagEnum.BOOLEAN)))
                 .isInstanceOf(WritePointException.class)
                 .hasMessageContaining("transport reset");
+        verify(modbusMaster).destroy();
     }
 
     @Test

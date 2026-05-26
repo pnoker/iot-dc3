@@ -29,6 +29,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -50,9 +51,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class NettyTcpServer {
 
     private static final String PROTOCOL = "tcp";
+    private final NettyTcpServerHandler nettyTcpServerHandler;
 
     /**
      * Mapping of device IDs to Netty channels.
@@ -69,6 +72,10 @@ public class NettyTcpServer {
 
     public static Channel getDeviceChannel(Long deviceId) {
         return DEVICE_CHANNEL_MAP.get(deviceId);
+    }
+
+    public static void unregisterDeviceChannel(Channel channel) {
+        DEVICE_CHANNEL_MAP.entrySet().removeIf(entry -> entry.getValue() == channel);
     }
 
     public static void clearDeviceChannels() {
@@ -94,7 +101,7 @@ public class NettyTcpServer {
                             socketChannel.pipeline()
                                     .addLast(new StringEncoder())
                                     .addLast(new ByteArrayEncoder())
-                                    .addLast(new WriteTimeoutHandler(30), new NettyTcpServerHandler(null));
+                                    .addLast(new WriteTimeoutHandler(30), nettyTcpServerHandler);
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();

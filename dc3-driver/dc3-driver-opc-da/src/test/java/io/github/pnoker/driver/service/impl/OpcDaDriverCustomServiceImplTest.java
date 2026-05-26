@@ -25,6 +25,7 @@ import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import org.jinterop.dcom.core.JIVariant;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,7 @@ import org.openscada.opc.lib.da.UnknownGroupException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -58,6 +60,7 @@ class OpcDaDriverCustomServiceImplTest {
     private DriverSenderService driverSenderService;
 
     private OpcDaDriverCustomServiceImpl service;
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
     private static Map<String, AttributeBO> pointConfig(String group, String tag) {
         Map<String, AttributeBO> m = new HashMap<>();
@@ -76,8 +79,14 @@ class OpcDaDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new OpcDaDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+        service = new OpcDaDriverCustomServiceImpl(driverMetadata, driverSenderService, scheduledThreadPoolExecutor);
         service.initial();
+    }
+
+    @AfterEach
+    void tearDown() {
+        scheduledThreadPoolExecutor.shutdownNow();
     }
 
     @Test
@@ -103,6 +112,7 @@ class OpcDaDriverCustomServiceImplTest {
         connectionMap().put(123L, cached);
         service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE, 123L));
         assertThat(connectionMap()).doesNotContainKey(123L);
+        verify(cached).dispose();
     }
 
     @Test
@@ -111,6 +121,7 @@ class OpcDaDriverCustomServiceImplTest {
         connectionMap().put(456L, cached);
         service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, 456L));
         assertThat(connectionMap()).doesNotContainKey(456L);
+        verify(cached).dispose();
     }
 
     @Test

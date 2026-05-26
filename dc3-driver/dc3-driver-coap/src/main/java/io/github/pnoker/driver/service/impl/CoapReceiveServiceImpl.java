@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * CoAP Receive Service Implementation
@@ -52,7 +53,10 @@ public class CoapReceiveServiceImpl implements CoapReceiveService {
                 coapMessage.getSourceAddress(), coapMessage.getSourcePort(),
                 coapMessage.getUriPath(), payloadLengthOf(coapMessage));
 
-        PointValue pointValue = JsonUtil.parseObject(coapMessage.getPayload(), PointValue.class);
+        PointValue pointValue = toPointValue(coapMessage);
+        if (Objects.isNull(pointValue)) {
+            return;
+        }
         pointValue.setCreateTime(LocalDateTimeUtil.now());
         driverSenderService.pointValueSender(pointValue);
 
@@ -65,14 +69,33 @@ public class CoapReceiveServiceImpl implements CoapReceiveService {
     public void receiveValues(List<CoapMessage> coapMessageList) {
         log.debug("CoAP message batch received, count={}", coapMessageList.size());
 
-        List<PointValue> pointValues = coapMessageList.stream().map(coapMessage -> {
-            PointValue pointValue = JsonUtil.parseObject(coapMessage.getPayload(), PointValue.class);
-            pointValue.setCreateTime(LocalDateTimeUtil.now());
-            return pointValue;
-        }).toList();
-        driverSenderService.pointValueSender(pointValues);
+        List<PointValue> pointValues = coapMessageList.stream()
+                .map(this::toPointValue)
+                .filter(Objects::nonNull)
+                .peek(pointValue -> pointValue.setCreateTime(LocalDateTimeUtil.now()))
+                .toList();
+        if (!pointValues.isEmpty()) {
+            driverSenderService.pointValueSender(pointValues);
+        }
 
         log.debug("CoAP point value batch forwarded, count={}", pointValues.size());
+    }
+
+    private PointValue toPointValue(CoapMessage coapMessage) {
+        try {
+            PointValue pointValue = JsonUtil.parseObject(coapMessage.getPayload(), PointValue.class);
+            if (Objects.isNull(pointValue) || Objects.isNull(pointValue.getDeviceId())
+                    || Objects.isNull(pointValue.getPointId())) {
+                log.warn("CoAP point value skipped, from={}:{}, reason=missingIdentity",
+                        coapMessage.getSourceAddress(), coapMessage.getSourcePort());
+                return null;
+            }
+            return pointValue;
+        } catch (Exception e) {
+            log.warn("CoAP point value parse failed, from={}:{}, payloadLength={}",
+                    coapMessage.getSourceAddress(), coapMessage.getSourcePort(), payloadLengthOf(coapMessage), e);
+            return null;
+        }
     }
 
     private int payloadLengthOf(CoapMessage coapMessage) {

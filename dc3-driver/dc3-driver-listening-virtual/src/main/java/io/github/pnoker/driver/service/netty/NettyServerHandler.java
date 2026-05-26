@@ -98,7 +98,10 @@ public class NettyServerHandler {
         }
 
         String deviceName = byteBuf.toString(0, DEVICE_NAME_LENGTH, StandardCharsets.UTF_8).trim();
-        long deviceId = Long.parseLong(deviceName);
+        Long deviceId = parseDeviceId(deviceName, context);
+        if (Objects.isNull(deviceId)) {
+            return;
+        }
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
             log.warn("Driver message skipped, protocol=" + PROTOCOL + ", remoteAddress={}, deviceId={}, reason=deviceMissing",
@@ -119,20 +122,17 @@ public class NettyServerHandler {
         List<PointValue> pointValues = new ArrayList<>(16);
         for (Map.Entry<Long, Map<String, AttributeBO>> entry : pointConfigMap.entrySet()) {
             PointBO point = pointMetadata.getCache(entry.getKey());
-            Map<String, AttributeBO> infoMap = pointConfigMap.get(entry.getKey());
-            int start = infoMap.get("start").getValue(Integer.class);
-            int end = infoMap.get("end").getValue(Integer.class);
+            if (Objects.isNull(point)) {
+                continue;
+            }
+            Map<String, AttributeBO> infoMap = entry.getValue();
+            PointConfig pointConfig = readPointConfig(infoMap, point, context);
+            if (Objects.isNull(pointConfig)) {
+                continue;
+            }
 
-            if (infoMap.get("key").getValue().equals(hexKey) && Objects.nonNull(point)) {
-                String value = switch (point.getPointName()) {
-                    case "altitude" -> String.valueOf(byteBuf.getFloat(start));
-                    case "speed" -> String.valueOf(byteBuf.getDouble(start));
-                    case "level" -> String.valueOf(byteBuf.getLong(start));
-                    case "direction" -> String.valueOf(byteBuf.getInt(start));
-                    case "locked" -> String.valueOf(byteBuf.getBoolean(start));
-                    case "coordinate" -> byteBuf.toString(start, end, StandardCharsets.UTF_8).trim();
-                    default -> StringUtils.EMPTY;
-                };
+            if (Objects.equals(pointConfig.key(), hexKey)) {
+                String value = readConfiguredValue(byteBuf, point, pointConfig.start(), pointConfig.end(), context);
 
                 if (StringUtils.isNotEmpty(value)) {
                     pointValues.add(new PointValue(new ReadPointValue(device, point, value)));
@@ -140,9 +140,108 @@ public class NettyServerHandler {
             }
         }
 
-        driverSenderService.pointValueSender(pointValues);
+        if (!pointValues.isEmpty()) {
+            driverSenderService.pointValueSender(pointValues);
+        }
         log.debug("Driver point values forwarded, protocol=" + PROTOCOL + ", deviceId={}, key={}, count={}", deviceId, hexKey,
                 pointValues.size());
+    }
+
+    private PointConfig readPointConfig(Map<String, AttributeBO> infoMap, PointBO point, ChannelHandlerContext context) {
+        if (Objects.isNull(infoMap) || Objects.isNull(infoMap.get("key")) || Objects.isNull(infoMap.get("start"))
+                || Objects.isNull(infoMap.get("end"))) {
+            log.warn("Driver point config skipped, protocol=" + PROTOCOL
+                            + ", remoteAddress={}, pointId={}, reason=requiredConfigMissing",
+                    context.channel().remoteAddress(), point.getId());
+            return null;
+        }
+        try {
+            return new PointConfig(infoMap.get("key").getValue(), infoMap.get("start").getValue(Integer.class),
+                    infoMap.get("end").getValue(Integer.class));
+        } catch (Exception e) {
+            log.warn("Driver point config skipped, protocol=" + PROTOCOL
+                            + ", remoteAddress={}, pointId={}, reason=invalidConfig",
+                    context.channel().remoteAddress(), point.getId(), e);
+            return null;
+        }
+    }
+
+    private Long parseDeviceId(String deviceName, ChannelHandlerContext context) {
+        try {
+            return Long.parseLong(deviceName);
+        } catch (NumberFormatException e) {
+            log.warn("Driver message skipped, protocol=" + PROTOCOL + ", remoteAddress={}, deviceName={}, reason=deviceIdInvalid",
+                    context.channel().remoteAddress(), deviceName);
+            return null;
+        }
+    }
+
+    private String readConfiguredValue(ByteBuf byteBuf, PointBO point, int start, int end, ChannelHandlerContext context) {
+        return switch (point.getPointName()) {
+            case "altitude" -> readFloat(byteBuf, start, point, context);
+            case "speed" -> readDouble(byteBuf, start, point, context);
+            case "level" -> readLong(byteBuf, start, point, context);
+            case "direction" -> readInt(byteBuf, start, point, context);
+            case "locked" -> readBoolean(byteBuf, start, point, context);
+            case "coordinate" -> readString(byteBuf, start, end, point, context);
+            default -> StringUtils.EMPTY;
+        };
+    }
+
+    private String readFloat(ByteBuf byteBuf, int start, PointBO point, ChannelHandlerContext context) {
+        if (!hasBytes(byteBuf, start, Float.BYTES, point, context)) {
+            return StringUtils.EMPTY;
+        }
+        return String.valueOf(byteBuf.getFloat(start));
+    }
+
+    private String readDouble(ByteBuf byteBuf, int start, PointBO point, ChannelHandlerContext context) {
+        if (!hasBytes(byteBuf, start, Double.BYTES, point, context)) {
+            return StringUtils.EMPTY;
+        }
+        return String.valueOf(byteBuf.getDouble(start));
+    }
+
+    private String readLong(ByteBuf byteBuf, int start, PointBO point, ChannelHandlerContext context) {
+        if (!hasBytes(byteBuf, start, Long.BYTES, point, context)) {
+            return StringUtils.EMPTY;
+        }
+        return String.valueOf(byteBuf.getLong(start));
+    }
+
+    private String readInt(ByteBuf byteBuf, int start, PointBO point, ChannelHandlerContext context) {
+        if (!hasBytes(byteBuf, start, Integer.BYTES, point, context)) {
+            return StringUtils.EMPTY;
+        }
+        return String.valueOf(byteBuf.getInt(start));
+    }
+
+    private String readBoolean(ByteBuf byteBuf, int start, PointBO point, ChannelHandlerContext context) {
+        if (!hasBytes(byteBuf, start, 1, point, context)) {
+            return StringUtils.EMPTY;
+        }
+        return String.valueOf(byteBuf.getBoolean(start));
+    }
+
+    private String readString(ByteBuf byteBuf, int start, int end, PointBO point, ChannelHandlerContext context) {
+        int length = end > start ? end - start : end;
+        if (!hasBytes(byteBuf, start, length, point, context)) {
+            return StringUtils.EMPTY;
+        }
+        return byteBuf.toString(start, length, StandardCharsets.UTF_8).trim();
+    }
+
+    private boolean hasBytes(ByteBuf byteBuf, int start, int length, PointBO point, ChannelHandlerContext context) {
+        if (start < 0 || length <= 0 || start + length > byteBuf.writerIndex()) {
+            log.warn("Driver point value skipped, protocol=" + PROTOCOL
+                            + ", remoteAddress={}, pointId={}, pointName={}, reason=payloadOutOfBounds, start={}, length={}, bytes={}",
+                    context.channel().remoteAddress(), point.getId(), point.getPointName(), start, length, byteBuf.readableBytes());
+            return false;
+        }
+        return true;
+    }
+
+    private record PointConfig(String key, int start, int end) {
     }
 
 }
