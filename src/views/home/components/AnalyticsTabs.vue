@@ -53,7 +53,7 @@
   import { deviceStats, driverStats, statsTop } from '@/api/dashboard';
   import { listDeviceByIds } from '@/api/device';
   import { listDriverByIds } from '@/api/driver';
-  import { getPointByIds } from '@/api/point';
+  import { listPointByIds } from '@/api/point';
   import { listProfileByIds } from '@/api/profile';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
@@ -147,7 +147,7 @@
     try {
       let res: any;
       if (kind === 'device') res = await listDeviceByIds(missing);
-      else if (kind === 'point') res = await getPointByIds(missing);
+      else if (kind === 'point') res = await listPointByIds(missing);
       else if (kind === 'driver') res = await listDriverByIds(missing);
       else res = await listProfileByIds(missing);
       const data = res?.data || {};

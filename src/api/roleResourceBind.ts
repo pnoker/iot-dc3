@@ -24,13 +24,13 @@ export const addRoleResourceBind = (body: RoleResourceBindForm) => httpPost(`${A
 export const deleteRoleResourceBind = (id: string) =>
   httpPost(`${API_AUTH_BASE}/role_resource/delete`, undefined, { params: { id } });
 
-export const getRoleResourceList = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_resource/list`, query);
+export const listRoleResource = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_resource/list`, query);
 
-export const getResourceListByRoleId = (roleId: string) =>
+export const listResourceByRoleId = (roleId: string) =>
   httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_role`, { params: { role_id: roleId } });
 
-export const getResourceListByUserId = (userId: string) =>
+export const listResourceByUserId = (userId: string) =>
   httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_user`, { params: { user_id: userId } });
 
-export const getRoleListByResourceId = (resourceId: string) =>
+export const listRoleByResourceId = (resourceId: string) =>
   httpGet(`${API_AUTH_BASE}/role_resource/list_role_by_resource`, { params: { resource_id: resourceId } });

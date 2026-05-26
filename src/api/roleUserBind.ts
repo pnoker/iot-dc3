@@ -24,9 +24,9 @@ export const addRoleUserBind = (body: RoleUserBindForm) => httpPost(`${API_AUTH_
 export const deleteRoleUserBind = (id: string) =>
   httpPost(`${API_AUTH_BASE}/role_user/delete`, undefined, { params: { id } });
 
-export const getRoleUserList = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_user/list`, query);
+export const listRoleUser = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_user/list`, query);
 
-export const getRoleListByUserId = (userId: string, tenantId?: string | number) => {
+export const listRoleByUserId = (userId: string, tenantId?: string | number) => {
   const params: Record<string, string | number> = { user_id: userId };
   if (typeof tenantId === 'number') {
     params.tenant_id = tenantId;
@@ -34,5 +34,5 @@ export const getRoleListByUserId = (userId: string, tenantId?: string | number) 
   return httpGet(`${API_AUTH_BASE}/role_user/list_role_by_user`, { params });
 };
 
-export const getUserListByRoleId = (roleId: string) =>
+export const listUserByRoleId = (roleId: string) =>
   httpGet(`${API_AUTH_BASE}/role_user/list_user_by_role`, { params: { role_id: roleId } });

@@ -20,13 +20,13 @@ const apiMocks = vi.hoisted(() => ({
   listDeviceByIds: vi.fn(),
   listDriverByIds: vi.fn(),
   listProfileByIds: vi.fn(),
-  getPointByIds: vi.fn(),
+  listPointByIds: vi.fn(),
 }));
 
 vi.mock('@/api/device', () => ({ listDeviceByIds: apiMocks.listDeviceByIds }));
 vi.mock('@/api/driver', () => ({ listDriverByIds: apiMocks.listDriverByIds }));
 vi.mock('@/api/profile', () => ({ listProfileByIds: apiMocks.listProfileByIds }));
-vi.mock('@/api/point', () => ({ getPointByIds: apiMocks.getPointByIds }));
+vi.mock('@/api/point', () => ({ listPointByIds: apiMocks.listPointByIds }));
 
 // Module under test imports the mocked APIs at module scope, so we must
 // import it AFTER vi.mock — but the cache is module-level, so each test
@@ -53,7 +53,7 @@ describe('useEntityNames', () => {
     apiMocks.listProfileByIds.mockResolvedValue({
       data: { 'p-1': { profileName: 'TempSensor' } },
     });
-    apiMocks.getPointByIds.mockResolvedValue({
+    apiMocks.listPointByIds.mockResolvedValue({
       data: { 'pt-1': { pointName: 'Inlet temperature' } },
     });
   });
@@ -187,6 +187,6 @@ describe('useEntityNames', () => {
     expect(apiMocks.listDeviceByIds).not.toHaveBeenCalled();
     expect(apiMocks.listDriverByIds).not.toHaveBeenCalled();
     expect(apiMocks.listProfileByIds).not.toHaveBeenCalled();
-    expect(apiMocks.getPointByIds).not.toHaveBeenCalled();
+    expect(apiMocks.listPointByIds).not.toHaveBeenCalled();
   });
 });

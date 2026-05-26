@@ -160,3 +160,65 @@ export function normalizeCommandTimeoutSeconds(value: TimeoutValue): number | un
 export function commandTimeoutLabel(value: TimeoutValue): string {
   return normalizeCommandTimeoutSeconds(value)?.toString() ?? '-';
 }
+
+// Alarm helpers — wire format is integer (0..4 for type, 0..3 for level),
+// distinct from the string-coded EventTypeFlag/EventLevelFlag enums above.
+// Backend enum is `AlarmTypeFlagEnum`; level uses P0..P3 priority labels.
+
+const ALARM_TYPE_LABEL_BY_INDEX: Record<number, string> = {
+  0: 'RULE',
+  1: 'OFFLINE',
+  2: 'FAULT',
+  3: 'STATE_FLIP',
+  4: 'REPORT',
+};
+
+const ALARM_TYPE_TAG_BY_INDEX: Record<number, 'info' | 'warning' | 'danger'> = {
+  0: 'info',
+  1: 'danger',
+  2: 'danger',
+  3: 'warning',
+  4: 'info',
+};
+
+const ALARM_LEVEL_LABEL_BY_INDEX: Record<number, string> = {
+  0: 'P0',
+  1: 'P1',
+  2: 'P2',
+  3: 'P3',
+};
+
+const ALARM_LEVEL_TAG_BY_INDEX: Record<number, 'info' | 'success' | 'warning' | 'danger'> = {
+  0: 'danger',
+  1: 'warning',
+  2: 'info',
+  3: 'success',
+};
+
+export const ALARM_TYPE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
+  { value: 0, label: 'RULE' },
+  { value: 1, label: 'OFFLINE' },
+  { value: 2, label: 'FAULT' },
+  { value: 3, label: 'STATE_FLIP' },
+  { value: 4, label: 'REPORT' },
+];
+
+export function alarmTypeLabel(flag: number | null | undefined): string {
+  if (flag === null || flag === undefined) return '-';
+  return ALARM_TYPE_LABEL_BY_INDEX[flag] ?? String(flag);
+}
+
+export function alarmTypeTag(flag: number | null | undefined): 'info' | 'warning' | 'danger' {
+  if (flag === null || flag === undefined) return 'info';
+  return ALARM_TYPE_TAG_BY_INDEX[flag] ?? 'info';
+}
+
+export function alarmLevelLabel(flag: number | null | undefined): string {
+  if (flag === null || flag === undefined) return '—';
+  return ALARM_LEVEL_LABEL_BY_INDEX[flag] ?? '—';
+}
+
+export function alarmLevelTag(flag: number | null | undefined): 'info' | 'success' | 'warning' | 'danger' {
+  if (flag === null || flag === undefined) return 'info';
+  return ALARM_LEVEL_TAG_BY_INDEX[flag] ?? 'info';
+}

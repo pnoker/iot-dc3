@@ -28,7 +28,7 @@ export const updatePoint = (point: PointForm) => httpPost<R<PointRecord>>(`${API
 export const getPointById = (id: string) =>
   httpGet<R<PointRecord>>(`${API_MANAGER_BASE}/point/get_by_id`, { params: { id } });
 
-export const getPointByIds = (pointIds: string[]) =>
+export const listPointByIds = (pointIds: string[]) =>
   httpPost<R<Record<string, PointRecord>>>(`${API_MANAGER_BASE}/point/list_by_ids`, pointIds);
 
 export const listPoint = <T = R<PageResult<PointRecord>>>(query: PageQuery) =>

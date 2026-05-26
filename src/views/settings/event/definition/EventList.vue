@@ -66,10 +66,10 @@
           {{ reactiveData.detailRecord.eventCode || '-' }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('eventDefinition.detail.eventType')">{{
-          reactiveData.detailRecord.eventTypeFlag || '-'
+          eventTypeLabel(reactiveData.detailRecord.eventTypeFlag)
         }}</el-descriptions-item>
         <el-descriptions-item :label="$t('eventDefinition.detail.eventLevel')">{{
-          reactiveData.detailRecord.eventLevelFlag || '-'
+          eventLevelLabel(reactiveData.detailRecord.eventLevelFlag)
         }}</el-descriptions-item>
         <el-descriptions-item :label="$t('common.enableFlag')">
           <enable-tag :value="reactiveData.detailRecord.enableFlag" />
@@ -109,6 +109,7 @@
   } from '@/api/event';
   import { timestampLabel } from '@/utils/dateUtil';
   import { failMessage, successMessage } from '@/utils/notificationUtil';
+  import { eventLevelLabel, eventTypeLabel } from '@/utils/thingModelFormatUtil';
   import { isNull } from '@/utils/validationUtil';
   import type { EventForm, EventParamRecord, EventRecord, Order } from '@/config/types';
   import BlankCard from '@/components/card/blank/BlankCard.vue';

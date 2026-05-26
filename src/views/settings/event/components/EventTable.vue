@@ -30,14 +30,7 @@
         <el-form-item :label="$t('settings.event.alarmType')" prop="alarmTypeFlag">
           <el-segmented
             v-model="fd.alarmTypeFlag"
-            :options="[
-              { label: $t('common.all'), value: '' },
-              { label: 'RULE', value: 0 },
-              { label: 'OFFLINE', value: 1 },
-              { label: 'FAULT', value: 2 },
-              { label: 'STATE_FLIP', value: 3 },
-              { label: 'REPORT', value: 4 },
-            ]"
+            :options="[{ label: $t('common.all'), value: '' }, ...alarmTypeOptions]"
           />
         </el-form-item>
         <el-form-item :label="$t('settings.event.confirmFlag')" prop="confirmFlag">
@@ -174,9 +167,16 @@
   import { alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm } from '@/api/dashboard';
   import { listDeviceByIds } from '@/api/device';
   import { listDriverByIds } from '@/api/driver';
-  import { getPointByIds } from '@/api/point';
+  import { listPointByIds } from '@/api/point';
   import { timestampColumn } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
+  import {
+    ALARM_TYPE_OPTIONS,
+    alarmLevelLabel,
+    alarmLevelTag,
+    alarmTypeLabel,
+    alarmTypeTag,
+  } from '@/utils/thingModelFormatUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
@@ -207,65 +207,7 @@
   const rows = ref<Row[]>([]);
   const nameMap = reactive<Record<string, string>>({});
 
-  const alarmTypeOptions = [
-    { label: 'RULE', value: 0 },
-    { label: 'OFFLINE', value: 1 },
-    { label: 'FAULT', value: 2 },
-    { label: 'STATE_FLIP', value: 3 },
-    { label: 'REPORT', value: 4 },
-  ];
-
-  const alarmTypeLabel = (flag: number) => {
-    const opt = alarmTypeOptions.find((o) => o.value === flag);
-    return opt ? opt.label : String(flag);
-  };
-
-  const alarmLevelLabel = (flag?: number) => {
-    switch (flag) {
-      case 0:
-        return 'P0';
-      case 1:
-        return 'P1';
-      case 2:
-        return 'P2';
-      case 3:
-        return 'P3';
-      default:
-        return '—';
-    }
-  };
-
-  const alarmLevelTag = (flag?: number): 'info' | 'success' | 'warning' | 'danger' => {
-    switch (flag) {
-      case 0:
-        return 'danger';
-      case 1:
-        return 'warning';
-      case 2:
-        return 'info';
-      case 3:
-        return 'success';
-      default:
-        return 'info';
-    }
-  };
-
-  const alarmTypeTag = (flag: number): 'info' | 'warning' | 'danger' => {
-    switch (flag) {
-      case 0:
-        return 'info';
-      case 1:
-        return 'danger';
-      case 2:
-        return 'danger';
-      case 3:
-        return 'warning';
-      case 4:
-        return 'info';
-      default:
-        return 'info';
-    }
-  };
+  const alarmTypeOptions = ALARM_TYPE_OPTIONS;
 
   const readQuery = () => {
     const q = route.query;
@@ -333,7 +275,7 @@
     try {
       let res: any;
       if (props.source === 'point') {
-        res = await getPointByIds(ids);
+        res = await listPointByIds(ids);
       } else if (props.source === 'device') {
         res = await listDeviceByIds(ids);
       } else {

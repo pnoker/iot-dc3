@@ -86,8 +86,8 @@
   import { useRoute, useRouter } from 'vue-router';
 
   import { getRoleById } from '@/api/role';
-  import { getResourceListByRoleId } from '@/api/roleResourceBind';
-  import { getUserListByRoleId } from '@/api/roleUserBind';
+  import { listResourceByRoleId } from '@/api/roleResourceBind';
+  import { listUserByRoleId } from '@/api/roleUserBind';
   import { timestampLabel } from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
@@ -123,7 +123,7 @@
   const loadUsers = () => {
     if (!reactiveData.id || reactiveData.usersLoaded) return;
     reactiveData.usersLoading = true;
-    getUserListByRoleId(reactiveData.id)
+    listUserByRoleId(reactiveData.id)
       .then((res: any) => {
         reactiveData.users = (res.data as any[]) || [];
         reactiveData.usersLoaded = true;
@@ -139,7 +139,7 @@
   const loadResources = () => {
     if (!reactiveData.id || reactiveData.resourcesLoaded) return;
     reactiveData.resourcesLoading = true;
-    getResourceListByRoleId(reactiveData.id)
+    listResourceByRoleId(reactiveData.id)
       .then((res: any) => {
         reactiveData.resources = (res.data as any[]) || [];
         reactiveData.resourcesLoaded = true;

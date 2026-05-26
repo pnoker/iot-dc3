@@ -18,7 +18,7 @@ import { reactive } from 'vue';
 
 import { listDeviceByIds } from '@/api/device';
 import { listDriverByIds } from '@/api/driver';
-import { getPointByIds } from '@/api/point';
+import { listPointByIds } from '@/api/point';
 import { listProfileByIds } from '@/api/profile';
 
 /**
@@ -62,7 +62,7 @@ const fetchers: Record<EntityKind, (ids: string[]) => Promise<BatchResponse>> = 
   device: (ids) => listDeviceByIds(ids) as Promise<BatchResponse>,
   driver: (ids) => listDriverByIds(ids) as Promise<BatchResponse>,
   profile: (ids) => listProfileByIds(ids) as Promise<BatchResponse>,
-  point: (ids) => getPointByIds(ids) as Promise<BatchResponse>,
+  point: (ids) => listPointByIds(ids) as Promise<BatchResponse>,
 };
 
 // Entity payloads returned by the getXxxByIds endpoints all use a

@@ -87,8 +87,8 @@
   import type { TabsPaneContext } from 'element-plus';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { getResourceListByUserId } from '@/api/roleResourceBind';
-  import { getRoleListByUserId } from '@/api/roleUserBind';
+  import { listResourceByUserId } from '@/api/roleResourceBind';
+  import { listRoleByUserId } from '@/api/roleUserBind';
   import { getUserById } from '@/api/user';
   import { timestampLabel } from '@/utils/dateUtil';
 
@@ -125,7 +125,7 @@
   const loadRoles = () => {
     if (!reactiveData.id || reactiveData.rolesLoaded) return;
     reactiveData.rolesLoading = true;
-    getRoleListByUserId(reactiveData.id)
+    listRoleByUserId(reactiveData.id)
       .then((res: any) => {
         reactiveData.roles = (res.data as any[]) || [];
         reactiveData.rolesLoaded = true;
@@ -141,7 +141,7 @@
   const loadResources = () => {
     if (!reactiveData.id || reactiveData.resourcesLoaded) return;
     reactiveData.resourcesLoading = true;
-    getResourceListByUserId(reactiveData.id)
+    listResourceByUserId(reactiveData.id)
       .then((res: any) => {
         reactiveData.resources = (res.data as any[]) || [];
         reactiveData.resourcesLoaded = true;

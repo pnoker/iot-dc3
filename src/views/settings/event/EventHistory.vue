@@ -50,8 +50,16 @@
         <el-table-column :label="$t('eventHistory.recordId')" min-width="180" prop="recordId" show-overflow-tooltip />
         <el-table-column :label="$t('eventHistory.deviceId')" min-width="160" prop="deviceId" show-overflow-tooltip />
         <el-table-column :label="$t('eventHistory.eventCode')" min-width="140" prop="eventCode" />
-        <el-table-column :label="$t('eventHistory.type')" prop="eventTypeFlag" width="110" />
-        <el-table-column :label="$t('eventHistory.level')" prop="eventLevelFlag" width="100" />
+        <el-table-column :label="$t('eventHistory.type')" width="110">
+          <template #default="{ row }">{{ eventTypeLabel(row.eventTypeFlag) }}</template>
+        </el-table-column>
+        <el-table-column :label="$t('eventHistory.level')" width="100">
+          <template #default="{ row }">
+            <el-tag :type="eventLevelTag(row.eventLevelFlag)" size="small">
+              {{ eventLevelLabel(row.eventLevelFlag) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('eventHistory.ack')" prop="acknowledgeFlag" width="90" />
         <el-table-column :label="$t('eventHistory.message')" min-width="200" prop="message" show-overflow-tooltip />
         <el-table-column
@@ -86,8 +94,12 @@
         <el-descriptions-item :label="$t('eventHistory.deviceId')">{{ detailRow.deviceId }}</el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.eventId')">{{ detailRow.eventId }}</el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.eventCode')">{{ detailRow.eventCode }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('eventHistory.type')">{{ detailRow.eventTypeFlag }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('eventHistory.level')">{{ detailRow.eventLevelFlag }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.type')">{{
+          eventTypeLabel(detailRow.eventTypeFlag)
+        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.level')">{{
+          eventLevelLabel(detailRow.eventLevelFlag)
+        }}</el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.message')" :span="2">
           {{ detailRow.message || '-' }}
         </el-descriptions-item>
@@ -125,6 +137,7 @@
   import { getEventHistoryById, listEventHistory } from '@/api/event';
   import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
   import { prettyJson } from '@/utils/jsonUtil';
+  import { eventLevelLabel, eventLevelTag, eventTypeLabel } from '@/utils/thingModelFormatUtil';
   import type { EventHistory, Order } from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';

@@ -22,7 +22,7 @@ import { listApi } from '@/api/api';
 import { addResource, deleteResource, listResourceTree, updateResource } from '@/api/resource';
 import { listDriverByIds } from '@/api/driver';
 import { listDeviceByIds } from '@/api/device';
-import { getPointByIds } from '@/api/point';
+import { listPointByIds } from '@/api/point';
 import { listProfileByIds } from '@/api/profile';
 import { useMenuStore } from '@/store';
 import { timestampColumn } from '@/utils/dateUtil';
@@ -190,7 +190,7 @@ export default defineComponent({
         );
       if (pointIds.length)
         promises.push(
-          getPointByIds(pointIds)
+          listPointByIds(pointIds)
             .then((r) => fill(pointIds, r, 'pointName'))
             .catch(() => {})
         );
