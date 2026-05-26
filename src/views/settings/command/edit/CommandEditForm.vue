@@ -59,13 +59,35 @@
       </div>
       <el-table :data="reactiveData.params" border max-height="260" size="small">
         <el-table-column :label="$t('common.name')" min-width="150">
-          <template #default="{ row }">
-            <el-input v-model="row.paramName" clearable />
+          <template #default="{ row, $index }">
+            <el-tooltip
+              :content="paramErrors[$index]?.paramName || ''"
+              :visible="!!paramErrors[$index]?.paramName"
+              placement="top"
+            >
+              <el-input
+                v-model="row.paramName"
+                :class="{ 'is-error': !!paramErrors[$index]?.paramName }"
+                clearable
+                @blur="validateRow($index)"
+              />
+            </el-tooltip>
           </template>
         </el-table-column>
         <el-table-column :label="$t('command.form.code')" min-width="150">
-          <template #default="{ row }">
-            <el-input v-model="row.paramCode" clearable />
+          <template #default="{ row, $index }">
+            <el-tooltip
+              :content="paramErrors[$index]?.paramCode || ''"
+              :visible="!!paramErrors[$index]?.paramCode"
+              placement="top"
+            >
+              <el-input
+                v-model="row.paramCode"
+                :class="{ 'is-error': !!paramErrors[$index]?.paramCode }"
+                clearable
+                @blur="validateRow($index)"
+              />
+            </el-tooltip>
           </template>
         </el-table-column>
         <el-table-column :label="$t('command.form.direction')" min-width="130">
@@ -188,8 +210,34 @@
     paramLoading: false,
   });
 
+  const PARAM_NAME_RE = /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥\-_#@/.|]{1,31}$/;
+
   const rules: FormRules = {
     commandName: [{ required: true, message: t('command.form.nameRequired'), trigger: 'blur' }],
+  };
+
+  type RowErrors = { paramName?: string; paramCode?: string };
+  const paramErrors = reactive<RowErrors[]>([]);
+
+  const validateRow = (index: number) => {
+    const row = reactiveData.params[index];
+    if (!row) return;
+    const errors: RowErrors = {};
+    const name = String(row.paramName || '').trim();
+    const code = String(row.paramCode || '').trim();
+    if (!name) {
+      errors.paramName = t('command.form.paramRequired');
+    } else if (!PARAM_NAME_RE.test(name)) {
+      errors.paramName = t('command.form.paramNamePattern');
+    }
+    if (!code) {
+      errors.paramCode = t('command.form.paramRequired');
+    }
+    paramErrors[index] = errors;
+  };
+
+  const clearParamErrors = () => {
+    paramErrors.splice(0, paramErrors.length);
   };
 
   const reset = () => {
@@ -197,6 +245,7 @@
     reactiveData.params = cloneParams(reactiveData.originalParams);
     reactiveData.submitting = false;
     formRef.value?.clearValidate();
+    clearParamErrors();
   };
 
   const rowKey = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -239,21 +288,30 @@
         };
       });
 
-  const validateParams = (params: CommandParamRecord[]) => {
+  const validateParams = (params: CommandParamRecord[]): boolean => {
+    clearParamErrors();
+    let valid = true;
     const codes = new Set<string>();
+    for (let i = 0; i < reactiveData.params.length; i++) {
+      validateRow(i);
+    }
     for (const item of params) {
       const code = String(item.paramCode || '').trim();
       if (!item.paramName || !code || !item.paramDirectionFlag || !item.paramTypeFlag) {
         failMessage(t('command.form.paramRequired'));
-        return false;
+        valid = false;
+      }
+      if (item.paramName && !PARAM_NAME_RE.test(item.paramName)) {
+        failMessage(t('command.form.paramNamePattern'));
+        valid = false;
       }
       if (codes.has(code)) {
         failMessage(t('command.form.paramCodeUnique'));
-        return false;
+        valid = false;
       }
       codes.add(code);
     }
-    return true;
+    return valid;
   };
 
   const addParamRow = () => {
@@ -262,6 +320,7 @@
 
   const removeParamRow = (index: number) => {
     reactiveData.params.splice(index, 1);
+    paramErrors.splice(index, 1);
   };
 
   const show = (profileId = '') => {
@@ -271,6 +330,7 @@
     reactiveData.form = { ...emptyForm };
     reactiveData.originalParams = [];
     reactiveData.params = [];
+    clearParamErrors();
     reactiveData.visible = true;
   };
 
@@ -290,6 +350,7 @@
     reactiveData.form = { ...initial };
     reactiveData.originalParams = [];
     reactiveData.params = [];
+    clearParamErrors();
     reactiveData.visible = true;
     if (row.id) {
       reactiveData.paramLoading = true;
@@ -312,9 +373,13 @@
   };
 
   const submit = async () => {
-    const valid = await formRef.value?.validate().catch(() => false);
-    if (!valid) return;
+    if (reactiveData.submitting) return;
     reactiveData.submitting = true;
+    const valid = await formRef.value?.validate().catch(() => false);
+    if (!valid) {
+      reactiveData.submitting = false;
+      return;
+    }
     const payload = {
       ...reactiveData.form,
       timeout: normalizeCommandTimeoutSeconds(reactiveData.form.timeout) ?? 30,
@@ -333,3 +398,9 @@
 
   defineExpose({ show, showEdit });
 </script>
+
+<style>
+  .is-error .el-input__wrapper {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset !important;
+  }
+</style>

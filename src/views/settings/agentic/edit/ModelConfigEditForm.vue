@@ -153,8 +153,14 @@
   };
 
   const onSubmit = async () => {
-    await formRef.value?.validate();
+    if (submitting.value) return;
     submitting.value = true;
+    try {
+      await formRef.value?.validate();
+    } catch {
+      submitting.value = false;
+      return;
+    }
     emit('save', { ...form }, () => {
       submitting.value = false;
       visible.value = false;

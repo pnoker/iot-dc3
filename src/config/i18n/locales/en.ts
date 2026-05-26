@@ -490,6 +490,8 @@ export default {
       nameRequired: 'Command name is required',
       codeRequired: 'Command code is required',
       paramRequired: 'Command param name, code, direction, and type are required.',
+      paramNamePattern:
+        'Param name must be 2-32 chars, start with a letter/digit/CJK, and only contain letters, digits, CJK, and -_#@/.|.',
       paramCodeUnique: 'Command param code must be unique.',
     },
     detail: {
@@ -554,6 +556,8 @@ export default {
       nameRequired: 'Event name is required',
       codeRequired: 'Event code is required',
       paramRequired: 'Event param name, code, and type are required.',
+      paramNamePattern:
+        'Param name must be 2-32 chars, start with a letter/digit/CJK, and only contain letters, digits, CJK, and -_#@/.|.',
       paramCodeUnique: 'Event param code must be unique.',
     },
     detail: {

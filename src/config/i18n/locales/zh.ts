@@ -489,6 +489,7 @@ export default {
       nameRequired: '指令名称不能为空',
       codeRequired: '指令标识不能为空',
       paramRequired: '指令参数名称、标识、方向和类型不能为空。',
+      paramNamePattern: '指令参数名称需2-32位，以字母、数字或中文开头，仅支持字母、数字、中文及-_#@/.|。',
       paramCodeUnique: '指令参数标识不能重复。',
     },
     detail: {
@@ -553,6 +554,7 @@ export default {
       nameRequired: '事件名称不能为空',
       codeRequired: '事件标识不能为空',
       paramRequired: '事件参数名称、标识和类型不能为空。',
+      paramNamePattern: '事件参数名称需2-32位，以字母、数字或中文开头，仅支持字母、数字、中文及-_#@/.|。',
       paramCodeUnique: '事件参数标识不能重复。',
     },
     detail: {
