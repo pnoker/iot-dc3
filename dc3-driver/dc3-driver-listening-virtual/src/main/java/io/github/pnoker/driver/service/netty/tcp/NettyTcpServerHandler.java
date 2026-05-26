@@ -22,7 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import jakarta.annotation.PostConstruct;
+import io.netty.util.ReferenceCountUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -57,21 +57,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
 
-    /**
-     * Static self-reference for accessing Spring-injected beans from static context.
-     */
     private static final String PROTOCOL = "tcp";
-    private static NettyTcpServerHandler nettyTcpServerHandler;
 
     private final NettyServerHandler nettyServerHandler;
-
-    /**
-     * Initializes the handler instance after Spring dependency injection.
-     */
-    @PostConstruct
-    public void init() {
-        nettyTcpServerHandler = this;
-    }
 
     /**
      * Handles incoming TCP messages.
@@ -82,7 +70,23 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     @SneakyThrows
     public void channelRead(ChannelHandlerContext context, Object msg) {
-        nettyTcpServerHandler.nettyServerHandler.read(context, (ByteBuf) msg);
+        try {
+            if (msg instanceof ByteBuf byteBuf) {
+                nettyServerHandler.read(context, byteBuf);
+            } else {
+                log.warn("Driver message skipped, protocol=" + PROTOCOL + ", remoteAddress={}, reason=unsupportedMessageType, type={}",
+                        context.channel().remoteAddress(), msg == null ? null : msg.getClass().getName());
+            }
+        } finally {
+            ReferenceCountUtil.release(msg);
+        }
+    }
+
+    @Override
+    @SneakyThrows
+    public void channelInactive(ChannelHandlerContext context) {
+        NettyTcpServer.unregisterDeviceChannel(context.channel());
+        super.channelInactive(context);
     }
 
     /**

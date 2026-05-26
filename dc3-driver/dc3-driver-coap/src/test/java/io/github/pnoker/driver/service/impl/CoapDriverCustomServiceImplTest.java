@@ -43,6 +43,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -103,6 +104,24 @@ class CoapDriverCustomServiceImplTest {
                 () -> service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 1L)));
         assertThatNoException().isThrownBy(
                 () -> service.event(metadataEvent(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.UPDATE, 2L)));
+    }
+
+    @Test
+    void deviceDeleteReleasesRememberedClient() {
+        Map<String, AttributeBO> driverConfig = new HashMap<>();
+        driverConfig.put("deviceHost",
+                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeFlagEnum.STRING).build());
+        driverConfig.put("devicePort",
+                AttributeBO.builder().value("5683").type(AttributeTypeFlagEnum.INT).build());
+        Map<String, AttributeBO> pointConfig = new HashMap<>();
+        pointConfig.put("readPath",
+                AttributeBO.builder().value("/sensors/temp").type(AttributeTypeFlagEnum.STRING).build());
+        when(coapClientManager.get(anyString(), anyString())).thenReturn(null);
+        service.read(driverConfig, pointConfig, device(1L), point(1L));
+
+        service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, 1L));
+
+        verify(coapClientManager).releaseClient("coap://192.168.1.10:5683");
     }
 
     @Test

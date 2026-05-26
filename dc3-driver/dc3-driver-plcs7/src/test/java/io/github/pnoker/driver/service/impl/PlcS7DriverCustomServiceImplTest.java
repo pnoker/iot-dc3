@@ -46,6 +46,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -213,6 +214,8 @@ class PlcS7DriverCustomServiceImplTest {
                 device(13L), point(PointTypeFlagEnum.INT));
 
         assertThat(r).isNull();
+        assertThat(connectionMap()).doesNotContainKey(13L);
+        verify(plc).close();
     }
 
     // ------------------------------------------------------------------------
@@ -256,20 +259,17 @@ class PlcS7DriverCustomServiceImplTest {
     }
 
     @Test
-    void writeReturnsFalseWhenPlcThrows() throws Exception {
+    void writeReturnsFalseAndInvalidatesConnectionWhenPlcThrows() throws Exception {
         primeCachedPLC(23L);
-        when(plc.readInt32(anyString())).thenThrow(new RuntimeException("plc offline"));
+        doThrow(new RuntimeException("plc offline")).when(plc).writeInt32(anyString(), org.mockito.ArgumentMatchers.anyInt());
 
-        // Intentionally use wrong value to trigger exception
-        boolean readOk;
-        try {
-            ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(1, 0, 0),
-                    device(23L), point(PointTypeFlagEnum.INT));
-            readOk = r != null;
-        } catch (Exception e) {
-            readOk = false;
-        }
-        assertThat(readOk).isFalse();
+        Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 0, 0),
+                device(23L), point(PointTypeFlagEnum.INT),
+                writePointValue("1", PointTypeFlagEnum.INT));
+
+        assertThat(ok).isFalse();
+        assertThat(connectionMap()).doesNotContainKey(23L);
+        verify(plc).close();
     }
 
     // ------------------------------------------------------------------------

@@ -22,7 +22,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -57,21 +56,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-    /**
-     * Static self-reference for accessing Spring-injected beans from static context.
-     */
     private static final String PROTOCOL = "udp";
-    private static NettyUdpServerHandler nettyUdpServerHandler;
 
     private final NettyServerHandler nettyServerHandler;
-
-    /**
-     * Initializes the handler instance after Spring dependency injection.
-     */
-    @PostConstruct
-    public void init() {
-        nettyUdpServerHandler = this;
-    }
 
     /**
      * Handles incoming UDP datagram packets.
@@ -82,7 +69,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
     @Override
     @SneakyThrows
     public void channelRead0(ChannelHandlerContext context, DatagramPacket msg) {
-        nettyUdpServerHandler.nettyServerHandler.read(context, msg.content());
+        nettyServerHandler.read(context, msg.content());
     }
 
     /**

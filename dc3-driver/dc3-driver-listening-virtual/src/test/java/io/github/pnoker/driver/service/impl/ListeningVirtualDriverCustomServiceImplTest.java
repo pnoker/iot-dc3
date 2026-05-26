@@ -29,6 +29,7 @@ import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.github.pnoker.driver.service.netty.udp.NettyUdpServer;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -46,6 +48,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ListeningVirtualDriverCustomServiceImplTest {
@@ -142,10 +145,15 @@ class ListeningVirtualDriverCustomServiceImplTest {
     }
 
     @Test
-    void writeFlushesValueWhenChannelExistsForDevice() {
+    void writeFlushesValueWhenChannelExistsForDevice() throws Exception {
         DeviceBO device = device(900L);
         PointBO point = point(2L);
         Channel channel = org.mockito.Mockito.mock(Channel.class);
+        ChannelFuture future = org.mockito.Mockito.mock(ChannelFuture.class);
+        when(channel.isActive()).thenReturn(true);
+        when(channel.writeAndFlush(any(byte[].class))).thenReturn(future);
+        when(future.await(5, TimeUnit.SECONDS)).thenReturn(true);
+        when(future.isSuccess()).thenReturn(true);
         NettyTcpServer.registerDeviceChannel(900L, channel);
 
         Boolean ok = service.write(null, null, device, point,
@@ -156,14 +164,32 @@ class ListeningVirtualDriverCustomServiceImplTest {
     }
 
     @Test
-    void writeReturnsTrueButSkipsWhenChannelMissing() {
+    void writeReturnsFalseWhenFlushFails() throws Exception {
+        DeviceBO device = device(902L);
+        PointBO point = point(2L);
+        Channel channel = org.mockito.Mockito.mock(Channel.class);
+        ChannelFuture future = org.mockito.Mockito.mock(ChannelFuture.class);
+        when(channel.isActive()).thenReturn(true);
+        when(channel.writeAndFlush(any(byte[].class))).thenReturn(future);
+        when(future.await(5, TimeUnit.SECONDS)).thenReturn(true);
+        when(future.isSuccess()).thenReturn(false);
+        NettyTcpServer.registerDeviceChannel(902L, channel);
+
+        Boolean ok = service.write(null, null, device, point,
+                WritePointValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
+
+        assertThat(ok).isFalse();
+    }
+
+    @Test
+    void writeReturnsFalseWhenChannelMissing() {
         DeviceBO device = device(901L);
         PointBO point = point(2L);
 
         Boolean ok = service.write(null, null, device, point,
                 WritePointValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
 
-        assertThat(ok).isTrue();
+        assertThat(ok).isFalse();
         // No channel was registered, so nothing was flushed.
         Channel anyChannel = org.mockito.Mockito.mock(Channel.class);
         verify(anyChannel, never()).writeAndFlush(any());

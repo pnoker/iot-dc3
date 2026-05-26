@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -179,11 +181,81 @@ class MqttReceiveServiceImplTest {
 
         ArgumentCaptor<EventReportDTO> captor = ArgumentCaptor.forClass(EventReportDTO.class);
         verify(driverSenderService).eventReportSender(captor.capture());
+        verify(driverSenderService, never()).pointValueSender(any(PointValue.class));
         EventReportDTO report = captor.getValue();
         assertThat(report.deviceId()).isEqualTo(10L);
         assertThat(report.eventId()).isEqualTo(20L);
         assertThat(report.eventCode()).isEqualTo("alarm");
         assertThat(report.paramValues()).containsEntry("temperature", "92").containsEntry("source", "mqtt");
         assertThat(report.configSnapshot()).contains("sourceTopic").contains("eventCodePath").contains("payloadPath");
+    }
+
+    @Test
+    void eventMessageWithPointIdentityReportsBothEventAndPointValue() {
+        driverMetadata.getDeviceIds().add(10L);
+        driverMetadata.setEventAttributeIdMap(Map.of(
+                1L, eventAttribute(1L, "sourceTopic"),
+                2L, eventAttribute(2L, "eventCodePath"),
+                3L, eventAttribute(3L, "payloadPath")
+        ));
+
+        DeviceBO device = new DeviceBO();
+        device.setId(10L);
+        device.setTenantId(1L);
+        device.setDeviceCode("device-a");
+        device.setEventAttributeConfigIdMap(Map.of(20L, Map.of(
+                1L, eventConfig(1L, 10L, 20L, "dc3/event/device-a"),
+                2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
+                3L, eventConfig(3L, 10L, 20L, "$.payload")
+        )));
+        when(deviceClient.getById(10L)).thenReturn(device);
+
+        FacadeEventBO event = new FacadeEventBO();
+        event.setId(20L);
+        event.setTenantId(1L);
+        event.setEventCode("alarm");
+        event.setEventTypeFlag(EventTypeFlagEnum.ALERT);
+        event.setEventLevelFlag(EventLevelFlagEnum.HIGH);
+        event.setEnableFlag(EnableFlagEnum.ENABLE);
+        when(eventFacade.getById(1L, 20L)).thenReturn(event);
+
+        MqttMessage msg = mqttMessage("dc3/event/device-a", 1,
+                "{\"deviceId\":10,\"pointId\":30,\"rawValue\":\"92\",\"eventCode\":\"alarm\",\"payload\":{\"temperature\":\"92\"}}");
+
+        service.receiveValue(msg);
+
+        verify(driverSenderService).eventReportSender(any(EventReportDTO.class));
+        ArgumentCaptor<PointValue> pointCaptor = ArgumentCaptor.forClass(PointValue.class);
+        verify(driverSenderService).pointValueSender(pointCaptor.capture());
+        assertThat(pointCaptor.getValue().getDeviceId()).isEqualTo(10L);
+        assertThat(pointCaptor.getValue().getPointId()).isEqualTo(30L);
+    }
+
+    @Test
+    void eventReportFailureDoesNotDropPointValue() {
+        driverMetadata.getDeviceIds().add(10L);
+        driverMetadata.setEventAttributeIdMap(Map.of(
+                1L, eventAttribute(1L, "sourceTopic"),
+                2L, eventAttribute(2L, "eventCodePath"),
+                3L, eventAttribute(3L, "payloadPath")
+        ));
+
+        DeviceBO device = new DeviceBO();
+        device.setId(10L);
+        device.setTenantId(1L);
+        device.setEventAttributeConfigIdMap(Map.of(20L, Map.of(
+                1L, eventConfig(1L, 10L, 20L, "dc3/event/device-a"),
+                2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
+                3L, eventConfig(3L, 10L, 20L, "$.payload")
+        )));
+        when(deviceClient.getById(10L)).thenReturn(device);
+        when(eventFacade.getById(1L, 20L)).thenThrow(new RuntimeException("metadata unavailable"));
+
+        MqttMessage msg = mqttMessage("dc3/event/device-a", 1,
+                "{\"deviceId\":10,\"pointId\":30,\"rawValue\":\"92\",\"eventCode\":\"alarm\",\"payload\":{\"temperature\":\"92\"}}");
+
+        service.receiveValue(msg);
+
+        verify(driverSenderService).pointValueSender(any(PointValue.class));
     }
 }

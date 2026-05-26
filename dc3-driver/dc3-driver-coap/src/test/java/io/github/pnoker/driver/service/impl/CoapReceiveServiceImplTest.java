@@ -33,6 +33,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class CoapReceiveServiceImplTest {
@@ -109,6 +110,19 @@ class CoapReceiveServiceImplTest {
         assertThat(values.get(1).getDeviceId()).isEqualTo(2L);
         assertThat(values.get(0).getCreateTime()).isNotNull();
         assertThat(values.get(1).getCreateTime()).isNotNull();
+    }
+
+    @Test
+    void receiveValueSkipsMalformedPayload() {
+        CoapMessage message = CoapMessage.builder()
+                .sourceAddress("192.168.1.10")
+                .sourcePort(56830)
+                .payload("not-json")
+                .build();
+
+        assertThatNoException().isThrownBy(() -> service.receiveValue(message));
+
+        verify(driverSenderService, never()).pointValueSender(org.mockito.ArgumentMatchers.any(PointValue.class));
     }
 
 }

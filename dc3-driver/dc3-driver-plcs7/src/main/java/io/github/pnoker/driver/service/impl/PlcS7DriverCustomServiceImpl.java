@@ -86,7 +86,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 MyS7PLC removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
-                    removed.getPlc().close();
+                    closeConnection(metadataEvent.getId(), removed);
                 }
                 log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}",
                         driverCode, metadataEvent.getId(), operateType, Objects.nonNull(removed));
@@ -110,6 +110,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             Object value = readByType(myS7PLC.getPlc(), variable);
             return new ReadPointValue(device, point, String.valueOf(value));
         } catch (Exception e) {
+            invalidateConnection(device.getId(), myS7PLC);
             log.error("Driver point read failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                     point.getId(), e);
             return null;
@@ -131,6 +132,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             writeByType(myS7PLC.getPlc(), variable, writePointValue.getValue());
             return true;
         } catch (Exception e) {
+            invalidateConnection(device.getId(), myS7PLC);
             log.error("Driver point write failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                     point.getId(), e);
             return false;
@@ -244,6 +246,22 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported write type: " + type);
+        }
+    }
+
+    private void invalidateConnection(Long deviceId, MyS7PLC myS7PLC) {
+        connectMap.remove(deviceId, myS7PLC);
+        closeConnection(deviceId, myS7PLC);
+    }
+
+    private void closeConnection(Long deviceId, MyS7PLC myS7PLC) {
+        myS7PLC.lock.lock();
+        try {
+            myS7PLC.getPlc().close();
+        } catch (Exception e) {
+            log.warn("Driver connection close failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+        } finally {
+            myS7PLC.lock.unlock();
         }
     }
 

@@ -72,7 +72,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Modbus factory for creating ModbusMaster instances.
      */
-    private static final ModbusFactory modbusFactory = new ModbusFactory();
+    private static ModbusFactory modbusFactory = new ModbusFactory();
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
@@ -135,15 +135,25 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                                PointBO point) {
-        return new ReadPointValue(device, point,
-                readValue(getConnector(device.getId(), driverConfig), pointConfig, point.getPointTypeFlag().getCode()));
+        ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
+        try {
+            return new ReadPointValue(device, point, readValue(modbusMaster, pointConfig, point.getPointTypeFlag().getCode()));
+        } catch (ReadPointException e) {
+            invalidateConnector(device.getId(), modbusMaster);
+            throw e;
+        }
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                          PointBO point, WritePointValue writePointValue) {
         ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
-        return writeValue(modbusMaster, pointConfig, writePointValue);
+        try {
+            return writeValue(modbusMaster, pointConfig, writePointValue);
+        } catch (WritePointException e) {
+            invalidateConnector(device.getId(), modbusMaster);
+            throw e;
+        }
     }
 
     /**
@@ -170,6 +180,12 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                 log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, port={}, baudRate={}",
                         deviceId, port, baudRate);
             } catch (ModbusInitException e) {
+                try {
+                    modbusMaster.destroy();
+                } catch (Exception destroyException) {
+                    log.warn("Driver connection destroy failed after init error, protocol=" + driverCode
+                            + ", deviceId={}, port={}", deviceId, port, destroyException);
+                }
                 log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, port={}, baudRate={}", deviceId,
                         port, baudRate, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, port={}, message={}",
@@ -213,7 +229,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
             default:
                 log.warn("Unsupported Modbus function code, slaveId={}, functionCode={}, offset={}", slaveId,
                         functionCode, offset);
-                return "0";
+                throw new UnSupportException("Unsupported Modbus read function code: " + functionCode);
         }
     }
 
@@ -337,6 +353,15 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
             log.error("Driver point write failed, protocol={}", driverCode, e);
             throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(),
                     e);
+        }
+    }
+
+    private void invalidateConnector(Long deviceId, ModbusMaster modbusMaster) {
+        connectMap.remove(deviceId, modbusMaster);
+        try {
+            modbusMaster.destroy();
+        } catch (Exception e) {
+            log.warn("Driver connection destroy failed, protocol=" + driverCode + ", deviceId={}", deviceId, e);
         }
     }
 

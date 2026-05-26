@@ -38,6 +38,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * CoAP Driver Custom Service Implementation
@@ -57,6 +59,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final CoapClientManager coapClientManager;
+    private final Map<Long, String> deviceUriMap = new ConcurrentHashMap<>();
     @Value("${dc3.driver.code}")
     private String driverCode;
 
@@ -77,12 +80,9 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
                     metadataType, operateType, metadataEvent.getId());
-            if (MetadataOperateTypeEnum.DELETE.equals(operateType)) {
-                // Release the CoAP client for the deleted device
-                String deviceHost = getDeviceHost(metadataEvent.getId());
-                if (deviceHost != null) {
-                    coapClientManager.releaseClient(deviceHost);
-                }
+            if (MetadataOperateTypeEnum.DELETE.equals(operateType)
+                    || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
+                releaseDeviceClient(metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
@@ -98,6 +98,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         String readPath = getConfigValue(pointConfig, "readPath", "/sensors");
 
         String uri = buildUri(deviceHost, devicePort);
+        rememberDeviceUri(device.getId(), uri);
         log.debug("CoAP read: uri={}, path={}, deviceId={}, pointId={}", uri, readPath, device.getId(), point.getId());
 
         CoapResult response = coapClientManager.get(uri, readPath);
@@ -119,6 +120,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         String value = values.getValue();
 
         String uri = buildUri(deviceHost, devicePort);
+        rememberDeviceUri(device.getId(), uri);
         log.debug("CoAP write: uri={}, path={}, deviceId={}, pointId={}, valueLength={}",
                 uri, writePath, device.getId(), point.getId(), value != null ? value.length() : 0);
 
@@ -156,9 +158,21 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    private String getDeviceHost(Long deviceId) {
-        // Best-effort: cannot resolve host from deviceId alone in event handler
-        return null;
+    private void rememberDeviceUri(Long deviceId, String uri) {
+        if (Objects.isNull(deviceId) || StringUtils.isBlank(uri)) {
+            return;
+        }
+        String previousUri = deviceUriMap.put(deviceId, uri);
+        if (StringUtils.isNotBlank(previousUri) && !Objects.equals(previousUri, uri)) {
+            coapClientManager.releaseClient(previousUri);
+        }
+    }
+
+    private void releaseDeviceClient(Long deviceId) {
+        String uri = deviceUriMap.remove(deviceId);
+        if (StringUtils.isNotBlank(uri)) {
+            coapClientManager.releaseClient(uri);
+        }
     }
 
 }
