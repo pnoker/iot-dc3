@@ -9,3 +9,5 @@ minimumReleaseAgeExclude:
   - '@vue/language-core@3.3.0'
   - vue-i18n@11.4.4
   - vue-tsc@3.3.0
+  - '@vue/language-core@3.3.2'
+  - vue-tsc@3.3.2
