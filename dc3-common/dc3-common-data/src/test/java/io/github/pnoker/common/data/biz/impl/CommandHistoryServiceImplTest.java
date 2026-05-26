@@ -34,6 +34,8 @@ import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +47,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -200,6 +203,58 @@ class CommandHistoryServiceImplTest {
         assertThat(dto.expireAt()).isAfterOrEqualTo(beforeInstant.plusSeconds(30));
         assertThat(dto.expireAt()).isBeforeOrEqualTo(afterInstant.plusSeconds(30));
         verify(commandFacade).getById(tenantId, commandId);
+    }
+
+    @Test
+    void callResolvesCommandByCodeWithinDeviceProfile() {
+        Long tenantId = 100L;
+        Long deviceId = 10L;
+        Long commandId = 20L;
+
+        FacadeDeviceBO device = new FacadeDeviceBO();
+        device.setId(deviceId);
+        device.setTenantId(tenantId);
+        device.setProfileId(30L);
+        device.setEnableFlag(EnableFlagEnum.ENABLE);
+
+        FacadeCommandBO command = new FacadeCommandBO();
+        command.setId(commandId);
+        command.setTenantId(tenantId);
+        command.setProfileId(30L);
+        command.setCommandCode("restart");
+        command.setTimeout(5);
+        command.setEnableFlag(EnableFlagEnum.ENABLE);
+
+        FacadeDriverBO driver = new FacadeDriverBO();
+        driver.setId(40L);
+        driver.setServiceName("modbus-driver");
+
+        EntityStateDO driverState = new EntityStateDO();
+        driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
+
+        CommandCallVO call = new CommandCallVO();
+        call.setDeviceId(deviceId);
+        call.setCommandCode("restart");
+
+        when(deviceFacade.getById(tenantId, deviceId)).thenReturn(device);
+        when(commandFacade.listByPage(any(FacadeCommandQuery.class)))
+                .thenReturn(new FacadePage<>(1L, 1L, 1L, 1L, List.of(command)));
+        when(driverFacade.getByDeviceId(tenantId, deviceId)).thenReturn(driver);
+        when(entityStateMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(driverState);
+
+        service.call(tenantId, call);
+
+        ArgumentCaptor<FacadeCommandQuery> queryCaptor = ArgumentCaptor.forClass(FacadeCommandQuery.class);
+        verify(commandFacade).listByPage(queryCaptor.capture());
+        assertThat(queryCaptor.getValue().getTenantId()).isEqualTo(tenantId);
+        assertThat(queryCaptor.getValue().getProfileId()).isEqualTo(30L);
+        assertThat(queryCaptor.getValue().getCommandCode()).isEqualTo("restart");
+
+        ArgumentCaptor<CommandCallDTO> dtoCaptor = ArgumentCaptor.forClass(CommandCallDTO.class);
+        verify(rabbitTemplate).convertAndSend(eq(RabbitConstant.TOPIC_EXCHANGE_COMMAND),
+                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver"), dtoCaptor.capture(),
+                any(CorrelationData.class));
+        assertThat(dtoCaptor.getValue().commandId()).isEqualTo(commandId);
     }
 
 }

@@ -36,7 +36,11 @@ public interface EventHistoryService {
 
     String report(EventReportDTO entityDTO);
 
-    EventHistoryDO getByRecordId(String recordId);
+    EventHistoryDO getByRecordId(Long tenantId, String recordId);
+
+    default EventHistoryDO getByRecordId(String recordId) {
+        return getByRecordId(null, recordId);
+    }
 
     Page<EventHistoryDO> list(Long tenantId, EventHistoryQueryVO queryVO);
 

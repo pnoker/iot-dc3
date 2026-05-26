@@ -44,8 +44,9 @@ public class CommandCallVO implements Serializable {
     @NotNull
     private Long deviceId;
 
-    @NotNull
     private Long commandId;
+
+    private String commandCode;
 
     private Map<String, String> paramValues;
 

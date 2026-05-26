@@ -36,7 +36,11 @@ public interface PointCommandHistoryService {
      * @param commandId unique command identifier
      * @return matching command history row, or null
      */
-    PointCommandHistoryDO getByCommandId(String commandId);
+    PointCommandHistoryDO getByCommandId(Long tenantId, String commandId);
+
+    default PointCommandHistoryDO getByCommandId(String commandId) {
+        return getByCommandId(null, commandId);
+    }
 
     /**
      * Query point command histories with pagination and optional filters.

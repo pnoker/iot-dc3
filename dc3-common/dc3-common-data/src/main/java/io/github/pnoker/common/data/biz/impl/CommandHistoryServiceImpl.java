@@ -28,6 +28,7 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -43,9 +44,12 @@ import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -87,7 +91,9 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
 
     @Override
     public String call(Long tenantId, CommandCallVO entityVO) {
-        FacadeCommandBO command = validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getCommandId());
+        FacadeCommandBO command = validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getCommandId(),
+                entityVO.getCommandCode());
+        Long commandId = command.getId();
 
         FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
         if (Objects.isNull(driver)) {
@@ -105,7 +111,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         recordDO.setRecordId(recordId);
         recordDO.setTenantId(tenantId);
         recordDO.setDeviceId(entityVO.getDeviceId());
-        recordDO.setCommandId(entityVO.getCommandId());
+        recordDO.setCommandId(commandId);
         recordDO.setCommandCode(command.getCommandCode());
         recordDO.setParamValues(Objects.isNull(entityVO.getParamValues()) ? null : JsonUtil.toJsonString(entityVO.getParamValues()));
         recordDO.setStatus(PointCommandStatusEnum.PENDING.getCode());
@@ -119,7 +125,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
                 .recordId(recordId)
                 .tenantId(tenantId)
                 .deviceId(entityVO.getDeviceId())
-                .commandId(entityVO.getCommandId())
+                .commandId(commandId)
                 .commandCode(command.getCommandCode())
                 .paramValues(entityVO.getParamValues())
                 .source(CommandHistorySourceEnum.HTTP.getCode())
@@ -136,8 +142,9 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
     }
 
     @Override
-    public CommandHistoryDO getByRecordId(String recordId) {
+    public CommandHistoryDO getByRecordId(Long tenantId, String recordId) {
         return commandHistoryManager.lambdaQuery()
+                .eq(Objects.nonNull(tenantId), CommandHistoryDO::getTenantId, tenantId)
                 .eq(CommandHistoryDO::getRecordId, recordId)
                 .one();
     }
@@ -164,7 +171,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         }
     }
 
-    private FacadeCommandBO validateCommandScope(Long tenantId, Long deviceId, Long commandId) {
+    private FacadeCommandBO validateCommandScope(Long tenantId, Long deviceId, Long commandId, String commandCode) {
         FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
         if (Objects.isNull(device)) {
             throw new NotFoundException("Device does not exist");
@@ -173,7 +180,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
             throw new ServiceException("Device is disabled");
         }
 
-        FacadeCommandBO command = commandFacade.getById(tenantId, commandId);
+        FacadeCommandBO command = resolveCommand(tenantId, device, commandId, commandCode);
         if (Objects.isNull(command)) {
             throw new NotFoundException("Command does not exist");
         }
@@ -184,6 +191,28 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
         return command;
+    }
+
+    private FacadeCommandBO resolveCommand(Long tenantId, FacadeDeviceBO device, Long commandId, String commandCode) {
+        if (Objects.nonNull(commandId)) {
+            return commandFacade.getById(tenantId, commandId);
+        }
+        if (StringUtils.isBlank(commandCode)) {
+            throw new ServiceException("Command id or code is required");
+        }
+
+        Pages page = new Pages();
+        page.setSize(1);
+        FacadePage<FacadeCommandBO> commandPage = commandFacade.listByPage(FacadeCommandQuery.builder()
+                .page(page)
+                .tenantId(tenantId)
+                .profileId(device.getProfileId())
+                .commandCode(commandCode)
+                .build());
+        if (Objects.isNull(commandPage) || Objects.isNull(commandPage.getRecords()) || commandPage.getRecords().isEmpty()) {
+            return null;
+        }
+        return commandPage.getRecords().get(0);
     }
 
     private int resolveCommandTimeout(FacadeCommandBO command) {

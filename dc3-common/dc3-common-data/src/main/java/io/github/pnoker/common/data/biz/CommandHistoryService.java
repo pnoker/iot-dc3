@@ -33,7 +33,11 @@ public interface CommandHistoryService {
 
     String call(Long tenantId, CommandCallVO entityVO);
 
-    CommandHistoryDO getByRecordId(String recordId);
+    CommandHistoryDO getByRecordId(Long tenantId, String recordId);
+
+    default CommandHistoryDO getByRecordId(String recordId) {
+        return getByRecordId(null, recordId);
+    }
 
     Page<CommandHistoryDO> list(Long tenantId, CommandHistoryQueryVO queryVO);
 

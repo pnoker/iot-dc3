@@ -54,7 +54,7 @@ public class PointCommandHistoryController implements BaseController {
 
     @GetMapping("/{commandId}")
     public Mono<R<PointCommandHistoryDO>> getByCommandId(@NotBlank @PathVariable String commandId) {
-        return async(() -> R.ok(pointCommandHistoryService.getByCommandId(commandId)));
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(pointCommandHistoryService.getByCommandId(tenantId, commandId))));
     }
 
     @PostMapping("/list")

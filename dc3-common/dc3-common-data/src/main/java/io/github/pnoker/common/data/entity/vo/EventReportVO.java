@@ -44,8 +44,9 @@ public class EventReportVO implements Serializable {
     @NotNull
     private Long deviceId;
 
-    @NotNull
     private Long eventId;
+
+    private String eventCode;
 
     private Map<String, String> paramValues;
 

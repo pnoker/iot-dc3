@@ -26,6 +26,7 @@ import io.github.pnoker.common.data.dal.EventHistoryManager;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
@@ -36,9 +37,12 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -68,9 +72,8 @@ public class EventHistoryServiceImpl implements EventHistoryService {
 
     @Override
     public String report(Long tenantId, EventReportVO entityVO) {
-        validateEventScope(tenantId, entityVO.getDeviceId(), entityVO.getEventId());
-
-        FacadeEventBO event = eventFacade.getById(tenantId, entityVO.getEventId());
+        FacadeEventBO event = validateEventScope(tenantId, entityVO.getDeviceId(), entityVO.getEventId(),
+                entityVO.getEventCode());
 
         String recordId = UUID.randomUUID().toString();
         LocalDateTime nowLocal = LocalDateTime.now();
@@ -79,7 +82,7 @@ public class EventHistoryServiceImpl implements EventHistoryService {
         recordDO.setRecordId(recordId);
         recordDO.setTenantId(tenantId);
         recordDO.setDeviceId(entityVO.getDeviceId());
-        recordDO.setEventId(entityVO.getEventId());
+        recordDO.setEventId(event.getId());
         recordDO.setEventCode(event.getEventCode());
         recordDO.setEventTypeFlag(event.getEventTypeFlag().getIndex());
         recordDO.setEventLevelFlag(event.getEventLevelFlag().getIndex());
@@ -96,7 +99,7 @@ public class EventHistoryServiceImpl implements EventHistoryService {
 
     @Override
     public String report(EventReportDTO entityDTO) {
-        validateEventScope(entityDTO.tenantId(), entityDTO.deviceId(), entityDTO.eventId());
+        validateEventScope(entityDTO.tenantId(), entityDTO.deviceId(), entityDTO.eventId(), entityDTO.eventCode());
 
         LocalDateTime nowLocal = LocalDateTime.now();
 
@@ -124,8 +127,9 @@ public class EventHistoryServiceImpl implements EventHistoryService {
     }
 
     @Override
-    public EventHistoryDO getByRecordId(String recordId) {
+    public EventHistoryDO getByRecordId(Long tenantId, String recordId) {
         return eventHistoryManager.lambdaQuery()
+                .eq(Objects.nonNull(tenantId), EventHistoryDO::getTenantId, tenantId)
                 .eq(EventHistoryDO::getRecordId, recordId)
                 .one();
     }
@@ -141,7 +145,7 @@ public class EventHistoryServiceImpl implements EventHistoryService {
         return eventHistoryManager.page(queryVO.toPage(), wrapper);
     }
 
-    private void validateEventScope(Long tenantId, Long deviceId, Long eventId) {
+    private FacadeEventBO validateEventScope(Long tenantId, Long deviceId, Long eventId, String eventCode) {
         FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
         if (Objects.isNull(device)) {
             throw new NotFoundException("Device does not exist");
@@ -150,7 +154,7 @@ public class EventHistoryServiceImpl implements EventHistoryService {
             throw new ServiceException("Device is disabled");
         }
 
-        FacadeEventBO event = eventFacade.getById(tenantId, eventId);
+        FacadeEventBO event = resolveEvent(tenantId, device, eventId, eventCode);
         if (Objects.isNull(event)) {
             throw new NotFoundException("Event does not exist");
         }
@@ -160,6 +164,29 @@ public class EventHistoryServiceImpl implements EventHistoryService {
         if (Objects.isNull(device.getProfileId()) || !Objects.equals(device.getProfileId(), event.getProfileId())) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
+        return event;
+    }
+
+    private FacadeEventBO resolveEvent(Long tenantId, FacadeDeviceBO device, Long eventId, String eventCode) {
+        if (Objects.nonNull(eventId)) {
+            return eventFacade.getById(tenantId, eventId);
+        }
+        if (StringUtils.isBlank(eventCode)) {
+            throw new ServiceException("Event id or code is required");
+        }
+
+        Pages page = new Pages();
+        page.setSize(1);
+        FacadePage<FacadeEventBO> eventPage = eventFacade.listByPage(FacadeEventQuery.builder()
+                .page(page)
+                .tenantId(tenantId)
+                .profileId(device.getProfileId())
+                .eventCode(eventCode)
+                .build());
+        if (Objects.isNull(eventPage) || Objects.isNull(eventPage.getRecords()) || eventPage.getRecords().isEmpty()) {
+            return null;
+        }
+        return eventPage.getRecords().get(0);
     }
 
 }
