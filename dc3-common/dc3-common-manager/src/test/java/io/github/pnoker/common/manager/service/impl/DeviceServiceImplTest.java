@@ -44,6 +44,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -105,7 +106,9 @@ class DeviceServiceImplTest {
         doRow = new DeviceDO();
         doRow.setId(1L);
         doRow.setDeviceName("Boiler-A");
+        doRow.setDeviceCode("boiler-a");
         doRow.setDriverId(7L);
+        doRow.setProfileId(5L);
         doRow.setTenantId(100L);
 
         driver = new DriverBO();
@@ -124,6 +127,7 @@ class DeviceServiceImplTest {
         when(deviceManager.save(doRow)).thenReturn(true);
 
         assertThatNoException().isThrownBy(() -> service.add(bo));
+        assertThat(bo.getDeviceCode()).isNull();
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
     }
 
@@ -193,5 +197,22 @@ class DeviceServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Resource does not exist");
         verify(deviceManager, never()).updateById(any(DeviceDO.class));
+    }
+
+    @Test
+    void updateKeepsGeneratedDeviceCodeImmutable() {
+        bo.setDeviceCode("client-change");
+        ProfileBO profile = new ProfileBO();
+        profile.setTenantId(100L);
+        when(deviceManager.getById(1L)).thenReturn(doRow);
+        when(driverService.getById(7L)).thenReturn(driver);
+        when(profileService.getById(5L)).thenReturn(profile);
+        when(deviceManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
+        when(deviceBuilder.buildDOByBO(bo)).thenReturn(doRow);
+        when(deviceBuilder.buildBOByDO(doRow)).thenReturn(bo);
+        when(deviceManager.updateById(doRow)).thenReturn(true);
+
+        assertThatNoException().isThrownBy(() -> service.update(bo));
+        assertThat(bo.getDeviceCode()).isEqualTo("boiler-a");
     }
 }

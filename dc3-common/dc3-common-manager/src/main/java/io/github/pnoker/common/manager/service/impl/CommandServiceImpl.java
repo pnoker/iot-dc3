@@ -96,6 +96,7 @@ public class CommandServiceImpl implements CommandService {
     @Transactional
     public void add(CommandBO entityBO) {
         validateTenantRelations(entityBO);
+        entityBO.setCommandCode(null);
         checkDuplicate(entityBO, false, true);
 
         CommandDO entityDO = commandBuilder.buildDOByBO(entityBO);
@@ -138,6 +139,7 @@ public class CommandServiceImpl implements CommandService {
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+        entityBO.setCommandCode(current.getCommandCode());
         validateTenantRelations(entityBO);
 
         checkDuplicate(entityBO, true, true);
@@ -237,11 +239,26 @@ public class CommandServiceImpl implements CommandService {
     }
 
     private boolean checkDuplicate(CommandBO entityBO, boolean isUpdate, boolean throwException) {
+        boolean hasName = StringUtils.isNotEmpty(entityBO.getCommandName());
+        boolean hasCode = StringUtils.isNotEmpty(entityBO.getCommandCode());
+        if (!hasName && !hasCode) {
+            return false;
+        }
         LambdaQueryWrapper<CommandDO> wrapper = Wrappers.<CommandDO>query().lambda();
-        wrapper.eq(CommandDO::getCommandName, entityBO.getCommandName());
-        wrapper.eq(CommandDO::getCommandCode, entityBO.getCommandCode());
         wrapper.eq(CommandDO::getProfileId, entityBO.getProfileId());
         wrapper.eq(CommandDO::getTenantId, entityBO.getTenantId());
+        wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), CommandDO::getId, entityBO.getId());
+        wrapper.and(query -> {
+            if (hasName) {
+                query.eq(CommandDO::getCommandName, entityBO.getCommandName());
+            }
+            if (hasCode) {
+                if (hasName) {
+                    query.or();
+                }
+                query.eq(CommandDO::getCommandCode, entityBO.getCommandCode());
+            }
+        });
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         CommandDO one = commandManager.getOne(wrapper);
         if (Objects.isNull(one)) {

@@ -53,8 +53,10 @@ public class EventParamVO extends BaseVO {
             groups = {Add.class, Update.class})
     private String paramName;
 
+    @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
 
+    @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeFlagEnum paramTypeFlag;
 
     private EventParamExt paramExt;

@@ -181,11 +181,26 @@ public class CommandParamServiceImpl implements CommandParamService {
     }
 
     private boolean checkDuplicate(CommandParamBO entityBO, boolean isUpdate, boolean throwException) {
+        boolean hasName = StringUtils.isNotEmpty(entityBO.getParamName());
+        boolean hasCode = StringUtils.isNotEmpty(entityBO.getParamCode());
+        if (!hasName && !hasCode) {
+            return false;
+        }
         LambdaQueryWrapper<CommandParamDO> wrapper = Wrappers.<CommandParamDO>query().lambda();
-        wrapper.eq(CommandParamDO::getParamName, entityBO.getParamName());
-        wrapper.eq(CommandParamDO::getParamCode, entityBO.getParamCode());
         wrapper.eq(CommandParamDO::getCommandId, entityBO.getCommandId());
         wrapper.eq(CommandParamDO::getTenantId, entityBO.getTenantId());
+        wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), CommandParamDO::getId, entityBO.getId());
+        wrapper.and(query -> {
+            if (hasName) {
+                query.eq(CommandParamDO::getParamName, entityBO.getParamName());
+            }
+            if (hasCode) {
+                if (hasName) {
+                    query.or();
+                }
+                query.eq(CommandParamDO::getParamCode, entityBO.getParamCode());
+            }
+        });
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         CommandParamDO one = commandParamManager.getOne(wrapper);
         if (Objects.isNull(one)) {

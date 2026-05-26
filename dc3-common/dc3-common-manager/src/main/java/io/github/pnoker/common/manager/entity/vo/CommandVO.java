@@ -56,10 +56,13 @@ public class CommandVO extends BaseVO {
 
     private String commandCode;
 
+    @NotNull(message = "Command type can't be empty", groups = {Add.class, Update.class})
     private CommandTypeFlagEnum commandTypeFlag;
 
+    @NotNull(message = "Call type can't be empty", groups = {Add.class, Update.class})
     private CallTypeFlagEnum callTypeFlag;
 
+    @NotNull(message = "Command timeout can't be empty", groups = {Add.class, Update.class})
     private Integer timeout;
 
     private CommandExt commandExt;

@@ -90,6 +90,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void add(ProfileBO entityBO) {
+        entityBO.setProfileCode(null);
         if (checkDuplicate(entityBO, false)) {
             throw new DuplicateException("Failed to create profile: profile has been duplicated");
         }
@@ -117,6 +118,7 @@ public class ProfileServiceImpl implements ProfileService {
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+        entityBO.setProfileCode(current.getProfileCode());
 
         if (checkDuplicate(entityBO, true)) {
             throw new DuplicateException("Failed to update profile: profile has been duplicated");
@@ -223,10 +225,12 @@ public class ProfileServiceImpl implements ProfileService {
      * @return
      */
     private boolean checkDuplicate(ProfileBO entityBO, boolean isUpdate) {
+        if (StringUtils.isEmpty(entityBO.getProfileName())) {
+            return false;
+        }
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, entityBO.getProfileName());
-        wrapper.eq(ProfileDO::getProfileCode, entityBO.getProfileCode());
-        wrapper.eq(ProfileDO::getProfileTypeFlag, entityBO.getProfileTypeFlag());
+        wrapper.eq(Objects.nonNull(entityBO.getProfileTypeFlag()), ProfileDO::getProfileTypeFlag, entityBO.getProfileTypeFlag());
         wrapper.eq(ProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileDO one = profileManager.getOne(wrapper);

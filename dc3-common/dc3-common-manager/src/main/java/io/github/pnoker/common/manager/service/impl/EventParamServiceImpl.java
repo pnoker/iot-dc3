@@ -179,11 +179,26 @@ public class EventParamServiceImpl implements EventParamService {
     }
 
     private boolean checkDuplicate(EventParamBO entityBO, boolean isUpdate, boolean throwException) {
+        boolean hasName = StringUtils.isNotEmpty(entityBO.getParamName());
+        boolean hasCode = StringUtils.isNotEmpty(entityBO.getParamCode());
+        if (!hasName && !hasCode) {
+            return false;
+        }
         LambdaQueryWrapper<EventParamDO> wrapper = Wrappers.<EventParamDO>query().lambda();
-        wrapper.eq(EventParamDO::getParamName, entityBO.getParamName());
-        wrapper.eq(EventParamDO::getParamCode, entityBO.getParamCode());
         wrapper.eq(EventParamDO::getEventId, entityBO.getEventId());
         wrapper.eq(EventParamDO::getTenantId, entityBO.getTenantId());
+        wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), EventParamDO::getId, entityBO.getId());
+        wrapper.and(query -> {
+            if (hasName) {
+                query.eq(EventParamDO::getParamName, entityBO.getParamName());
+            }
+            if (hasCode) {
+                if (hasName) {
+                    query.or();
+                }
+                query.eq(EventParamDO::getParamCode, entityBO.getParamCode());
+            }
+        });
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         EventParamDO one = eventParamManager.getOne(wrapper);
         if (Objects.isNull(one)) {

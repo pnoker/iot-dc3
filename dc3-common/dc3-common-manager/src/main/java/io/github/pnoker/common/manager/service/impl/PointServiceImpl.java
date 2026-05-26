@@ -101,6 +101,7 @@ public class PointServiceImpl implements PointService {
     @Transactional
     public void add(PointBO entityBO) {
         validateTenantRelations(entityBO);
+        entityBO.setPointCode(null);
         checkDuplicate(entityBO, false, true);
 
         PointDO entityDO = pointBuilder.buildDOByBO(entityBO);
@@ -142,6 +143,7 @@ public class PointServiceImpl implements PointService {
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+        entityBO.setPointCode(current.getPointCode());
         validateTenantRelations(entityBO);
 
         checkDuplicate(entityBO, true, true);
@@ -347,11 +349,26 @@ public class PointServiceImpl implements PointService {
      * @return
      */
     private boolean checkDuplicate(PointBO entityBO, boolean isUpdate, boolean throwException) {
+        boolean hasName = StringUtils.isNotEmpty(entityBO.getPointName());
+        boolean hasCode = StringUtils.isNotEmpty(entityBO.getPointCode());
+        if (!hasName && !hasCode) {
+            return false;
+        }
         LambdaQueryWrapper<PointDO> wrapper = Wrappers.<PointDO>query().lambda();
-        wrapper.eq(PointDO::getPointName, entityBO.getPointName());
-        wrapper.eq(PointDO::getPointCode, entityBO.getPointCode());
         wrapper.eq(PointDO::getProfileId, entityBO.getProfileId());
         wrapper.eq(PointDO::getTenantId, entityBO.getTenantId());
+        wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), PointDO::getId, entityBO.getId());
+        wrapper.and(query -> {
+            if (hasName) {
+                query.eq(PointDO::getPointName, entityBO.getPointName());
+            }
+            if (hasCode) {
+                if (hasName) {
+                    query.or();
+                }
+                query.eq(PointDO::getPointCode, entityBO.getPointCode());
+            }
+        });
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointDO one = pointManager.getOne(wrapper);
         if (Objects.isNull(one)) {
