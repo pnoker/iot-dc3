@@ -50,7 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
+
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
@@ -184,13 +184,10 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
             return new ReadPointValue(device, point, "abcd1234");
         }
         if (PointTypeFlagEnum.BOOLEAN.equals(point.getPointTypeFlag())) {
-            Random random = new Random();
-            boolean b = random.nextBoolean();
-            return new ReadPointValue(device, point, String.valueOf(b));
+            return new ReadPointValue(device, point, String.valueOf(ThreadLocalRandom.current().nextBoolean()));
         }
 
-        Random random = new Random();
-        double value = random.nextDouble() * 100;
+        double value = ThreadLocalRandom.current().nextDouble() * 100;
         return new ReadPointValue(device, point, String.valueOf(value));
     }
 

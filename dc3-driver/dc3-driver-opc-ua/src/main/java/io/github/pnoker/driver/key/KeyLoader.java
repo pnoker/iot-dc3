@@ -61,6 +61,15 @@ public class KeyLoader {
      * or the {@code dc3.opcua.keystore-password} system property.
      */
     private static final char[] PASSWORD = loadKeystorePassword();
+    /**
+     * Client certificate alias, used to read client private key and certificate from
+     * keystore.
+     */
+    private static final String CLIENT_ALIAS = "client-ai";
+    @Getter
+    private X509Certificate clientCertificate;
+    @Getter
+    private KeyPair clientKeyPair;
 
     private static char[] loadKeystorePassword() {
         String password = System.getenv("OPCUA_KEYSTORE_PASSWORD");
@@ -69,18 +78,6 @@ public class KeyLoader {
         }
         return password.toCharArray();
     }
-
-    /**
-     * Client certificate alias, used to read client private key and certificate from
-     * keystore.
-     */
-    private static final String CLIENT_ALIAS = "client-ai";
-
-    @Getter
-    private X509Certificate clientCertificate;
-
-    @Getter
-    private KeyPair clientKeyPair;
 
     /**
      * Loads or creates the client certificate and key pair.

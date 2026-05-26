@@ -102,6 +102,14 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 Server removed = connectMap.remove(metadataEvent.getId());
+                if (Objects.nonNull(removed)) {
+                    try {
+                        removed.disconnect();
+                    } catch (Exception e) {
+                        log.warn("Driver connection disconnect failed, protocol=" + driverCode + ", deviceId={}",
+                                metadataEvent.getId(), e);
+                    }
+                }
                 log.info("Driver connection invalidated, protocol=" + driverCode + ", deviceId={}, operateType={}, removed={}",
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
@@ -190,7 +198,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         } catch (NotConnectedException | JIException | AddFailedException | DuplicateGroupException
                  | UnknownHostException e) {
             server.dispose();
-            log.error("Driver point read failed, protocol=" + driverCode + "", e);
+            log.error("Driver point read failed, protocol={}", driverCode, e);
             throw new ReadPointException("Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
@@ -249,7 +257,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         } catch (NotConnectedException | AddFailedException | DuplicateGroupException | UnknownHostException
                  | JIException e) {
             server.dispose();
-            log.error("Driver point write failed, protocol=" + driverCode + "", e);
+            log.error("Driver point write failed, protocol={}", driverCode, e);
             throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }

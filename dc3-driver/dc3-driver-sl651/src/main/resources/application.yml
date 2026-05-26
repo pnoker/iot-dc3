@@ -1,0 +1,64 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: SL651 Hydrological Telemetry Driver
+    code: Sl651Driver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: false
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Listen Port
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 5001
+        remark: TCP port for SL651 server to listen on
+      - attribute-name: Auth Password
+        attribute-code: pwd
+        attribute-type-flag: STRING
+        default-value: '0000'
+        remark: Remote station authentication password
+    point-attribute:
+      - attribute-name: Element Index
+        attribute-code: index
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Zero-based index into the telemetry body element list
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/sl651/${spring.application.name}.log

@@ -83,20 +83,6 @@
         <jserialcomm.version>2.11.0</jserialcomm.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>ias-releases</id>
-            <name>Infinite Automation Release Repository</name>
-            <url>https://maven.mangoautomation.net/repository/ias-release/</url>
-        </repository>
-    </repositories>
-
     <modules>
         <module>dc3-api</module>
         <module>dc3-common</module>

@@ -15,32 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.driver.bean;
+package io.github.pnoker.driver;
 
-import lombok.Getter;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Simplified S7 point variable holding an S7 address string and type code.
+ * Main application class for the Mitsubishi Melsec MC driver.
+ * <p>
+ * This driver enables communication with Mitsubishi PLCs (FX5U, L series,
+ * Q series, QnA series, A series, iQ-R series) using the Melsec (MC)
+ * communication protocol. It supports 1E, 3E, and 4E frame types with
+ * thread-safe connection management.
+ * </p>
  *
  * @author pnoker
  * @version 2026.5.22
  * @since 2016.10.1
  */
-@Getter
-public class PlcS7PointVariable {
+@SpringBootApplication
+public class MelsecDriverApplication {
 
-    private final String address;
-
-    private final String type;
-
-    public PlcS7PointVariable(int dbNum, int byteOffset, int bitOffset, String type) {
-        this.type = type;
-        boolean isBitAccess = ("boolean".equals(type) || "bool".equals(type)) && bitOffset > 0;
-        if (isBitAccess) {
-            this.address = String.format("DB%d.%d.%d", dbNum, byteOffset, bitOffset);
-        } else {
-            this.address = String.format("DB%d.%d", dbNum, byteOffset);
-        }
+    /**
+     * Main entry point for the Mitsubishi Melsec MC driver application.
+     *
+     * @param args command line arguments passed to the application
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(MelsecDriverApplication.class, args);
     }
 
 }

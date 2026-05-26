@@ -58,6 +58,10 @@ import java.util.Objects;
 public class NettyServerHandler {
 
     private static final String PROTOCOL = "netty";
+    private static final int DEVICE_NAME_LENGTH = 22;
+    private static final int HEX_KEY_OFFSET = 22;
+    private static final int HEX_KEY_LENGTH = 1;
+    private static final int MIN_MESSAGE_LENGTH = DEVICE_NAME_LENGTH + HEX_KEY_LENGTH;
 
     private final DeviceMetadata deviceMetadata;
 
@@ -87,13 +91,13 @@ public class NettyServerHandler {
             log.trace("Driver message payload received, protocol=" + PROTOCOL + ", remoteAddress={}, payload={}",
                     context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         }
-        if (readableBytes < 23) {
+        if (readableBytes < MIN_MESSAGE_LENGTH) {
             log.warn("Driver message skipped, protocol=" + PROTOCOL + ", remoteAddress={}, reason=payloadTooShort, bytes={}",
                     context.channel().remoteAddress(), readableBytes);
             return;
         }
 
-        String deviceName = byteBuf.toString(0, 22, StandardCharsets.UTF_8).trim();
+        String deviceName = byteBuf.toString(0, DEVICE_NAME_LENGTH, StandardCharsets.UTF_8).trim();
         long deviceId = Long.parseLong(deviceName);
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
@@ -102,7 +106,7 @@ public class NettyServerHandler {
             return;
         }
 
-        String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
+        String hexKey = ByteBufUtil.hexDump(byteBuf, HEX_KEY_OFFSET, HEX_KEY_LENGTH);
         NettyTcpServer.registerDeviceChannel(deviceId, context.channel());
 
         Map<Long, Map<String, AttributeBO>> pointConfigMap = deviceMetadata.getPointConfig(deviceId);

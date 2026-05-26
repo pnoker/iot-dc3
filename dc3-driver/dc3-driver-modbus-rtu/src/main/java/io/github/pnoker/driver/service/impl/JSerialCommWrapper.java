@@ -106,4 +106,14 @@ public class JSerialCommWrapper implements SerialPortWrapper {
         return parity;
     }
 
+    @Override
+    public int getFlowControlIn() {
+        return SerialPort.FLOW_CONTROL_DISABLED;
+    }
+
+    @Override
+    public int getFlowControlOut() {
+        return SerialPort.FLOW_CONTROL_DISABLED;
+    }
+
 }
