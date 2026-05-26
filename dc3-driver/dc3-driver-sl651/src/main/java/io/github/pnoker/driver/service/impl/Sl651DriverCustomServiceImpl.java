@@ -17,16 +17,15 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import com.github.xingshuangs.iot.protocol.sl651.event.ISl651MessageListener;
-import com.github.xingshuangs.iot.protocol.sl651.model.SL651BodyResponse;
-import com.github.xingshuangs.iot.protocol.sl651.model.SL651Response;
-import com.github.xingshuangs.iot.protocol.sl651.service.SL651Server;
+import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -37,9 +36,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * SL651-2014 hydrological telemetry driver service.
@@ -66,6 +70,8 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final DeviceMetadata deviceMetadata;
+    private final PointMetadata pointMetadata;
 
     @Value("${dc3.driver.code}")
     private String driverCode;
@@ -76,7 +82,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.sl651.pwd:0000}")
     private String serverPwd;
 
-    private SL651Server sl651Server;
+    private Object sl651Server;
 
     private static String bytesToHex(byte[] bytes) {
         if (bytes == null) {
@@ -147,11 +153,24 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     }
 
     private void startServer() {
-        sl651Server = new SL651Server(serverPwd);
-        sl651Server.setMessageListener(new Sl651MessageListener());
         try {
-            sl651Server.start(serverPort);
-            log.info("Driver SL651 server started, protocol={}, port={}, pwd={}", driverCode, serverPort, serverPwd);
+            Class<?> serverClass = Class.forName("com.github.xingshuangs.iot.protocol.sl651.service.SL651Server");
+            Class<?> listenerClass = Class.forName("com.github.xingshuangs.iot.protocol.sl651.event.ISl651MessageListener");
+            Object server = serverClass.getConstructor(String.class).newInstance(serverPwd);
+            Object listener = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[]{listenerClass},
+                    (proxy, method, args) -> {
+                        if ("onMessage".equals(method.getName()) && Objects.nonNull(args) && args.length == 3) {
+                            byte[] messageBytes = args[0] instanceof byte[] bytes ? bytes : new byte[0];
+                            handleSl651Message(messageBytes, args[1], args[2]);
+                        }
+                        return null;
+                    });
+            serverClass.getMethod("setMessageListener", listenerClass).invoke(server, listener);
+            serverClass.getMethod("start", int.class).invoke(server, serverPort);
+            sl651Server = server;
+            log.info("Driver SL651 server started, protocol={}, port={}", driverCode, serverPort);
+        } catch (ClassNotFoundException e) {
+            log.warn("Driver SL651 server unavailable, protocol={}, reason=sl651ApiMissing", driverCode, e);
         } catch (Exception e) {
             log.error("Driver SL651 server start failed, protocol={}, port={}", driverCode, serverPort, e);
         }
@@ -162,40 +181,133 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     // ------------------------------------------------------------------------
 
     private void stopServer() {
-        if (Objects.nonNull(sl651Server) && sl651Server.isAlive()) {
-            try {
-                sl651Server.stop();
+        Object server = sl651Server;
+        if (Objects.isNull(server)) {
+            return;
+        }
+        try {
+            Method isAlive = server.getClass().getMethod("isAlive");
+            boolean alive = Boolean.TRUE.equals(isAlive.invoke(server));
+            if (alive) {
+                server.getClass().getMethod("stop").invoke(server);
                 log.info("Driver SL651 server stopped, protocol={}", driverCode);
-            } catch (Exception e) {
-                log.error("Driver SL651 server stop failed, protocol={}", driverCode, e);
             }
+        } catch (Exception e) {
+            log.error("Driver SL651 server stop failed, protocol={}", driverCode, e);
+        } finally {
             sl651Server = null;
         }
     }
 
-    private class Sl651MessageListener implements ISl651MessageListener {
+    void forwardTelemetry(String stationAddr, List<String> elements) {
+        if (Objects.isNull(elements) || elements.isEmpty()) {
+            return;
+        }
 
-        @Override
-        public void onMessage(byte[] bytes, SL651Response response, List<SL651BodyResponse> bodyResponses) {
-            String stationAddr = bytesToHex(response.getRemoteStationAddress());
-            String funcCode = bytesToHex(response.getFunctionCode());
-            log.debug("Driver SL651 message received, protocol={}, stationAddr={}, funcCode={}, bodyCount={}",
-                    driverCode, stationAddr, funcCode,
-                    Objects.nonNull(bodyResponses) ? bodyResponses.size() : 0);
-
-            if (bodyResponses == null || bodyResponses.isEmpty()) {
-                return;
+        List<PointValue> pointValues = new ArrayList<>(16);
+        Set<Long> deviceIds = driverMetadata.getDeviceIds();
+        if (Objects.isNull(deviceIds) || deviceIds.isEmpty()) {
+            return;
+        }
+        for (Long deviceId : deviceIds) {
+            DeviceBO device = deviceMetadata.getCache(deviceId);
+            if (!matchesStation(stationAddr, device)) {
+                continue;
             }
-            for (int i = 0; i < bodyResponses.size(); i++) {
-                SL651BodyResponse body = bodyResponses.get(i);
-                List<String> elements = body.getBodyElements();
-                if (elements != null) {
-                    log.debug("Driver SL651 body[{}], protocol={}, stationsAddr={}, elements={}",
-                            i, driverCode, stationAddr, elements);
+
+            Map<Long, Map<String, AttributeBO>> pointConfigMap = deviceMetadata.getPointConfig(deviceId);
+            if (Objects.isNull(pointConfigMap) || pointConfigMap.isEmpty()) {
+                continue;
+            }
+
+            for (Map.Entry<Long, Map<String, AttributeBO>> entry : pointConfigMap.entrySet()) {
+                PointBO point = pointMetadata.getCache(entry.getKey());
+                Integer index = getElementIndex(entry.getValue());
+                if (Objects.isNull(point) || Objects.isNull(index) || index < 0 || index >= elements.size()) {
+                    continue;
                 }
+                pointValues.add(new PointValue(new ReadPointValue(device, point, elements.get(index))));
             }
         }
 
+        if (!pointValues.isEmpty()) {
+            driverSenderService.pointValueSender(pointValues);
+            log.debug("Driver SL651 point values forwarded, protocol={}, stationAddr={}, count={}",
+                    driverCode, stationAddr, pointValues.size());
+        }
+    }
+
+    private boolean matchesStation(String stationAddr, DeviceBO device) {
+        if (Objects.isNull(device) || Objects.isNull(stationAddr)) {
+            return false;
+        }
+        return stationAddr.equalsIgnoreCase(device.getDeviceCode())
+                || stationAddr.equalsIgnoreCase(device.getDeviceName());
+    }
+
+    private Integer getElementIndex(Map<String, AttributeBO> pointConfig) {
+        if (Objects.isNull(pointConfig) || Objects.isNull(pointConfig.get("index"))) {
+            return null;
+        }
+        try {
+            return pointConfig.get("index").getValue(Integer.class);
+        } catch (Exception e) {
+            log.warn("Driver SL651 point config skipped, protocol={}, reason=invalidIndex", driverCode, e);
+            return null;
+        }
+    }
+
+    private void handleSl651Message(byte[] bytes, Object response, Object bodyResponses) {
+        String stationAddr = bytesToHex(invokeBytes(response, "getRemoteStationAddress"));
+        String funcCode = bytesToHex(invokeBytes(response, "getFunctionCode"));
+        List<String> elements = extractBodyElements(bodyResponses);
+        log.debug("Driver SL651 message received, protocol={}, stationAddr={}, funcCode={}, bodyCount={}",
+                driverCode, stationAddr, funcCode, elements.size());
+        forwardTelemetry(stationAddr, elements);
+    }
+
+    private byte[] invokeBytes(Object target, String methodName) {
+        if (Objects.isNull(target)) {
+            return new byte[0];
+        }
+        try {
+            Object value = target.getClass().getMethod(methodName).invoke(target);
+            return value instanceof byte[] bytes ? bytes : new byte[0];
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            log.warn("Driver SL651 response field unavailable, protocol={}, method={}", driverCode, methodName, e);
+            return new byte[0];
+        }
+    }
+
+    private List<String> extractBodyElements(Object bodyResponses) {
+        if (!(bodyResponses instanceof List<?> responses) || responses.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> elements = new ArrayList<>(16);
+        for (int i = 0; i < responses.size(); i++) {
+            Object body = responses.get(i);
+            List<String> bodyElements = invokeBodyElements(body);
+            if (!bodyElements.isEmpty()) {
+                log.debug("Driver SL651 body[{}], protocol={}, elements={}", i, driverCode, bodyElements);
+                elements.addAll(bodyElements);
+            }
+        }
+        return elements;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> invokeBodyElements(Object body) {
+        if (Objects.isNull(body)) {
+            return List.of();
+        }
+        try {
+            Object value = body.getClass().getMethod("getBodyElements").invoke(body);
+            return value instanceof List<?> ? (List<String>) value : List.of();
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            log.warn("Driver SL651 body elements unavailable, protocol={}", driverCode, e);
+            return List.of();
+        }
     }
 
 }
