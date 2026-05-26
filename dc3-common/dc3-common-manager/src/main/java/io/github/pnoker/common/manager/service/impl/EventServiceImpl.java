@@ -96,6 +96,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public void add(EventBO entityBO) {
         validateTenantRelations(entityBO);
+        entityBO.setEventCode(null);
         checkDuplicate(entityBO, false, true);
 
         EventDO entityDO = eventBuilder.buildDOByBO(entityBO);
@@ -138,6 +139,7 @@ public class EventServiceImpl implements EventService {
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+        entityBO.setEventCode(current.getEventCode());
         validateTenantRelations(entityBO);
 
         checkDuplicate(entityBO, true, true);
@@ -237,11 +239,26 @@ public class EventServiceImpl implements EventService {
     }
 
     private boolean checkDuplicate(EventBO entityBO, boolean isUpdate, boolean throwException) {
+        boolean hasName = StringUtils.isNotEmpty(entityBO.getEventName());
+        boolean hasCode = StringUtils.isNotEmpty(entityBO.getEventCode());
+        if (!hasName && !hasCode) {
+            return false;
+        }
         LambdaQueryWrapper<EventDO> wrapper = Wrappers.<EventDO>query().lambda();
-        wrapper.eq(EventDO::getEventName, entityBO.getEventName());
-        wrapper.eq(EventDO::getEventCode, entityBO.getEventCode());
         wrapper.eq(EventDO::getProfileId, entityBO.getProfileId());
         wrapper.eq(EventDO::getTenantId, entityBO.getTenantId());
+        wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), EventDO::getId, entityBO.getId());
+        wrapper.and(query -> {
+            if (hasName) {
+                query.eq(EventDO::getEventName, entityBO.getEventName());
+            }
+            if (hasCode) {
+                if (hasName) {
+                    query.or();
+                }
+                query.eq(EventDO::getEventCode, entityBO.getEventCode());
+            }
+        });
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         EventDO one = eventManager.getOne(wrapper);
         if (Objects.isNull(one)) {

@@ -120,6 +120,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Transactional
     public void add(DeviceBO entityBO) {
         validateTenantRelations(entityBO);
+        entityBO.setDeviceCode(null);
 
         boolean duplicate = checkDuplicate(entityBO, false);
         if (duplicate) {
@@ -162,6 +163,7 @@ public class DeviceServiceImpl implements DeviceService {
         if (!Objects.equals(entityBO.getTenantId(), entityDO.getTenantId())) {
             throw new NotFoundException("Resource does not exist");
         }
+        entityBO.setDeviceCode(entityDO.getDeviceCode());
         validateTenantRelations(entityBO);
 
         boolean duplicate = checkDuplicate(entityBO, true);
@@ -549,9 +551,11 @@ public class DeviceServiceImpl implements DeviceService {
      * @return
      */
     private boolean checkDuplicate(DeviceBO entityBO, boolean isUpdate) {
+        if (StringUtils.isEmpty(entityBO.getDeviceName())) {
+            return false;
+        }
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDeviceName, entityBO.getDeviceName());
-        wrapper.eq(StringUtils.isNotEmpty(entityBO.getDeviceCode()), DeviceDO::getDeviceCode, entityBO.getDeviceCode());
         wrapper.eq(DeviceDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO one = deviceManager.getOne(wrapper);

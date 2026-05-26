@@ -56,8 +56,10 @@ public class EventVO extends BaseVO {
 
     private String eventCode;
 
+    @NotNull(message = "Event type can't be empty", groups = {Add.class, Update.class})
     private EventTypeFlagEnum eventTypeFlag;
 
+    @NotNull(message = "Event level can't be empty", groups = {Add.class, Update.class})
     private EventLevelFlagEnum eventLevelFlag;
 
     private EventExt eventExt;

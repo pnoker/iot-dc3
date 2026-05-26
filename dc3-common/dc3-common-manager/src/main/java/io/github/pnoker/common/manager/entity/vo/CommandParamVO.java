@@ -54,10 +54,13 @@ public class CommandParamVO extends BaseVO {
             groups = {Add.class, Update.class})
     private String paramName;
 
+    @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
 
+    @NotNull(message = "Param direction can't be empty", groups = {Add.class, Update.class})
     private ParamDirectionFlagEnum paramDirectionFlag;
 
+    @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeFlagEnum paramTypeFlag;
 
     private Boolean requiredFlag;

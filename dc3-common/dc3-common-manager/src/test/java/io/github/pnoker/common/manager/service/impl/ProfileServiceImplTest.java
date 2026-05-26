@@ -105,6 +105,7 @@ class ProfileServiceImplTest {
         when(profileBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(profileManager.save(doRow)).thenReturn(true);
         assertThatNoException().isThrownBy(() -> service.add(bo));
+        assertThat(bo.getProfileCode()).isNull();
         verify(profileManager).save(doRow);
     }
 
@@ -211,11 +212,13 @@ class ProfileServiceImplTest {
 
     @Test
     void updateAcceptsSameRowOnDuplicateCheck() {
+        bo.setProfileCode("client-change");
         when(profileManager.getById(1L)).thenReturn(doRow);
         when(profileManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(profileBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(profileManager.updateById(doRow)).thenReturn(true);
         assertThatNoException().isThrownBy(() -> service.update(bo));
+        assertThat(bo.getProfileCode()).isEqualTo("default");
     }
 
     @Test

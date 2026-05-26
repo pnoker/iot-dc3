@@ -120,6 +120,7 @@ class PointServiceImplTest {
         when(deviceMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
 
         assertThatNoException().isThrownBy(() -> service.add(bo));
+        assertThat(bo.getPointCode()).isNull();
         verify(metadataEventPublisher, atLeastOnce()).publishEvent(any(MetadataEvent.class));
     }
 
@@ -213,6 +214,7 @@ class PointServiceImplTest {
 
     @Test
     void updateThrowsUpdateExceptionWhenManagerReturnsFalse() {
+        bo.setPointCode("client-change");
         when(pointManager.getById(1L)).thenReturn(doRow);
         when(profileService.getById(5L)).thenReturn(profile);
         when(deviceMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
@@ -220,6 +222,7 @@ class PointServiceImplTest {
         when(pointBuilder.buildDOByBO(bo)).thenReturn(doRow);
         when(pointManager.updateById(doRow)).thenReturn(false);
         assertThatThrownBy(() -> service.update(bo)).isInstanceOf(UpdateException.class);
+        assertThat(bo.getPointCode()).isEqualTo("temp");
     }
 
     @Test

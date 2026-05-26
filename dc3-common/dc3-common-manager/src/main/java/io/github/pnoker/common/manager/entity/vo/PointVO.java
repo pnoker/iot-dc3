@@ -67,11 +67,13 @@ public class PointVO extends BaseVO {
     /**
      * Type
      */
+    @NotNull(message = "Point type can't be empty", groups = {Add.class, Update.class})
     private PointTypeFlagEnum pointTypeFlag;
 
     /**
      *
      */
+    @NotNull(message = "Read/write flag can't be empty", groups = {Add.class, Update.class})
     private RwFlagEnum rwFlag;
 
     /**
@@ -87,6 +89,7 @@ public class PointVO extends BaseVO {
     /**
      *
      */
+    @NotNull(message = "Value decimal can't be empty", groups = {Add.class, Update.class})
     private Byte valueDecimal;
 
     /**
