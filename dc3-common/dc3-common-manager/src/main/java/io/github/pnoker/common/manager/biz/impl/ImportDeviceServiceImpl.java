@@ -21,16 +21,16 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.exception.ImportException;
 import io.github.pnoker.common.manager.biz.ImportDeviceService;
 import io.github.pnoker.common.manager.dal.DeviceManager;
+import io.github.pnoker.common.manager.dal.DriverAttributeConfigManager;
+import io.github.pnoker.common.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
-import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
-import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
-import io.github.pnoker.common.manager.service.DriverAttributeConfigService;
-import io.github.pnoker.common.manager.service.PointAttributeConfigService;
+import io.github.pnoker.common.manager.entity.model.DriverAttributeConfigDO;
+import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.common.utils.PoiUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +39,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,9 +58,9 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
 
     private final DeviceManager deviceManager;
 
-    private final DriverAttributeConfigService driverAttributeConfigService;
+    private final DriverAttributeConfigManager driverAttributeConfigManager;
 
-    private final PointAttributeConfigService pointAttributeConfigService;
+    private final PointAttributeConfigManager pointAttributeConfigManager;
 
     @Override
     @Transactional
@@ -103,16 +104,19 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
      */
     private void importDriverAttributeConfig(DeviceBO deviceBO, List<DriverAttributeBO> driverAttributeBOList,
                                              Sheet sheet, int row) {
+        List<DriverAttributeConfigDO> entities = new ArrayList<>();
         for (int j = 0; j < driverAttributeBOList.size(); j++) {
-            DriverAttributeConfigBO entityBO = new DriverAttributeConfigBO();
+            DriverAttributeConfigDO entityDO = new DriverAttributeConfigDO();
             DriverAttributeBO driverAttributeBO = driverAttributeBOList.get(j);
-            entityBO.setAttributeId(driverAttributeBO.getId());
-            entityBO.setDeviceId(deviceBO.getId());
-            String attributeValue = PoiUtil.getCellStringValue(sheet, row, 2 + j);
-            entityBO.setConfigValue(attributeValue);
-            entityBO.setRemark(deviceBO.getRemark());
-            entityBO.setTenantId(deviceBO.getTenantId());
-            driverAttributeConfigService.innerSave(entityBO);
+            entityDO.setAttributeId(driverAttributeBO.getId());
+            entityDO.setDeviceId(deviceBO.getId());
+            entityDO.setConfigValue(PoiUtil.getCellStringValue(sheet, row, 2 + j));
+            entityDO.setRemark(deviceBO.getRemark());
+            entityDO.setTenantId(deviceBO.getTenantId());
+            entities.add(entityDO);
+        }
+        if (!entities.isEmpty()) {
+            driverAttributeConfigManager.saveBatch(entities);
         }
     }
 
@@ -129,21 +133,24 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
     private void importPointAttributeConfig(DeviceBO deviceBO, List<PointBO> pointBOList,
                                             List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet,
                                             int row) {
+        List<PointAttributeConfigDO> entities = new ArrayList<>();
         for (int j = 0; j < pointBOList.size(); j++) {
             for (int k = 0; k < pointAttributeBOList.size(); k++) {
-                PointAttributeConfigBO entityBO = new PointAttributeConfigBO();
+                PointAttributeConfigDO entityDO = new PointAttributeConfigDO();
                 PointBO pointBO = pointBOList.get(j);
                 PointAttributeBO pointAttributeBO = pointAttributeBOList.get(k);
-                entityBO.setAttributeId(pointAttributeBO.getId());
-                entityBO.setDeviceId(deviceBO.getId());
-                entityBO.setPointId(pointBO.getId());
-                String attributeValue = PoiUtil.getCellStringValue(sheet, row,
-                        2 + driverAttributeBOList.size() + k * pointAttributeBOList.size() + j);
-                entityBO.setConfigValue(attributeValue);
-                entityBO.setRemark(deviceBO.getRemark());
-                entityBO.setTenantId(deviceBO.getTenantId());
-                pointAttributeConfigService.innerSave(entityBO);
+                entityDO.setAttributeId(pointAttributeBO.getId());
+                entityDO.setDeviceId(deviceBO.getId());
+                entityDO.setPointId(pointBO.getId());
+                entityDO.setConfigValue(PoiUtil.getCellStringValue(sheet, row,
+                        2 + driverAttributeBOList.size() + k * pointAttributeBOList.size() + j));
+                entityDO.setRemark(deviceBO.getRemark());
+                entityDO.setTenantId(deviceBO.getTenantId());
+                entities.add(entityDO);
             }
+        }
+        if (!entities.isEmpty()) {
+            pointAttributeConfigManager.saveBatch(entities);
         }
     }
 

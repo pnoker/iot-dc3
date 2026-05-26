@@ -77,7 +77,25 @@
         <mockito.javaagent.argLine>
             -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
         </mockito.javaagent.argLine>
+
+        <!-- Modbus -->
+        <modbus4j.version>3.0.3</modbus4j.version>
+        <jserialcomm.version>2.11.0</jserialcomm.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>ias-releases</id>
+            <name>Infinite Automation Release Repository</name>
+            <url>https://maven.mangoautomation.net/repository/ias-release/</url>
+        </repository>
+    </repositories>
 
     <modules>
         <module>dc3-api</module>
@@ -254,6 +272,20 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-web</artifactId>
                 <version>${dc3.version}</version>
+            </dependency>
+
+            <!-- Modbus Related -->
+            <dependency>
+                <groupId>com.infiniteautomation</groupId>
+                <artifactId>modbus4j</artifactId>
+                <version>${modbus4j.version}</version>
+            </dependency>
+
+            <!-- Serial Communication -->
+            <dependency>
+                <groupId>com.fazecast</groupId>
+                <artifactId>jSerialComm</artifactId>
+                <version>${jserialcomm.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

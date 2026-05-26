@@ -30,6 +30,7 @@ import io.github.pnoker.api.common.GrpcCommandDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
 import io.github.pnoker.common.manager.entity.query.CommandQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcCommandBuilder;
@@ -130,7 +131,12 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
         GrpcRCommandDTO.Builder builder = GrpcRCommandDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        CommandBO entityBO = commandService.getById(request.getCommandId());
+        CommandBO entityBO;
+        try {
+            entityBO = commandService.getById(request.getCommandId());
+        } catch (NotFoundException e) {
+            entityBO = null;
+        }
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

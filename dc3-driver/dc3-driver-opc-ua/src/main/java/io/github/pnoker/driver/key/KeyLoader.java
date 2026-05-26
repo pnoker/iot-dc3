@@ -56,8 +56,19 @@ public class KeyLoader {
 
     /**
      * PKCS12 keystore password, used to load/generate client certificate keystore.
+     * <p>
+     * Override the default via the {@code OPCUA_KEYSTORE_PASSWORD} environment variable
+     * or the {@code dc3.opcua.keystore-password} system property.
      */
-    private static final char[] PASSWORD = "password".toCharArray();
+    private static final char[] PASSWORD = loadKeystorePassword();
+
+    private static char[] loadKeystorePassword() {
+        String password = System.getenv("OPCUA_KEYSTORE_PASSWORD");
+        if (password == null || password.isBlank()) {
+            password = System.getProperty("dc3.opcua.keystore-password", "password");
+        }
+        return password.toCharArray();
+    }
 
     /**
      * Client certificate alias, used to read client private key and certificate from

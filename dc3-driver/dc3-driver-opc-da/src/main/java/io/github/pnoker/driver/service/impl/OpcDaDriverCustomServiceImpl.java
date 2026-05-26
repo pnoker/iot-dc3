@@ -133,8 +133,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      * @throws ConnectorException if the connection fails
      */
     private Server getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        Server server = connectMap.get(deviceId);
-        if (Objects.isNull(server)) {
+        return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
             String clsId = driverConfig.get("clsId").getValue(String.class);
             String user = driverConfig.get("username").getValue(String.class);
@@ -142,21 +141,19 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
             log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, usernamePresent={}",
                     deviceId, host, clsId, Objects.nonNull(user));
             ConnectionInformation connectionInformation = new ConnectionInformation(host, clsId, user, password);
-            server = new Server(connectionInformation, Executors.newSingleThreadScheduledExecutor());
+            Server server = new Server(connectionInformation, Executors.newSingleThreadScheduledExecutor());
             try {
                 server.connect();
-                connectMap.put(deviceId, server);
                 log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}", deviceId,
                         host, clsId);
             } catch (AlreadyConnectedException | UnknownHostException | JIException e) {
-                connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
                 log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}", deviceId, host,
                         clsId, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, message={}",
                         deviceId, host, clsId, e.getMessage(), e);
             }
-        }
-        return server;
+            return server;
+        });
     }
 
     /**

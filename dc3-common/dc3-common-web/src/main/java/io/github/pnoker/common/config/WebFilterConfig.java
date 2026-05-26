@@ -98,10 +98,9 @@ public class WebFilterConfig {
                             .contextWrite(context -> context.put(RequestConstant.Key.USER_HEADER, userHeader));
                 }
             } catch (Exception e) {
-                log.error("Error parsing user header", e);
+                log.warn("Rejecting request with malformed X-Auth-User header, Url: {}", request.getURI(), e);
+                return writeUnauthorized(exchange);
             }
-
-            return chain.filter(exchange);
         };
     }
 

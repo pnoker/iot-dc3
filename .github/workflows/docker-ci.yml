@@ -79,6 +79,7 @@ jobs:
             dc3-center-single
             dc3-driver-listening-virtual
             dc3-driver-modbus-tcp
+            dc3-driver-modbus-rtu
             dc3-driver-mqtt
             dc3-driver-opc-da
             dc3-driver-opc-ua

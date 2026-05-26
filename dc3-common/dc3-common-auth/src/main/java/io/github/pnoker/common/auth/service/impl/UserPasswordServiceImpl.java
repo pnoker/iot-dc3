@@ -116,7 +116,12 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     public void restPassword(Long id) {
         UserPasswordBO userPasswordBO = getById(id);
         if (Objects.nonNull(userPasswordBO)) {
-            userPasswordBO.setLoginPassword(AlgorithmConstant.DEFAULT_PASSWORD);
+            String defaultPassword = System.getenv("DC3_SECURITY_DEFAULT_PASSWORD");
+            if (defaultPassword == null || defaultPassword.isBlank()) {
+                defaultPassword = System.getProperty("dc3.security.default-password",
+                        AlgorithmConstant.DEFAULT_PASSWORD);
+            }
+            userPasswordBO.setLoginPassword(defaultPassword);
             update(userPasswordBO);
         }
     }

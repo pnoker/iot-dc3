@@ -36,6 +36,7 @@
         <module>dc3-driver-coap</module>
         <module>dc3-driver-listening-virtual</module>
         <module>dc3-driver-modbus-tcp</module>
+        <module>dc3-driver-modbus-rtu</module>
         <module>dc3-driver-mqtt</module>
         <module>dc3-driver-opc-da</module>
         <module>dc3-driver-opc-ua</module>

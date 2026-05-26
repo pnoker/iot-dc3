@@ -31,6 +31,7 @@ import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
@@ -154,7 +155,12 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DriverBO driverBO = driverService.getById(request.getDriverId());
+        DriverBO driverBO;
+        try {
+            driverBO = driverService.getById(request.getDriverId());
+        } catch (NotFoundException e) {
+            driverBO = null;
+        }
         if (Objects.isNull(driverBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

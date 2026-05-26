@@ -174,6 +174,10 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         List<FacadeDriverBO> drivers;
         try {
             drivers = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Driver summary interrupted, tenantId={}", tenantId, e);
+            return summary;
         } catch (Exception e) {
             future.cancel(true);
             log.warn("Driver summary failed, tenantId={}", tenantId, e);
@@ -209,6 +213,10 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         List<FacadeDeviceBO> devices;
         try {
             devices = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Device summary interrupted, tenantId={}", tenantId, e);
+            return summary;
         } catch (Exception e) {
             future.cancel(true);
             log.warn("Device summary failed, tenantId={}", tenantId, e);

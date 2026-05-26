@@ -30,6 +30,7 @@ import io.github.pnoker.api.center.manager.ProfileApiGrpc;
 import io.github.pnoker.api.common.GrpcProfileDTO;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcProfileBuilder;
@@ -90,7 +91,12 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
         GrpcRProfileDTO.Builder builder = GrpcRProfileDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        ProfileBO profile = profileService.getById(request.getProfileId());
+        ProfileBO profile;
+        try {
+            profile = profileService.getById(request.getProfileId());
+        } catch (NotFoundException e) {
+            profile = null;
+        }
         if (Objects.isNull(profile)) {
             noResource(rBuilder);
         } else {

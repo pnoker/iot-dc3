@@ -22,6 +22,7 @@ import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -49,6 +50,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnBean(MqttReceiveService.class)
+@DisallowConcurrentExecution
 public class MqttScheduleJob extends QuartzJobBean {
 
     private static final ReentrantReadWriteLock MESSAGE_LOCK = new ReentrantReadWriteLock();

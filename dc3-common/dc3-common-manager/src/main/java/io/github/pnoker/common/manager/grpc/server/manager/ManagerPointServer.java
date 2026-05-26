@@ -30,6 +30,7 @@ import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointBuilder;
@@ -130,7 +131,12 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
         GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        PointBO entityBO = pointService.getById(request.getPointId());
+        PointBO entityBO;
+        try {
+            entityBO = pointService.getById(request.getPointId());
+        } catch (NotFoundException e) {
+            entityBO = null;
+        }
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

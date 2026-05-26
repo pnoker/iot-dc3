@@ -32,6 +32,12 @@
 
     <dependencies>
 
+        <!-- Modbus Protocol -->
+        <dependency>
+            <groupId>com.infiniteautomation</groupId>
+            <artifactId>modbus4j</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

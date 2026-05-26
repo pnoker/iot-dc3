@@ -32,6 +32,7 @@ import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDeviceBuilder;
@@ -186,7 +187,12 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceBO entityBO = deviceService.getById(request.getDeviceId());
+        DeviceBO entityBO;
+        try {
+            entityBO = deviceService.getById(request.getDeviceId());
+        } catch (NotFoundException e) {
+            entityBO = null;
+        }
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

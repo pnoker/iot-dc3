@@ -60,6 +60,9 @@ public class RegexUtil {
      * @return true if valid name format, false otherwise
      */
     public static boolean isName(String name) {
+        if (StringUtils.isEmpty(name)) {
+            return false;
+        }
         String regex = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$";
         return name.matches(regex);
     }
@@ -71,6 +74,9 @@ public class RegexUtil {
      * @return true if valid mobile format, false otherwise
      */
     public static boolean isPhone(String phone) {
+        if (StringUtils.isEmpty(phone)) {
+            return false;
+        }
         String regex = "^1([3-9])\\d{9}$";
         return phone.matches(regex);
     }
@@ -82,6 +88,9 @@ public class RegexUtil {
      * @return true if valid email format, false otherwise
      */
     public static boolean isMail(String mail) {
+        if (StringUtils.isEmpty(mail)) {
+            return false;
+        }
         String regex = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$";
         return mail.matches(regex);
     }
@@ -93,6 +102,9 @@ public class RegexUtil {
      * @return true if valid password format, false otherwise
      */
     public static boolean isPassword(String password) {
+        if (StringUtils.isEmpty(password)) {
+            return false;
+        }
         String regex = "^[a-zA-Z]\\w{7,15}$";
         return password.matches(regex);
     }
@@ -104,6 +116,9 @@ public class RegexUtil {
      * @return true if valid host format, false otherwise
      */
     public static boolean isHost(String host) {
+        if (StringUtils.isEmpty(host)) {
+            return false;
+        }
         String regex = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$";
         return host.matches(regex);
     }

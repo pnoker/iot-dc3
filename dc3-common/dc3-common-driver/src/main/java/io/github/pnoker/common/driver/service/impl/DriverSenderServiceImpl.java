@@ -145,7 +145,9 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 log.warn(
                         "DriverMetadata has no registered driver yet; point value will be published without driverId/tenantId");
             }
-            log.info("Send point value: {}", JsonUtil.toJsonString(entityDTO));
+            if (log.isDebugEnabled()) {
+                log.debug("Send point value: {}", JsonUtil.toJsonString(entityDTO));
+            }
             rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE,
                     RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService(), entityDTO);
         }
