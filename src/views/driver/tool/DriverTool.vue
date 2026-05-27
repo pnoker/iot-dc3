@@ -18,7 +18,6 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    :rules="formRule"
     @refresh="$emit('refresh')"
     @reset="onReset"
     @search="onSearch"
@@ -52,14 +51,7 @@
         />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-        <el-segmented
-          v-model="formData.enableFlag"
-          :options="[
-            { label: $t('common.all'), value: '' },
-            { label: $t('common.enable'), value: 'ENABLE' },
-            { label: $t('common.disable'), value: 'DISABLE' },
-          ]"
-        />
+        <enable-flag-segmented v-model="formData.enableFlag" include-all />
       </el-form-item>
     </template>
     <template #actions>
@@ -70,9 +62,9 @@
 
 <script lang="ts" setup>
   import { reactive } from 'vue';
-  import type { FormRules } from 'element-plus';
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
@@ -89,9 +81,6 @@
   const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change']);
 
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
-  const formRule = reactive<FormRules>({
-    port: [{ type: 'number', message: 'Port must be a number' }],
-  });
 
   const onSearch = (data: Record<string, any>) => {
     emit('search', cleanSearchParams(data));

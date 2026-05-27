@@ -18,7 +18,6 @@
   <tool-card
     :form-model="formData"
     :page="page"
-    :rules="formRule"
     @refresh="$emit('refresh')"
     @reset="onReset"
     @search="onSearch"
@@ -61,14 +60,7 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-        <el-segmented
-          v-model="formData.enableFlag"
-          :options="[
-            { label: $t('common.all'), value: '' },
-            { label: $t('common.enable'), value: 'ENABLE' },
-            { label: $t('common.disable'), value: 'DISABLE' },
-          ]"
-        />
+        <enable-flag-segmented v-model="formData.enableFlag" include-all />
       </el-form-item>
     </template>
     <template v-if="pre || next" #buttons="{ search, reset }">
@@ -91,10 +83,9 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-  import type { FormRules } from 'element-plus';
   import { Back, Check, Plus, RefreshLeft, Search } from '@element-plus/icons-vue';
-  import { useI18n } from 'vue-i18n';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import type { Dictionary } from '@/config/types';
   import { getProfileDictionary } from '@/api/dictionary';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
@@ -130,12 +121,7 @@
     'next-handle',
   ]);
 
-  const { t } = useI18n();
-
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
-  const formRule = reactive<FormRules>({
-    port: [{ type: 'number', message: t('common.name') }],
-  });
 
   const onSearch = (data: Record<string, any>) => {
     emit('search', cleanSearchParams(data));

@@ -77,14 +77,7 @@
         />
       </el-form-item>
       <el-form-item v-if="embedded === 'device'" :label="$t('common.enableFlag')" prop="enableFlag">
-        <el-segmented
-          v-model="formData.enableFlag"
-          :options="[
-            { label: $t('common.all'), value: '' },
-            { label: $t('common.enable'), value: 'ENABLE' },
-            { label: $t('common.disable'), value: 'DISABLE' },
-          ]"
-        />
+        <enable-flag-segmented v-model="formData.enableFlag" include-all />
       </el-form-item>
       <el-form-item :label="$t('settings.event.timeRange')" prop="rangeKey">
         <range-segmented v-model="formData.rangeKey" include-all />
@@ -102,6 +95,7 @@
   import { reactive, ref } from 'vue';
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { Dictionary } from '@/config/types';
   import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary';

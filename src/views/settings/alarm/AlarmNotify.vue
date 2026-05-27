@@ -32,10 +32,10 @@
           <el-input v-model="searchForm.keyword" :placeholder="activeConfig.searchPlaceholder" clearable />
         </el-form-item>
         <el-form-item v-if="activeConfig.filterProp" :label="activeConfig.filterLabel" prop="filterValue">
-          <el-segmented
+          <enable-flag-segmented
             v-if="activeConfig.filterProp === 'enableFlag'"
             v-model="searchForm.filterValue"
-            :options="enableFilterOptions"
+            include-all
           />
           <el-select v-else v-model="searchForm.filterValue" :placeholder="activeConfig.filterPlaceholder" clearable>
             <el-option v-for="option in activeConfig.filterOptions" :key="option.value" v-bind="option" />
@@ -167,7 +167,6 @@
 
   const {
     t,
-    enableFilterOptions,
     formVisible,
     setFormRef,
     formModel,

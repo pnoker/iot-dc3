@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormItemRule, FormRules } from 'element-plus';
 import { computed, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -22,7 +22,7 @@ import { useRouter } from 'vue-router';
 import type { AlarmEntityRecord, Order, PageQuery } from '@/config/types';
 import { timestampLabel } from '@/utils/dateUtil';
 import { prettyJson } from '@/utils/jsonUtil';
-import { failMessage, successMessage } from '@/utils/notificationUtil';
+import { successMessage } from '@/utils/notificationUtil';
 import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
 import {
@@ -40,7 +40,7 @@ export interface AlarmEntityPageProps {
 export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   const { t } = useI18n();
   const router = useRouter();
-  const { configs, enableFilterOptions } = createAlarmEntityConfigs((key) => t(key));
+  const { configs } = createAlarmEntityConfigs((key) => t(key));
 
   const formVisible = ref(false);
   const editing = ref(false);
@@ -75,11 +75,36 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   );
   const formRules = computed<FormRules>(() => {
     const rules: FormRules = {};
-    activeConfig.value.fields
-      .filter((field) => field.required)
-      .forEach((field) => {
-        rules[field.prop] = [{ required: true, message: t('settings.alarm.required'), trigger: 'blur' }];
-      });
+    activeConfig.value.fields.forEach((field) => {
+      const fieldRules: FormItemRule[] = [];
+      if (field.required) {
+        fieldRules.push({
+          required: true,
+          message: t('settings.alarm.required'),
+          trigger: field.kind === 'select' ? 'change' : 'blur',
+        });
+      }
+      if (field.kind === 'json') {
+        fieldRules.push({
+          validator: (_rule, value, callback) => {
+            if (!value) {
+              callback();
+              return;
+            }
+            try {
+              JSON.parse(String(value));
+              callback();
+            } catch {
+              callback(new Error(t('settings.alarm.invalidJson')));
+            }
+          },
+          trigger: 'blur',
+        });
+      }
+      if (fieldRules.length > 0) {
+        rules[field.prop] = fieldRules;
+      }
+    });
     return rules;
   });
 
@@ -216,8 +241,8 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
       let data: Record<string, unknown>;
       try {
         data = payload();
-      } catch (error) {
-        failMessage(t('settings.alarm.invalidJson'), undefined, error);
+      } catch {
+        formRef.value?.validate().catch(() => undefined);
         return;
       }
       state.saving = true;
@@ -310,7 +335,6 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
 
   return {
     t,
-    enableFilterOptions,
     formVisible,
     setFormRef,
     formModel,

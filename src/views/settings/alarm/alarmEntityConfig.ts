@@ -160,11 +160,6 @@ const defaultBindExt = () =>
   });
 
 export const createAlarmEntityConfigs = (t: Translate) => {
-  const enableFilterOptions: AlarmOption[] = [
-    { label: t('common.all'), value: '' },
-    { label: t('common.enable'), value: 'ENABLE' },
-    { label: t('common.disable'), value: 'DISABLE' },
-  ];
   const enableOptions: AlarmOption[] = [
     { label: t('common.enable'), value: 'ENABLE' },
     { label: t('common.disable'), value: 'DISABLE' },
@@ -492,6 +487,5 @@ export const createAlarmEntityConfigs = (t: Translate) => {
 
   return {
     configs,
-    enableFilterOptions,
   };
 };

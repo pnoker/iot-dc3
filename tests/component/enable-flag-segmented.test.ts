@@ -67,6 +67,15 @@ describe('EnableFlagSegmented', () => {
     expect(buttons[1].attributes('data-value')).toBe('1');
   });
 
+  it('prepends an all option when includeAll=true', () => {
+    const wrapper = mountSegmented({ modelValue: '', includeAll: true });
+    const buttons = wrapper.findAll('button');
+    expect(buttons).toHaveLength(3);
+    expect(buttons[0].attributes('data-value')).toBe('');
+    expect(buttons[1].attributes('data-value')).toBe('ENABLE');
+    expect(buttons[2].attributes('data-value')).toBe('DISABLE');
+  });
+
   it('emits the chosen flag string via update:modelValue', async () => {
     const wrapper = mountSegmented({ modelValue: 'ENABLE' });
     await wrapper.findAll('button')[1].trigger('click');
@@ -77,5 +86,11 @@ describe('EnableFlagSegmented', () => {
     const wrapper = mountSegmented({ modelValue: 0, valueType: 'number' });
     await wrapper.findAll('button')[1].trigger('click');
     expect(wrapper.emitted('update:modelValue')).toEqual([[1]]);
+  });
+
+  it('keeps the empty all value when includeAll is used with numeric mode', async () => {
+    const wrapper = mountSegmented({ modelValue: '', includeAll: true, valueType: 'number' });
+    await wrapper.findAll('button')[0].trigger('click');
+    expect(wrapper.emitted('update:modelValue')).toEqual([['']]);
   });
 });

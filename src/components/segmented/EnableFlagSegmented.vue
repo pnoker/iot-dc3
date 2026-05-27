@@ -37,6 +37,10 @@
       type: [String, Number],
       default: 'ENABLE',
     },
+    includeAll: {
+      type: Boolean,
+      default: false,
+    },
     valueType: {
       type: String as PropType<ValueType>,
       default: 'flag',
@@ -52,19 +56,27 @@
   const { t } = useI18n();
 
   const options = computed<SegmentedOption[]>(() => {
-    if (props.valueType === 'number') {
-      return [
-        { label: t('common.enable'), value: 0 },
-        { label: t('common.disable'), value: 1 },
-      ];
+    const base =
+      props.valueType === 'number'
+        ? [
+            { label: t('common.enable'), value: 0 },
+            { label: t('common.disable'), value: 1 },
+          ]
+        : [
+            { label: t('common.enable'), value: 'ENABLE' },
+            { label: t('common.disable'), value: 'DISABLE' },
+          ];
+    if (props.includeAll) {
+      return [{ label: t('common.all'), value: '' }, ...base];
     }
-    return [
-      { label: t('common.enable'), value: 'ENABLE' },
-      { label: t('common.disable'), value: 'DISABLE' },
-    ];
+    return base;
   });
 
   const onChange = (value: string | number | boolean) => {
+    if (props.includeAll && value === '') {
+      emit('update:modelValue', '');
+      return;
+    }
     if (props.valueType === 'number') {
       emit('update:modelValue', Number(value) === 1 ? 1 : 0);
       return;
