@@ -15,6 +15,7 @@
  */
 
 import { ElMessage } from 'element-plus';
+import i18n from '@/config/i18n';
 
 /**
  * Copy content to clipboard
@@ -58,7 +59,7 @@ const fallbackCopy = (content: string, detail?: boolean, message?: string): bool
   if (success) {
     showSuccessMessage(content, detail, message);
   } else {
-    ElMessage.error({ message: 'Failed to copy to clipboard' });
+    ElMessage.error({ message: i18n.global.t('common.clipboard.failed') });
   }
 
   // Safe DOM cleanup - check element exists before removal
@@ -74,13 +75,9 @@ const fallbackCopy = (content: string, detail?: boolean, message?: string): bool
  * Show success message
  */
 const showSuccessMessage = (content: string, detail?: boolean, message?: string): void => {
-  let tip = 'Copied to clipboard!';
+  let tip = i18n.global.t('common.clipboard.copied');
   if (detail) {
-    if (message) {
-      tip = `Copied ${message} to clipboard!`;
-    } else {
-      tip = `Copied ${content} to clipboard!`;
-    }
+    tip = i18n.global.t('common.clipboard.copiedTarget', { target: message || content });
   }
   ElMessage.success({ message: tip });
 };

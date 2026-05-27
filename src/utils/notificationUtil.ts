@@ -15,6 +15,7 @@
  */
 
 import { ElNotification } from 'element-plus';
+import i18n from '@/config/i18n';
 import { isNull } from './validationUtil';
 
 /**
@@ -23,9 +24,9 @@ import { isNull } from './validationUtil';
  * @param message Notification message content
  * @param title Notification title
  */
-export const successMessage = (message?: string, title: string = 'Success') => {
+export const successMessage = (message?: string, title: string = i18n.global.t('common.notification.successTitle')) => {
   if (isNull(message)) {
-    message = 'Operation successful!';
+    message = i18n.global.t('common.notification.successDefault');
   }
 
   ElNotification({
@@ -43,9 +44,13 @@ export const successMessage = (message?: string, title: string = 'Success') => {
  * @param title Notification title
  * @param error Error object for debugging
  */
-export const warnMessage = (message?: string, title = 'Warning', error?: unknown) => {
+export const warnMessage = (
+  message?: string,
+  title = i18n.global.t('common.notification.warningTitle'),
+  error?: unknown
+) => {
   if (isNull(message)) {
-    message = 'Operation warning!';
+    message = i18n.global.t('common.notification.warningDefault');
   }
 
   if ('dev' === import.meta.env.MODE && error) {
@@ -67,9 +72,13 @@ export const warnMessage = (message?: string, title = 'Warning', error?: unknown
  * @param title Notification title
  * @param error Error object for debugging
  */
-export const failMessage = (message?: string, title = 'Error', error?: unknown) => {
+export const failMessage = (
+  message?: string,
+  title = i18n.global.t('common.notification.errorTitle'),
+  error?: unknown
+) => {
   if (isNull(message)) {
-    message = 'Operation failed!';
+    message = i18n.global.t('common.notification.errorDefault');
   }
 
   if ('dev' === import.meta.env.MODE && error) {
