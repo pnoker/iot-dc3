@@ -15,89 +15,54 @@
   -->
 
 <template>
-  <div class="edit-card">
-    <div class="edit-card-header">
-      <el-card shadow="hover">
-        <el-steps :active="reactiveData.active" align-center finish-status="success">
-          <el-step :title="$t('profile.edit.profileConfig')"></el-step>
-          <el-step :title="$t('profile.edit.pointConfig')"></el-step>
-          <el-step :title="$t('profile.edit.commandConfig')"></el-step>
-          <el-step :title="$t('profile.edit.eventConfig')"></el-step>
-          <el-step :title="$t('profile.edit.complete')"></el-step>
-        </el-steps>
-      </el-card>
-    </div>
-
-    <div class="edit-card-body">
-      <el-card v-if="reactiveData.active === 0" shadow="hover">
-        <el-divider content-position="left">{{ $t('profile.edit.profileConfig') }}</el-divider>
-        <el-form ref="formDataRef" :model="reactiveData.profileFormData" :rules="formRule" label-position="top">
-          <el-form-item :label="$t('profile.edit.profileName')" prop="profileName">
-            <el-input
-              v-model="reactiveData.profileFormData.profileName"
-              :placeholder="$t('profile.edit.profileNamePlaceholder')"
-              clearable
-              maxlength="32"
-              show-word-limit
-            />
-          </el-form-item>
-          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-            <enable-flag-segmented v-model="reactiveData.profileFormData.enableFlag" />
-          </el-form-item>
-          <el-form-item :label="$t('profile.edit.description')" prop="remark">
-            <el-input
-              v-model="reactiveData.profileFormData.remark"
-              :placeholder="$t('profile.edit.descriptionPlaceholder')"
-              clearable
-              maxlength="300"
-              show-word-limit
-              type="textarea"
-            />
-          </el-form-item>
-          <el-form-item class="edit-form-button">
-            <el-button :icon="Back" plain @click="done">{{ $t('common.return') }}</el-button>
-            <el-button :icon="RefreshLeft" @click="profileReset">{{ $t('common.reset') }}</el-button>
-            <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
-          </el-form-item>
-        </el-form>
-      </el-card>
-      <el-card v-if="reactiveData.active === 1" shadow="hover">
-        <el-divider content-position="left">{{ $t('profile.edit.pointConfig') }}</el-divider>
-        <point :embedded="'edit'" :profile-id="reactiveData.id"></point>
-        <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
-        </el-form-item>
-      </el-card>
-      <el-card v-if="reactiveData.active === 2" shadow="hover">
-        <el-divider content-position="left">{{ $t('profile.edit.commandConfig') }}</el-divider>
-        <command-list :embedded="'edit'" :profile-id="reactiveData.id"></command-list>
-        <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
-        </el-form-item>
-      </el-card>
-      <el-card v-if="reactiveData.active === 3" shadow="hover">
-        <el-divider content-position="left">{{ $t('profile.edit.eventConfig') }}</el-divider>
-        <event-list :embedded="'edit'" :profile-id="reactiveData.id"></event-list>
-        <el-form-item class="edit-form-button">
-          <el-button :icon="Back" plain @click="pre">{{ $t('common.previous') }}</el-button>
-          <el-button :icon="Right" plain type="primary" @click="next">{{ $t('common.next') }}</el-button>
-        </el-form-item>
-      </el-card>
-      <el-card v-if="reactiveData.active === 4" shadow="hover">
-        <el-divider content-position="left">{{ $t('profile.edit.complete') }}</el-divider>
-        <el-result
-          :sub-title="$t('profile.edit.completeSubTitle')"
-          :title="$t('profile.edit.completeTitle')"
-          icon="success"
-        >
-          <template #extra>
-            <el-button plain type="primary" @click="done">{{ $t('common.return') }}</el-button>
-          </template>
-        </el-result>
-      </el-card>
-    </div>
+  <div>
+    <base-card>
+      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
+        <el-tab-pane :label="$t('profile.edit.profileConfig')" name="profileConfig">
+          <div class="config-toolbar">
+            <div class="config-toolbar__actions">
+              <el-button :icon="RefreshLeft" size="small" @click="profileReset">{{ $t('common.reset') }}</el-button>
+              <el-button :icon="Check" plain size="small" type="primary" @click="profileSave">
+                {{ $t('common.save') }}
+              </el-button>
+            </div>
+          </div>
+          <el-form ref="formDataRef" :model="reactiveData.profileFormData" :rules="formRule" label-position="top">
+            <el-form-item :label="$t('profile.edit.profileName')" prop="profileName">
+              <el-input
+                v-model="reactiveData.profileFormData.profileName"
+                :placeholder="$t('profile.edit.profileNamePlaceholder')"
+                clearable
+                maxlength="32"
+                show-word-limit
+              />
+            </el-form-item>
+            <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+              <enable-flag-segmented v-model="reactiveData.profileFormData.enableFlag" />
+            </el-form-item>
+            <el-form-item :label="$t('profile.edit.description')" prop="remark">
+              <el-input
+                v-model="reactiveData.profileFormData.remark"
+                :placeholder="$t('profile.edit.descriptionPlaceholder')"
+                clearable
+                maxlength="300"
+                show-word-limit
+                type="textarea"
+              />
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('profile.edit.pointConfig')" name="pointConfig">
+          <point :embedded="'edit'" :profile-id="reactiveData.id"></point>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('profile.edit.commandConfig')" name="commandConfig">
+          <command-list :embedded="'edit'" :profile-id="reactiveData.id"></command-list>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('profile.edit.eventConfig')" name="eventConfig">
+          <event-list :embedded="'edit'" :profile-id="reactiveData.id"></event-list>
+        </el-tab-pane>
+      </el-tabs>
+    </base-card>
   </div>
 </template>
 
@@ -105,4 +70,22 @@
 
 <style lang="scss" scoped>
   @use '@/styles/edit-card.scss';
+
+  .config-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+  }
+
+  .config-toolbar__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-left: auto;
+  }
 </style>

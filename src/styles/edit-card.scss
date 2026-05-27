@@ -14,45 +14,31 @@
  * limitations under the License.
  */
 
-// 详情/编辑页外壳通用样式。表单统一为 label-position="top",不再固定 label 宽度。
+// 编辑页表单通用样式。
 
-.edit-card {
-  margin-top: 1px;
-}
+.edit-form-item {
+  display: flex;
+  margin: 10px 0;
+  justify-content: center;
 
-.edit-card-header {
-  margin-bottom: 4px;
-
-  :deep(.el-card) {
-    border: 0;
-  }
-}
-
-.edit-card-body {
-  .edit-form-item {
-    display: flex;
-    margin: 10px 0;
+  :deep(.el-row) {
     justify-content: center;
-
-    :deep(.el-row) {
-      justify-content: center;
-    }
-
-    :deep(.el-alert) {
-      margin-bottom: 10px;
-    }
-
-    :deep(.el-textarea__inner) {
-      height: 80px;
-    }
   }
 
-  .edit-form-button {
-    display: flex;
-    margin-top: 10px;
+  :deep(.el-alert) {
+    margin-bottom: 10px;
+  }
 
-    :deep(.el-form-item__content) {
-      justify-content: center;
-    }
+  :deep(.el-textarea__inner) {
+    height: 80px;
+  }
+}
+
+.edit-form-button {
+  display: flex;
+  margin-top: 10px;
+
+  :deep(.el-form-item__content) {
+    justify-content: center;
   }
 }

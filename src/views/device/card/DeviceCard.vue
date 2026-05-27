@@ -102,7 +102,7 @@
   };
 
   const edit = () => {
-    router.push({ name: 'deviceEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
+    router.push({ name: 'deviceEdit', query: { id: props.data.id, active: 'deviceConfig' } }).catch(() => {
       // nothing to do
     });
   };

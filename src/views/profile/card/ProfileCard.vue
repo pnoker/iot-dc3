@@ -86,7 +86,7 @@
   };
 
   const edit = () => {
-    router.push({ name: 'profileEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
+    router.push({ name: 'profileEdit', query: { id: props.data.id, active: 'profileConfig' } }).catch(() => {
       // nothing to do
     });
   };

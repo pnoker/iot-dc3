@@ -16,7 +16,7 @@
 
 import { computed, defineComponent, reactive, ref, unref, watch } from 'vue';
 import type { FormInstance, FormItemRule, FormRules } from 'element-plus';
-import { Back, Check, RefreshLeft, Right, Search } from '@element-plus/icons-vue';
+import { Check, RefreshLeft, Search } from '@element-plus/icons-vue';
 
 import { useRoute } from 'vue-router';
 import router from '@/config/router';
@@ -55,6 +55,7 @@ import type {
   PointRecord,
 } from '@/config/types';
 
+import baseCard from '@/components/card/base/BaseCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import MatrixStatusSegmented from '@/components/segmented/MatrixStatusSegmented.vue';
 import { isNull } from '@/utils/validationUtil';
@@ -283,17 +284,18 @@ function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
 }
 
-function activeStep(value: unknown): number {
-  const step = Number(value ?? 0);
-  if (!Number.isFinite(step)) {
-    return 0;
-  }
-  return Math.min(Math.max(Math.trunc(step), 0), 5);
+const DEVICE_EDIT_TABS = ['deviceConfig', 'driverConfig', 'pointConfig', 'commandConfig', 'eventConfig'] as const;
+
+function resolveDeviceTab(value: unknown): string {
+  const str = String(value ?? '');
+  if ((DEVICE_EDIT_TABS as readonly string[]).includes(str)) return str;
+  return 'deviceConfig';
 }
 
 export default defineComponent({
   name: 'DeviceEdit',
   components: {
+    baseCard,
     EnableFlagSegmented,
     MatrixStatusSegmented,
   },
@@ -308,8 +310,6 @@ export default defineComponent({
     // 图标
     const Icon = {
       RefreshLeft,
-      Right,
-      Back,
       Check,
       Search,
     };
@@ -317,7 +317,7 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
-      active: activeStep(route.query.active),
+      active: resolveDeviceTab(route.query.active),
       loading: true,
       oldDeviceFormData: {} as Record<string, any>,
       deviceFormData: {} as any,
@@ -1290,59 +1290,18 @@ export default defineComponent({
       return true;
     };
 
-    const pre = () => {
-      let step = 1;
-      if (reactiveData.active === 2 && reactiveData.driverAttributes?.length < 1) {
-        step = 2;
+    const deviceSave = async () => {
+      const ok = await deviceUpdate();
+      if (ok) {
+        successMessage();
       }
-      reactiveData.active -= step;
-      changeActive(reactiveData.active);
     };
 
-    const next = async () => {
-      if (reactiveData.active === 0) {
-        const ok = await deviceUpdate();
-        if (!ok) {
-          return;
-        }
+    const driverSave = async () => {
+      const ok = await driverUpdate();
+      if (ok) {
+        successMessage();
       }
-      if (reactiveData.active === 1) {
-        const ok = await driverUpdate();
-        if (!ok) {
-          return;
-        }
-      }
-      if (reactiveData.active === 2) {
-        const ok = await savePointMatrix();
-        if (!ok) {
-          return;
-        }
-      }
-      if (reactiveData.active === 3) {
-        const ok = await saveCommandMatrix();
-        if (!ok) {
-          return;
-        }
-      }
-      if (reactiveData.active === 4) {
-        const ok = await saveEventMatrix();
-        if (!ok) {
-          return;
-        }
-      }
-
-      let step = 1;
-      if (reactiveData.active === 0 && reactiveData.driverAttributes?.length < 1) {
-        step = 2;
-      }
-      reactiveData.active += step;
-      changeActive(reactiveData.active);
-    };
-
-    const done = () => {
-      router.push({ name: 'device' }).catch(() => {
-        // nothing to do
-      });
     };
 
     const deviceReset = () => {
@@ -1371,18 +1330,17 @@ export default defineComponent({
       eventInfo();
     };
 
-    const changeActive = (step: number) => {
+    const changeActive = (tab: any) => {
+      reactiveData.active = tab.props.name;
       const query = route.query;
-      router.push({ query: { ...query, active: step } }).catch(() => {
-        // nothing to do
-      });
+      router.push({ query: { ...query, active: tab.props.name } });
     };
 
     watch(
       () => [route.query.id, route.query.active],
       ([id, active]) => {
         const nextId = id as string;
-        const nextActive = activeStep(active);
+        const nextActive = resolveDeviceTab(active);
 
         if (reactiveData.active !== nextActive) {
           reactiveData.active = nextActive;
@@ -1429,7 +1387,8 @@ export default defineComponent({
       profileDictionaryVisible,
       changeProfile,
       changeAttribute,
-      driverUpdate,
+      deviceSave,
+      driverSave,
       savePointMatrix,
       saveCommandMatrix,
       saveEventMatrix,
@@ -1454,9 +1413,6 @@ export default defineComponent({
       pointMatrixRowClassName,
       commandMatrixRowClassName,
       eventMatrixRowClassName,
-      pre,
-      next,
-      done,
       deviceReset,
       driverInfoReset,
       pointInfoReset,

@@ -16,7 +16,7 @@
 
 import { defineComponent, reactive, ref, unref, watch } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
-import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
+import { Check, Edit, RefreshLeft } from '@element-plus/icons-vue';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
 
@@ -25,45 +25,35 @@ import { useRoute } from 'vue-router';
 
 import { getProfileById, updateProfile } from '@/api/profile';
 
+import baseCard from '@/components/card/base/BaseCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import point from '@/views/point/Point.vue';
 import CommandList from '@/views/settings/command/CommandList.vue';
 import EventList from '@/views/settings/event/definition/EventList.vue';
 
-function activeStep(value: unknown): number {
-  const step = Number(value ?? 0);
-  if (!Number.isFinite(step)) {
-    return 0;
-  }
-  return Math.min(Math.max(Math.trunc(step), 0), 4);
+const PROFILE_EDIT_TABS = ['profileConfig', 'pointConfig', 'commandConfig', 'eventConfig'] as const;
+
+function resolveTab(value: unknown): string {
+  const str = String(value ?? '');
+  if (PROFILE_EDIT_TABS.includes(str as any)) return str;
+  return 'profileConfig';
 }
 
 export default defineComponent({
-  components: { EnableFlagSegmented, point, CommandList, EventList },
+  components: { baseCard, EnableFlagSegmented, point, CommandList, EventList },
   setup() {
     const route = useRoute();
     const { t } = useI18n();
 
-    // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
-    // 图标
-    const Icon = {
-      Edit,
-      RefreshLeft,
-      Right,
-      Back,
-    };
-
-    // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id,
-      active: activeStep(route.query.active),
+      active: resolveTab(route.query.active),
       oldProfileFormData: {},
       profileFormData: {} as any,
     });
 
-    // 定义表单校验规则
     const formRule = reactive<FormRules>({
       profileName: nameRules(t, t('common.entityProfile')),
       enableFlag: [
@@ -83,59 +73,34 @@ export default defineComponent({
       });
     };
 
-    const profileUpdate = async (): Promise<boolean> => {
+    const profileSave = async () => {
       const form = unref(formDataRef);
-      if (!form) {
-        return false;
-      }
+      if (!form) return;
 
       try {
         await form.validate();
         const res = await updateProfile(reactiveData.profileFormData);
         reactiveData.oldProfileFormData = { ...res.data };
-        return true;
       } catch {
-        return false;
+        // validation or API error
       }
-    };
-
-    const pre = () => {
-      reactiveData.active--;
-      changeActive(reactiveData.active);
-    };
-
-    const next = async () => {
-      if (reactiveData.active === 0) {
-        const ok = await profileUpdate();
-        if (!ok) {
-          return;
-        }
-      }
-
-      reactiveData.active++;
-      changeActive(reactiveData.active);
-    };
-
-    const done = () => {
-      router.push({ name: 'profile' }).catch(() => {
-        // nothing to do
-      });
     };
 
     const profileReset = () => {
       reactiveData.profileFormData = { ...reactiveData.oldProfileFormData };
     };
 
-    const changeActive = (step: number) => {
+    const changeActive = (tab: any) => {
+      reactiveData.active = tab.props.name;
       const query = route.query;
-      router.push({ query: { ...query, active: step } });
+      router.push({ query: { ...query, active: tab.props.name } });
     };
 
     watch(
       () => [route.query.id, route.query.active],
       ([id, active]) => {
         const nextId = id as string;
-        const nextActive = activeStep(active);
+        const nextActive = resolveTab(active);
 
         if (reactiveData.active !== nextActive) {
           reactiveData.active = nextActive;
@@ -156,12 +121,12 @@ export default defineComponent({
       formDataRef,
       reactiveData,
       formRule,
-      pre,
-      next,
-      done,
+      profileSave,
       profileReset,
       changeActive,
-      ...Icon,
+      Check,
+      Edit,
+      RefreshLeft,
     };
   },
 });

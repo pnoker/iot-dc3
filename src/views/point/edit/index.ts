@@ -111,7 +111,7 @@ export default defineComponent({
     };
 
     const done = () => {
-      router.push({ name: 'profileEdit', query: { id: route.query.profileId, active: '1' } }).catch(() => {
+      router.push({ name: 'profileEdit', query: { id: route.query.profileId, active: 'pointConfig' } }).catch(() => {
         // nothing to do
       });
     };
