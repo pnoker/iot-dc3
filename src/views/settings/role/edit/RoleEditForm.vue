@@ -43,6 +43,8 @@
           v-model="reactiveData.form.roleName"
           :placeholder="t('settings.role.roleNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         />
       </el-form-item>
       <el-form-item :label="t('settings.role.roleCode')" prop="roleCode">
@@ -50,6 +52,7 @@
           v-model="reactiveData.form.roleCode"
           :placeholder="t('settings.role.roleCodePlaceholder')"
           clearable
+          maxlength="32"
         />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">

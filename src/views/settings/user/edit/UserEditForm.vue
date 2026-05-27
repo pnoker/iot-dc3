@@ -33,6 +33,8 @@
           :disabled="reactiveData.mode === 'edit'"
           :placeholder="t('settings.user.userNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         />
       </el-form-item>
       <el-form-item :label="t('settings.user.nickName')" prop="nickName">
@@ -40,13 +42,25 @@
           v-model="reactiveData.form.nickName"
           :placeholder="t('settings.user.nickNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         />
       </el-form-item>
       <el-form-item :label="t('settings.user.phone')" prop="phone">
-        <el-input v-model="reactiveData.form.phone" :placeholder="t('settings.user.phonePlaceholder')" clearable />
+        <el-input
+          v-model="reactiveData.form.phone"
+          :placeholder="t('settings.user.phonePlaceholder')"
+          clearable
+          maxlength="11"
+        />
       </el-form-item>
       <el-form-item :label="t('settings.user.email')" prop="email">
-        <el-input v-model="reactiveData.form.email" :placeholder="t('settings.user.emailPlaceholder')" clearable />
+        <el-input
+          v-model="reactiveData.form.email"
+          :placeholder="t('settings.user.emailPlaceholder')"
+          clearable
+          maxlength="128"
+        />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <enable-flag-segmented v-model="reactiveData.form.enableFlag" value-type="number" />

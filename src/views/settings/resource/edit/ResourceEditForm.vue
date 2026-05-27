@@ -44,6 +44,8 @@
           v-model="reactiveData.form.resourceName"
           :placeholder="t('settings.resource.resourceNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         />
       </el-form-item>
       <el-form-item :label="t('settings.resource.resourceCode')" prop="resourceCode">
@@ -51,6 +53,7 @@
           v-model="reactiveData.form.resourceCode"
           :placeholder="t('settings.resource.resourceCodePlaceholder')"
           clearable
+          maxlength="32"
         />
       </el-form-item>
       <el-form-item :label="t('settings.resource.resourceType')" prop="resourceTypeFlag">
@@ -69,6 +72,7 @@
           v-model="reactiveData.form.entityId"
           :placeholder="t('settings.resource.entityIdPlaceholder')"
           clearable
+          maxlength="19"
         />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">

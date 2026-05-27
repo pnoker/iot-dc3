@@ -17,7 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
-import { nameRules, remarkRules } from '@/utils/formRuleUtil';
+import { byteRules, decimalRules, nameRules, remarkRules, requiredSelectRule } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
 
 import router from '@/config/router';
@@ -55,14 +55,13 @@ export default defineComponent({
 
     // 定义表单校验规则
     const pointFormRule = reactive<FormRules>({
-      pointName: nameRules(t, '位号'),
-      enable: [
-        {
-          required: true,
-          message: t('common.enableFlag'),
-          trigger: 'change',
-        },
-      ],
+      pointName: nameRules(t, t('common.entityPoint')),
+      pointTypeFlag: requiredSelectRule(t('point.edit.dataTypeRequired')),
+      rwFlag: requiredSelectRule(t('point.edit.rwTypeRequired')),
+      enableFlag: requiredSelectRule(t('common.enableFlag')),
+      baseValue: decimalRules(t('point.edit.baseValueFormat')),
+      multiple: decimalRules(t('point.edit.ratioFormat')),
+      valueDecimal: byteRules(t, t('point.edit.accuracyFormat')),
       remark: remarkRules(t),
     });
 

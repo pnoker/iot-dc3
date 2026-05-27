@@ -38,6 +38,8 @@
               v-model="reactiveData.deviceFormData.deviceName"
               :placeholder="$t('device.edit.deviceNamePlaceholder')"
               clearable
+              maxlength="32"
+              show-word-limit
             />
           </el-form-item>
           <el-form-item :label="$t('device.edit.driver')" prop="driverId">
@@ -121,6 +123,7 @@
             v-for="attribute in reactiveData.driverAttributes"
             :key="attribute.id"
             :prop="`${attribute.attributeCode}.configValue`"
+            :rules="attributeFormItemRules(attribute)"
           >
             <template #label>
               <span>{{ attribute.attributeName }}</span>
@@ -145,11 +148,15 @@
               v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
               :placeholder="attributePlaceholder(attribute)"
               clearable
+              maxlength="512"
+              show-word-limit
               @keyup.enter="driverUpdate"
             />
             <div v-if="attribute.remark || attribute.defaultValue" class="attribute-hint">
               <span v-if="attribute.remark">{{ attribute.remark }}</span>
-              <span v-if="attribute.defaultValue">Default: {{ attribute.defaultValue }}</span>
+              <span v-if="attribute.defaultValue">{{
+                $t('device.edit.defaultValue', { value: attribute.defaultValue })
+              }}</span>
             </div>
           </el-form-item>
         </el-form>
@@ -180,17 +187,7 @@
               clearable
               size="small"
             />
-            <el-segmented
-              v-model="reactiveData.pointMatrixStatus"
-              :options="[
-                { label: $t('common.all'), value: '' },
-                { label: $t('device.edit.pointStatus.missing'), value: 'missing' },
-                { label: $t('device.edit.pointStatus.configured'), value: 'configured' },
-                { label: $t('device.edit.pointStatus.dirty'), value: 'dirty' },
-                { label: $t('device.edit.pointStatus.error'), value: 'error' },
-              ]"
-              size="small"
-            />
+            <matrix-status-segmented v-model="reactiveData.pointMatrixStatus" size="small" />
           </div>
           <div class="point-matrix-toolbar__actions">
             <el-tag :type="pointDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
@@ -269,7 +266,9 @@
                   class="point-matrix-input"
                   clearable
                   inputmode="decimal"
+                  maxlength="512"
                   size="small"
+                  @blur="validatePointCell(row, attribute)"
                   @input="markPointCellDirty(row, attribute)"
                 />
                 <el-input
@@ -277,6 +276,7 @@
                   v-model="row.attributes[attribute.attributeCode].configValue"
                   :placeholder="attributePlaceholder(attribute)"
                   clearable
+                  maxlength="512"
                   size="small"
                   @input="markPointCellDirty(row, attribute)"
                 />
@@ -320,17 +320,7 @@
               clearable
               size="small"
             />
-            <el-segmented
-              v-model="reactiveData.commandMatrixStatus"
-              :options="[
-                { label: $t('common.all'), value: '' },
-                { label: $t('device.edit.pointStatus.missing'), value: 'missing' },
-                { label: $t('device.edit.pointStatus.configured'), value: 'configured' },
-                { label: $t('device.edit.pointStatus.dirty'), value: 'dirty' },
-                { label: $t('device.edit.pointStatus.error'), value: 'error' },
-              ]"
-              size="small"
-            />
+            <matrix-status-segmented v-model="reactiveData.commandMatrixStatus" size="small" />
           </div>
           <div class="point-matrix-toolbar__actions">
             <el-tag :type="commandDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
@@ -409,7 +399,9 @@
                   class="point-matrix-input"
                   clearable
                   inputmode="decimal"
+                  maxlength="512"
                   size="small"
+                  @blur="validateCommandCell(row, attribute)"
                   @input="markCommandCellDirty(row, attribute)"
                 />
                 <el-input
@@ -417,6 +409,7 @@
                   v-model="row.attributes[attribute.attributeCode].configValue"
                   :placeholder="attributePlaceholder(attribute)"
                   clearable
+                  maxlength="512"
                   size="small"
                   @input="markCommandCellDirty(row, attribute)"
                 />
@@ -459,17 +452,7 @@
               clearable
               size="small"
             />
-            <el-segmented
-              v-model="reactiveData.eventMatrixStatus"
-              :options="[
-                { label: $t('common.all'), value: '' },
-                { label: $t('device.edit.pointStatus.missing'), value: 'missing' },
-                { label: $t('device.edit.pointStatus.configured'), value: 'configured' },
-                { label: $t('device.edit.pointStatus.dirty'), value: 'dirty' },
-                { label: $t('device.edit.pointStatus.error'), value: 'error' },
-              ]"
-              size="small"
-            />
+            <matrix-status-segmented v-model="reactiveData.eventMatrixStatus" size="small" />
           </div>
           <div class="point-matrix-toolbar__actions">
             <el-tag :type="eventDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
@@ -548,7 +531,9 @@
                   class="point-matrix-input"
                   clearable
                   inputmode="decimal"
+                  maxlength="512"
                   size="small"
+                  @blur="validateEventCell(row, attribute)"
                   @input="markEventCellDirty(row, attribute)"
                 />
                 <el-input
@@ -556,6 +541,7 @@
                   v-model="row.attributes[attribute.attributeCode].configValue"
                   :placeholder="attributePlaceholder(attribute)"
                   clearable
+                  maxlength="512"
                   size="small"
                   @input="markEventCellDirty(row, attribute)"
                 />

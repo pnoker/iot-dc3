@@ -20,7 +20,7 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-import { AUTH_NAME_PATTERN } from '@/utils/formRuleUtil';
+import { authNameRules, remarkRules } from '@/utils/formRuleUtil';
 
 type FormMode = 'add' | 'edit';
 
@@ -57,12 +57,9 @@ export default defineComponent({
     });
 
     const rules: FormRules = {
-      roleName: [
-        { required: true, message: t('settings.role.roleNamePlaceholder'), trigger: 'blur' },
-        { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
-        { pattern: AUTH_NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
-      ],
+      roleName: authNameRules(t, t('common.entityRole')),
       parentRoleId: [{ required: true, message: t('settings.role.parentRoleIdPlaceholder'), trigger: 'change' }],
+      remark: remarkRules(t),
     };
 
     // Synthesize a virtual "Root" row so top-level roles are reachable

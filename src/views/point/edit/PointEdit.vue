@@ -34,6 +34,8 @@
               v-model="reactiveData.pointFormData.pointName"
               :placeholder="$t('point.edit.pointNamePlaceholder')"
               clearable
+              maxlength="32"
+              show-word-limit
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.dataType')" prop="pointTypeFlag">
@@ -67,10 +69,13 @@
             <enable-flag-segmented v-model="reactiveData.pointFormData.enableFlag" />
           </el-form-item>
           <el-form-item :label="$t('point.edit.accuracy')" prop="valueDecimal">
-            <el-input
+            <el-input-number
               v-model="reactiveData.pointFormData.valueDecimal"
+              :max="127"
+              :min="0"
               :placeholder="$t('point.edit.accuracyPlaceholder')"
-              clearable
+              :precision="0"
+              controls-position="right"
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.unit')" prop="unit">
@@ -78,6 +83,7 @@
               v-model="reactiveData.pointFormData.unit"
               :placeholder="$t('point.edit.unitPlaceholder')"
               clearable
+              maxlength="32"
             />
           </el-form-item>
           <el-form-item :label="$t('point.edit.baseValue')" prop="baseValue">

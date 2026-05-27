@@ -87,6 +87,7 @@
     value: [
       {
         required: true,
+        whitespace: true,
         message: t('pointValue.edit.valueRequired'),
         trigger: 'blur',
       },

@@ -15,7 +15,7 @@
  */
 
 import { computed, defineComponent, reactive, ref, unref, watch } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormItemRule, FormRules } from 'element-plus';
 import { Back, Check, RefreshLeft, Right, Search } from '@element-plus/icons-vue';
 
 import { useRoute } from 'vue-router';
@@ -56,6 +56,7 @@ import type {
 } from '@/config/types';
 
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+import MatrixStatusSegmented from '@/components/segmented/MatrixStatusSegmented.vue';
 import { isNull } from '@/utils/validationUtil';
 import { failMessage, successMessage } from '@/utils/notificationUtil';
 import { getDriverById } from '@/api/driver';
@@ -64,7 +65,7 @@ import { listPointByProfileId } from '@/api/point';
 import { listCommandByProfileId } from '@/api/command';
 import { listEventByProfileId } from '@/api/event';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
-import { useI18n } from 'vue-i18n';
+import { type ComposerTranslation, useI18n } from 'vue-i18n';
 
 type AttributeConfigValue = string | number | boolean | null;
 
@@ -119,6 +120,16 @@ const INTEGER_ATTRIBUTE_TYPES = new Set(['BYTE', 'SHORT', 'INT', 'LONG']);
 const DECIMAL_ATTRIBUTE_TYPES = new Set(['FLOAT', 'DOUBLE']);
 const BOOLEAN_TRUE_VALUES = new Set(['true', '1', 'yes', 'y', 'on']);
 const BOOLEAN_FALSE_VALUES = new Set(['false', '0', 'no', 'n', 'off']);
+const DECIMAL_VALUE_PATTERN = /^[+-]?(?:(?:\d+\.?\d*)|(?:\.\d+))(?:[eE][+-]?\d+)?$/;
+const INTEGER_VALUE_PATTERN = /^[+-]?\d+$/;
+const ATTRIBUTE_CONFIG_MAX_LENGTH = 512;
+const FLOAT_MAX = 3.4028234663852886e38;
+const INTEGER_ATTRIBUTE_RANGES = {
+  BYTE: { min: -128n, max: 127n },
+  SHORT: { min: -32768n, max: 32767n },
+  INT: { min: -2147483648n, max: 2147483647n },
+  LONG: { min: -9223372036854775808n, max: 9223372036854775807n },
+};
 
 function attributeType(attribute: Attribute): string {
   return String(attribute.attributeTypeFlag || 'STRING').toUpperCase();
@@ -137,8 +148,10 @@ function attributePrecision(attribute: Attribute): number | undefined {
   return DECIMAL_ATTRIBUTE_TYPES.has(attributeType(attribute)) ? 3 : 0;
 }
 
-function attributePlaceholder(attribute: Attribute): string {
-  return attribute.defaultValue ? `Default: ${attribute.defaultValue}` : `Enter ${attribute.attributeName}`;
+function attributePlaceholder(attribute: Attribute, t: ComposerTranslation): string {
+  return attribute.defaultValue
+    ? t('device.edit.defaultValue', { value: attribute.defaultValue })
+    : t('device.edit.attributePlaceholder', { name: attribute.attributeName });
 }
 
 function coerceAttributeValue(attribute: Attribute, value?: unknown): AttributeConfigValue {
@@ -192,8 +205,71 @@ function createPointAttributeCell(attribute: Attribute, id?: string, value?: unk
   };
 }
 
-function serializeAttributeValue(value: AttributeConfigValue): string {
+function serializeAttributeValue(value: unknown): string {
   return value === null || value === undefined ? '' : String(value);
+}
+
+function validateAttributeConfigValue(
+  attribute: Attribute,
+  value: unknown,
+  t: ComposerTranslation,
+  required = false
+): string {
+  const rawValue = serializeAttributeValue(value).trim();
+  if (required && !rawValue) {
+    return t('device.edit.attributeConfigRequired');
+  }
+  if (rawValue.length > ATTRIBUTE_CONFIG_MAX_LENGTH) {
+    return t('device.edit.attributeConfigLength', { max: ATTRIBUTE_CONFIG_MAX_LENGTH });
+  }
+
+  if (!isNumberAttribute(attribute)) {
+    return '';
+  }
+
+  const type = attributeType(attribute);
+  if (!rawValue) {
+    return t('device.edit.attributeConfigRequired');
+  }
+
+  if (!DECIMAL_VALUE_PATTERN.test(rawValue)) {
+    return t('device.edit.attributeNumberFormat');
+  }
+
+  if (INTEGER_ATTRIBUTE_TYPES.has(type)) {
+    if (!INTEGER_VALUE_PATTERN.test(rawValue)) {
+      return t('device.edit.attributeIntegerFormat');
+    }
+
+    const range = INTEGER_ATTRIBUTE_RANGES[type as keyof typeof INTEGER_ATTRIBUTE_RANGES];
+    if (range) {
+      const normalizedValue = rawValue.startsWith('+') ? rawValue.slice(1) : rawValue;
+      const integerValue = BigInt(normalizedValue);
+      if (integerValue < range.min || integerValue > range.max) {
+        return t('device.edit.attributeRange', {
+          min: range.min.toString(),
+          max: range.max.toString(),
+        });
+      }
+    }
+
+    return '';
+  }
+
+  const numericValue = Number(rawValue);
+  if (!Number.isFinite(numericValue)) {
+    return t('device.edit.attributeNumberFormat');
+  }
+
+  const max = 'FLOAT' === type ? FLOAT_MAX : Number.MAX_VALUE;
+  if (Math.abs(numericValue) > max) {
+    return t('device.edit.attributeRange', {
+      min: `-${max}`,
+      max: String(max),
+    });
+  }
+
+  return '';
 }
 
 function attributeFormItem(formData: Record<string, AttributeFormItem>, attribute: Attribute): AttributeFormItem {
@@ -219,6 +295,7 @@ export default defineComponent({
   name: 'DeviceEdit',
   components: {
     EnableFlagSegmented,
+    MatrixStatusSegmented,
   },
   setup() {
     const route = useRoute();
@@ -277,7 +354,7 @@ export default defineComponent({
 
     // 定义表单校验规则
     const deviceFormRule = reactive<FormRules>({
-      deviceName: nameRules(t, '设备'),
+      deviceName: nameRules(t, t('common.entityDevice')),
       driverId: [
         {
           required: true,
@@ -295,7 +372,7 @@ export default defineComponent({
       enableFlag: [
         {
           required: true,
-          message: 'Select enable status',
+          message: () => t('device.edit.enableFlagRequired'),
           trigger: 'change',
         },
       ],
@@ -393,6 +470,22 @@ export default defineComponent({
     const hasDriverAttributes = computed(() => {
       return Array.isArray(reactiveData.driverAttributes) && reactiveData.driverAttributes.length > 0;
     });
+
+    const attributeFormItemRules = (attribute: Attribute): FormItemRule[] => [
+      {
+        validator: (_rule, value, callback) => {
+          const message = validateAttributeConfigValue(attribute, value, t, true);
+          if (message) {
+            callback(new Error(message));
+            return;
+          }
+          callback();
+        },
+        trigger: 'blur',
+      },
+    ];
+
+    const attributeInputPlaceholder = (attribute: Attribute): string => attributePlaceholder(attribute, t);
 
     const driverDictionary = (query?: string) => {
       reactiveData.driverLoading = true;
@@ -787,6 +880,10 @@ export default defineComponent({
     };
 
     const driverUpdate = async (): Promise<boolean> => {
+      if (!hasDriverAttributes.value) {
+        return true;
+      }
+
       const form = unref(driverFormRef);
       if (!form) {
         return false;
@@ -794,6 +891,7 @@ export default defineComponent({
 
       try {
         await form.validate();
+        let failedCount = 0;
         await Promise.all(
           reactiveData.driverAttributes.map((attribute) => {
             const formItem = reactiveData.driverFormData[attribute.attributeCode];
@@ -809,15 +907,34 @@ export default defineComponent({
 
             const persist = driverInfo.id ? updateDriverInfo(driverInfo) : addDriverInfo(driverInfo);
             return persist.catch(() => {
-              // nothing to do
+              failedCount++;
             });
           })
         );
+        if (failedCount > 0) {
+          failMessage(t('device.edit.driverSaveFailed', { count: failedCount }));
+          return false;
+        }
         reactiveData.oldDriverFormData = clone(reactiveData.driverFormData);
         return true;
       } catch {
         return false;
       }
+    };
+
+    const validateAttributeCell = (attribute: Attribute, cell: PointAttributeCell): boolean => {
+      cell.error = validateAttributeConfigValue(attribute, cell.configValue, t);
+      return isNull(cell.error);
+    };
+
+    const validateDirtyCells = (dirtyCells: Array<{ attribute: Attribute; cell: PointAttributeCell }>): boolean => {
+      let valid = true;
+      dirtyCells.forEach(({ attribute, cell }) => {
+        if (!validateAttributeCell(attribute, cell)) {
+          valid = false;
+        }
+      });
+      return valid;
     };
 
     const pointCell = (row: PointInfoMatrixRow, attribute: Attribute): PointAttributeCell => {
@@ -841,6 +958,10 @@ export default defineComponent({
       return pointCell(row, attribute).error;
     };
 
+    const validatePointCell = (row: PointInfoMatrixRow, attribute: Attribute): boolean => {
+      return validateAttributeCell(attribute, pointCell(row, attribute));
+    };
+
     const isPointRowDirty = (row: PointInfoMatrixRow): boolean => {
       return Object.values(row.attributes).some((cell) => cell.dirty);
     };
@@ -862,7 +983,7 @@ export default defineComponent({
     };
 
     const pointRowStatusLabel = (row: PointInfoMatrixRow): string => {
-      return t(`device.edit.pointStatus.${pointRowStatus(row)}`);
+      return t(`common.configStatus.${pointRowStatus(row)}`);
     };
 
     const pointRowStatusTag = (row: PointInfoMatrixRow) => {
@@ -880,11 +1001,14 @@ export default defineComponent({
     const savePointMatrix = async (): Promise<boolean> => {
       const dirtyCells = reactiveData.pointInfoData.flatMap((row) =>
         reactiveData.pointAttributes
-          .map((attribute) => ({ row, cell: pointCell(row, attribute) }))
+          .map((attribute) => ({ row, attribute, cell: pointCell(row, attribute) }))
           .filter(({ cell }) => cell.dirty)
       );
       if (dirtyCells.length < 1) {
         return true;
+      }
+      if (!validateDirtyCells(dirtyCells)) {
+        return false;
       }
 
       reactiveData.pointSaving = true;
@@ -951,6 +1075,10 @@ export default defineComponent({
       return commandCell(row, attribute).error;
     };
 
+    const validateCommandCell = (row: CommandInfoMatrixRow, attribute: Attribute): boolean => {
+      return validateAttributeCell(attribute, commandCell(row, attribute));
+    };
+
     const isCommandRowDirty = (row: CommandInfoMatrixRow): boolean => {
       return Object.values(row.attributes).some((cell) => cell.dirty);
     };
@@ -974,7 +1102,7 @@ export default defineComponent({
     };
 
     const commandRowStatusLabel = (row: CommandInfoMatrixRow): string => {
-      return t(`device.edit.pointStatus.${commandRowStatus(row)}`);
+      return t(`common.configStatus.${commandRowStatus(row)}`);
     };
 
     const commandRowStatusTag = (row: CommandInfoMatrixRow) => {
@@ -992,11 +1120,14 @@ export default defineComponent({
     const saveCommandMatrix = async (): Promise<boolean> => {
       const dirtyCells = reactiveData.commandInfoData.flatMap((row) =>
         reactiveData.commandAttributes
-          .map((attribute) => ({ row, cell: commandCell(row, attribute) }))
+          .map((attribute) => ({ row, attribute, cell: commandCell(row, attribute) }))
           .filter(({ cell }) => cell.dirty)
       );
       if (dirtyCells.length < 1) {
         return true;
+      }
+      if (!validateDirtyCells(dirtyCells)) {
+        return false;
       }
 
       reactiveData.commandSaving = true;
@@ -1063,6 +1194,10 @@ export default defineComponent({
       return eventCell(row, attribute).error;
     };
 
+    const validateEventCell = (row: EventInfoMatrixRow, attribute: Attribute): boolean => {
+      return validateAttributeCell(attribute, eventCell(row, attribute));
+    };
+
     const isEventRowDirty = (row: EventInfoMatrixRow): boolean => {
       return Object.values(row.attributes).some((cell) => cell.dirty);
     };
@@ -1084,7 +1219,7 @@ export default defineComponent({
     };
 
     const eventRowStatusLabel = (row: EventInfoMatrixRow): string => {
-      return t(`device.edit.pointStatus.${eventRowStatus(row)}`);
+      return t(`common.configStatus.${eventRowStatus(row)}`);
     };
 
     const eventRowStatusTag = (row: EventInfoMatrixRow) => {
@@ -1102,11 +1237,14 @@ export default defineComponent({
     const saveEventMatrix = async (): Promise<boolean> => {
       const dirtyCells = reactiveData.eventInfoData.flatMap((row) =>
         reactiveData.eventAttributes
-          .map((attribute) => ({ row, cell: eventCell(row, attribute) }))
+          .map((attribute) => ({ row, attribute, cell: eventCell(row, attribute) }))
           .filter(({ cell }) => cell.dirty)
       );
       if (dirtyCells.length < 1) {
         return true;
+      }
+      if (!validateDirtyCells(dirtyCells)) {
+        return false;
       }
 
       reactiveData.eventSaving = true;
@@ -1304,6 +1442,9 @@ export default defineComponent({
       pointCellError,
       commandCellError,
       eventCellError,
+      validatePointCell,
+      validateCommandCell,
+      validateEventCell,
       pointRowStatusLabel,
       commandRowStatusLabel,
       eventRowStatusLabel,
@@ -1323,7 +1464,8 @@ export default defineComponent({
       eventInfoReset,
       changeActive,
       attributeFormItem,
-      attributePlaceholder,
+      attributeFormItemRules,
+      attributePlaceholder: attributeInputPlaceholder,
       attributePrecision,
       isBooleanAttribute,
       isNumberAttribute,

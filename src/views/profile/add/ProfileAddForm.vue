@@ -31,6 +31,8 @@
           v-model="reactiveData.formData.profileName"
           :placeholder="$t('profile.add.profileNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('profile.add.description')" prop="remark">
@@ -75,7 +77,7 @@
   const formDataRef = ref<FormInstance>();
 
   const formRule = reactive<FormRules>({
-    profileName: nameRules(t, '模板'),
+    profileName: nameRules(t, t('common.entityProfile')),
     remark: remarkRules(t),
   });
 

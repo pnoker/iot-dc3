@@ -28,7 +28,12 @@
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
       <el-form-item :label="$t('settings.agentic.providerName')" prop="name">
-        <el-input v-model="form.name" :placeholder="$t('settings.agentic.providerNamePlaceholder')" clearable />
+        <el-input
+          v-model="form.name"
+          :placeholder="$t('settings.agentic.providerNamePlaceholder')"
+          clearable
+          maxlength="128"
+        />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.providerType')" prop="providerType">
         <el-select
@@ -40,13 +45,19 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.baseUrl')" prop="baseUrl">
-        <el-input v-model="form.baseUrl" :placeholder="$t('settings.agentic.baseUrlPlaceholder')" clearable />
+        <el-input
+          v-model="form.baseUrl"
+          :placeholder="$t('settings.agentic.baseUrlPlaceholder')"
+          clearable
+          maxlength="256"
+        />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.apiKey')" prop="apiKey">
         <el-input
           v-model="form.apiKey"
           :placeholder="$t('settings.agentic.apiKeyPlaceholder')"
           clearable
+          maxlength="256"
           show-password
           type="password"
         />
@@ -63,7 +74,7 @@
       <el-form-item :label="$t('common.enableFlag')">
         <enable-flag-segmented v-model="form.enableFlag" />
       </el-form-item>
-      <el-form-item :label="$t('common.remark')">
+      <el-form-item :label="$t('common.remark')" prop="remark">
         <el-input v-model="form.remark" :rows="3" maxlength="300" show-word-limit type="textarea" />
       </el-form-item>
     </el-form>
@@ -84,6 +95,7 @@
 
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import type { AgenticProvider } from '@/config/types';
+  import { remarkRules } from '@/utils/formRuleUtil';
 
   import { AGENTIC_PROVIDER_TYPES } from '../providerTypes';
 
@@ -112,8 +124,9 @@
   const form = reactive(initialForm());
 
   const rules = computed<FormRules>(() => ({
-    name: [{ required: true, message: t('settings.agentic.nameRequired'), trigger: 'blur' }],
-    baseUrl: [{ required: true, message: t('settings.agentic.baseUrlRequired'), trigger: 'blur' }],
+    name: [{ required: true, whitespace: true, message: t('settings.agentic.nameRequired'), trigger: 'blur' }],
+    baseUrl: [{ required: true, whitespace: true, message: t('settings.agentic.baseUrlRequired'), trigger: 'blur' }],
+    remark: remarkRules(t),
   }));
 
   const show = () => {

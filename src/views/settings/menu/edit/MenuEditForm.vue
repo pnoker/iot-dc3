@@ -43,6 +43,8 @@
           v-model="reactiveData.form.menuName"
           :placeholder="t('settings.menu.menuNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         />
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuCode')" prop="menuCode">
@@ -50,13 +52,24 @@
           v-model="reactiveData.form.menuCode"
           :placeholder="t('settings.menu.menuCodePlaceholder')"
           clearable
+          maxlength="64"
         />
       </el-form-item>
       <el-form-item :label="t('settings.menu.titleZh')" prop="titleZh">
-        <el-input v-model="reactiveData.form.titleZh" :placeholder="t('settings.menu.titleZhPlaceholder')" clearable />
+        <el-input
+          v-model="reactiveData.form.titleZh"
+          :placeholder="t('settings.menu.titleZhPlaceholder')"
+          clearable
+          maxlength="64"
+        />
       </el-form-item>
       <el-form-item :label="t('settings.menu.titleEn')" prop="titleEn">
-        <el-input v-model="reactiveData.form.titleEn" :placeholder="t('settings.menu.titleEnPlaceholder')" clearable />
+        <el-input
+          v-model="reactiveData.form.titleEn"
+          :placeholder="t('settings.menu.titleEnPlaceholder')"
+          clearable
+          maxlength="64"
+        />
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuType')" prop="menuTypeFlag">
         <el-select v-model="reactiveData.form.menuTypeFlag">
@@ -69,7 +82,7 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuIndex')" prop="menuIndex">
-        <el-input-number v-model="reactiveData.form.menuIndex" :max="999" :min="0" />
+        <el-input-number v-model="reactiveData.form.menuIndex" :max="999" :min="0" :precision="0" />
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuIcon')" prop="icon">
         <el-select
@@ -92,7 +105,12 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuUrl')" prop="url">
-        <el-input v-model="reactiveData.form.url" :placeholder="t('settings.menu.menuUrlPlaceholder')" clearable />
+        <el-input
+          v-model="reactiveData.form.url"
+          :placeholder="t('settings.menu.menuUrlPlaceholder')"
+          clearable
+          maxlength="256"
+        />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <enable-flag-segmented v-model="reactiveData.form.enableFlag" />

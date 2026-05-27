@@ -40,6 +40,8 @@
           v-model="reactiveData.form.labelName"
           :placeholder="t('settings.label.labelNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         />
       </el-form-item>
       <el-form-item :label="t('settings.label.labelCode')" prop="labelCode">
@@ -47,6 +49,7 @@
           v-model="reactiveData.form.labelCode"
           :placeholder="t('settings.label.labelCodePlaceholder')"
           clearable
+          maxlength="32"
         />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">

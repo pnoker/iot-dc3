@@ -31,6 +31,8 @@
           v-model="reactiveData.formData.deviceName"
           :placeholder="$t('device.add.deviceNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('device.add.driver')" prop="driverId">
@@ -140,7 +142,7 @@
   });
 
   const formRule = reactive<FormRules>({
-    deviceName: nameRules(t, '设备'),
+    deviceName: nameRules(t, t('common.entityDevice')),
     driverId: [
       {
         required: true,

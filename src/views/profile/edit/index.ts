@@ -65,7 +65,7 @@ export default defineComponent({
 
     // 定义表单校验规则
     const formRule = reactive<FormRules>({
-      profileName: nameRules(t, '模板'),
+      profileName: nameRules(t, t('common.entityProfile')),
       enableFlag: [
         {
           required: true,

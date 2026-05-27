@@ -31,6 +31,8 @@
           v-model="reactiveData.formData.pointName"
           :placeholder="$t('point.add.pointNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('point.add.dataType')" prop="pointTypeFlag">
@@ -57,17 +59,21 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('point.add.accuracy')" prop="valueDecimal">
-        <el-input
+        <el-input-number
           v-model="reactiveData.formData.valueDecimal"
+          :max="127"
+          :min="0"
           :placeholder="$t('point.add.accuracyPlaceholder')"
-          clearable
-        ></el-input>
+          :precision="0"
+          controls-position="right"
+        ></el-input-number>
       </el-form-item>
       <el-form-item :label="$t('point.add.unit')" prop="unit">
         <el-input
           v-model="reactiveData.formData.unit"
           :placeholder="$t('point.add.unitPlaceholder')"
           clearable
+          maxlength="32"
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('point.add.baseValue')" prop="baseValue">
@@ -111,7 +117,7 @@
   import { useI18n } from 'vue-i18n';
 
   import { successMessage } from '@/utils/notificationUtil';
-  import { DECIMAL_PATTERN, nameRules, remarkRules } from '@/utils/formRuleUtil';
+  import { byteRules, decimalRules, nameRules, remarkRules } from '@/utils/formRuleUtil';
 
   interface PointAddFormData {
     pointName?: string;
@@ -155,7 +161,7 @@
   });
 
   const formRule = reactive<FormRules>({
-    pointName: nameRules(t, '位号'),
+    pointName: nameRules(t, t('common.entityPoint')),
     pointTypeFlag: [
       {
         required: true,
@@ -170,25 +176,9 @@
         trigger: 'change',
       },
     ],
-    baseValue: [
-      {
-        pattern: DECIMAL_PATTERN,
-        message: t('point.add.baseValueFormat'),
-      },
-    ],
-    multiple: [
-      {
-        pattern: DECIMAL_PATTERN,
-        message: t('point.add.ratioFormat'),
-      },
-    ],
-    valueDecimal: [
-      {
-        required: true,
-        message: t('point.add.accuracyFormat'),
-        trigger: 'blur',
-      },
-    ],
+    baseValue: decimalRules(t('point.add.baseValueFormat')),
+    multiple: decimalRules(t('point.add.ratioFormat')),
+    valueDecimal: byteRules(t, t('point.add.accuracyFormat')),
     remark: remarkRules(t),
   });
 

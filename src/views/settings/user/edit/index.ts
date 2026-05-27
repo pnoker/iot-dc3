@@ -51,12 +51,12 @@ export default defineComponent({
 
     const rules: FormRules = {
       userName: [
-        { required: true, message: t('settings.user.userNamePlaceholder'), trigger: 'blur' },
-        { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
-        { pattern: AUTH_NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+        { required: true, whitespace: true, message: t('settings.user.userNamePlaceholder'), trigger: 'blur' },
+        { min: 2, max: 32, message: t('common.authNameLength'), trigger: 'blur' },
+        { pattern: AUTH_NAME_PATTERN, message: t('common.authNameFormat'), trigger: 'blur' },
       ],
       nickName: [
-        { required: true, message: t('settings.user.nickNamePlaceholder'), trigger: 'blur' },
+        { required: true, whitespace: true, message: t('settings.user.nickNamePlaceholder'), trigger: 'blur' },
         { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
         { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
       ],

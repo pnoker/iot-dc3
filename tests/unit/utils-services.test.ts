@@ -113,14 +113,18 @@ describe('utils (services)', () => {
 
   describe('formRuleUtil', () => {
     it('exposes stable form validation rule contracts', async () => {
-      const { DECIMAL_PATTERN, NAME_PATTERN, nameRules, remarkRules } = await import('@/utils/formRuleUtil');
+      const { AUTH_NAME_PATTERN, DECIMAL_PATTERN, NAME_PATTERN, authNameRules, nameRules, remarkRules } =
+        await import('@/utils/formRuleUtil');
       const t = vi.fn((key: string, args?: Record<string, unknown>) => `${key}:${args?.name ?? ''}`);
 
       expect(NAME_PATTERN.test('设备-01')).toBe(true);
       expect(NAME_PATTERN.test('_bad')).toBe(false);
+      expect(AUTH_NAME_PATTERN.test('role.admin')).toBe(true);
+      expect(AUTH_NAME_PATTERN.test('角色')).toBe(false);
       expect(DECIMAL_PATTERN.test('-12.345')).toBe(true);
       expect(DECIMAL_PATTERN.test('12.3456')).toBe(false);
       expect(nameRules(t, 'Device')).toHaveLength(3);
+      expect(authNameRules(t, 'Role')).toHaveLength(3);
       expect(remarkRules(t)[0]).toMatchObject({ max: 300, trigger: 'blur' });
     });
   });

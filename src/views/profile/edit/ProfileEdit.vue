@@ -32,11 +32,13 @@
       <el-card v-if="reactiveData.active === 0" shadow="hover">
         <el-divider content-position="left">{{ $t('profile.edit.profileConfig') }}</el-divider>
         <el-form ref="formDataRef" :model="reactiveData.profileFormData" :rules="formRule" label-position="top">
-          <el-form-item :label="$t('profile.edit.profileName')" prop="name">
+          <el-form-item :label="$t('profile.edit.profileName')" prop="profileName">
             <el-input
               v-model="reactiveData.profileFormData.profileName"
               :placeholder="$t('profile.edit.profileNamePlaceholder')"
               clearable
+              maxlength="32"
+              show-word-limit
             />
           </el-form-item>
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">

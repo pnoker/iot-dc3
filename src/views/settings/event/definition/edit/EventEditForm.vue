@@ -28,7 +28,13 @@
   >
     <el-form ref="formRef" :model="reactiveData.form" :rules="rules" class="things-form-grid" label-position="top">
       <el-form-item :label="$t('common.name')" prop="eventName">
-        <el-input v-model="reactiveData.form.eventName" :placeholder="$t('common.name')" clearable />
+        <el-input
+          v-model="reactiveData.form.eventName"
+          :placeholder="$t('common.name')"
+          clearable
+          maxlength="32"
+          show-word-limit
+        />
       </el-form-item>
       <el-form-item :label="$t('eventDefinition.form.eventType')" prop="eventTypeFlag">
         <el-select v-model="reactiveData.form.eventTypeFlag" clearable>
@@ -57,34 +63,35 @@
       <el-table :data="reactiveData.params" border max-height="260" size="small">
         <el-table-column :label="$t('common.name')" min-width="170">
           <template #default="{ row, $index }">
-            <el-tooltip
-              :content="paramErrors[$index]?.paramName || ''"
-              :visible="!!paramErrors[$index]?.paramName"
-              placement="top"
-            >
+            <div :class="{ 'is-error': !!paramErrors[$index]?.paramName }" class="param-field">
               <el-input
                 v-model="row.paramName"
-                :class="{ 'is-error': !!paramErrors[$index]?.paramName }"
                 clearable
+                maxlength="32"
+                show-word-limit
+                @input="clearParamFieldError($index, 'paramName')"
                 @blur="validateRow($index)"
               />
-            </el-tooltip>
+              <div v-if="paramErrors[$index]?.paramName" class="param-field__error">
+                {{ paramErrors[$index]?.paramName }}
+              </div>
+            </div>
           </template>
         </el-table-column>
         <el-table-column :label="$t('eventDefinition.form.code')" min-width="170">
           <template #default="{ row, $index }">
-            <el-tooltip
-              :content="paramErrors[$index]?.paramCode || ''"
-              :visible="!!paramErrors[$index]?.paramCode"
-              placement="top"
-            >
+            <div :class="{ 'is-error': !!paramErrors[$index]?.paramCode }" class="param-field">
               <el-input
                 v-model="row.paramCode"
-                :class="{ 'is-error': !!paramErrors[$index]?.paramCode }"
                 clearable
+                maxlength="128"
+                @input="clearParamFieldError($index, 'paramCode')"
                 @blur="validateRow($index)"
               />
-            </el-tooltip>
+              <div v-if="paramErrors[$index]?.paramCode" class="param-field__error">
+                {{ paramErrors[$index]?.paramCode }}
+              </div>
+            </div>
           </template>
         </el-table-column>
         <el-table-column :label="$t('eventDefinition.form.type')" min-width="140">
@@ -127,8 +134,7 @@
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import { EVENT_LEVEL_OPTIONS, EVENT_TYPE_OPTIONS, POINT_TYPE_OPTIONS } from '@/config/constant/enums';
   import type { EventForm, EventParamRecord, EventRecord } from '@/config/types';
-  import { NAME_PATTERN } from '@/utils/formRuleUtil';
-  import { failMessage } from '@/utils/notificationUtil';
+  import { NAME_PATTERN, nameRules, remarkRules } from '@/utils/formRuleUtil';
   import { enableFlagValue, eventLevelValue, eventTypeValue, pointTypeValue } from '@/utils/thingModelFormatUtil';
 
   type FormMode = 'add' | 'edit';
@@ -174,21 +180,28 @@
   });
 
   const rules: FormRules = {
-    eventName: [
-      { required: true, message: t('eventDefinition.form.nameRequired'), trigger: 'blur' },
-      { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
-      { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
-    ],
+    eventName: nameRules(t, t('common.entityEvent')),
     eventTypeFlag: [{ required: true, message: t('eventDefinition.form.eventTypeRequired'), trigger: 'change' }],
     eventLevelFlag: [{ required: true, message: t('eventDefinition.form.eventLevelRequired'), trigger: 'change' }],
+    remark: remarkRules(t),
   };
 
   type RowErrors = { paramName?: string; paramCode?: string };
+  type RowErrorField = keyof RowErrors;
   const paramErrors = reactive<RowErrors[]>([]);
 
-  const validateRow = (index: number) => {
+  const setParamFieldError = (index: number, field: RowErrorField, message: string) => {
+    paramErrors[index] = { ...(paramErrors[index] || {}), [field]: message };
+  };
+
+  const clearParamFieldError = (index: number, field: RowErrorField) => {
+    if (!paramErrors[index]?.[field]) return;
+    paramErrors[index] = { ...(paramErrors[index] || {}), [field]: undefined };
+  };
+
+  const validateRow = (index: number): boolean => {
     const row = reactiveData.params[index];
-    if (!row) return;
+    if (!row) return true;
     const errors: RowErrors = {};
     const name = String(row.paramName || '').trim();
     const code = String(row.paramCode || '').trim();
@@ -201,6 +214,7 @@
       errors.paramCode = t('eventDefinition.form.paramRequired');
     }
     paramErrors[index] = errors;
+    return !errors.paramName && !errors.paramCode;
   };
 
   const clearParamErrors = () => {
@@ -234,42 +248,48 @@
     }));
 
   const normalizeParams = (): EventParamRecord[] =>
-    reactiveData.params
-      .filter((item) => String(item.paramName || item.paramCode || '').trim() !== '')
-      .map((item) => {
-        const param = { ...item } as EventParamRecord;
-        delete (param as { _key?: string })._key;
-        return {
-          ...param,
-          paramName: String(item.paramName || '').trim(),
-          paramCode: String(item.paramCode || '').trim(),
-          paramTypeFlag: item.paramTypeFlag || 'STRING',
-          enableFlag: item.enableFlag || 'ENABLE',
-        };
-      });
+    reactiveData.params.map((item) => {
+      const param = { ...item } as EventParamRecord;
+      delete (param as { _key?: string })._key;
+      return {
+        ...param,
+        paramName: String(item.paramName || '').trim(),
+        paramCode: String(item.paramCode || '').trim(),
+        paramTypeFlag: item.paramTypeFlag || 'STRING',
+        enableFlag: item.enableFlag || 'ENABLE',
+      };
+    });
 
   const validateParams = (params: EventParamRecord[]): boolean => {
     clearParamErrors();
     let valid = true;
-    const codes = new Set<string>();
+    const codes = new Map<string, number>();
     for (let i = 0; i < reactiveData.params.length; i++) {
-      validateRow(i);
+      if (!validateRow(i)) {
+        valid = false;
+      }
     }
-    for (const item of params) {
+    for (let index = 0; index < params.length; index++) {
+      const item = params[index];
+      if (!item) continue;
       const code = String(item.paramCode || '').trim();
       if (!item.paramName || !code || !item.paramTypeFlag) {
-        failMessage(t('eventDefinition.form.paramRequired'));
         valid = false;
       }
       if (item.paramName && !NAME_PATTERN.test(item.paramName)) {
-        failMessage(t('eventDefinition.form.paramNamePattern'));
         valid = false;
       }
-      if (codes.has(code)) {
-        failMessage(t('eventDefinition.form.paramCodeUnique'));
+      if (code && codes.has(code)) {
+        const firstIndex = codes.get(code);
+        if (firstIndex !== undefined) {
+          setParamFieldError(firstIndex, 'paramCode', t('eventDefinition.form.paramCodeUnique'));
+        }
+        setParamFieldError(index, 'paramCode', t('eventDefinition.form.paramCodeUnique'));
         valid = false;
       }
-      codes.add(code);
+      if (code && !codes.has(code)) {
+        codes.set(code, index);
+      }
     }
     return valid;
   };
@@ -358,5 +378,18 @@
 <style>
   .is-error .el-input__wrapper {
     box-shadow: 0 0 0 1px var(--el-color-danger) inset !important;
+  }
+
+  .param-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 2px 0;
+  }
+
+  .param-field__error {
+    color: var(--el-color-danger);
+    font-size: 12px;
+    line-height: 1.2;
   }
 </style>

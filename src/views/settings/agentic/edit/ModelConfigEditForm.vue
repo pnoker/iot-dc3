@@ -28,10 +28,20 @@
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
       <el-form-item :label="$t('settings.agentic.model')" prop="model">
-        <el-input v-model="form.model" :placeholder="$t('settings.agentic.modelPlaceholder')" clearable />
+        <el-input
+          v-model="form.model"
+          :placeholder="$t('settings.agentic.modelPlaceholder')"
+          clearable
+          maxlength="128"
+        />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.label')" prop="label">
-        <el-input v-model="form.label" :placeholder="$t('settings.agentic.labelPlaceholder')" clearable />
+        <el-input
+          v-model="form.label"
+          :placeholder="$t('settings.agentic.labelPlaceholder')"
+          clearable
+          maxlength="128"
+        />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.provider')" prop="providerId">
         <el-select
@@ -54,7 +64,7 @@
         <el-slider v-model="form.temperature" :max="2" :min="0" :step="0.1" />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.maxTokens')" prop="maxTokens">
-        <el-input-number v-model="form.maxTokens" :min="1" :step="256" controls-position="right" />
+        <el-input-number v-model="form.maxTokens" :min="1" :precision="0" :step="256" controls-position="right" />
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.default')">
         <el-switch
@@ -68,7 +78,7 @@
       <el-form-item :label="$t('common.enableFlag')">
         <enable-flag-segmented v-model="form.enableFlag" />
       </el-form-item>
-      <el-form-item :label="$t('common.remark')">
+      <el-form-item :label="$t('common.remark')" prop="remark">
         <el-input v-model="form.remark" :rows="3" maxlength="300" show-word-limit type="textarea" />
       </el-form-item>
     </el-form>
@@ -89,6 +99,7 @@
 
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import type { AgenticModelConfig, AgenticProvider } from '@/config/types';
+  import { remarkRules } from '@/utils/formRuleUtil';
 
   const props = defineProps<{
     providers: AgenticProvider[];
@@ -122,7 +133,7 @@
   const form = reactive<AgenticModelConfig>(initialForm());
 
   const rules = computed<FormRules>(() => ({
-    model: [{ required: true, message: t('settings.agentic.modelRequired'), trigger: 'blur' }],
+    model: [{ required: true, whitespace: true, message: t('settings.agentic.modelRequired'), trigger: 'blur' }],
     providerId: [{ required: true, message: t('settings.agentic.providerRequired'), trigger: 'change' }],
     maxTokens: [{ required: true, message: t('settings.agentic.maxTokensRequired'), trigger: 'blur' }],
     temperature: [
@@ -134,6 +145,7 @@
         trigger: 'change',
       },
     ],
+    remark: remarkRules(t),
   }));
 
   const show = () => {

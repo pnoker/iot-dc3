@@ -48,6 +48,8 @@
           v-model="reactiveData.form.groupName"
           :placeholder="t('settings.group.groupNamePlaceholder')"
           clearable
+          maxlength="32"
+          show-word-limit
         />
       </el-form-item>
       <el-form-item :label="t('settings.group.groupCode')" prop="groupCode">
@@ -55,10 +57,11 @@
           v-model="reactiveData.form.groupCode"
           :placeholder="t('settings.group.groupCodePlaceholder')"
           clearable
+          maxlength="32"
         />
       </el-form-item>
       <el-form-item :label="t('settings.group.groupIndex')" prop="groupIndex">
-        <el-input-number v-model="reactiveData.form.groupIndex" :min="0" controls-position="right" />
+        <el-input-number v-model="reactiveData.form.groupIndex" :min="0" :precision="0" controls-position="right" />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <enable-flag-segmented v-model="reactiveData.form.enableFlag" />
