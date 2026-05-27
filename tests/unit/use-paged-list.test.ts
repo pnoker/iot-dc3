@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { usePagedList } from '@/composables/usePagedList';
 
@@ -145,5 +145,45 @@ describe('usePagedList', () => {
       })
     ).rejects.toThrow('boom');
     expect(state.loading).toBe(false);
+  });
+
+  it('loads server-paginated rows when a request handler is provided', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        code: 'ok',
+        message: 'ok',
+        data: { records: sampleRows.slice(0, 2), total: sampleRows.length },
+      })
+    );
+    const { state, load, search, sort, sizeChange, currentChange } = usePagedList<Row, { keyword?: string }>({
+      request,
+    });
+
+    await load();
+    expect(state.listData).toEqual(sampleRows.slice(0, 2));
+    expect(state.page.total).toBe(sampleRows.length);
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({ page: state.page }));
+
+    search({ keyword: 'Row 02' });
+    await Promise.resolve();
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({ keyword: 'Row 02' }));
+
+    sort();
+    await Promise.resolve();
+    expect(request).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: expect.objectContaining({ orders: [{ column: 'create_time', asc: true }] }) })
+    );
+
+    sizeChange(24);
+    await Promise.resolve();
+    expect(state.page.current).toBe(1);
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({ page: expect.objectContaining({ size: 24 }) }));
+
+    currentChange(2);
+    await Promise.resolve();
+    expect(request).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: expect.objectContaining({ current: 2 }) })
+    );
   });
 });

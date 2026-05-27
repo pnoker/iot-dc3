@@ -99,7 +99,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref, watch } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import {
     addCommand,
@@ -110,11 +110,12 @@
     updateCommand,
     updateCommandParam,
   } from '@/api/command';
+  import { usePagedList } from '@/composables/usePagedList';
   import { timestampLabel } from '@/utils/dateUtil';
   import { failMessage, successMessage } from '@/utils/notificationUtil';
   import { commandTimeoutLabel } from '@/utils/thingModelFormatUtil';
   import { isNull } from '@/utils/validationUtil';
-  import type { CommandForm, CommandParamRecord, CommandRecord, Order } from '@/config/types';
+  import type { CommandForm, CommandParamRecord, CommandRecord } from '@/config/types';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
@@ -142,65 +143,45 @@
   const canManage = computed(() => props.embedded === '' || props.embedded === 'edit');
   const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
 
-  const reactiveData = reactive({
-    loading: false,
-    listData: [] as CommandRecord[],
-    detailVisible: false,
-    detailRecord: null as CommandRecord | null,
-    query: {} as Record<string, unknown>,
-    order: false,
-    page: {
-      total: 0,
-      size: 12,
-      current: 1,
-      orders: [] as Order[],
-    },
-  });
-
   const withFixedQuery = (params: Record<string, unknown> = {}) => {
     const q = { ...params };
     if (!isNull(props.profileId)) q.profileId = props.profileId;
     return q;
   };
 
+  const {
+    state,
+    load,
+    search: searchList,
+    reset: resetList,
+    sort,
+    sizeChange,
+    currentChange,
+  } = usePagedList<CommandRecord, Record<string, unknown>>({
+    request: (query) => listCommand(withFixedQuery(query)),
+  });
+
+  const reactiveData = state as typeof state & {
+    detailVisible: boolean;
+    detailRecord: CommandRecord | null;
+  };
+  reactiveData.detailVisible = false;
+  reactiveData.detailRecord = null;
+
   const withFixedProfile = (form: CommandForm) => {
     const profileId = !isNull(props.profileId) ? props.profileId : form.profileId;
     return isNull(profileId) ? { ...form } : { ...form, profileId };
   };
 
-  const load = () => {
-    reactiveData.loading = true;
-    const query = withFixedQuery(reactiveData.query);
-    listCommand({ page: reactiveData.page, ...query })
-      .then((res) => {
-        const data = res.data || {};
-        reactiveData.listData = data.records || [];
-        reactiveData.page.total = data.total || 0;
-      })
-      .finally(() => {
-        reactiveData.loading = false;
-      });
-  };
-
   const search = (params: Record<string, unknown>) => {
-    reactiveData.query = withFixedQuery(params || {});
-    reactiveData.page.current = 1;
-    load();
+    searchList(params || {});
   };
 
   const reset = () => {
-    reactiveData.query = withFixedQuery({});
-    reactiveData.page.current = 1;
-    load();
+    resetList();
   };
 
   const refresh = () => load();
-
-  const sort = () => {
-    reactiveData.order = !reactiveData.order;
-    reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
-    load();
-  };
 
   const openAdd = () => editRef.value?.show(props.profileId);
   const openDetail = (row: CommandRecord) => {
@@ -297,16 +278,6 @@
         successMessage();
       }
     });
-  };
-
-  const sizeChange = (size: number) => {
-    reactiveData.page.size = size;
-    load();
-  };
-
-  const currentChange = (current: number) => {
-    reactiveData.page.current = current;
-    load();
   };
 
   const preHandle = () => {

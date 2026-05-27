@@ -16,7 +16,7 @@
 
 import { reactive } from 'vue';
 
-import type { Order } from '@/config/types';
+import type { Order, PageQuery, PageResult } from '@/config/types';
 
 export interface PagedListPage {
   total: number;
@@ -37,6 +37,7 @@ export interface PagedListState<T, Q extends Record<string, any> = Record<string
 export interface UsePagedListOptions<T, Q extends Record<string, any> = Record<string, any>> {
   pageSize?: number;
   sortColumn?: string;
+  request?: (query: PageQuery & Partial<Q>) => Promise<R<PageResult<T>>>;
   filter?: (rows: T[], query: Partial<Q>) => T[];
   sortValue?: (row: T) => string | number | null | undefined;
 }
@@ -70,21 +71,53 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
     applyFilters();
   };
 
+  const load = async () => {
+    if (!options.request) {
+      applyFilters();
+      return;
+    }
+
+    state.loading = true;
+    try {
+      const response = await options.request({ page: state.page, ...state.query } as PageQuery & Partial<Q>);
+      const data = response.data || ({ records: [], total: 0 } as PageResult<T>);
+      state.listData = data.records || [];
+      state.page.total = data.total || 0;
+    } catch {
+      // handled globally
+    } finally {
+      state.loading = false;
+    }
+  };
+
   const search = (params?: Partial<Q>) => {
     state.query = params || {};
     state.page.current = 1;
+    if (options.request) {
+      void load();
+      return;
+    }
     applyFilters();
   };
 
   const reset = () => {
     state.query = {};
     state.page.current = 1;
+    if (options.request) {
+      void load();
+      return;
+    }
     applyFilters();
   };
 
   const sort = () => {
     state.order = !state.order;
     state.page.orders = [{ column: options.sortColumn ?? 'create_time', asc: state.order }];
+
+    if (options.request) {
+      void load();
+      return;
+    }
 
     if (options.sortValue) {
       const asc = state.order;
@@ -102,11 +135,19 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
   const sizeChange = (size: number) => {
     state.page.size = size;
     state.page.current = 1;
+    if (options.request) {
+      void load();
+      return;
+    }
     applyFilters();
   };
 
   const currentChange = (current: number) => {
     state.page.current = current;
+    if (options.request) {
+      void load();
+      return;
+    }
     applyFilters();
   };
 
@@ -123,6 +164,7 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
     state,
     setAllData,
     applyFilters,
+    load,
     search,
     reset,
     sort,

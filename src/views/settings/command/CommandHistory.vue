@@ -155,18 +155,23 @@
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
   import { getCommandHistoryById, listCommandHistory } from '@/api/command';
+  import { usePagedList } from '@/composables/usePagedList';
   import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
   import { prettyJson } from '@/utils/jsonUtil';
-  import type { CommandHistory, Order } from '@/config/types';
+  import type { CommandHistory } from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
-  const reactiveData = reactive({
-    loading: false,
-    listData: [] as CommandHistory[],
-    query: {} as Record<string, unknown>,
-    page: { total: 0, size: 12, current: 1, orders: [] as Order[] },
+  const {
+    state: reactiveData,
+    load,
+    search,
+    reset,
+    sizeChange,
+    currentChange,
+  } = usePagedList<CommandHistory, Record<string, unknown>>({
+    request: (query) => listCommandHistory(query),
   });
 
   const formData = reactive<Record<string, string>>({});
@@ -175,42 +180,16 @@
 
   const formatJson = (value: unknown) => prettyJson(value);
 
-  const load = () => {
-    reactiveData.loading = true;
-    listCommandHistory({ page: reactiveData.page, ...reactiveData.query })
-      .then((res) => {
-        const data = res.data || {};
-        reactiveData.listData = data.records || [];
-        reactiveData.page.total = data.total || 0;
-      })
-      .finally(() => {
-        reactiveData.loading = false;
-      });
-  };
-
   const onSearch = (data: Record<string, string>) => {
-    reactiveData.query = cleanSearchParams(data);
-    reactiveData.page.current = 1;
-    load();
+    search(cleanSearchParams(data));
   };
 
   const onReset = () => {
     resetSearchForm(formData, {});
-    reactiveData.query = {};
-    reactiveData.page.current = 1;
-    load();
+    reset();
   };
 
   const refresh = () => load();
-
-  const sizeChange = (size: number) => {
-    reactiveData.page.size = size;
-    load();
-  };
-  const currentChange = (current: number) => {
-    reactiveData.page.current = current;
-    load();
-  };
 
   const openDetail = (row: CommandHistory) => {
     getCommandHistoryById(row.recordId)

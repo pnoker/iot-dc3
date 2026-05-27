@@ -19,10 +19,10 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { addGroup, deleteGroup, listGroup, updateGroup } from '@/api/group';
+import { usePagedList } from '@/composables/usePagedList';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
-import type { Order } from '@/config/types';
 import type { GroupForm, GroupRecord } from '@/config/types/manager';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -43,19 +43,15 @@ export default defineComponent({
     const router = useRouter();
     const editRef = ref<InstanceType<typeof groupEditForm>>();
 
-    const reactiveData = reactive({
-      loading: false,
-      listData: [] as GroupRecord[],
-      groupOptions: [] as GroupRecord[],
-      query: {} as Record<string, unknown>,
-      order: false,
-      page: {
-        total: 0,
-        size: 12,
-        current: 1,
-        orders: [] as Order[],
-      },
+    const { state, load, search, reset, sort, sizeChange, currentChange } = usePagedList<
+      GroupRecord,
+      Record<string, unknown>
+    >({
+      request: (query) => listGroup(query),
     });
+
+    const reactiveData = state as typeof state & { groupOptions: GroupRecord[] };
+    reactiveData.groupOptions = [];
 
     const parentNameMap = reactive<Record<string, string>>({});
 
@@ -74,48 +70,14 @@ export default defineComponent({
         });
     };
 
-    const load = () => {
-      reactiveData.loading = true;
-      listGroup({ page: reactiveData.page, ...reactiveData.query })
-        .then((res) => {
-          const data = res.data || {};
-          reactiveData.listData = data.records || [];
-          reactiveData.page.total = data.total || 0;
-        })
-        .catch(() => {
-          // handled globally
-        })
-        .finally(() => {
-          reactiveData.loading = false;
-        });
-    };
-
     const parentName = (id: string | number | null | undefined) => {
       if (!id || String(id) === '0') return t('settings.group.rootGroup');
       return parentNameMap[String(id)] || String(id);
     };
 
-    const search = (params: Record<string, unknown>) => {
-      reactiveData.query = params || {};
-      reactiveData.page.current = 1;
-      load();
-    };
-
-    const reset = () => {
-      reactiveData.query = {};
-      reactiveData.page.current = 1;
-      load();
-    };
-
     const refresh = () => {
       load();
       loadOptions();
-    };
-
-    const sort = () => {
-      reactiveData.order = !reactiveData.order;
-      reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
-      load();
     };
 
     const openAdd = () => editRef.value?.show();
@@ -159,16 +121,6 @@ export default defineComponent({
         .catch(() => {
           // handled globally
         });
-    };
-
-    const sizeChange = (size: number) => {
-      reactiveData.page.size = size;
-      load();
-    };
-
-    const currentChange = (current: number) => {
-      reactiveData.page.current = current;
-      load();
     };
 
     load();

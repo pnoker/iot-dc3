@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive } from 'vue';
+import { defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { listApi } from '@/api/api';
+import { usePagedList } from '@/composables/usePagedList';
 import { timestampColumn } from '@/utils/dateUtil';
 
-import type { ApiRecord, Order } from '@/config/types';
+import type { ApiRecord } from '@/config/types';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import EnableTag from '@/components/tag/EnableTag.vue';
@@ -41,69 +42,24 @@ export default defineComponent({
     const { t } = useI18n();
     const router = useRouter();
 
-    const reactiveData = reactive({
-      loading: false,
-      listData: [] as ApiRecord[],
-      query: {} as Record<string, unknown>,
-      order: false,
-      page: {
-        total: 0,
-        size: 12,
-        current: 1,
-        orders: [] as Order[],
-      },
+    const {
+      state: reactiveData,
+      load,
+      search,
+      reset,
+      sort,
+      sizeChange,
+      currentChange,
+    } = usePagedList<ApiRecord, Record<string, unknown>>({
+      request: (query) => listApi(query),
     });
 
-    const load = () => {
-      reactiveData.loading = true;
-      listApi({ page: reactiveData.page, ...reactiveData.query })
-        .then((res) => {
-          const data = res.data || {};
-          reactiveData.listData = data.records || [];
-          reactiveData.page.total = data.total || 0;
-        })
-        .catch(() => {
-          // handled globally
-        })
-        .finally(() => {
-          reactiveData.loading = false;
-        });
-    };
-
-    const search = (params: Record<string, unknown>) => {
-      reactiveData.query = params || {};
-      reactiveData.page.current = 1;
-      load();
-    };
-
-    const reset = () => {
-      reactiveData.query = {};
-      reactiveData.page.current = 1;
-      load();
-    };
-
     const refresh = () => load();
-
-    const sort = () => {
-      reactiveData.order = !reactiveData.order;
-      reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
-      load();
-    };
 
     const openDetail = (row: ApiRecord) => {
       router.push({ name: 'settingsApiDetail', query: { id: String(row.id) } }).catch(() => {
         // handled globally
       });
-    };
-
-    const sizeChange = (size: number) => {
-      reactiveData.page.size = size;
-      load();
-    };
-
-    const currentChange = (current: number) => {
-      reactiveData.page.current = current;
-      load();
     };
 
     load();

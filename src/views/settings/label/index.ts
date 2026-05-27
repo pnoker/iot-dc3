@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { addLabel, deleteLabel, listLabel, updateLabel } from '@/api/label';
+import { usePagedList } from '@/composables/usePagedList';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
 
-import type { Order } from '@/config/types';
 import type { LabelForm, LabelRecord } from '@/config/types/manager';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -43,54 +43,19 @@ export default defineComponent({
     const router = useRouter();
     const editRef = ref<InstanceType<typeof labelEditForm>>();
 
-    const reactiveData = reactive({
-      loading: false,
-      listData: [] as LabelRecord[],
-      query: {} as Record<string, unknown>,
-      order: false,
-      page: {
-        total: 0,
-        size: 12,
-        current: 1,
-        orders: [] as Order[],
-      },
+    const {
+      state: reactiveData,
+      load,
+      search,
+      reset,
+      sort,
+      sizeChange,
+      currentChange,
+    } = usePagedList<LabelRecord, Record<string, unknown>>({
+      request: (query) => listLabel(query),
     });
 
-    const load = () => {
-      reactiveData.loading = true;
-      listLabel({ page: reactiveData.page, ...reactiveData.query })
-        .then((res) => {
-          const data = res.data || {};
-          reactiveData.listData = data.records || [];
-          reactiveData.page.total = data.total || 0;
-        })
-        .catch(() => {
-          // handled globally
-        })
-        .finally(() => {
-          reactiveData.loading = false;
-        });
-    };
-
-    const search = (params: Record<string, unknown>) => {
-      reactiveData.query = params || {};
-      reactiveData.page.current = 1;
-      load();
-    };
-
-    const reset = () => {
-      reactiveData.query = {};
-      reactiveData.page.current = 1;
-      load();
-    };
-
     const refresh = () => load();
-
-    const sort = () => {
-      reactiveData.order = !reactiveData.order;
-      reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
-      load();
-    };
 
     const openAdd = () => editRef.value?.show();
     const openDetail = (row: LabelRecord) => {
@@ -133,16 +98,6 @@ export default defineComponent({
         .catch(() => {
           // handled globally
         });
-    };
-
-    const sizeChange = (size: number) => {
-      reactiveData.page.size = size;
-      load();
-    };
-
-    const currentChange = (current: number) => {
-      reactiveData.page.current = current;
-      load();
     };
 
     load();
