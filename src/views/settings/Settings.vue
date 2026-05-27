@@ -18,35 +18,36 @@
   <el-container class="settings-container">
     <el-aside class="settings-aside" width="220px">
       <el-card class="settings-aside-card" shadow="never">
-        <el-menu :default-active="activeMenu" :default-openeds="defaultOpeneds" @select="onSelect">
-          <template v-for="item in sidebarItems" :key="item.name">
-            <el-sub-menu v-if="item.children?.length" :index="item.name">
-              <template #title>
+        <el-scrollbar>
+          <el-menu :default-active="activeMenu" :default-openeds="defaultOpeneds" @select="onSelect">
+            <template v-for="item in sidebarItems" :key="item.name">
+              <el-sub-menu v-if="item.children?.length" :index="item.name">
+                <template #title>
+                  <el-icon v-if="item.icon">
+                    <component :is="item.icon" />
+                  </el-icon>
+                  <span>{{ item.title }}</span>
+                </template>
+                <el-menu-item v-for="child in item.children" :key="child.name" :index="child.name">
+                  <el-icon v-if="child.icon"><component :is="child.icon" /></el-icon>
+                  <span>{{ child.title }}</span>
+                </el-menu-item>
+              </el-sub-menu>
+              <el-menu-item v-else :index="item.name">
                 <el-icon v-if="item.icon">
                   <component :is="item.icon" />
                 </el-icon>
                 <span>{{ item.title }}</span>
-              </template>
-              <el-menu-item v-for="child in item.children" :key="child.name" :index="child.name">
-                <el-icon v-if="child.icon"><component :is="child.icon" /></el-icon>
-                <span>{{ child.title }}</span>
               </el-menu-item>
-            </el-sub-menu>
-            <el-menu-item v-else :index="item.name">
-              <el-icon v-if="item.icon">
-                <component :is="item.icon" />
-              </el-icon>
-              <span>{{ item.title }}</span>
-            </el-menu-item>
-          </template>
-        </el-menu>
+            </template>
+          </el-menu>
+        </el-scrollbar>
       </el-card>
     </el-aside>
     <el-main class="settings-main">
-      <router-view />
-      <!-- No backtop here: .settings-main is no longer a scroll container
-           (see overflow override below), so the Layout-level <el-backtop>
-           on .body .el-scrollbar__wrap handles all settings sub-pages. -->
+      <el-scrollbar>
+        <router-view />
+      </el-scrollbar>
     </el-main>
   </el-container>
 </template>
@@ -277,17 +278,11 @@
   .settings-container {
     align-items: stretch;
     gap: 4px;
-    min-height: calc(100vh - 120px);
+    height: 100%;
     min-width: 0;
   }
 
   .settings-aside {
-    // No margin-top. The previous 1px was meant to line up with the
-    // tool-card's old 1px top margin, but that margin is gone now; any
-    // non-zero value here leaves the aside sitting lower than the main
-    // content so the breadcrumb→aside gap reads as "bigger" than the
-    // breadcrumb→content gap on every settings sub-page (including
-    // About, which has no tool-card at all).
     .settings-aside-card {
       height: 100%;
       border: 0;
@@ -297,11 +292,16 @@
       :deep(.el-card__body) {
         flex: 1;
         padding: 0;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      :deep(.el-scrollbar) {
+        height: 100%;
       }
     }
 
     :deep(.el-menu) {
-      height: 100%;
       border-right: none;
     }
 
@@ -316,13 +316,10 @@
   .settings-main {
     padding: 0;
     min-width: 0;
-    // el-main ships with overflow:auto by design (aside-doesn't-scroll,
-    // main-scrolls layout). We don't want that here — the Layout-level
-    // el-scrollbar already owns page scrolling, and an additional auto
-    // overflow on main gave flex-row a 1px rounding window where a ghost
-    // scrollbar would appear, consuming wheel events whenever the cursor
-    // hovered any settings card. Reset to visible so wheel always reaches
-    // the Layout scrollbar above.
-    overflow: visible;
+    overflow: hidden;
+
+    > .el-scrollbar {
+      height: 100%;
+    }
   }
 </style>

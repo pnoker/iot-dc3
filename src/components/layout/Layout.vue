@@ -82,25 +82,24 @@
     </div>
     <div class="body">
       <div class="body-main">
-        <el-scrollbar ref="scrollbarRef">
-          <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
-            <el-breadcrumb separator="/">
-              <el-breadcrumb-item
-                v-for="(item, index) in breadcrumbItems"
-                :key="`${item.path}-${index}`"
-                :to="item.path"
-              >
-                <span class="breadcrumb__item">
-                  <el-icon v-if="item.icon" class="breadcrumb__icon">
-                    <component :is="item.icon" />
-                  </el-icon>
-                  <span>{{ item.title }}</span>
-                </span>
-              </el-breadcrumb-item>
-            </el-breadcrumb>
-          </div>
+        <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item v-for="(item, index) in breadcrumbItems" :key="`${item.path}-${index}`" :to="item.path">
+              <span class="breadcrumb__item">
+                <el-icon v-if="item.icon" class="breadcrumb__icon">
+                  <component :is="item.icon" />
+                </el-icon>
+                <span>{{ item.title }}</span>
+              </span>
+            </el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
+        <el-scrollbar v-if="!isFixedLayout" ref="scrollbarRef">
           <router-view />
         </el-scrollbar>
+        <div v-else class="fixed-viewport">
+          <router-view />
+        </div>
       </div>
       <agentic-assistant />
       <el-backtop :bottom="40" :right="40" target=".body-main .el-scrollbar__wrap" />
@@ -272,6 +271,11 @@
     return node?.menuExt?.content?.icon || SETTINGS_FALLBACK_ICON[code] || FALLBACK_ICON[code];
   };
 
+  const isFixedLayout = computed(() => {
+    const name = route.name as string;
+    return !!name && name.startsWith('settings');
+  });
+
   const breadcrumbItems = computed(() => {
     const items: { path: string; title: string; icon?: string }[] = [
       { path: '/home', title: t('nav.home'), icon: iconForCode('home') },
@@ -408,12 +412,21 @@
       background: #f6f7f9;
 
       .body-main {
+        display: flex;
+        flex-direction: column;
         flex: 1 1 auto;
         min-width: 0;
         height: 100%;
 
         > .el-scrollbar {
-          height: 100%;
+          flex: 1;
+          min-height: 0;
+        }
+
+        .fixed-viewport {
+          flex: 1;
+          min-height: 0;
+          overflow: hidden;
         }
       }
 
