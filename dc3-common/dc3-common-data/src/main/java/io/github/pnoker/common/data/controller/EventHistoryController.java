@@ -58,7 +58,9 @@ public class EventHistoryController implements BaseController {
     public Mono<R<String>> report(@Validated @RequestBody EventReportVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             String recordId = eventHistoryService.report(tenantId, entityVO);
-            return R.ok(recordId);
+            R<String> result = R.ok();
+            result.setData(recordId);
+            return result;
         }));
     }
 

@@ -74,9 +74,9 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently online
      */
     @GetMapping("/get_device_online_by_driver_id")
-    public Mono<R<String>> getDeviceOnlineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Long>> getDeviceOnlineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            String result = driverStatusService.getDeviceOnlineByDriverId(tenantId, driverId);
+            Long result = driverStatusService.getDeviceOnlineByDriverId(tenantId, driverId);
             return R.ok(result);
         }));
     }
@@ -88,9 +88,9 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently offline
      */
     @GetMapping("/get_device_offline_by_driver_id")
-    public Mono<R<String>> getDeviceOfflineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Long>> getDeviceOfflineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            String result = driverStatusService.getDeviceOfflineByDriverId(tenantId, driverId);
+            Long result = driverStatusService.getDeviceOfflineByDriverId(tenantId, driverId);
             return R.ok(result);
         }));
     }

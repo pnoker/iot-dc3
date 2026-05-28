@@ -58,7 +58,9 @@ public class CommandHistoryController implements BaseController {
     public Mono<R<String>> call(@Validated @RequestBody CommandCallVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             String recordId = commandHistoryService.call(tenantId, entityVO);
-            return R.ok(recordId);
+            R<String> result = R.ok();
+            result.setData(recordId);
+            return result;
         }));
     }
 

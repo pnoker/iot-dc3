@@ -44,17 +44,17 @@ public interface DriverStatusService {
      *
      * @param tenantId Tenant ID
      * @param driverId Driver ID
-     * @return Number of online devices, as a string
+     * @return Number of online devices
      */
-    String getDeviceOnlineByDriverId(Long tenantId, Long driverId);
+    Long getDeviceOnlineByDriverId(Long tenantId, Long driverId);
 
     /**
      * Count of currently offline devices under the driver.
      *
      * @param tenantId Tenant ID
      * @param driverId Driver ID
-     * @return Number of offline devices, as a string
+     * @return Number of offline devices
      */
-    String getDeviceOfflineByDriverId(Long tenantId, Long driverId);
+    Long getDeviceOfflineByDriverId(Long tenantId, Long driverId);
 
 }

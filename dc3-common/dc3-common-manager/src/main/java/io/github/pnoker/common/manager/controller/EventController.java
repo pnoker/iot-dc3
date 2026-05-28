@@ -68,12 +68,12 @@ public class EventController implements BaseController {
     private final DeviceService deviceService;
 
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventVO entityVO) {
+    public Mono<R<Long>> add(@Validated(Add.class) @RequestBody EventVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             EventBO entityBO = eventBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             eventService.add(entityBO);
-            return R.ok(String.valueOf(entityBO.getId()));
+            return R.ok(entityBO.getId());
         }));
     }
 
