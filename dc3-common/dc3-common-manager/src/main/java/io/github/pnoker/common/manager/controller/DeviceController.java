@@ -238,11 +238,11 @@ public class DeviceController implements BaseController {
      * @return
      */
     @GetMapping("/get_count_by_driver_id")
-    public Mono<R<String>> getCountByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Integer>> getCountByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.getById(driverId));
             List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.listByDriverId(driverId));
-            return R.ok(String.valueOf(deviceBOList.size()));
+            return R.ok(deviceBOList.size());
         }));
     }
 

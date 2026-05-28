@@ -68,12 +68,12 @@ public class CommandController implements BaseController {
     private final DeviceService deviceService;
 
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandVO entityVO) {
+    public Mono<R<Long>> add(@Validated(Add.class) @RequestBody CommandVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             CommandBO entityBO = commandBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             commandService.add(entityBO);
-            return R.ok(String.valueOf(entityBO.getId()));
+            return R.ok(entityBO.getId());
         }));
     }
 

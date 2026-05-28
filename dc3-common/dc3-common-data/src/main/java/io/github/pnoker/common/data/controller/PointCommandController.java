@@ -57,7 +57,9 @@ public class PointCommandController implements BaseController {
     public Mono<R<String>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             String commandId = pointCommandService.read(tenantId, entityVO);
-            return R.ok(commandId);
+            R<String> result = R.ok();
+            result.setData(commandId);
+            return result;
         }));
     }
 
@@ -71,7 +73,9 @@ public class PointCommandController implements BaseController {
     public Mono<R<String>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             String commandId = pointCommandService.write(tenantId, entityVO);
-            return R.ok(commandId);
+            R<String> result = R.ok();
+            result.setData(commandId);
+            return result;
         }));
     }
 

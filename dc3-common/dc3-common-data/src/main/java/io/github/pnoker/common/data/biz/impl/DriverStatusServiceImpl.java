@@ -80,23 +80,21 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     }
 
     @Override
-    public String getDeviceOnlineByDriverId(Long tenantId, Long driverId) {
+    public Long getDeviceOnlineByDriverId(Long tenantId, Long driverId) {
         List<String> list = getDeviceStatuses(tenantId, driverId);
         if (Objects.isNull(list)) {
-            return String.valueOf(0L);
+            return 0L;
         }
-        long count = list.stream().filter(e -> e.equals(EntityStatusEnum.ONLINE.getCode())).count();
-        return String.valueOf(count);
+        return list.stream().filter(e -> e.equals(EntityStatusEnum.ONLINE.getCode())).count();
     }
 
     @Override
-    public String getDeviceOfflineByDriverId(Long tenantId, Long driverId) {
+    public Long getDeviceOfflineByDriverId(Long tenantId, Long driverId) {
         List<String> list = getDeviceStatuses(tenantId, driverId);
         if (Objects.isNull(list)) {
-            return String.valueOf(0L);
+            return 0L;
         }
-        long count = list.stream().filter(e -> e.equals(EntityStatusEnum.OFFLINE.getCode())).count();
-        return String.valueOf(count);
+        return list.stream().filter(e -> e.equals(EntityStatusEnum.OFFLINE.getCode())).count();
     }
 
     /**
