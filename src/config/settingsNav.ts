@@ -46,11 +46,11 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsDeviceAlarm: 'nav.settingsDeviceAlarm',
   settingsDriverAlarm: 'nav.settingsDriverAlarm',
   settingsModel: 'nav.settingsModel',
-  settingsAgentic: 'nav.settingsAgentic',
-  settingsAgenticProvider: 'nav.settingsAgenticProvider',
+  settingsModelConfig: 'nav.settingsModelConfig',
+  settingsModelProvider: 'nav.settingsModelProvider',
   settingsEvent: 'nav.settingsEvent',
-  settingsEventOverview: 'nav.settingsEventOverview',
-  settingsPointEvent: 'nav.settingsPointEvent',
+  settingsAlarmOverview: 'nav.settingsAlarmOverview',
+  settingsPointAlarm: 'nav.settingsPointAlarm',
   settingsCommand: 'nav.settingsCommand',
   settingsCommandHistory: 'nav.settingsCommandHistory',
   settingsEventHistory: 'nav.settingsEventHistory',
@@ -69,8 +69,8 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsAlarmBindDetail: 'nav.settingsAlarmBindDetail',
   settingsAlarmStateDetail: 'nav.settingsAlarmStateDetail',
   settingsAlarmHistoryDetail: 'nav.settingsAlarmHistoryDetail',
-  settingsAgenticDetail: 'nav.settingsAgenticDetail',
-  settingsAgenticProviderDetail: 'nav.settingsAgenticProviderDetail',
+  settingsModelConfigDetail: 'nav.settingsModelConfigDetail',
+  settingsModelProviderDetail: 'nav.settingsModelProviderDetail',
 };
 
 export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
@@ -93,11 +93,11 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsDeviceAlarm: 'Management',
   settingsDriverAlarm: 'Promotion',
   settingsModel: 'Cpu',
-  settingsAgentic: 'ChatDotRound',
-  settingsAgenticProvider: 'ChatLineSquare',
+  settingsModelConfig: 'ChatDotRound',
+  settingsModelProvider: 'ChatLineSquare',
   settingsEvent: 'Bell',
-  settingsEventOverview: 'DataLine',
-  settingsPointEvent: 'TrendCharts',
+  settingsAlarmOverview: 'DataLine',
+  settingsPointAlarm: 'TrendCharts',
   settingsCommand: 'Operation',
   settingsCommandHistory: 'Document',
   settingsEventHistory: 'Document',
@@ -116,17 +116,17 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsAlarmBindDetail: 'Link',
   settingsAlarmStateDetail: 'Monitor',
   settingsAlarmHistoryDetail: 'DocumentChecked',
-  settingsAgenticDetail: 'ChatDotRound',
-  settingsAgenticProviderDetail: 'ChatLineSquare',
+  settingsModelConfigDetail: 'ChatDotRound',
+  settingsModelProviderDetail: 'ChatLineSquare',
 };
 
 export const SETTINGS_MODEL_CHILDREN: SettingsNavNode[] = [
-  { name: 'settingsAgentic', titleKey: 'nav.settingsAgentic', icon: 'ChatDotRound' },
-  { name: 'settingsAgenticProvider', titleKey: 'nav.settingsAgenticProvider', icon: 'ChatLineSquare' },
+  { name: 'settingsModelConfig', titleKey: 'nav.settingsModelConfig', icon: 'ChatDotRound' },
+  { name: 'settingsModelProvider', titleKey: 'nav.settingsModelProvider', icon: 'ChatLineSquare' },
 ];
 
 export const SETTINGS_ALARM_CHILDREN: SettingsNavNode[] = [
-  { name: 'settingsEventOverview', titleKey: 'nav.settingsEventOverview', icon: 'DataLine' },
+  { name: 'settingsAlarmOverview', titleKey: 'nav.settingsAlarmOverview', icon: 'DataLine' },
   { name: 'settingsAlarmRule', titleKey: 'nav.settingsAlarmRule', icon: 'SetUp' },
   { name: 'settingsAlarmNotify', titleKey: 'nav.settingsAlarmNotify', icon: 'Bell' },
   { name: 'settingsAlarmMessage', titleKey: 'nav.settingsAlarmMessage', icon: 'Message' },
@@ -134,9 +134,9 @@ export const SETTINGS_ALARM_CHILDREN: SettingsNavNode[] = [
   { name: 'settingsAlarmBind', titleKey: 'nav.settingsAlarmBind', icon: 'Link' },
   { name: 'settingsAlarmState', titleKey: 'nav.settingsAlarmState', icon: 'Monitor' },
   { name: 'settingsAlarmHistory', titleKey: 'nav.settingsAlarmHistory', icon: 'DocumentChecked' },
-  { name: 'settingsDeviceAlarm', titleKey: 'nav.settingsDeviceAlarm', icon: 'Management' },
-  { name: 'settingsPointEvent', titleKey: 'nav.settingsPointEvent', icon: 'TrendCharts' },
   { name: 'settingsDriverAlarm', titleKey: 'nav.settingsDriverAlarm', icon: 'Promotion' },
+  { name: 'settingsDeviceAlarm', titleKey: 'nav.settingsDeviceAlarm', icon: 'Management' },
+  { name: 'settingsPointAlarm', titleKey: 'nav.settingsPointAlarm', icon: 'TrendCharts' },
 ];
 
 export const SETTINGS_EVENT_CHILDREN: SettingsNavNode[] = [
@@ -150,21 +150,21 @@ export const SETTINGS_COMMAND_CHILDREN: SettingsNavNode[] = [
 export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
   { name: 'settingsUser', titleKey: 'nav.settingsUser', icon: 'User' },
   { name: 'settingsRole', titleKey: 'nav.settingsRole', icon: 'UserFilled' },
-  { name: 'settingsResource', titleKey: 'nav.settingsResource', icon: 'Key' },
+  { name: 'settingsModel', titleKey: 'nav.settingsModel', icon: 'Cpu', children: SETTINGS_MODEL_CHILDREN },
+  { name: 'settingsCommand', titleKey: 'nav.settingsCommand', icon: 'Operation', children: SETTINGS_COMMAND_CHILDREN },
+  { name: 'settingsEvent', titleKey: 'nav.settingsEvent', icon: 'Bell', children: SETTINGS_EVENT_CHILDREN },
+  { name: 'settingsAlarm', titleKey: 'nav.settingsAlarm', icon: 'AlarmClock', children: SETTINGS_ALARM_CHILDREN },
   { name: 'settingsApi', titleKey: 'nav.settingsApi', icon: 'Link' },
+  { name: 'settingsResource', titleKey: 'nav.settingsResource', icon: 'Key' },
   { name: 'settingsMenu', titleKey: 'nav.settingsMenu', icon: 'Menu' },
   { name: 'settingsGroup', titleKey: 'nav.settingsGroup', icon: 'Grid' },
   { name: 'settingsLabel', titleKey: 'nav.settingsLabel', icon: 'CollectionTag' },
-  { name: 'settingsAlarm', titleKey: 'nav.settingsAlarm', icon: 'AlarmClock', children: SETTINGS_ALARM_CHILDREN },
-  { name: 'settingsEvent', titleKey: 'nav.settingsEvent', icon: 'Bell', children: SETTINGS_EVENT_CHILDREN },
-  { name: 'settingsCommand', titleKey: 'nav.settingsCommand', icon: 'Operation', children: SETTINGS_COMMAND_CHILDREN },
-  { name: 'settingsModel', titleKey: 'nav.settingsModel', icon: 'Cpu', children: SETTINGS_MODEL_CHILDREN },
 ];
 
 export const SETTINGS_ACTIVE_ALIAS: Record<string, string> = {
-  settingsModel: 'settingsAgentic',
-  settingsAgenticDetail: 'settingsAgentic',
-  settingsAgenticProviderDetail: 'settingsAgenticProvider',
+  settingsModel: 'settingsModelConfig',
+  settingsModelConfigDetail: 'settingsModelConfig',
+  settingsModelProviderDetail: 'settingsModelProvider',
   settingsAlarm: 'settingsAlarmRule',
   settingsAlarmRuleDetail: 'settingsAlarmRule',
   settingsAlarmNotifyDetail: 'settingsAlarmNotify',
@@ -180,7 +180,7 @@ export const SETTINGS_ACTIVE_ALIAS: Record<string, string> = {
 
 export const SETTINGS_ROUTE_ALIAS: Record<string, string> = {
   settingsAlarm: 'settingsAlarmRule',
-  settingsModel: 'settingsAgentic',
+  settingsModel: 'settingsModelConfig',
   settingsCommand: 'settingsCommandHistory',
 };
 
@@ -194,10 +194,10 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   settingsAlarmHistory: 'settingsAlarm',
   settingsDeviceAlarm: 'settingsAlarm',
   settingsDriverAlarm: 'settingsAlarm',
-  settingsEventOverview: 'settingsAlarm',
-  settingsAgentic: 'settingsModel',
-  settingsAgenticProvider: 'settingsModel',
-  settingsPointEvent: 'settingsEvent',
+  settingsAlarmOverview: 'settingsAlarm',
+  settingsPointAlarm: 'settingsAlarm',
+  settingsModelConfig: 'settingsModel',
+  settingsModelProvider: 'settingsModel',
   settingsCommandHistory: 'settingsCommand',
   settingsEventHistory: 'settingsEvent',
 };
@@ -284,18 +284,18 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
     alarmParent,
     { path: '/settings/alarm/history', titleKey: 'nav.settingsAlarmHistory', code: 'settingsAlarmHistory' },
   ],
-  settingsAgentic: [modelParent],
-  settingsAgenticProvider: [modelParent],
-  settingsAgenticDetail: [
+  settingsModelConfig: [modelParent],
+  settingsModelProvider: [modelParent],
+  settingsModelConfigDetail: [
     modelParent,
-    { path: '/settings/agentic', titleKey: 'nav.settingsAgentic', code: 'settingsAgentic' },
+    { path: '/settings/model/config', titleKey: 'nav.settingsModelConfig', code: 'settingsModelConfig' },
   ],
-  settingsAgenticProviderDetail: [
+  settingsModelProviderDetail: [
     modelParent,
-    { path: '/settings/agentic/provider', titleKey: 'nav.settingsAgenticProvider', code: 'settingsAgenticProvider' },
+    { path: '/settings/model/provider', titleKey: 'nav.settingsModelProvider', code: 'settingsModelProvider' },
   ],
-  settingsEventOverview: [alarmParent],
-  settingsPointEvent: [eventParent],
+  settingsAlarmOverview: [alarmParent],
+  settingsPointAlarm: [alarmParent],
   settingsCommandHistory: [commandParent],
   settingsEventHistory: [eventParent],
 };

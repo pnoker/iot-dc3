@@ -196,21 +196,21 @@
     const model = items.find((item) => item.name === 'settingsModel');
     if (model) {
       model.children = model.children || [];
-      if (!hasItem(model.children, 'settingsAgentic')) {
+      if (!hasItem(model.children, 'settingsModelConfig')) {
         model.children.push(
-          extracted.find((item) => item.name === 'settingsAgentic') || {
-            name: 'settingsAgentic',
-            title: t('nav.settingsAgentic'),
-            icon: SETTINGS_FALLBACK_ICON.settingsAgentic,
+          extracted.find((item) => item.name === 'settingsModelConfig') || {
+            name: 'settingsModelConfig',
+            title: t('nav.settingsModelConfig'),
+            icon: SETTINGS_FALLBACK_ICON.settingsModelConfig,
           }
         );
       }
-      if (!hasItem(model.children, 'settingsAgenticProvider')) {
+      if (!hasItem(model.children, 'settingsModelProvider')) {
         model.children.push(
-          extracted.find((item) => item.name === 'settingsAgenticProvider') || {
-            name: 'settingsAgenticProvider',
-            title: t('nav.settingsAgenticProvider'),
-            icon: SETTINGS_FALLBACK_ICON.settingsAgenticProvider,
+          extracted.find((item) => item.name === 'settingsModelProvider') || {
+            name: 'settingsModelProvider',
+            title: t('nav.settingsModelProvider'),
+            icon: SETTINGS_FALLBACK_ICON.settingsModelProvider,
           }
         );
       }

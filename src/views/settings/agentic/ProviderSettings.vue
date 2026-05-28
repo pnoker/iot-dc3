@@ -145,7 +145,7 @@
 
   const openAdd = () => editRef.value?.show();
   const openDetail = (row: AgenticProvider) => {
-    router.push({ name: 'settingsAgenticProviderDetail', query: { id: String(row.id) } }).catch(() => {
+    router.push({ name: 'settingsModelProviderDetail', query: { id: String(row.id) } }).catch(() => {
       // handled globally
     });
   };

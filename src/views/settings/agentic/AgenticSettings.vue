@@ -158,7 +158,7 @@
 
   const openAdd = () => editRef.value?.show();
   const openDetail = (row: AgenticModelConfig) => {
-    router.push({ name: 'settingsAgenticDetail', query: { id: String(row.id) } }).catch(() => {
+    router.push({ name: 'settingsModelConfigDetail', query: { id: String(row.id) } }).catch(() => {
       // handled globally
     });
   };

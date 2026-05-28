@@ -78,7 +78,7 @@ const settingsRouter: RouteRecordRaw = {
         {
           name: 'settingsModel',
           path: 'model',
-          redirect: '/settings/agentic',
+          redirect: '/settings/model/config',
           meta: { title: 'Model' },
         },
         {
@@ -143,7 +143,7 @@ const settingsRouter: RouteRecordRaw = {
           props: { entity: 'history' },
         },
         {
-          name: 'settingsEventOverview',
+          name: 'settingsAlarmOverview',
           path: 'alarm/overview',
           meta: { title: 'Event Overview' },
           component: () => import('@/views/settings/event/Overview.vue'),
@@ -161,8 +161,8 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/event/DriverEvent.vue'),
         },
         {
-          name: 'settingsPointEvent',
-          path: 'event/point',
+          name: 'settingsPointAlarm',
+          path: 'alarm/point',
           meta: { title: 'Point Events' },
 
           component: () => import('@/views/settings/event/PointEvent.vue'),
@@ -180,14 +180,14 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/command/CommandHistory.vue'),
         },
         {
-          name: 'settingsAgentic',
-          path: 'agentic',
+          name: 'settingsModelConfig',
+          path: 'model/config',
           meta: { title: 'Model Config' },
           component: () => import('@/views/settings/agentic/AgenticSettings.vue'),
         },
         {
-          name: 'settingsAgenticProvider',
-          path: 'agentic/provider',
+          name: 'settingsModelProvider',
+          path: 'model/provider',
           meta: { title: 'Model Providers' },
           component: () => import('@/views/settings/agentic/ProviderSettings.vue'),
         },

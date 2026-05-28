@@ -211,12 +211,12 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: '/settings/agentic',
+    path: '/settings/model',
     component: Layout,
     children: [
       {
-        name: 'settingsAgenticDetail',
-        path: '/settings/agentic/detail',
+        name: 'settingsModelConfigDetail',
+        path: '/settings/model/config/detail',
         meta: {
           icon: 'el-icon-chat-dot-round',
           title: 'Model Config Detail',
@@ -224,8 +224,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/settings/agentic/detail/ModelConfigDetail.vue'),
       },
       {
-        name: 'settingsAgenticProviderDetail',
-        path: '/settings/agentic/provider/detail',
+        name: 'settingsModelProviderDetail',
+        path: '/settings/model/provider/detail',
         meta: {
           icon: 'el-icon-chat-line-square',
           title: 'Model Provider Detail',
