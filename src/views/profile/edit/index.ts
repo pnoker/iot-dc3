@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref, watch } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
-import { Check, Edit, RefreshLeft } from '@element-plus/icons-vue';
+import { defineComponent, reactive, watch } from 'vue';
+import type { FormRules } from 'element-plus';
 import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 import { useI18n } from 'vue-i18n';
 
@@ -26,6 +25,7 @@ import { useRoute } from 'vue-router';
 import { getProfileById, updateProfile } from '@/api/profile';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
+import InfoCard from '@/components/card/info/InfoCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import point from '@/views/point/Point.vue';
 import CommandList from '@/views/settings/command/CommandList.vue';
@@ -40,12 +40,10 @@ function resolveTab(value: unknown): string {
 }
 
 export default defineComponent({
-  components: { baseCard, EnableFlagSegmented, point, CommandList, EventList },
+  components: { baseCard, InfoCard, EnableFlagSegmented, point, CommandList, EventList },
   setup() {
     const route = useRoute();
     const { t } = useI18n();
-
-    const formDataRef = ref<FormInstance>();
 
     const reactiveData = reactive({
       id: route.query.id,
@@ -74,15 +72,11 @@ export default defineComponent({
     };
 
     const profileSave = async () => {
-      const form = unref(formDataRef);
-      if (!form) return;
-
       try {
-        await form.validate();
         const res = await updateProfile(reactiveData.profileFormData);
         reactiveData.oldProfileFormData = { ...res.data };
       } catch {
-        // validation or API error
+        // API error
       }
     };
 
@@ -118,15 +112,11 @@ export default defineComponent({
     profile();
 
     return {
-      formDataRef,
       reactiveData,
       formRule,
       profileSave,
       profileReset,
       changeActive,
-      Check,
-      Edit,
-      RefreshLeft,
     };
   },
 });

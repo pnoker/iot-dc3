@@ -20,22 +20,13 @@
       <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
         <!-- Device Config -->
         <el-tab-pane :label="$t('device.edit.deviceConfig')" name="deviceConfig">
-          <div class="config-toolbar">
-            <div class="config-toolbar__actions">
-              <el-button :icon="RefreshLeft" size="small" @click="deviceReset">{{ $t('common.reset') }}</el-button>
-              <el-button :icon="Check" plain size="small" type="primary" @click="deviceSave">
-                {{ $t('common.save') }}
-              </el-button>
-            </div>
-          </div>
-          <el-form
-            ref="deviceFormRef"
-            :model="reactiveData.deviceFormData"
+          <info-card
+            :form-model="reactiveData.deviceFormData"
             :rules="deviceFormRule"
-            class="config-form"
-            label-position="top"
+            @reset="deviceReset"
+            @save="deviceSave"
           >
-            <div class="config-form-grid">
+            <template #fields>
               <el-form-item :label="$t('device.edit.deviceName')" prop="deviceName">
                 <el-input
                   v-model="reactiveData.deviceFormData.deviceName"
@@ -66,9 +57,6 @@
                   />
                 </el-select>
               </el-form-item>
-              <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-                <enable-flag-segmented v-model="reactiveData.deviceFormData.enableFlag" />
-              </el-form-item>
               <el-form-item :label="$t('device.edit.profile')" prop="profileId">
                 <el-select
                   v-model="reactiveData.deviceFormData.profileId"
@@ -90,7 +78,10 @@
                   />
                 </el-select>
               </el-form-item>
-              <el-form-item :label="$t('device.edit.description')" prop="remark">
+              <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+                <enable-flag-segmented v-model="reactiveData.deviceFormData.enableFlag" />
+              </el-form-item>
+              <el-form-item class="info-card-item-full" :label="$t('device.edit.description')" prop="remark">
                 <el-input
                   v-model="reactiveData.deviceFormData.remark"
                   :placeholder="$t('device.edit.descriptionPlaceholder')"
@@ -100,8 +91,8 @@
                   type="textarea"
                 />
               </el-form-item>
-            </div>
-          </el-form>
+            </template>
+          </info-card>
         </el-tab-pane>
 
         <!-- Driver Config -->
@@ -112,52 +103,56 @@
             :title="$t('device.edit.driverConfig')"
             type="success"
           />
-          <el-form ref="driverFormRef" :model="reactiveData.driverFormData" label-position="top">
-            <el-form-item
-              v-for="attribute in reactiveData.driverAttributes"
-              :key="attribute.id"
-              :prop="`${attribute.attributeCode}.configValue`"
-              :rules="attributeFormItemRules(attribute)"
-            >
-              <template #label>
-                <span>{{ attribute.attributeName }}</span>
-                <el-tag class="attribute-type" effect="plain" size="small">{{ attribute.attributeTypeFlag }}</el-tag>
-              </template>
-              <el-switch
-                v-if="isBooleanAttribute(attribute)"
-                v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
-                :active-value="true"
-                :inactive-value="false"
-              />
-              <el-input-number
-                v-else-if="isNumberAttribute(attribute)"
-                v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
-                :placeholder="attributePlaceholder(attribute)"
-                :precision="attributePrecision(attribute)"
-                class="attribute-number-input"
-                controls-position="right"
-              />
-              <el-input
-                v-else
-                v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
-                :placeholder="attributePlaceholder(attribute)"
-                clearable
-                maxlength="512"
-                show-word-limit
-                @keyup.enter="driverSave"
-              />
-              <div v-if="attribute.remark || attribute.defaultValue" class="attribute-hint">
-                <span v-if="attribute.remark">{{ attribute.remark }}</span>
-                <span v-if="attribute.defaultValue">{{
-                  $t('device.edit.defaultValue', { value: attribute.defaultValue })
-                }}</span>
-              </div>
-            </el-form-item>
-          </el-form>
-          <el-form-item class="edit-form-button">
-            <el-button :icon="RefreshLeft" @click="driverInfoReset">{{ $t('common.reset') }}</el-button>
-            <el-button :icon="Check" plain type="primary" @click="driverSave">{{ $t('common.save') }}</el-button>
-          </el-form-item>
+          <info-card
+            :form-model="reactiveData.driverFormData"
+            class="driver-info-card"
+            @reset="driverInfoReset"
+            @save="driverSave"
+          >
+            <template #fields>
+              <el-form-item
+                v-for="attribute in reactiveData.driverAttributes"
+                :key="attribute.id"
+                :prop="`${attribute.attributeCode}.configValue`"
+                :rules="attributeFormItemRules(attribute)"
+              >
+                <template #label>
+                  <span>{{ attribute.attributeName }}</span>
+                  <el-tag class="attribute-type" effect="plain" size="small">
+                    {{ attribute.attributeTypeFlag }}
+                  </el-tag>
+                </template>
+                <el-switch
+                  v-if="isBooleanAttribute(attribute)"
+                  v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
+                  :active-value="true"
+                  :inactive-value="false"
+                />
+                <el-input-number
+                  v-else-if="isNumberAttribute(attribute)"
+                  v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
+                  :placeholder="attributePlaceholder(attribute)"
+                  :precision="attributePrecision(attribute)"
+                  controls-position="right"
+                />
+                <el-input
+                  v-else
+                  v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
+                  :placeholder="attributePlaceholder(attribute)"
+                  clearable
+                  maxlength="512"
+                  show-word-limit
+                  @keyup.enter="driverSave"
+                />
+                <div v-if="attribute.remark || attribute.defaultValue" class="attribute-hint">
+                  <span v-if="attribute.remark">{{ attribute.remark }}</span>
+                  <span v-if="attribute.defaultValue">
+                    {{ $t('device.edit.defaultValue', { value: attribute.defaultValue }) }}
+                  </span>
+                </div>
+              </el-form-item>
+            </template>
+          </info-card>
         </el-tab-pane>
 
         <!-- Point Config -->
@@ -168,36 +163,27 @@
             :title="$t('device.edit.pointConfig')"
             type="success"
           />
-          <div class="point-matrix-toolbar">
-            <div class="point-matrix-toolbar__filters">
-              <el-input
-                v-model="reactiveData.pointMatrixKeyword"
-                :placeholder="$t('device.edit.pointSearchPlaceholder')"
-                :prefix-icon="Search"
-                clearable
-                size="small"
-              />
-              <matrix-status-segmented v-model="reactiveData.pointMatrixStatus" size="small" />
-            </div>
-            <div class="point-matrix-toolbar__actions">
-              <el-tag :type="pointDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
-                {{ $t('device.edit.changedCount', { count: pointDirtyCount }) }}
-              </el-tag>
-              <el-button :disabled="pointDirtyCount < 1" :icon="RefreshLeft" size="small" @click="pointInfoReset">
-                {{ $t('device.edit.discardChanges') }}
-              </el-button>
-              <el-button
-                :disabled="pointDirtyCount < 1"
-                :icon="Check"
-                :loading="reactiveData.pointSaving"
-                size="small"
-                type="primary"
-                @click="savePointMatrix"
-              >
-                {{ $t('device.edit.saveAll') }}
-              </el-button>
-            </div>
-          </div>
+          <matrix-toolbar
+            :dirty-count="pointDirtyCount"
+            :form-model="reactiveData"
+            :saving="reactiveData.pointSaving"
+            @discard="pointInfoReset"
+            @save="savePointMatrix"
+          >
+            <template #filters>
+              <el-form-item :label="$t('device.edit.pointName')" prop="pointMatrixKeyword">
+                <el-input
+                  v-model="reactiveData.pointMatrixKeyword"
+                  :placeholder="$t('device.edit.pointSearchPlaceholder')"
+                  :prefix-icon="Search"
+                  clearable
+                />
+              </el-form-item>
+              <el-form-item :label="$t('device.edit.configStatus')" prop="pointMatrixStatus">
+                <matrix-status-segmented v-model="reactiveData.pointMatrixStatus" />
+              </el-form-item>
+            </template>
+          </matrix-toolbar>
 
           <el-empty v-if="!hasPointAttributes" :description="$t('device.edit.pointAttributeEmpty')" />
           <el-table
@@ -295,36 +281,27 @@
             :title="$t('device.edit.commandConfig')"
             type="success"
           />
-          <div class="point-matrix-toolbar">
-            <div class="point-matrix-toolbar__filters">
-              <el-input
-                v-model="reactiveData.commandMatrixKeyword"
-                :placeholder="$t('device.edit.commandSearchPlaceholder')"
-                :prefix-icon="Search"
-                clearable
-                size="small"
-              />
-              <matrix-status-segmented v-model="reactiveData.commandMatrixStatus" size="small" />
-            </div>
-            <div class="point-matrix-toolbar__actions">
-              <el-tag :type="commandDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
-                {{ $t('device.edit.changedCount', { count: commandDirtyCount }) }}
-              </el-tag>
-              <el-button :disabled="commandDirtyCount < 1" :icon="RefreshLeft" size="small" @click="commandInfoReset">
-                {{ $t('device.edit.discardChanges') }}
-              </el-button>
-              <el-button
-                :disabled="commandDirtyCount < 1"
-                :icon="Check"
-                :loading="reactiveData.commandSaving"
-                size="small"
-                type="primary"
-                @click="saveCommandMatrix"
-              >
-                {{ $t('device.edit.saveAll') }}
-              </el-button>
-            </div>
-          </div>
+          <matrix-toolbar
+            :dirty-count="commandDirtyCount"
+            :form-model="reactiveData"
+            :saving="reactiveData.commandSaving"
+            @discard="commandInfoReset"
+            @save="saveCommandMatrix"
+          >
+            <template #filters>
+              <el-form-item :label="$t('device.edit.commandName')" prop="commandMatrixKeyword">
+                <el-input
+                  v-model="reactiveData.commandMatrixKeyword"
+                  :placeholder="$t('device.edit.commandSearchPlaceholder')"
+                  :prefix-icon="Search"
+                  clearable
+                />
+              </el-form-item>
+              <el-form-item :label="$t('device.edit.configStatus')" prop="commandMatrixStatus">
+                <matrix-status-segmented v-model="reactiveData.commandMatrixStatus" />
+              </el-form-item>
+            </template>
+          </matrix-toolbar>
 
           <el-empty v-if="!hasCommandAttributes" :description="$t('device.edit.commandAttributeEmpty')" />
           <el-table
@@ -425,36 +402,27 @@
             :title="$t('device.edit.eventConfig')"
             type="success"
           />
-          <div class="point-matrix-toolbar">
-            <div class="point-matrix-toolbar__filters">
-              <el-input
-                v-model="reactiveData.eventMatrixKeyword"
-                :placeholder="$t('device.edit.eventSearchPlaceholder')"
-                :prefix-icon="Search"
-                clearable
-                size="small"
-              />
-              <matrix-status-segmented v-model="reactiveData.eventMatrixStatus" size="small" />
-            </div>
-            <div class="point-matrix-toolbar__actions">
-              <el-tag :type="eventDirtyCount > 0 ? 'warning' : 'info'" effect="plain" size="small">
-                {{ $t('device.edit.changedCount', { count: eventDirtyCount }) }}
-              </el-tag>
-              <el-button :disabled="eventDirtyCount < 1" :icon="RefreshLeft" size="small" @click="eventInfoReset">
-                {{ $t('device.edit.discardChanges') }}
-              </el-button>
-              <el-button
-                :disabled="eventDirtyCount < 1"
-                :icon="Check"
-                :loading="reactiveData.eventSaving"
-                size="small"
-                type="primary"
-                @click="saveEventMatrix"
-              >
-                {{ $t('device.edit.saveAll') }}
-              </el-button>
-            </div>
-          </div>
+          <matrix-toolbar
+            :dirty-count="eventDirtyCount"
+            :form-model="reactiveData"
+            :saving="reactiveData.eventSaving"
+            @discard="eventInfoReset"
+            @save="saveEventMatrix"
+          >
+            <template #filters>
+              <el-form-item :label="$t('device.edit.eventName')" prop="eventMatrixKeyword">
+                <el-input
+                  v-model="reactiveData.eventMatrixKeyword"
+                  :placeholder="$t('device.edit.eventSearchPlaceholder')"
+                  :prefix-icon="Search"
+                  clearable
+                />
+              </el-form-item>
+              <el-form-item :label="$t('device.edit.configStatus')" prop="eventMatrixStatus">
+                <matrix-status-segmented v-model="reactiveData.eventMatrixStatus" />
+              </el-form-item>
+            </template>
+          </matrix-toolbar>
 
           <el-empty v-if="!hasEventAttributes" :description="$t('device.edit.eventAttributeEmpty')" />
           <el-table
@@ -553,51 +521,13 @@
 <style lang="scss" scoped>
   @use '@/styles/edit-card.scss';
 
-  .config-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 10px 0;
-  }
-
-  .config-toolbar__actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-left: auto;
-  }
-
-  .config-form {
-    .config-form-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0 16px;
-
-      :deep(.el-form-item) {
-        flex: 1 1 calc(33.333% - 16px);
-        min-width: 220px;
-        margin-right: 0;
-
-        .el-input,
-        .el-select,
-        .el-segmented {
-          width: 100%;
-        }
-      }
-    }
+  .driver-info-card {
+    margin-top: 12px;
   }
 
   .attribute-type {
     margin-left: 8px;
     vertical-align: middle;
-  }
-
-  .attribute-number-input {
-    width: 100%;
   }
 
   .attribute-hint {
@@ -608,34 +538,6 @@
     line-height: 18px;
     color: var(--el-text-color-secondary);
     font-size: 12px;
-  }
-
-  .point-matrix-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 10px 0;
-  }
-
-  .point-matrix-toolbar__filters {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-
-    .el-input {
-      width: 260px;
-    }
-  }
-
-  .point-matrix-toolbar__actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px;
   }
 
   .point-matrix-table {

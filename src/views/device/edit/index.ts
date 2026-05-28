@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, ref, unref, watch } from 'vue';
-import type { FormInstance, FormItemRule, FormRules } from 'element-plus';
-import { Check, RefreshLeft, Search } from '@element-plus/icons-vue';
+import { computed, defineComponent, reactive, watch } from 'vue';
+import type { FormItemRule, FormRules } from 'element-plus';
+import { Search } from '@element-plus/icons-vue';
 
 import { useRoute } from 'vue-router';
 import router from '@/config/router';
@@ -56,6 +56,8 @@ import type {
 } from '@/config/types';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
+import InfoCard from '@/components/card/info/InfoCard.vue';
+import MatrixToolbar from '@/components/card/matrix/MatrixToolbar.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import MatrixStatusSegmented from '@/components/segmented/MatrixStatusSegmented.vue';
 import { isNull } from '@/utils/validationUtil';
@@ -296,23 +298,14 @@ export default defineComponent({
   name: 'DeviceEdit',
   components: {
     baseCard,
+    InfoCard,
+    MatrixToolbar,
     EnableFlagSegmented,
     MatrixStatusSegmented,
   },
   setup() {
     const route = useRoute();
     const { t } = useI18n();
-
-    // 定义表单引用
-    const deviceFormRef = ref<FormInstance>();
-    const driverFormRef = ref<FormInstance>();
-
-    // 图标
-    const Icon = {
-      RefreshLeft,
-      Check,
-      Search,
-    };
 
     // 定义响应式数据
     const reactiveData = reactive({
@@ -864,13 +857,7 @@ export default defineComponent({
     };
 
     const deviceUpdate = async (): Promise<boolean> => {
-      const form = unref(deviceFormRef);
-      if (!form) {
-        return false;
-      }
-
       try {
-        await form.validate();
         const res = await updateDevice(reactiveData.deviceFormData);
         reactiveData.oldDeviceFormData = { ...res.data };
         return true;
@@ -884,13 +871,7 @@ export default defineComponent({
         return true;
       }
 
-      const form = unref(driverFormRef);
-      if (!form) {
-        return false;
-      }
-
       try {
-        await form.validate();
         let failedCount = 0;
         await Promise.all(
           reactiveData.driverAttributes.map((attribute) => {
@@ -1367,8 +1348,6 @@ export default defineComponent({
     device();
 
     return {
-      deviceFormRef,
-      driverFormRef,
       deviceFormRule,
       reactiveData,
       hasPointAttributes,
@@ -1425,7 +1404,7 @@ export default defineComponent({
       attributePrecision,
       isBooleanAttribute,
       isNumberAttribute,
-      ...Icon,
+      Search,
     };
   },
 });
