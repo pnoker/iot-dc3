@@ -97,72 +97,77 @@
 
         <!-- Driver Config -->
         <el-tab-pane v-if="hasDriverAttributes" :label="$t('device.edit.driverConfig')" name="driverConfig">
-          <el-alert
-            :closable="false"
-            :description="$t('device.edit.driverConfigTip')"
-            :title="$t('device.edit.driverConfig')"
-            type="success"
+          <matrix-toolbar
+            :dirty-count="driverDirtyCount"
+            :form-model="reactiveData"
+            :saving="reactiveData.driverSaving"
+            @discard="driverInfoReset"
+            @save="saveDriverMatrix"
           />
-          <info-card
-            :form-model="reactiveData.driverFormData"
-            class="driver-info-card"
-            @reset="driverInfoReset"
-            @save="driverSave"
+          <el-empty v-if="!hasDriverAttributes" :description="$t('device.edit.driverAttributeEmpty')" />
+          <el-table
+            v-else
+            v-loading="reactiveData.loading"
+            :data="reactiveData.driverAttributes"
+            border
+            class="driver-matrix-table"
+            row-key="id"
+            stripe
           >
-            <template #fields>
-              <el-form-item
-                v-for="attribute in reactiveData.driverAttributes"
-                :key="attribute.id"
-                :prop="`${attribute.attributeCode}.configValue`"
-                :rules="attributeFormItemRules(attribute)"
-              >
-                <template #label>
-                  <span>{{ attribute.attributeName }}</span>
-                  <el-tag class="attribute-type" effect="plain" size="small">
-                    {{ attribute.attributeTypeFlag }}
-                  </el-tag>
-                </template>
-                <el-switch
-                  v-if="isBooleanAttribute(attribute)"
-                  v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
-                  :active-value="true"
-                  :inactive-value="false"
-                />
-                <el-input-number
-                  v-else-if="isNumberAttribute(attribute)"
-                  v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
-                  :placeholder="attributePlaceholder(attribute)"
-                  :precision="attributePrecision(attribute)"
-                  controls-position="right"
-                />
-                <el-input
-                  v-else
-                  v-model="attributeFormItem(reactiveData.driverFormData, attribute).configValue"
-                  :placeholder="attributePlaceholder(attribute)"
-                  clearable
-                  maxlength="512"
-                  show-word-limit
-                  @keyup.enter="driverSave"
-                />
-                <div v-if="attribute.remark || attribute.defaultValue" class="attribute-hint">
-                  <span v-if="attribute.remark">{{ attribute.remark }}</span>
-                  <span v-if="attribute.defaultValue">
-                    {{ $t('device.edit.defaultValue', { value: attribute.defaultValue }) }}
-                  </span>
+            <el-table-column :label="$t('device.edit.attributeName')" min-width="160" prop="attributeName" />
+            <el-table-column :label="$t('device.edit.attributeType')" width="100">
+              <template #default="{ row }">
+                <el-tag effect="plain" size="small">{{ row.attributeTypeFlag }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column :label="$t('device.edit.defaultValue')" width="140">
+              <template #default="{ row }">
+                {{ row.defaultValue || '-' }}
+              </template>
+            </el-table-column>
+            <el-table-column :label="$t('device.edit.configValue')" min-width="200">
+              <template #default="{ row: attribute }">
+                <div class="driver-matrix-cell">
+                  <el-switch
+                    v-if="isBooleanAttribute(attribute)"
+                    :model-value="getDriverCellValue(attribute)"
+                    :active-value="true"
+                    :inactive-value="false"
+                    size="small"
+                    @change="(val: any) => setDriverCellValue(attribute, val)"
+                  />
+                  <el-input-number
+                    v-else-if="isNumberAttribute(attribute)"
+                    :model-value="getDriverCellValue(attribute)"
+                    :placeholder="attributePlaceholder(attribute)"
+                    :precision="attributePrecision(attribute)"
+                    controls-position="right"
+                    size="small"
+                    @input="(val: any) => setDriverCellValue(attribute, val)"
+                  />
+                  <el-input
+                    v-else
+                    :model-value="getDriverCellValue(attribute)"
+                    :placeholder="attributePlaceholder(attribute)"
+                    clearable
+                    maxlength="512"
+                    show-word-limit
+                    size="small"
+                    @input="(val: string) => setDriverCellValue(attribute, val)"
+                  />
+                  <div v-if="driverCellDirty(attribute)" class="driver-matrix-cell__meta">
+                    <span class="point-matrix-cell__dirty">
+                      {{ $t('device.edit.modified') }}
+                    </span>
+                  </div>
                 </div>
-              </el-form-item>
-            </template>
-          </info-card>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-tab-pane>
 
         <!-- Point Config -->
         <el-tab-pane :label="$t('device.edit.pointConfig')" name="pointConfig">
-          <el-alert
-            :closable="false"
-            :description="$t('device.edit.pointConfigTip')"
-            :title="$t('device.edit.pointConfig')"
-            type="success"
-          />
           <matrix-toolbar
             :dirty-count="pointDirtyCount"
             :form-model="reactiveData"
@@ -256,12 +261,9 @@
                     size="small"
                     @input="markPointCellDirty(row, attribute)"
                   />
-                  <div v-if="pointCellDirty(row, attribute) || attribute.defaultValue" class="point-matrix-cell__meta">
-                    <span v-if="pointCellDirty(row, attribute)" class="point-matrix-cell__dirty">
+                  <div v-if="pointCellDirty(row, attribute)" class="point-matrix-cell__meta">
+                    <span class="point-matrix-cell__dirty">
                       {{ $t('device.edit.modified') }}
-                    </span>
-                    <span v-if="attribute.defaultValue" class="point-matrix-cell__default">
-                      {{ $t('device.edit.defaultValue', { value: attribute.defaultValue }) }}
                     </span>
                   </div>
                   <div v-if="pointCellError(row, attribute)" class="point-matrix-cell__error">
@@ -275,12 +277,6 @@
 
         <!-- Command Config -->
         <el-tab-pane :label="$t('device.edit.commandConfig')" name="commandConfig">
-          <el-alert
-            :closable="false"
-            :description="$t('device.edit.commandConfigTip')"
-            :title="$t('device.edit.commandConfig')"
-            type="success"
-          />
           <matrix-toolbar
             :dirty-count="commandDirtyCount"
             :form-model="reactiveData"
@@ -374,15 +370,9 @@
                     size="small"
                     @input="markCommandCellDirty(row, attribute)"
                   />
-                  <div
-                    v-if="commandCellDirty(row, attribute) || attribute.defaultValue"
-                    class="point-matrix-cell__meta"
-                  >
-                    <span v-if="commandCellDirty(row, attribute)" class="point-matrix-cell__dirty">
+                  <div v-if="commandCellDirty(row, attribute)" class="point-matrix-cell__meta">
+                    <span class="point-matrix-cell__dirty">
                       {{ $t('device.edit.modified') }}
-                    </span>
-                    <span v-if="attribute.defaultValue" class="point-matrix-cell__default">
-                      {{ $t('device.edit.defaultValue', { value: attribute.defaultValue }) }}
                     </span>
                   </div>
                   <div v-if="commandCellError(row, attribute)" class="point-matrix-cell__error">
@@ -396,12 +386,6 @@
 
         <!-- Event Config -->
         <el-tab-pane :label="$t('device.edit.eventConfig')" name="eventConfig">
-          <el-alert
-            :closable="false"
-            :description="$t('device.edit.eventConfigTip')"
-            :title="$t('device.edit.eventConfig')"
-            type="success"
-          />
           <matrix-toolbar
             :dirty-count="eventDirtyCount"
             :form-model="reactiveData"
@@ -495,12 +479,9 @@
                     size="small"
                     @input="markEventCellDirty(row, attribute)"
                   />
-                  <div v-if="eventCellDirty(row, attribute) || attribute.defaultValue" class="point-matrix-cell__meta">
-                    <span v-if="eventCellDirty(row, attribute)" class="point-matrix-cell__dirty">
+                  <div v-if="eventCellDirty(row, attribute)" class="point-matrix-cell__meta">
+                    <span class="point-matrix-cell__dirty">
                       {{ $t('device.edit.modified') }}
-                    </span>
-                    <span v-if="attribute.defaultValue" class="point-matrix-cell__default">
-                      {{ $t('device.edit.defaultValue', { value: attribute.defaultValue }) }}
                     </span>
                   </div>
                   <div v-if="eventCellError(row, attribute)" class="point-matrix-cell__error">

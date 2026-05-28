@@ -16,7 +16,7 @@
 
 <template>
   <div class="base-card">
-    <el-card class="base-card__body" shadow="hover">
+    <el-card class="base-card__body" shadow="never">
       <div class="base-card__container">
         <slot />
       </div>
@@ -44,6 +44,10 @@
       width: 100%;
       box-sizing: border-box;
       min-width: 0;
+    }
+
+    :deep(.el-card.base-card__body) {
+      border: 0;
     }
 
     :deep(.el-tabs__nav) {

@@ -56,7 +56,6 @@ export default defineComponent({
       profileName: nameRules(t, t('common.entityProfile')),
       enableFlag: [
         {
-          required: true,
           message: t('common.enableFlag'),
           trigger: 'change',
         },

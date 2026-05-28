@@ -27,33 +27,75 @@
       @sort="sort"
       @pre-handle="preHandle"
       @next-handle="nextHandle"
-      @show-add="showAdd"
+      @show-add="openAdd"
       @size-change="sizeChange"
       @current-change="currentChange"
-    ></point-tool>
+    />
 
     <blank-card>
       <el-row>
         <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
+          <skeleton-card :footer="true" :loading="reactiveData.loading" />
         </el-col>
         <el-col v-if="hasData">
-          <el-empty :description="$t('point.empty')"></el-empty>
+          <el-empty :description="$t('point.empty')" />
         </el-col>
         <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
           <point-card
             :data="data"
-            :embedded="embedded != '' && embedded != 'edit'"
+            :embedded="false"
             :profile="reactiveData.profileTable[data.profileId]"
-            @disable-thing="disableThing"
-            @enable-thing="enableThing"
             @delete-thing="deleteThing"
-          ></point-card>
+            @detail-thing="openDetail"
+            @disable-thing="disableThing"
+            @edit-thing="openEdit"
+            @enable-thing="enableThing"
+          />
         </el-col>
       </el-row>
     </blank-card>
 
-    <point-add-form ref="pointAddFormRef" :profile-id="profileId" @add-thing="addThing"></point-add-form>
+    <point-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
+
+    <el-drawer v-model="reactiveData.detailVisible" :title="$t('point.detail.pointInfo')" size="520px">
+      <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
+        <el-descriptions-item :label="$t('point.detail.pointName')">
+          {{ reactiveData.detailRecord.pointName }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.card.dataType')">
+          {{ $t(pointTypeKey(reactiveData.detailRecord.pointTypeFlag)) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.card.rw')">
+          {{ $t(rwFlagKey(reactiveData.detailRecord.rwFlag)) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.card.unit')">
+          {{ reactiveData.detailRecord.unit || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.card.ratio')">
+          {{ reactiveData.detailRecord.multiple }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.card.baseValue')">
+          {{ reactiveData.detailRecord.baseValue }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.card.accuracy')">
+          {{ reactiveData.detailRecord.valueDecimal }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.card.profile')">
+          {{
+            reactiveData.detailRecord.profileId
+              ? reactiveData.profileTable[reactiveData.detailRecord.profileId]?.profileName || '-'
+              : '-'
+          }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.detail.relatedDevices')" :span="2">
+          {{ reactiveData.detailRecord.deviceCount || 0 }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('point.add.description')" :span="2">
+          {{ reactiveData.detailRecord.remark || '-' }}
+        </el-descriptions-item>
+      </el-descriptions>
+      <el-empty v-else :description="$t('common.description')" />
+    </el-drawer>
   </div>
 </template>
 
@@ -63,13 +105,14 @@
   import { addPoint, deletePoint, listPoint, updatePoint } from '@/api/point';
   import { listProfileByIds } from '@/api/profile';
 
-  import type { Order } from '@/config/types';
+  import type { Order, PointRecord } from '@/config/types';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+  import { pointTypeKey, rwFlagKey } from '@/utils/pointFormatUtil';
   import { failMessage } from '@/utils/notificationUtil';
   import { isNull } from '@/utils/validationUtil';
-  import PointAddForm from './add/PointAddForm.vue';
+  import PointEditForm from './add/PointEditForm.vue';
   import PointCard from './card/PointCard.vue';
   import PointTool from './tool/PointTool.vue';
 
@@ -91,7 +134,7 @@
 
   type PointListResponse = R<PointListPage>;
   type LookupTableResponse = R<Record<string, unknown>>;
-  type DialogInstance = { show: () => void };
+  type EditFormInstance = { show: (profileId: string) => void; showEdit: (row: PointRecord) => void };
 
   const props = withDefaults(
     defineProps<{
@@ -115,9 +158,9 @@
     (e: 'next-handle'): void;
   }>();
 
-  const pointAddFormRef = ref<DialogInstance | null>(null);
+  const editRef = ref<EditFormInstance | null>(null);
 
-  const reactiveData = reactive({
+  const state = reactive({
     loading: true,
     profileTable: {} as Record<string, Record<string, any>>,
     listData: [] as PointListItem[],
@@ -130,6 +173,13 @@
       orders: [] as Order[],
     },
   });
+
+  const reactiveData = state as typeof state & {
+    detailVisible: boolean;
+    detailRecord: PointRecord | null;
+  };
+  reactiveData.detailVisible = false;
+  reactiveData.detailRecord = null;
 
   const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
 
@@ -147,7 +197,7 @@
     return nextQuery;
   };
 
-  const list = () => {
+  const load = () => {
     const query = withFixedQuery(reactiveData.query);
     reactiveData.query = query;
 
@@ -184,22 +234,42 @@
 
   const search = (params: PointQuery) => {
     reactiveData.query = withFixedQuery(params);
-    list();
+    load();
   };
 
   const reset = () => {
     reactiveData.query = withFixedQuery();
-    list();
+    load();
   };
 
-  const showAdd = () => {
-    pointAddFormRef.value?.show();
+  const openAdd = () => {
+    editRef.value?.show(props.profileId);
   };
 
-  const addThing = (form: unknown, done: () => void) => {
+  const openEdit = (row: PointRecord) => {
+    editRef.value?.showEdit(row);
+  };
+
+  const openDetail = (row: PointRecord) => {
+    reactiveData.detailRecord = row;
+    reactiveData.detailVisible = true;
+  };
+
+  const onAdd = (form: unknown, done: () => void) => {
     addPoint(form as Record<string, unknown>)
       .then(() => {
-        list();
+        load();
+        done();
+      })
+      .catch(() => {
+        // nothing to do
+      });
+  };
+
+  const onUpdate = (form: unknown, done: () => void) => {
+    updatePoint(form as Record<string, unknown>)
+      .then(() => {
+        load();
         done();
       })
       .catch(() => {
@@ -210,7 +280,7 @@
   const disableThing = (id: string, profileId: string, done: () => void) => {
     updatePoint({ id, profileId, enableFlag: 'DISABLE' })
       .then(() => {
-        list();
+        load();
         done();
       })
       .catch(() => {
@@ -221,7 +291,7 @@
   const enableThing = (id: string, profileId: string, done: () => void) => {
     updatePoint({ id, profileId, enableFlag: 'ENABLE' })
       .then(() => {
-        list();
+        load();
         done();
       })
       .catch(() => {
@@ -233,7 +303,7 @@
     deletePoint(id)
       .then((res) => {
         if (res.data.ok) {
-          list();
+          load();
           done();
         } else {
           failMessage(res.data.message);
@@ -244,9 +314,7 @@
       });
   };
 
-  const refresh = () => {
-    list();
-  };
+  const refresh = () => load();
 
   const sort = () => {
     reactiveData.order = !reactiveData.order;
@@ -255,31 +323,23 @@
     } else {
       reactiveData.page.orders = [{ column: 'create_time', asc: false }];
     }
-    list();
+    load();
   };
 
   const sizeChange = (size: number) => {
     reactiveData.page.size = size;
-    list();
+    load();
   };
 
   const currentChange = (current: number) => {
     reactiveData.page.current = current;
-    list();
+    load();
   };
 
-  const preHandle = () => {
-    emit('pre-handle');
-  };
+  const preHandle = () => emit('pre-handle');
+  const nextHandle = () => emit('next-handle');
 
-  const nextHandle = () => {
-    emit('next-handle');
-  };
+  defineExpose({ reactiveData, refresh });
 
-  defineExpose({
-    reactiveData,
-    refresh,
-  });
-
-  list();
+  load();
 </script>

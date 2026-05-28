@@ -26,26 +26,26 @@
       @current-change="currentChange"
     >
       <template #filters>
-        <el-form-item :label="$t('command.history.deviceId')" prop="deviceId">
+        <el-form-item :label="$t('commandHistory.deviceId')" prop="deviceId">
           <el-input
             v-model="formData.deviceId"
-            :placeholder="$t('command.history.deviceId')"
+            :placeholder="$t('commandHistory.deviceId')"
             class="edit-form-default"
             clearable
           />
         </el-form-item>
-        <el-form-item :label="$t('command.history.commandCode')" prop="commandCode">
+        <el-form-item :label="$t('commandHistory.commandCode')" prop="commandCode">
           <el-input
             v-model="formData.commandCode"
-            :placeholder="$t('command.history.commandCode')"
+            :placeholder="$t('commandHistory.commandCode')"
             class="edit-form-default"
             clearable
           />
         </el-form-item>
-        <el-form-item :label="$t('command.history.status')" prop="status">
+        <el-form-item :label="$t('commandHistory.status')" prop="status">
           <el-input
             v-model="formData.status"
-            :placeholder="$t('command.history.status')"
+            :placeholder="$t('commandHistory.status')"
             class="edit-form-default"
             clearable
           />
@@ -55,29 +55,19 @@
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
+        <el-table-column :label="$t('commandHistory.recordId')" min-width="180" prop="recordId" show-overflow-tooltip />
+        <el-table-column :label="$t('commandHistory.deviceId')" min-width="160" prop="deviceId" show-overflow-tooltip />
+        <el-table-column :label="$t('commandHistory.commandCode')" min-width="140" prop="commandCode" />
+        <el-table-column :label="$t('commandHistory.status')" prop="status" width="100" />
         <el-table-column
-          :label="$t('command.history.recordId')"
-          min-width="180"
-          prop="recordId"
-          show-overflow-tooltip
-        />
-        <el-table-column
-          :label="$t('command.history.deviceId')"
-          min-width="160"
-          prop="deviceId"
-          show-overflow-tooltip
-        />
-        <el-table-column :label="$t('command.history.commandCode')" min-width="140" prop="commandCode" />
-        <el-table-column :label="$t('command.history.status')" prop="status" width="100" />
-        <el-table-column
-          :label="$t('command.history.error')"
+          :label="$t('commandHistory.error')"
           min-width="180"
           prop="errorMessage"
           show-overflow-tooltip
         />
         <el-table-column
           :formatter="timestampColumn"
-          :label="$t('command.history.occurTime')"
+          :label="$t('commandHistory.occurTime')"
           prop="occurTime"
           width="165"
         />
@@ -96,49 +86,49 @@
     <el-dialog
       v-model="detailVisible"
       :append-to-body="true"
-      :title="$t('command.history.detailTitle')"
+      :title="$t('commandHistory.detailTitle')"
       draggable
       width="700px"
     >
       <el-descriptions v-if="detailRow" :column="2" border>
-        <el-descriptions-item :label="$t('command.history.recordId')" :span="2">
+        <el-descriptions-item :label="$t('commandHistory.recordId')" :span="2">
           {{ detailRow.recordId }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.deviceId')">{{ detailRow.deviceId }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.commandId')">{{ detailRow.commandId }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.commandCode')">
+        <el-descriptions-item :label="$t('commandHistory.deviceId')">{{ detailRow.deviceId }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('commandHistory.commandId')">{{ detailRow.commandId }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('commandHistory.commandCode')">
           {{ detailRow.commandCode }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.status')">{{ detailRow.status }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.errorCode')">
+        <el-descriptions-item :label="$t('commandHistory.status')">{{ detailRow.status }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('commandHistory.errorCode')">
           {{ detailRow.errorCode || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.errorMessage')">
+        <el-descriptions-item :label="$t('commandHistory.errorMessage')">
           {{ detailRow.errorMessage || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.source')">{{ detailRow.source || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.sourceUserId')">
+        <el-descriptions-item :label="$t('commandHistory.source')">{{ detailRow.source || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('commandHistory.sourceUserId')">
           {{ detailRow.sourceUserId || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.paramValues')" :span="2">
+        <el-descriptions-item :label="$t('commandHistory.paramValues')" :span="2">
           <pre class="json-preview">{{ formatJson(detailRow.paramValues) }}</pre>
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.resultValues')" :span="2">
+        <el-descriptions-item :label="$t('commandHistory.resultValues')" :span="2">
           <pre class="json-preview">{{ formatJson(detailRow.resultValues) }}</pre>
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.configSnapshot')" :span="2">
+        <el-descriptions-item :label="$t('commandHistory.configSnapshot')" :span="2">
           <pre class="json-preview">{{ formatJson(detailRow.configSnapshot) }}</pre>
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.occurTime')">
+        <el-descriptions-item :label="$t('commandHistory.occurTime')">
           {{ timestampLabel(detailRow.occurTime) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.sendTime')">
+        <el-descriptions-item :label="$t('commandHistory.sendTime')">
           {{ timestampLabel(detailRow.sendTime) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.finishTime')">
+        <el-descriptions-item :label="$t('commandHistory.finishTime')">
           {{ timestampLabel(detailRow.finishTime) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.history.expireTime')">
+        <el-descriptions-item :label="$t('commandHistory.expireTime')">
           {{ timestampLabel(detailRow.expireTime) }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('common.createTime')">

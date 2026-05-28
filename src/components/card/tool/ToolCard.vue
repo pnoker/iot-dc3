@@ -147,13 +147,6 @@
 
 <style lang="scss" scoped>
   .tool-card {
-    // Top margin used to be 1px, but that 1px margin-collapses with the
-    // breadcrumb's margin-bottom on pages whose content root is a plain
-    // block (PointValue, Driver, Device), while on settings sub-pages
-    // the el-main wrapper creates a BFC that traps the margin inside,
-    // making the breadcrumb→tool-card gap visually 1px larger than
-    // elsewhere. Zero top margin — the breadcrumb already reserves a
-    // 1px margin-bottom of its own — so every page renders identically.
     margin: 0 0 4px;
 
     .tool-card__body {

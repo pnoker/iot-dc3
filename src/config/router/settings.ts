@@ -82,6 +82,18 @@ const settingsRouter: RouteRecordRaw = {
           meta: { title: 'Model' },
         },
         {
+          name: 'settingsEvent',
+          path: 'event',
+          redirect: '/settings/event/history',
+          meta: { title: 'Event' },
+        },
+        {
+          name: 'settingsCommand',
+          path: 'command',
+          redirect: '/settings/command/history',
+          meta: { title: 'Command' },
+        },
+        {
           name: 'settingsAlarmRule',
           path: 'alarm/rule',
           meta: { title: 'Alarm Rules' },
@@ -126,9 +138,46 @@ const settingsRouter: RouteRecordRaw = {
         {
           name: 'settingsAlarmHistory',
           path: 'alarm/history',
-          meta: { title: 'Alarm Histories' },
+          meta: { title: 'Alarm History' },
           component: () => import('@/views/settings/alarm/AlarmNotify.vue'),
           props: { entity: 'history' },
+        },
+        {
+          name: 'settingsEventOverview',
+          path: 'alarm/overview',
+          meta: { title: 'Event Overview' },
+          component: () => import('@/views/settings/event/Overview.vue'),
+        },
+        {
+          name: 'settingsDeviceAlarm',
+          path: 'alarm/device',
+          meta: { title: 'Device Alarm' },
+          component: () => import('@/views/settings/event/DeviceEvent.vue'),
+        },
+        {
+          name: 'settingsDriverAlarm',
+          path: 'alarm/driver',
+          meta: { title: 'Driver Alarm' },
+          component: () => import('@/views/settings/event/DriverEvent.vue'),
+        },
+        {
+          name: 'settingsPointEvent',
+          path: 'event/point',
+          meta: { title: 'Point Events' },
+
+          component: () => import('@/views/settings/event/PointEvent.vue'),
+        },
+        {
+          name: 'settingsEventHistory',
+          path: 'event/history',
+          meta: { title: 'Event History' },
+          component: () => import('@/views/settings/event/EventHistory.vue'),
+        },
+        {
+          name: 'settingsCommandHistory',
+          path: 'command/history',
+          meta: { title: 'Command History' },
+          component: () => import('@/views/settings/command/CommandHistory.vue'),
         },
         {
           name: 'settingsAgentic',
@@ -141,42 +190,6 @@ const settingsRouter: RouteRecordRaw = {
           path: 'agentic/provider',
           meta: { title: 'Model Providers' },
           component: () => import('@/views/settings/agentic/ProviderSettings.vue'),
-        },
-        {
-          name: 'settingsEventOverview',
-          path: 'event',
-          meta: { title: 'Event Overview' },
-          component: () => import('@/views/settings/event/Overview.vue'),
-        },
-        {
-          name: 'settingsDeviceEvent',
-          path: 'event/device',
-          meta: { title: 'Device Events' },
-          component: () => import('@/views/settings/event/DeviceEvent.vue'),
-        },
-        {
-          name: 'settingsDriverEvent',
-          path: 'event/driver',
-          meta: { title: 'Driver Events' },
-          component: () => import('@/views/settings/event/DriverEvent.vue'),
-        },
-        {
-          name: 'settingsPointEvent',
-          path: 'event/point',
-          meta: { title: 'Point Events' },
-          component: () => import('@/views/settings/event/PointEvent.vue'),
-        },
-        {
-          name: 'settingsCommandRecord',
-          path: 'command/record',
-          meta: { title: 'Command Record' },
-          component: () => import('@/views/settings/command/CommandHistory.vue'),
-        },
-        {
-          name: 'settingsEventReport',
-          path: 'event/report',
-          meta: { title: 'Event Report' },
-          component: () => import('@/views/settings/event/EventHistory.vue'),
         },
         {
           name: 'settingsAbout',

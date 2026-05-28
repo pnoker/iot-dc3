@@ -90,30 +90,6 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: '/point',
-    component: Layout,
-    children: [
-      {
-        name: 'pointDetail',
-        path: '/point/detail',
-        meta: {
-          icon: 'el-icon-s-order',
-          title: 'Point Detail',
-        },
-        component: () => import('@/views/point/detail/PointDetail.vue'),
-      },
-      {
-        name: 'pointEdit',
-        path: '/point/edit',
-        meta: {
-          icon: 'el-icon-s-order',
-          title: 'Point Edit',
-        },
-        component: () => import('@/views/point/edit/PointEdit.vue'),
-      },
-    ],
-  },
-  {
     path: '/settings/api',
     component: Layout,
     children: [

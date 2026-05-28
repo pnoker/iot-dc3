@@ -104,11 +104,10 @@
           :disable-title="$t('point.card.confirmDisable')"
           :enable-title="$t('point.card.confirmEnable')"
           :enabled="enabled"
-          detail-disabled
           @delete="emitDelete"
-          @detail="detail"
+          @detail="emit('detail-thing', data)"
           @disable="emitToggle('disable-thing')"
-          @edit="edit"
+          @edit="emit('edit-thing', data)"
           @enable="emitToggle('enable-thing')"
         />
       </div>
@@ -119,7 +118,6 @@
 <script lang="ts" setup>
   import { computed, type PropType } from 'vue';
   import { Edit, List, Location, Sunset } from '@element-plus/icons-vue';
-  import router from '@/config/router';
   import { copy } from '@/utils/commonUtil';
   import { timestamp } from '@/utils/dateUtil';
   import { successMessage } from '@/utils/notificationUtil';
@@ -135,7 +133,7 @@
     icon: { type: String, default: 'images/common/point.png' },
   });
 
-  const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
+  const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing', 'edit-thing', 'detail-thing']);
   const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
   const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
@@ -144,23 +142,6 @@
 
   const emitDelete = () => {
     emit('delete-thing', props.data.id, () => successMessage());
-  };
-
-  const edit = () => {
-    router
-      .push({
-        name: 'pointEdit',
-        query: { id: props.data.id, profileId: props.data.profileId, active: '0' },
-      })
-      .catch(() => {
-        // nothing to do
-      });
-  };
-
-  const detail = () => {
-    router.push({ name: 'pointDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
-      // nothing to do
-    });
   };
 </script>
 

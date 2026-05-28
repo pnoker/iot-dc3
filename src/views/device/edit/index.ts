@@ -318,6 +318,7 @@ export default defineComponent({
       driverAttributeTable: {} as Record<string, any>,
       oldDriverFormData: {} as AttributeFormData,
       driverFormData: {} as AttributeFormData,
+      driverSaving: false,
       pointAttributes: [] as Attribute[],
       pointAttributeTable: {} as Record<string, any>,
       pointInfoData: [] as PointInfoMatrixRow[],
@@ -364,7 +365,6 @@ export default defineComponent({
       ],
       enableFlag: [
         {
-          required: true,
           message: () => t('device.edit.enableFlagRequired'),
           trigger: 'change',
         },
@@ -661,6 +661,7 @@ export default defineComponent({
 
           reactiveData.driverFormData = clone(formData);
           reactiveData.oldDriverFormData = clone(formData);
+          driverDirtySet.clear();
         })
         .catch(() => {
           // nothing to do
@@ -1278,9 +1279,36 @@ export default defineComponent({
       }
     };
 
-    const driverSave = async () => {
+    const driverDirtySet = reactive(new Set<string>());
+
+    const getDriverCellValue = (attribute: Attribute): any => {
+      return reactiveData.driverFormData[attribute.attributeCode]?.configValue;
+    };
+
+    const setDriverCellValue = (attribute: Attribute, val: any) => {
+      const item = reactiveData.driverFormData[attribute.attributeCode];
+      if (!item) return;
+      item.configValue = val;
+      const oldVal = reactiveData.oldDriverFormData[attribute.attributeCode]?.configValue;
+      if (val !== oldVal) {
+        driverDirtySet.add(attribute.attributeCode);
+      } else {
+        driverDirtySet.delete(attribute.attributeCode);
+      }
+    };
+
+    const driverCellDirty = (attribute: Attribute): boolean => {
+      return driverDirtySet.has(attribute.attributeCode);
+    };
+
+    const driverDirtyCount = computed(() => driverDirtySet.size);
+
+    const saveDriverMatrix = async () => {
+      reactiveData.driverSaving = true;
       const ok = await driverUpdate();
+      reactiveData.driverSaving = false;
       if (ok) {
+        driverDirtySet.clear();
         successMessage();
       }
     };
@@ -1291,6 +1319,7 @@ export default defineComponent({
 
     const driverInfoReset = () => {
       reactiveData.driverFormData = clone(reactiveData.oldDriverFormData);
+      driverDirtySet.clear();
     };
 
     const pointInfoReset = () => {
@@ -1367,7 +1396,11 @@ export default defineComponent({
       changeProfile,
       changeAttribute,
       deviceSave,
-      driverSave,
+      driverDirtyCount,
+      getDriverCellValue,
+      setDriverCellValue,
+      driverCellDirty,
+      saveDriverMatrix,
       savePointMatrix,
       saveCommandMatrix,
       saveEventMatrix,

@@ -155,8 +155,6 @@
     deviceEdit: 'nav.deviceEdit',
     profileDetail: 'nav.profileDetail',
     profileEdit: 'nav.profileEdit',
-    pointDetail: 'nav.pointDetail',
-    pointEdit: 'nav.pointEdit',
     settings: 'nav.settings',
     settingsUser: 'nav.settingsUser',
     settingsRole: 'nav.settingsRole',
@@ -178,8 +176,8 @@
     settingsAgenticProvider: 'nav.settingsAgenticProvider',
     settingsEvent: 'nav.settingsEvent',
     settingsEventOverview: 'nav.settingsEventOverview',
-    settingsDeviceEvent: 'nav.settingsDeviceEvent',
-    settingsDriverEvent: 'nav.settingsDriverEvent',
+    settingsDeviceAlarm: 'nav.settingsDeviceAlarm',
+    settingsDriverAlarm: 'nav.settingsDriverAlarm',
     settingsPointEvent: 'nav.settingsPointEvent',
     settingsAbout: 'nav.settingsAbout',
     settingsUserDetail: 'nav.settingsUserDetail',
@@ -199,8 +197,8 @@
     settingsAgenticDetail: 'nav.settingsAgenticDetail',
     settingsAgenticProviderDetail: 'nav.settingsAgenticProviderDetail',
     settingsCommand: 'nav.settingsCommand',
-    settingsCommandRecord: 'nav.settingsCommandRecord',
-    settingsEventReport: 'nav.settingsEventReport',
+    settingsCommandHistory: 'nav.settingsCommandHistory',
+    settingsEventHistory: 'nav.settingsEventHistory',
   };
 
   // Static icon fallback for route names the backend menu tree does not yet
@@ -243,8 +241,6 @@
     deviceEdit: 'Management',
     profileDetail: 'List',
     profileEdit: 'List',
-    pointDetail: 'TrendCharts',
-    pointEdit: 'TrendCharts',
     settingsUserDetail: 'User',
     settingsRoleDetail: 'UserFilled',
     settingsResourceDetail: 'Key',
@@ -262,8 +258,8 @@
     settingsAgenticDetail: 'ChatDotRound',
     settingsAgenticProviderDetail: 'ChatLineSquare',
     settingsCommand: 'Operation',
-    settingsCommandRecord: 'Document',
-    settingsEventReport: 'Document',
+    settingsCommandHistory: 'Document',
+    settingsEventHistory: 'Document',
   };
 
   const iconForCode = (code: string): string | undefined => {
@@ -293,7 +289,7 @@
     } else if (name.startsWith('profile')) {
       items.push({ path: '/profile', title: t('nav.profile'), icon: iconForCode('profile') });
     } else if (name.startsWith('point')) {
-      items.push({ path: '/point_value', title: t('nav.pointValue'), icon: iconForCode('pointValue') });
+      items.push({ path: '/profile', title: t('nav.profile'), icon: iconForCode('profile') });
     } else if (name.startsWith('settings')) {
       items.push({ path: '/settings', title: t('nav.settings'), icon: iconForCode('settings') });
       (SETTINGS_BREADCRUMB_PARENTS[name] || []).forEach((mid) => {
@@ -406,7 +402,7 @@
       bottom: 0;
       display: flex;
       min-width: 1280px;
-      padding: 5px 0 5px 0;
+      padding: 1px 0 5px 0;
       overflow: hidden;
       position: absolute;
       background: #f6f7f9;
