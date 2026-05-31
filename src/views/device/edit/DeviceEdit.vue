@@ -110,24 +110,20 @@
             v-loading="reactiveData.loading"
             :data="reactiveData.driverAttributes"
             border
-            class="driver-matrix-table"
+            class="matrix-table"
             row-key="id"
+            size="small"
             stripe
           >
-            <el-table-column :label="$t('device.edit.attributeName')" min-width="160" prop="attributeName" />
-            <el-table-column :label="$t('device.edit.attributeType')" width="100">
+            <el-table-column :label="$t('device.edit.attributeName')" min-width="140" prop="attributeName" />
+            <el-table-column :label="$t('device.edit.attributeType')" width="90">
               <template #default="{ row }">
                 <el-tag effect="plain" size="small">{{ row.attributeTypeFlag }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('device.edit.defaultValue')" width="140">
-              <template #default="{ row }">
-                {{ row.defaultValue || '-' }}
-              </template>
-            </el-table-column>
-            <el-table-column :label="$t('device.edit.configValue')" min-width="200">
+            <el-table-column :label="$t('device.edit.configValue')" min-width="240">
               <template #default="{ row: attribute }">
-                <div class="driver-matrix-cell">
+                <div class="matrix-cell">
                   <el-switch
                     v-if="isBooleanAttribute(attribute)"
                     :model-value="getDriverCellValue(attribute)"
@@ -143,6 +139,7 @@
                     :precision="attributePrecision(attribute)"
                     controls-position="right"
                     size="small"
+                    style="width: 100%"
                     @input="(val: any) => setDriverCellValue(attribute, val)"
                   />
                   <el-input
@@ -153,12 +150,11 @@
                     maxlength="512"
                     show-word-limit
                     size="small"
+                    style="width: 100%"
                     @input="(val: string) => setDriverCellValue(attribute, val)"
                   />
-                  <div v-if="driverCellDirty(attribute)" class="driver-matrix-cell__meta">
-                    <span class="point-matrix-cell__dirty">
-                      {{ $t('device.edit.modified') }}
-                    </span>
+                  <div v-if="driverCellDirty(attribute)" class="matrix-cell__meta">
+                    <span class="matrix-cell__dirty">{{ $t('device.edit.modified') }}</span>
                   </div>
                 </div>
               </template>
@@ -188,36 +184,45 @@
                 <matrix-status-segmented v-model="reactiveData.pointMatrixStatus" />
               </el-form-item>
             </template>
+            <template #trailing>
+              <el-pagination
+                v-if="filteredPointInfoData.length > reactiveData.pointPageSize"
+                v-model:current-page="reactiveData.pointPageCurrent"
+                v-model:page-size="reactiveData.pointPageSize"
+                :page-sizes="[10, 20, 50]"
+                :total="filteredPointInfoData.length"
+                layout="total, sizes, prev, pager, next"
+                size="small"
+              />
+            </template>
           </matrix-toolbar>
 
           <el-empty v-if="!hasPointAttributes" :description="$t('device.edit.pointAttributeEmpty')" />
           <el-table
             v-else
             v-loading="reactiveData.loading"
-            :data="filteredPointInfoData"
+            :data="paginatedPointInfoData"
             :row-class-name="pointMatrixRowClassName"
             border
-            class="point-matrix-table"
-            max-height="560"
+            class="matrix-table"
             size="small"
             stripe
           >
-            <el-table-column :label="$t('device.edit.pointName')" fixed min-width="220">
+            <el-table-column :label="$t('device.edit.pointName')" fixed min-width="160" show-overflow-tooltip>
               <template #default="{ row }">
-                <div class="point-matrix-point">
-                  <div class="point-matrix-point__name">{{ row.pointName }}</div>
-                  <div class="point-matrix-point__code">{{ row.pointCode || row.id }}</div>
-                </div>
+                <el-tooltip :content="row.pointCode || row.id" :disabled="!row.pointCode" placement="top">
+                  <span class="point-matrix-name">{{ row.pointName }}</span>
+                </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('device.edit.configStatus')" fixed min-width="120">
+            <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
               <template #default="{ row }">
                 <el-tag :type="pointRowStatusTag(row)" effect="plain" size="small">
                   {{ pointRowStatusLabel(row) }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column v-for="attribute in reactiveData.pointAttributes" :key="attribute.id" min-width="220">
+            <el-table-column v-for="attribute in reactiveData.pointAttributes" :key="attribute.id" min-width="180">
               <template #header>
                 <div class="point-matrix-attribute-header">
                   <span>{{ attribute.attributeName }}</span>
@@ -227,7 +232,7 @@
               <template #default="{ row }">
                 <div
                   :class="[
-                    'point-matrix-cell',
+                    'matrix-cell',
                     pointCellDirty(row, attribute) ? 'is-dirty' : '',
                     pointCellError(row, attribute) ? 'is-error' : '',
                   ]"
@@ -244,7 +249,7 @@
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="row.attributes[attribute.attributeCode].configValue"
                     :placeholder="attributePlaceholder(attribute)"
-                    class="point-matrix-input"
+                    style="width: 100%"
                     clearable
                     inputmode="decimal"
                     maxlength="512"
@@ -261,12 +266,12 @@
                     size="small"
                     @input="markPointCellDirty(row, attribute)"
                   />
-                  <div v-if="pointCellDirty(row, attribute)" class="point-matrix-cell__meta">
-                    <span class="point-matrix-cell__dirty">
+                  <div v-if="pointCellDirty(row, attribute)" class="matrix-cell__meta">
+                    <span class="matrix-cell__dirty">
                       {{ $t('device.edit.modified') }}
                     </span>
                   </div>
-                  <div v-if="pointCellError(row, attribute)" class="point-matrix-cell__error">
+                  <div v-if="pointCellError(row, attribute)" class="matrix-cell__error">
                     {{ pointCellError(row, attribute) }}
                   </div>
                 </div>
@@ -276,7 +281,7 @@
         </el-tab-pane>
 
         <!-- Command Config -->
-        <el-tab-pane :label="$t('device.edit.commandConfig')" name="commandConfig">
+        <el-tab-pane :label="$t('device.detail.relatedCommands')" name="commandConfig">
           <matrix-toolbar
             :dirty-count="commandDirtyCount"
             :form-model="reactiveData"
@@ -297,36 +302,45 @@
                 <matrix-status-segmented v-model="reactiveData.commandMatrixStatus" />
               </el-form-item>
             </template>
+            <template #trailing>
+              <el-pagination
+                v-if="filteredCommandInfoData.length > reactiveData.commandPageSize"
+                v-model:current-page="reactiveData.commandPageCurrent"
+                v-model:page-size="reactiveData.commandPageSize"
+                :page-sizes="[10, 20, 50]"
+                :total="filteredCommandInfoData.length"
+                layout="total, sizes, prev, pager, next"
+                size="small"
+              />
+            </template>
           </matrix-toolbar>
 
           <el-empty v-if="!hasCommandAttributes" :description="$t('device.edit.commandAttributeEmpty')" />
           <el-table
             v-else
             v-loading="reactiveData.loading"
-            :data="filteredCommandInfoData"
+            :data="paginatedCommandInfoData"
             :row-class-name="commandMatrixRowClassName"
             border
-            class="point-matrix-table"
-            max-height="560"
+            class="matrix-table"
             size="small"
             stripe
           >
-            <el-table-column :label="$t('device.edit.commandName')" fixed min-width="220">
+            <el-table-column :label="$t('device.edit.commandName')" fixed min-width="160" show-overflow-tooltip>
               <template #default="{ row }">
-                <div class="point-matrix-point">
-                  <div class="point-matrix-point__name">{{ row.commandName }}</div>
-                  <div class="point-matrix-point__code">{{ row.commandCode || row.id }}</div>
-                </div>
+                <el-tooltip :content="row.commandCode || row.id" :disabled="!row.commandCode" placement="top">
+                  <span class="point-matrix-name">{{ row.commandName }}</span>
+                </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('device.edit.configStatus')" fixed min-width="120">
+            <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
               <template #default="{ row }">
                 <el-tag :type="commandRowStatusTag(row)" effect="plain" size="small">
                   {{ commandRowStatusLabel(row) }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column v-for="attribute in reactiveData.commandAttributes" :key="attribute.id" min-width="220">
+            <el-table-column v-for="attribute in reactiveData.commandAttributes" :key="attribute.id" min-width="180">
               <template #header>
                 <div class="point-matrix-attribute-header">
                   <span>{{ attribute.attributeName }}</span>
@@ -336,7 +350,7 @@
               <template #default="{ row }">
                 <div
                   :class="[
-                    'point-matrix-cell',
+                    'matrix-cell',
                     commandCellDirty(row, attribute) ? 'is-dirty' : '',
                     commandCellError(row, attribute) ? 'is-error' : '',
                   ]"
@@ -353,7 +367,7 @@
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="row.attributes[attribute.attributeCode].configValue"
                     :placeholder="attributePlaceholder(attribute)"
-                    class="point-matrix-input"
+                    style="width: 100%"
                     clearable
                     inputmode="decimal"
                     maxlength="512"
@@ -370,12 +384,12 @@
                     size="small"
                     @input="markCommandCellDirty(row, attribute)"
                   />
-                  <div v-if="commandCellDirty(row, attribute)" class="point-matrix-cell__meta">
-                    <span class="point-matrix-cell__dirty">
+                  <div v-if="commandCellDirty(row, attribute)" class="matrix-cell__meta">
+                    <span class="matrix-cell__dirty">
                       {{ $t('device.edit.modified') }}
                     </span>
                   </div>
-                  <div v-if="commandCellError(row, attribute)" class="point-matrix-cell__error">
+                  <div v-if="commandCellError(row, attribute)" class="matrix-cell__error">
                     {{ commandCellError(row, attribute) }}
                   </div>
                 </div>
@@ -385,7 +399,7 @@
         </el-tab-pane>
 
         <!-- Event Config -->
-        <el-tab-pane :label="$t('device.edit.eventConfig')" name="eventConfig">
+        <el-tab-pane :label="$t('device.detail.relatedEvents')" name="eventConfig">
           <matrix-toolbar
             :dirty-count="eventDirtyCount"
             :form-model="reactiveData"
@@ -406,36 +420,45 @@
                 <matrix-status-segmented v-model="reactiveData.eventMatrixStatus" />
               </el-form-item>
             </template>
+            <template #trailing>
+              <el-pagination
+                v-if="filteredEventInfoData.length > reactiveData.eventPageSize"
+                v-model:current-page="reactiveData.eventPageCurrent"
+                v-model:page-size="reactiveData.eventPageSize"
+                :page-sizes="[10, 20, 50]"
+                :total="filteredEventInfoData.length"
+                layout="total, sizes, prev, pager, next"
+                size="small"
+              />
+            </template>
           </matrix-toolbar>
 
           <el-empty v-if="!hasEventAttributes" :description="$t('device.edit.eventAttributeEmpty')" />
           <el-table
             v-else
             v-loading="reactiveData.loading"
-            :data="filteredEventInfoData"
+            :data="paginatedEventInfoData"
             :row-class-name="eventMatrixRowClassName"
             border
-            class="point-matrix-table"
-            max-height="560"
+            class="matrix-table"
             size="small"
             stripe
           >
-            <el-table-column :label="$t('device.edit.eventName')" fixed min-width="220">
+            <el-table-column :label="$t('device.edit.eventName')" fixed min-width="160" show-overflow-tooltip>
               <template #default="{ row }">
-                <div class="point-matrix-point">
-                  <div class="point-matrix-point__name">{{ row.eventName }}</div>
-                  <div class="point-matrix-point__code">{{ row.eventCode || row.id }}</div>
-                </div>
+                <el-tooltip :content="row.eventCode || row.id" :disabled="!row.eventCode" placement="top">
+                  <span class="point-matrix-name">{{ row.eventName }}</span>
+                </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('device.edit.configStatus')" fixed min-width="120">
+            <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
               <template #default="{ row }">
                 <el-tag :type="eventRowStatusTag(row)" effect="plain" size="small">
                   {{ eventRowStatusLabel(row) }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column v-for="attribute in reactiveData.eventAttributes" :key="attribute.id" min-width="220">
+            <el-table-column v-for="attribute in reactiveData.eventAttributes" :key="attribute.id" min-width="180">
               <template #header>
                 <div class="point-matrix-attribute-header">
                   <span>{{ attribute.attributeName }}</span>
@@ -445,7 +468,7 @@
               <template #default="{ row }">
                 <div
                   :class="[
-                    'point-matrix-cell',
+                    'matrix-cell',
                     eventCellDirty(row, attribute) ? 'is-dirty' : '',
                     eventCellError(row, attribute) ? 'is-error' : '',
                   ]"
@@ -462,7 +485,7 @@
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="row.attributes[attribute.attributeCode].configValue"
                     :placeholder="attributePlaceholder(attribute)"
-                    class="point-matrix-input"
+                    style="width: 100%"
                     clearable
                     inputmode="decimal"
                     maxlength="512"
@@ -479,12 +502,12 @@
                     size="small"
                     @input="markEventCellDirty(row, attribute)"
                   />
-                  <div v-if="eventCellDirty(row, attribute)" class="point-matrix-cell__meta">
-                    <span class="point-matrix-cell__dirty">
+                  <div v-if="eventCellDirty(row, attribute)" class="matrix-cell__meta">
+                    <span class="matrix-cell__dirty">
                       {{ $t('device.edit.modified') }}
                     </span>
                   </div>
-                  <div v-if="eventCellError(row, attribute)" class="point-matrix-cell__error">
+                  <div v-if="eventCellError(row, attribute)" class="matrix-cell__error">
                     {{ eventCellError(row, attribute) }}
                   </div>
                 </div>
@@ -521,30 +544,19 @@
     font-size: 12px;
   }
 
-  .point-matrix-table {
+  .matrix-table {
     width: 100%;
     font-size: 13px;
 
     :deep(.point-matrix-row-dirty) {
       --el-table-tr-bg-color: var(--el-color-warning-light-9);
     }
-
-    :deep(.el-table__cell) {
-      padding: 6px 0;
-      vertical-align: top;
-    }
   }
 
-  .point-matrix-point__name {
+  .point-matrix-name {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--el-text-color-primary);
-  }
-
-  .point-matrix-point__code {
-    margin-top: 2px;
-    font-size: 11px;
-    color: var(--el-text-color-secondary);
   }
 
   .point-matrix-attribute-header {
@@ -552,51 +564,34 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    font-size: 13px;
   }
 
-  .point-matrix-cell {
-    min-height: 42px;
-    padding: 1px 0;
-
-    &.is-dirty {
-      :deep(.el-input__wrapper),
-      :deep(.el-input-number .el-input__wrapper) {
-        box-shadow: 0 0 0 1px var(--el-color-warning) inset;
-      }
+  .matrix-cell {
+    &.is-dirty :deep(.el-input__wrapper) {
+      box-shadow: 0 0 0 1px var(--el-color-warning) inset;
     }
 
-    &.is-error {
-      :deep(.el-input__wrapper),
-      :deep(.el-input-number .el-input__wrapper) {
-        box-shadow: 0 0 0 1px var(--el-color-danger) inset;
-      }
+    &.is-error :deep(.el-input__wrapper) {
+      box-shadow: 0 0 0 1px var(--el-color-danger) inset;
     }
   }
 
-  .point-matrix-input {
-    width: 100%;
-  }
-
-  .point-matrix-cell__meta {
+  .matrix-cell__meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 3px;
-    font-size: 11px;
-    line-height: 14px;
+    gap: 4px;
+    margin-top: 2px;
+    font-size: 10px;
+    line-height: 1;
   }
 
-  .point-matrix-cell__dirty {
+  .matrix-cell__dirty {
     color: var(--el-color-warning);
   }
 
-  .point-matrix-cell__default {
-    color: var(--el-text-color-secondary);
-  }
-
-  .point-matrix-cell__error {
-    margin-top: 3px;
-    font-size: 11px;
+  .matrix-cell__error {
+    margin-top: 2px;
+    font-size: 10px;
     color: var(--el-color-danger);
   }
 </style>

@@ -51,13 +51,13 @@
             </template>
           </info-card>
         </el-tab-pane>
-        <el-tab-pane :label="$t('profile.edit.pointConfig')" name="pointConfig">
+        <el-tab-pane :label="$t('profile.detail.relatedPoints')" name="pointConfig">
           <point :embedded="'edit'" :profile-id="reactiveData.id"></point>
         </el-tab-pane>
-        <el-tab-pane :label="$t('profile.edit.commandConfig')" name="commandConfig">
+        <el-tab-pane :label="$t('profile.detail.relatedCommands')" name="commandConfig">
           <command-list :embedded="'edit'" :profile-id="reactiveData.id"></command-list>
         </el-tab-pane>
-        <el-tab-pane :label="$t('profile.edit.eventConfig')" name="eventConfig">
+        <el-tab-pane :label="$t('profile.detail.relatedEvents')" name="eventConfig">
           <event-list :embedded="'edit'" :profile-id="reactiveData.id"></event-list>
         </el-tab-pane>
       </el-tabs>

@@ -326,6 +326,8 @@ export default defineComponent({
       pointMatrixKeyword: '',
       pointMatrixStatus: '' as PointMatrixStatus,
       pointSaving: false,
+      pointPageSize: 10,
+      pointPageCurrent: 1,
       commandAttributes: [] as Attribute[],
       commandAttributeTable: {} as Record<string, any>,
       commandInfoData: [] as CommandInfoMatrixRow[],
@@ -333,6 +335,8 @@ export default defineComponent({
       commandMatrixKeyword: '',
       commandMatrixStatus: '' as PointMatrixStatus,
       commandSaving: false,
+      commandPageSize: 10,
+      commandPageCurrent: 1,
       eventAttributes: [] as Attribute[],
       eventAttributeTable: {} as Record<string, any>,
       eventInfoData: [] as EventInfoMatrixRow[],
@@ -340,6 +344,8 @@ export default defineComponent({
       eventMatrixKeyword: '',
       eventMatrixStatus: '' as PointMatrixStatus,
       eventSaving: false,
+      eventPageSize: 10,
+      eventPageCurrent: 1,
       driverDictionary: [] as Dictionary[],
       driverLoading: false,
       profileDictionary: [] as Dictionary[],
@@ -456,6 +462,64 @@ export default defineComponent({
         return true;
       });
     });
+
+    // Client-side pagination helpers — slice the filtered arrays so long
+    // point / command / event lists don't force the user to scroll forever.
+    const paginatedPointInfoData = computed(() => {
+      const filtered = filteredPointInfoData.value;
+      const start = (reactiveData.pointPageCurrent - 1) * reactiveData.pointPageSize;
+      return filtered.slice(start, start + reactiveData.pointPageSize);
+    });
+
+    const paginatedCommandInfoData = computed(() => {
+      const filtered = filteredCommandInfoData.value;
+      const start = (reactiveData.commandPageCurrent - 1) * reactiveData.commandPageSize;
+      return filtered.slice(start, start + reactiveData.commandPageSize);
+    });
+
+    const paginatedEventInfoData = computed(() => {
+      const filtered = filteredEventInfoData.value;
+      const start = (reactiveData.eventPageCurrent - 1) * reactiveData.eventPageSize;
+      return filtered.slice(start, start + reactiveData.eventPageSize);
+    });
+
+    // Reset pagination to page 1 whenever the search keyword or status filter changes.
+    watch(
+      () => reactiveData.pointMatrixKeyword,
+      () => {
+        reactiveData.pointPageCurrent = 1;
+      }
+    );
+    watch(
+      () => reactiveData.pointMatrixStatus,
+      () => {
+        reactiveData.pointPageCurrent = 1;
+      }
+    );
+    watch(
+      () => reactiveData.commandMatrixKeyword,
+      () => {
+        reactiveData.commandPageCurrent = 1;
+      }
+    );
+    watch(
+      () => reactiveData.commandMatrixStatus,
+      () => {
+        reactiveData.commandPageCurrent = 1;
+      }
+    );
+    watch(
+      () => reactiveData.eventMatrixKeyword,
+      () => {
+        reactiveData.eventPageCurrent = 1;
+      }
+    );
+    watch(
+      () => reactiveData.eventMatrixStatus,
+      () => {
+        reactiveData.eventPageCurrent = 1;
+      }
+    );
 
     // Some drivers don't expose any configurable attributes. In that case we
     // still want to render step 2 (with prev / next buttons + an empty hint)
@@ -1386,6 +1450,9 @@ export default defineComponent({
       filteredPointInfoData,
       filteredCommandInfoData,
       filteredEventInfoData,
+      paginatedPointInfoData,
+      paginatedCommandInfoData,
+      paginatedEventInfoData,
       pointDirtyCount,
       commandDirtyCount,
       eventDirtyCount,

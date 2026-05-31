@@ -23,7 +23,13 @@ const Layout = () => import('@/components/layout/Layout.vue');
 
 /**
  * Operate routes configuration
- * Includes detail and edit pages for various entities
+ * Includes detail and edit pages for various entities.
+ *
+ * Settings detail routes live under a single /settings Layout wrapper so they
+ * do not compete with the nested /settings/* list routes defined in
+ * settings.ts (which resolve through Settings.vue → sidebar). Relative child
+ * paths (api/detail, label/detail, …) are more specific than the empty-path
+ * layout child, so Vue Router picks the correct branch.
  */
 const routes: Array<RouteRecordRaw> = [
   {
@@ -90,57 +96,39 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: '/settings/api',
+    path: '/settings',
     component: Layout,
     children: [
       {
         name: 'settingsApiDetail',
-        path: '/settings/api/detail',
+        path: 'api/detail',
         meta: {
           icon: 'el-icon-link',
           title: 'API Detail',
         },
         component: () => import('@/views/settings/api/detail/ApiDetail.vue'),
       },
-    ],
-  },
-  {
-    path: '/settings/group',
-    component: Layout,
-    children: [
       {
         name: 'settingsGroupDetail',
-        path: '/settings/group/detail',
+        path: 'group/detail',
         meta: {
           icon: 'el-icon-grid',
           title: 'Group Detail',
         },
         component: () => import('@/views/settings/group/detail/GroupDetail.vue'),
       },
-    ],
-  },
-  {
-    path: '/settings/label',
-    component: Layout,
-    children: [
       {
         name: 'settingsLabelDetail',
-        path: '/settings/label/detail',
+        path: 'label/detail',
         meta: {
           icon: 'el-icon-collection-tag',
           title: 'Label Detail',
         },
         component: () => import('@/views/settings/label/detail/LabelDetail.vue'),
       },
-    ],
-  },
-  {
-    path: '/settings/alarm',
-    component: Layout,
-    children: [
       {
         name: 'settingsAlarmRuleDetail',
-        path: '/settings/alarm/rule/detail',
+        path: 'alarm/rule/detail',
         meta: {
           icon: 'el-icon-set-up',
           title: 'Alarm Rule Detail',
@@ -150,7 +138,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         name: 'settingsAlarmNotifyDetail',
-        path: '/settings/alarm/notify/detail',
+        path: 'alarm/notify/detail',
         meta: {
           icon: 'el-icon-bell',
           title: 'Alarm Notify Policy Detail',
@@ -160,7 +148,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         name: 'settingsAlarmMessageDetail',
-        path: '/settings/alarm/message/detail',
+        path: 'alarm/message/detail',
         meta: {
           icon: 'el-icon-message',
           title: 'Alarm Message Template Detail',
@@ -170,7 +158,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         name: 'settingsAlarmChannelDetail',
-        path: '/settings/alarm/channel/detail',
+        path: 'alarm/channel/detail',
         meta: {
           icon: 'el-icon-connection',
           title: 'Alarm Notify Channel Detail',
@@ -180,7 +168,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         name: 'settingsAlarmBindDetail',
-        path: '/settings/alarm/bind/detail',
+        path: 'alarm/bind/detail',
         meta: {
           icon: 'el-icon-link',
           title: 'Alarm Channel Binding Detail',
@@ -190,7 +178,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         name: 'settingsAlarmStateDetail',
-        path: '/settings/alarm/state/detail',
+        path: 'alarm/state/detail',
         meta: {
           icon: 'el-icon-monitor',
           title: 'Alarm Runtime State Detail',
@@ -200,7 +188,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         name: 'settingsAlarmHistoryDetail',
-        path: '/settings/alarm/history/detail',
+        path: 'alarm/history/detail',
         meta: {
           icon: 'el-icon-document-checked',
           title: 'Alarm Delivery History Detail',
@@ -208,15 +196,9 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
         props: { entity: 'history' },
       },
-    ],
-  },
-  {
-    path: '/settings/model',
-    component: Layout,
-    children: [
       {
         name: 'settingsModelConfigDetail',
-        path: '/settings/model/config/detail',
+        path: 'model/config/detail',
         meta: {
           icon: 'el-icon-chat-dot-round',
           title: 'Model Config Detail',
@@ -225,67 +207,43 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         name: 'settingsModelProviderDetail',
-        path: '/settings/model/provider/detail',
+        path: 'model/provider/detail',
         meta: {
           icon: 'el-icon-chat-line-square',
           title: 'Model Provider Detail',
         },
         component: () => import('@/views/settings/agentic/detail/ProviderDetail.vue'),
       },
-    ],
-  },
-  {
-    path: '/settings/resource',
-    component: Layout,
-    children: [
       {
         name: 'settingsResourceDetail',
-        path: '/settings/resource/detail',
+        path: 'resource/detail',
         meta: {
           icon: 'el-icon-key',
           title: 'Resource Detail',
         },
         component: () => import('@/views/settings/resource/detail/ResourceDetail.vue'),
       },
-    ],
-  },
-  {
-    path: '/settings/menu',
-    component: Layout,
-    children: [
       {
         name: 'settingsMenuDetail',
-        path: '/settings/menu/detail',
+        path: 'menu/detail',
         meta: {
           icon: 'el-icon-menu',
           title: 'Menu Detail',
         },
         component: () => import('@/views/settings/menu/detail/MenuDetail.vue'),
       },
-    ],
-  },
-  {
-    path: '/settings/user',
-    component: Layout,
-    children: [
       {
         name: 'settingsUserDetail',
-        path: '/settings/user/detail',
+        path: 'user/detail',
         meta: {
           icon: 'el-icon-user',
           title: 'User Detail',
         },
         component: () => import('@/views/settings/user/detail/UserDetail.vue'),
       },
-    ],
-  },
-  {
-    path: '/settings/role',
-    component: Layout,
-    children: [
       {
         name: 'settingsRoleDetail',
-        path: '/settings/role/detail',
+        path: 'role/detail',
         meta: {
           icon: 'el-icon-user-filled',
           title: 'Role Detail',
