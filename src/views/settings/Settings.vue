@@ -62,6 +62,7 @@
     getSettingsDefaultOpeneds,
     getSettingsRouteName,
     SETTINGS_ALARM_CHILDREN,
+    SETTINGS_COMMAND_CHILDREN,
     SETTINGS_EVENT_CHILDREN,
     SETTINGS_FALLBACK_ICON,
     SETTINGS_FALLBACK_SIDEBAR,
@@ -122,6 +123,13 @@
     children: children?.length ? children : SETTINGS_EVENT_CHILDREN.map(toSidebarItem),
   });
 
+  const commandGroup = (children?: SidebarItem[]): SidebarItem => ({
+    name: 'settingsCommand',
+    title: t('nav.settingsCommand'),
+    icon: SETTINGS_FALLBACK_ICON.settingsCommand,
+    children: children?.length ? children : SETTINGS_COMMAND_CHILDREN.map(toSidebarItem),
+  });
+
   const menuTitle = (node: any) => {
     const titleKey = node.menuCode === 'settingsEvent' ? 'nav.settingsEvent' : SETTINGS_TITLE_KEYS[node.menuCode];
     return titleKey ? t(titleKey) : resolveMenuTitle(node);
@@ -154,13 +162,12 @@
       'settingsAbout',
     ]);
     ensureDirectItem(items, { name: 'settingsLabel', title: t('nav.settingsLabel'), icon: 'CollectionTag' }, [
-      'settingsAlarm',
-      'settingsModel',
-      'settingsEvent',
       'settingsAbout',
     ]);
+    ensureDirectItem(items, { name: 'settingsAbout', title: t('nav.settingsAbout'), icon: 'InfoFilled' }, []);
     ensureAlarmGroup(items);
     ensureModelGroup(items);
+    ensureCommandGroup(items);
     ensureEventGroup(items);
     return items;
   });
@@ -238,6 +245,26 @@
     }
 
     insertBefore(items, alarmGroup(extracted), ['settingsModel', 'settingsEvent', 'settingsAbout']);
+  };
+
+  const ensureCommandGroup = (items: SidebarItem[]) => {
+    const commandChildNames = SETTINGS_COMMAND_CHILDREN.map((item) => item.name);
+    const extracted: SidebarItem[] = [];
+    for (const name of commandChildNames) {
+      const index = items.findIndex((item) => item.name === name);
+      if (index >= 0) {
+        const removed = items.splice(index, 1)[0];
+        if (removed) extracted.push(removed);
+      }
+    }
+
+    const command = items.find((item) => item.name === 'settingsCommand');
+    if (command) {
+      command.children = command.children?.length ? command.children : commandGroup(extracted).children;
+      return;
+    }
+
+    insertBefore(items, commandGroup(extracted), ['settingsAbout']);
   };
 
   const ensureEventGroup = (items: SidebarItem[]) => {

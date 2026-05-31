@@ -382,7 +382,7 @@
       tone: 'red',
       trend: sparkTrend(state.alertSparkline),
       sparkline: state.alertSparkline,
-      onClick: () => router.push({ name: 'settingsDriverEvent' }),
+      onClick: () => router.push({ name: 'settingsDriverAlarm' }),
       onRefresh: refreshAlert,
     },
     {
@@ -394,7 +394,7 @@
       tone: 'orange',
       trend: sparkTrend(state.alertSparkline),
       sparkline: state.alertSparkline,
-      onClick: () => router.push({ name: 'settingsDeviceEvent' }),
+      onClick: () => router.push({ name: 'settingsDeviceAlarm' }),
       onRefresh: refreshAlert,
     },
   ]);

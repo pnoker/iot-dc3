@@ -159,6 +159,7 @@ export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
   { name: 'settingsMenu', titleKey: 'nav.settingsMenu', icon: 'Menu' },
   { name: 'settingsGroup', titleKey: 'nav.settingsGroup', icon: 'Grid' },
   { name: 'settingsLabel', titleKey: 'nav.settingsLabel', icon: 'CollectionTag' },
+  { name: 'settingsAbout', titleKey: 'nav.settingsAbout', icon: 'InfoFilled' },
 ];
 
 export const SETTINGS_ACTIVE_ALIAS: Record<string, string> = {

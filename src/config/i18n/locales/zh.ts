@@ -135,7 +135,7 @@ export default {
     settingsModelProvider: '模型供应商',
     settingsEvent: '事件',
     settingsAlarmOverview: '概览',
-    settingsPointEvent: '点位事件',
+    settingsPointAlarm: '点位告警',
     settingsCommand: '指令',
     settingsCommandHistory: '指令历史',
     settingsEventHistory: '事件历史',

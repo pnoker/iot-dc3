@@ -31,7 +31,7 @@ import type { Router } from 'vue-router';
 /** All entity kinds that dashboard cards can route to. */
 export type JumpKind = 'driver' | 'device' | 'profile' | 'point';
 
-/** Event-source flavour — drives jumps to settingsDeviceEvent / settingsDriverEvent. */
+/** Event-source flavour — drives jumps to settingsDeviceAlarm / settingsDriverAlarm. */
 export type AlertSourceKind = 'point' | 'device' | 'driver';
 
 /**
@@ -63,8 +63,8 @@ export const jumpToEntity = (router: Router, kind: JumpKind, id: string | number
  */
 export const jumpToSourceEvents = (router: Router, source: AlertSourceKind, sourceId: string | number): void => {
   let name: string;
-  if (source === 'point') name = 'settingsDeviceEvent';
-  else if (source === 'driver') name = 'settingsDriverEvent';
-  else name = 'settingsDeviceEvent';
+  if (source === 'point') name = 'settingsPointAlarm';
+  else if (source === 'driver') name = 'settingsDriverAlarm';
+  else name = 'settingsDeviceAlarm';
   router.push({ name, query: { sourceId: String(sourceId) } }).catch(() => {});
 };

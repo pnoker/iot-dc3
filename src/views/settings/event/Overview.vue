@@ -356,7 +356,7 @@
       tone: 'purple',
       sparkline: state.driverDaily,
       trend: sparkTrend(state.driverDaily),
-      onClick: () => router.push({ name: 'settingsDriverEvent' }),
+      onClick: () => router.push({ name: 'settingsDriverAlarm' }),
       onRefresh: load,
     },
     {
@@ -368,7 +368,7 @@
       tone: 'blue',
       sparkline: state.deviceDaily,
       trend: sparkTrend(state.deviceDaily),
-      onClick: () => router.push({ name: 'settingsDeviceEvent' }),
+      onClick: () => router.push({ name: 'settingsDeviceAlarm' }),
       onRefresh: load,
     },
     {
@@ -380,7 +380,7 @@
       tone: 'red',
       sparkline: state.driverDaily,
       trend: sparkTrend(state.driverDaily),
-      onClick: () => router.push({ name: 'settingsDriverEvent', query: { confirmFlag: '0' } }),
+      onClick: () => router.push({ name: 'settingsDriverAlarm', query: { confirmFlag: '0' } }),
       onRefresh: load,
     },
     {
@@ -392,7 +392,7 @@
       tone: 'orange',
       sparkline: state.deviceDaily,
       trend: sparkTrend(state.deviceDaily),
-      onClick: () => router.push({ name: 'settingsDeviceEvent', query: { confirmFlag: '0' } }),
+      onClick: () => router.push({ name: 'settingsDeviceAlarm', query: { confirmFlag: '0' } }),
       onRefresh: load,
     },
     {
@@ -404,7 +404,7 @@
       tone: 'purple',
       sparkline: state.sparkline24h,
       trend: sparkTrend(state.sparkline24h),
-      onClick: () => router.push({ name: 'settingsDriverEvent', query: { rangeKey: 'today' } }),
+      onClick: () => router.push({ name: 'settingsDriverAlarm', query: { rangeKey: 'today' } }),
       onRefresh: load,
     },
     {
@@ -416,7 +416,7 @@
       tone: 'blue',
       sparkline: state.sparkline24h,
       trend: sparkTrend(state.sparkline24h),
-      onClick: () => router.push({ name: 'settingsDeviceEvent', query: { rangeKey: 'today' } }),
+      onClick: () => router.push({ name: 'settingsDeviceAlarm', query: { rangeKey: 'today' } }),
       onRefresh: load,
     },
   ]);
@@ -427,9 +427,9 @@
   // route.query on mount and re-syncs on subsequent changes.
   const goto = (source: 'point' | 'device' | 'driver', query: Record<string, string>) => {
     let name: string;
-    if (source === 'point') name = 'settingsPointEvent';
-    else if (source === 'driver') name = 'settingsDriverEvent';
-    else name = 'settingsDeviceEvent';
+    if (source === 'point') name = 'settingsPointAlarm';
+    else if (source === 'driver') name = 'settingsDriverAlarm';
+    else name = 'settingsDeviceAlarm';
     router.push({ name, query }).catch(() => {});
   };
 
