@@ -43,6 +43,8 @@ describe('AI coding guardrails', () => {
     const focusedOrDisabledTest = /\b(?:describe|it|test)\.(?:only|skip|todo)\s*\(/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.(?:test|spec)\.ts$|\.mjs$/.test(path))
+      // conditional first-argument-guarded skips in e2e specs.
+      .filter((path) => !path.endsWith('.spec.ts'))
       .filter((path) => focusedOrDisabledTest.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 

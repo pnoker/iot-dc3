@@ -95,6 +95,36 @@ Object.defineProperty(URL, 'revokeObjectURL', {
   value: vi.fn(),
 });
 
+// Polyfill localStorage / sessionStorage for Node ≥ 22 where the native
+// globals are gated behind --localstorage-file. happy-dom provides them on
+// its own Window, but vitest's globalThis may still resolve to Node's
+// undefined getter, which breaks source modules that reference
+// window.localStorage directly (e.g. storageUtil).
+const ensureStorage = (name: 'localStorage' | 'sessionStorage') => {
+  if ((globalThis as any)[name] == null) {
+    const store = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, String(value));
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+      clear: () => {
+        store.clear();
+      },
+      get length() {
+        return store.size;
+      },
+      key: (index: number) => [...store.keys()][index] ?? null,
+    };
+    Object.defineProperty(globalThis, name, { value: storage, configurable: true, writable: true });
+  }
+};
+ensureStorage('localStorage');
+ensureStorage('sessionStorage');
+
 afterEach(() => {
   document.body.innerHTML = '';
   localStorage.clear();

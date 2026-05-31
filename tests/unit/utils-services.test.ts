@@ -159,14 +159,16 @@ describe('utils (services)', () => {
       jumpToEntity(router as Router, 'driver', '');
       jumpToSourceEvents(router as Router, 'device', 5);
       jumpToSourceEvents(router as Router, 'driver', 6);
+      jumpToSourceEvents(router as Router, 'point', 7);
 
       expect(router.push).toHaveBeenCalledWith({ name: 'driverDetail', query: { id: '1', active: 'detail' } });
       expect(router.push).toHaveBeenCalledWith({ name: 'deviceDetail', query: { id: '2', active: 'detail' } });
       expect(router.push).toHaveBeenCalledWith({ name: 'profileDetail', query: { id: '3', active: 'detail' } });
       expect(router.push).toHaveBeenCalledWith({ name: 'pointValue', query: { pointId: '4' } });
-      expect(router.push).toHaveBeenCalledWith({ name: 'settingsDeviceEvent', query: { sourceId: '5' } });
-      expect(router.push).toHaveBeenCalledWith({ name: 'settingsDriverEvent', query: { sourceId: '6' } });
-      expect(router.push).toHaveBeenCalledTimes(6);
+      expect(router.push).toHaveBeenCalledWith({ name: 'settingsDeviceAlarm', query: { sourceId: '5' } });
+      expect(router.push).toHaveBeenCalledWith({ name: 'settingsDriverAlarm', query: { sourceId: '6' } });
+      expect(router.push).toHaveBeenCalledWith({ name: 'settingsPointAlarm', query: { sourceId: '7' } });
+      expect(router.push).toHaveBeenCalledTimes(7);
     });
   });
 

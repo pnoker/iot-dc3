@@ -71,8 +71,8 @@ describe('thing model profile/device flow', () => {
       { file: 'src/views/profile/edit/ProfileEdit.vue', props: ['profileCode'] },
       { file: 'src/views/device/add/DeviceAddForm.vue', props: ['deviceCode'] },
       { file: 'src/views/device/edit/DeviceEdit.vue', props: ['deviceCode'] },
-      { file: 'src/views/point/add/PointAddForm.vue', props: ['pointCode'] },
-      { file: 'src/views/point/edit/PointEdit.vue', props: ['pointCode'] },
+      { file: 'src/views/point/add/PointEditForm.vue', props: ['pointCode'] },
+      { file: 'src/views/point/value/edit/PointValueEditForm.vue', props: ['pointCode'] },
       { file: 'src/views/settings/command/edit/CommandEditForm.vue', props: ['commandCode'] },
       { file: 'src/views/settings/event/definition/edit/EventEditForm.vue', props: ['eventCode'] },
     ];
