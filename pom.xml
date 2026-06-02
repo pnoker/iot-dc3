@@ -81,6 +81,28 @@
         <!-- Modbus -->
         <modbus4j.version>3.0.3</modbus4j.version>
         <jserialcomm.version>2.11.0</jserialcomm.version>
+
+        <!-- LwM2M -->
+        <leshan.version>2.0.0-M14</leshan.version>
+
+        <!-- BACnet -->
+        <bacnet4j.version>6.0.1</bacnet4j.version>
+
+        <!-- DLMS/COSEM -->
+        <gurux.dlms.version>4.0.79</gurux.dlms.version>
+
+        <!-- Bluetooth LE -->
+        <bluetooth.manager.version>1.5.3</bluetooth.manager.version>
+        <bluetooth.manager.tinyb.version>1.3.3</bluetooth.manager.tinyb.version>
+
+        <!-- Zigbee -->
+        <zigbee.version>1.4.16.1</zigbee.version>
+
+        <!-- IEC 104 -->
+        <j60870.version>1.7.2</j60870.version>
+
+        <!-- SNMP -->
+        <snmp4j.version>3.8.3</snmp4j.version>
     </properties>
 
     <modules>
@@ -272,6 +294,82 @@
                 <groupId>com.fazecast</groupId>
                 <artifactId>jSerialComm</artifactId>
                 <version>${jserialcomm.version}</version>
+            </dependency>
+
+            <!-- DC3 Common SQL -->
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-sql</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+
+            <!-- LwM2M Related -->
+            <dependency>
+                <groupId>org.eclipse.leshan</groupId>
+                <artifactId>leshan-server-cf</artifactId>
+                <version>${leshan.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.leshan</groupId>
+                <artifactId>leshan-core</artifactId>
+                <version>${leshan.version}</version>
+            </dependency>
+
+            <!-- BACnet Related -->
+            <dependency>
+                <groupId>com.infiniteautomation</groupId>
+                <artifactId>bacnet4j</artifactId>
+                <version>${bacnet4j.version}</version>
+            </dependency>
+
+            <!-- DLMS/COSEM Related -->
+            <dependency>
+                <groupId>org.gurux</groupId>
+                <artifactId>gurux.dlms</artifactId>
+                <version>${gurux.dlms.version}</version>
+            </dependency>
+
+            <!-- Bluetooth LE Related -->
+            <dependency>
+                <groupId>org.sputnikdev</groupId>
+                <artifactId>bluetooth-manager</artifactId>
+                <version>${bluetooth.manager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.sputnikdev</groupId>
+                <artifactId>bluetooth-manager-tinyb</artifactId>
+                <version>${bluetooth.manager.tinyb.version}</version>
+            </dependency>
+
+            <!-- Zigbee Related -->
+            <dependency>
+                <groupId>com.zsmartsystems.zigbee</groupId>
+                <artifactId>com.zsmartsystems.zigbee</artifactId>
+                <version>${zigbee.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zsmartsystems.zigbee</groupId>
+                <artifactId>com.zsmartsystems.zigbee.serial</artifactId>
+                <version>${zigbee.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zsmartsystems.zigbee</groupId>
+                <artifactId>com.zsmartsystems.zigbee.dongle.telegesis</artifactId>
+                <version>${zigbee.version}</version>
+            </dependency>
+
+            <!-- IEC 104 Related -->
+            <dependency>
+                <groupId>org.openmuc</groupId>
+                <artifactId>j60870</artifactId>
+                <version>${j60870.version}</version>
+            </dependency>
+
+            <!-- SNMP Related -->
+            <dependency>
+                <groupId>org.snmp4j</groupId>
+                <artifactId>snmp4j</artifactId>
+                <version>${snmp4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,0 +1,48 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    schedule:
+      read:
+        cron: '0/5 * * * * ?'
+
+spring:
+  env: dev
+  group: ${user.name}
+  rabbitmq:
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
+    host: ${RABBITMQ_HOST:dc3-rabbitmq}
+    port: ${RABBITMQ_PORT:35672}
+    username: ${RABBITMQ_USERNAME:dc3}
+    password: ${RABBITMQ_PASSWORD:dc3dc3dc3}
+  grpc:
+    client:
+      channels:
+        dc3-center-manager:
+          address: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9400'
+          enable-keep-alive: true
+          keep-alive-without-calls: true
+          negotiation-type: PLAINTEXT
+
+logging:
+  level:
+    io.github.pnoker: DEBUG
+    io.github.pnoker.driver.sdk: DEBUG
+    io.github.pnoker.driver.sdk.service: DEBUG
+    io.github.pnoker.driver.sdk.service.job: DEBUG
+    io.github.pnoker.driver.sdk.service.rabbit: DEBUG

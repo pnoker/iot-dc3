@@ -1,0 +1,97 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: Bluetooth LE Driver
+    code: BleDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Adapter Name
+        attribute-code: adapterName
+        attribute-type-flag: STRING
+        default-value: hci0
+        remark: Bluetooth adapter name
+      - attribute-name: Device Address
+        attribute-code: deviceAddress
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: BLE device MAC address (e.g. AA:BB:CC:DD:EE:FF)
+      - attribute-name: Connection Timeout
+        attribute-code: connectionTimeout
+        attribute-type-flag: INT
+        default-value: 10000
+        remark: Connection timeout in milliseconds
+    point-attribute:
+      - attribute-name: Service UUID
+        attribute-code: serviceUuid
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: GATT Service UUID
+      - attribute-name: Characteristic UUID
+        attribute-code: characteristicUuid
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: GATT Characteristic UUID
+      - attribute-name: Read Format
+        attribute-code: readFormat
+        attribute-type-flag: STRING
+        default-value: UTF8
+        remark: Data format (UTF8, HEX, INT16, UINT16, FLOAT)
+      - attribute-name: Byte Order
+        attribute-code: byteOrder
+        attribute-type-flag: STRING
+        default-value: BIG
+        remark: Byte order (BIG, LITTLE)
+    command-attribute:
+      - attribute-name: Service UUID
+        attribute-code: serviceUuid
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: GATT Service UUID
+      - attribute-name: Characteristic UUID
+        attribute-code: characteristicUuid
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: GATT Characteristic UUID for writing
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/ble/${spring.application.name}.log

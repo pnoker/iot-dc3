@@ -1,0 +1,101 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: CAN Bus Driver
+    code: CanDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Interface
+        attribute-code: interfaceName
+        attribute-type-flag: STRING
+        default-value: can0
+      - attribute-name: Bitrate
+        attribute-code: bitrate
+        attribute-type-flag: INT
+        default-value: 500000
+      - attribute-name: Frame Format
+        attribute-code: frameFormat
+        attribute-type-flag: STRING
+        default-value: STANDARD
+        remark: STANDARD(11bit) or EXTENDED(29bit)
+    point-attribute:
+      - attribute-name: CAN ID
+        attribute-code: canId
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: Data Offset
+        attribute-code: dataOffset
+        attribute-type-flag: INT
+        default-value: 0
+      - attribute-name: Data Length
+        attribute-code: dataLength
+        attribute-type-flag: INT
+        default-value: 1
+      - attribute-name: Data Format
+        attribute-code: dataFormat
+        attribute-type-flag: STRING
+        default-value: INT
+        remark: INT/UINT/HEX
+      - attribute-name: Byte Order
+        attribute-code: byteOrder
+        attribute-type-flag: STRING
+        default-value: LITTLE
+      - attribute-name: Request CAN ID
+        attribute-code: requestCanId
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: Request Data
+        attribute-code: requestData
+        attribute-type-flag: STRING
+        default-value: ''
+    command-attribute:
+      - attribute-name: CAN ID
+        attribute-code: canId
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: Data
+        attribute-code: data
+        attribute-type-flag: STRING
+        default-value: '${value}'
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/can/${spring.application.name}.log

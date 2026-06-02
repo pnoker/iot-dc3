@@ -1,0 +1,83 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: EtherNet/IP Driver
+    code: EthernetIpDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Host
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: localhost
+      - attribute-name: Port
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 44818
+      - attribute-name: Slot
+        attribute-code: slot
+        attribute-type-flag: INT
+        default-value: 0
+      - attribute-name: Timeout
+        attribute-code: timeout
+        attribute-type-flag: INT
+        default-value: 5000
+    point-attribute:
+      - attribute-name: Tag Name
+        attribute-code: tagName
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: Tag Type
+        attribute-code: tagType
+        attribute-type-flag: STRING
+        default-value: DINT
+      - attribute-name: Element Count
+        attribute-code: elementCount
+        attribute-type-flag: INT
+        default-value: 1
+    command-attribute:
+      - attribute-name: Send Command
+        attribute-code: sendCommand
+        attribute-type-flag: STRING
+        default-value: '${value}'
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/ethernet-ip/${spring.application.name}.log

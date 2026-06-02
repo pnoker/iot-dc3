@@ -33,17 +33,34 @@
     </description>
 
     <modules>
+        <module>dc3-driver-bacnet-ip</module>
+        <module>dc3-driver-ble</module>
+        <module>dc3-driver-can</module>
         <module>dc3-driver-coap</module>
+        <module>dc3-driver-dlms</module>
+        <module>dc3-driver-ethernet-ip</module>
+        <module>dc3-driver-fins</module>
+        <module>dc3-driver-http</module>
+        <module>dc3-driver-iec104</module>
         <module>dc3-driver-listening-virtual</module>
+        <module>dc3-driver-lwm2m</module>
+        <module>dc3-driver-melsec</module>
         <module>dc3-driver-modbus-tcp</module>
         <module>dc3-driver-modbus-rtu</module>
         <module>dc3-driver-mqtt</module>
+        <module>dc3-driver-mysql</module>
         <module>dc3-driver-opc-da</module>
         <module>dc3-driver-opc-ua</module>
-        <module>dc3-driver-melsec</module>
+        <module>dc3-driver-oracle</module>
         <module>dc3-driver-plcs7</module>
+        <module>dc3-driver-postgresql</module>
+        <module>dc3-driver-serial</module>
         <module>dc3-driver-sl651</module>
+        <module>dc3-driver-snmp</module>
+        <module>dc3-driver-sqlserver</module>
+        <module>dc3-driver-tcp-udp</module>
         <module>dc3-driver-virtual</module>
+        <module>dc3-driver-zigbee</module>
     </modules>
 
     <repositories>

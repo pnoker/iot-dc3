@@ -1,0 +1,115 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: TCP/UDP Raw Driver
+    code: TcpUdpDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Protocol
+        attribute-code: protocol
+        attribute-type-flag: STRING
+        default-value: TCP
+        remark: TCP or UDP
+      - attribute-name: Host
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: localhost
+      - attribute-name: Port
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 502
+      - attribute-name: Connect Timeout
+        attribute-code: connectTimeout
+        attribute-type-flag: INT
+        default-value: 5000
+      - attribute-name: Read Timeout
+        attribute-code: readTimeout
+        attribute-type-flag: INT
+        default-value: 3000
+      - attribute-name: Delimiter
+        attribute-code: delimiter
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Hex delimiter
+    point-attribute:
+      - attribute-name: Send Command
+        attribute-code: sendCommand
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: Receive Length
+        attribute-code: receiveLength
+        attribute-type-flag: INT
+        default-value: 0
+        remark: 0 means use delimiter
+      - attribute-name: Frame Header
+        attribute-code: frameHeader
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: Frame Footer
+        attribute-code: frameFooter
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: Data Offset
+        attribute-code: dataOffset
+        attribute-type-flag: INT
+        default-value: 0
+      - attribute-name: Data Length
+        attribute-code: dataLength
+        attribute-type-flag: INT
+        default-value: 0
+      - attribute-name: Data Format
+        attribute-code: dataFormat
+        attribute-type-flag: STRING
+        default-value: HEX
+        remark: HEX/ASCII/INT16/UINT16/INT32/FLOAT
+      - attribute-name: Byte Order
+        attribute-code: byteOrder
+        attribute-type-flag: STRING
+        default-value: BIG
+    command-attribute:
+      - attribute-name: Send Command
+        attribute-code: sendCommand
+        attribute-type-flag: STRING
+        default-value: '${value}'
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/tcp-udp/${spring.application.name}.log
