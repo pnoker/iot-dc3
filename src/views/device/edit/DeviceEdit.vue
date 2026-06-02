@@ -109,10 +109,8 @@
             v-else
             v-loading="reactiveData.loading"
             :data="reactiveData.driverAttributes"
-            border
             class="matrix-table"
             row-key="id"
-            size="small"
             stripe
           >
             <el-table-column :label="$t('device.edit.attributeName')" min-width="140" prop="attributeName" />
@@ -203,9 +201,6 @@
             v-loading="reactiveData.loading"
             :data="paginatedPointInfoData"
             :row-class-name="pointMatrixRowClassName"
-            border
-            class="matrix-table"
-            size="small"
             stripe
           >
             <el-table-column :label="$t('device.edit.pointName')" fixed min-width="160" show-overflow-tooltip>
@@ -321,9 +316,6 @@
             v-loading="reactiveData.loading"
             :data="paginatedCommandInfoData"
             :row-class-name="commandMatrixRowClassName"
-            border
-            class="matrix-table"
-            size="small"
             stripe
           >
             <el-table-column :label="$t('device.edit.commandName')" fixed min-width="160" show-overflow-tooltip>
@@ -439,9 +431,6 @@
             v-loading="reactiveData.loading"
             :data="paginatedEventInfoData"
             :row-class-name="eventMatrixRowClassName"
-            border
-            class="matrix-table"
-            size="small"
             stripe
           >
             <el-table-column :label="$t('device.edit.eventName')" fixed min-width="160" show-overflow-tooltip>
@@ -546,7 +535,6 @@
 
   .matrix-table {
     width: 100%;
-    font-size: 13px;
 
     :deep(.point-matrix-row-dirty) {
       --el-table-tr-bg-color: var(--el-color-warning-light-9);

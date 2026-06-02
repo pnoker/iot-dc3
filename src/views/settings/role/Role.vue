@@ -38,7 +38,7 @@
         </el-table-column>
         <el-table-column :label="t('common.remark')" min-width="200" prop="remark" show-overflow-tooltip />
         <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
-        <el-table-column :label="t('common.operation')" fixed="right" width="280">
+        <el-table-column :label="t('common.operation')" fixed="right" width="320">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
