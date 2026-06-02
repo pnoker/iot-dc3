@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.pnoker</groupId>
+        <artifactId>dc3-common</artifactId>
+        <version>2026.5.22</version>
+    </parent>
+
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-common-sql</artifactId>
+    <version>2026.5.22</version>
+    <packaging>jar</packaging>
+
+    <inceptionYear>2016</inceptionYear>
+    <url>https://github.com/pnoker/iot-dc3</url>
+    <description>
+        The common SQL/JDBC driver dependencies of the IoT DC3 platform.
+    </description>
+
+    <developers>
+        <developer>
+            <id>pnoker</id>
+            <name>pnoker</name>
+            <email>pnokers@icloud.com</email>
+            <roles>
+                <role>PMC</role>
+            </roles>
+            <organization>pnoker.github.io</organization>
+            <url>https://github.com/pnoker/iot-dc3</url>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>GNU Affero General Public License v3.0</name>
+            <url>https://www.gnu.org/licenses/agpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/pnoker/iot-dc3</url>
+        <connection>scm:git:https://github.com/pnoker/iot-dc3.git</connection>
+        <developerConnection>scm:git:https://github.com/pnoker/iot-dc3.git</developerConnection>
+    </scm>
+
+    <dependencies>
+
+        <!-- JDBC Connection Pool -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+
+        <!-- DC3 Common Related -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-driver</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

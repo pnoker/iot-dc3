@@ -1,0 +1,109 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: SNMP Driver
+    code: SnmpDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Host
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: 127.0.0.1
+      - attribute-name: Port
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 161
+      - attribute-name: Version
+        attribute-code: version
+        attribute-type-flag: STRING
+        default-value: v2c
+        remark: SNMP version (v1/v2c)
+      - attribute-name: Community
+        attribute-code: community
+        attribute-type-flag: STRING
+        default-value: public
+      - attribute-name: USM Username
+        attribute-code: usmUsername
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: SNMPv3 USM username (not used in v1/v2c)
+      - attribute-name: USM Auth Protocol
+        attribute-code: usmAuthProtocol
+        attribute-type-flag: STRING
+        default-value: MD5
+        remark: SNMPv3 auth protocol (MD5/SHA)
+      - attribute-name: USM Auth Password
+        attribute-code: usmAuthPassword
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: Timeout
+        attribute-code: timeout
+        attribute-type-flag: INT
+        default-value: 5000
+        remark: Request timeout in milliseconds
+      - attribute-name: Retries
+        attribute-code: retries
+        attribute-type-flag: INT
+        default-value: 1
+    point-attribute:
+      - attribute-name: OID
+        attribute-code: oid
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: SNMP object identifier (e.g. 1.3.6.1.2.1.1.1.0)
+      - attribute-name: SNMP Type
+        attribute-code: snmpType
+        attribute-type-flag: STRING
+        default-value: OCTET_STRING
+        remark: SNMP data type (INTEGER/GAUGE32/COUNTER32/OCTET_STRING/TIMETICKS/IPADDRESS/OID)
+    command-attribute:
+      - attribute-name: OID
+        attribute-code: oid
+        attribute-type-flag: STRING
+        default-value: ''
+      - attribute-name: SNMP Type
+        attribute-code: snmpType
+        attribute-type-flag: STRING
+        default-value: OCTET_STRING
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/snmp/${spring.application.name}.log

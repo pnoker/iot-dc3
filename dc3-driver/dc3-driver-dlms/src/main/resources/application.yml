@@ -1,0 +1,112 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: DLMS/COSEM Driver
+    code: DlmsDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Transport Type
+        attribute-code: transportType
+        attribute-type-flag: STRING
+        default-value: TCP
+        remark: Transport type (TCP, SERIAL)
+      - attribute-name: Host
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: localhost
+        remark: Remote device address (TCP mode)
+      - attribute-name: Port
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 4059
+        remark: Remote device port (TCP mode)
+      - attribute-name: Serial Port
+        attribute-code: serialPort
+        attribute-type-flag: STRING
+        default-value: /dev/ttyUSB0
+        remark: Serial port path (SERIAL mode)
+      - attribute-name: Baud Rate
+        attribute-code: baudRate
+        attribute-type-flag: INT
+        default-value: 9600
+        remark: Baud rate (SERIAL mode)
+      - attribute-name: Client Address
+        attribute-code: clientAddress
+        attribute-type-flag: INT
+        default-value: 16
+        remark: DLMS client address (public client=16)
+      - attribute-name: Server Address
+        attribute-code: serverAddress
+        attribute-type-flag: INT
+        default-value: 1
+        remark: DLMS server address
+      - attribute-name: Authentication
+        attribute-code: authentication
+        attribute-type-flag: STRING
+        default-value: NONE
+        remark: Authentication method (NONE, LOW, HIGH)
+      - attribute-name: Password
+        attribute-code: password
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Authentication password
+    point-attribute:
+      - attribute-name: Object Type
+        attribute-code: objectType
+        attribute-type-flag: STRING
+        default-value: REGISTER
+        remark: DLMS object type (REGISTER, CLOCK, DATA, etc.)
+      - attribute-name: Logical Name
+        attribute-code: logicalName
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Object logical name / OBIS code (e.g. 1.0.1.8.0.255)
+      - attribute-name: Attribute ID
+        attribute-code: attributeId
+        attribute-type-flag: INT
+        default-value: 2
+        remark: Attribute ID (2=Present Value)
+    command-attribute: []
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/dlms/${spring.application.name}.log

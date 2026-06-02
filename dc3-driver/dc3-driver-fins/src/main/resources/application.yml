@@ -1,0 +1,114 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: Omron FINS Driver
+    code: FinsDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Host
+        attribute-code: host
+        attribute-type-flag: STRING
+        default-value: 127.0.0.1
+      - attribute-name: Port
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 9600
+      - attribute-name: Protocol
+        attribute-code: protocol
+        attribute-type-flag: STRING
+        default-value: TCP
+      - attribute-name: Source Node
+        attribute-code: sourceNode
+        attribute-type-flag: INT
+        default-value: 1
+      - attribute-name: Dest Node
+        attribute-code: destNode
+        attribute-type-flag: INT
+        default-value: 2
+      - attribute-name: Source Unit
+        attribute-code: sourceUnit
+        attribute-type-flag: INT
+        default-value: 0
+      - attribute-name: Dest Unit
+        attribute-code: destUnit
+        attribute-type-flag: INT
+        default-value: 0
+      - attribute-name: Timeout
+        attribute-code: timeout
+        attribute-type-flag: INT
+        default-value: 5000
+        remark: Request timeout in milliseconds
+    point-attribute:
+      - attribute-name: Memory Area
+        attribute-code: memoryArea
+        attribute-type-flag: STRING
+        default-value: D
+        remark: D/W/H/C
+      - attribute-name: Address
+        attribute-code: address
+        attribute-type-flag: INT
+        default-value: 0
+      - attribute-name: Data Type
+        attribute-code: dataType
+        attribute-type-flag: STRING
+        default-value: UINT16
+        remark: INT16/UINT16/INT32/UINT32/FLOAT/STRING/BCD
+      - attribute-name: Bit Position
+        attribute-code: bitPosition
+        attribute-type-flag: INT
+        default-value: 0
+    command-attribute:
+      - attribute-name: Memory Area
+        attribute-code: memoryArea
+        attribute-type-flag: STRING
+        default-value: D
+      - attribute-name: Address
+        attribute-code: address
+        attribute-type-flag: INT
+        default-value: 0
+      - attribute-name: Data Type
+        attribute-code: dataType
+        attribute-type-flag: STRING
+        default-value: UINT16
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/fins/${spring.application.name}.log

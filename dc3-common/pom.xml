@@ -102,6 +102,7 @@
         <module>dc3-common-quartz</module>
         <module>dc3-common-rabbitmq</module>
         <module>dc3-common-repository</module>
+        <module>dc3-common-sql</module>
         <module>dc3-common-resource-registrar</module>
         <module>dc3-common-test</module>
         <module>dc3-common-thread</module>

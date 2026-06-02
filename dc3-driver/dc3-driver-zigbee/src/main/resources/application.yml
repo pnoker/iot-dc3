@@ -1,0 +1,117 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: Zigbee Driver
+    code: ZigbeeDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Serial Port
+        attribute-code: serialPort
+        attribute-type-flag: STRING
+        default-value: /dev/ttyUSB0
+        remark: Zigbee coordinator serial port
+      - attribute-name: Baud Rate
+        attribute-code: baudRate
+        attribute-type-flag: INT
+        default-value: 115200
+        remark: Serial port baud rate
+      - attribute-name: Dongle Type
+        attribute-code: dongleType
+        attribute-type-flag: STRING
+        default-value: TELEGESIS
+        remark: Coordinator dongle type (TELEGESIS, EMBER, CONBEE)
+      - attribute-name: PAN ID
+        attribute-code: panId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: PAN ID (0=auto)
+      - attribute-name: Channel
+        attribute-code: channel
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Channel (0=auto, 11-26)
+    point-attribute:
+      - attribute-name: Node IEEE Address
+        attribute-code: nodeIeeeAddress
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Zigbee node IEEE address (e.g. 00158D0001234567)
+      - attribute-name: Endpoint ID
+        attribute-code: endpointId
+        attribute-type-flag: INT
+        default-value: 1
+        remark: Endpoint ID
+      - attribute-name: Cluster ID
+        attribute-code: clusterId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Cluster ID (e.g. 1026=Temperature Measurement)
+      - attribute-name: Attribute ID
+        attribute-code: attributeId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Attribute ID (e.g. 0=Measured Value)
+    command-attribute:
+      - attribute-name: Node IEEE Address
+        attribute-code: nodeIeeeAddress
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Zigbee node IEEE address
+      - attribute-name: Endpoint ID
+        attribute-code: endpointId
+        attribute-type-flag: INT
+        default-value: 1
+        remark: Endpoint ID
+      - attribute-name: Cluster ID
+        attribute-code: clusterId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Cluster ID for writing
+      - attribute-name: Attribute ID
+        attribute-code: attributeId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Attribute ID for writing
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/zigbee/${spring.application.name}.log

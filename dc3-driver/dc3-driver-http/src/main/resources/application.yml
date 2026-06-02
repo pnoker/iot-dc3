@@ -1,0 +1,102 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: HTTP REST Client Driver
+    code: HttpDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Base URL
+        attribute-code: baseUrl
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Base URL for API requests (e.g. https://api.example.com)
+      - attribute-name: Method
+        attribute-code: method
+        attribute-type-flag: STRING
+        default-value: GET
+        remark: Default HTTP method (GET, POST, PUT, DELETE)
+      - attribute-name: Headers
+        attribute-code: headers
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Custom headers as JSON (e.g. {"Authorization":"Bearer xxx"})
+      - attribute-name: Timeout
+        attribute-code: timeout
+        attribute-type-flag: INT
+        default-value: 5000
+        remark: Request timeout in milliseconds
+    point-attribute:
+      - attribute-name: Path
+        attribute-code: path
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: API path (e.g. /api/v1/sensor/{id})
+      - attribute-name: Method
+        attribute-code: method
+        attribute-type-flag: STRING
+        default-value: GET
+        remark: HTTP method override for this point
+      - attribute-name: Body Template
+        attribute-code: bodyTemplate
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Request body template with ${value} placeholder
+      - attribute-name: Response Path
+        attribute-code: responsePath
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: JSON path to extract value (e.g. $.data.temperature)
+    command-attribute:
+      - attribute-name: Path
+        attribute-code: path
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: API path for command
+      - attribute-name: Method
+        attribute-code: method
+        attribute-type-flag: STRING
+        default-value: POST
+        remark: HTTP method for command
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/http/${spring.application.name}.log

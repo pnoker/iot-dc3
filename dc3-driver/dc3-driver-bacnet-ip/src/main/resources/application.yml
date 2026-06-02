@@ -1,0 +1,117 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: BACnet IP Driver
+    code: BacnetIpDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      # Read data regularly
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Local Device ID
+        attribute-code: localDeviceId
+        attribute-type-flag: INT
+        default-value: 1001
+        remark: Local BACnet device instance number
+      - attribute-name: Bind Address
+        attribute-code: bindAddress
+        attribute-type-flag: STRING
+        default-value: '0.0.0.0'
+        remark: Local bind address
+      - attribute-name: Port
+        attribute-code: port
+        attribute-type-flag: INT
+        default-value: 47808
+        remark: BACnet UDP port (default 47808 = 0xBAC0)
+      - attribute-name: Broadcast Address
+        attribute-code: broadcastAddress
+        attribute-type-flag: STRING
+        default-value: '255.255.255.255'
+        remark: Broadcast address for device discovery
+      - attribute-name: Timeout
+        attribute-code: timeout
+        attribute-type-flag: INT
+        default-value: 6000
+        remark: Request timeout in milliseconds
+    point-attribute:
+      - attribute-name: Remote Device ID
+        attribute-code: remoteDeviceId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Remote BACnet device instance number
+      - attribute-name: Object Type
+        attribute-code: objectType
+        attribute-type-flag: STRING
+        default-value: ANALOG_INPUT
+        remark: BACnet object type (ANALOG_INPUT, ANALOG_OUTPUT, ANALOG_VALUE, BINARY_INPUT, BINARY_OUTPUT, BINARY_VALUE, MULTI_STATE_INPUT, MULTI_STATE_OUTPUT, MULTI_STATE_VALUE)
+      - attribute-name: Object Instance
+        attribute-code: objectInstance
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Object instance number
+      - attribute-name: Property ID
+        attribute-code: propertyId
+        attribute-type-flag: STRING
+        default-value: PRESENT_VALUE
+        remark: Property identifier (PRESENT_VALUE, DESCRIPTION, STATUS_FLAGS, etc.)
+    command-attribute:
+      - attribute-name: Remote Device ID
+        attribute-code: remoteDeviceId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Remote BACnet device instance number
+      - attribute-name: Object Type
+        attribute-code: objectType
+        attribute-type-flag: STRING
+        default-value: ANALOG_OUTPUT
+        remark: BACnet object type for writing
+      - attribute-name: Object Instance
+        attribute-code: objectInstance
+        attribute-type-flag: INT
+        default-value: 0
+        remark: Object instance number
+      - attribute-name: Property ID
+        attribute-code: propertyId
+        attribute-type-flag: STRING
+        default-value: PRESENT_VALUE
+        remark: Property identifier
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/bacnet-ip/${spring.application.name}.log

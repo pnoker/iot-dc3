@@ -1,0 +1,112 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+dc3:
+  driver:
+    tenant: default
+    name: LwM2M Driver
+    code: Lwm2mDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Endpoint
+        attribute-code: endpoint
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: LwM2M device endpoint name
+      - attribute-name: Server Host
+        attribute-code: serverHost
+        attribute-type-flag: STRING
+        default-value: '0.0.0.0'
+        remark: LwM2M server bind address
+      - attribute-name: Server Port
+        attribute-code: serverPort
+        attribute-type-flag: INT
+        default-value: 5683
+        remark: CoAP port
+      - attribute-name: Secure Port
+        attribute-code: securePort
+        attribute-type-flag: INT
+        default-value: 5684
+        remark: CoAPS/DTLS port
+      - attribute-name: Security Mode
+        attribute-code: securityMode
+        attribute-type-flag: STRING
+        default-value: NOSEC
+        remark: 'Security mode: NOSEC, PSK'
+      - attribute-name: PSK Identity
+        attribute-code: pskIdentity
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: PSK identity (when securityMode=PSK)
+      - attribute-name: PSK Key
+        attribute-code: pskKey
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: PSK key in HEX (when securityMode=PSK)
+    point-attribute:
+      - attribute-name: Object ID
+        attribute-code: objectId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: LwM2M Object ID (e.g. 3303=Temperature)
+      - attribute-name: Object Instance ID
+        attribute-code: objectInstanceId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: LwM2M Object Instance ID
+      - attribute-name: Resource ID
+        attribute-code: resourceId
+        attribute-type-flag: INT
+        default-value: 0
+        remark: LwM2M Resource ID (e.g. 5700=Sensor Value)
+      - attribute-name: Observe
+        attribute-code: observe
+        attribute-type-flag: STRING
+        default-value: 'false'
+        remark: 'Enable LwM2M Observe: true, false'
+    command-attribute: []
+
+  lwm2m:
+    server-host: '0.0.0.0'
+    server-port: 5683
+    secure-port: 5684
+    security-mode: NOSEC
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/lwm2m/${spring.application.name}.log
