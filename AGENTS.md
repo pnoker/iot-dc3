@@ -32,14 +32,120 @@ Core stack:
 
 ## Repository Map
 
-- `dc3-api/`: protobuf and gRPC API contracts.
-- `dc3-common/`: shared domain, business, facade, transport, persistence, configuration, and utility modules.
-- `dc3-center/`: deployable center services.
-- `dc3-driver/`: deployable device drivers.
-- `dc3-gateway/`: HTTP gateway service.
-- `dc3/`: compose files, runtime env files, scripts, and project docs.
-- `.mvn/settings.xml`: local Maven mirror configuration used for mainland China development.
-- `Makefile`: preferred command entrypoint for build, compose, hooks, and release helpers.
+```
+iot-dc3/
+├── dc3-api/                          # Protobuf & gRPC contracts
+│   ├── dc3-api-auth                  #   auth service proto
+│   ├── dc3-api-data                  #   data service proto
+│   ├── dc3-api-driver                #   driver service proto
+│   └── dc3-api-manager               #   manager service proto
+├── dc3-common/                       # Shared libraries
+│   ├── dc3-common-model              #   Base BO/VO/DTO/Builder/Ext classes
+│   ├── dc3-common-public             #   BaseService<B,Q>, R<T> envelope, TenantOwned
+│   ├── dc3-common-web                #   BaseController (reactive), WebFlux config
+│   ├── dc3-common-auth               #   Token gRPC server, auth controllers
+│   ├── dc3-common-manager            #   Device/Driver/Point/Profile services + DAL
+│   ├── dc3-common-data               #   Point value ingestion, command dispatch
+│   ├── dc3-common-driver             #   Driver SDK (SPI interfaces + runtime)
+│   ├── dc3-common-facade/            #   Cross-service facade
+│   │   ├── dc3-common-facade-api             #     Interface contracts
+│   │   ├── dc3-common-facade-grpc            #     gRPC implementations
+│   │   ├── dc3-common-facade-local-auth      #     In-process auth facade
+│   │   ├── dc3-common-facade-local-data      #     In-process data facade
+│   │   └── dc3-common-facade-local-manager   #     In-process manager facade
+│   ├── dc3-common-dal                #   Shared label/group DAL
+│   ├── dc3-common-postgres           #   MyBatis-Plus configuration
+│   ├── dc3-common-rabbitmq           #   RabbitMQ config and constants
+│   ├── dc3-common-mqtt               #   MQTT config
+│   ├── dc3-common-repository         #   Point value repository abstraction
+│   ├── dc3-common-quartz             #   Scheduling infrastructure
+│   ├── dc3-common-test               #   Testcontainers, harnesses, contract test bases
+│   ├── dc3-common-agentic            #   AI-assisted operations
+│   ├── dc3-common-gateway            #   Gateway utilities
+│   ├── dc3-common-log                #   Logging configuration
+│   ├── dc3-common-exception          #   Exception hierarchy
+│   ├── dc3-common-constant           #   Shared constants
+│   ├── dc3-common-sql                #   SQL utilities
+│   ├── dc3-common-thread             #   Thread pool config
+│   ├── dc3-common-api                #   API utilities
+│   └── dc3-common-resource-registrar #   Resource registration
+├── dc3-center/                       # Deployable service applications
+│   ├── dc3-center-auth               #   Auth service
+│   ├── dc3-center-manager            #   Manager service
+│   ├── dc3-center-data               #   Data service
+│   ├── dc3-center-agentic            #   AI-assisted operations service
+│   └── dc3-center-single             #   All-in-one single process
+├── dc3-driver/                       # Protocol driver implementations
+│   ├── dc3-driver-modbus-tcp         #   Modbus TCP
+│   ├── dc3-driver-modbus-rtu         #   Modbus RTU
+│   ├── dc3-driver-mqtt               #   MQTT
+│   ├── dc3-driver-opc-ua             #   OPC UA
+│   ├── dc3-driver-opc-da             #   OPC DA
+│   ├── dc3-driver-plcs7              #   S7 PLC
+│   ├── dc3-driver-coap               #   CoAP
+│   ├── dc3-driver-virtual            #   Virtual (simulator)
+│   ├── dc3-driver-listening-virtual  #   Listening virtual
+│   └── ... (20+ more protocol drivers)
+├── dc3-gateway/                      # Spring Cloud Gateway (HTTP entrypoint)
+├── dc3-coverage/                     # JaCoCo aggregate coverage report
+├── dc3-e2e/                          # Testcontainers-backed E2E tests
+├── dc3/                              # Compose files, env, scripts, docs
+│   ├── docker-compose.yml            #   Main app stack
+│   ├── docker-compose-db.yml         #   Database services
+│   ├── docker-compose-dev.yml        #   Development overrides
+│   ├── docker-compose-optional.yml   #   Optional monitoring/messaging
+│   ├── env/dev.env                   #   IDE-friendly local env vars
+│   └── bin/                          #   changelog.py, commit_msg_lint.py, tag.sh
+├── docs/                             # VitePress documentation site
+├── Makefile                          # Preferred command entrypoint
+├── .githooks/commit-msg              # Conventional commit validation hook
+└── .mvn/settings.xml                 # Local Maven mirror (mainland China)
+```
+
+## Layering Architecture
+
+All business modules follow a strict four-layer pattern:
+
+```
+Controller (WebFlux, Mono<R<T>>)  →  Service (BO)  →  Manager (DO, MyBatis-Plus)  →  Mapper (SQL)
+```
+
+### Key Base Classes
+
+| Class                           | Module              | Purpose                                                                               |
+|---------------------------------|---------------------|---------------------------------------------------------------------------------------|
+| `BaseService<B,Q>`              | `dc3-common-public` | CRUD interface: `add`, `delete`, `update`, `getById`, `list(Q)`                       |
+| `BaseController`                | `dc3-common-web`    | Reactive controller interface with `getUserHeader`, `requireTenant`, `async` defaults |
+| `R<T>`                          | `dc3-common-public` | Response envelope: `ok`, `code`, `message`, `data` — use `R.ok(data)` / `R.fail(msg)` |
+| `BaseBO` / `BaseVO` / `BaseDTO` | `dc3-common-model`  | Shared fields: `id`, `remark`, `creatorId/Name/Time`, `operatorId/Name/Time`          |
+| `BaseBuilder`                   | `dc3-common-model`  | MapStruct `@Mapper(componentModel = "spring")` for VO↔BO↔DTO conversion               |
+| `BaseExt`                       | `dc3-common-model`  | JSON extension column: `type`, `version`, `remark`                                    |
+| `TenantOwned`                   | `dc3-common-public` | Marker interface for tenant-scoped entities; used by `BaseController.requireTenant()` |
+
+### Controller Layer
+
+Controllers implement the `BaseController` interface (Java interface with default methods, not an abstract class). They
+return `Mono<R<T>>`. The `async()` helper offloads blocking JDBC calls to the `boundedElastic` scheduler. Example:
+
+```java
+public Mono<R<DeviceBO>> getById(@PathVariable Long id) {
+    return async(() -> R.ok(deviceService.getById(id)));
+}
+```
+
+### Service Layer
+
+Service interfaces extend `BaseService<B, Q>` and work exclusively in BO types. Cross-service calls go through facade
+interfaces. Concrete services inject their Manager (DAL layer) and handle BO↔DO conversion via builders.
+
+### Manager Layer (DAL)
+
+Manager interfaces extend MyBatis-Plus `IService<DO>`. Implementations extend `ServiceImpl<Mapper, DO>`. They provide
+`checkDuplicate()` and `innerSave()`. The `select*` verb is reserved for this layer only. The Mapper layer is standard
+MyBatis-Plus `BaseMapper<DO>`.
+
+DO classes use snowflake IDs (`@TableId(type = IdType.ASSIGN_ID)`), soft delete (`@TableLogic` on `deleted` field), and
+`JacksonTypeHandler` for JSON columns.
 
 ## Command Rules
 
@@ -61,6 +167,15 @@ Direct Maven commands should use the checked-in settings file for local developm
 ```bash
 mvn -s .mvn/settings.xml clean package
 mvn -s .mvn/settings.xml -q -DskipTests compile
+
+# Run tests for a single module
+mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-manager
+
+# Run a single test class
+mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-manager -Dtest=DeviceControllerTest
+
+# Run a single test method
+mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-public -Dtest="RTest#testOkWithData"
 ```
 
 GitHub Actions should not need `.mvn/settings.xml` unless a workflow is intentionally testing the mainland-China mirror
@@ -131,6 +246,36 @@ When changing a gRPC contract:
 
 Server classes should be Spring beans extending generated `*ImplBase` classes. Client stubs should come from shared
 stub configuration instead of ad hoc channel construction.
+
+Server implementation pattern:
+
+```java
+@Service
+public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
+    // Inject Grpc*Builder for domain ↔ gRPC DTO conversion
+    // Each method builds a GrpcR result envelope (mirroring REST R<T>)
+    // Uses StreamObserver for async response:
+    //   onNext(builder.build()) + onCompleted()
+}
+```
+
+### Driver SDK
+
+Drivers implement a composable set of SPI interfaces from `dc3-common-driver`. The SDK handles registration,
+scheduling, and value dispatch — drivers only implement protocol logic.
+
+| SPI Interface            | Methods                                              | Purpose                                               |
+|--------------------------|------------------------------------------------------|-------------------------------------------------------|
+| `DriverProtocol`         | `read(...)`, `write(...)`                            | Core protocol I/O (the primary contract)              |
+| `DriverLifecycle`        | `initial()`, `schedule()`                            | Startup initialization + periodic Quartz task         |
+| `DriverMetadataListener` | `event(MetadataEventDTO)`                            | React to CRUD changes on driver/device/point metadata |
+| `DriverHealth`           | `health()` → `DriverHealthState`                     | Driver-level health (defaults to ONLINE)              |
+| `DeviceHealth`           | `health(driverConfig, device)` → `DeviceHealthState` | Per-device health check                               |
+| `DriverCommand`          | `execute(...)` → `Map<String,String>`                | Custom device commands                                |
+
+`DriverCustomService` aggregates all SPI interfaces for convenience. Protocol-agnostic plumbing (registration via
+`DriverRegisterService`, scheduling via `DriverScheduleService`, value sending via `DriverSenderService`) is handled by
+the SDK runtime.
 
 ### Web API
 
@@ -329,6 +474,46 @@ make install-hooks
 
 The hook checks commit subjects before `git commit` completes. It is a local Git mechanism; CI or branch protection
 should run the same script for server-side enforcement if needed.
+
+## Testing
+
+### Test Pyramid
+
+- **Unit tests** (`*Test.java`, `*Tests.java`): run by Surefire. JUnit 5 + Mockito (
+  `@ExtendWith(MockitoExtension.class)`),
+  AssertJ assertions, Reactor `StepVerifier` for reactive code. No Spring context spin-up — controllers are tested with
+  manual dependency injection and context wiring.
+- **Integration tests** (`*IT.java`): run by Failsafe. Use `dc3-common-test` infrastructure: Testcontainers
+  (`PgTimescaleContainer`, `RabbitContainer`, `MqttContainer`), gRPC in-process extension (`GrpcInProcessExtension`),
+  and RabbitMQ test harness (`RabbitTestHarness`).
+- **E2E tests** (`dc3-e2e/`): gated behind `@EnabledIfEnvironmentVariable(named = "DC3_E2E")`. Boots real
+  PostgreSQL/TimescaleDB and RabbitMQ via Testcontainers on a shared Docker network. Tests messaging contracts (command
+  dispatch, event routing, hypertable operations). Run with `make test-e2e`.
+
+### Test Infrastructure (`dc3-common-test`)
+
+| Utility                  | Purpose                                                              |
+|--------------------------|----------------------------------------------------------------------|
+| `GrpcInProcessExtension` | JUnit 5 extension: in-process gRPC server + managed channel per test |
+| `RabbitTestHarness`      | Send/receive to RabbitMQ in tests; `awaitTrue()` via Awaitility      |
+| `PgTimescaleContainer`   | Singleton `timescale/timescaledb-ha:pg18` container                  |
+| `RabbitContainer`        | RabbitMQ testcontainer                                               |
+| `MqttContainer`          | MQTT testcontainer                                                   |
+| `FixedClockConfig`       | `@TestConfiguration` overriding the `Clock` bean to a fixed instant  |
+| `JsonAssertions`         | `assertJsonEquals()` and `assertJsonContains()` over JSONAssert      |
+
+### Contract Tests
+
+- `EnumContractTest<E>`: abstract test verifying `getIndex()` uniqueness, `ofIndex()` round-trip, and name stability
+  for all enum constants via `@TestFactory`.
+- `SecretFieldContractTest`: verifies sensitive fields (apiKey, password, secret, token) are excluded from
+  `@ToString` and serialization.
+
+### Coverage Gate
+
+`make coverage` generates the aggregate JaCoCo report at `dc3-coverage/target/site/jacoco-aggregate/`. The
+`check_coverage.py` script enforces minimum thresholds (default: ≥20% line, ≥15% branch). Coverage regressions greater
+than 1% block the change.
 
 ## Validation Checklist
 
