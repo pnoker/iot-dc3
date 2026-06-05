@@ -208,7 +208,7 @@ public class DriverProperties {
         /**
          * Whether the SDK should periodically evaluate and report device health.
          */
-        private Boolean enable = true;
+        private Boolean enabled = true;
 
         /**
          * Quartz cron expression used by the device health job. Drivers can tune
@@ -263,7 +263,7 @@ public class DriverProperties {
             /**
              * Whether the job is enabled.
              */
-            private Boolean enable = false;
+            private Boolean enabled = false;
 
             /**
              * Quartz cron expression used by the job. Defaults to every 15 minutes on
