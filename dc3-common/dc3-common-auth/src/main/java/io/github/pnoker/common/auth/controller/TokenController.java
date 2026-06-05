@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import io.github.pnoker.common.annotation.PublicEndpoint;
 import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.query.TokenQuery;
@@ -54,6 +55,7 @@ public class TokenController implements BaseController {
      * @param entityVO {@link TokenQuery}
      * @return
      */
+    @PublicEndpoint
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -68,6 +70,7 @@ public class TokenController implements BaseController {
      * @param entityVO {@link TokenQuery}
      * @return Token
      */
+    @PublicEndpoint
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {

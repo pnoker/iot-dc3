@@ -20,8 +20,11 @@ package io.github.pnoker.common.base;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.common.TenantOwned;
+import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.security.PermissionProvider;
 import io.github.pnoker.common.utils.UserHeaderUtil;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -123,6 +126,31 @@ public interface BaseController {
      */
     default <T> Mono<R<T>> async(Supplier<R<T>> supplier) {
         return Mono.fromCallable(supplier::get).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    /**
+     * Assert that the current user holds at least one of the given resource permissions.
+     * Throws AccessDeniedException if none are granted.
+     *
+     * @param provider      PermissionProvider (injected by caller)
+     * @param resourceCodes resource permission codes to check
+     * @return Mono that completes empty on success, errors on denial
+     */
+    default Mono<Void> requireAnyPermission(PermissionProvider provider, String... resourceCodes) {
+        return getTenantId().flatMap(tenantId ->
+                getUserId().flatMap(userId ->
+                        Flux.fromArray(resourceCodes)
+                                .flatMap(code -> provider.hasPermission(tenantId, userId, code))
+                                .any(granted -> granted)
+                                .flatMap(hasPermission -> {
+                                    if (Boolean.TRUE.equals(hasPermission)) {
+                                        return Mono.empty();
+                                    }
+                                    return Mono.error(new AccessDeniedException(
+                                            "Access denied: none of the required permissions are granted"));
+                                })
+                )
+        );
     }
 
 }
