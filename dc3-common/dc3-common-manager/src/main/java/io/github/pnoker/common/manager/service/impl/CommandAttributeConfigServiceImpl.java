@@ -150,7 +150,7 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
         }
 
         CommandAttributeConfigDO entityDO = commandAttributeConfigBuilder.buildDOByBO(entityBO);
-        entityBO.setOperateTime(null);
+        entityDO.setOperateTime(null);
         if (!commandAttributeConfigManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update command attribute config");
         }
@@ -189,7 +189,7 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
 
     @Override
     public List<CommandAttributeConfigBO> listByDeviceId(Long deviceId) {
-        List<CommandBO> commandBOList = commandService.listByDeviceId(deviceId);
+        List<CommandBO> commandBOList = commandService.listByDeviceId(deviceId, null);
         Set<Long> commandIds = commandBOList.stream().map(CommandBO::getId).collect(Collectors.toSet());
         if (CollectionUtils.isEmpty(commandIds)) {
             return Collections.emptyList();

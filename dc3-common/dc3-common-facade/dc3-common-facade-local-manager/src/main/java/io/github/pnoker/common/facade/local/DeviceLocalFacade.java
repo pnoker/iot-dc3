@@ -87,7 +87,7 @@ public class DeviceLocalFacade implements DeviceFacade {
 
     @Override
     public List<FacadeDeviceBO> listByProfileId(Long profileId) {
-        List<DeviceBO> list = deviceService.listByProfileId(profileId);
+        List<DeviceBO> list = deviceService.listByProfileId(profileId, null);
         if (Objects.isNull(list) || list.isEmpty()) {
             return Collections.emptyList();
         }
@@ -96,7 +96,7 @@ public class DeviceLocalFacade implements DeviceFacade {
 
     @Override
     public List<FacadeDeviceBO> listByDriverId(Long driverId) {
-        List<DeviceBO> list = deviceService.listByDriverId(driverId);
+        List<DeviceBO> list = deviceService.listByDriverId(driverId, null);
         if (Objects.isNull(list) || list.isEmpty()) {
             return Collections.emptyList();
         }

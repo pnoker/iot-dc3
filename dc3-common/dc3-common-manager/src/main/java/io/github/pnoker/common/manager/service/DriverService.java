@@ -43,28 +43,31 @@ public interface DriverService extends BaseService<DriverBO, DriverQuery> {
     DriverBO getByServiceName(String serviceName, Long tenantId);
 
     /**
-     * ID
+     * Profile ID TenantId
      *
-     * @param profileId ID
+     * @param profileId Profile ID
+     * @param tenantId  Tenant ID
      * @return Driver
      */
-    List<DriverBO> listByProfileId(Long profileId);
+    List<DriverBO> listByProfileId(Long profileId, Long tenantId);
 
     /**
-     * Point ID
+     * Point ID TenantId
      *
-     * @param pointId Point ID
+     * @param pointId  Point ID
+     * @param tenantId Tenant ID
      * @return Driver
      */
-    List<DriverBO> selectByPointId(Long pointId);
+    List<DriverBO> selectByPointId(Long pointId, Long tenantId);
 
     /**
-     * Driver ID
+     * Device ID TenantId
      *
      * @param deviceId Device ID
+     * @param tenantId Tenant ID
      * @return Driver
      */
-    DriverBO listByDeviceId(Long deviceId);
+    DriverBO listByDeviceId(Long deviceId, Long tenantId);
 
     /**
      * Driver ID

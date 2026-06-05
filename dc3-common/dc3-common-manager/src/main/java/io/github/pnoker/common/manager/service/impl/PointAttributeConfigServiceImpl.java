@@ -150,7 +150,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         }
 
         PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
-        entityBO.setOperateTime(null);
+        entityDO.setOperateTime(null);
         if (!pointAttributeConfigManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update point attribute config");
         }
@@ -189,7 +189,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public List<PointAttributeConfigBO> listByDeviceId(Long deviceId) {
-        List<PointBO> pointBOList = pointService.listByDeviceId(deviceId);
+        List<PointBO> pointBOList = pointService.listByDeviceId(deviceId, null);
         Set<Long> pointIds = pointBOList.stream().map(PointBO::getId).collect(Collectors.toSet());
         if (CollectionUtils.isEmpty(pointIds)) {
             return Collections.emptyList();

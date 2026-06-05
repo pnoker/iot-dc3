@@ -134,7 +134,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
             builder.addAllEventAttributes(grpcEventAttributeDTOList);
 
             //
-            List<Long> idList = deviceService.listIdsByDriverId(entityBO.getId());
+            List<Long> idList = deviceService.listIdsByDriverId(entityBO.getId(), entityBO.getTenantId());
             builder.addAllDeviceIds(idList);
 
             rBuilder.setOk(true);
@@ -224,7 +224,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                 .toList();
         builder.addAllEventAttributes(eventAttributeDTOList);
 
-        List<Long> idList = Optional.ofNullable(deviceService.listIdsByDriverId(entityBO.getId())).orElseGet(List::of);
+        List<Long> idList = Optional.ofNullable(deviceService.listIdsByDriverId(entityBO.getId(), entityBO.getTenantId())).orElseGet(List::of);
         builder.addAllDeviceIds(idList);
     }
 

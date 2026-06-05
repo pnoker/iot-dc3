@@ -165,7 +165,7 @@ public class DeviceController implements BaseController {
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<DeviceVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.listByProfileId(profileId));
+            List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.listByProfileId(profileId, tenantId));
             List<DeviceVO> entityVOList = deviceBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));
@@ -241,7 +241,7 @@ public class DeviceController implements BaseController {
     public Mono<R<Integer>> getCountByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.getById(driverId));
-            List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.listByDriverId(driverId));
+            List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.listByDriverId(driverId, tenantId));
             return R.ok(deviceBOList.size());
         }));
     }

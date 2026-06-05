@@ -106,7 +106,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DeviceBO> entityBOList = deviceService.listByDriverId(driver.getDriverId());
+        List<DeviceBO> entityBOList = deviceService.listByDriverId(driver.getDriverId(), null);
         if (CollectionUtils.isEmpty(entityBOList)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -133,7 +133,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DeviceBO> entityBOList = deviceService.listByProfileId(request.getProfileId());
+        List<DeviceBO> entityBOList = deviceService.listByProfileId(request.getProfileId(), null);
         if (CollectionUtils.isEmpty(entityBOList)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

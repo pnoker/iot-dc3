@@ -183,20 +183,23 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventBO> listByDeviceId(Long deviceId) {
+    public List<EventBO> listByDeviceId(Long deviceId, Long tenantId) {
         DeviceDO deviceDO = deviceMapper.selectById(deviceId);
         if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return Collections.emptyList();
         }
-        return listByProfileId(deviceDO.getProfileId())
+        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId())
                 .stream()
                 .filter(event -> Objects.equals(deviceDO.getTenantId(), event.getTenantId()))
                 .toList();
     }
 
     @Override
-    public List<EventBO> listByProfileId(Long profileId) {
+    public List<EventBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryChainWrapper<EventDO> wrapper = eventManager.lambdaQuery().eq(EventDO::getProfileId, profileId);
+        if (Objects.nonNull(tenantId)) {
+            wrapper.eq(EventDO::getTenantId, tenantId);
+        }
         List<EventDO> entityDOList = wrapper.list();
         return eventBuilder.buildBOListByDOList(entityDOList);
     }
@@ -310,7 +313,7 @@ public class EventServiceImpl implements EventService {
         if (Objects.isNull(deviceId)) {
             return Collections.emptySet();
         }
-        DriverBO driverBO = driverService.listByDeviceId(deviceId);
+        DriverBO driverBO = driverService.listByDeviceId(deviceId, null);
         if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
             return Collections.emptySet();
         }

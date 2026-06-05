@@ -183,20 +183,23 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public List<CommandBO> listByDeviceId(Long deviceId) {
+    public List<CommandBO> listByDeviceId(Long deviceId, Long tenantId) {
         DeviceDO deviceDO = deviceMapper.selectById(deviceId);
         if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return Collections.emptyList();
         }
-        return listByProfileId(deviceDO.getProfileId())
+        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId())
                 .stream()
                 .filter(command -> Objects.equals(deviceDO.getTenantId(), command.getTenantId()))
                 .toList();
     }
 
     @Override
-    public List<CommandBO> listByProfileId(Long profileId) {
+    public List<CommandBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryChainWrapper<CommandDO> wrapper = commandManager.lambdaQuery().eq(CommandDO::getProfileId, profileId);
+        if (Objects.nonNull(tenantId)) {
+            wrapper.eq(CommandDO::getTenantId, tenantId);
+        }
         List<CommandDO> entityDOList = wrapper.list();
         return commandBuilder.buildBOListByDOList(entityDOList);
     }
@@ -310,7 +313,7 @@ public class CommandServiceImpl implements CommandService {
         if (Objects.isNull(deviceId)) {
             return Collections.emptySet();
         }
-        DriverBO driverBO = driverService.listByDeviceId(deviceId);
+        DriverBO driverBO = driverService.listByDeviceId(deviceId, null);
         if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
             return Collections.emptySet();
         }

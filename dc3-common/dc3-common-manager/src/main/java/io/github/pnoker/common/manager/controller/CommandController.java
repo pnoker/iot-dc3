@@ -110,7 +110,7 @@ public class CommandController implements BaseController {
     public Mono<R<List<CommandVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.getById(profileId));
-            List<CommandBO> entityBOList = filterTenant(tenantId, commandService.listByProfileId(profileId));
+            List<CommandBO> entityBOList = filterTenant(tenantId, commandService.listByProfileId(profileId, tenantId));
             List<CommandVO> entityVOList = commandBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));
@@ -120,7 +120,7 @@ public class CommandController implements BaseController {
     public Mono<R<List<CommandVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
-            List<CommandBO> entityBOList = filterTenant(tenantId, commandService.listByDeviceId(deviceId));
+            List<CommandBO> entityBOList = filterTenant(tenantId, commandService.listByDeviceId(deviceId, tenantId));
             List<CommandVO> entityVOList = commandBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));

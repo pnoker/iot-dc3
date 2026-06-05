@@ -53,28 +53,31 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
     DeviceBO getByCode(String code, Long tenantId);
 
     /**
-     * Driver ID
+     * Driver ID TenantId
      *
      * @param driverId Driver ID
+     * @param tenantId Tenant ID
      * @return {@link DeviceBO}
      */
-    List<DeviceBO> listByDriverId(Long driverId);
+    List<DeviceBO> listByDriverId(Long driverId, Long tenantId);
 
     /**
-     * Driver ID Device ID
+     * Driver ID TenantId Device ID
      *
      * @param driverId Driver ID
+     * @param tenantId Tenant ID
      * @return {@link DeviceBO}
      */
-    List<Long> listIdsByDriverId(Long driverId);
+    List<Long> listIdsByDriverId(Long driverId, Long tenantId);
 
     /**
-     * ID
+     * Profile ID TenantId
      *
-     * @param profileId ID
+     * @param profileId Profile ID
+     * @param tenantId  Tenant ID
      * @return {@link DeviceBO}
      */
-    List<DeviceBO> listByProfileId(Long profileId);
+    List<DeviceBO> listByProfileId(Long profileId, Long tenantId);
 
     /**
      * Device ID
