@@ -28,6 +28,8 @@ import type { Login } from '@/config/types';
 import { getStorage, removeStorage } from '@/utils/storageUtil';
 import { isNull } from '@/utils/validationUtil';
 import { AUTH_HEADERS } from '@/config/constant/common';
+import { ElMessage } from 'element-plus';
+import { useMenuStore, type MenuNode } from '@/store/modules/menu';
 
 /**
  * NProgress configuration
@@ -41,6 +43,20 @@ const NPROGRESS_CONFIG = {
  * Configure NProgress
  */
 NProgress.configure(NPROGRESS_CONFIG);
+
+/**
+ * Recursively search the menu tree for a node whose menu_code matches
+ * the given route name, indicating the user has permission to access it.
+ */
+const isRouteInMenuTree = (routeName: string, nodes: MenuNode[]): boolean => {
+  for (const node of nodes) {
+    if (node.menuCode === routeName) return true;
+    if (node.children && node.children.length > 0) {
+      if (isRouteInMenuTree(routeName, node.children)) return true;
+    }
+  }
+  return false;
+};
 
 /**
  * Vue Router instance with authentication guards
@@ -92,6 +108,20 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     removeStorage(AUTH_HEADERS.LOGIN);
     removeStorage(AUTH_HEADERS.TOKEN);
     return { name: 'login' };
+  }
+
+  // Permission check: if the menu tree is loaded, verify the route is accessible.
+  // Public routes (login, errors, home) are always allowed.
+  // For all other routes, the route name must appear as a menu_code in the
+  // user's menu tree (which the server already scopes to the user's roles).
+  const publicRoutes = ['login', '403', '404', '500', 'home'];
+  const routeName = to.name as string;
+  if (!publicRoutes.includes(routeName)) {
+    const menuStore = useMenuStore();
+    if (menuStore.tree.length > 0 && !isRouteInMenuTree(routeName, menuStore.tree)) {
+      ElMessage.warning('You do not have permission to access this page');
+      return { name: 'home' };
+    }
   }
 
   // Update page title
