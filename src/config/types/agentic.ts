@@ -37,7 +37,23 @@ export interface AgenticProvider {
   operateTime?: string;
 }
 
-export interface AgenticModelConfig extends AgenticModel {
+export interface AgenticModelConfig {
+  /** Inlined from AgenticModel. */
+  model: string;
+  /** Inlined from AgenticModel. */
+  label: string;
+  /** Inlined from AgenticModel. */
+  stream: boolean;
+  /** Inlined from AgenticModel. */
+  toolCall: boolean;
+  /** Inlined from AgenticModel. */
+  vision: boolean;
+  /** Inlined from AgenticModel. */
+  reasoning: boolean;
+  /** Inlined from AgenticModel. */
+  temperature?: number;
+  /** Inlined from AgenticModel. */
+  maxTokens?: number;
   id?: string;
   providerId?: string;
   providerName?: string;
