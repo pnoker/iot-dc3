@@ -29,130 +29,78 @@
 
     <blank-card>
       <el-row>
-        <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
-        </el-col>
-        <el-col v-if="hasData">
-          <el-empty :description="$t('driver.empty')"></el-empty>
-        </el-col>
-        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <driver-card :data="data" :status-table="reactiveData.statusTable"></driver-card>
-        </el-col>
+        <template v-if="reactiveData.loading">
+          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+            <skeleton-card :footer="true" :loading="true" />
+          </el-col>
+        </template>
+        <template v-else>
+          <el-col v-if="reactiveData.listData.length < 1">
+            <el-empty :description="$t('driver.empty')" />
+          </el-col>
+          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+            <driver-card :data="data" :status-table="statusTable" />
+          </el-col>
+        </template>
       </el-row>
     </blank-card>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive } from 'vue';
+  import { reactive, watch } from 'vue';
 
-  import { getDriverStatus, listDriver } from '@/api/driver';
+  import { listDriver, listDriverStatus } from '@/api/driver';
+  import { usePagedList } from '@/composables/usePagedList';
 
-  import type { Order } from '@/config/types';
+  import type { DriverRecord } from '@/config/types/manager';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
   import DriverCard from './card/DriverCard.vue';
   import DriverTool from './tool/DriverTool.vue';
 
-  interface DriverListItem {
-    id: string;
-    [key: string]: unknown;
-  }
-
-  interface DriverListPage {
-    total: number;
-    records: DriverListItem[];
-  }
-
-  interface DriverQuery extends Record<string, unknown> {
-    type: 'driver';
-  }
-
-  type DriverListResponse = R<DriverListPage>;
-  type DriverStatusResponse = R<Record<string, unknown>>;
-
-  const reactiveData = reactive({
-    loading: true,
-    statusTable: {} as Record<string, string>,
-    listData: [] as DriverListItem[],
-    query: {
-      type: 'driver',
-    } as DriverQuery,
-    order: false,
-    page: {
-      total: 0,
-      size: 12,
-      current: 1,
-      orders: [] as Order[],
-    },
+  const {
+    state: reactiveData,
+    load,
+    search: _search,
+    sort,
+    sizeChange,
+    currentChange,
+  } = usePagedList<DriverRecord>({
+    pageSize: 12,
+    sortColumn: 'create_time',
+    request: (query) => listDriver(query),
   });
 
-  const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
-
-  const list = () => {
-    const listPromise = listDriver<DriverListResponse>({
-      page: reactiveData.page,
-      ...reactiveData.query,
-    })
-      .then((res) => {
-        const data = res.data;
-        reactiveData.page.total = data.total;
-        reactiveData.listData = data.records;
-      })
-      .catch(() => {
-        // nothing to do
-      });
-
-    const statusPromise = getDriverStatus({
-      page: reactiveData.page,
-      ...reactiveData.query,
-    })
-      .then((res: DriverStatusResponse) => {
-        reactiveData.statusTable = res.data as Record<string, string>;
-      })
-      .catch(() => {
-        // nothing to do
-      });
-
-    Promise.all([listPromise, statusPromise]).finally(() => {
-      reactiveData.loading = false;
-    });
-  };
+  const statusTable = reactive<Record<string, string>>({});
 
   const search = (params: Record<string, unknown>) => {
-    reactiveData.query = { ...params, type: 'driver' };
-    list();
+    _search({ type: 'driver', ...params });
   };
 
   const reset = () => {
-    reactiveData.query = { type: 'driver' };
-    list();
+    _search({ type: 'driver' });
   };
 
-  const refresh = () => {
-    list();
+  const refresh = () => load();
+
+  const loadStatus = () => {
+    listDriverStatus({ page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>) })
+      .then((res) => {
+        Object.assign(statusTable, res.data as Record<string, string>);
+      })
+      .catch(() => {
+        // handled globally
+      });
   };
 
-  const sort = () => {
-    reactiveData.order = !reactiveData.order;
-    if (reactiveData.order) {
-      reactiveData.page.orders = [{ column: 'create_time', asc: true }];
-    } else {
-      reactiveData.page.orders = [{ column: 'create_time', asc: false }];
+  watch(
+    () => reactiveData.listData,
+    () => {
+      loadStatus();
     }
-    list();
-  };
+  );
 
-  const sizeChange = (size: number) => {
-    reactiveData.page.size = size;
-    list();
-  };
-
-  const currentChange = (current: number) => {
-    reactiveData.page.current = current;
-    list();
-  };
-
-  list();
+  load();
 </script>

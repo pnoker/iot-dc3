@@ -30,21 +30,25 @@
 
     <blank-card>
       <el-row>
-        <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
-        </el-col>
-        <el-col v-if="hasData">
-          <el-empty :description="$t('profile.empty')"></el-empty>
-        </el-col>
-        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <profile-card
-            :data="data"
-            :embedded="embedded != ''"
-            @disable-thing="disableThing"
-            @enable-thing="enableThing"
-            @delete-thing="deleteThing"
-          ></profile-card>
-        </el-col>
+        <template v-if="reactiveData.loading">
+          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+            <skeleton-card :footer="true" :loading="true" />
+          </el-col>
+        </template>
+        <template v-else>
+          <el-col v-if="reactiveData.listData.length < 1">
+            <el-empty :description="$t('profile.empty')" />
+          </el-col>
+          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+            <profile-card
+              :data="data"
+              :embedded="embedded != ''"
+              @disable-thing="disableThing"
+              @enable-thing="enableThing"
+              @delete-thing="deleteThing"
+            ></profile-card>
+          </el-col>
+        </template>
       </el-row>
     </blank-card>
 
@@ -53,35 +57,21 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref } from 'vue';
+  import { computed, ref } from 'vue';
 
   import { addProfile, deleteProfile, listProfile, updateProfile } from '@/api/profile';
+  import { usePagedList } from '@/composables/usePagedList';
+  import { failMessage, successMessage } from '@/utils/notificationUtil';
+  import { isNull } from '@/utils/validationUtil';
 
-  import type { Order } from '@/config/types';
+  import type { ProfileRecord } from '@/config/types/manager';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
-  import { failMessage } from '@/utils/notificationUtil';
-  import { isNull } from '@/utils/validationUtil';
   import ProfileAddForm from '@/views/profile/add/ProfileAddForm.vue';
   import ProfileCard from '@/views/profile/card/ProfileCard.vue';
   import ProfileTool from '@/views/profile/tool/ProfileTool.vue';
 
-  interface ProfileListItem {
-    id: number | string;
-    [key: string]: unknown;
-  }
-
-  interface ProfileListPage {
-    total: number;
-    records: ProfileListItem[];
-  }
-
-  interface ProfileQuery extends Record<string, unknown> {
-    deviceId?: string;
-  }
-
-  type ProfileListResponse = R<ProfileListPage>;
   type DialogInstance = { show: () => void };
 
   const props = withDefaults(
@@ -97,60 +87,31 @@
 
   const profileAddFormRef = ref<DialogInstance | null>(null);
 
-  const reactiveData = reactive({
-    loading: true,
-    listData: [] as ProfileListItem[],
-    query: {} as ProfileQuery,
-    order: false,
-    page: {
-      total: 0,
-      size: 12,
-      current: 1,
-      orders: [] as Order[],
-    },
+  const {
+    state: reactiveData,
+    load,
+    search: _search,
+    sort,
+    sizeChange,
+    currentChange,
+  } = usePagedList<ProfileRecord>({
+    pageSize: 12,
+    sortColumn: 'create_time',
+    request: (query) => listProfile(query),
   });
 
-  const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
+  const baseProfileQuery = computed(() => {
+    const q: Record<string, unknown> = {};
+    if (!isNull(props.deviceId)) q.deviceId = props.deviceId;
+    return q;
+  });
 
-  const withFixedQuery = (params: ProfileQuery = {}) => {
-    const nextQuery: ProfileQuery = { ...params };
-
-    if (!isNull(props.deviceId)) {
-      nextQuery.deviceId = props.deviceId;
-    }
-
-    return nextQuery;
-  };
-
-  const list = () => {
-    const query = withFixedQuery(reactiveData.query);
-    reactiveData.query = query;
-
-    listProfile<ProfileListResponse>({
-      page: reactiveData.page,
-      ...query,
-    })
-      .then((res) => {
-        const data = res.data;
-        reactiveData.page.total = data.total;
-        reactiveData.listData = data.records;
-      })
-      .catch(() => {
-        // nothing to do
-      })
-      .finally(() => {
-        reactiveData.loading = false;
-      });
-  };
-
-  const search = (params: ProfileQuery) => {
-    reactiveData.query = withFixedQuery(params);
-    list();
+  const search = (params: Record<string, unknown>) => {
+    _search({ ...baseProfileQuery.value, ...params });
   };
 
   const reset = () => {
-    reactiveData.query = withFixedQuery();
-    list();
+    _search(baseProfileQuery.value);
   };
 
   const showAdd = () => {
@@ -158,69 +119,67 @@
   };
 
   const addThing = (form: unknown, done: () => void) => {
-    addProfile(form as Record<string, unknown>).then(() => {
-      list();
-      done();
-    });
+    addProfile(form as Record<string, unknown>)
+      .then(() => {
+        successMessage();
+        load();
+      })
+      .catch(() => {
+        failMessage();
+      })
+      .finally(() => {
+        done();
+      });
   };
 
   const disableThing = (id: number | string, done: () => void) => {
-    updateProfile({ id: String(id), enableFlag: 'DISABLE' }).then(() => {
-      list();
-      done();
-    });
+    updateProfile({ id: String(id), enableFlag: 'DISABLE' })
+      .then(() => {
+        successMessage();
+        load();
+      })
+      .catch(() => {
+        failMessage();
+      })
+      .finally(() => {
+        done();
+      });
   };
 
   const enableThing = (id: number | string, done: () => void) => {
-    updateProfile({ id: String(id), enableFlag: 'ENABLE' }).then(() => {
-      list();
-      done();
-    });
+    updateProfile({ id: String(id), enableFlag: 'ENABLE' })
+      .then(() => {
+        successMessage();
+        load();
+      })
+      .catch(() => {
+        failMessage();
+      })
+      .finally(() => {
+        done();
+      });
   };
 
   const deleteThing = (id: number | string, done: () => void) => {
     deleteProfile(String(id))
-      .then((res) => {
-        if (res.data.ok) {
-          list();
-          done();
-        } else {
-          failMessage(res.data.message);
-        }
+      .then(() => {
+        successMessage();
+        load();
       })
       .catch(() => {
-        // nothing to do
+        failMessage();
+      })
+      .finally(() => {
+        done();
       });
   };
 
-  const refresh = () => {
-    list();
-  };
-
-  const sort = () => {
-    reactiveData.order = !reactiveData.order;
-    if (reactiveData.order) {
-      reactiveData.page.orders = [{ column: 'create_time', asc: true }];
-    } else {
-      reactiveData.page.orders = [{ column: 'create_time', asc: false }];
-    }
-    list();
-  };
-
-  const sizeChange = (size: number) => {
-    reactiveData.page.size = size;
-    list();
-  };
-
-  const currentChange = (current: number) => {
-    reactiveData.page.current = current;
-    list();
-  };
+  const refresh = () => load();
 
   defineExpose({
     reactiveData,
     refresh,
   });
 
-  list();
+  load();
 </script>

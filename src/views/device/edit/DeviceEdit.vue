@@ -81,7 +81,7 @@
               <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
                 <enable-flag-segmented v-model="reactiveData.deviceFormData.enableFlag" />
               </el-form-item>
-              <el-form-item class="info-card-item-full" :label="$t('device.edit.description')" prop="remark">
+              <el-form-item :label="$t('device.edit.description')" class="info-card-item-full" prop="remark">
                 <el-input
                   v-model="reactiveData.deviceFormData.remark"
                   :placeholder="$t('device.edit.descriptionPlaceholder')"
@@ -96,7 +96,7 @@
         </el-tab-pane>
 
         <!-- Driver Config -->
-        <el-tab-pane v-if="hasDriverAttributes" :label="$t('device.edit.driverConfig')" name="driverConfig">
+        <el-tab-pane :label="$t('device.edit.driverConfig')" name="driverConfig">
           <matrix-toolbar
             :dirty-count="driverDirtyCount"
             :form-model="reactiveData"
@@ -124,9 +124,9 @@
                 <div class="matrix-cell">
                   <el-switch
                     v-if="isBooleanAttribute(attribute)"
-                    :model-value="getDriverCellValue(attribute)"
                     :active-value="true"
                     :inactive-value="false"
+                    :model-value="getDriverCellValue(attribute)"
                     size="small"
                     @change="(val: any) => setDriverCellValue(attribute, val)"
                   />
@@ -244,11 +244,11 @@
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="row.attributes[attribute.attributeCode].configValue"
                     :placeholder="attributePlaceholder(attribute)"
-                    style="width: 100%"
                     clearable
                     inputmode="decimal"
                     maxlength="512"
                     size="small"
+                    style="width: 100%"
                     @blur="validatePointCell(row, attribute)"
                     @input="markPointCellDirty(row, attribute)"
                   />
@@ -359,11 +359,11 @@
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="row.attributes[attribute.attributeCode].configValue"
                     :placeholder="attributePlaceholder(attribute)"
-                    style="width: 100%"
                     clearable
                     inputmode="decimal"
                     maxlength="512"
                     size="small"
+                    style="width: 100%"
                     @blur="validateCommandCell(row, attribute)"
                     @input="markCommandCellDirty(row, attribute)"
                   />
@@ -474,11 +474,11 @@
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="row.attributes[attribute.attributeCode].configValue"
                     :placeholder="attributePlaceholder(attribute)"
-                    style="width: 100%"
                     clearable
                     inputmode="decimal"
                     maxlength="512"
                     size="small"
+                    style="width: 100%"
                     @blur="validateEventCell(row, attribute)"
                     @input="markEventCellDirty(row, attribute)"
                   />

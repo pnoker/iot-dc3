@@ -23,104 +23,73 @@
       @reset="reset"
       @search="search"
       @sort="sort"
-      @show-add="showAdd"
-      @show-import="showImport"
+      @open-add="openAdd"
+      @open-import="openImport"
       @size-change="sizeChange"
       @current-change="currentChange"
     />
 
     <blank-card>
       <el-row>
-        <skeleton-card :footer="true" :loading="reactiveData.loading">
-          <el-col v-if="hasData">
+        <template v-if="reactiveData.loading">
+          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+            <skeleton-card :footer="true" :loading="true" />
+          </el-col>
+        </template>
+        <template v-else>
+          <el-col v-if="reactiveData.listData.length < 1">
             <el-empty :description="$t('device.empty')" />
           </el-col>
           <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
             <device-card
               :data="data"
-              :driver="reactiveData.driverTable[data.driverId]"
+              :driver="reactiveData.driverTable[data.driverId ?? '']"
               :embedded="embedded != ''"
               :status="reactiveData.statusTable[data.id]"
-              @disable-thing="disableThing"
-              @enable-thing="enableThing"
-              @delete-thing="deleteThing"
+              @disable="onDisable"
+              @enable="onEnable"
+              @delete="onDelete"
             />
           </el-col>
-        </skeleton-card>
+        </template>
       </el-row>
-      <!--            <el-row>
-                            <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
-                                <skeleton-card :footer="true" :loading="reactiveData.loading" />
-                            </el-col>
-                            <el-col v-if="hasData">
-                                <el-empty :description="$t('device.empty')" />
-                            </el-col>
-                            <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
-                                <device-card
-                                    :data="data"
-                                    :driver="reactiveData.driverTable[data.driverId]"
-                                    :embedded="embedded != ''"
-                                    :status="reactiveData.statusTable[data.id]"
-                                    @disable-thing="disableThing"
-                                    @enable-thing="enableThing"
-                                    @delete-thing="deleteThing"
-                                />
-                            </el-col>
-                        </el-row>-->
     </blank-card>
 
-    <device-add-form ref="deviceAddFormRef" @add-thing="addThing" />
-    <device-import-form ref="deviceImportFormRef" @import-template="importTemplate" @import-thing="importThing" />
+    <device-add-form ref="deviceAddFormRef" @add="onAdd" />
+    <device-import-form ref="deviceImportFormRef" @import-template="importTemplate" @import="onImport" />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref } from 'vue';
+  import { computed, ref, watch } from 'vue';
 
   import {
     addDevice,
     deleteDevice,
-    getDeviceStatus,
     importDevice,
     importDeviceTemplate,
     listDevice,
+    listDeviceStatus,
     updateDevice,
   } from '@/api/device';
   import { listDriverByIds } from '@/api/driver';
+  import { usePagedList } from '@/composables/usePagedList';
+  import { failMessage, successMessage } from '@/utils/notificationUtil';
+  import { isNull } from '@/utils/validationUtil';
 
-  import type { Order } from '@/config/types';
+  import type { DeviceRecord } from '@/config/types/manager';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
-  import { failMessage } from '@/utils/notificationUtil';
-  import { isNull } from '@/utils/validationUtil';
   import DeviceAddForm from './add/DeviceAddForm.vue';
   import DeviceCard from './card/DeviceCard.vue';
   import DeviceImportForm from './import/DeviceImportForm.vue';
   import DeviceTool from './tool/DeviceTool.vue';
 
-  interface DeviceListItem {
-    id: string;
-    driverId: string;
-    [key: string]: unknown;
-  }
-
-  interface DeviceListPage {
-    total: number;
-    records: DeviceListItem[];
-  }
-
-  interface DeviceQuery extends Record<string, unknown> {
-    driverId?: string;
-    profileId?: string;
-  }
-
   interface DeviceImportTemplateResult {
     data: BlobPart;
   }
 
-  type DeviceListResponse = R<DeviceListPage>;
-  type LookupTableResponse = R<Record<string, unknown>>;
   type DialogInstance = { show: () => void };
 
   const props = withDefaults(
@@ -139,109 +108,60 @@
   const deviceAddFormRef = ref<DialogInstance | null>(null);
   const deviceImportFormRef = ref<DialogInstance | null>(null);
 
-  const reactiveData = reactive({
-    loading: true,
-    driverTable: {} as Record<string, Record<string, any>>,
-    statusTable: {} as Record<string, string>,
-    listData: [] as DeviceListItem[],
-    query: {} as DeviceQuery,
-    order: false,
-    page: {
-      total: 0,
-      size: 12,
-      current: 1,
-      orders: [] as Order[],
-    },
+  const {
+    state,
+    load,
+    search: _search,
+    sort,
+    sizeChange,
+    currentChange,
+  } = usePagedList<DeviceRecord>({
+    pageSize: 12,
+    sortColumn: 'create_time',
+    request: (query) => listDevice(query),
   });
 
-  const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
-
-  const withFixedQuery = (params: DeviceQuery = {}) => {
-    const nextQuery: DeviceQuery = { ...params };
-
-    if (!isNull(props.driverId)) {
-      nextQuery.driverId = props.driverId;
-    }
-
-    if (!isNull(props.profileId)) {
-      nextQuery.profileId = props.profileId;
-    }
-
-    return nextQuery;
+  const reactiveData = state as typeof state & {
+    driverTable: Record<string, Record<string, any>>;
+    statusTable: Record<string, string>;
   };
+  reactiveData.driverTable = {};
+  reactiveData.statusTable = {};
 
-  const list = () => {
-    const query = withFixedQuery(reactiveData.query);
-    reactiveData.query = query;
+  const baseDeviceQuery = computed(() => {
+    const q: Record<string, unknown> = {};
+    if (!isNull(props.driverId)) q.driverId = props.driverId;
+    if (!isNull(props.profileId)) q.profileId = props.profileId;
+    return q;
+  });
 
-    listDevice<DeviceListResponse>({
-      page: reactiveData.page,
-      ...query,
-    })
-      .then((res) => {
-        const data = res.data;
-        reactiveData.page.total = data.total;
-        reactiveData.listData = data.records;
-
-        const driverIds = Array.from(new Set(reactiveData.listData.map((device) => device.driverId)));
-        if (driverIds.length === 0) {
-          reactiveData.driverTable = {};
-          return;
-        }
-
-        listDriverByIds(driverIds)
-          .then((driverRes: LookupTableResponse) => {
-            reactiveData.driverTable = driverRes.data as Record<string, Record<string, any>>;
-          })
-          .catch(() => {
-            // nothing to do
-          });
-      })
-      .catch(() => {
-        // nothing to do
-      })
-      .finally(() => {
-        reactiveData.loading = false;
-      });
-
-    getDeviceStatus({
-      page: reactiveData.page,
-      ...query,
-    })
-      .then((res: LookupTableResponse) => {
-        reactiveData.statusTable = res.data as Record<string, string>;
-      })
-      .catch(() => {
-        // nothing to do
-      });
-  };
-
-  const search = (params: DeviceQuery) => {
-    reactiveData.query = withFixedQuery(params);
-    list();
+  const search = (params: Record<string, unknown>) => {
+    _search({ ...baseDeviceQuery.value, ...params });
   };
 
   const reset = () => {
-    reactiveData.query = withFixedQuery();
-    list();
+    _search(baseDeviceQuery.value);
   };
 
-  const showAdd = () => {
+  const openAdd = () => {
     deviceAddFormRef.value?.show();
   };
 
-  const addThing = (form: unknown, done: () => void) => {
+  const onAdd = (form: unknown, done: () => void) => {
     addDevice(form as Record<string, unknown>)
       .then(() => {
-        list();
-        done();
+        successMessage();
+        load();
       })
       .catch(() => {
-        // nothing to do
+        failMessage();
+      })
+      .finally(() => {
+        done();
       });
   };
 
-  const showImport = () => {
+  const openImport = () => {
     deviceImportFormRef.value?.show();
   };
 
@@ -260,90 +180,105 @@
         link.setAttribute('download', name);
         document.body.appendChild(link);
         link.click();
-
-        done();
       })
       .catch(() => {
-        // nothing to do
+        failMessage();
+      })
+      .finally(() => {
+        done();
       });
   };
 
-  const importThing = (form: unknown, done: () => void) => {
+  const onImport = (form: unknown, done: () => void) => {
     importDevice(form as Record<string, unknown>)
       .then(() => {
-        list();
-        done();
+        successMessage();
+        load();
       })
       .catch(() => {
-        // nothing to do
+        failMessage();
+      })
+      .finally(() => {
+        done();
       });
   };
 
-  const disableThing = (id: string, driverId: string, done: () => void) => {
+  const onDisable = (id: string, driverId: string, done: () => void) => {
     updateDevice({ id, driverId, enableFlag: 'DISABLE' })
       .then(() => {
-        list();
-        done();
+        successMessage();
+        load();
       })
       .catch(() => {
-        // nothing to do
+        failMessage();
+      })
+      .finally(() => {
+        done();
       });
   };
 
-  const enableThing = (id: string, driverId: string, done: () => void) => {
+  const onEnable = (id: string, driverId: string, done: () => void) => {
     updateDevice({ id, driverId, enableFlag: 'ENABLE' })
       .then(() => {
-        list();
+        successMessage();
+        load();
+      })
+      .catch(() => {
+        failMessage();
+      })
+      .finally(() => {
         done();
-      })
-      .catch(() => {
-        // nothing to do
       });
   };
 
-  const deleteThing = (id: string, done: () => void) => {
+  const onDelete = (id: string, done: () => void) => {
     deleteDevice(id)
-      .then((res) => {
-        if (res.data.ok) {
-          list();
-          done();
-        } else {
-          failMessage(res.data.message);
-        }
+      .then(() => {
+        successMessage();
+        load();
       })
       .catch(() => {
-        // nothing to do
+        failMessage();
+      })
+      .finally(() => {
+        done();
       });
   };
 
-  const refresh = () => {
-    list();
-  };
+  const refresh = () => load();
 
-  const sort = () => {
-    reactiveData.order = !reactiveData.order;
-    if (reactiveData.order) {
-      reactiveData.page.orders = [{ column: 'create_time', asc: true }];
-    } else {
-      reactiveData.page.orders = [{ column: 'create_time', asc: false }];
+  watch(
+    () => reactiveData.listData,
+    (devices) => {
+      // Load status table
+      listDeviceStatus({ page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>) })
+        .then((res) => {
+          reactiveData.statusTable = (res.data || {}) as Record<string, string>;
+        })
+        .catch(() => {
+          // handled globally
+        });
+
+      // Load driver lookup table
+      const driverIds = Array.from(new Set(devices.map((d) => d.driverId).filter((id): id is string => !!id)));
+      if (driverIds.length === 0) {
+        reactiveData.driverTable = {};
+        return;
+      }
+      listDriverByIds(driverIds)
+        .then((res) => {
+          reactiveData.driverTable = (res.data || {}) as Record<string, Record<string, any>>;
+        })
+        .catch(() => {
+          // handled globally
+        });
     }
-    list();
-  };
-
-  const sizeChange = (size: number) => {
-    reactiveData.page.size = size;
-    list();
-  };
-
-  const currentChange = (current: number) => {
-    reactiveData.page.current = current;
-    list();
-  };
+  );
 
   defineExpose({
     reactiveData,
     refresh,
   });
 
-  list();
+  load();
 </script>

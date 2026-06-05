@@ -55,7 +55,7 @@
       </el-form-item>
     </template>
     <template #actions>
-      <el-button v-if="add" :icon="Plus" type="success">{{ $t('common.add') }}</el-button>
+      <el-button :icon="Plus" type="success" @click="$emit('show-add')">{{ $t('common.add') }}</el-button>
     </template>
   </tool-card>
 </template>
@@ -78,7 +78,7 @@
     },
   });
 
-  const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change']);
+  const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change', 'show-add']);
 
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
 

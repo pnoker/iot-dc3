@@ -21,7 +21,7 @@ import { Search } from '@element-plus/icons-vue';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import router from '@/config/router';
 
-import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
+import { listDriverDictionary, listProfileDictionary } from '@/api/dictionary';
 import { getDeviceById, updateDevice } from '@/api/device';
 import {
   listCommandAttributeByDriverId,
@@ -546,7 +546,7 @@ export default defineComponent({
 
     const driverDictionary = (query?: string) => {
       reactiveData.driverLoading = true;
-      getDriverDictionary({
+      listDriverDictionary({
         page: { size: 50, current: 1 },
         label: query || '',
       })
@@ -567,7 +567,7 @@ export default defineComponent({
 
     const profileDictionary = (query?: string) => {
       reactiveData.profileLoading = true;
-      getProfileDictionary({
+      listProfileDictionary({
         page: { size: 50, current: 1 },
         label: query || '',
       })
@@ -625,90 +625,91 @@ export default defineComponent({
       }
       reactiveData.loading = true;
 
-      listDriverAttributeByDriverId(driverId)
-        .then((res) => {
-          reactiveData.driverAttributes = res.data;
-          reactiveData.driverAttributeTable = reactiveData.driverAttributes.reduce(
-            (pre, cur) => {
-              pre[cur.id] = cur.attributeCode;
-              return pre;
-            },
-            {} as Record<string, any>
-          );
+      Promise.allSettled([
+        listDriverAttributeByDriverId(driverId)
+          .then((res) => {
+            reactiveData.driverAttributes = res.data;
+            reactiveData.driverAttributeTable = reactiveData.driverAttributes.reduce(
+              (pre, cur) => {
+                pre[cur.id] = cur.attributeCode;
+                return pre;
+              },
+              {} as Record<string, any>
+            );
+            const driverFormData: AttributeFormData = {};
+            reactiveData.driverAttributes.forEach((attribute) => {
+              driverFormData[attribute.attributeCode] = createAttributeFormItem(attribute);
+            });
+            reactiveData.driverFormData = clone(driverFormData);
+            reactiveData.oldDriverFormData = clone(driverFormData);
+            driverInfo();
+          })
+          .catch(() => {
+            reactiveData.driverAttributes = [];
+            reactiveData.driverAttributeTable = {};
+            reactiveData.driverFormData = {};
+            reactiveData.oldDriverFormData = {};
+          }),
 
-          const driverFormData: AttributeFormData = {};
-          reactiveData.driverAttributes.forEach((attribute) => {
-            driverFormData[attribute.attributeCode] = createAttributeFormItem(attribute);
-          });
-          reactiveData.driverFormData = clone(driverFormData);
-          reactiveData.oldDriverFormData = clone(driverFormData);
+        listPointAttributeByDriverId(driverId)
+          .then((res) => {
+            reactiveData.pointAttributes = res.data;
+            reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce(
+              (pre, cur) => {
+                pre[cur.id] = cur.attributeCode;
+                return pre;
+              },
+              {} as Record<string, any>
+            );
+            pointInfo();
+          })
+          .catch(() => {
+            reactiveData.pointAttributes = [];
+            reactiveData.pointAttributeTable = {};
+            reactiveData.pointInfoData = [];
+            reactiveData.oldPointInfoData = [];
+          }),
 
-          driverInfo();
-        })
-        .catch(() => {
-          // nothing to do
-        });
+        listCommandAttributeByDriverId(driverId)
+          .then((res) => {
+            reactiveData.commandAttributes = res.data;
+            reactiveData.commandAttributeTable = reactiveData.commandAttributes.reduce(
+              (pre, cur) => {
+                pre[cur.id] = cur.attributeCode;
+                return pre;
+              },
+              {} as Record<string, any>
+            );
+            commandInfo();
+          })
+          .catch(() => {
+            reactiveData.commandAttributes = [];
+            reactiveData.commandAttributeTable = {};
+            reactiveData.commandInfoData = [];
+            reactiveData.oldCommandInfoData = [];
+          }),
 
-      listPointAttributeByDriverId(driverId)
-        .then((res) => {
-          reactiveData.pointAttributes = res.data;
-          reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce(
-            (pre, cur) => {
-              pre[cur.id] = cur.attributeCode;
-              return pre;
-            },
-            {} as Record<string, any>
-          );
-
-          pointInfo();
-        })
-        .catch(() => {
-          reactiveData.pointAttributes = [];
-          reactiveData.pointAttributeTable = {};
-          reactiveData.pointInfoData = [];
-          reactiveData.oldPointInfoData = [];
-          reactiveData.loading = false;
-        });
-
-      listCommandAttributeByDriverId(driverId)
-        .then((res) => {
-          reactiveData.commandAttributes = res.data;
-          reactiveData.commandAttributeTable = reactiveData.commandAttributes.reduce(
-            (pre, cur) => {
-              pre[cur.id] = cur.attributeCode;
-              return pre;
-            },
-            {} as Record<string, any>
-          );
-
-          commandInfo();
-        })
-        .catch(() => {
-          reactiveData.commandAttributes = [];
-          reactiveData.commandAttributeTable = {};
-          reactiveData.commandInfoData = [];
-          reactiveData.oldCommandInfoData = [];
-        });
-
-      listEventAttributeByDriverId(driverId)
-        .then((res) => {
-          reactiveData.eventAttributes = res.data;
-          reactiveData.eventAttributeTable = reactiveData.eventAttributes.reduce(
-            (pre, cur) => {
-              pre[cur.id] = cur.attributeCode;
-              return pre;
-            },
-            {} as Record<string, any>
-          );
-
-          eventInfo();
-        })
-        .catch(() => {
-          reactiveData.eventAttributes = [];
-          reactiveData.eventAttributeTable = {};
-          reactiveData.eventInfoData = [];
-          reactiveData.oldEventInfoData = [];
-        });
+        listEventAttributeByDriverId(driverId)
+          .then((res) => {
+            reactiveData.eventAttributes = res.data;
+            reactiveData.eventAttributeTable = reactiveData.eventAttributes.reduce(
+              (pre, cur) => {
+                pre[cur.id] = cur.attributeCode;
+                return pre;
+              },
+              {} as Record<string, any>
+            );
+            eventInfo();
+          })
+          .catch(() => {
+            reactiveData.eventAttributes = [];
+            reactiveData.eventAttributeTable = {};
+            reactiveData.eventInfoData = [];
+            reactiveData.oldEventInfoData = [];
+          }),
+      ]).finally(() => {
+        reactiveData.loading = false;
+      });
     };
 
     const driverInfo = () => {
