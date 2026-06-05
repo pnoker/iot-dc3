@@ -21,7 +21,6 @@
 spring:
   main:
     banner-mode: off
-    allow-bean-definition-overriding: true
   rabbitmq:
     publisher-confirm-type: correlated
     publisher-returns: true

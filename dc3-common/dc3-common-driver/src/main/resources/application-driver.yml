@@ -20,7 +20,6 @@
 # the property values configured in application.yml will be the main ones.
 spring:
   main:
-    allow-bean-definition-overriding: true
   grpc:
     client:
       channels:

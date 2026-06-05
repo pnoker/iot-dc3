@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.data.biz.DriverStateService;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
@@ -111,7 +112,7 @@ public class DriverStateServiceImpl implements DriverStateService {
         byte lastIndex = stateDO.getLastStateFlag();
         if (isFlip(lastIndex, current)) {
             String message = String.format("Driver status changed: %s -> %s",
-                    EntityStatusEnum.ofIndex(lastIndex) != null ? EntityStatusEnum.ofIndex(lastIndex).getCode() : "unknown",
+                    EntityStatusEnum.ofIndex(lastIndex) != null ? EntityStatusEnum.ofIndex(lastIndex).getCode() : DataConstant.STATUS_UNKNOWN,
                     current);
             DriverAlarmDTO alarm = DriverAlarmDTO.builder()
                     .tenantId(entityDTO.getTenantId())

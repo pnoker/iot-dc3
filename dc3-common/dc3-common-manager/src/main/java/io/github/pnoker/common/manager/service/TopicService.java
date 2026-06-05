@@ -23,7 +23,7 @@ import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.query.TopicQuery;
 import io.github.pnoker.common.manager.entity.vo.TopicVO;
 
-import java.util.List;
+
 
 /**
  * Business service for topic operations.
@@ -35,6 +35,6 @@ import java.util.List;
 
 public interface TopicService extends IService<DeviceDO> {
 
-    Page<List<TopicVO>> query(TopicQuery topicQuery);
+    Page<TopicVO> query(TopicQuery topicQuery);
 
 }

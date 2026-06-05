@@ -47,13 +47,13 @@ import java.util.Objects;
 public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implements TopicService {
 
     @Override
-    public Page<List<TopicVO>> query(TopicQuery topicQuery) {
+    public Page<TopicVO> query(TopicQuery topicQuery) {
         if (Objects.isNull(topicQuery.getPage())) {
             topicQuery.setPage(new Pages());
         }
         int page = (int) topicQuery.getPage().getCurrent();
         int size = (int) topicQuery.getPage().getSize();
-        Page<List<TopicVO>> resultPage = new Page<>(page, size);
+        Page<TopicVO> resultPage = new Page<>(page, size);
         List<TopicVO> topicVOList = new ArrayList<>();
         String topic = topicQuery.getTopic();
         Long deviceIdL = null;
@@ -93,9 +93,11 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
         int totalItems = topicVOList.size();
         int fromIndex = Math.max(0, (page - 1) * size);
         int toIndex = Math.min(fromIndex + size, totalItems);
-        List<List<TopicVO>> paginatedData = new ArrayList<>();
+        List<TopicVO> paginatedData;
         if (fromIndex < toIndex) {
-            paginatedData.add(topicVOList.subList(fromIndex, toIndex));
+            paginatedData = topicVOList.subList(fromIndex, toIndex);
+        } else {
+            paginatedData = new ArrayList<>();
         }
         resultPage.setRecords(paginatedData);
         resultPage.setTotal(totalItems);

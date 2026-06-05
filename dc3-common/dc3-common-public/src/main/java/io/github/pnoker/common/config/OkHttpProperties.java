@@ -21,6 +21,7 @@ import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 
@@ -33,6 +34,7 @@ import java.time.Duration;
  */
 @Getter
 @Setter
+@Validated
 @ConfigurationProperties(prefix = EnvironmentConstant.HTTP_CLIENT_PREFIX)
 public class OkHttpProperties {
 

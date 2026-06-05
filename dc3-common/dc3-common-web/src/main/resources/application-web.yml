@@ -24,8 +24,6 @@ spring:
     # Enable rollback if a failure occurs during transaction commit.
     rollback-on-commit-failure: true
   main:
-    # Allow bean definition overriding when multiple configurations define the same bean.
-    allow-bean-definition-overriding: true
   web:
     resources:
       # Disable Spring Boot's default static resource mappings.

@@ -34,6 +34,11 @@ public class DataConstant {
      */
     public static final String SERVICE_NAME = "dc3-center-data";
 
+    /**
+     * Fallback status when an entity status cannot be resolved.
+     */
+    public static final String STATUS_UNKNOWN = "unknown";
+
     public static final String POINT_VALUE_URL_PREFIX = "/point_value";
 
     public static final String POINT_COMMAND_URL_PREFIX = "/point_command";

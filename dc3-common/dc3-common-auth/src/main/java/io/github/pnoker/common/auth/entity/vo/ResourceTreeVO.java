@@ -43,6 +43,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ResourceTreeVO extends ResourceVO {
 
+    @ToString.Exclude
     private List<ResourceTreeVO> children = new ArrayList<>();
 
 }

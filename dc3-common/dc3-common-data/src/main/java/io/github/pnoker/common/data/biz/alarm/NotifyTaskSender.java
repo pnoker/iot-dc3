@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class NotifyTaskSender {
         }
         String channelType = Objects.nonNull(task.getChannelTypeFlag())
                 ? task.getChannelTypeFlag().toString()
-                : "unknown";
+                : DataConstant.STATUS_UNKNOWN;
         String routingKey = (RabbitConstant.ROUTING_NOTIFY_TASK_PREFIX + channelType).toLowerCase(Locale.ROOT);
         rabbitTemplate.convertAndSend(alarmExchange.getName(), routingKey, task);
     }

@@ -43,6 +43,7 @@ import java.util.Objects;
 @EqualsAndHashCode(callSuper = true)
 public class RoleTreeBO extends RoleBO {
 
+    @ToString.Exclude
     private List<RoleTreeBO> children = new ArrayList<>();
 
     /**
