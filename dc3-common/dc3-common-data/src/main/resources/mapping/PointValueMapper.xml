@@ -68,4 +68,24 @@
         ORDER BY create_time
     </select>
 
+    <!--
+      Batch latest point value query using PostgreSQL DISTINCT ON.
+      For each (device_id, point_id) pair, returns the single row with the
+      most recent create_time. Replaces the N+1 loop in PointValueServiceImpl.
+    -->
+    <select id="selectLatestPointValues" resultType="io.github.pnoker.common.data.entity.model.PointValueDO">
+        SELECT DISTINCT ON (pv.device_id, pv.point_id)
+        pv.id, pv.tenant_id, pv.device_id, pv.point_id,
+        pv.raw_value, pv.cal_value, pv.num_value, pv.driver_id,
+        pv.create_time, pv.operate_time
+        FROM dc3_point_value pv
+        WHERE pv.tenant_id = #{tenantId}
+        AND pv.device_id = #{deviceId}
+        AND pv.point_id IN
+        <foreach collection="pointIds" item="pointId" open="(" separator="," close=")">
+            #{pointId}
+        </foreach>
+        ORDER BY pv.device_id, pv.point_id, pv.create_time DESC
+    </select>
+
 </mapper>
