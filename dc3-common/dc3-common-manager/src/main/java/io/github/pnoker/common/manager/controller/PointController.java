@@ -166,7 +166,7 @@ public class PointController implements BaseController {
     public Mono<R<List<PointVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.getById(profileId));
-            List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByProfileId(profileId));
+            List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByProfileId(profileId, tenantId));
             List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));
@@ -182,7 +182,7 @@ public class PointController implements BaseController {
     public Mono<R<List<PointVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
-            List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByDeviceId(deviceId));
+            List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByDeviceId(deviceId, tenantId));
             List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));

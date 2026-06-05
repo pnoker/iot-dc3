@@ -150,7 +150,7 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
         }
 
         EventAttributeConfigDO entityDO = eventAttributeConfigBuilder.buildDOByBO(entityBO);
-        entityBO.setOperateTime(null);
+        entityDO.setOperateTime(null);
         if (!eventAttributeConfigManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update event attribute config");
         }
@@ -189,7 +189,7 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
 
     @Override
     public List<EventAttributeConfigBO> listByDeviceId(Long deviceId) {
-        List<EventBO> eventBOList = eventService.listByDeviceId(deviceId);
+        List<EventBO> eventBOList = eventService.listByDeviceId(deviceId, null);
         Set<Long> eventIds = eventBOList.stream().map(EventBO::getId).collect(Collectors.toSet());
         if (CollectionUtils.isEmpty(eventIds)) {
             return Collections.emptyList();

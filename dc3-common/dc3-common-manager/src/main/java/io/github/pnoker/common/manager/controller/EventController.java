@@ -110,7 +110,7 @@ public class EventController implements BaseController {
     public Mono<R<List<EventVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.getById(profileId));
-            List<EventBO> entityBOList = filterTenant(tenantId, eventService.listByProfileId(profileId));
+            List<EventBO> entityBOList = filterTenant(tenantId, eventService.listByProfileId(profileId, tenantId));
             List<EventVO> entityVOList = eventBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));
@@ -120,7 +120,7 @@ public class EventController implements BaseController {
     public Mono<R<List<EventVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
-            List<EventBO> entityBOList = filterTenant(tenantId, eventService.listByDeviceId(deviceId));
+            List<EventBO> entityBOList = filterTenant(tenantId, eventService.listByDeviceId(deviceId, tenantId));
             List<EventVO> entityVOList = eventBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));

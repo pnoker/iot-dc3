@@ -37,20 +37,22 @@ import java.util.Set;
 public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
-     * ID
+     * Profile ID TenantId
      *
      * @param profileId Point ID
+     * @param tenantId  Tenant ID
      * @return Point
      */
-    List<PointBO> listByProfileId(Long profileId);
+    List<PointBO> listByProfileId(Long profileId, Long tenantId);
 
     /**
-     * Device ID
+     * Device ID TenantId
      *
      * @param deviceId Device ID
+     * @param tenantId Tenant ID
      * @return Point
      */
-    List<PointBO> listByDeviceId(Long deviceId);
+    List<PointBO> listByDeviceId(Long deviceId, Long tenantId);
 
     /**
      * ID

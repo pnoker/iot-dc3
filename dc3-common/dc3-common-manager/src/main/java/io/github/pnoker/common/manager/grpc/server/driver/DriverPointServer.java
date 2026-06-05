@@ -173,7 +173,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
             return filterProfileId(request, deviceBO.getProfileId());
         }
 
-        Set<Long> profileIds = deviceService.listByDriverId(driverBO.getId())
+        Set<Long> profileIds = deviceService.listByDriverId(driverBO.getId(), driverBO.getTenantId())
                 .stream()
                 .filter(device -> Objects.equals(driverBO.getTenantId(), device.getTenantId()))
                 .map(DeviceBO::getProfileId)
@@ -200,7 +200,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
     }
 
     private boolean driverHasPoint(DriverBO driverBO, PointBO pointBO) {
-        return deviceService.listByDriverId(driverBO.getId())
+        return deviceService.listByDriverId(driverBO.getId(), driverBO.getTenantId())
                 .stream()
                 .filter(device -> Objects.equals(driverBO.getTenantId(), device.getTenantId()))
                 .map(DeviceBO::getProfileId)

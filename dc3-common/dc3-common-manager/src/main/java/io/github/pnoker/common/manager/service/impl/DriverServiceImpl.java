@@ -46,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -74,6 +75,7 @@ public class DriverServiceImpl implements DriverService {
     private final PointManager pointManager;
 
     @Override
+    @Transactional
     public void add(DriverBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
@@ -143,9 +145,12 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<DriverBO> listByProfileId(Long profileId) {
+    public List<DriverBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda()
                 .eq(DeviceDO::getProfileId, profileId);
+        if (Objects.nonNull(tenantId)) {
+            wrapper.eq(DeviceDO::getTenantId, tenantId);
+        }
         List<DeviceDO> deviceDOList = deviceManager.list(wrapper);
         if (CollectionUtils.isEmpty(deviceDOList)) {
             return Collections.emptyList();
@@ -161,14 +166,23 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<DriverBO> selectByPointId(Long pointId) {
+    public List<DriverBO> selectByPointId(Long pointId, Long tenantId) {
         PointDO entityDO = pointManager.getById(pointId);
-        return listByProfileId(entityDO.getProfileId());
+        if (Objects.isNull(entityDO)) {
+            throw new NotFoundException("Point does not exist");
+        }
+        return listByProfileId(entityDO.getProfileId(), tenantId);
     }
 
     @Override
-    public DriverBO listByDeviceId(Long deviceId) {
+    public DriverBO listByDeviceId(Long deviceId, Long tenantId) {
         DeviceDO entityDO = deviceManager.getById(deviceId);
+        if (Objects.isNull(entityDO)) {
+            throw new NotFoundException("Device does not exist");
+        }
+        if (Objects.nonNull(tenantId) && !Objects.equals(tenantId, entityDO.getTenantId())) {
+            return null;
+        }
         return getById(entityDO.getDriverId());
     }
 

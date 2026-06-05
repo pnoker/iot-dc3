@@ -186,20 +186,23 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<PointBO> listByDeviceId(Long deviceId) {
+    public List<PointBO> listByDeviceId(Long deviceId, Long tenantId) {
         DeviceDO deviceDO = deviceMapper.selectById(deviceId);
         if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return Collections.emptyList();
         }
-        return listByProfileId(deviceDO.getProfileId())
+        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId())
                 .stream()
                 .filter(point -> Objects.equals(deviceDO.getTenantId(), point.getTenantId()))
                 .toList();
     }
 
     @Override
-    public List<PointBO> listByProfileId(Long profileId) {
+    public List<PointBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, profileId);
+        if (Objects.nonNull(tenantId)) {
+            wrapper.eq(PointDO::getTenantId, tenantId);
+        }
         List<PointDO> entityDOList = wrapper.list();
         return pointBuilder.buildBOListByDOList(entityDOList);
     }
@@ -412,7 +415,7 @@ public class PointServiceImpl implements PointService {
             return Collections.emptySet();
         }
 
-        DriverBO driverBO = driverService.listByDeviceId(deviceId);
+        DriverBO driverBO = driverService.listByDeviceId(deviceId, null);
         if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
             return Collections.emptySet();
         }

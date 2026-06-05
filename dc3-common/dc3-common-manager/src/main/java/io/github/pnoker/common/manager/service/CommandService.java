@@ -33,9 +33,9 @@ import java.util.Set;
  */
 public interface CommandService extends BaseService<CommandBO, CommandQuery> {
 
-    List<CommandBO> listByProfileId(Long profileId);
+    List<CommandBO> listByProfileId(Long profileId, Long tenantId);
 
-    List<CommandBO> listByDeviceId(Long deviceId);
+    List<CommandBO> listByDeviceId(Long deviceId, Long tenantId);
 
     List<CommandBO> selectByProfileIds(List<Long> profileIds);
 

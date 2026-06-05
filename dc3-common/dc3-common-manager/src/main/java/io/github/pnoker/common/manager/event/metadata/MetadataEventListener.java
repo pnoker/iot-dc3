@@ -66,12 +66,12 @@ public class MetadataEventListener {
             }
 
             if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-                DriverBO entityBO = driverService.listByDeviceId(id);
+                DriverBO entityBO = driverService.listByDeviceId(id, null);
                 if (Objects.nonNull(entityBO)) {
                     notifyDriver(entityBO.getServiceName(), entityDTO);
                 }
             } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-                List<DriverBO> entityBOList = driverService.selectByPointId(id);
+                List<DriverBO> entityBOList = driverService.selectByPointId(id, null);
                 if (CollectionUtils.isNotEmpty(entityBOList)) {
                     entityBOList.forEach(entityBO -> notifyDriver(entityBO.getServiceName(), entityDTO));
                 }

@@ -33,9 +33,9 @@ import java.util.Set;
  */
 public interface EventService extends BaseService<EventBO, EventQuery> {
 
-    List<EventBO> listByProfileId(Long profileId);
+    List<EventBO> listByProfileId(Long profileId, Long tenantId);
 
-    List<EventBO> listByDeviceId(Long deviceId);
+    List<EventBO> listByDeviceId(Long deviceId, Long tenantId);
 
     List<EventBO> selectByProfileIds(List<Long> profileIds);
 
