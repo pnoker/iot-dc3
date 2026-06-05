@@ -47,6 +47,7 @@ import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
@@ -73,6 +74,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
+@Slf4j
 @Component
 public class OpenAiCompatibleAgenticRuntime {
 
@@ -443,6 +445,7 @@ public class OpenAiCompatibleAgenticRuntime {
         try {
             return value.convert(String.class);
         } catch (RuntimeException e) {
+            log.debug("Reasoning content extraction failed", e);
             return null;
         }
     }

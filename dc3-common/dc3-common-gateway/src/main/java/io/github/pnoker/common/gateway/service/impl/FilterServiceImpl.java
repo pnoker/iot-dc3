@@ -137,7 +137,7 @@ public class FilterServiceImpl implements FilterService {
         try {
             header = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
         } catch (Exception e) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST, e);
         }
         if (Objects.isNull(header) || StringUtils.isAnyEmpty(header.getSalt(), header.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);

@@ -53,17 +53,24 @@ public class TenantServer extends TenantApiGrpc.TenantApiImplBase {
         GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        TenantBO entityBO = tenantService.getByCode(request.getCode());
-        if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+        try {
+            TenantBO entityBO = tenantService.getByCode(request.getCode());
+            if (Objects.isNull(entityBO)) {
+                rBuilder.setOk(false);
+                rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            } else {
+                rBuilder.setOk(true);
+                rBuilder.setCode(ResponseEnum.OK.getCode());
+                rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            builder.setData(grpcTenantBuilder.buildGrpcDTOByBO(entityBO));
+                builder.setData(grpcTenantBuilder.buildGrpcDTOByBO(entityBO));
+            }
+        } catch (Exception e) {
+            log.warn("getByCode failed", e);
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
+            rBuilder.setMessage(ResponseEnum.FAILURE.getText());
         }
 
         builder.setResult(rBuilder);

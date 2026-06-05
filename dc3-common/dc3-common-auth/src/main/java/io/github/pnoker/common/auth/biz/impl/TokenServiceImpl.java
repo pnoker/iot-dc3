@@ -149,6 +149,7 @@ public class TokenServiceImpl implements TokenService {
             tokenValid.setExpireTime(claims.getExpiration());
             return tokenValid;
         } catch (Exception e) {
+            log.warn("Token validation failed", e);
             return tokenValid;
         }
     }

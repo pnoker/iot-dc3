@@ -142,6 +142,7 @@ public class UserServiceImpl implements UserService {
         return userBuilder.buildBOByDO(entityDO);
     }
 
+    @Override
     public UserBO getByUserName(String userName, boolean throwException) {
         if (StringUtils.isEmpty(userName)) {
             if (throwException) {
@@ -169,7 +170,7 @@ public class UserServiceImpl implements UserService {
     public UserBO getByEmail(String email, boolean throwException) {
         if (StringUtils.isEmpty(email)) {
             if (throwException) {
-                throw new EmptyException("The phone is empty");
+                throw new EmptyException("The email is empty");
             }
             return null;
         }

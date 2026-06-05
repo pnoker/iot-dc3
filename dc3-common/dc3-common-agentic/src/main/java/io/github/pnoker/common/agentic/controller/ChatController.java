@@ -20,6 +20,7 @@ import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.entity.R;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ public class ChatController implements BaseController {
             return agenticChatService.chatCompletion(request, header)
                     .map(response -> ResponseEntity.ok()
                             .contentType(MediaType.APPLICATION_JSON)
-                            .body(response));
+                            .body(R.ok(response)));
         });
     }
 
