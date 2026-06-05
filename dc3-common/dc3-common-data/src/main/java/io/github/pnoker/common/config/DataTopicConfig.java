@@ -127,6 +127,8 @@ public class DataTopicConfig {
     Queue pointValueQueue() {
         return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_VALUE)
                 .ttl(604800000)
+                .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_POINT_VALUE_DEAD)
+                .deadLetterRoutingKey(SymbolConstant.HASHTAG)
                 .build();
     }
 
@@ -137,6 +139,25 @@ public class DataTopicConfig {
                 .with(RabbitConstant.ROUTING_POINT_VALUE_PREFIX + SymbolConstant.ASTERISK);
         binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
+    }
+
+    // ===== Point value dead letter ==========================================
+
+    @Bean
+    TopicExchange pointValueDeadExchange() {
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_POINT_VALUE_DEAD, true, false);
+    }
+
+    @Bean
+    Queue pointValueDeadQueue() {
+        return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_VALUE_DEAD).build();
+    }
+
+    @Bean
+    Binding pointValueDeadBinding(Queue pointValueDeadQueue, TopicExchange pointValueDeadExchange) {
+        return BindingBuilder.bind(pointValueDeadQueue)
+                .to(pointValueDeadExchange)
+                .with(SymbolConstant.HASHTAG);
     }
 
     // ===== Notify task ======================================================

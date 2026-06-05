@@ -126,6 +126,9 @@ public class RabbitConstant {
     public static String TOPIC_EXCHANGE_EVENT = "dc3.e.event";
     public static String QUEUE_EVENT_PREFIX = "dc3.q.event.";
     public static String ROUTING_EVENT_PREFIX = "dc3.r.event.";
+    // Point Value Dead Letter
+    public static String TOPIC_EXCHANGE_POINT_VALUE_DEAD = "dc3.e.point_value_dead";
+    public static String QUEUE_POINT_VALUE_DEAD = "dc3.q.point_value_dead";
 
     private RabbitConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
