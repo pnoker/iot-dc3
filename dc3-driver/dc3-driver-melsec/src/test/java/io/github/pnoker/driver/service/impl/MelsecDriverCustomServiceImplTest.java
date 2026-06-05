@@ -65,6 +65,42 @@ class MelsecDriverCustomServiceImplTest {
 
     private MelsecDriverCustomServiceImpl service;
 
+    private static Map<String, AttributeBO> driverConfig() {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("host", AttributeBO.builder().value("127.0.0.1").type(AttributeTypeFlagEnum.STRING).build());
+        m.put("port", AttributeBO.builder().value("5000").type(AttributeTypeFlagEnum.INT).build());
+        m.put("series", AttributeBO.builder().value("QnA").type(AttributeTypeFlagEnum.STRING).build());
+        return m;
+    }
+
+    private static Map<String, AttributeBO> pointConfig(String address, int length) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("address", AttributeBO.builder().value(address).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("length", AttributeBO.builder().value(String.valueOf(length)).type(AttributeTypeFlagEnum.INT).build());
+        return m;
+    }
+
+    private static DeviceBO device(Long id) {
+        DeviceBO device = new DeviceBO();
+        device.setId(id);
+        return device;
+    }
+
+    private static PointBO point(PointTypeFlagEnum type) {
+        PointBO point = new PointBO();
+        point.setId(1L);
+        point.setPointTypeFlag(type);
+        return point;
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         service = new MelsecDriverCustomServiceImpl(driverMetadata, driverSenderService);
@@ -147,42 +183,6 @@ class MelsecDriverCustomServiceImplTest {
         assertThat(variable.getAddress()).isEqualTo("D100");
         assertThat(variable.getType()).isEqualTo("string");
         assertThat(variable.getLength()).isEqualTo(16);
-    }
-
-    private static Map<String, AttributeBO> driverConfig() {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value("127.0.0.1").type(AttributeTypeFlagEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value("5000").type(AttributeTypeFlagEnum.INT).build());
-        m.put("series", AttributeBO.builder().value("QnA").type(AttributeTypeFlagEnum.STRING).build());
-        return m;
-    }
-
-    private static Map<String, AttributeBO> pointConfig(String address, int length) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("address", AttributeBO.builder().value(address).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("length", AttributeBO.builder().value(String.valueOf(length)).type(AttributeTypeFlagEnum.INT).build());
-        return m;
-    }
-
-    private static DeviceBO device(Long id) {
-        DeviceBO device = new DeviceBO();
-        device.setId(id);
-        return device;
-    }
-
-    private static PointBO point(PointTypeFlagEnum type) {
-        PointBO point = new PointBO();
-        point.setId(1L);
-        point.setPointTypeFlag(type);
-        return point;
-    }
-
-    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO event = new MetadataEventDTO();
-        event.setMetadataType(type);
-        event.setOperateType(op);
-        event.setId(id);
-        return event;
     }
 
     private void primeCachedPLC(Long deviceId) throws Exception {

@@ -73,6 +73,53 @@ class ModbusRtuDriverCustomServiceImplTest {
     private ModbusRtuDriverCustomServiceImpl service;
     private ModbusFactory previousFactory;
 
+    private static ModbusFactory swapStaticFactory(ModbusFactory replacement) throws Exception {
+        Field field = ModbusRtuDriverCustomServiceImpl.class.getDeclaredField("modbusFactory");
+        field.setAccessible(true);
+        ModbusFactory previous = (ModbusFactory) field.get(null);
+        field.set(null, replacement);
+        return previous;
+    }
+
+    private static Map<String, AttributeBO> driverConfig() {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("port", AttributeBO.builder().value("/dev/ttyS0").type(AttributeTypeFlagEnum.STRING).build());
+        m.put("baudRate", AttributeBO.builder().value("9600").type(AttributeTypeFlagEnum.INT).build());
+        m.put("dataBits", AttributeBO.builder().value("8").type(AttributeTypeFlagEnum.INT).build());
+        m.put("stopBits", AttributeBO.builder().value("1").type(AttributeTypeFlagEnum.INT).build());
+        m.put("parity", AttributeBO.builder().value("0").type(AttributeTypeFlagEnum.INT).build());
+        return m;
+    }
+
+    private static Map<String, AttributeBO> pointConfig(int slaveId, int functionCode, int offset) {
+        Map<String, AttributeBO> m = new HashMap<>();
+        m.put("slaveId", AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("functionCode", AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeFlagEnum.INT).build());
+        return m;
+    }
+
+    private static DeviceBO device(Long id) {
+        DeviceBO device = new DeviceBO();
+        device.setId(id);
+        return device;
+    }
+
+    private static PointBO point(PointTypeFlagEnum type) {
+        PointBO point = new PointBO();
+        point.setId(1L);
+        point.setPointTypeFlag(type);
+        return point;
+    }
+
+    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(op);
+        event.setId(id);
+        return event;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         service = new ModbusRtuDriverCustomServiceImpl(driverMetadata, driverSenderService);
@@ -140,52 +187,5 @@ class ModbusRtuDriverCustomServiceImplTest {
 
         verify(modbusFactory, times(2)).createRtuMaster(any(JSerialCommWrapper.class));
         verify(modbusMaster).destroy();
-    }
-
-    private static ModbusFactory swapStaticFactory(ModbusFactory replacement) throws Exception {
-        Field field = ModbusRtuDriverCustomServiceImpl.class.getDeclaredField("modbusFactory");
-        field.setAccessible(true);
-        ModbusFactory previous = (ModbusFactory) field.get(null);
-        field.set(null, replacement);
-        return previous;
-    }
-
-    private static Map<String, AttributeBO> driverConfig() {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("port", AttributeBO.builder().value("/dev/ttyS0").type(AttributeTypeFlagEnum.STRING).build());
-        m.put("baudRate", AttributeBO.builder().value("9600").type(AttributeTypeFlagEnum.INT).build());
-        m.put("dataBits", AttributeBO.builder().value("8").type(AttributeTypeFlagEnum.INT).build());
-        m.put("stopBits", AttributeBO.builder().value("1").type(AttributeTypeFlagEnum.INT).build());
-        m.put("parity", AttributeBO.builder().value("0").type(AttributeTypeFlagEnum.INT).build());
-        return m;
-    }
-
-    private static Map<String, AttributeBO> pointConfig(int slaveId, int functionCode, int offset) {
-        Map<String, AttributeBO> m = new HashMap<>();
-        m.put("slaveId", AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("functionCode", AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeFlagEnum.INT).build());
-        return m;
-    }
-
-    private static DeviceBO device(Long id) {
-        DeviceBO device = new DeviceBO();
-        device.setId(id);
-        return device;
-    }
-
-    private static PointBO point(PointTypeFlagEnum type) {
-        PointBO point = new PointBO();
-        point.setId(1L);
-        point.setPointTypeFlag(type);
-        return point;
-    }
-
-    private static MetadataEventDTO metadataEvent(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO event = new MetadataEventDTO();
-        event.setMetadataType(type);
-        event.setOperateType(op);
-        event.setId(id);
-        return event;
     }
 }
