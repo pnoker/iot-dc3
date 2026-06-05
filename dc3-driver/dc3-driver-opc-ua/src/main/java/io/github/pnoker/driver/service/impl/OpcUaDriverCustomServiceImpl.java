@@ -100,7 +100,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             keyLoader = new KeyLoader().load(
                     java.nio.file.Path.of(System.getProperty("user.dir"), "dc3", "opc-ua"));
         } catch (Exception e) {
-            log.warn("OPC UA KeyLoader initialization failed, falling back to anonymous auth: {}", e.getMessage());
+            log.warn("OPC UA KeyLoader initialization failed, falling back to anonymous auth", e);
             keyLoader = null;
         }
     }
@@ -130,7 +130,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
@@ -140,11 +140,11 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                 if (Objects.nonNull(removed)) {
                     removed.disconnect();
                 }
-                log.info("Driver connection invalidated, protocol=" + driverCode + ", deviceId={}, operateType={}, removed={}",
+                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}", driverCode, 
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -177,7 +177,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             int port = driverConfig.get("port").getValue(Integer.class);
             String path = driverConfig.get("path").getValue(String.class);
             String url = String.format("opc.tcp://%s:%s%s", host, port, path);
-            log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
+            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, port={}, path={}", driverCode, deviceId,
                     host, port, path);
             try {
                 // Prefer certificate-based auth when KeyLoader is available
@@ -200,11 +200,11 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                             }
                             return configBuilder.build();
                         });
-                log.info("Driver connection created, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
+                log.info("Driver connection created, protocol={}, deviceId={}, host={}, port={}, path={}", driverCode, deviceId,
                         host, port, path);
                 return opcUaClient;
             } catch (UaException e) {
-                log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
+                log.error("Driver connection failed, protocol={}, deviceId={}, host={}, port={}, path={}", driverCode, deviceId,
                         host, port, path, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}, message={}",
                         deviceId, host, port, path, e.getMessage(), e);
@@ -345,7 +345,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         try {
             client.disconnect();
         } catch (Exception e) {
-            log.warn("Driver connection disconnect failed, protocol=" + driverCode + ", deviceId={}", deviceId, e);
+            log.warn("Driver connection disconnect failed, protocol={}, deviceId={}", driverCode, deviceId, e);
         }
     }
 

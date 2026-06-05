@@ -84,11 +84,11 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
     @Override
     public void initial() {
         threadPoolExecutor.execute(() -> {
-            log.info("Driver listener starting, protocol=" + PROTOCOL_TCP + ", port={}", tcpPort);
+            log.info("Driver listener starting, protocol={}, port={}", PROTOCOL_TCP, tcpPort);
             nettyTcpServer.start(tcpPort);
         });
         threadPoolExecutor.execute(() -> {
-            log.info("Driver listener starting, protocol=" + PROTOCOL_UDP + ", port={}", udpPort);
+            log.info("Driver listener starting, protocol={}, port={}", PROTOCOL_UDP, udpPort);
             nettyUdpServer.start(udpPort);
         });
     }
@@ -112,10 +112,10 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -161,12 +161,12 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.getDeviceChannel(deviceId);
         if (Objects.isNull(channel) || !channel.isActive()) {
-            log.warn("Driver point write skipped, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}, reason=channelMissing",
+            log.warn("Driver point write skipped, protocol={}, deviceId={}, pointId={}, reason=channelMissing", PROTOCOL_TCP, 
                     deviceId, point.getId());
             return false;
         }
 
-        log.debug("Driver point write requested, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}, valueLength={}", deviceId,
+        log.debug("Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}", PROTOCOL_TCP, deviceId,
                 point.getId(), Objects.toString(writePointValue.getValue(), "").length());
         ChannelFuture future = channel.writeAndFlush(DecodeUtil.stringToByte(writePointValue.getValue()));
         if (Objects.isNull(future)) {
@@ -175,14 +175,13 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         try {
             boolean completed = future.await(WRITE_FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!completed || !future.isSuccess()) {
-                log.warn("Driver point write flush failed, protocol=" + PROTOCOL_TCP
-                                + ", deviceId={}, pointId={}, completed={}",
+                log.warn("Driver point write flush failed, protocol={}, deviceId={}, pointId={}, completed={}", PROTOCOL_TCP,
                         deviceId, point.getId(), completed, future.cause());
                 return false;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("Driver point write interrupted, protocol=" + PROTOCOL_TCP + ", deviceId={}, pointId={}",
+            log.warn("Driver point write interrupted, protocol={}, deviceId={}, pointId={}", PROTOCOL_TCP, 
                     deviceId, point.getId(), e);
             return false;
         }

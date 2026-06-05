@@ -96,7 +96,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
@@ -107,15 +107,15 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
                     try {
                         removed.dispose();
                     } catch (Exception e) {
-                        log.warn("Driver connection disconnect failed, protocol=" + driverCode + ", deviceId={}",
+                        log.warn("Driver connection disconnect failed, protocol={}, deviceId={}", driverCode, 
                                 metadataEvent.getId(), e);
                     }
                 }
-                log.info("Driver connection invalidated, protocol=" + driverCode + ", deviceId={}, operateType={}, removed={}",
+                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}", driverCode, 
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -148,22 +148,22 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
             String clsId = driverConfig.get("clsId").getValue(String.class);
             String user = driverConfig.get("username").getValue(String.class);
             String password = driverConfig.get("password").getValue(String.class);
-            log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, usernamePresent={}",
+            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, clsId={}, usernamePresent={}", driverCode, 
                     deviceId, host, clsId, Objects.nonNull(user));
             ConnectionInformation connectionInformation = new ConnectionInformation(host, clsId, user, password);
             Server server = new Server(connectionInformation, scheduledThreadPoolExecutor);
             try {
                 server.connect();
-                log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}", deviceId,
+                log.info("Driver connection established, protocol={}, deviceId={}, host={}, clsId={}", driverCode, deviceId,
                         host, clsId);
             } catch (AlreadyConnectedException | UnknownHostException | JIException e) {
                 try {
                     server.dispose();
                 } catch (Exception disposeException) {
-                    log.warn("Driver connection dispose failed after connect error, protocol=" + driverCode
-                            + ", deviceId={}, host={}, clsId={}", deviceId, host, clsId, disposeException);
+                    log.warn("Driver connection dispose failed after connect error, protocol={}, deviceId={}, host={}, clsId={}", driverCode,
+                            deviceId, host, clsId, disposeException);
                 }
-                log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}", deviceId, host,
+                log.error("Driver connection failed, protocol={}, deviceId={}, host={}, clsId={}", driverCode, deviceId, host,
                         clsId, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, message={}",
                         deviceId, host, clsId, e.getMessage(), e);
@@ -327,7 +327,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         try {
             server.dispose();
         } catch (Exception e) {
-            log.warn("Driver connection dispose failed, protocol=" + driverCode + ", deviceId={}", deviceId, e);
+            log.warn("Driver connection dispose failed, protocol={}, deviceId={}", driverCode, deviceId, e);
         }
     }
 
