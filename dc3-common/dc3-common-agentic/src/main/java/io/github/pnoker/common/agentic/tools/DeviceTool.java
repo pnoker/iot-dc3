@@ -209,7 +209,7 @@ public class DeviceTool {
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid device IDs provided.");
         }
-        Map<Long, String> statuses = facade.selectDeviceStatusesByIds(tenantId, ids);
+        Map<Long, String> statuses = facade.listDeviceStatusesByIds(tenantId, ids);
         if (AgenticToolUtil.isEmpty(statuses)) {
             return AgenticToolResult.empty("No device statuses found.", Map.of());
         }
@@ -228,7 +228,7 @@ public class DeviceTool {
         if (Objects.isNull(facade)) {
             return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
-        Map<Long, String> statuses = facade.selectDeviceStatusesByProfileId(tenantId, profileId);
+        Map<Long, String> statuses = facade.listDeviceStatusesByProfileId(tenantId, profileId);
         if (AgenticToolUtil.isEmpty(statuses)) {
             return AgenticToolResult.empty("No device statuses found for profile ID: " + profileId, Map.of());
         }

@@ -64,10 +64,10 @@ public class PointValueGrpcFacade implements PointValueFacade {
                 .setPointId(pointId)
                 .setTenantId(tenantId)
                 .build();
-        GrpcRPointValueDTO response = grpcFacadeSupport.call("PointValueFacade.lastValue", pointValueApiBlockingStub,
-                stub -> stub.lastValue(request));
+        GrpcRPointValueDTO response = grpcFacadeSupport.call("PointValueFacade.getLastValue", pointValueApiBlockingStub,
+                stub -> stub.getLastValue(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "lastValue");
+            guardOrThrow(response.getResult(), "getLastValue");
             return null;
         }
         if (!response.hasData()) {
@@ -84,10 +84,10 @@ public class PointValueGrpcFacade implements PointValueFacade {
                 .setTenantId(tenantId)
                 .setCount(count)
                 .build();
-        GrpcRPointValueStringList response = grpcFacadeSupport.call("PointValueFacade.history", pointValueApiBlockingStub,
-                stub -> stub.historyValue(request));
+        GrpcRPointValueStringList response = grpcFacadeSupport.call("PointValueFacade.listHistoryValues", pointValueApiBlockingStub,
+                stub -> stub.listHistoryValues(request));
         if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "history");
+            guardOrThrow(response.getResult(), "listHistoryValues");
             return Collections.emptyList();
         }
         return response.getDataList();

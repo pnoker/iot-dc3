@@ -62,7 +62,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     private final SystemHealthService systemHealthService;
 
     @Override
-    public Map<Long, String> selectDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {
+    public Map<Long, String> listDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {
         List<FacadeDeviceBO> devices = deviceFacade.listByIds(tenantId, deviceIds);
         Map<Long, String> result = new LinkedHashMap<>();
         devices.forEach(device -> result.put(device.getId(), deviceStatus(tenantId, device.getId())));
@@ -70,7 +70,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     }
 
     @Override
-    public Map<Long, String> selectDeviceStatusesByProfileId(Long tenantId, Long profileId) {
+    public Map<Long, String> listDeviceStatusesByProfileId(Long tenantId, Long profileId) {
         List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
         Map<Long, String> result = new LinkedHashMap<>();
         devices.forEach(device -> result.put(device.getId(), deviceStatus(tenantId, device.getId())));
@@ -78,7 +78,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     }
 
     @Override
-    public Map<Long, String> selectDriverStatusesByIds(Long tenantId, Collection<Long> driverIds) {
+    public Map<Long, String> listDriverStatusesByIds(Long tenantId, Collection<Long> driverIds) {
         List<FacadeDriverBO> drivers = driverFacade.listByIds(tenantId, driverIds);
         Map<Long, String> result = new LinkedHashMap<>();
         drivers.forEach(driver -> result.put(driver.getId(), driverStatus(tenantId, driver.getId())));

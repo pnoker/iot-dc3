@@ -57,7 +57,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
     private final PointCommandService pointCommandService;
 
     @Override
-    public void lastValue(GrpcPointValueQuery request, StreamObserver<GrpcRPointValueDTO> responseObserver) {
+    public void getLastValue(GrpcPointValueQuery request, StreamObserver<GrpcRPointValueDTO> responseObserver) {
         try {
             // latest() with a page query — simplified: query by device+point, return
             // first result
@@ -78,13 +78,13 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(false)
                         .setCode(ResponseEnum.NO_RESOURCE.getCode())
-                        .setMessage(ResponseEnum.NO_RESOURCE.getText())
+                        .setMessage(ResponseEnum.NO_RESOURCE.getRemark())
                         .build());
             } else {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(true)
                         .setCode(ResponseEnum.OK.getCode())
-                        .setMessage(ResponseEnum.OK.getText())
+                        .setMessage(ResponseEnum.OK.getRemark())
                         .build());
 
                 io.github.pnoker.common.entity.bo.PointValueBO bo = page.getRecords().getFirst();
@@ -102,7 +102,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("PointValueServer.lastValue failed, tenantId={}, deviceId={}, pointId={}", request.getTenantId(),
+            log.error("PointValueServer.getLastValue failed, tenantId={}, deviceId={}, pointId={}", request.getTenantId(),
                     request.getDeviceId(), request.getPointId(), e);
             responseObserver.onNext(GrpcRPointValueDTO.newBuilder()
                     .setResult(GrpcR.newBuilder()
@@ -116,8 +116,8 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
     }
 
     @Override
-    public void historyValue(GrpcPointValueHistoryQuery request,
-                             StreamObserver<GrpcRPointValueStringList> responseObserver) {
+    public void listHistoryValues(GrpcPointValueHistoryQuery request,
+                                  StreamObserver<GrpcRPointValueStringList> responseObserver) {
         try {
             List<String> history = pointValueService.history(request.getTenantId(), request.getDeviceId(),
                     request.getPointId(), request.getCount());
@@ -126,7 +126,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .setResult(GrpcR.newBuilder()
                             .setOk(true)
                             .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getText())
+                            .setMessage(ResponseEnum.OK.getRemark())
                             .build());
 
             if (Objects.nonNull(history)) {
@@ -135,7 +135,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("PointValueServer.historyValue failed, tenantId={}, deviceId={}, pointId={}, count={}",
+            log.error("PointValueServer.listHistoryValues failed, tenantId={}, deviceId={}, pointId={}, count={}",
                     request.getTenantId(), request.getDeviceId(), request.getPointId(), request.getCount(), e);
             responseObserver.onNext(GrpcRPointValueStringList.newBuilder()
                     .setResult(GrpcR.newBuilder()
@@ -160,7 +160,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .setResult(GrpcR.newBuilder()
                             .setOk(true)
                             .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getText())
+                            .setMessage(ResponseEnum.OK.getRemark())
                             .build())
                     .setData(true)
                     .build());
@@ -193,7 +193,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .setResult(GrpcR.newBuilder()
                             .setOk(true)
                             .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getText())
+                            .setMessage(ResponseEnum.OK.getRemark())
                             .build())
                     .setData(true)
                     .build());

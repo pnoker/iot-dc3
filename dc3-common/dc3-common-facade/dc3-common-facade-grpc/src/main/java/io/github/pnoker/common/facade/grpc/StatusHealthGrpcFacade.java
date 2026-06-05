@@ -58,30 +58,30 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public Map<Long, String> selectDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {
+    public Map<Long, String> listDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {
         GrpcIdsStatusQuery request = idsQuery(tenantId, deviceIds);
-        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.selectDeviceStatusesByIds",
+        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.listDeviceStatusesByIds",
                 statusHealthApiBlockingStub, stub -> stub.deviceStatusesByIds(request));
-        return statusMap(response.getResult(), response.getDataMap(), "selectDeviceStatusesByIds");
+        return statusMap(response.getResult(), response.getDataMap(), "listDeviceStatusesByIds");
     }
 
     @Override
-    public Map<Long, String> selectDeviceStatusesByProfileId(Long tenantId, Long profileId) {
+    public Map<Long, String> listDeviceStatusesByProfileId(Long tenantId, Long profileId) {
         GrpcProfileStatusQuery request = GrpcProfileStatusQuery.newBuilder()
                 .setTenantId(Objects.requireNonNullElse(tenantId, 0L))
                 .setProfileId(Objects.requireNonNullElse(profileId, 0L))
                 .build();
-        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.selectDeviceStatusesByProfileId",
+        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.listDeviceStatusesByProfileId",
                 statusHealthApiBlockingStub, stub -> stub.deviceStatusesByProfileId(request));
-        return statusMap(response.getResult(), response.getDataMap(), "selectDeviceStatusesByProfileId");
+        return statusMap(response.getResult(), response.getDataMap(), "listDeviceStatusesByProfileId");
     }
 
     @Override
-    public Map<Long, String> selectDriverStatusesByIds(Long tenantId, Collection<Long> driverIds) {
+    public Map<Long, String> listDriverStatusesByIds(Long tenantId, Collection<Long> driverIds) {
         GrpcIdsStatusQuery request = idsQuery(tenantId, driverIds);
-        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.selectDriverStatusesByIds",
+        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.listDriverStatusesByIds",
                 statusHealthApiBlockingStub, stub -> stub.driverStatusesByIds(request));
-        return statusMap(response.getResult(), response.getDataMap(), "selectDriverStatusesByIds");
+        return statusMap(response.getResult(), response.getDataMap(), "listDriverStatusesByIds");
     }
 
     @Override

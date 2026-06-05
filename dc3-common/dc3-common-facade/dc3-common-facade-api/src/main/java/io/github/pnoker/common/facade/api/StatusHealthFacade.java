@@ -32,11 +32,11 @@ import java.util.Map;
  */
 public interface StatusHealthFacade {
 
-    Map<Long, String> selectDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds);
+    Map<Long, String> listDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds);
 
-    Map<Long, String> selectDeviceStatusesByProfileId(Long tenantId, Long profileId);
+    Map<Long, String> listDeviceStatusesByProfileId(Long tenantId, Long profileId);
 
-    Map<Long, String> selectDriverStatusesByIds(Long tenantId, Collection<Long> driverIds);
+    Map<Long, String> listDriverStatusesByIds(Long tenantId, Collection<Long> driverIds);
 
     FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId);
 
