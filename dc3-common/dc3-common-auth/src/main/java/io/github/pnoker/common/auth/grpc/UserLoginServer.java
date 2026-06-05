@@ -58,11 +58,11 @@ public class UserLoginServer extends UserLoginApiGrpc.UserLoginApiImplBase {
             if (Objects.isNull(entityBO)) {
                 rBuilder.setOk(false);
                 rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
             } else {
                 rBuilder.setOk(true);
                 rBuilder.setCode(ResponseEnum.OK.getCode());
-                rBuilder.setMessage(ResponseEnum.OK.getText());
+                rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
                 builder.setData(grpcUserLoginBuilder.buildGrpcDTOByBO(entityBO));
             }
@@ -70,7 +70,7 @@ public class UserLoginServer extends UserLoginApiGrpc.UserLoginApiImplBase {
             log.warn("getByName failed", e);
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(ResponseEnum.FAILURE.getText());
+            rBuilder.setMessage(ResponseEnum.FAILURE.getRemark());
         }
 
         builder.setResult(rBuilder);

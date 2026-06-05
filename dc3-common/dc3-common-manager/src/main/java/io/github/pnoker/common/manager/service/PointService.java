@@ -60,7 +60,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @param profileIds ID
      * @return Point
      */
-    List<PointBO> selectByProfileIds(List<Long> profileIds);
+    List<PointBO> listByProfileIds(List<Long> profileIds);
 
     /**
      * Device ID

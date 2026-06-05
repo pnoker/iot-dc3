@@ -38,17 +38,17 @@ public enum RwFlagEnum {
     /**
      * Read only
      */
-    R((byte) 0, "r", "Read only"),
+    READ_ONLY((byte) 0, "r", "Read only"),
 
     /**
      * Write only
      */
-    W((byte) 1, "w", "Write only"),
+    WRITE_ONLY((byte) 1, "w", "Write only"),
 
     /**
      * Read and Write
      */
-    RW((byte) 2, "rw", "Read and Write"),
+    READ_WRITE((byte) 2, "rw", "Read and Write"),
     ;
 
     /**

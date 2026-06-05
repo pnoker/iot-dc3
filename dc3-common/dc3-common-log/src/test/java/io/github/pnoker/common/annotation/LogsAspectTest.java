@@ -78,7 +78,7 @@ class LogsAspectTest {
         Logs logs = annotatedMethod("defaultOperation").getAnnotation(Logs.class);
 
         assertThat(logs.value()).isEqualTo("sync-resource");
-        assertThat(logs.type()).isEqualTo(LogsType.INFO);
+        assertThat(logs.type()).isEqualTo(LogsTypeEnum.INFO);
         assertThat(logs.tag()).isEmpty();
         assertThat(logs.save()).isFalse();
         assertThat(Logs.class.getAnnotation(Retention.class).value())
@@ -91,11 +91,11 @@ class LogsAspectTest {
         Logs logs = annotatedMethod("warningOperation").getAnnotation(Logs.class);
 
         assertThat(logs.value()).isEqualTo("warn-resource");
-        assertThat(logs.type()).isEqualTo(LogsType.WARN);
+        assertThat(logs.type()).isEqualTo(LogsTypeEnum.WARN);
         assertThat(logs.tag()).isEqualTo("resource");
         assertThat(logs.save()).isTrue();
-        assertThat(LogsType.values())
-                .containsExactly(LogsType.INFO, LogsType.WARN, LogsType.DEBUG, LogsType.ERROR);
+        assertThat(LogsTypeEnum.values())
+                .containsExactly(LogsTypeEnum.INFO, LogsTypeEnum.WARN, LogsTypeEnum.DEBUG, LogsTypeEnum.ERROR);
     }
 
     private static final class AnnotatedOperations {
@@ -104,7 +104,7 @@ class LogsAspectTest {
         void defaultOperation() {
         }
 
-        @Logs(value = "warn-resource", type = LogsType.WARN, tag = "resource", save = true)
+        @Logs(value = "warn-resource", type = LogsTypeEnum.WARN, tag = "resource", save = true)
         void warningOperation() {
         }
 

@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.cache.PointValueLocalCacheService;
+import io.github.pnoker.common.data.cache.PointValueLocalCache;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
@@ -66,7 +66,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     private final DeviceFacade deviceFacade;
 
-    private final PointValueLocalCacheService pointValueLocalCacheService;
+    private final PointValueLocalCache pointValueLocalCacheService;
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 

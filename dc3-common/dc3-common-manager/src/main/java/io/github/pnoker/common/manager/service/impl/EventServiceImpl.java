@@ -205,7 +205,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventBO> selectByProfileIds(List<Long> profileIds) {
+    public List<EventBO> listByProfileIds(List<Long> profileIds) {
         if (CollectionUtils.isEmpty(profileIds)) {
             return Collections.emptyList();
         }
@@ -313,7 +313,7 @@ public class EventServiceImpl implements EventService {
         if (Objects.isNull(deviceId)) {
             return Collections.emptySet();
         }
-        DriverBO driverBO = driverService.listByDeviceId(deviceId, null);
+        DriverBO driverBO = driverService.getByDeviceId(deviceId, null);
         if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
             return Collections.emptySet();
         }

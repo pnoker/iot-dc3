@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
@@ -50,7 +50,7 @@ public final class WindowSpecParser {
         if (Objects.isNull(window) || StringUtils.isBlank(window.getMode())) {
             return WindowSpec.last();
         }
-        WindowMode mode = WindowMode.ofCode(window.getMode());
+        WindowModeEnum mode = WindowModeEnum.ofCode(window.getMode());
         if (Objects.isNull(mode)) {
             return WindowSpec.invalid("Unknown window mode '" + window.getMode() + "'");
         }
@@ -67,11 +67,11 @@ public final class WindowSpecParser {
         if (mode.requiresDuration() && (duration.isZero() || duration.isNegative())) {
             return WindowSpec.invalid("Window duration must be positive for mode " + mode);
         }
-        return WindowSpec.ok(mode, mode == WindowMode.LAST ? null : duration,
+        return WindowSpec.ok(mode, mode == WindowModeEnum.LAST ? null : duration,
                 normalizedMinSamples(window, mode));
     }
 
-    private static int normalizedMinSamples(RuleExt.Window window, WindowMode mode) {
+    private static int normalizedMinSamples(RuleExt.Window window, WindowModeEnum mode) {
         Integer raw = window.getMinSamples();
         if (Objects.isNull(raw) || raw < 0) {
             // Default: LAST always needs the current sample (=1); aggregating
@@ -79,7 +79,7 @@ public final class WindowSpecParser {
             // should set minSamples explicitly.
             return 1;
         }
-        if (mode == WindowMode.LAST && raw < 1) {
+        if (mode == WindowModeEnum.LAST && raw < 1) {
             return 1;
         }
         return raw;

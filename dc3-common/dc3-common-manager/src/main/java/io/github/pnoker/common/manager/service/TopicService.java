@@ -35,6 +35,6 @@ import io.github.pnoker.common.manager.entity.vo.TopicVO;
 
 public interface TopicService extends IService<DeviceDO> {
 
-    Page<TopicVO> query(TopicQuery topicQuery);
+    Page<TopicVO> list(TopicQuery topicQuery);
 
 }

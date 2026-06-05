@@ -75,10 +75,10 @@ class RuleStateLookupTest {
         assertThat(lookup.hasFiringState(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isFalse();
     }
 
-    // ---------- findFiringAlarmId ----------
+    // ---------- getFiringAlarmId ----------
 
     @Test
-    void findFiringAlarmIdReturnsAlarmIdWhenFound() {
+    void getFiringAlarmIdReturnsAlarmIdWhenFound() {
         RuleStateDO state = new RuleStateDO();
         state.setId(99L);
         state.setAlarmId(100L);
@@ -90,7 +90,7 @@ class RuleStateLookupTest {
         when(chainWrapper.last(anyString())).thenReturn(chainWrapper);
         when(chainWrapper.one()).thenReturn(state);
 
-        assertThat(lookup.findFiringAlarmId(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isEqualTo(100L);
+        assertThat(lookup.getFiringAlarmId(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isEqualTo(100L);
 
         verify(chainWrapper).gt(any(), eq(0L));
         verify(chainWrapper).orderByDesc((com.baomidou.mybatisplus.core.toolkit.support.SFunction<RuleStateDO, ?>) any());
@@ -98,7 +98,7 @@ class RuleStateLookupTest {
     }
 
     @Test
-    void findFiringAlarmIdReturnsNullWhenNotFound() {
+    void getFiringAlarmIdReturnsNullWhenNotFound() {
         when(ruleStateManager.lambdaQuery()).thenReturn(chainWrapper);
         when(chainWrapper.eq(any(), any())).thenReturn(chainWrapper);
         when(chainWrapper.gt(any(), any())).thenReturn(chainWrapper);
@@ -106,11 +106,11 @@ class RuleStateLookupTest {
         when(chainWrapper.last(anyString())).thenReturn(chainWrapper);
         when(chainWrapper.one()).thenReturn(null);
 
-        assertThat(lookup.findFiringAlarmId(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isNull();
+        assertThat(lookup.getFiringAlarmId(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isNull();
     }
 
     @Test
-    void findFiringAlarmIdReturnsNullWhenStateHasNullAlarmId() {
+    void getFiringAlarmIdReturnsNullWhenStateHasNullAlarmId() {
         RuleStateDO state = new RuleStateDO();
         state.setId(99L);
         state.setAlarmId(null);
@@ -122,6 +122,6 @@ class RuleStateLookupTest {
         when(chainWrapper.last(anyString())).thenReturn(chainWrapper);
         when(chainWrapper.one()).thenReturn(state);
 
-        assertThat(lookup.findFiringAlarmId(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isNull();
+        assertThat(lookup.getFiringAlarmId(TENANT_ID, RULE_ID, TARGET_TYPE, ENTITY_ID)).isNull();
     }
 }

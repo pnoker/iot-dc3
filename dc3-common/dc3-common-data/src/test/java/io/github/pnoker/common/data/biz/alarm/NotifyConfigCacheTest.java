@@ -86,8 +86,8 @@ class NotifyConfigCacheTest {
         when(notifyManager.getById(1L)).thenReturn(entity);
         when(notifyBuilder.buildBOByDO(entity)).thenReturn(bo);
 
-        NotifyBO first = cache.findNotify(1L);
-        NotifyBO second = cache.findNotify(1L);
+        NotifyBO first = cache.getNotify(1L);
+        NotifyBO second = cache.getNotify(1L);
 
         assertThat(first).isSameAs(bo);
         assertThat(second).isSameAs(bo);
@@ -100,9 +100,9 @@ class NotifyConfigCacheTest {
         when(notifyManager.getById(1L)).thenReturn(entity);
         when(notifyBuilder.buildBOByDO(any())).thenReturn(new NotifyBO());
 
-        cache.findNotify(1L);
+        cache.getNotify(1L);
         cache.invalidateNotify(1L);
-        cache.findNotify(1L);
+        cache.getNotify(1L);
 
         verify(notifyManager, times(2)).getById(1L);
     }
@@ -113,14 +113,14 @@ class NotifyConfigCacheTest {
         when(messageManager.getById(2L)).thenReturn(entity);
         when(messageBuilder.buildBOByDO(any())).thenReturn(new MessageBO());
 
-        cache.findMessage(2L);
-        cache.findMessage(2L);
+        cache.getMessage(2L);
+        cache.getMessage(2L);
 
         verify(messageManager, times(1)).getById(2L);
     }
 
     @Test
-    void findChannelEnforcesTenantScopeAtCallSite() {
+    void getChannelEnforcesTenantScopeAtCallSite() {
         NotifyChannelDO entity = new NotifyChannelDO();
         entity.setTenantId(7L);
         entity.setChannelTypeFlag((byte) 0);
@@ -131,18 +131,18 @@ class NotifyConfigCacheTest {
         when(notifyChannelBuilder.buildBOByDO(entity)).thenReturn(bo);
 
         // Same tenant id → return; different tenant id → null even on cache hit.
-        assertThat(cache.findChannel(3L, 7L)).isSameAs(bo);
-        assertThat(cache.findChannel(3L, 9L)).isNull();
+        assertThat(cache.getChannel(3L, 7L)).isSameAs(bo);
+        assertThat(cache.getChannel(3L, 9L)).isNull();
     }
 
     @Test
-    void findChannelReturnsNullForMissingChannelTypeFlag() {
+    void getChannelReturnsNullForMissingChannelTypeFlag() {
         NotifyChannelDO entity = new NotifyChannelDO();
         entity.setTenantId(7L);
         // channelTypeFlag intentionally null
         when(notifyChannelManager.getById(3L)).thenReturn(entity);
 
-        assertThat(cache.findChannel(3L, 7L)).isNull();
+        assertThat(cache.getChannel(3L, 7L)).isNull();
     }
 
     @Test
@@ -152,11 +152,11 @@ class NotifyConfigCacheTest {
         when(messageManager.getById(2L)).thenReturn(new MessageDO());
         when(messageBuilder.buildBOByDO(any())).thenReturn(new MessageBO());
 
-        cache.findNotify(1L);
-        cache.findMessage(2L);
+        cache.getNotify(1L);
+        cache.getMessage(2L);
         cache.invalidateAll();
-        cache.findNotify(1L);
-        cache.findMessage(2L);
+        cache.getNotify(1L);
+        cache.getMessage(2L);
 
         verify(notifyManager, times(2)).getById(1L);
         verify(messageManager, times(2)).getById(2L);
@@ -167,12 +167,12 @@ class NotifyConfigCacheTest {
         // Default ids never query; this prevents hot rules with default-zero
         // notify/message/channel ids from continually polling the database for
         // a row that doesn't exist.
-        cache.findNotify(0L);
-        cache.findNotify(null);
-        cache.findMessage(0L);
-        cache.findMessage(null);
-        cache.findChannel(0L, 7L);
-        cache.findChannel(null, 7L);
+        cache.getNotify(0L);
+        cache.getNotify(null);
+        cache.getMessage(0L);
+        cache.getMessage(null);
+        cache.getChannel(0L, 7L);
+        cache.getChannel(null, 7L);
 
         verifyNoInteractions(notifyManager, messageManager, notifyChannelManager);
     }

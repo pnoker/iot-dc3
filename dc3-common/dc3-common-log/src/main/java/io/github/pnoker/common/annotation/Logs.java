@@ -49,9 +49,9 @@ public @interface Logs {
     /**
      * The type/level of the log entry
      *
-     * @return The LogsType enum value
+     * @return The LogsTypeEnum enum value
      */
-    LogsType type() default LogsType.INFO;
+    LogsTypeEnum type() default LogsTypeEnum.INFO;
 
     /**
      * Custom tag for categorizing or filtering logs

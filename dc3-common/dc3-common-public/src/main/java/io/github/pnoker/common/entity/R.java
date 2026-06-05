@@ -54,7 +54,7 @@ public class R<T> implements Serializable {
     /**
      * Response message
      */
-    private String message = ResponseEnum.OK.getText();
+    private String message = ResponseEnum.OK.getRemark();
 
     /**
      * Response data payload
@@ -106,7 +106,7 @@ public class R<T> implements Serializable {
      * @return Response with success status and custom code/message
      */
     public static <T> R<T> ok(ResponseEnum code) {
-        return new R<T>().success(code.getCode(), code.getText());
+        return new R<T>().success(code.getCode(), code.getRemark());
     }
 
     /**
@@ -173,7 +173,7 @@ public class R<T> implements Serializable {
      * @return Response
      */
     public static <T> R<T> fail(ResponseEnum code) {
-        return new R<T>().failure(code.getCode(), code.getText());
+        return new R<T>().failure(code.getCode(), code.getRemark());
     }
 
     /**
@@ -219,7 +219,7 @@ public class R<T> implements Serializable {
     private R<T> success() {
         this.ok = true;
         this.code = ResponseEnum.OK.getCode();
-        this.message = ResponseEnum.OK.getText();
+        this.message = ResponseEnum.OK.getRemark();
         return this;
     }
 
@@ -258,7 +258,7 @@ public class R<T> implements Serializable {
     private R<T> failure() {
         this.ok = false;
         this.code = ResponseEnum.FAILURE.getCode();
-        this.message = ResponseEnum.FAILURE.getText();
+        this.message = ResponseEnum.FAILURE.getRemark();
         return this;
     }
 

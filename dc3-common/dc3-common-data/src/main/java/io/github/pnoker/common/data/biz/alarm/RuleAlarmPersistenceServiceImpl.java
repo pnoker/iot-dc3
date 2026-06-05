@@ -62,7 +62,7 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
             return;
         }
 
-        Long firingAlarmId = findFiringAlarmId(match);
+        Long firingAlarmId = getFiringAlarmId(match);
         if (isValidId(firingAlarmId)) {
             fact.setAlarmId(firingAlarmId);
             return;
@@ -159,13 +159,13 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
         return ext;
     }
 
-    private Long findFiringAlarmId(RuleMatch match) {
+    private Long getFiringAlarmId(RuleMatch match) {
         RuleFact fact = match.getFact();
         if (!isValidId(match.getRule().getId()) || !isValidId(fact.getTenantId())
                 || Objects.isNull(fact.getAlarmTargetTypeFlag()) || !isValidId(fact.getEntityId())) {
             return null;
         }
-        return ruleStateLookup.findFiringAlarmId(
+        return ruleStateLookup.getFiringAlarmId(
                 fact.getTenantId(),
                 match.getRule().getId(),
                 fact.getAlarmTargetTypeFlag().getIndex(),

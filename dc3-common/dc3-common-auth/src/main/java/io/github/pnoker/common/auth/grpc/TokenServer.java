@@ -57,15 +57,15 @@ public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
             if (Objects.isNull(entity)) {
                 rBuilder.setOk(false);
                 rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
             } else if (!entity.isValid()) {
                 rBuilder.setOk(false);
                 rBuilder.setCode(ResponseEnum.TOKEN_INVALID.getCode());
-                rBuilder.setMessage(ResponseEnum.TOKEN_INVALID.getText());
+                rBuilder.setMessage(ResponseEnum.TOKEN_INVALID.getRemark());
             } else {
                 rBuilder.setOk(true);
                 rBuilder.setCode(ResponseEnum.OK.getCode());
-                rBuilder.setMessage(ResponseEnum.OK.getText());
+                rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
                 builder.setData(TimeUtil.completeFormat(entity.getExpireTime()));
             }
@@ -73,7 +73,7 @@ public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
             log.warn("checkValid failed", e);
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(ResponseEnum.FAILURE.getText());
+            rBuilder.setMessage(ResponseEnum.FAILURE.getRemark());
         }
 
         builder.setResult(rBuilder);

@@ -47,7 +47,7 @@ import java.util.Objects;
 public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implements TopicService {
 
     @Override
-    public Page<TopicVO> query(TopicQuery topicQuery) {
+    public Page<TopicVO> list(TopicQuery topicQuery) {
         if (Objects.isNull(topicQuery.getPage())) {
             topicQuery.setPage(new Pages());
         }

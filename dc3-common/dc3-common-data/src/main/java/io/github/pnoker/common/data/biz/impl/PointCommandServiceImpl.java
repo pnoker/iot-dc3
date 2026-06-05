@@ -231,7 +231,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     private void validateWriteScope(Long tenantId, Long deviceId, Long pointId) {
         validateCommandScope(tenantId, deviceId, pointId);
         FacadePointBO point = pointFacade.getById(tenantId, pointId);
-        if (!RwFlagEnum.W.equals(point.getRwFlag()) && !RwFlagEnum.RW.equals(point.getRwFlag())) {
+        if (!RwFlagEnum.WRITE_ONLY.equals(point.getRwFlag()) && !RwFlagEnum.READ_WRITE.equals(point.getRwFlag())) {
             throw new ServiceException("Point is not writable");
         }
     }

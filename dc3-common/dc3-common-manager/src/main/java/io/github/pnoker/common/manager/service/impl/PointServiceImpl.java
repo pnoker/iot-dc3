@@ -208,7 +208,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<PointBO> selectByProfileIds(List<Long> profileIds) {
+    public List<PointBO> listByProfileIds(List<Long> profileIds) {
         if (CollectionUtils.isEmpty(profileIds)) {
             return Collections.emptyList();
         }
@@ -415,7 +415,7 @@ public class PointServiceImpl implements PointService {
             return Collections.emptySet();
         }
 
-        DriverBO driverBO = driverService.listByDeviceId(deviceId, null);
+        DriverBO driverBO = driverService.getByDeviceId(deviceId, null);
         if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
             return Collections.emptySet();
         }

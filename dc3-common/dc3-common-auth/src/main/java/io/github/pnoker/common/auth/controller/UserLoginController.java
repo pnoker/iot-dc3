@@ -205,7 +205,7 @@ public class UserLoginController implements BaseController {
     @GetMapping("/check")
     public Mono<R<Boolean>> checkLoginNameValid(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            boolean available = userLoginService.checkLoginNameAvailable(name, tenantId);
+            boolean available = userLoginService.isLoginNameAvailable(name, tenantId);
             return R.ok(available);
         }));
     }

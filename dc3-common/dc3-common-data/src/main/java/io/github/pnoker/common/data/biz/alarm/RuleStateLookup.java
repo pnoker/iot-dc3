@@ -63,7 +63,7 @@ public class RuleStateLookup {
      * when none exists. Used by the alarm pipeline to reuse an existing firing
      * alarm id on a follow-up evaluation rather than creating a duplicate row.
      */
-    public Long findFiringAlarmId(long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId) {
+    public Long getFiringAlarmId(long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId) {
         RuleStateDO state = ruleStateManager.lambdaQuery()
                 .eq(RuleStateDO::getTenantId, tenantId)
                 .eq(RuleStateDO::getRuleId, ruleId)

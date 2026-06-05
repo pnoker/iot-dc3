@@ -69,7 +69,7 @@ public class RuleServiceImpl implements RuleService {
 
     @Override
     public void add(RuleBO entityBO) {
-        validateWindowMode(entityBO);
+        validateWindowModeEnum(entityBO);
         checkDuplicate(entityBO, false, true);
 
         RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
@@ -99,7 +99,7 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public void update(RuleBO entityBO) {
         getDOById(entityBO.getId(), true);
-        validateWindowMode(entityBO);
+        validateWindowModeEnum(entityBO);
 
         checkDuplicate(entityBO, true, true);
 
@@ -177,7 +177,7 @@ public class RuleServiceImpl implements RuleService {
      * aggregation modes, and malformed ISO-8601 duration strings — the same
      * rules the runtime evaluator will apply later.
      */
-    private void validateWindowMode(RuleBO entityBO) {
+    private void validateWindowModeEnum(RuleBO entityBO) {
         if (Objects.isNull(entityBO) || Objects.isNull(entityBO.getRuleExt())
                 || Objects.isNull(entityBO.getRuleExt().getContent())) {
             return;

@@ -45,7 +45,7 @@ public interface UserLoginService extends BaseService<UserLoginBO, UserLoginQuer
      * @param loginName Name
      * @return Boolean
      */
-    boolean checkLoginNameValid(String loginName);
+    boolean isLoginNameValid(String loginName);
 
     /**
      * Check whether the login name is available (not yet taken) within
@@ -55,6 +55,6 @@ public interface UserLoginService extends BaseService<UserLoginBO, UserLoginQuer
      * @param tenantId  tenant scope
      * @return {@code true} if the name is not yet used in this tenant
      */
-    boolean checkLoginNameAvailable(String loginName, Long tenantId);
+    boolean isLoginNameAvailable(String loginName, Long tenantId);
 
 }

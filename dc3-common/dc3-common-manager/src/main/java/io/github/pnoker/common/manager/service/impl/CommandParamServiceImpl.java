@@ -264,7 +264,7 @@ public class CommandParamServiceImpl implements CommandParamService {
         if (Objects.isNull(deviceId)) {
             return Collections.emptySet();
         }
-        DriverBO driverBO = driverService.listByDeviceId(deviceId, null);
+        DriverBO driverBO = driverService.getByDeviceId(deviceId, null);
         if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {
             return Collections.emptySet();
         }

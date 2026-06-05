@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -69,45 +69,45 @@ class WindowedRuleEvaluatorTest {
         return new RuleFact(7L, AlarmTargetTypeFlagEnum.POINT, 11L, null, LocalDateTime.now(), Map.of());
     }
 
-    private static WindowSpec spec(WindowMode mode, int minSamples) {
+    private static WindowSpec spec(WindowModeEnum mode, int minSamples) {
         return WindowSpec.ok(mode, Duration.ofMinutes(3), minSamples);
     }
 
     @Test
     void avgFiresWhenAggregateAboveThreshold() {
-        when(windowDataSource.aggregate(any(), any(), eq(WindowMode.AVG)))
+        when(windowDataSource.aggregate(any(), any(), eq(WindowModeEnum.AVG)))
                 .thenReturn(new WindowDataSource.AggregateOutcome(BigDecimal.valueOf(85), 5));
 
-        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowMode.AVG, 3));
+        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowModeEnum.AVG, 3));
         assertThat(fired).isTrue();
     }
 
     @Test
     void avgDoesNotFireBelowThreshold() {
-        when(windowDataSource.aggregate(any(), any(), eq(WindowMode.AVG)))
+        when(windowDataSource.aggregate(any(), any(), eq(WindowModeEnum.AVG)))
                 .thenReturn(new WindowDataSource.AggregateOutcome(BigDecimal.valueOf(72), 5));
 
-        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowMode.AVG, 3));
+        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowModeEnum.AVG, 3));
         assertThat(fired).isFalse();
     }
 
     @Test
     void respectsMinSamplesGate() {
-        when(windowDataSource.aggregate(any(), any(), eq(WindowMode.AVG)))
+        when(windowDataSource.aggregate(any(), any(), eq(WindowModeEnum.AVG)))
                 .thenReturn(new WindowDataSource.AggregateOutcome(BigDecimal.valueOf(85), 2));
 
         // 2 samples in the window but minSamples=5 → don't fire even though
         // the aggregate would otherwise satisfy the threshold.
-        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowMode.AVG, 5));
+        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowModeEnum.AVG, 5));
         assertThat(fired).isFalse();
     }
 
     @Test
     void countModeUsesSampleCountAsValue() {
-        when(windowDataSource.aggregate(any(), any(), eq(WindowMode.COUNT)))
+        when(windowDataSource.aggregate(any(), any(), eq(WindowModeEnum.COUNT)))
                 .thenReturn(new WindowDataSource.AggregateOutcome(BigDecimal.valueOf(7), 7));
 
-        boolean fired = evaluator.matches(rule(">=", BigDecimal.valueOf(5), null), fact(), spec(WindowMode.COUNT, 1));
+        boolean fired = evaluator.matches(rule(">=", BigDecimal.valueOf(5), null), fact(), spec(WindowModeEnum.COUNT, 1));
         assertThat(fired).isTrue();
     }
 
@@ -119,7 +119,7 @@ class WindowedRuleEvaluatorTest {
                 new WindowSample(90.0, "90", LocalDateTime.now()));
         when(windowDataSource.samples(any(), any())).thenReturn(samples);
 
-        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowMode.ALL, 3));
+        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowModeEnum.ALL, 3));
         assertThat(fired).isTrue();
     }
 
@@ -131,7 +131,7 @@ class WindowedRuleEvaluatorTest {
                 new WindowSample(90.0, "90", LocalDateTime.now()));
         when(windowDataSource.samples(any(), any())).thenReturn(samples);
 
-        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowMode.ALL, 3));
+        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowModeEnum.ALL, 3));
         assertThat(fired).isFalse();
     }
 
@@ -143,7 +143,7 @@ class WindowedRuleEvaluatorTest {
                 new WindowSample(85.0, "85", LocalDateTime.now()));
         when(windowDataSource.samples(any(), any())).thenReturn(samples);
 
-        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowMode.ANY, 1));
+        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowModeEnum.ANY, 1));
         assertThat(fired).isTrue();
     }
 
@@ -154,7 +154,7 @@ class WindowedRuleEvaluatorTest {
                 new WindowSample(75.0, "75", LocalDateTime.now()));
         when(windowDataSource.samples(any(), any())).thenReturn(samples);
 
-        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowMode.ANY, 1));
+        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowModeEnum.ANY, 1));
         assertThat(fired).isFalse();
     }
 
@@ -165,18 +165,18 @@ class WindowedRuleEvaluatorTest {
         when(windowDataSource.samples(any(), any())).thenReturn(List.of(
                 new WindowSample(85.0, "85", LocalDateTime.now())));
 
-        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowMode.ALL, 3));
+        boolean fired = evaluator.matches(rule(">", BigDecimal.valueOf(80), null), fact(), spec(WindowModeEnum.ALL, 3));
         assertThat(fired).isFalse();
     }
 
     @Test
     void recoveryUsesSynthesizedConditionAndWindow() {
-        when(windowDataSource.aggregate(any(), any(), eq(WindowMode.AVG)))
+        when(windowDataSource.aggregate(any(), any(), eq(WindowModeEnum.AVG)))
                 .thenReturn(new WindowDataSource.AggregateOutcome(BigDecimal.valueOf(70), 5));
         RuleExt.Recovery recovery = new RuleExt.Recovery(true, "<=", BigDecimal.valueOf(75), "PT2M");
 
         boolean recovered = evaluator.recovers(
-                rule(">", BigDecimal.valueOf(80), recovery), fact(), spec(WindowMode.AVG, 3));
+                rule(">", BigDecimal.valueOf(80), recovery), fact(), spec(WindowModeEnum.AVG, 3));
         assertThat(recovered).isTrue();
     }
 
@@ -184,7 +184,7 @@ class WindowedRuleEvaluatorTest {
     void recoveryNoOpsWhenRecoveryDisabled() {
         RuleExt.Recovery disabled = new RuleExt.Recovery(false, "<=", BigDecimal.valueOf(75), "PT2M");
         boolean recovered = evaluator.recovers(
-                rule(">", BigDecimal.valueOf(80), disabled), fact(), spec(WindowMode.AVG, 3));
+                rule(">", BigDecimal.valueOf(80), disabled), fact(), spec(WindowModeEnum.AVG, 3));
         assertThat(recovered).isFalse();
     }
 

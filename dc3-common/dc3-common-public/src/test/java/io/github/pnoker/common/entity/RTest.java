@@ -29,7 +29,7 @@ class RTest {
         R<String> response = R.ok();
         assertThat(response.isOk()).isTrue();
         assertThat(response.getCode()).isEqualTo(ResponseEnum.OK.getCode());
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getText());
+        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getRemark());
         assertThat(response.getData()).isNull();
     }
 
@@ -46,7 +46,7 @@ class RTest {
         R<String> response = R.ok(ResponseEnum.OK);
         assertThat(response.isOk()).isTrue();
         assertThat(response.getCode()).isEqualTo(ResponseEnum.OK.getCode());
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getText());
+        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getRemark());
     }
 
     @Test
@@ -64,7 +64,7 @@ class RTest {
         R<Integer> response = R.ok(123);
         assertThat(response.getData()).isEqualTo(123);
         assertThat(response.isOk()).isTrue();
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getText());
+        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getRemark());
     }
 
     @Test
@@ -79,7 +79,7 @@ class RTest {
         R<String> response = R.fail();
         assertThat(response.isOk()).isFalse();
         assertThat(response.getCode()).isEqualTo(ResponseEnum.FAILURE.getCode());
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.FAILURE.getText());
+        assertThat(response.getMessage()).isEqualTo(ResponseEnum.FAILURE.getRemark());
     }
 
     @Test
@@ -95,7 +95,7 @@ class RTest {
         R<String> response = R.fail(ResponseEnum.TOKEN_INVALID);
         assertThat(response.isOk()).isFalse();
         assertThat(response.getCode()).isEqualTo(ResponseEnum.TOKEN_INVALID.getCode());
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.TOKEN_INVALID.getText());
+        assertThat(response.getMessage()).isEqualTo(ResponseEnum.TOKEN_INVALID.getRemark());
     }
 
     @Test
@@ -111,7 +111,7 @@ class RTest {
         R<Integer> response = R.fail(456);
         assertThat(response.getData()).isEqualTo(456);
         assertThat(response.isOk()).isFalse();
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.FAILURE.getText());
+        assertThat(response.getMessage()).isEqualTo(ResponseEnum.FAILURE.getRemark());
     }
 
     @Test

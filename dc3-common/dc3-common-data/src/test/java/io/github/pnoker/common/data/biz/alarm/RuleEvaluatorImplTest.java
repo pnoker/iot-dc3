@@ -73,7 +73,7 @@ class RuleEvaluatorImplTest {
     }
 
     @Test
-    void treatsNullWindowModeAsLast() {
+    void treatsNullWindowModeEnumAsLast() {
         RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
         rule.getRuleExt().getContent().setWindow(new RuleExt.Window(null, null, null));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));

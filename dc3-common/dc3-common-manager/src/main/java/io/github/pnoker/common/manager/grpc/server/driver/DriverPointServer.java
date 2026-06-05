@@ -79,11 +79,11 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             GrpcPagePointDTO.Builder pageBuilder = GrpcPagePointDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -119,11 +119,11 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
                 || !driverHasPoint(driverBO, entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
         }
@@ -146,7 +146,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
             return page;
         }
 
-        List<PointBO> points = pointService.selectByProfileIds(profileIds.stream().toList())
+        List<PointBO> points = pointService.listByProfileIds(profileIds.stream().toList())
                 .stream()
                 .filter(point -> Objects.equals(driverBO.getTenantId(), point.getTenantId()))
                 .filter(point -> request.getPointId() <= 0 || Objects.equals(point.getId(), request.getPointId()))

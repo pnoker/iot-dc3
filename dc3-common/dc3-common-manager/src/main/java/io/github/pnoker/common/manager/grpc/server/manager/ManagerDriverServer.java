@@ -72,11 +72,11 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -105,15 +105,15 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DriverBO entityDO = driverService.listByDeviceId(request.getDeviceId(), null);
+        DriverBO entityDO = driverService.getByDeviceId(request.getDeviceId(), null);
         if (Objects.isNull(entityDO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
         }
@@ -132,11 +132,11 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             List<GrpcDriverDTO> entityGrpcDTOList = entityBOList.stream()
                     .map(grpcDriverBuilder::buildGrpcDTOByBO)
@@ -164,11 +164,11 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         if (Objects.isNull(driverBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
         }

@@ -90,7 +90,7 @@ class PointCommandServiceImplTest {
         point = new FacadePointBO();
         point.setProfileId(5L);
         point.setEnableFlag(EnableFlagEnum.ENABLE);
-        point.setRwFlag(RwFlagEnum.RW);
+        point.setRwFlag(RwFlagEnum.READ_WRITE);
         driver = new FacadeDriverBO();
         driver.setId(30L);
         driver.setServiceName("dc3-driver-modbus-tcp");
@@ -264,7 +264,7 @@ class PointCommandServiceImplTest {
         FacadePointBO readOnlyPoint = new FacadePointBO();
         readOnlyPoint.setProfileId(5L);
         readOnlyPoint.setEnableFlag(EnableFlagEnum.ENABLE);
-        readOnlyPoint.setRwFlag(RwFlagEnum.R);
+        readOnlyPoint.setRwFlag(RwFlagEnum.READ_ONLY);
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(readOnlyPoint);
 

@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.biz.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.cache.PointValueLocalCacheService;
+import io.github.pnoker.common.data.cache.PointValueLocalCache;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
@@ -64,7 +64,7 @@ class PointValueServiceImplTest {
     private DeviceFacade deviceFacade;
 
     @Mock
-    private PointValueLocalCacheService pointValueLocalCacheService;
+    private PointValueLocalCache pointValueLocalCacheService;
 
     @Mock
     private RepositoryService repositoryService;
