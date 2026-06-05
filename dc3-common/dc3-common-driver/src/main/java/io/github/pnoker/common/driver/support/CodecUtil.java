@@ -58,7 +58,7 @@ public class CodecUtil {
      */
     public static String base64Decode(String content) {
         byte[] bytes = DecodeUtil.stringToByte(content);
-        return new String(Base64.getDecoder().decode(bytes));
+        return new String(Base64.getDecoder().decode(bytes), StandardCharsets.UTF_8);
     }
 
     /**

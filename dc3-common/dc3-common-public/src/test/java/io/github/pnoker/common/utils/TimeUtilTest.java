@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.utils;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -29,11 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TimeUtilTest {
-
-    @AfterEach
-    void clearThreadLocal() {
-        TimeUtil.clean();
-    }
 
     @Test
     void milliSecondsExposesEpoch() {
@@ -82,15 +76,6 @@ class TimeUtilTest {
     @Test
     void completeDateReturnsNullForUnparsableInput() {
         assertThat(TimeUtil.completeDate("garbage")).isNull();
-    }
-
-    @Test
-    void cleanRemovesThreadLocalState() {
-        TimeUtil.defaultFormat(new Date());
-        TimeUtil.completeFormat(new Date());
-        TimeUtil.clean();
-        // After clean, formatters are recreated lazily; calling format again must succeed.
-        assertThat(TimeUtil.defaultFormat(new Date())).isNotBlank();
     }
 
     @Test

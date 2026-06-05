@@ -21,8 +21,9 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -37,13 +38,13 @@ import java.util.Date;
 public class TimeUtil {
 
     /**
-     * ThreadLocal SimpleDateFormat to ensure thread safety
+     * Thread-safe date-time formatters (DateTimeFormatter is immutable and thread-safe by design).
      */
-    private static final ThreadLocal<SimpleDateFormat> DEFAULT_DATE_FORMAT_THREAD_LOCAL = ThreadLocal
-            .withInitial(() -> new SimpleDateFormat(TimeConstant.DEFAULT_DATE_FORMAT));
+    private static final DateTimeFormatter DEFAULT_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern(TimeConstant.DEFAULT_DATE_FORMAT);
 
-    private static final ThreadLocal<SimpleDateFormat> COMPLETE_DATE_FORMAT_THREAD_LOCAL = ThreadLocal
-            .withInitial(() -> new SimpleDateFormat(TimeConstant.COMPLETE_DATE_FORMAT));
+    private static final DateTimeFormatter COMPLETE_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern(TimeConstant.COMPLETE_DATE_FORMAT);
 
     private TimeUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
@@ -90,7 +91,7 @@ public class TimeUtil {
      * @return Formatted date string
      */
     public static String defaultFormat(Date date) {
-        return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().format(date);
+        return date.toInstant().atZone(TimeConstant.DEFAULT_ZONEID).toLocalDateTime().format(DEFAULT_DATE_FORMATTER);
     }
 
     /**
@@ -100,7 +101,7 @@ public class TimeUtil {
      * @return Formatted date string with milliseconds
      */
     public static String completeFormat(Date date) {
-        return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().format(date);
+        return date.toInstant().atZone(TimeConstant.DEFAULT_ZONEID).toLocalDateTime().format(COMPLETE_DATE_FORMATTER);
     }
 
     /**
@@ -111,8 +112,9 @@ public class TimeUtil {
      */
     public static Date defaultDate(String dateString) {
         try {
-            return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
-        } catch (ParseException e) {
+            LocalDateTime ldt = LocalDateTime.parse(dateString, DEFAULT_DATE_FORMATTER);
+            return Date.from(ldt.atZone(TimeConstant.DEFAULT_ZONEID).toInstant());
+        } catch (DateTimeParseException e) {
             log.debug("Failed to parse date string '{}' with default format", dateString);
             return null;
         }
@@ -126,19 +128,12 @@ public class TimeUtil {
      */
     public static Date completeDate(String dateString) {
         try {
-            return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
-        } catch (ParseException e) {
+            LocalDateTime ldt = LocalDateTime.parse(dateString, COMPLETE_DATE_FORMATTER);
+            return Date.from(ldt.atZone(TimeConstant.DEFAULT_ZONEID).toInstant());
+        } catch (DateTimeParseException e) {
             log.debug("Failed to parse date string '{}' with complete format", dateString);
             return null;
         }
-    }
-
-    /**
-     * Remove the current thread's values from the ThreadLocal variables.
-     */
-    public static void clean() {
-        DEFAULT_DATE_FORMAT_THREAD_LOCAL.remove();
-        COMPLETE_DATE_FORMAT_THREAD_LOCAL.remove();
     }
 
 }

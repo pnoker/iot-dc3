@@ -35,41 +35,36 @@ class TreeUtilTest {
 
     @Test
     void buildByLoopReturnsEmptyForEmptyInput() {
-        TreeUtil treeUtil = new TreeUtil();
-        assertThat(treeUtil.buildByLoop(List.of(), 0)).isEmpty();
+        assertThat(TreeUtil.buildByLoop(List.of(), 0)).isEmpty();
     }
 
     @Test
     void buildByLoopAttachesChildrenToRoots() {
-        TreeUtil treeUtil = new TreeUtil();
         TreeNode root = node(1, 0);
         TreeNode child = node(2, 1);
         TreeNode grandchild = node(3, 2);
-        List<TreeNode> roots = treeUtil.buildByLoop(List.of(root, child, grandchild), 0);
+        List<TreeNode> roots = TreeUtil.buildByLoop(List.of(root, child, grandchild), 0);
         assertThat(roots).extracting(TreeNode::getId).containsExactly(1);
         assertThat(roots.get(0).getChildren()).extracting(TreeNode::getId).contains(2);
     }
 
     @Test
     void buildByLoopReturnsMultipleRoots() {
-        TreeUtil treeUtil = new TreeUtil();
-        List<TreeNode> roots = treeUtil.buildByLoop(List.of(node(1, 0), node(2, 0)), 0);
+        List<TreeNode> roots = TreeUtil.buildByLoop(List.of(node(1, 0), node(2, 0)), 0);
         assertThat(roots).extracting(TreeNode::getId).containsExactlyInAnyOrder(1, 2);
     }
 
     @Test
     void buildByRecursiveReturnsEmptyForEmptyInput() {
-        TreeUtil treeUtil = new TreeUtil();
-        assertThat(treeUtil.buildByRecursive(List.of(), 0)).isEmpty();
+        assertThat(TreeUtil.buildByRecursive(List.of(), 0)).isEmpty();
     }
 
     @Test
     void buildByRecursiveAttachesChildrenAndGrandchildren() {
-        TreeUtil treeUtil = new TreeUtil();
         TreeNode root = node(1, 0);
         TreeNode child = node(2, 1);
         TreeNode grandchild = node(3, 2);
-        List<TreeNode> roots = treeUtil.buildByRecursive(List.of(root, child, grandchild), 0);
+        List<TreeNode> roots = TreeUtil.buildByRecursive(List.of(root, child, grandchild), 0);
         assertThat(roots).hasSize(1);
         TreeNode rootNode = roots.get(0);
         assertThat(rootNode.getChildren()).extracting(TreeNode::getId).contains(2);
@@ -79,18 +74,16 @@ class TreeUtilTest {
 
     @Test
     void findChildrenAttachesChildrenAndReturnsTheRoot() {
-        TreeUtil treeUtil = new TreeUtil();
         TreeNode root = node(1, 0);
         TreeNode child = node(2, 1);
-        TreeNode result = treeUtil.findChildren(root, List.of(child));
+        TreeNode result = TreeUtil.findChildren(root, List.of(child));
         assertThat(result).isSameAs(root);
         assertThat(result.getChildren()).extracting(TreeNode::getId).contains(2);
     }
 
     @Test
     void buildByLoopFiltersNonMatchingRoots() {
-        TreeUtil treeUtil = new TreeUtil();
-        List<TreeNode> roots = treeUtil.buildByLoop(List.of(node(1, 5), node(2, 5)), 0);
+        List<TreeNode> roots = TreeUtil.buildByLoop(List.of(node(1, 5), node(2, 5)), 0);
         assertThat(roots).isEmpty();
     }
 }
