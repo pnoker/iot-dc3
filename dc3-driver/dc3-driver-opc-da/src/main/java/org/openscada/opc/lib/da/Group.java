@@ -52,7 +52,7 @@ import java.util.Set;
 @Slf4j
 public class Group {
 
-    private static Random _random = new Random();
+    private static final Random _random = new Random();
 
     private final int _serverHandle;
 

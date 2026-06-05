@@ -23,9 +23,15 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 
 /**
  * RabbitMQ exchange, queue, and routing key constants for the DC3 platform.
+ * <p>
+ * All fields are {@code final}. The environment/group tag prefix is read from
+ * the {@code dc3.rabbit.tag} system property during class initialization.
+ * {@link io.github.pnoker.common.config.RabbitmqEnvironmentConfig} sets this
+ * property during {@code EnvironmentPostProcessor} execution, which runs
+ * before any application context beans are created.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 public class RabbitConstant {
@@ -66,69 +72,139 @@ public class RabbitConstant {
     public static final String ROUTING_POINT_COMMAND_RESULT = "dc3.r.point_command_result";
 
     public static final String ROUTING_POINT_COMMAND_RESULT_PREFIX = ROUTING_POINT_COMMAND_RESULT + SymbolConstant.DOT;
-    // Register
-    public static String TOPIC_EXCHANGE_REGISTER = "dc3.e.register";
-    public static String QUEUE_REGISTER_UP = "dc3.q.register.up";
-    public static String QUEUE_REGISTER_DOWN_PREFIX = "dc3.q.register.down.";
-    // State
-    public static String TOPIC_EXCHANGE_STATE = "dc3.e.state";
-    public static String QUEUE_DRIVER_STATE = "dc3.q.state.driver";
-    public static String QUEUE_DEVICE_STATE = "dc3.q.state.device";
-    // Alarm
-    public static String TOPIC_EXCHANGE_ALARM = "dc3.e.alarm";
-    public static String QUEUE_DRIVER_ALARM = "dc3.q.alarm.driver";
-    public static String QUEUE_DEVICE_ALARM = "dc3.q.alarm.device";
-    public static String QUEUE_NOTIFY_TASK = "dc3.q.notify.task";
-    // Metadata
-    public static String TOPIC_EXCHANGE_METADATA = "dc3.e.metadata";
-    public static String QUEUE_DRIVER_METADATA_PREFIX = "dc3.q.metadata.driver.";
-    // Point Command
-    public static String TOPIC_EXCHANGE_POINT_COMMAND = "dc3.e.point_command";
-    public static String QUEUE_POINT_COMMAND_PREFIX = "dc3.q.point_command.";
-    // Value
-    public static String TOPIC_EXCHANGE_VALUE = "dc3.e.value";
-    public static String QUEUE_POINT_VALUE = "dc3.q.value.point";
-    // Mqtt
-    public static String TOPIC_EXCHANGE_MQTT = "dc3.e.mqtt";
-    public static String QUEUE_MQTT = "dc3.q.mqtt";
-    // State Timeout - Delay Exchange (receives messages to be delayed)
-    public static String TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY = "dc3.e.state_timeout_delay";
-    // State Timeout - Check Exchange (receives expired messages from DLX)
-    public static String TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK = "dc3.e.state_timeout_check";
-    // Driver timeout delay queue (45s TTL, dead-letter to check exchange)
-    public static String QUEUE_DRIVER_TIMEOUT_DELAY = "dc3.q.state_timeout.driver.45s";
-    // Driver timeout check queue (consumed by Data Center)
-    public static String QUEUE_DRIVER_TIMEOUT_CHECK = "dc3.q.state_timeout.driver_check";
-    // Device scan tick delay queue (10s TTL, dead-letter to scan queue)
-    public static String QUEUE_DEVICE_SCAN_TICK = "dc3.q.state_timeout.device_scan_tick.10s";
-    // Device scan execution queue (consumed by Data Center)
-    public static String QUEUE_DEVICE_SCAN = "dc3.q.state_timeout.device_scan";
-    // Point Command Dead Letter
-    public static String TOPIC_EXCHANGE_POINT_COMMAND_DEAD = "dc3.e.point_command_dead";
-    public static String QUEUE_POINT_COMMAND_DEAD = "dc3.q.point_command_dead";
-    // Point Command Result
-    public static String TOPIC_EXCHANGE_POINT_COMMAND_RESULT = "dc3.e.point_command_result";
-    public static String QUEUE_POINT_COMMAND_RESULT = "dc3.q.point_command_result";
-    // Custom Command
-    public static String TOPIC_EXCHANGE_COMMAND = "dc3.e.command";
-    public static String QUEUE_COMMAND_PREFIX = "dc3.q.command.";
-    public static String ROUTING_COMMAND_PREFIX = "dc3.r.command.";
-    // Custom Command Result
-    public static String TOPIC_EXCHANGE_COMMAND_RESULT = "dc3.e.command_result";
-    public static String QUEUE_COMMAND_RESULT = "dc3.q.command_result";
-    public static String ROUTING_COMMAND_RESULT = "dc3.r.command_result";
 
-    public static String ROUTING_COMMAND_RESULT_PREFIX = ROUTING_COMMAND_RESULT + SymbolConstant.DOT;
+    // --- Tag-aware fields initialized from system property ---
+    // Register
+    public static final String TOPIC_EXCHANGE_REGISTER;
+    public static final String QUEUE_REGISTER_UP;
+    public static final String QUEUE_REGISTER_DOWN_PREFIX;
+    // State
+    public static final String TOPIC_EXCHANGE_STATE;
+    public static final String QUEUE_DRIVER_STATE;
+    public static final String QUEUE_DEVICE_STATE;
+    // Alarm
+    public static final String TOPIC_EXCHANGE_ALARM;
+    public static final String QUEUE_DRIVER_ALARM;
+    public static final String QUEUE_DEVICE_ALARM;
+    public static final String QUEUE_NOTIFY_TASK;
+    // Metadata
+    public static final String TOPIC_EXCHANGE_METADATA;
+    public static final String QUEUE_DRIVER_METADATA_PREFIX;
+    // Point Command
+    public static final String TOPIC_EXCHANGE_POINT_COMMAND;
+    public static final String QUEUE_POINT_COMMAND_PREFIX;
+    // Value
+    public static final String TOPIC_EXCHANGE_VALUE;
+    public static final String QUEUE_POINT_VALUE;
+    // Mqtt
+    public static final String TOPIC_EXCHANGE_MQTT;
+    public static final String QUEUE_MQTT;
+    // State Timeout - Delay Exchange (receives messages to be delayed)
+    public static final String TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY;
+    // State Timeout - Check Exchange (receives expired messages from DLX)
+    public static final String TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK;
+    // Driver timeout delay queue (45s TTL, dead-letter to check exchange)
+    public static final String QUEUE_DRIVER_TIMEOUT_DELAY;
+    // Driver timeout check queue (consumed by Data Center)
+    public static final String QUEUE_DRIVER_TIMEOUT_CHECK;
+    // Device scan tick delay queue (10s TTL, dead-letter to scan queue)
+    public static final String QUEUE_DEVICE_SCAN_TICK;
+    // Device scan execution queue (consumed by Data Center)
+    public static final String QUEUE_DEVICE_SCAN;
+    // Point Command Dead Letter
+    public static final String TOPIC_EXCHANGE_POINT_COMMAND_DEAD;
+    public static final String QUEUE_POINT_COMMAND_DEAD;
+    // Point Command Result
+    public static final String TOPIC_EXCHANGE_POINT_COMMAND_RESULT;
+    public static final String QUEUE_POINT_COMMAND_RESULT;
+    // Custom Command
+    public static final String TOPIC_EXCHANGE_COMMAND;
+    public static final String QUEUE_COMMAND_PREFIX;
+    public static final String ROUTING_COMMAND_PREFIX;
+    // Custom Command Result
+    public static final String TOPIC_EXCHANGE_COMMAND_RESULT;
+    public static final String QUEUE_COMMAND_RESULT;
+    public static final String ROUTING_COMMAND_RESULT;
+
+    public static final String ROUTING_COMMAND_RESULT_PREFIX;
     // Custom Command Dead Letter
-    public static String TOPIC_EXCHANGE_COMMAND_DEAD = "dc3.e.command_dead";
-    public static String QUEUE_COMMAND_DEAD = "dc3.q.command_dead";
+    public static final String TOPIC_EXCHANGE_COMMAND_DEAD;
+    public static final String QUEUE_COMMAND_DEAD;
     // Event Report
-    public static String TOPIC_EXCHANGE_EVENT = "dc3.e.event";
-    public static String QUEUE_EVENT_PREFIX = "dc3.q.event.";
-    public static String ROUTING_EVENT_PREFIX = "dc3.r.event.";
+    public static final String TOPIC_EXCHANGE_EVENT;
+    public static final String QUEUE_EVENT_PREFIX;
+    public static final String ROUTING_EVENT_PREFIX;
     // Point Value Dead Letter
-    public static String TOPIC_EXCHANGE_POINT_VALUE_DEAD = "dc3.e.point_value_dead";
-    public static String QUEUE_POINT_VALUE_DEAD = "dc3.q.point_value_dead";
+    public static final String TOPIC_EXCHANGE_POINT_VALUE_DEAD;
+    public static final String QUEUE_POINT_VALUE_DEAD;
+
+    static {
+        String tag = System.getProperty("dc3.rabbit.tag", "");
+
+        // Register
+        TOPIC_EXCHANGE_REGISTER = tag + "dc3.e.register";
+        QUEUE_REGISTER_UP = tag + "dc3.q.register.up";
+        QUEUE_REGISTER_DOWN_PREFIX = tag + "dc3.q.register.down.";
+        // State
+        TOPIC_EXCHANGE_STATE = tag + "dc3.e.state";
+        QUEUE_DRIVER_STATE = tag + "dc3.q.state.driver";
+        QUEUE_DEVICE_STATE = tag + "dc3.q.state.device";
+        // Alarm
+        TOPIC_EXCHANGE_ALARM = tag + "dc3.e.alarm";
+        QUEUE_DRIVER_ALARM = tag + "dc3.q.alarm.driver";
+        QUEUE_DEVICE_ALARM = tag + "dc3.q.alarm.device";
+        QUEUE_NOTIFY_TASK = tag + "dc3.q.notify.task";
+        // Metadata
+        TOPIC_EXCHANGE_METADATA = tag + "dc3.e.metadata";
+        QUEUE_DRIVER_METADATA_PREFIX = tag + "dc3.q.metadata.driver.";
+        // Point Command
+        TOPIC_EXCHANGE_POINT_COMMAND = tag + "dc3.e.point_command";
+        QUEUE_POINT_COMMAND_PREFIX = tag + "dc3.q.point_command.";
+        // Value
+        TOPIC_EXCHANGE_VALUE = tag + "dc3.e.value";
+        QUEUE_POINT_VALUE = tag + "dc3.q.value.point";
+        // Mqtt
+        TOPIC_EXCHANGE_MQTT = tag + "dc3.e.mqtt";
+        QUEUE_MQTT = tag + "dc3.q.mqtt";
+        // State Timeout - Delay Exchange (receives messages to be delayed)
+        TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY = tag + "dc3.e.state_timeout_delay";
+        // State Timeout - Check Exchange (receives expired messages from DLX)
+        TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK = tag + "dc3.e.state_timeout_check";
+        // Driver timeout delay queue (45s TTL, dead-letter to check exchange)
+        QUEUE_DRIVER_TIMEOUT_DELAY = tag + "dc3.q.state_timeout.driver.45s";
+        // Driver timeout check queue (consumed by Data Center)
+        QUEUE_DRIVER_TIMEOUT_CHECK = tag + "dc3.q.state_timeout.driver_check";
+        // Device scan tick delay queue (10s TTL, dead-letter to scan queue)
+        QUEUE_DEVICE_SCAN_TICK = tag + "dc3.q.state_timeout.device_scan_tick.10s";
+        // Device scan execution queue (consumed by Data Center)
+        QUEUE_DEVICE_SCAN = tag + "dc3.q.state_timeout.device_scan";
+        // Point Command Dead Letter
+        TOPIC_EXCHANGE_POINT_COMMAND_DEAD = tag + "dc3.e.point_command_dead";
+        QUEUE_POINT_COMMAND_DEAD = tag + "dc3.q.point_command_dead";
+        // Point Command Result
+        TOPIC_EXCHANGE_POINT_COMMAND_RESULT = tag + "dc3.e.point_command_result";
+        QUEUE_POINT_COMMAND_RESULT = tag + "dc3.q.point_command_result";
+        // Custom Command
+        TOPIC_EXCHANGE_COMMAND = tag + "dc3.e.command";
+        QUEUE_COMMAND_PREFIX = tag + "dc3.q.command.";
+        ROUTING_COMMAND_PREFIX = tag + "dc3.r.command.";
+        // Custom Command Result
+        TOPIC_EXCHANGE_COMMAND_RESULT = tag + "dc3.e.command_result";
+        QUEUE_COMMAND_RESULT = tag + "dc3.q.command_result";
+        ROUTING_COMMAND_RESULT = tag + "dc3.r.command_result";
+
+        ROUTING_COMMAND_RESULT_PREFIX = ROUTING_COMMAND_RESULT + SymbolConstant.DOT;
+        // Custom Command Dead Letter
+        TOPIC_EXCHANGE_COMMAND_DEAD = tag + "dc3.e.command_dead";
+        QUEUE_COMMAND_DEAD = tag + "dc3.q.command_dead";
+        // Event Report
+        TOPIC_EXCHANGE_EVENT = tag + "dc3.e.event";
+        QUEUE_EVENT_PREFIX = tag + "dc3.q.event.";
+        ROUTING_EVENT_PREFIX = tag + "dc3.r.event.";
+        // Point Value Dead Letter
+        TOPIC_EXCHANGE_POINT_VALUE_DEAD = tag + "dc3.e.point_value_dead";
+        QUEUE_POINT_VALUE_DEAD = tag + "dc3.q.point_value_dead";
+    }
 
     private RabbitConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);

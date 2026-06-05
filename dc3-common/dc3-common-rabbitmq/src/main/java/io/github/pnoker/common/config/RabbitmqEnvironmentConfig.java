@@ -18,7 +18,6 @@
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.utils.EnvironmentUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.EnvironmentPostProcessor;
@@ -33,14 +32,25 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * environment and group tags. Used for multi-developer scenarios where different
  * exchanges, queues, and topics need to be isolated by environment and group identifiers.
  * </p>
+ * <p>
+ * The tag is stored as a system property ({@code dc3.rabbit.tag}) so that
+ * {@link io.github.pnoker.common.constant.driver.RabbitConstant} can read it during its
+ * static class initialization, allowing all fields to remain {@code final}.
+ * </p>
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
 @Order
 public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
+
+    /**
+     * System property key used to communicate the environment/group tag to
+     * {@link io.github.pnoker.common.constant.driver.RabbitConstant}'s static initializer.
+     */
+    public static final String DC3_RABBIT_TAG = "dc3.rabbit.tag";
 
     /**
      * Post-process environment to configure RabbitMQ constants
@@ -58,49 +68,12 @@ public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
 
         String tag = EnvironmentUtil.getTag(env, group);
 
-        // Sync registration related constants
-        RabbitConstant.TOPIC_EXCHANGE_REGISTER = tag + RabbitConstant.TOPIC_EXCHANGE_REGISTER;
-        RabbitConstant.QUEUE_REGISTER_UP = tag + RabbitConstant.QUEUE_REGISTER_UP;
-        RabbitConstant.QUEUE_REGISTER_DOWN_PREFIX = tag + RabbitConstant.QUEUE_REGISTER_DOWN_PREFIX;
-
-        // State related constants
-        RabbitConstant.TOPIC_EXCHANGE_STATE = tag + RabbitConstant.TOPIC_EXCHANGE_STATE;
-        RabbitConstant.QUEUE_DRIVER_STATE = tag + RabbitConstant.QUEUE_DRIVER_STATE;
-        RabbitConstant.QUEUE_DEVICE_STATE = tag + RabbitConstant.QUEUE_DEVICE_STATE;
-
-        // Alarm related constants
-        RabbitConstant.TOPIC_EXCHANGE_ALARM = tag + RabbitConstant.TOPIC_EXCHANGE_ALARM;
-        RabbitConstant.QUEUE_DRIVER_ALARM = tag + RabbitConstant.QUEUE_DRIVER_ALARM;
-        RabbitConstant.QUEUE_DEVICE_ALARM = tag + RabbitConstant.QUEUE_DEVICE_ALARM;
-        RabbitConstant.QUEUE_NOTIFY_TASK = tag + RabbitConstant.QUEUE_NOTIFY_TASK;
-
-        // Metadata related constants
-        RabbitConstant.TOPIC_EXCHANGE_METADATA = tag + RabbitConstant.TOPIC_EXCHANGE_METADATA;
-        RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX = tag + RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX;
-
-        // Point command related constants
-        RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND = tag + RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND;
-        RabbitConstant.QUEUE_POINT_COMMAND_PREFIX = tag + RabbitConstant.QUEUE_POINT_COMMAND_PREFIX;
-        RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_DEAD = tag + RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_DEAD;
-        RabbitConstant.QUEUE_POINT_COMMAND_DEAD = tag + RabbitConstant.QUEUE_POINT_COMMAND_DEAD;
-        RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT = tag + RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT;
-        RabbitConstant.QUEUE_POINT_COMMAND_RESULT = tag + RabbitConstant.QUEUE_POINT_COMMAND_RESULT;
-
-        // Point Value related constants
-        RabbitConstant.TOPIC_EXCHANGE_VALUE = tag + RabbitConstant.TOPIC_EXCHANGE_VALUE;
-        RabbitConstant.QUEUE_POINT_VALUE = tag + RabbitConstant.QUEUE_POINT_VALUE;
-
-        // MQTT related constants
-        RabbitConstant.TOPIC_EXCHANGE_MQTT = tag + RabbitConstant.TOPIC_EXCHANGE_MQTT;
-        RabbitConstant.QUEUE_MQTT = tag + RabbitConstant.QUEUE_MQTT;
-
-        // State timeout related constants
-        RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY = tag + RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY;
-        RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK = tag + RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK;
-        RabbitConstant.QUEUE_DRIVER_TIMEOUT_DELAY = tag + RabbitConstant.QUEUE_DRIVER_TIMEOUT_DELAY;
-        RabbitConstant.QUEUE_DRIVER_TIMEOUT_CHECK = tag + RabbitConstant.QUEUE_DRIVER_TIMEOUT_CHECK;
-        RabbitConstant.QUEUE_DEVICE_SCAN_TICK = tag + RabbitConstant.QUEUE_DEVICE_SCAN_TICK;
-        RabbitConstant.QUEUE_DEVICE_SCAN = tag + RabbitConstant.QUEUE_DEVICE_SCAN;
+        // Store tag as system property so RabbitConstant can read it during static
+        // initialization. EnvironmentPostProcessor runs during prepareEnvironment(),
+        // which is before application context creation -- so by the time any class
+        // references RabbitConstant, the system property is already set.
+        System.setProperty(DC3_RABBIT_TAG, tag);
+        log.info("RabbitMQ environment tag set: {}", tag);
     }
 
 }
