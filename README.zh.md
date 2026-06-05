@@ -38,38 +38,30 @@
 
 ## 📸 产品预览
 
-<!-- 📸 截图补充说明：共需要 3 张截图，放入 dc3/images/ 目录，替换下方占位文字为 <img> 标签即可 -->
-<!-- 截图 1（建议文件名 dc3/images/screenshot-overview.png）：平台首页/仪表盘，展示系统概览、设备在线统计、数据趋势图表，中文界面，建议 1200×675px（16:9） -->
-<!-- 截图 2（建议文件名 dc3/images/screenshot-device.png）：设备管理页面，展示设备列表、在线状态指示器、搜索筛选、分组管理，中文界面，建议 1200×675px -->
-<!-- 截图 3（建议文件名 dc3/images/screenshot-ai.png）：AI 智能对话页面，展示用户通过自然语言与 LLM 交互操控设备、查询数据的场景，中文界面，建议 1200×675px -->
-
 <table>
   <tr>
-    <th>📸 平台概览</th>
-    <th>📸 设备管理</th>
-    <th>📸 AI 智能对话</th>
+    <th width="33%">📸 平台概览</th>
+    <th width="33%">📸 设备管理</th>
+    <th width="33%">📸 AI 智能对话</th>
   </tr>
   <tr>
     <td align="center">
+      <img src="dc3/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
       <br>
-      <strong>平台首页 / 仪表盘</strong><br><br>
-      <em>系统概览 · 设备在线统计<br>数据趋势图表 · 关键指标</em><br><br>
-      <small>中文界面 · 1200×675px（16:9）</small>
-      <br><br>
+      <strong>平台首页 / 仪表盘</strong><br>
+      <em>系统概览 · 设备在线统计 · 数据趋势图表</em>
     </td>
     <td align="center">
+      <img src="dc3/images/screenshot-device.png" alt="设备管理页面" width="100%">
       <br>
-      <strong>设备管理页面</strong><br><br>
-      <em>设备列表 · 在线状态指示<br>搜索筛选 · 分组管理</em><br><br>
-      <small>中文界面 · 1200×675px（16:9）</small>
-      <br><br>
+      <strong>设备管理页面</strong><br>
+      <em>设备列表 · 在线状态指示 · 搜索筛选</em>
     </td>
     <td align="center">
+      <img src="dc3/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
       <br>
-      <strong>AI 智能对话页面</strong><br><br>
-      <em>自然语言操控设备<br>数据查询 · 智能分析</em><br><br>
-      <small>中文界面 · 1200×675px（16:9）</small>
-      <br><br>
+      <strong>AI 智能对话页面</strong><br>
+      <em>自然语言操控设备 · 数据查询 · 智能分析</em>
     </td>
   </tr>
 </table>
