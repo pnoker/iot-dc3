@@ -130,7 +130,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                     ? DeviceHealthState.online()
                     : DeviceHealthState.offline();
         } catch (Exception e) {
-            log.warn("Driver health check failed, protocol=" + driverCode + ", deviceId={}", device.getId(), e);
+            log.warn("Driver health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
             return DeviceHealthState.offline();
         }
     }
@@ -140,7 +140,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
@@ -149,12 +149,12 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                 ModbusMaster removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.destroy();
-                    log.info("Driver connection destroyed, protocol=" + driverCode + ", deviceId={}, operateType={}",
+                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}", driverCode, 
                             metadataEvent.getId(), operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -206,13 +206,13 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
             int dataBits = driverConfig.get("dataBits").getValue(Integer.class);
             int stopBits = driverConfig.get("stopBits").getValue(Integer.class);
             int parity = driverConfig.get("parity").getValue(Integer.class);
-            log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, port={}, baudRate={}", deviceId,
+            log.debug("Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}", driverCode, deviceId,
                     port, baudRate);
             JSerialCommWrapper wrapper = new JSerialCommWrapper(port, baudRate, dataBits, stopBits, parity);
             ModbusMaster modbusMaster = modbusFactory.createRtuMaster(wrapper);
             try {
                 modbusMaster.init();
-                log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, port={}, baudRate={}",
+                log.info("Driver connection established, protocol={}, deviceId={}, port={}, baudRate={}", driverCode, 
                         deviceId, port, baudRate);
                 // Successful connection clears failure tracking
                 failureMap.remove(deviceId);
@@ -220,13 +220,13 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                 try {
                     modbusMaster.destroy();
                 } catch (Exception destroyException) {
-                    log.warn("Driver connection destroy failed after init error, protocol=" + driverCode
-                            + ", deviceId={}, port={}", deviceId, port, destroyException);
+                    log.warn("Driver connection destroy failed after init error, protocol={}, deviceId={}, port={}", driverCode,
+                            deviceId, port, destroyException);
                 }
                 // Record failure for backoff
                 failureMap.compute(deviceId, (k, v) ->
                         v == null ? new ConsecutiveFailure() : v.increment());
-                log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, port={}, baudRate={}", deviceId,
+                log.error("Driver connection failed, protocol={}, deviceId={}, port={}, baudRate={}", driverCode, deviceId,
                         port, baudRate, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, port={}, message={}",
                         deviceId, port, e.getMessage(), e);
@@ -360,7 +360,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
             WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, writePointValue.getValue(Boolean.class));
             return (WriteCoilResponse) modbusMaster.send(coilRequest);
         } catch (ModbusTransportException e) {
-            log.error("Driver point write failed, protocol=" + driverCode + ", slaveId={}, offset={}", slaveId, offset, e);
+            log.error("Driver point write failed, protocol={}, slaveId={}, offset={}", driverCode, slaveId, offset, e);
             throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", slaveId={}, offset={}, message={}",
                     slaveId, offset, e.getMessage(), e);
         }
@@ -401,7 +401,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
         try {
             modbusMaster.destroy();
         } catch (Exception e) {
-            log.warn("Driver connection destroy failed, protocol=" + driverCode + ", deviceId={}", deviceId, e);
+            log.warn("Driver connection destroy failed, protocol={}, deviceId={}", driverCode, deviceId, e);
         }
     }
 

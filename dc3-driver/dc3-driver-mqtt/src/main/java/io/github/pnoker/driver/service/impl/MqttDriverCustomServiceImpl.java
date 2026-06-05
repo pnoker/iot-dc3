@@ -136,11 +136,11 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             // to do something for device event
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, deviceId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             // to do something for point event
-            log.info("Driver metadata event received, protocol=" + driverCode + ", metadataType={}, operateType={}, pointId={}",
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -206,7 +206,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
          */
         String commandTopic = pointConfig.get("commandTopic").getValue(String.class);
         String value = values.getValue();
-        log.debug("Driver point write requested, protocol=" + driverCode + ", deviceId={}, pointId={}, topic={}, valueLength={}",
+        log.debug("Driver point write requested, protocol={}, deviceId={}, pointId={}, topic={}, valueLength={}", driverCode, 
                 device.getId(), point.getId(), commandTopic, Objects.toString(value, "").length());
         try {
             int commandQos = pointConfig.get("commandQos").getValue(Integer.class);
