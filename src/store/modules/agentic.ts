@@ -18,11 +18,11 @@ import {
   completeAgenticChatCompletion,
   confirmAgenticAction,
   deleteAgenticSession,
-  getAgenticAttachments,
-  getAgenticMessages,
-  getAgenticModels,
-  getAgenticSessions,
-  getPendingAgenticActions,
+  listPendingAgenticActions,
+  listAgenticAttachments,
+  listAgenticMessages,
+  listAgenticModels,
+  listAgenticSessions,
   rejectAgenticAction,
   streamAgenticChatCompletion,
   updateAgenticSession,
@@ -152,7 +152,7 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const loadModels = async () => {
     try {
-      const response = await getAgenticModels();
+      const response = await listAgenticModels();
       models.value = response.data?.length ? response.data : [DEFAULT_MODEL];
     } catch (error) {
       models.value = [DEFAULT_MODEL];
@@ -170,7 +170,7 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const loadSessions = async () => {
     try {
-      const response = await getAgenticSessions({ page: { current: 1, size: 50 } });
+      const response = await listAgenticSessions({ page: { current: 1, size: 50 } });
       sessions.value = (response.data?.records || []).map(normalizeSession);
       if (activeConversationId.value) {
         restoreSessionModel(sessions.value.find((session) => session.conversationId === activeConversationId.value));
@@ -359,7 +359,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       return;
     }
     try {
-      const response = await getAgenticMessages(conversationId);
+      const response = await listAgenticMessages(conversationId);
       if (response.data) {
         const previousMessages = messagesByConversation.value[conversationId] || [];
         const loadedMessages = response.data.map((message) => ({
@@ -383,7 +383,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       return;
     }
     try {
-      const response = await getAgenticAttachments(conversationId);
+      const response = await listAgenticAttachments(conversationId);
       attachmentsByConversation.value[conversationId] = response.data || [];
     } catch (error) {
       attachmentsByConversation.value[conversationId] = attachmentsByConversation.value[conversationId] || [];
@@ -416,7 +416,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       return;
     }
     try {
-      const response = await getPendingAgenticActions(conversationId);
+      const response = await listPendingAgenticActions(conversationId);
       pendingActionsByConversation.value[conversationId] = response.data || [];
     } catch (error) {
       pendingActionsByConversation.value[conversationId] = [];
@@ -449,23 +449,25 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const syncSessionAfterMessage = async (conversationId: string, firstUserText: string) => {
     const session = sessions.value.find((item) => item.conversationId === conversationId);
-    const title = shouldGenerateSessionTitle(session?.title)
-      ? normalizeTitle(firstUserText)
-      : normalizeTitle(session!.title!);
-    if (!session) {
-      sessions.value = [
-        {
-          conversationId,
-          title,
-          sessionExt: buildCurrentSessionExt(resolveModelName(selectedModel.value)),
-        },
-        ...sessions.value,
-      ];
-      await renameSession(conversationId, title);
-      return;
-    }
-    if (normalizeTitle(session.title || DEFAULT_SESSION_TITLE) !== title) {
-      await renameSession(conversationId, title);
+    // Guard: if session or its title is missing, always generate a new title
+    // rather than crashing on the non-null assertion in the else branch.
+    if (!session || !session.title || shouldGenerateSessionTitle(session.title)) {
+      const title = normalizeTitle(firstUserText);
+      if (!session) {
+        sessions.value = [
+          {
+            conversationId,
+            title,
+            sessionExt: buildCurrentSessionExt(resolveModelName(selectedModel.value)),
+          },
+          ...sessions.value,
+        ];
+        await renameSession(conversationId, title);
+        return;
+      }
+      if (normalizeTitle(session.title || DEFAULT_SESSION_TITLE) !== title) {
+        await renameSession(conversationId, title);
+      }
     }
   };
 
@@ -683,6 +685,30 @@ export const useAgenticStore = defineStore('agentic', () => {
     loadPendingActions,
     confirmAction,
     rejectAction,
+    reset() {
+      visible.value = false;
+      bootstrapped.value = false;
+      loading.value = false;
+      streaming.value = false;
+      sessions.value = [];
+      models.value = [];
+      selectedModel.value = '';
+      reasoningEnabled.value = false;
+      temperature.value = undefined;
+      maxTokens.value = undefined;
+      activeConversationId.value = '';
+      currentAbortController.value = undefined;
+      messagesByConversation.value = {};
+      attachmentsByConversation.value = {};
+      pendingAttachmentIdsByConversation.value = {};
+      pendingActionsByConversation.value = {};
+      traceEventsByConversation.value = {};
+      try {
+        localStorage.removeItem(MESSAGE_STORAGE_KEY);
+      } catch {
+        // storage unavailable
+      }
+    },
   };
 });
 
