@@ -58,6 +58,15 @@ const inflight: Record<EntityKind, Set<string>> = {
   point: new Set(),
 };
 
+// Track the pending promise per kind so concurrent callers can await
+// the same fetch instead of returning immediately with uncached IDs.
+const pending: Record<EntityKind, Promise<void> | null> = {
+  device: null,
+  driver: null,
+  profile: null,
+  point: null,
+};
+
 const fetchers: Record<EntityKind, (ids: string[]) => Promise<BatchResponse>> = {
   device: (ids) => listDeviceByIds(ids) as Promise<BatchResponse>,
   driver: (ids) => listDriverByIds(ids) as Promise<BatchResponse>,
@@ -77,30 +86,60 @@ const nameField: Record<EntityKind, string> = {
 async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): Promise<void> {
   if (!rawIds || rawIds.length === 0) return;
   const missing: string[] = [];
+  let hasInflight = false;
   for (const raw of rawIds) {
     const id = String(raw);
     if (!id) continue;
     if (cache[kind][id] !== undefined) continue;
-    if (inflight[kind].has(id)) continue;
+    if (inflight[kind].has(id)) {
+      hasInflight = true;
+      continue;
+    }
     missing.push(id);
   }
+
+  // If some IDs are already being fetched by another caller, await the
+  // pending promise first — it may resolve the IDs we need. Then re-check
+  // which IDs are still missing so we only fetch the remainder.
+  if (hasInflight && pending[kind]) {
+    await pending[kind];
+    // Re-evaluate: the pending fetch may have resolved some of our IDs
+    const stillMissing: string[] = [];
+    for (const raw of rawIds) {
+      const id = String(raw);
+      if (!id || cache[kind][id] !== undefined) continue;
+      if (inflight[kind].has(id)) continue;
+      stillMissing.push(id);
+    }
+    if (stillMissing.length === 0) return;
+    // Merge with any newly discovered missing IDs
+    for (const id of stillMissing) {
+      if (!missing.includes(id)) missing.push(id);
+    }
+  }
+
   if (missing.length === 0) return;
   missing.forEach((id) => inflight[kind].add(id));
-  try {
-    const res = await fetchers[kind](missing);
-    const data = res?.data ?? {};
-    for (const id of missing) {
-      const row = data[id];
-      // Cache whatever the backend returned — even empty → fallback to id.
-      // Storing `id` as the value means future lookups hit cache (no re-fetch
-      // of deleted entities every time a historical row references them).
-      cache[kind][id] = row?.[nameField[kind]] ?? id;
+
+  const promise = (async () => {
+    try {
+      const res = await fetchers[kind](missing);
+      const data = res?.data ?? {};
+      for (const id of missing) {
+        const row = data[id];
+        // Cache whatever the backend returned — even empty → fallback to id.
+        cache[kind][id] = row?.[nameField[kind]] ?? id;
+      }
+    } catch {
+      // errors handled by global axios interceptor
+    } finally {
+      missing.forEach((id) => inflight[kind].delete(id));
     }
-  } catch {
-    // errors handled by global axios interceptor
-  } finally {
-    missing.forEach((id) => inflight[kind].delete(id));
-  }
+  })();
+
+  pending[kind] = promise;
+  await promise;
+  pending[kind] = null;
 }
 
 export type AlertSourceKind = 'point' | 'device' | 'driver';

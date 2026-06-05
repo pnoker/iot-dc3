@@ -22,41 +22,30 @@ export function isEmail(email: string): boolean {
   return /^([a-zA-Z0-9_.-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(email);
 }
 
+// Chinese mobile phone prefixes as of 2024+
+// 13x, 14x, 15x, 16x, 17x, 18x, 19x
 export function isPhone(phone: string): boolean {
-  return /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(phone);
+  return /^1[3-9]\d{9}$/.test(phone);
 }
 
 export function isNum(num: unknown, type: number): boolean {
-  let regName = /^[^\d.]/g;
-  if (type == 1) {
-    if (!regName.test(String(num))) return false;
-  } else if (type == 2) {
-    regName = /^[^\d]/g;
-    if (!regName.test(String(num))) return false;
+  if (type === 1) {
+    return /^\d*\.?\d+$/.test(String(num));
   }
-  return true;
-}
-
-export function isNumord(num: unknown, type: number): boolean {
-  let regName = /^[^\d.]/g;
-  if (type == 1) {
-    if (!regName.test(String(num))) return false;
-  } else if (type == 2) {
-    regName = /^[^\d.]/g;
-    if (!regName.test(String(num))) return false;
+  if (type === 2) {
+    return /^\d+$/.test(String(num));
   }
   return true;
 }
 
 export function isNull(val: unknown): boolean {
-  if (typeof val == 'boolean') return false;
-  if (typeof val == 'number') return false;
-  if (val instanceof Array) {
-    if (val.length === 0) return true;
-  } else if (val instanceof Object) {
-    if (JSON.stringify(val) === '{}') return true;
-  } else {
-    return val === 'null' || val == null || val === 'undefined' || val === undefined || val === '';
+  if (typeof val === 'boolean') return false;
+  if (typeof val === 'number') return false;
+  if (Array.isArray(val)) {
+    return val.length === 0;
   }
-  return false;
+  if (val !== null && typeof val === 'object') {
+    return Object.keys(val as object).length === 0;
+  }
+  return val === 'null' || val == null || val === 'undefined' || val === undefined || val === '';
 }
