@@ -53,11 +53,11 @@ export type {
   NotifyChannelBindRecord,
   RuleStateRecord,
   NotifyHistoryRecord,
-  AlarmEntityRecord,
+  AlarmEntity,
 } from './alarm';
 
-export type { CommandRecord, CommandForm, CommandParamRecord, CommandHistory } from './command';
-export type { EventRecord, EventForm, EventParamRecord, EventHistory } from './event';
+export type { CommandRecord, CommandForm, CommandParamRecord, CommandParamForm, CommandHistoryRecord } from './command';
+export type { EventRecord, EventForm, EventParamRecord, EventParamForm, EventHistoryRecord } from './event';
 
 export type {
   UserForm,

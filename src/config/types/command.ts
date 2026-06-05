@@ -18,25 +18,6 @@
  * Command definition types (dc3_command / dc3_command_param).
  */
 
-export interface CommandRecord {
-  id: string;
-  commandName?: string;
-  commandCode?: string;
-  commandTypeFlag?: string | number;
-  callTypeFlag?: string | number;
-  timeout?: number;
-  commandExt?: Record<string, unknown>;
-  profileId?: string;
-  enableFlag?: string | number;
-  signature?: string;
-  version?: number;
-  remark?: string;
-  tenantId?: string;
-  createTime?: string;
-  operateTime?: string;
-  [key: string]: unknown;
-}
-
 export interface CommandForm {
   id?: string;
   commandName?: string;
@@ -53,7 +34,14 @@ export interface CommandForm {
   [key: string]: unknown;
 }
 
-export interface CommandParamRecord {
+export interface CommandRecord extends CommandForm {
+  id: string;
+  tenantId?: string;
+  createTime?: string;
+  operateTime?: string;
+}
+
+export interface CommandParamForm {
   id?: string;
   paramName?: string;
   paramCode?: string;
@@ -69,10 +57,14 @@ export interface CommandParamRecord {
   [key: string]: unknown;
 }
 
+export interface CommandParamRecord extends CommandParamForm {
+  id: string;
+}
+
 /**
  * Command call history (dc3_command_history).
  */
-export interface CommandHistory {
+export interface CommandHistoryRecord {
   id?: string;
   recordId: string;
   tenantId?: string;

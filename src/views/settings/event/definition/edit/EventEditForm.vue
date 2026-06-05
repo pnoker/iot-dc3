@@ -69,8 +69,8 @@
                 clearable
                 maxlength="32"
                 show-word-limit
-                @input="clearParamFieldError($index, 'paramName')"
                 @blur="validateRow($index)"
+                @input="clearParamFieldError($index, 'paramName')"
               />
               <div v-if="paramErrors[$index]?.paramName" class="param-field__error">
                 {{ paramErrors[$index]?.paramName }}
@@ -85,8 +85,8 @@
                 v-model="row.paramCode"
                 clearable
                 maxlength="128"
-                @input="clearParamFieldError($index, 'paramCode')"
                 @blur="validateRow($index)"
+                @input="clearParamFieldError($index, 'paramCode')"
               />
               <div v-if="paramErrors[$index]?.paramCode" class="param-field__error">
                 {{ paramErrors[$index]?.paramCode }}
@@ -133,7 +133,7 @@
   import { listEventParamByEventId } from '@/api/event';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import { EVENT_LEVEL_OPTIONS, EVENT_TYPE_OPTIONS, POINT_TYPE_OPTIONS } from '@/config/constant/enums';
-  import type { EventForm, EventParamRecord, EventRecord } from '@/config/types';
+  import type { EventForm, EventParamForm, EventParamRecord, EventRecord } from '@/config/types';
   import { NAME_PATTERN, nameRules, remarkRules } from '@/utils/formRuleUtil';
   import { enableFlagValue, eventLevelValue, eventTypeValue, pointTypeValue } from '@/utils/thingModelFormatUtil';
 
@@ -142,7 +142,7 @@
 
   const { t } = useI18n();
 
-  type EventParamDraft = EventParamRecord & { _key: string };
+  type EventParamDraft = EventParamForm & { _key: string };
 
   const emit = defineEmits<{
     (e: 'add-thing', form: EventForm, params: EventParamRecord[], done: DoneCallback): void;

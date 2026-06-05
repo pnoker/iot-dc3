@@ -72,8 +72,8 @@
                 clearable
                 maxlength="32"
                 show-word-limit
-                @input="clearParamFieldError($index, 'paramName')"
                 @blur="validateRow($index)"
+                @input="clearParamFieldError($index, 'paramName')"
               />
               <div v-if="paramErrors[$index]?.paramName" class="param-field__error">
                 {{ paramErrors[$index]?.paramName }}
@@ -88,8 +88,8 @@
                 v-model="row.paramCode"
                 clearable
                 maxlength="128"
-                @input="clearParamFieldError($index, 'paramCode')"
                 @blur="validateRow($index)"
+                @input="clearParamFieldError($index, 'paramCode')"
               />
               <div v-if="paramErrors[$index]?.paramCode" class="param-field__error">
                 {{ paramErrors[$index]?.paramCode }}
@@ -163,7 +163,7 @@
     PARAM_DIRECTION_OPTIONS,
     POINT_TYPE_OPTIONS,
   } from '@/config/constant/enums';
-  import type { CommandForm, CommandParamRecord, CommandRecord } from '@/config/types';
+  import type { CommandForm, CommandParamForm, CommandParamRecord, CommandRecord } from '@/config/types';
   import { NAME_PATTERN, nameRules, remarkRules } from '@/utils/formRuleUtil';
   import {
     callTypeValue,
@@ -179,7 +179,7 @@
 
   const { t } = useI18n();
 
-  type CommandParamDraft = CommandParamRecord & { _key: string };
+  type CommandParamDraft = CommandParamForm & { _key: string };
 
   const emit = defineEmits<{
     (e: 'add-thing', form: CommandForm, params: CommandParamRecord[], done: DoneCallback): void;

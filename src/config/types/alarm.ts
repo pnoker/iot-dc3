@@ -32,7 +32,7 @@ export interface StructuredExt<T = Record<string, unknown>> {
   content?: T;
 }
 
-export interface AlarmBaseRecord {
+export interface AlarmBase {
   id: string;
   remark?: string;
   createTime?: string;
@@ -42,7 +42,7 @@ export interface AlarmBaseRecord {
   [key: string]: unknown;
 }
 
-export interface RuleRecord extends AlarmBaseRecord {
+export interface RuleRecord extends AlarmBase {
   alarmTargetTypeFlag?: AlarmTargetTypeFlag;
   ruleName?: string;
   ruleCode?: string;
@@ -53,7 +53,7 @@ export interface RuleRecord extends AlarmBaseRecord {
   enableFlag?: EnableFlag;
 }
 
-export interface NotifyRecord extends AlarmBaseRecord {
+export interface NotifyRecord extends AlarmBase {
   notifyName?: string;
   notifyCode?: string;
   autoConfirmFlag?: AutoConfirmFlag;
@@ -62,7 +62,7 @@ export interface NotifyRecord extends AlarmBaseRecord {
   enableFlag?: EnableFlag;
 }
 
-export interface MessageRecord extends AlarmBaseRecord {
+export interface MessageRecord extends AlarmBase {
   messageName?: string;
   messageCode?: string;
   messageLevel?: number | string;
@@ -70,7 +70,7 @@ export interface MessageRecord extends AlarmBaseRecord {
   enableFlag?: EnableFlag;
 }
 
-export interface NotifyChannelRecord extends AlarmBaseRecord {
+export interface NotifyChannelRecord extends AlarmBase {
   channelName?: string;
   channelCode?: string;
   channelTypeFlag?: NotifyChannelTypeFlag;
@@ -79,14 +79,14 @@ export interface NotifyChannelRecord extends AlarmBaseRecord {
   enableFlag?: EnableFlag;
 }
 
-export interface NotifyChannelBindRecord extends AlarmBaseRecord {
+export interface NotifyChannelBindRecord extends AlarmBase {
   notifyId?: string;
   channelId?: string;
   bindExt?: StructuredExt;
   enableFlag?: EnableFlag;
 }
 
-export interface RuleStateRecord extends AlarmBaseRecord {
+export interface RuleStateRecord extends AlarmBase {
   ruleId?: string;
   alarmTargetTypeFlag?: AlarmTargetTypeFlag;
   entityId?: string;
@@ -101,7 +101,7 @@ export interface RuleStateRecord extends AlarmBaseRecord {
   entityStateExt?: StructuredExt;
 }
 
-export interface NotifyHistoryRecord extends AlarmBaseRecord {
+export interface NotifyHistoryRecord extends AlarmBase {
   ruleId?: string;
   notifyId?: string;
   messageId?: string;
@@ -116,11 +116,10 @@ export interface NotifyHistoryRecord extends AlarmBaseRecord {
   retryCount?: number | string;
 }
 
-export type AlarmEntityRecord =
+export type AlarmEntity =
   | RuleRecord
   | NotifyRecord
   | MessageRecord
-  | NotifyChannelRecord
   | NotifyChannelBindRecord
   | RuleStateRecord
   | NotifyHistoryRecord;

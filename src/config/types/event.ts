@@ -18,24 +18,6 @@
  * Event definition types (dc3_event / dc3_event_param).
  */
 
-export interface EventRecord {
-  id: string;
-  eventName?: string;
-  eventCode?: string;
-  eventTypeFlag?: string | number;
-  eventLevelFlag?: string | number;
-  eventExt?: Record<string, unknown>;
-  profileId?: string;
-  enableFlag?: string | number;
-  signature?: string;
-  version?: number;
-  remark?: string;
-  tenantId?: string;
-  createTime?: string;
-  operateTime?: string;
-  [key: string]: unknown;
-}
-
 export interface EventForm {
   id?: string;
   eventName?: string;
@@ -51,7 +33,14 @@ export interface EventForm {
   [key: string]: unknown;
 }
 
-export interface EventParamRecord {
+export interface EventRecord extends EventForm {
+  id: string;
+  tenantId?: string;
+  createTime?: string;
+  operateTime?: string;
+}
+
+export interface EventParamForm {
   id?: string;
   paramName?: string;
   paramCode?: string;
@@ -64,10 +53,14 @@ export interface EventParamRecord {
   [key: string]: unknown;
 }
 
+export interface EventParamRecord extends EventParamForm {
+  id: string;
+}
+
 /**
  * Event report history (dc3_event_history).
  */
-export interface EventHistory {
+export interface EventHistoryRecord {
   id?: string;
   recordId: string;
   tenantId?: string;
