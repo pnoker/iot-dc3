@@ -29,6 +29,9 @@ app.use(router);
 app.use(createPinia());
 app.use(i18n);
 plugins(app);
+app.config.errorHandler = (err, instance, info) => {
+  console.error('Global error:', err, 'Component:', instance, 'Info:', info);
+};
 app.mount('#app');
 
 export default app;

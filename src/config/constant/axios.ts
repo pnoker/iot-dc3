@@ -18,7 +18,7 @@
 export const AXIOS_CONFIG = {
   TIMEOUT: 15000,
   MIN_STATUS: 200,
-  MAX_STATUS: 500,
+  MAX_STATUS: 599,
   UNAUTHORIZED_STATUS: 401,
   HEADERS: {
     ACCEPT: 'application/json',

@@ -16,6 +16,7 @@
 
 import type { AxiosInstance } from 'axios';
 import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+import { ElNotification } from 'element-plus';
 
 import { AXIOS_CONFIG, AXIOS_ERROR_MESSAGES } from '@/config/constant/axios';
 import { AUTH_HEADERS } from '@/config/constant/common';
@@ -116,6 +117,12 @@ request.interceptors.response.use(
       localStorage.clear();
       sessionStorage.clear();
       window.location.hash = '#/login';
+    } else if (status >= 500) {
+      ElNotification({
+        title: 'Server Error',
+        message: `The server encountered an error (${status}). Please try again later.`,
+        type: 'error',
+      });
     } else {
       failMessage(AXIOS_ERROR_MESSAGES.REQUEST_ERROR, response.data?.code, response.data);
     }
@@ -124,6 +131,14 @@ request.interceptors.response.use(
     return Promise.reject(response.data ?? { status, message: 'Request failed' });
   },
   (error: AxiosError) => {
+    if (!error.response) {
+      // Network error — no response received
+      ElNotification({
+        title: 'Network Error',
+        message: 'Unable to reach the server. Please check your connection.',
+        type: 'error',
+      });
+    }
     return Promise.reject(error);
   }
 );
