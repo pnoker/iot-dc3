@@ -23,8 +23,10 @@ import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.npdu.ip.IpNetworkBuilder;
 import com.serotonin.bacnet4j.transport.DefaultTransport;
 import com.serotonin.bacnet4j.type.Encodable;
+import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
+import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -176,13 +178,44 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             PropertyIdentifier propertyId = resolvePropertyIdentifier(propertyIdStr);
 
             ObjectIdentifier oid = new ObjectIdentifier(objectType, objectInstance);
-            Encodable encodable = new Real(Float.parseFloat(value));
+            Encodable encodable = createEncodable(objectType, value);
             RequestUtils.writeProperty(localDevice, remoteDevice, oid, propertyId, encodable);
 
             return true;
         } catch (Exception e) {
             throw new WritePointException("BACnet write failed, protocol={}, message={}",
                     driverCode, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create the correct Encodable value for the given BACnet object type.
+     * <p>
+     * Analog types → Real (float), Binary types → BinaryPV (active/inactive),
+     * Multi-state types → UnsignedInteger, Device → UnsignedInteger, default → Real.
+     */
+    private Encodable createEncodable(ObjectType objectType, String value) {
+        String upperName = objectType.toString().toUpperCase();
+        if (upperName.startsWith("BINARY_")) {
+            boolean active = "true".equalsIgnoreCase(value)
+                    || "1".equals(value)
+                    || "active".equalsIgnoreCase(value);
+            return active ? BinaryPV.active : BinaryPV.inactive;
+        }
+        if (upperName.startsWith("MULTI_STATE_") || upperName.startsWith("DEVICE")) {
+            try {
+                return new UnsignedInteger(Integer.parseInt(value));
+            } catch (NumberFormatException e) {
+                log.warn("BACnet write: multi-state/device value '{}' is not an integer, falling back to Real", value);
+                return new Real(Float.parseFloat(value));
+            }
+        }
+        // Analog types and fallback
+        try {
+            return new Real(Float.parseFloat(value));
+        } catch (NumberFormatException e) {
+            // For string values on non-analog fallback objects
+            return new CharacterString(value);
         }
     }
 

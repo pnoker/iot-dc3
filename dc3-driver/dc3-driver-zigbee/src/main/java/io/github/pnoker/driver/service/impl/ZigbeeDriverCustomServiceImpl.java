@@ -20,7 +20,6 @@ package io.github.pnoker.driver.service.impl;
 import com.zsmartsystems.zigbee.IeeeAddress;
 import com.zsmartsystems.zigbee.ZigBeeEndpoint;
 import com.zsmartsystems.zigbee.ZigBeeNetworkManager;
-import com.zsmartsystems.zigbee.ZigBeeNetworkState;
 import com.zsmartsystems.zigbee.ZigBeeNode;
 import com.zsmartsystems.zigbee.ZigBeeStatus;
 import com.zsmartsystems.zigbee.dongle.telegesis.ZigBeeDongleTelegesis;

@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.lwm2m;
 
-import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -62,9 +61,8 @@ public class Lwm2mServerManager implements DisposableBean {
     private final DriverSenderService driverSenderService;
     private final DriverMetadata driverMetadata;
     private final DeviceMetadata deviceMetadata;
-
-    private LeshanServer server;
     private final Map<String, Registration> registrations = new ConcurrentHashMap<>();
+    private LeshanServer server;
 
     /**
      * Start the LwM2M server and register device lifecycle listeners.
@@ -87,7 +85,7 @@ public class Lwm2mServerManager implements DisposableBean {
 
                 @Override
                 public void updated(RegistrationUpdate update, Registration updatedReg,
-                                   Registration previousReg) {
+                                    Registration previousReg) {
                     String endpoint = updatedReg.getEndpoint();
                     registrations.put(endpoint, updatedReg);
                     log.info("LwM2M device updated: endpoint={}, id={}", endpoint, updatedReg.getId());
@@ -95,7 +93,7 @@ public class Lwm2mServerManager implements DisposableBean {
 
                 @Override
                 public void unregistered(Registration registration, Collection<Observation> observations,
-                                        boolean expired, Registration previousReg) {
+                                         boolean expired, Registration previousReg) {
                     String endpoint = registration.getEndpoint();
                     registrations.remove(endpoint);
                     log.info("LwM2M device unregistered: endpoint={}, expired={}", endpoint, expired);

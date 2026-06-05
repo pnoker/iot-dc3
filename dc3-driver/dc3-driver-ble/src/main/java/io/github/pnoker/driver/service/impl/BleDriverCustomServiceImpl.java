@@ -33,13 +33,13 @@ import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.sputnikdev.bluetooth.URL;
 import org.sputnikdev.bluetooth.manager.BluetoothManager;
 import org.sputnikdev.bluetooth.manager.CharacteristicGovernor;
 import org.sputnikdev.bluetooth.manager.DeviceGovernor;
 import org.sputnikdev.bluetooth.manager.impl.BluetoothManagerBuilder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -74,6 +74,32 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     public BleDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
+    }
+
+    private static int readInt16(byte[] data, String byteOrder) {
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        if ("LITTLE".equalsIgnoreCase(byteOrder)) bb.order(ByteOrder.LITTLE_ENDIAN);
+        return bb.getShort();
+    }
+
+    private static int readUint16(byte[] data, String byteOrder) {
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        if ("LITTLE".equalsIgnoreCase(byteOrder)) bb.order(ByteOrder.LITTLE_ENDIAN);
+        return bb.getShort() & 0xFFFF;
+    }
+
+    private static float readFloat(byte[] data, String byteOrder) {
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        if ("LITTLE".equalsIgnoreCase(byteOrder)) bb.order(ByteOrder.LITTLE_ENDIAN);
+        return bb.getFloat();
+    }
+
+    private static String bytesToHex(byte[] data) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : data) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
     }
 
     @Override
@@ -178,7 +204,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     }
 
     private CharacteristicGovernor getCharacteristicGovernor(Long deviceId, Map<String, AttributeBO> driverConfig,
-                                                              String serviceUuid, String characteristicUuid) {
+                                                             String serviceUuid, String characteristicUuid) {
         String deviceAddress = getRequiredConfig(driverConfig, "deviceAddress");
         String adapterName = getConfigValue(driverConfig, "adapterName", "hci0");
 
@@ -202,32 +228,6 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
             case "FLOAT" -> String.valueOf(readFloat(data, byteOrder));
             default -> new String(data, StandardCharsets.UTF_8);
         };
-    }
-
-    private static int readInt16(byte[] data, String byteOrder) {
-        ByteBuffer bb = ByteBuffer.wrap(data);
-        if ("LITTLE".equalsIgnoreCase(byteOrder)) bb.order(ByteOrder.LITTLE_ENDIAN);
-        return bb.getShort();
-    }
-
-    private static int readUint16(byte[] data, String byteOrder) {
-        ByteBuffer bb = ByteBuffer.wrap(data);
-        if ("LITTLE".equalsIgnoreCase(byteOrder)) bb.order(ByteOrder.LITTLE_ENDIAN);
-        return bb.getShort() & 0xFFFF;
-    }
-
-    private static float readFloat(byte[] data, String byteOrder) {
-        ByteBuffer bb = ByteBuffer.wrap(data);
-        if ("LITTLE".equalsIgnoreCase(byteOrder)) bb.order(ByteOrder.LITTLE_ENDIAN);
-        return bb.getFloat();
-    }
-
-    private static String bytesToHex(byte[] data) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : data) {
-            sb.append(String.format("%02X", b));
-        }
-        return sb.toString();
     }
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {

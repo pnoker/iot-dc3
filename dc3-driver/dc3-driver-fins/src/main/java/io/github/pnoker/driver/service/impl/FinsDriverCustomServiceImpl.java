@@ -318,7 +318,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Send a FINS command frame and receive the response.
      *
-     * @param socket   the TCP socket
+     * @param socket    the TCP socket
      * @param finsFrame the FINS command frame
      * @return response data bytes
      * @throws IOException on I/O error
@@ -392,9 +392,11 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
     private String decodeValue(byte[] data, String dataType) {
         return switch (dataType.toUpperCase()) {
             case "INT16" -> String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort());
-            case "UINT16" -> String.valueOf(Short.toUnsignedInt(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort()));
+            case "UINT16" ->
+                    String.valueOf(Short.toUnsignedInt(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort()));
             case "INT32" -> String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt());
-            case "UINT32" -> String.valueOf(Integer.toUnsignedLong(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt()));
+            case "UINT32" ->
+                    String.valueOf(Integer.toUnsignedLong(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt()));
             case "FLOAT" -> String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getFloat());
             case "STRING" -> new String(data).trim();
             case "BCD" -> bytesToBcdString(data);

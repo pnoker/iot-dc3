@@ -89,8 +89,8 @@ public class SerialPortConnection {
     /**
      * Send bytes and read the response.
      *
-     * @param command       bytes to send
-     * @param responseLen   expected response length (0 = read until timeout or inter-frame gap)
+     * @param command     bytes to send
+     * @param responseLen expected response length (0 = read until timeout or inter-frame gap)
      * @return response bytes
      * @throws IOException if I/O fails
      */

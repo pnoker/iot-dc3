@@ -55,8 +55,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NettyTcpServer {
 
     private static final String PROTOCOL = "tcp";
-    private final NettyTcpServerHandler nettyTcpServerHandler;
-
     /**
      * Mapping of device IDs to Netty channels.
      * <p>
@@ -65,6 +63,7 @@ public class NettyTcpServer {
      * </p>
      */
     private static final Map<Long, Channel> DEVICE_CHANNEL_MAP = new ConcurrentHashMap<>(16);
+    private final NettyTcpServerHandler nettyTcpServerHandler;
 
     public static void registerDeviceChannel(Long deviceId, Channel channel) {
         DEVICE_CHANNEL_MAP.put(deviceId, channel);
