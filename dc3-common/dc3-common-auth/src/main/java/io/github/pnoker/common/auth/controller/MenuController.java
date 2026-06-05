@@ -66,6 +66,7 @@ public class MenuController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {
+        // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
         return getUserHeader().flatMap(header -> async(() -> {
             MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
             entityBO.setCreatorId(header.getUserId());
@@ -79,6 +80,7 @@ public class MenuController implements BaseController {
 
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+        // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
         return async(() -> {
             menuService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -87,6 +89,7 @@ public class MenuController implements BaseController {
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MenuVO entityVO) {
+        // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
         return getUserHeader().flatMap(header -> async(() -> {
             MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());
@@ -98,6 +101,7 @@ public class MenuController implements BaseController {
 
     @GetMapping("/get_by_id")
     public Mono<R<MenuVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+        // Read access to global menu data is open to all authenticated users.
         return async(() -> {
             MenuBO entityBO = menuService.getById(id);
             MenuVO entityVO = menuBuilder.buildVOByBO(entityBO);
@@ -107,6 +111,7 @@ public class MenuController implements BaseController {
 
     @PostMapping("/list")
     public Mono<R<Page<MenuVO>>> list(@RequestBody(required = false) MenuQuery entityQuery) {
+        // Read access to global menu data is open to all authenticated users.
         return async(() -> {
             MenuQuery query = Objects.isNull(entityQuery) ? new MenuQuery() : entityQuery;
             Page<MenuBO> entityPageBO = menuService.list(query);
@@ -117,6 +122,7 @@ public class MenuController implements BaseController {
 
     @PostMapping("/list_tree")
     public Mono<R<List<MenuTreeVO>>> listTree(@RequestBody(required = false) MenuQuery entityQuery) {
+        // Read access to global menu data is open to all authenticated users.
         return async(() -> {
             List<MenuTreeBO> entityBOList = menuService.listTree(entityQuery);
             List<MenuTreeVO> entityVOList = new ArrayList<>(entityBOList.size());

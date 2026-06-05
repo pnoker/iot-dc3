@@ -27,6 +27,8 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
@@ -68,11 +70,19 @@ public class TenantController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
-        return async(() -> {
+        return getUserHeader().flatMap(header -> async(() -> {
+            TenantBO userTenant = tenantService.getById(header.getTenantId());
+            if (!"default".equals(userTenant.getTenantCode())) {
+                throw new ServiceException("Only system administrators can create tenants");
+            }
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
+            entityBO.setCreatorId(header.getUserId());
+            entityBO.setCreatorName(header.getNickName());
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
             tenantService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -83,10 +93,15 @@ public class TenantController implements BaseController {
      */
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            TenantBO userTenant = tenantService.getById(tenantId);
+            boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
+            if (!isSystemAdmin && !Objects.equals(id, tenantId)) {
+                throw new ServiceException("Access denied: cannot delete another tenant.");
+            }
             tenantService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -101,11 +116,16 @@ public class TenantController implements BaseController {
      */
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody TenantVO entityVO) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            TenantBO userTenant = tenantService.getById(tenantId);
+            boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
+            if (!isSystemAdmin && !Objects.equals(entityVO.getId(), tenantId)) {
+                throw new ServiceException("Access denied: cannot update another tenant.");
+            }
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
             tenantService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
-        });
+        }));
     }
 
     /**
@@ -116,11 +136,16 @@ public class TenantController implements BaseController {
      */
     @GetMapping("/get_by_id")
     public Mono<R<TenantVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            TenantBO userTenant = tenantService.getById(tenantId);
+            boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
+            if (!isSystemAdmin && !Objects.equals(id, tenantId)) {
+                throw new NotFoundException("Resource does not exist");
+            }
             TenantBO entityBO = tenantService.getById(id);
             TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
-        });
+        }));
     }
 
     /**
@@ -131,13 +156,18 @@ public class TenantController implements BaseController {
      */
     @GetMapping("/get_by_code")
     public Mono<R<TenantVO>> getByCode(@NotNull @RequestParam(value = "code") String code) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            TenantBO userTenant = tenantService.getById(tenantId);
+            boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
             TenantBO select = tenantService.getByCode(code);
-            if (Objects.nonNull(select)) {
-                return R.ok(tenantBuilder.buildVOByBO(select));
+            if (Objects.isNull(select)) {
+                return R.fail(ResponseEnum.NO_RESOURCE.getText());
             }
-            return R.fail(ResponseEnum.NO_RESOURCE.getText());
-        });
+            if (!isSystemAdmin && !Objects.equals(select.getId(), tenantId)) {
+                return R.fail("Resource does not exist");
+            }
+            return R.ok(tenantBuilder.buildVOByBO(select));
+        }));
     }
 
     /**
@@ -148,12 +178,17 @@ public class TenantController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<TenantVO>>> list(@RequestBody(required = false) TenantQuery entityQuery) {
-        return async(() -> {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            TenantBO userTenant = tenantService.getById(tenantId);
+            boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
             TenantQuery query = Objects.isNull(entityQuery) ? new TenantQuery() : entityQuery;
+            if (!isSystemAdmin) {
+                query.setTenantCode(userTenant.getTenantCode());
+            }
             Page<TenantBO> entityPageBO = tenantService.list(query);
             Page<TenantVO> entityPageVO = tenantBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
-        });
+        }));
     }
 
 }

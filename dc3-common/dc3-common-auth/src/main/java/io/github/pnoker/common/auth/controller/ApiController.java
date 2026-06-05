@@ -62,6 +62,7 @@ public class ApiController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
+        // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
         return async(() -> {
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.add(entityBO);
@@ -71,6 +72,7 @@ public class ApiController implements BaseController {
 
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+        // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
         return async(() -> {
             apiService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -79,6 +81,7 @@ public class ApiController implements BaseController {
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
+        // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
         return async(() -> {
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.update(entityBO);
@@ -88,6 +91,7 @@ public class ApiController implements BaseController {
 
     @GetMapping("/get_by_id")
     public Mono<R<ApiVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+        // Read access to global API data is open to all authenticated users.
         return async(() -> {
             ApiBO entityBO = apiService.getById(id);
             ApiVO entityVO = apiBuilder.buildVOByBO(entityBO);
@@ -97,6 +101,7 @@ public class ApiController implements BaseController {
 
     @PostMapping("/list")
     public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
+        // Read access to global API data is open to all authenticated users.
         return async(() -> {
             ApiQuery query = Objects.isNull(entityQuery) ? new ApiQuery() : entityQuery;
             Page<ApiBO> entityPageBO = apiService.list(query);
