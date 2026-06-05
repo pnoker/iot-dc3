@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.annotation;
 
+import lombok.Getter;
+
 /**
  * Enumeration representing different types of log levels used in the DC3 IoT Platform.
  * Provides standardized log levels for consistent logging across the platform: - INFO:
@@ -28,6 +30,7 @@ package io.github.pnoker.common.annotation;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Getter
 public enum LogsTypeEnum {
 
     INFO, WARN, DEBUG, ERROR

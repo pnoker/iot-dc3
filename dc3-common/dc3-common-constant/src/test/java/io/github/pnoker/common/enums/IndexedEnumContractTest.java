@@ -80,7 +80,6 @@ class IndexedEnumContractTest {
             ProfileTypeFlagEnum.class,
             ResourceScopeFlagEnum.class,
             ResourceTypeFlagEnum.class,
-            ResponseEnum.class,
             RuleStateFlagEnum.class,
             RwFlagEnum.class);
 

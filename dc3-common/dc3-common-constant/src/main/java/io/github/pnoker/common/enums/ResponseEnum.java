@@ -35,20 +35,20 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ResponseEnum {
 
-    OK((byte) 200, "R200", "Success"), TOKEN_INVALID((byte) 20301, "R20301", "Token is invalid"),
-    IP_INVALID((byte) 20302, "R20302", "Invalid IP"), FAILURE((byte) 500, "R500", "Service exception"),
-    NO_RESOURCE((byte) 404, "R404", "Resource does not exist"), OUT_RANGE((byte) 900, "R900", "Number out of range"),
+    OK(200, "R200", "Success"), TOKEN_INVALID(20301, "R20301", "Token is invalid"),
+    IP_INVALID(20302, "R20302", "Invalid IP"), FAILURE(500, "R500", "Service exception"),
+    NO_RESOURCE(404, "R404", "Resource does not exist"), OUT_RANGE(900, "R900", "Number out of range"),
 
-    ADD_SUCCESS((byte) 20001, "R20001", "Added successfully"),
-    DELETE_SUCCESS((byte) 20002, "R20002", "Deleted successfully"),
-    UPDATE_SUCCESS((byte) 20003, "R20003", "Updated successfully"),
+    ADD_SUCCESS(20001, "R20001", "Added successfully"),
+    DELETE_SUCCESS(20002, "R20002", "Deleted successfully"),
+    UPDATE_SUCCESS(20003, "R20003", "Updated successfully"),
     ;
 
     /**
      * Index
      */
     @EnumValue
-    private final Byte index;
+    private final Integer index;
 
     /**
      * Code
@@ -66,7 +66,7 @@ public enum ResponseEnum {
      * @param index Index
      * @return {@link ResponseEnum}
      */
-    public static ResponseEnum ofIndex(Byte index) {
+    public static ResponseEnum ofIndex(Integer index) {
         Optional<ResponseEnum> any = Arrays.stream(ResponseEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
