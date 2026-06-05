@@ -80,7 +80,7 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Modbus factory for creating ModbusMaster instances.
      */
-    private static ModbusFactory modbusFactory = new ModbusFactory();
+    private static final ModbusFactory modbusFactory = new ModbusFactory();
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     @Value("${dc3.driver.code}")
