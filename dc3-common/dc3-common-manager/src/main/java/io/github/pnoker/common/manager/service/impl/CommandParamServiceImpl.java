@@ -85,7 +85,7 @@ public class CommandParamServiceImpl implements CommandParamService {
     private final DriverService driverService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(CommandParamBO entityBO) {
         validateTenantRelations(entityBO);
         checkDuplicate(entityBO, false, true);
@@ -98,7 +98,7 @@ public class CommandParamServiceImpl implements CommandParamService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         CommandParamDO entityDO = getDOById(id, true);
         if (!commandParamManager.removeById(id)) {
@@ -108,7 +108,7 @@ public class CommandParamServiceImpl implements CommandParamService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void update(CommandParamBO entityBO) {
         CommandParamDO current = getDOById(entityBO.getId(), true);
         Long oldCommandId = current.getCommandId();

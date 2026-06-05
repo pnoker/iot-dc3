@@ -75,7 +75,7 @@ public class DriverServiceImpl implements DriverService {
     private final PointManager pointManager;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(DriverBO entityBO) {
         checkDuplicate(entityBO, false, true);
 

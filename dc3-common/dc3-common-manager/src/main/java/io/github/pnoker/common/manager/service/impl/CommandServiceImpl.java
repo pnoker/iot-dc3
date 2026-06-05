@@ -93,7 +93,7 @@ public class CommandServiceImpl implements CommandService {
     private final DriverService driverService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(CommandBO entityBO) {
         validateTenantRelations(entityBO);
         entityBO.setCommandCode(null);
@@ -113,7 +113,7 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         CommandDO entityDO = getDOById(id, true);
         List<Long> deviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
@@ -132,7 +132,7 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void update(CommandBO entityBO) {
         CommandDO current = getDOById(entityBO.getId(), true);
         List<Long> oldDeviceIds = listDeviceIdsByProfileId(current.getProfileId());

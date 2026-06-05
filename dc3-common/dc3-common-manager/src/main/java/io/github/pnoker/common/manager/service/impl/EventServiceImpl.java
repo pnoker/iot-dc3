@@ -93,7 +93,7 @@ public class EventServiceImpl implements EventService {
     private final DriverService driverService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(EventBO entityBO) {
         validateTenantRelations(entityBO);
         entityBO.setEventCode(null);
@@ -113,7 +113,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         EventDO entityDO = getDOById(id, true);
         List<Long> deviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
@@ -132,7 +132,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void update(EventBO entityBO) {
         EventDO current = getDOById(entityBO.getId(), true);
         List<Long> oldDeviceIds = listDeviceIdsByProfileId(current.getProfileId());
