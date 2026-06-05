@@ -158,44 +158,44 @@ class UserLoginServiceImplTest {
     }
 
     @Test
-    void checkLoginNameValidReturnsFalseForUnknownLogin() {
+    void isLoginNameValidReturnsFalseForUnknownLogin() {
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
-        assertThat(service.checkLoginNameValid("ghost")).isFalse();
+        assertThat(service.isLoginNameValid("ghost")).isFalse();
     }
 
     @Test
-    void checkLoginNameValidReturnsTrueForEnabledLogin() throws Exception {
+    void isLoginNameValidReturnsTrueForEnabledLogin() throws Exception {
         setField(bo, "enableFlag", EnableFlagEnum.ENABLE);
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(userLoginBuilder.buildBOByDO(doRow)).thenReturn(bo);
-        assertThat(service.checkLoginNameValid("alice")).isTrue();
+        assertThat(service.isLoginNameValid("alice")).isTrue();
     }
 
     @Test
-    void checkLoginNameValidReturnsFalseForDisabledLogin() throws Exception {
+    void isLoginNameValidReturnsFalseForDisabledLogin() throws Exception {
         setField(bo, "enableFlag", EnableFlagEnum.DISABLE);
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
         when(userLoginBuilder.buildBOByDO(doRow)).thenReturn(bo);
-        assertThat(service.checkLoginNameValid("alice")).isFalse();
+        assertThat(service.isLoginNameValid("alice")).isFalse();
     }
 
     @Test
-    void checkLoginNameAvailableReturnsTrueWhenTenantHasNoMembers() {
+    void isLoginNameAvailableReturnsTrueWhenTenantHasNoMembers() {
         when(tenantBindService.listUserIdsByTenantId(1L)).thenReturn(java.util.List.of());
-        assertThat(service.checkLoginNameAvailable("alice", 1L)).isTrue();
+        assertThat(service.isLoginNameAvailable("alice", 1L)).isTrue();
     }
 
     @Test
-    void checkLoginNameAvailableReturnsTrueWhenNameNotInTenant() {
+    void isLoginNameAvailableReturnsTrueWhenNameNotInTenant() {
         when(tenantBindService.listUserIdsByTenantId(1L)).thenReturn(java.util.List.of(1L, 2L));
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
-        assertThat(service.checkLoginNameAvailable("newuser", 1L)).isTrue();
+        assertThat(service.isLoginNameAvailable("newuser", 1L)).isTrue();
     }
 
     @Test
-    void checkLoginNameAvailableReturnsFalseWhenNameExistsInTenant() {
+    void isLoginNameAvailableReturnsFalseWhenNameExistsInTenant() {
         when(tenantBindService.listUserIdsByTenantId(1L)).thenReturn(java.util.List.of(1L, 2L));
         when(userLoginManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        assertThat(service.checkLoginNameAvailable("alice", 1L)).isFalse();
+        assertThat(service.isLoginNameAvailable("alice", 1L)).isFalse();
     }
 }

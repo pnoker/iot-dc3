@@ -70,7 +70,7 @@ public class ModelController implements BaseController {
     public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
             ModelConfigBO entityBO = modelConfigBuilder.buildBOByRequest(request);
-            return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.save(entityBO, header)));
+            return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.add(entityBO, header)));
         }));
     }
 
@@ -85,7 +85,7 @@ public class ModelController implements BaseController {
     @PostMapping("/config/delete")
     public Mono<R<Boolean>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            modelConfigService.remove(id);
+            modelConfigService.delete(id);
             return R.ok(true);
         });
     }

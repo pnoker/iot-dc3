@@ -67,7 +67,7 @@ public interface SessionService {
      *
      * @param conversationId conversation ID
      */
-    void removeByConversationId(String conversationId);
+    void deleteByConversationId(String conversationId);
 
     /**
      * Update mutable session metadata.

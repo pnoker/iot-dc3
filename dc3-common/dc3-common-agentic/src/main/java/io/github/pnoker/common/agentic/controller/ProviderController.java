@@ -64,7 +64,7 @@ public class ProviderController implements BaseController {
     public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
             ModelProviderBO entityBO = modelProviderBuilder.buildBOByRequest(request);
-            return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.save(entityBO, header)));
+            return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.add(entityBO, header)));
         }));
     }
 
@@ -79,7 +79,7 @@ public class ProviderController implements BaseController {
     @PostMapping("/config/delete")
     public Mono<R<Boolean>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
-            modelProviderService.remove(id);
+            modelProviderService.delete(id);
             return R.ok(true);
         });
     }

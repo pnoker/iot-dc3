@@ -106,11 +106,11 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -146,11 +146,11 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
                 || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             builder.setData(getDeviceAttachDTO(entityBO));
         }

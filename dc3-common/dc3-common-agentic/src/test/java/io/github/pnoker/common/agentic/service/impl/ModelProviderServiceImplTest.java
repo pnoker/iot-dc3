@@ -63,7 +63,7 @@ class ModelProviderServiceImplTest {
 
     @Test
     void saveRejectsNullEntity() {
-        assertThatThrownBy(() -> service.save(null, header)).isInstanceOf(RequestException.class)
+        assertThatThrownBy(() -> service.add(null, header)).isInstanceOf(RequestException.class)
                 .hasMessageContaining("Provider name");
     }
 
@@ -72,7 +72,7 @@ class ModelProviderServiceImplTest {
         ModelProviderBO bo = new ModelProviderBO();
         bo.setName("   ");
         bo.setBaseUrl("https://api");
-        assertThatThrownBy(() -> service.save(bo, header)).isInstanceOf(RequestException.class)
+        assertThatThrownBy(() -> service.add(bo, header)).isInstanceOf(RequestException.class)
                 .hasMessageContaining("Provider name");
     }
 
@@ -81,7 +81,7 @@ class ModelProviderServiceImplTest {
         ModelProviderBO bo = new ModelProviderBO();
         bo.setName("Anthropic");
         bo.setBaseUrl("  ");
-        assertThatThrownBy(() -> service.save(bo, header)).isInstanceOf(RequestException.class)
+        assertThatThrownBy(() -> service.add(bo, header)).isInstanceOf(RequestException.class)
                 .hasMessageContaining("base URL");
     }
 
@@ -132,7 +132,7 @@ class ModelProviderServiceImplTest {
 
     @Test
     void removeEvictsCachedClient() {
-        service.remove(42L);
+        service.delete(42L);
         verify(modelProviderManager).removeById(42L);
         verify(chatClientFactory).evict(42L);
     }

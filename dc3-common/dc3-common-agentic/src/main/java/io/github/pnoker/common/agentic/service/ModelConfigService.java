@@ -36,10 +36,10 @@ public interface ModelConfigService {
 
     List<ModelConfigBO> listConfigs();
 
-    ModelConfigBO save(ModelConfigBO entityBO, RequestHeader.UserHeader header);
+    ModelConfigBO add(ModelConfigBO entityBO, RequestHeader.UserHeader header);
 
     ModelConfigBO update(ModelConfigBO entityBO, RequestHeader.UserHeader header);
 
-    void remove(Long id);
+    void delete(Long id);
 
 }

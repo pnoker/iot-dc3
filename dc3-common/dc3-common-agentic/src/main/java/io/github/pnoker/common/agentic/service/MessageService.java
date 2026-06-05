@@ -57,6 +57,6 @@ public interface MessageService {
      * @param scopedConversationId tenant/user scoped conversation ID
      * @return number of rows soft-deleted
      */
-    int removeByConversationId(String scopedConversationId);
+    int deleteByConversationId(String scopedConversationId);
 
 }

@@ -104,7 +104,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public int removeByConversationId(String scopedConversationId) {
+    public int deleteByConversationId(String scopedConversationId) {
         if (StringUtils.isBlank(scopedConversationId)) {
             return 0;
         }

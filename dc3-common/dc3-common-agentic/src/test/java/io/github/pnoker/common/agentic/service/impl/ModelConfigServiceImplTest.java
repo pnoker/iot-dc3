@@ -76,7 +76,7 @@ class ModelConfigServiceImplTest {
         ModelConfigBO bo = new ModelConfigBO();
         bo.setModel("   ");
         bo.setProviderId(1L);
-        assertThatThrownBy(() -> service.save(bo, header)).isInstanceOf(RequestException.class)
+        assertThatThrownBy(() -> service.add(bo, header)).isInstanceOf(RequestException.class)
                 .hasMessageContaining("Model is required");
     }
 
@@ -85,7 +85,7 @@ class ModelConfigServiceImplTest {
         ModelConfigBO bo = new ModelConfigBO();
         bo.setModel("gpt-4o");
         bo.setProviderId(0L);
-        assertThatThrownBy(() -> service.save(bo, header)).isInstanceOf(RequestException.class)
+        assertThatThrownBy(() -> service.add(bo, header)).isInstanceOf(RequestException.class)
                 .hasMessageContaining("Provider is required");
     }
 
@@ -95,7 +95,7 @@ class ModelConfigServiceImplTest {
         bo.setModel("gpt-4o");
         bo.setProviderId(7L);
         when(modelProviderManager.getById(7L)).thenReturn(null);
-        assertThatThrownBy(() -> service.save(bo, header)).isInstanceOf(NotFoundException.class)
+        assertThatThrownBy(() -> service.add(bo, header)).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Provider does not exist");
     }
 
@@ -106,7 +106,7 @@ class ModelConfigServiceImplTest {
         bo.setProviderId(7L);
         bo.setTemperature(2.5);
         when(modelProviderManager.getById(7L)).thenReturn(new ModelProviderDO());
-        assertThatThrownBy(() -> service.save(bo, header)).isInstanceOf(RequestException.class)
+        assertThatThrownBy(() -> service.add(bo, header)).isInstanceOf(RequestException.class)
                 .hasMessageContaining("Temperature");
     }
 
@@ -117,7 +117,7 @@ class ModelConfigServiceImplTest {
         bo.setProviderId(7L);
         bo.setMaxTokens(0);
         when(modelProviderManager.getById(7L)).thenReturn(new ModelProviderDO());
-        assertThatThrownBy(() -> service.save(bo, header)).isInstanceOf(RequestException.class)
+        assertThatThrownBy(() -> service.add(bo, header)).isInstanceOf(RequestException.class)
                 .hasMessageContaining("Max tokens");
     }
 
@@ -143,7 +143,7 @@ class ModelConfigServiceImplTest {
 
     @Test
     void removeDelegatesToManager() {
-        service.remove(42L);
+        service.delete(42L);
         verify(modelConfigManager).removeById(42L);
     }
 

@@ -118,22 +118,22 @@ class SessionServiceImplTest {
     }
 
     @Test
-    void removeByConversationIdClearsChatMemoryWhenSessionExists() {
+    void deleteByConversationIdClearsChatMemoryWhenSessionExists() {
         SessionDO existing = new SessionDO();
         existing.setId(99L);
         when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
 
-        service.removeByConversationId("conv-1");
+        service.deleteByConversationId("conv-1");
 
         verify(sessionManager).removeById(99L);
         verify(agenticChatMemory).clear("conv-1");
     }
 
     @Test
-    void removeByConversationIdIsNoOpWhenSessionMissing() {
+    void deleteByConversationIdIsNoOpWhenSessionMissing() {
         when(sessionManager.getOne(anySessionQuery())).thenReturn(null);
 
-        service.removeByConversationId("missing");
+        service.deleteByConversationId("missing");
 
         verify(sessionManager, never()).removeById(any());
         verify(agenticChatMemory, never()).clear(any());

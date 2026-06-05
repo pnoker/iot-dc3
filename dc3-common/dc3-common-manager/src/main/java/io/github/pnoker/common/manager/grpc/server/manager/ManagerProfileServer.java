@@ -149,13 +149,13 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     private void ok(GrpcR.Builder rBuilder) {
         rBuilder.setOk(true);
         rBuilder.setCode(ResponseEnum.OK.getCode());
-        rBuilder.setMessage(ResponseEnum.OK.getText());
+        rBuilder.setMessage(ResponseEnum.OK.getRemark());
     }
 
     private void noResource(GrpcR.Builder rBuilder) {
         rBuilder.setOk(false);
         rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-        rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
     }
 
 }

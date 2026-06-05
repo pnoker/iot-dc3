@@ -52,7 +52,7 @@ import java.util.Objects;
  *       orchestration service which writes a richer payload (tools, contexts,
  *       tokens) than the {@link Message} envelope can carry.</li>
  *   <li>{@link #deleteByConversationId} delegates to
- *       {@link MessageService#removeByConversationId(String)} so wiping a session
+ *       {@link MessageService#deleteByConversationId(String)} so wiping a session
  *       wipes both replay history and persisted business records together.</li>
  * </ul>
  *
@@ -115,7 +115,7 @@ public class MessageChatMemoryRepository implements ChatMemoryRepository {
             return;
         }
         try {
-            int removed = messageService.removeByConversationId(conversationId);
+            int removed = messageService.deleteByConversationId(conversationId);
             log.debug("Agentic chat memory cleared, conversationId={}, rows={}", conversationId, removed);
         } catch (Exception e) {
             log.warn("Agentic chat memory clear failed, conversationId={}", conversationId, e);

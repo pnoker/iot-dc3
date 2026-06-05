@@ -70,6 +70,6 @@ class ModelControllerTest {
                     assertThat(response.getData()).isTrue();
                 })
                 .verifyComplete();
-        verify(modelConfigService).remove(42L);
+        verify(modelConfigService).delete(42L);
     }
 }

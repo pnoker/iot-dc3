@@ -33,10 +33,10 @@ public interface ModelProviderService {
 
     List<ModelProviderBO> list();
 
-    ModelProviderBO save(ModelProviderBO entityBO, RequestHeader.UserHeader header);
+    ModelProviderBO add(ModelProviderBO entityBO, RequestHeader.UserHeader header);
 
     ModelProviderBO update(ModelProviderBO entityBO, RequestHeader.UserHeader header);
 
-    void remove(Long id);
+    void delete(Long id);
 
 }

@@ -72,7 +72,7 @@ public class DriverInitRunner implements ApplicationRunner {
 
         // Initialize driver tasks including status monitoring, reading operations and
         // custom tasks
-        driverScheduleService.initial();
+        driverScheduleService.initialize();
     }
 
     private void registerWithRetry() throws InterruptedException {
