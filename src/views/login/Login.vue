@@ -108,7 +108,7 @@
     formData: {
       tenant,
       name,
-      password: 'dc3dc3dc3',
+      password: '',
     },
   });
 
