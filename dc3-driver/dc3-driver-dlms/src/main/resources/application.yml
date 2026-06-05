@@ -98,7 +98,7 @@ dc3:
         attribute-type-flag: INT
         default-value: 2
         remark: Attribute ID (2=Present Value)
-    command-attribute: []
+    command-attribute: [ ]
 
 spring:
   application:

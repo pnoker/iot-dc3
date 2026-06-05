@@ -101,17 +101,20 @@ dc3:
         attribute-code: checksumType
         attribute-type-flag: STRING
         default-value: NONE
-        remark: Checksum type: NONE, CRC16, XOR
+        remark:
+          Checksum type: NONE, CRC16, XOR
       - attribute-name: Data Format
         attribute-code: dataFormat
         attribute-type-flag: STRING
         default-value: HEX
-        remark: Data format: HEX, ASCII, BINARY, FLOAT
+        remark:
+          Data format: HEX, ASCII, BINARY, FLOAT
       - attribute-name: Byte Order
         attribute-code: byteOrder
         attribute-type-flag: STRING
         default-value: BIG
-        remark: Byte order: BIG, LITTLE
+        remark:
+          Byte order: BIG, LITTLE
     command-attribute:
       - attribute-name: Send Command
         attribute-code: sendCommand
@@ -122,7 +125,8 @@ dc3:
         attribute-code: byteOrder
         attribute-type-flag: STRING
         default-value: BIG
-        remark: Byte order for encoding value: BIG, LITTLE
+        remark:
+          Byte order for encoding value: BIG, LITTLE
 
 spring:
   application:

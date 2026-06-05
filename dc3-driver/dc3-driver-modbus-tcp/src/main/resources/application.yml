@@ -28,7 +28,7 @@ dc3:
         enable: true
         cron: '0/30 * * * * ?'
       custom:
-        enable: true
+        enable: false
         cron: '0/5 * * * * ?'
     health:
       device:

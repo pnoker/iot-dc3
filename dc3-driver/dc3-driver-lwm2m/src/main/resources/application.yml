@@ -92,7 +92,7 @@ dc3:
         attribute-type-flag: STRING
         default-value: 'false'
         remark: 'Enable LwM2M Observe: true, false'
-    command-attribute: []
+    command-attribute: [ ]
 
   lwm2m:
     server-host: '0.0.0.0'
