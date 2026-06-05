@@ -18,6 +18,8 @@
 package io.github.pnoker.common.driver.entity.bean;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +31,8 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Message payload that carries a point reading, including the raw value, the calculated
@@ -102,6 +106,59 @@ public class PointValue implements Serializable {
         this.calValue = calculatedValue.getFinalValue();
         this.numValue = calculatedValue.getNumericValue();
         this.createTime = LocalDateTimeUtil.now();
+    }
+
+    /**
+     * Creates a {@link PointValue} for a write echo where the value is already in its
+     * final device-level form. Scaling ({@code base}, {@code multiple}, {@code decimal})
+     * is NOT re-applied; the raw and calibrated values are set to the same string.
+     *
+     * @param device source device
+     * @param point  point definition (used only for numeric projection)
+     * @param value  final device-level value returned after a successful write
+     * @return a PointValue with {@code rawValue == calValue == value}
+     */
+    public static PointValue ofRawValue(DeviceBO device, PointBO point, String value) {
+        PointValue pointValue = new PointValue();
+        pointValue.setDeviceId(device.getId());
+        pointValue.setPointId(point.getId());
+        pointValue.setRawValue(value);
+        pointValue.setCalValue(value);
+        pointValue.setNumValue(resolveNumValue(value, point));
+        pointValue.setCreateTime(LocalDateTimeUtil.now());
+        return pointValue;
+    }
+
+    /**
+     * Computes a numeric projection of a final (already-scaled) value without
+     * re-applying point scaling rules.
+     *
+     * @param value final value string
+     * @param point point definition (used for type determination)
+     * @return numeric value or {@code null} for string-typed points
+     */
+    private static Double resolveNumValue(String value, PointBO point) {
+        if (Objects.isNull(point) || Objects.isNull(value) || Objects.isNull(point.getPointTypeFlag())) {
+            return null;
+        }
+        return switch (point.getPointTypeFlag()) {
+            case BYTE, SHORT, INT, LONG, FLOAT, DOUBLE -> {
+                try {
+                    yield Double.parseDouble(value.trim());
+                } catch (NumberFormatException e) {
+                    yield null;
+                }
+            }
+            case BOOLEAN -> {
+                String normalized = value.trim().toLowerCase(Locale.ROOT);
+                yield switch (normalized) {
+                    case "true", "1" -> 1.0;
+                    case "false", "0" -> 0.0;
+                    default -> null;
+                };
+            }
+            case STRING -> null;
+        };
     }
 
 }

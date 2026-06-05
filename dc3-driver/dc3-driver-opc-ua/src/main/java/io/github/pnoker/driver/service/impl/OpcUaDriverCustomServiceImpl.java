@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -33,12 +34,14 @@ import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
+import io.github.pnoker.driver.key.KeyLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
+import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
@@ -84,14 +87,42 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     private String driverCode;
     private Map<Long, OpcUaClient> connectMap;
 
+    /**
+     * KeyLoader for OPC UA client certificate management.
+     * Lazy-initialized on first health check to avoid blocking startup.
+     */
+    private volatile KeyLoader keyLoader;
+
     @Override
     public void initial() {
         connectMap = new ConcurrentHashMap<>(16);
+        try {
+            keyLoader = new KeyLoader().load(
+                    java.nio.file.Path.of(System.getProperty("user.dir"), "dc3", "opc-ua"));
+        } catch (Exception e) {
+            log.warn("OPC UA KeyLoader initialization failed, falling back to anonymous auth: {}", e.getMessage());
+            keyLoader = null;
+        }
     }
 
     @Override
     public void schedule() {
         // Device state lease renewal is owned by the SDK device health job.
+    }
+
+    @Override
+    public DeviceHealthState health(Map<String, AttributeBO> driverConfig, DeviceBO device) {
+        try {
+            OpcUaClient client = getConnector(device.getId(), driverConfig);
+            if (client != null) {
+                // Connect is idempotent — returns immediately when already connected
+                client.connect().get(1, TimeUnit.SECONDS);
+                return DeviceHealthState.online();
+            }
+        } catch (Exception e) {
+            log.debug("Health check failed for device {}", device.getId(), e);
+        }
+        return DeviceHealthState.offline();
     }
 
     @Override
@@ -149,13 +180,26 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             log.debug("Driver connection creating, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                     host, port, path);
             try {
+                // Prefer certificate-based auth when KeyLoader is available
+                KeyLoader loader = this.keyLoader;
                 OpcUaClient opcUaClient = OpcUaClient.create(url, endpoints -> endpoints.stream().findFirst(),
-                        configBuilder -> configBuilder
-                                // Use anonymous authentication
-                                .setIdentityProvider(new AnonymousProvider())
-                                // Set request timeout to 5000 ms
-                                .setRequestTimeout(Unsigned.uint(REQUEST_TIMEOUT_MS))
-                                .build());
+                        configBuilder -> {
+                            configBuilder
+                                    .setRequestTimeout(Unsigned.uint(REQUEST_TIMEOUT_MS))
+                                    .setApplicationName(LocalizedText.english("IoT DC3 OPC UA Driver"))
+                                    .setApplicationUri("urn:dc3:opc:ua:client");
+                            if (loader != null && loader.getClientCertificate() != null
+                                    && loader.getClientKeyPair() != null) {
+                                configBuilder
+                                        .setCertificate(loader.getClientCertificate())
+                                        .setKeyPair(loader.getClientKeyPair())
+                                        .setIdentityProvider(new AnonymousProvider());
+                            } else {
+                                configBuilder
+                                        .setIdentityProvider(new AnonymousProvider());
+                            }
+                            return configBuilder.build();
+                        });
                 log.info("Driver connection created, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}", deviceId,
                         host, port, path);
                 return opcUaClient;

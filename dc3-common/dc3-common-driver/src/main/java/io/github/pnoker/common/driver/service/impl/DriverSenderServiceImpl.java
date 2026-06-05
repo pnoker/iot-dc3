@@ -34,11 +34,14 @@ import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -132,24 +135,41 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     @Override
     public void pointValueSender(PointValue entityDTO) {
-        if (Objects.nonNull(entityDTO)) {
-            DriverBO driver = driverMetadata.getDriver();
-            if (Objects.nonNull(driver)) {
-                if (Objects.isNull(entityDTO.getDriverId())) {
-                    entityDTO.setDriverId(driver.getId());
-                }
-                if (Objects.isNull(entityDTO.getTenantId())) {
-                    entityDTO.setTenantId(driver.getTenantId());
-                }
-            } else {
-                log.warn(
-                        "DriverMetadata has no registered driver yet; point value will be published without driverId/tenantId");
+        if (Objects.isNull(entityDTO)) {
+            return;
+        }
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.nonNull(driver)) {
+            if (Objects.isNull(entityDTO.getDriverId())) {
+                entityDTO.setDriverId(driver.getId());
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Send point value: {}", JsonUtil.toJsonString(entityDTO));
+            if (Objects.isNull(entityDTO.getTenantId())) {
+                entityDTO.setTenantId(driver.getTenantId());
             }
-            rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE,
-                    RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService(), entityDTO);
+        } else {
+            log.warn(
+                    "DriverMetadata has no registered driver yet; point value will be published without driverId/tenantId");
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Send point value: {}", JsonUtil.toJsonString(entityDTO));
+        }
+
+        String routingKey = RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService();
+        CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
+        correlationData.getFuture().whenComplete((confirm, throwable) -> {
+            if (throwable != null) {
+                log.error("Point value publish failed (exception): deviceId={}, pointId={}",
+                        entityDTO.getDeviceId(), entityDTO.getPointId(), throwable);
+            } else if (confirm != null && !confirm.isAck()) {
+                log.warn("Point value publish NACKed: deviceId={}, pointId={}, reason={}",
+                        entityDTO.getDeviceId(), entityDTO.getPointId(), confirm.getReason());
+            }
+        });
+        try {
+            rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE, routingKey, entityDTO, correlationData);
+        } catch (AmqpException e) {
+            log.error("Point value publish rejected: deviceId={}, pointId={}",
+                    entityDTO.getDeviceId(), entityDTO.getPointId(), e);
         }
     }
 
