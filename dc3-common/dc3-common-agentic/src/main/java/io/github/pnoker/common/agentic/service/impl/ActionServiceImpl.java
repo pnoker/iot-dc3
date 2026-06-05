@@ -30,6 +30,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +47,7 @@ import java.util.UUID;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ActionServiceImpl implements ActionService {
@@ -107,6 +109,7 @@ public class ActionServiceImpl implements ActionService {
                 action.setRemark("Unsupported action type");
             }
         } catch (Exception e) {
+            log.warn("Action execution failed, actionId={}", action.getId(), e);
             action.setStatus(AgenticActionStatusEnum.FAILED.getIndex());
             action.setRemark(e.getMessage());
         }

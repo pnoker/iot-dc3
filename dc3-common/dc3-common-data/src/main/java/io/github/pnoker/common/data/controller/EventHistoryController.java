@@ -21,8 +21,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.EventHistoryService;
+import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
+import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
 import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotBlank;
@@ -54,6 +56,8 @@ public class EventHistoryController implements BaseController {
 
     private final EventHistoryService eventHistoryService;
 
+    private final EventHistoryBuilder eventHistoryBuilder;
+
     @PostMapping("/report")
     public Mono<R<String>> report(@Validated @RequestBody EventReportVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -65,15 +69,19 @@ public class EventHistoryController implements BaseController {
     }
 
     @GetMapping("/{recordId}")
-    public Mono<R<EventHistoryDO>> getByRecordId(@NotBlank @PathVariable String recordId) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(eventHistoryService.getByRecordId(tenantId, recordId))));
+    public Mono<R<EventHistoryVO>> getByRecordId(@NotBlank @PathVariable String recordId) {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            EventHistoryDO entityDO = eventHistoryService.getByRecordId(tenantId, recordId);
+            return R.ok(eventHistoryBuilder.buildVOByDO(entityDO));
+        }));
     }
 
     @PostMapping("/list")
-    public Mono<R<Page<EventHistoryDO>>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
+    public Mono<R<Page<EventHistoryVO>>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             EventHistoryQueryVO query = Objects.isNull(queryVO) ? new EventHistoryQueryVO() : queryVO;
-            return R.ok(eventHistoryService.list(tenantId, query));
+            Page<EventHistoryDO> page = eventHistoryService.list(tenantId, query);
+            return R.ok(eventHistoryBuilder.buildVOPageByDOPage(page));
         }));
     }
 

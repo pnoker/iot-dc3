@@ -22,9 +22,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -39,9 +39,9 @@ import java.time.LocalDateTime;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
+@Getter
+@Setter
+@ToString
 @TableName("dc3_point_data_volume_history")
 public class PointDataVolumeHistoryDO implements Serializable {
 
@@ -137,6 +137,6 @@ public class PointDataVolumeHistoryDO implements Serializable {
      */
     @TableField("deleted")
     @TableLogic
-    private Integer deleted;
+    private Byte deleted;
 
 }

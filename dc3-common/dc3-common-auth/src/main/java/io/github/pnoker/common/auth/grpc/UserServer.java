@@ -53,17 +53,24 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
         GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        UserBO entityBO = userService.getById(request.getId());
-        if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+        try {
+            UserBO entityBO = userService.getById(request.getId());
+            if (Objects.isNull(entityBO)) {
+                rBuilder.setOk(false);
+                rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            } else {
+                rBuilder.setOk(true);
+                rBuilder.setCode(ResponseEnum.OK.getCode());
+                rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            builder.setData(grpcUserBuilder.buildGrpcDTOByBO(entityBO));
+                builder.setData(grpcUserBuilder.buildGrpcDTOByBO(entityBO));
+            }
+        } catch (Exception e) {
+            log.warn("getById failed", e);
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
+            rBuilder.setMessage(ResponseEnum.FAILURE.getText());
         }
 
         builder.setResult(rBuilder);

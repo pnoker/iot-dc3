@@ -53,17 +53,24 @@ public class UserLoginServer extends UserLoginApiGrpc.UserLoginApiImplBase {
         GrpcRUserLoginDTO.Builder builder = GrpcRUserLoginDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        UserLoginBO entityBO = userLoginService.getByLoginName(request.getName(), false);
-        if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+        try {
+            UserLoginBO entityBO = userLoginService.getByLoginName(request.getName(), false);
+            if (Objects.isNull(entityBO)) {
+                rBuilder.setOk(false);
+                rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            } else {
+                rBuilder.setOk(true);
+                rBuilder.setCode(ResponseEnum.OK.getCode());
+                rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            builder.setData(grpcUserLoginBuilder.buildGrpcDTOByBO(entityBO));
+                builder.setData(grpcUserLoginBuilder.buildGrpcDTOByBO(entityBO));
+            }
+        } catch (Exception e) {
+            log.warn("getByName failed", e);
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
+            rBuilder.setMessage(ResponseEnum.FAILURE.getText());
         }
 
         builder.setResult(rBuilder);
