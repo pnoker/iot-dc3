@@ -18,7 +18,6 @@
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
-import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -29,6 +28,7 @@ import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
+import io.github.pnoker.common.driver.support.ConnectionBackoff;
 import io.github.pnoker.common.exception.WritePointException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +62,12 @@ public class DriverWriteServiceImpl implements DriverWriteService {
 
     @Override
     public boolean write(Long deviceId, Long pointId, String value) {
+        if (!ConnectionBackoff.shouldAttempt(deviceId)) {
+            long remaining = ConnectionBackoff.remainingDelay(deviceId);
+            log.debug("Backoff active for device {} ({}ms remaining)", deviceId, remaining);
+            return false;
+        }
+
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
             throw new WritePointException("Failed to write point value, device[{}] is null", deviceId);
@@ -88,16 +94,22 @@ public class DriverWriteServiceImpl implements DriverWriteService {
                     deviceId, pointId);
         }
 
-        Boolean ok = driverCustomService.write(driverConfig, pointConfig, device, point,
-                new WritePointValue(value, point.getPointTypeFlag()));
+        try {
+            Boolean ok = driverCustomService.write(driverConfig, pointConfig, device, point,
+                    new WritePointValue(value, point.getPointTypeFlag()));
 
-        // Only echo the value back to the platform when the device acknowledged the write.
-        // Failed writes must not produce fake success signals.
-        if (Boolean.TRUE.equals(ok)) {
-            driverSenderService.pointValueSender(new PointValue(new ReadPointValue(device, point, value)));
+            // Only echo the value back to the platform when the device acknowledged the write.
+            // Failed writes must not produce fake success signals.
+            if (Boolean.TRUE.equals(ok)) {
+                driverSenderService.pointValueSender(PointValue.ofRawValue(device, point, value));
+            }
+
+            ConnectionBackoff.recordSuccess(deviceId);
+            return Boolean.TRUE.equals(ok);
+        } catch (Exception e) {
+            ConnectionBackoff.recordFailure(deviceId);
+            throw e;
         }
-
-        return Boolean.TRUE.equals(ok);
     }
 
 }

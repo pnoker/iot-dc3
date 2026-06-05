@@ -70,10 +70,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
 
     /**
+     * Max consecutive failures before entering backoff.
+     */
+    private static final int FAILURE_BACKOFF_THRESHOLD = 3;
+    /**
+     * Backoff duration in milliseconds after exceeding the failure threshold.
+     */
+    private static final long FAILURE_BACKOFF_MS = 60_000;
+    /**
      * Modbus factory for creating ModbusMaster instances.
      */
     private static ModbusFactory modbusFactory = new ModbusFactory();
-
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     @Value("${dc3.driver.code}")
@@ -82,10 +89,16 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      * Cache of device ID to ModbusMaster connections.
      */
     private Map<Long, ModbusMaster> connectMap;
+    /**
+     * Failure tracking for connection backoff to prevent repeated connection
+     * attempts to unreachable devices on every schedule cycle.
+     */
+    private Map<Long, ConsecutiveFailure> failureMap;
 
     @Override
     public void initial() {
         connectMap = new ConcurrentHashMap<>(16);
+        failureMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
@@ -98,8 +111,22 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
         if (Objects.isNull(device) || Objects.isNull(device.getId())) {
             return DeviceHealthState.offline();
         }
+        Long deviceId = device.getId();
+        // If connection exists and is initialized, it's online
+        ModbusMaster existing = connectMap.get(deviceId);
+        if (existing != null) {
+            return existing.isInitialized()
+                    ? DeviceHealthState.online()
+                    : DeviceHealthState.offline();
+        }
+        // If in backoff, report offline without attempting a new connection
+        ConsecutiveFailure failure = failureMap.get(deviceId);
+        if (failure != null && failure.shouldBackoff()) {
+            return DeviceHealthState.offline();
+        }
+        // Last resort: try to create connection (will populate failure tracking if it fails)
         try {
-            return getConnector(device.getId(), driverConfig).isInitialized()
+            return getConnector(deviceId, driverConfig).isInitialized()
                     ? DeviceHealthState.online()
                     : DeviceHealthState.offline();
         } catch (Exception e) {
@@ -165,6 +192,14 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      * @throws ConnectorException if connection initialization fails
      */
     private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
+        // Check backoff before attempting connection
+        ConsecutiveFailure failure = failureMap.get(deviceId);
+        if (failure != null && failure.shouldBackoff()) {
+            throw new ConnectorException(
+                    "Driver connection in backoff after {} consecutive failures, protocol={}, deviceId={}",
+                    failure.count, driverCode, deviceId);
+        }
+
         return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
             int port = driverConfig.get("port").getValue(Integer.class);
@@ -174,10 +209,13 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             params.setHost(host);
             params.setPort(port);
             ModbusMaster modbusMaster = modbusFactory.createTcpMaster(params, true);
+            modbusMaster.setTimeout(5000);
             try {
                 modbusMaster.init();
                 log.info("Driver connection established, protocol=" + driverCode + ", deviceId={}, host={}, port={}", deviceId,
                         host, port);
+                // Successful connection clears failure tracking
+                failureMap.remove(deviceId);
             } catch (ModbusInitException e) {
                 try {
                     modbusMaster.destroy();
@@ -185,6 +223,9 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
                     log.warn("Driver connection destroy failed after init error, protocol=" + driverCode
                             + ", deviceId={}, host={}, port={}", deviceId, host, port, destroyException);
                 }
+                // Record failure for backoff
+                failureMap.compute(deviceId, (k, v) ->
+                        v == null ? new ConsecutiveFailure() : v.increment());
                 log.error("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}", deviceId,
                         host, port, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, message={}",
@@ -360,6 +401,34 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             modbusMaster.destroy();
         } catch (Exception e) {
             log.warn("Driver connection destroy failed, protocol=" + driverCode + ", deviceId={}", deviceId, e);
+        }
+    }
+
+    /**
+     * Tracks consecutive connection failures for backoff.
+     * Immutable after construction; {@link #increment()} returns a new instance.
+     */
+    private static class ConsecutiveFailure {
+        final int count;
+        final long firstFailTime;
+
+        ConsecutiveFailure() {
+            this.count = 1;
+            this.firstFailTime = System.currentTimeMillis();
+        }
+
+        ConsecutiveFailure(int count, long firstFailTime) {
+            this.count = count;
+            this.firstFailTime = firstFailTime;
+        }
+
+        ConsecutiveFailure increment() {
+            return new ConsecutiveFailure(count + 1, firstFailTime);
+        }
+
+        boolean shouldBackoff() {
+            return count >= FAILURE_BACKOFF_THRESHOLD
+                    && (System.currentTimeMillis() - firstFailTime) < FAILURE_BACKOFF_MS;
         }
     }
 

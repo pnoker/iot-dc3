@@ -51,8 +51,10 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         try {
             // Build driver registration information from properties
             RegisterBO entityBO = buildRegisterBOByProperty();
-            // Log driver information for debugging
-            log.info("The driver information is: {}", JsonUtil.toJsonString(entityBO));
+            // Log driver metadata at debug level to avoid leaking sensitive config in production logs
+            if (log.isDebugEnabled()) {
+                log.debug("The driver information is: {}", JsonUtil.toJsonString(entityBO));
+            }
             // Register driver with the driver client
             driverClient.driverRegister(entityBO);
         } catch (Exception e) {

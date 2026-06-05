@@ -27,6 +27,7 @@ import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.ConnectionBackoff;
 import io.github.pnoker.common.exception.ReadPointException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,12 @@ public class DriverReadServiceImpl implements DriverReadService {
 
     @Override
     public void read(Long deviceId, Long pointId) {
+        if (!ConnectionBackoff.shouldAttempt(deviceId)) {
+            long remaining = ConnectionBackoff.remainingDelay(deviceId);
+            log.debug("Backoff active for device {} ({}ms remaining)", deviceId, remaining);
+            return;
+        }
+
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
             throw new ReadPointException("Failed to read point value, device[{}] is null", deviceId);
@@ -84,12 +91,17 @@ public class DriverReadServiceImpl implements DriverReadService {
                     deviceId, pointId);
         }
 
-        ReadPointValue readPointValue = driverCustomService.read(driverConfig, pointConfig, device, point);
-        if (Objects.isNull(readPointValue)) {
-            throw new ReadPointException("Failed to read point value, point value is null");
+        try {
+            ReadPointValue readPointValue = driverCustomService.read(driverConfig, pointConfig, device, point);
+            if (Objects.isNull(readPointValue)) {
+                throw new ReadPointException("Failed to read point value, point value is null");
+            }
+            driverSenderService.pointValueSender(new PointValue(readPointValue));
+            ConnectionBackoff.recordSuccess(deviceId);
+        } catch (Exception e) {
+            ConnectionBackoff.recordFailure(deviceId);
+            throw e;
         }
-
-        driverSenderService.pointValueSender(new PointValue(readPointValue));
     }
 
 }

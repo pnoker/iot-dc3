@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -90,6 +91,22 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void schedule() {
         // Device state lease renewal is owned by the SDK device health job.
+    }
+
+    /**
+     * Reports driver-level health based on MQTT connection status.
+     * <p>
+     * Process liveness is already protected by Data Center timeout scanning.
+     * This hook reports protocol-level health for the MQTT broker connection.
+     * </p>
+     *
+     * @return driver health state
+     * @since 2026.5.22
+     */
+    @Override
+    public DriverHealthState health() {
+        // TODO: implement real MQTT connection health check via MqttSendService or Spring Integration MQTT client manager
+        return DriverHealthState.online();
     }
 
     /**
