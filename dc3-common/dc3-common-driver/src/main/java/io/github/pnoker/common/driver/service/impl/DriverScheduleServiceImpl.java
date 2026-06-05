@@ -51,7 +51,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
     private final QuartzService quartzService;
 
     @Override
-    public void initial() {
+    public void initialize() {
         // Get schedule properties from driver configuration
         DriverProperties.ScheduleProperties property = driverProperties.getSchedule();
         if (Objects.isNull(property)) {
@@ -66,7 +66,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
 
             // Create and schedule the device health job if enabled
             DriverProperties.DeviceHealthProperties deviceHealth = driverProperties.getHealth().getDevice();
-            if (Objects.nonNull(deviceHealth) && Boolean.TRUE.equals(deviceHealth.getEnable())) {
+            if (Objects.nonNull(deviceHealth) && Boolean.TRUE.equals(deviceHealth.getEnabled())) {
                 if (!CronExpression.isValidExpression(deviceHealth.getCron())) {
                     throw new CronException("Device health schedule cron expression is invalid");
                 }
@@ -76,7 +76,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             }
 
             // Create and schedule the read job if enabled
-            if (Boolean.TRUE.equals(property.getRead().getEnable())) {
+            if (Boolean.TRUE.equals(property.getRead().getEnabled())) {
                 // Validate read job cron expression
                 if (!CronExpression.isValidExpression(property.getRead().getCron())) {
                     throw new CronException("Read schedule cron expression is invalid");
@@ -87,7 +87,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             }
 
             // Create and schedule the custom job if enabled
-            if (Boolean.TRUE.equals(property.getCustom().getEnable())) {
+            if (Boolean.TRUE.equals(property.getCustom().getEnabled())) {
                 // Validate custom job cron expression
                 if (!CronExpression.isValidExpression(property.getCustom().getCron())) {
                     throw new CronException("Custom schedule cron expression is invalid");

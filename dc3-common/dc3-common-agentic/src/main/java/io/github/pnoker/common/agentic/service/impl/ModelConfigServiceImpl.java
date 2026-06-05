@@ -93,7 +93,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ModelConfigBO save(ModelConfigBO entityBO, RequestHeader.UserHeader header) {
+    public ModelConfigBO add(ModelConfigBO entityBO, RequestHeader.UserHeader header) {
         validate(entityBO);
         ModelConfigBO targetBO = new ModelConfigBO();
         apply(targetBO, entityBO);
@@ -125,7 +125,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         modelConfigManager.removeById(id);
     }
 

@@ -71,11 +71,11 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             GrpcPageCommandDTO.Builder pageCommandBuilder = GrpcPageCommandDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -108,11 +108,11 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             List<GrpcCommandDTO> entityGrpcDTOList = entityBOList.stream()
                     .map(grpcCommandBuilder::buildGrpcDTOByBO)
@@ -140,11 +140,11 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
         if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
 
             builder.setData(grpcCommandBuilder.buildGrpcDTOByBO(entityBO));
         }

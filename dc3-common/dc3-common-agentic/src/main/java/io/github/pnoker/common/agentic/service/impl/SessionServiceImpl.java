@@ -94,13 +94,13 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void removeByConversationId(String conversationId) {
+    public void deleteByConversationId(String conversationId) {
         SessionDO entityDO = findByConversationId(conversationId);
         if (Objects.isNull(entityDO)) {
             return;
         }
         sessionManager.removeById(entityDO.getId());
-        int removedMessages = messageService.removeByConversationId(conversationId);
+        int removedMessages = messageService.deleteByConversationId(conversationId);
         agenticChatMemory.clear(conversationId);
         log.info("Agentic session removed, conversationId={}, messagesRemoved={}", conversationId, removedMessages);
     }

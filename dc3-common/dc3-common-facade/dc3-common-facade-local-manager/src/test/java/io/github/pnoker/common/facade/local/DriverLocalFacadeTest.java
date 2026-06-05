@@ -130,7 +130,7 @@ class DriverLocalFacadeTest {
 
     @Test
     void listByDeviceIdReturnsNullWhenServiceReturnsNull() {
-        when(driverService.listByDeviceId(7L)).thenReturn(null);
+        when(driverService.getByDeviceId(7L)).thenReturn(null);
         assertThat(facade.getByDeviceId(7L)).isNull();
     }
 
@@ -138,7 +138,7 @@ class DriverLocalFacadeTest {
     void listByDeviceIdMapsThroughBuilder() {
         DriverBO bo = new DriverBO();
         FacadeDriverBO mapped = new FacadeDriverBO();
-        when(driverService.listByDeviceId(7L)).thenReturn(bo);
+        when(driverService.getByDeviceId(7L)).thenReturn(bo);
         when(facadeDriverBuilder.toFacadeBO(bo)).thenReturn(mapped);
         assertThat(facade.getByDeviceId(7L)).isSameAs(mapped);
     }

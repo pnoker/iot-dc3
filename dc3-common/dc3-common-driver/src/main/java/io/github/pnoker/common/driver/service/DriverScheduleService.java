@@ -29,6 +29,6 @@ public interface DriverScheduleService {
     /**
      * Initializes and schedules all enabled driver jobs.
      */
-    void initial();
+    void initialize();
 
 }

@@ -139,7 +139,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
         } catch (Exception e) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
@@ -164,13 +164,13 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
             if (Objects.isNull(entityBO)) {
                 rBuilder.setOk(false);
                 rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
             } else {
                 buildMetadataResponse(builder, entityBO);
 
                 rBuilder.setOk(true);
                 rBuilder.setCode(ResponseEnum.OK.getCode());
-                rBuilder.setMessage(ResponseEnum.OK.getText());
+                rBuilder.setMessage(ResponseEnum.OK.getRemark());
             }
         } catch (Exception e) {
             rBuilder.setOk(false);

@@ -89,7 +89,7 @@ public class SessionController implements BaseController {
     @DeleteMapping("/delete")
     public Mono<R<Boolean>> delete(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
-            sessionService.removeByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
+            sessionService.deleteByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
             return R.ok();
         }));

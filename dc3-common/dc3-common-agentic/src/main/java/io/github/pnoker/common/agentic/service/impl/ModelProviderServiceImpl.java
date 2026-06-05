@@ -64,7 +64,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ModelProviderBO save(ModelProviderBO entityBO, RequestHeader.UserHeader header) {
+    public ModelProviderBO add(ModelProviderBO entityBO, RequestHeader.UserHeader header) {
         validate(entityBO);
         ModelProviderBO targetBO = new ModelProviderBO();
         apply(targetBO, entityBO, false);
@@ -97,7 +97,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         modelProviderManager.removeById(id);
         chatClientFactory.evict(id);
     }
