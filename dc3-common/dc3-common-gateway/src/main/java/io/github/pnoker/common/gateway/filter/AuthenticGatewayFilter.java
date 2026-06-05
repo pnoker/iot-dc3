@@ -79,7 +79,7 @@ public class AuthenticGatewayFilter implements GatewayFilter {
                     }).build();
                     return chain.filter(exchange.mutate().request(mutated).build());
                 }).onErrorResume(UnAuthorizedException.class, e -> {
-                    log.warn("AuthenticGatewayFilter unauthorized: {}, Url: {}", e.getMessage(), request.getURI());
+                    log.warn("AuthenticGatewayFilter unauthorized, Url: {}", request.getURI(), e);
                     return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
                 }).onErrorResume(e -> {
                     log.error("AuthenticGatewayFilter unexpected error, Url: {}", request.getURI(), e);

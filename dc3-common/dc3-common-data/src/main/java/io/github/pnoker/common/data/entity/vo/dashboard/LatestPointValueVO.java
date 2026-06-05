@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -78,7 +79,7 @@ public class LatestPointValueVO implements Serializable {
      */
     private String valueType;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
 
 }

@@ -17,20 +17,26 @@
 
 package io.github.pnoker.common.data.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DashboardService;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
+import io.github.pnoker.common.data.entity.query.AlertPageQuery;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeRangeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -137,14 +143,13 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(systemHealthService.snapshot(tenantId))));
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/alert/page")
-    public Mono<R<com.baomidou.mybatisplus.extension.plugins.pagination.Page<AlertItemVO>>> alertPage(
-            @org.springframework.web.bind.annotation.RequestBody(
-                    required = false) io.github.pnoker.common.data.entity.query.AlertPageQuery query) {
+    @PostMapping("/alert/page")
+    public Mono<R<Page<AlertItemVO>>> alertPage(
+            @RequestBody(required = false) AlertPageQuery query) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            io.github.pnoker.common.data.entity.query.AlertPageQuery q = Objects.isNull(query)
-                    ? new io.github.pnoker.common.data.entity.query.AlertPageQuery() : query;
-            java.time.LocalDateTime from = TimeRangeUtil.resolveFrom(q.getRangeKey(), q.getRangeHours());
+            AlertPageQuery q = Objects.isNull(query)
+                    ? new AlertPageQuery() : query;
+            LocalDateTime from = TimeRangeUtil.resolveFrom(q.getRangeKey(), q.getRangeHours());
             long current = Objects.isNull(q.getCurrent()) ? 1L : q.getCurrent();
             long size = Objects.isNull(q.getSize()) ? 20L : q.getSize();
             return R.ok(dashboardService.alertPage(tenantId, q.getSource(), q.getAlarmTypeFlag(),
@@ -152,15 +157,15 @@ public class DashboardController implements BaseController {
         }));
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/alert/confirm")
-    public Mono<R<Boolean>> alertConfirm(@org.springframework.web.bind.annotation.RequestParam String source,
-                                         @org.springframework.web.bind.annotation.RequestParam Long id) {
+    @PostMapping("/alert/confirm")
+    public Mono<R<Boolean>> alertConfirm(@RequestParam String source,
+                                         @RequestParam Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.confirmAlert(tenantId, source, id))));
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/alert/unconfirm")
-    public Mono<R<Boolean>> alertUnconfirm(@org.springframework.web.bind.annotation.RequestParam String source,
-                                           @org.springframework.web.bind.annotation.RequestParam Long id) {
+    @PostMapping("/alert/unconfirm")
+    public Mono<R<Boolean>> alertUnconfirm(@RequestParam String source,
+                                           @RequestParam Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.unconfirmAlert(tenantId, source, id))));
     }
 
@@ -168,12 +173,12 @@ public class DashboardController implements BaseController {
      * Bulk confirm or unconfirm. Body = { confirm: true|false, items: [{source, id}, ...]
      * }. Returns the number of rows actually changed.
      */
-    @org.springframework.web.bind.annotation.PostMapping("/alert/bulk_confirm")
+    @PostMapping("/alert/bulk_confirm")
     public Mono<R<Integer>> alertBulkConfirm(
-            @org.springframework.web.bind.annotation.RequestBody AlertBulkConfirmRequest body) {
+            @RequestBody AlertBulkConfirmRequest body) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<AlertBulkConfirmRequest.Item> items = Objects.isNull(body) || Objects.isNull(body.getItems())
-                    ? java.util.Collections.emptyList()
+                    ? Collections.emptyList()
                     : body.getItems();
             boolean confirm = Objects.isNull(body) || Objects.isNull(body.getConfirm()) || body.getConfirm();
             return R.ok(dashboardService.bulkConfirmAlert(tenantId, items, confirm));

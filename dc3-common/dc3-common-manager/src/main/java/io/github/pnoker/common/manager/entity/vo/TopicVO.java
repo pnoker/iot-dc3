@@ -17,7 +17,15 @@
 
 package io.github.pnoker.common.manager.entity.vo;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * View object for topic API responses.
@@ -26,9 +34,16 @@ import lombok.Data;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public class TopicVO implements Serializable {
 
-@Data
-public class TopicVO {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String topic;
 

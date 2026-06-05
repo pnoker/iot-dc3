@@ -222,7 +222,7 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
             }
             return node != null ? node.asText() : json;
         } catch (Exception e) {
-            log.warn("JSON path extraction failed, path={}, message={}", path, e.getMessage());
+            log.warn("JSON path extraction failed, path={}", path, e);
             return json;
         }
     }

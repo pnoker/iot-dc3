@@ -107,7 +107,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             try {
                 return probe.check();
             } catch (Exception e) {
-                log.debug("Probe failed: {}", e.getMessage());
+                log.debug("Probe failed", e);
                 return false;
             }
         });
@@ -122,7 +122,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             Thread.currentThread().interrupt();
             return DataConstant.Health.STATUS_DOWN;
         } catch (ExecutionException e) {
-            log.debug("Probe execution failed: {}", e.getMessage());
+            log.debug("Probe execution failed", e);
             return DataConstant.Health.STATUS_DOWN;
         }
     }
