@@ -410,25 +410,25 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      */
     private static class ConsecutiveFailure {
         final int count;
-        final long firstFailTime;
+        final long firstFailureTime;
 
         ConsecutiveFailure() {
             this.count = 1;
-            this.firstFailTime = System.currentTimeMillis();
+            this.firstFailureTime = System.currentTimeMillis();
         }
 
-        ConsecutiveFailure(int count, long firstFailTime) {
+        ConsecutiveFailure(int count, long firstFailureTime) {
             this.count = count;
-            this.firstFailTime = firstFailTime;
+            this.firstFailureTime = firstFailureTime;
         }
 
         ConsecutiveFailure increment() {
-            return new ConsecutiveFailure(count + 1, firstFailTime);
+            return new ConsecutiveFailure(count + 1, firstFailureTime);
         }
 
         boolean shouldBackoff() {
             return count >= FAILURE_BACKOFF_THRESHOLD
-                    && (System.currentTimeMillis() - firstFailTime) < FAILURE_BACKOFF_MS;
+                    && (System.currentTimeMillis() - firstFailureTime) < FAILURE_BACKOFF_MS;
         }
     }
 
