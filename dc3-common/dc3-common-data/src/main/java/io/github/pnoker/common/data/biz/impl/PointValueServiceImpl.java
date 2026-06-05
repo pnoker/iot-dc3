@@ -153,11 +153,24 @@ public class PointValueServiceImpl implements PointValueService {
         Map<Long, PointValueBO> pointValueBOMap = pointValueLocalCacheService.selectLatestPointValue(tenantId,
                 entityQuery.getDeviceId(), pointIds);
         RepositoryService repositoryService = getFirstRepositoryService();
+
+        // Collect point IDs not found in the local cache and batch-query the repository
+        List<Long> missingIds = pointIds.stream()
+                .filter(id -> !pointValueBOMap.containsKey(id))
+                .toList();
+        if (!missingIds.isEmpty()) {
+            List<PointValueBO> dbResults = repositoryService.listLatestPointValues(tenantId,
+                    entityQuery.getDeviceId(), missingIds);
+            for (PointValueBO bo : dbResults) {
+                if (Objects.nonNull(bo) && Objects.nonNull(bo.getPointId())) {
+                    pointValueBOMap.put(bo.getPointId(), bo);
+                }
+            }
+        }
+
+        // Build the final list maintaining the original pointIds order
         List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
             PointValueBO value = pointValueBOMap.get(id);
-            if (Objects.isNull(value)) {
-                value = repositoryService.selectLatestPointValue(tenantId, entityQuery.getDeviceId(), id);
-            }
             return Objects.isNull(value) ? noLatestPointValue(tenantId, entityQuery.getDeviceId(), id)
                     : latestPointValue(value);
         }).toList();

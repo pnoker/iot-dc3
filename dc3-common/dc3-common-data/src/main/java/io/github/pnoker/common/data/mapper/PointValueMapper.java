@@ -54,4 +54,14 @@ public interface PointValueMapper extends BaseMapper<PointValueDO> {
                                        @Param("from") LocalDateTime from,
                                        @Param("to") LocalDateTime to);
 
+    /**
+     * Batch query the latest point value for each point within a single device.
+     * Uses PostgreSQL {@code DISTINCT ON} to pick the row with the most recent
+     * {@code create_time} per {@code (device_id, point_id)} pair, replacing the
+     * N+1 loop that previously called {@code selectLatestPointValue} once per point.
+     */
+    List<PointValueDO> selectLatestPointValues(@Param("tenantId") Long tenantId,
+                                               @Param("deviceId") Long deviceId,
+                                               @Param("pointIds") List<Long> pointIds);
+
 }

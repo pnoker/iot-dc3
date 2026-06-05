@@ -115,9 +115,12 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
 
     @Override
     public List<PointValueBO> listLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds) {
-        throw new UnsupportedOperationException(
-                "selectLatestPointValues is not implemented; callers should use selectLatestPointValue in a loop "
-                        + "or the PointValueLocalCacheService batch API until a real batch query is wired up.");
+        if (Objects.isNull(tenantId) || Objects.isNull(deviceId)
+                || Objects.isNull(pointIds) || pointIds.isEmpty()) {
+            return List.of();
+        }
+        List<PointValueDO> entityDOList = pointValueMapper.selectLatestPointValues(tenantId, deviceId, pointIds);
+        return pointValueBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
