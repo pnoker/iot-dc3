@@ -42,6 +42,7 @@ import java.util.Objects;
 @EqualsAndHashCode(callSuper = true)
 public class ResourceTreeBO extends ResourceBO {
 
+    @ToString.Exclude
     private List<ResourceTreeBO> children = new ArrayList<>();
 
     /**

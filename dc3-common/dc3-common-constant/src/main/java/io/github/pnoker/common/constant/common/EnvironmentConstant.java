@@ -20,8 +20,8 @@ package io.github.pnoker.common.constant.common;
 /**
  * Environment variables and configuration variables related constants
  * <p>
- * Provides constants for environment types, Spring configuration properties, Eureka
- * configuration, and driver-related configuration keys.
+ * Provides constants for environment types, Spring configuration properties,
+ * and driver-related configuration keys.
  * </p>
  *
  * @author pnoker
@@ -49,17 +49,6 @@ public class EnvironmentConstant {
      * Production environment: "pro"
      */
     public static final String ENV_PRO = "pro";
-
-    /**
-     * Eureka TLS enable configuration key: "eureka.client.tls.enabled"
-     */
-    public static final String EUREKA_TLS_ENABLE = "eureka.client.tls.enabled";
-
-    /**
-     * Eureka service registry URL configuration key:
-     * "eureka.client.service-url.defaultZone"
-     */
-    public static final String EUREKA_SERVICE_URL = "eureka.client.service-url.defaultZone";
 
     /**
      * Current environment type configuration key: "spring.env"

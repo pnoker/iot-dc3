@@ -41,6 +41,7 @@ import java.util.Objects;
 @EqualsAndHashCode(callSuper = true)
 public class MenuTreeBO extends MenuBO {
 
+    @ToString.Exclude
     private List<MenuTreeBO> children = new ArrayList<>();
 
     public static MenuTreeBO fromBO(MenuBO source) {

@@ -20,6 +20,7 @@ package io.github.pnoker.common.data.entity.property;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
+@Validated
 @ConfigurationProperties(prefix = "dc3.data.notify")
 public class NotifyCredentialProperties {
 

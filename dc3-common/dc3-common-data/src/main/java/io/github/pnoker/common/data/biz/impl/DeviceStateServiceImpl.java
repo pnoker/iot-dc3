@@ -24,6 +24,7 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
@@ -102,7 +103,7 @@ public class DeviceStateServiceImpl implements DeviceStateService {
         byte lastIndex = stateDO.getLastStateFlag();
         if (isFlip(lastIndex, current)) {
             String message = String.format("Device status changed: %s -> %s",
-                    EntityStatusEnum.ofIndex(lastIndex) != null ? EntityStatusEnum.ofIndex(lastIndex).getCode() : "unknown",
+                    EntityStatusEnum.ofIndex(lastIndex) != null ? EntityStatusEnum.ofIndex(lastIndex).getCode() : DataConstant.STATUS_UNKNOWN,
                     current);
             DeviceAlarmDTO alarm = DeviceAlarmDTO.builder()
                     .driverId(entityDTO.getDriverId())

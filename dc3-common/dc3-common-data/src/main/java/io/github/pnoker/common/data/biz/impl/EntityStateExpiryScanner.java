@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.impl;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
@@ -160,7 +161,7 @@ public class EntityStateExpiryScanner {
 
     private EntityAlarmDO buildOfflineAlarm(EntityStateDO scanned) {
         EntityStatusEnum prev = EntityStatusEnum.ofIndex(scanned.getLastStateFlag());
-        String prevCode = Objects.nonNull(prev) ? prev.getCode() : "unknown";
+        String prevCode = Objects.nonNull(prev) ? prev.getCode() : DataConstant.STATUS_UNKNOWN;
         String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", prevCode);
 
         EntityAlarmDO alarm = new EntityAlarmDO();
@@ -185,7 +186,7 @@ public class EntityStateExpiryScanner {
         EntityStateDO scanned = ctx.state;
         EntityAlarmDO alarm = ctx.alarm;
         EntityStatusEnum prev = EntityStatusEnum.ofIndex(scanned.getLastStateFlag());
-        String prevCode = Objects.nonNull(prev) ? prev.getCode() : "unknown";
+        String prevCode = Objects.nonNull(prev) ? prev.getCode() : DataConstant.STATUS_UNKNOWN;
 
         // Update lastAlarmId
         entityStateManager.lambdaUpdate()

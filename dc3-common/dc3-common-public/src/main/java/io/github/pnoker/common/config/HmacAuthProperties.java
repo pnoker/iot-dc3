@@ -21,6 +21,7 @@ import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Shared HMAC signing properties.
@@ -31,6 +32,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
+@Validated
 @ConfigurationProperties(prefix = EnvironmentConstant.AUTH_HMAC_PREFIX)
 public class HmacAuthProperties {
 
