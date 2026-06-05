@@ -198,6 +198,7 @@ export default {
     passwordRequired: 'Please enter password',
     passwordMin: 'Password must be at least 6 characters',
     loading: 'Logging in, please wait...',
+    failed: 'Login failed. Please check your credentials and try again.',
   },
   error: {
     forbidden: 'Sorry, you do not have permission to access this page',

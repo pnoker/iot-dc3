@@ -25,6 +25,7 @@ import { cancelToken, generateSalt, generateToken } from '@/api/token';
 import { AUTH_HEADERS } from '@/config/constant/common';
 import type { Login } from '@/config/types';
 import { getStorage, removeStorage, setStorage } from '@/utils/storageUtil';
+import { failMessage } from '@/utils/notificationUtil';
 import { isNull } from '@/utils/validationUtil';
 import { md5 } from 'js-md5';
 
@@ -69,13 +70,13 @@ export const useAuthStore = defineStore('auth', () => {
       lock: true,
       text: i18n.global.t('login.loading'),
     });
-    const loginData: Login = {
-      tenant: form.tenant,
-      name: form.name,
-    };
     try {
-      const saltRes = await generateSalt(loginData);
+      const saltRes = await generateSalt({ tenant: form.tenant, name: form.name });
       const salt: string = saltRes.data;
+      if (!salt) {
+        failMessage(i18n.global.t('login.failed'));
+        return;
+      }
       const loginWithPassword: Login = {
         tenant: form.tenant,
         name: form.name,
@@ -91,6 +92,8 @@ export const useAuthStore = defineStore('auth', () => {
         token: tokenRes.data,
       });
       await router.push({ name: 'home' });
+    } catch {
+      failMessage(i18n.global.t('login.failed'));
     } finally {
       loading.close();
     }
@@ -100,11 +103,11 @@ export const useAuthStore = defineStore('auth', () => {
     const tenantValue = getStorage(AUTH_HEADERS.TENANT);
     const userValue = getStorage(AUTH_HEADERS.LOGIN);
     if (!isNull(tenantValue) && !isNull(userValue)) {
-      const loginData = {
-        tenant: tenantValue,
-        name: userValue,
-      } as Login;
-      await cancelToken(loginData);
+      try {
+        await cancelToken({ tenant: tenantValue, name: userValue } as Login);
+      } catch {
+        // Server unreachable — proceed with local logout
+      }
     }
     removeToken();
   };

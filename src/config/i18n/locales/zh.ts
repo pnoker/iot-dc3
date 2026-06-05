@@ -196,6 +196,7 @@ export default {
     passwordRequired: '请输入密码',
     passwordMin: '密码长度最少为6位',
     loading: '登录中,请稍后...',
+    failed: '登录失败,请检查您的账号信息后重试。',
   },
   error: {
     forbidden: '抱歉, 你无权访问该页面',

@@ -61,9 +61,9 @@
               </el-input>
             </el-form-item>
             <el-form-item>
-              <el-button class="login-submit" type="primary" @click.prevent="handleLogin">{{
-                t('login.submit')
-              }}</el-button>
+              <el-button :loading="loading" class="login-submit" type="primary" @click.prevent="handleLogin">
+                {{ t('login.submit') }}
+              </el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -98,6 +98,7 @@
   const authStore = useAuthStore();
   // 定义表单引用
   const formDataRef = ref<FormInstance>();
+  const loading = ref(false);
 
   // 定义响应式数据
   const tenant = typeof authStore.getTenant === 'string' ? authStore.getTenant : 'default';
@@ -137,9 +138,18 @@
 
     try {
       await form.validate();
-      await authStore.login(reactiveData.formData);
     } catch {
       // validation errors are displayed by Element Plus
+      return;
+    }
+
+    loading.value = true;
+    try {
+      await authStore.login(reactiveData.formData);
+    } catch {
+      // authStore.login already shows failMessage
+    } finally {
+      loading.value = false;
     }
   };
 </script>

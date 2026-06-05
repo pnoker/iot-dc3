@@ -120,13 +120,14 @@
     SETTINGS_BREADCRUMB_PARENTS,
     SETTINGS_FALLBACK_ICON,
   } from '@/config/settingsNav';
-  import { useAuthStore, useMenuStore } from '@/store';
+  import { useAgenticStore, useAuthStore, useMenuStore } from '@/store';
   import { resolveMenuTitle } from '@/utils/menuUtil';
 
   const { t, locale } = useI18n();
   const route = useRoute();
   const authStore = useAuthStore();
   const menuStore = useMenuStore();
+  const agenticStore = useAgenticStore();
 
   const langOptions = [
     { label: 'EN', value: 'en' },
@@ -329,7 +330,13 @@
     if (command === 'settings') {
       await router.push({ name: 'settingsUser' });
     } else if (command === 'logout') {
-      await authStore.logout();
+      try {
+        await authStore.logout();
+      } catch {
+        // proceed with redirect even if server cancel fails
+      }
+      menuStore.reset();
+      agenticStore.reset();
       await router.push({ name: 'login' });
     } else if (command === 'help') {
       const helpWindow = window.open('https://doc.dc3.site', '_blank', 'noopener,noreferrer');
