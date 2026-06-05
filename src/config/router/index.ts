@@ -28,8 +28,9 @@ import type { Login } from '@/config/types';
 import { getStorage, removeStorage } from '@/utils/storageUtil';
 import { isNull } from '@/utils/validationUtil';
 import { AUTH_HEADERS } from '@/config/constant/common';
+import i18n from '@/config/i18n';
 import { ElMessage } from 'element-plus';
-import { useMenuStore, type MenuNode } from '@/store/modules/menu';
+import { type MenuNode, useMenuStore } from '@/store/modules/menu';
 
 /**
  * NProgress configuration
@@ -110,16 +111,21 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     return { name: 'login' };
   }
 
-  // Permission check: if the menu tree is loaded, verify the route is accessible.
-  // Public routes (login, errors, home) are always allowed.
+  // Permission check: public routes (login, errors, home) are always allowed.
   // For all other routes, the route name must appear as a menu_code in the
   // user's menu tree (which the server already scopes to the user's roles).
   const publicRoutes = ['login', '403', '404', '500', 'home'];
   const routeName = to.name as string;
   if (!publicRoutes.includes(routeName)) {
     const menuStore = useMenuStore();
+    // Wait for the menu tree to load before checking permissions.
+    // Without this, the guard would silently allow access to any route
+    // while the tree is still being fetched.
+    if (!menuStore.loaded) {
+      await menuStore.fetchTree();
+    }
     if (menuStore.tree.length > 0 && !isRouteInMenuTree(routeName, menuStore.tree)) {
-      ElMessage.warning('You do not have permission to access this page');
+      ElMessage.warning(i18n.global.t('error.forbidden'));
       return { name: 'home' };
     }
   }

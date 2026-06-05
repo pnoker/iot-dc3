@@ -21,8 +21,9 @@ import { ElNotification } from 'element-plus';
 import { AXIOS_CONFIG, AXIOS_ERROR_MESSAGES } from '@/config/constant/axios';
 import { AUTH_HEADERS } from '@/config/constant/common';
 import { failMessage, warnMessage } from '@/utils/notificationUtil';
-import { getStorage } from '@/utils/storageUtil';
+import { getStorage, removeStorage } from '@/utils/storageUtil';
 import { isNull } from '@/utils/validationUtil';
+import router from '@/config/router';
 import JSONBigInt from 'json-bigint';
 
 /**
@@ -113,10 +114,11 @@ request.interceptors.response.use(
     // Handle unauthorized access
     if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
       warnMessage(AXIOS_ERROR_MESSAGES.UNAUTHORIZED, AXIOS_ERROR_MESSAGES.UNAUTHORIZED_TITLE);
-      // Clear storage and redirect to login
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.hash = '#/login';
+      // Remove auth keys only — never nuke entire localStorage
+      removeStorage(AUTH_HEADERS.TENANT);
+      removeStorage(AUTH_HEADERS.LOGIN);
+      removeStorage(AUTH_HEADERS.TOKEN);
+      router.push({ name: 'login' }).catch(() => {});
     } else if (status >= 500) {
       ElNotification({
         title: 'Server Error',
