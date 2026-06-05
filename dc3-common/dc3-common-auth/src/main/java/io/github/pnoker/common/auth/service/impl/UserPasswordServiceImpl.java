@@ -26,7 +26,6 @@ import io.github.pnoker.common.auth.entity.builder.UserPasswordBuilder;
 import io.github.pnoker.common.auth.entity.model.UserPasswordDO;
 import io.github.pnoker.common.auth.entity.query.UserPasswordQuery;
 import io.github.pnoker.common.auth.service.UserPasswordService;
-import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
@@ -118,8 +117,11 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         if (Objects.nonNull(userPasswordBO)) {
             String defaultPassword = System.getenv("DC3_SECURITY_DEFAULT_PASSWORD");
             if (defaultPassword == null || defaultPassword.isBlank()) {
-                defaultPassword = System.getProperty("dc3.security.default-password",
-                        AlgorithmConstant.DEFAULT_PASSWORD);
+                defaultPassword = System.getProperty("dc3.security.default-password");
+            }
+            if (defaultPassword == null || defaultPassword.isBlank()) {
+                throw new IllegalStateException(
+                        "DC3_SECURITY_DEFAULT_PASSWORD environment variable or dc3.security.default-password property is required but not configured");
             }
             userPasswordBO.setLoginPassword(defaultPassword);
             update(userPasswordBO);

@@ -31,22 +31,6 @@ package io.github.pnoker.common.constant.common;
 public class AlgorithmConstant {
 
     /**
-     * Default encryption key (fallback only).
-     * <p>
-     * Production deployments should set the {@code DC3_SECURITY_KEY} environment variable
-     * or the {@code dc3.security.key} property instead.
-     */
-    public static final String DEFAULT_KEY = "io.github.pnoker.dc3";
-
-    /**
-     * Default password (fallback only).
-     * <p>
-     * Production deployments should set the {@code DC3_SECURITY_DEFAULT_PASSWORD} environment
-     * variable or the {@code dc3.security.default-password} property instead.
-     */
-    public static final String DEFAULT_PASSWORD = "dc3dc3dc3";
-
-    /**
      * Symmetric encryption algorithm: AES
      */
     public static final String ALGORITHM_AES = "AES";

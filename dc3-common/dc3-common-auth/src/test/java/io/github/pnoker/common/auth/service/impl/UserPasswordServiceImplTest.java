@@ -22,7 +22,6 @@ import io.github.pnoker.common.auth.dal.UserPasswordManager;
 import io.github.pnoker.common.auth.entity.bo.UserPasswordBO;
 import io.github.pnoker.common.auth.entity.builder.UserPasswordBuilder;
 import io.github.pnoker.common.auth.entity.model.UserPasswordDO;
-import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -41,7 +40,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -159,19 +157,15 @@ class UserPasswordServiceImplTest {
     }
 
     @Test
-    void resetPasswordReplacesValueWithDefaultBeforeUpdate() throws Exception {
+    void resetPasswordThrowsIllegalStateWhenDefaultNotConfigured() throws Exception {
         UserPasswordBO restored = new UserPasswordBO();
         setField(restored, "id", 9L);
         setField(restored, "loginPassword", "old");
 
         when(userPasswordManager.getById(9L)).thenReturn(doRow, doRow);
         when(userPasswordBuilder.buildBOByDO(doRow)).thenReturn(restored);
-        when(userPasswordManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(doRow);
-        when(userPasswordBuilder.buildDOByBO(restored)).thenReturn(doRow);
-        when(userPasswordManager.updateById(any(UserPasswordDO.class))).thenReturn(true);
 
-        assertThatNoException().isThrownBy(() -> service.restPassword(9L));
-        assertThat(restored.getLoginPassword()).isEqualTo(AlgorithmConstant.DEFAULT_PASSWORD);
+        assertThatThrownBy(() -> service.restPassword(9L)).isInstanceOf(IllegalStateException.class);
     }
 
     @Test

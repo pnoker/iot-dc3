@@ -32,7 +32,7 @@ spring:
     host: ${RABBITMQ_HOST:dc3-rabbitmq}
     port: ${RABBITMQ_PORT:35672}
     username: ${RABBITMQ_USERNAME:dc3}
-    password: ${RABBITMQ_PASSWORD:dc3dc3dc3}
+    password: ${RABBITMQ_PASSWORD:}
   grpc:
     client:
       channels:

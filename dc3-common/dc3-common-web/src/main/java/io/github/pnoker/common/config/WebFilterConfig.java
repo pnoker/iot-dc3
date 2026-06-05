@@ -82,6 +82,9 @@ public class WebFilterConfig {
                     log.warn("Rejecting X-Auth-User with missing/invalid signature, Url: {}", request.getURI());
                     return writeUnauthorized(exchange);
                 }
+            } else {
+                log.warn("HMAC request signing is DISABLED — backend services accept unsigned X-Auth-User headers. "
+                        + "This is acceptable for development but MUST NOT be used in production.");
             }
 
             try {
