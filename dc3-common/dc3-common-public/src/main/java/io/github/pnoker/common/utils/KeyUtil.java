@@ -202,7 +202,11 @@ public class KeyUtil {
     private static String getSecurityKey() {
         String key = System.getenv("DC3_SECURITY_KEY");
         if (key == null || key.isBlank()) {
-            key = System.getProperty("dc3.security.key", AlgorithmConstant.DEFAULT_KEY);
+            key = System.getProperty("dc3.security.key");
+        }
+        if (key == null || key.isBlank()) {
+            throw new IllegalStateException(
+                    "DC3_SECURITY_KEY environment variable or dc3.security.key property is required but not configured");
         }
         return key;
     }
