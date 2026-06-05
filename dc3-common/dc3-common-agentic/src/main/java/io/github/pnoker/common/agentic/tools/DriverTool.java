@@ -140,7 +140,7 @@ public class DriverTool {
         if (ids.isEmpty()) {
             return AgenticToolResult.invalid("No valid driver IDs provided.");
         }
-        Map<Long, String> statuses = facade.selectDriverStatusesByIds(tenantId, ids);
+        Map<Long, String> statuses = facade.listDriverStatusesByIds(tenantId, ids);
         if (AgenticToolUtil.isEmpty(statuses)) {
             return AgenticToolResult.empty("No driver statuses found.", Map.of());
         }

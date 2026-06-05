@@ -61,7 +61,7 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
     private final EventHistoryService eventHistoryService;
 
     @Override
-    public void report(GrpcEventReportVO request, StreamObserver<GrpcRString> responseObserver) {
+    public void reportEvent(GrpcEventReportVO request, StreamObserver<GrpcRString> responseObserver) {
         try {
             EventReportVO vo = new EventReportVO();
             vo.setDeviceId(request.getDeviceId());
@@ -74,13 +74,13 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
                     .setResult(GrpcR.newBuilder()
                             .setOk(true)
                             .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getText())
+                            .setMessage(ResponseEnum.OK.getRemark())
                             .build())
                     .setData(recordId)
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("EventHistoryServer.report failed", e);
+            log.error("EventHistoryServer.reportEvent failed", e);
             responseObserver.onNext(GrpcRString.newBuilder()
                     .setResult(GrpcR.newBuilder()
                             .setOk(false)
@@ -102,14 +102,14 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
                 response.setResult(GrpcR.newBuilder()
                         .setOk(true)
                         .setCode(ResponseEnum.OK.getCode())
-                        .setMessage(ResponseEnum.OK.getText())
+                        .setMessage(ResponseEnum.OK.getRemark())
                         .build());
                 response.setData(toGrpcDTO(recordDO));
             } else {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(false)
                         .setCode(ResponseEnum.NO_RESOURCE.getCode())
-                        .setMessage(ResponseEnum.NO_RESOURCE.getText())
+                        .setMessage(ResponseEnum.NO_RESOURCE.getRemark())
                         .build());
             }
             responseObserver.onNext(response.build());
@@ -128,7 +128,7 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
     }
 
     @Override
-    public void list(GrpcEventHistoryQuery request, StreamObserver<GrpcRPageEventHistoryDTO> responseObserver) {
+    public void listByPage(GrpcEventHistoryQuery request, StreamObserver<GrpcRPageEventHistoryDTO> responseObserver) {
         try {
             EventHistoryQueryVO queryVO = new EventHistoryQueryVO();
             queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
@@ -153,13 +153,13 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
                     .setResult(GrpcR.newBuilder()
                             .setOk(true)
                             .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getText())
+                            .setMessage(ResponseEnum.OK.getRemark())
                             .build())
                     .setData(pageDataBuilder.build())
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("EventHistoryServer.list failed", e);
+            log.error("EventHistoryServer.listByPage failed", e);
             responseObserver.onNext(GrpcRPageEventHistoryDTO.newBuilder()
                     .setResult(GrpcR.newBuilder()
                             .setOk(false)

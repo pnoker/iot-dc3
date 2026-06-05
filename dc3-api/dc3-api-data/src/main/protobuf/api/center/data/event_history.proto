@@ -29,9 +29,9 @@ option objc_class_prefix = "Data";
 option java_multiple_files = true;
 
 service EventHistoryApi {
-  rpc Report (GrpcEventReportVO) returns (GrpcRString);
+  rpc ReportEvent (GrpcEventReportVO) returns (GrpcRString);
   rpc GetByRecordId (GrpcStringQuery) returns (GrpcREventHistoryDTO);
-  rpc List (GrpcEventHistoryQuery) returns (GrpcRPageEventHistoryDTO);
+  rpc ListByPage (GrpcEventHistoryQuery) returns (GrpcRPageEventHistoryDTO);
 }
 
 message GrpcEventReportVO {

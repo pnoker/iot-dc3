@@ -30,10 +30,10 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to point values
 service PointValueApi {
   // Query the latest collected value of a device point
-  rpc LastValue (GrpcPointValueQuery) returns (GrpcRPointValueDTO);
+  rpc GetLastValue (GrpcPointValueQuery) returns (GrpcRPointValueDTO);
 
   // Query historical values of a device point
-  rpc HistoryValue (GrpcPointValueHistoryQuery) returns (GrpcRPointValueStringList);
+  rpc ListHistoryValues (GrpcPointValueHistoryQuery) returns (GrpcRPointValueStringList);
 
   // Send a read command to a device for a specific point
   rpc ReadCommand (GrpcPointValueCommandQuery) returns (GrpcRBoolean);

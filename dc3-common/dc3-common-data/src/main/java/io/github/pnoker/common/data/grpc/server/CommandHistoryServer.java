@@ -61,7 +61,7 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
     private final CommandHistoryService commandHistoryService;
 
     @Override
-    public void call(GrpcCommandCallVO request, StreamObserver<GrpcRString> responseObserver) {
+    public void callCommand(GrpcCommandCallVO request, StreamObserver<GrpcRString> responseObserver) {
         try {
             CommandCallVO vo = new CommandCallVO();
             vo.setDeviceId(request.getDeviceId());
@@ -73,13 +73,13 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                     .setResult(GrpcR.newBuilder()
                             .setOk(true)
                             .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getText())
+                            .setMessage(ResponseEnum.OK.getRemark())
                             .build())
                     .setData(recordId)
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("CommandHistoryServer.call failed", e);
+            log.error("CommandHistoryServer.callCommand failed", e);
             responseObserver.onNext(GrpcRString.newBuilder()
                     .setResult(GrpcR.newBuilder()
                             .setOk(false)
@@ -101,14 +101,14 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                 response.setResult(GrpcR.newBuilder()
                         .setOk(true)
                         .setCode(ResponseEnum.OK.getCode())
-                        .setMessage(ResponseEnum.OK.getText())
+                        .setMessage(ResponseEnum.OK.getRemark())
                         .build());
                 response.setData(toGrpcDTO(recordDO));
             } else {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(false)
                         .setCode(ResponseEnum.NO_RESOURCE.getCode())
-                        .setMessage(ResponseEnum.NO_RESOURCE.getText())
+                        .setMessage(ResponseEnum.NO_RESOURCE.getRemark())
                         .build());
             }
             responseObserver.onNext(response.build());
@@ -127,7 +127,7 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
     }
 
     @Override
-    public void list(GrpcCommandHistoryQuery request, StreamObserver<GrpcRPageCommandHistoryDTO> responseObserver) {
+    public void listByPage(GrpcCommandHistoryQuery request, StreamObserver<GrpcRPageCommandHistoryDTO> responseObserver) {
         try {
             CommandHistoryQueryVO queryVO = new CommandHistoryQueryVO();
             queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
@@ -150,13 +150,13 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                     .setResult(GrpcR.newBuilder()
                             .setOk(true)
                             .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getText())
+                            .setMessage(ResponseEnum.OK.getRemark())
                             .build())
                     .setData(pageDataBuilder.build())
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.error("CommandHistoryServer.list failed", e);
+            log.error("CommandHistoryServer.listByPage failed", e);
             responseObserver.onNext(GrpcRPageCommandHistoryDTO.newBuilder()
                     .setResult(GrpcR.newBuilder()
                             .setOk(false)

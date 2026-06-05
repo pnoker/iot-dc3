@@ -28,9 +28,9 @@ option objc_class_prefix = "Data";
 option java_multiple_files = true;
 
 service CommandHistoryApi {
-  rpc Call (GrpcCommandCallVO) returns (GrpcRString);
+  rpc CallCommand (GrpcCommandCallVO) returns (GrpcRString);
   rpc GetByRecordId (GrpcStringQuery) returns (GrpcRCommandHistoryDTO);
-  rpc List (GrpcCommandHistoryQuery) returns (GrpcRPageCommandHistoryDTO);
+  rpc ListByPage (GrpcCommandHistoryQuery) returns (GrpcRPageCommandHistoryDTO);
 }
 
 message GrpcCommandCallVO {

@@ -97,7 +97,7 @@ class PointValueServerTest {
                 .build()));
         when(pointValueService.latest(any())).thenReturn(page);
 
-        GrpcRPointValueDTO response = stub.lastValue(GrpcPointValueQuery.newBuilder()
+        GrpcRPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
                 .setTenantId(1L)
                 .setDeviceId(10L)
                 .setPointId(20L)
@@ -113,7 +113,7 @@ class PointValueServerTest {
         empty.setRecords(List.of());
         when(pointValueService.latest(any())).thenReturn(empty);
 
-        GrpcRPointValueDTO response = stub.lastValue(GrpcPointValueQuery.newBuilder()
+        GrpcRPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).build());
         assertThat(response.getResult().getOk()).isFalse();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
@@ -123,7 +123,7 @@ class PointValueServerTest {
     void lastValueReturnsFailureEnvelopeOnException() {
         when(pointValueService.latest(any())).thenThrow(new NotFoundException("Device does not exist"));
 
-        GrpcRPointValueDTO response = stub.lastValue(GrpcPointValueQuery.newBuilder()
+        GrpcRPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(99L).setPointId(20L).build());
         assertThat(response.getResult().getOk()).isFalse();
         assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.FAILURE.getCode());
@@ -135,7 +135,7 @@ class PointValueServerTest {
         when(pointValueService.history(eq(1L), eq(10L), eq(20L), eq(50)))
                 .thenReturn(List.of("v1", "v2", "v3"));
 
-        GrpcRPointValueStringList response = stub.historyValue(GrpcPointValueHistoryQuery.newBuilder()
+        GrpcRPointValueStringList response = stub.listHistoryValues(GrpcPointValueHistoryQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).setCount(50)
                 .build());
         assertThat(response.getResult().getOk()).isTrue();
@@ -147,7 +147,7 @@ class PointValueServerTest {
         when(pointValueService.history(any(), any(), any(), eq(50)))
                 .thenThrow(new NotFoundException("Point does not exist"));
 
-        GrpcRPointValueStringList response = stub.historyValue(GrpcPointValueHistoryQuery.newBuilder()
+        GrpcRPointValueStringList response = stub.listHistoryValues(GrpcPointValueHistoryQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(10L).setPointId(99L).setCount(50)
                 .build());
         assertThat(response.getResult().getOk()).isFalse();
