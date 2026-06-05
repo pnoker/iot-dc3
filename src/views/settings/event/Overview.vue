@@ -16,6 +16,10 @@
 
 <template>
   <div class="event-overview">
+    <div class="auto-refresh-bar">
+      <span class="auto-refresh-bar__label">{{ $t('common.autoRefresh') }} (30s)</span>
+      <span class="auto-refresh-bar__time">{{ $t('common.lastRefreshTime') }}: {{ lastRefreshText }}</span>
+    </div>
     <el-tabs v-model="activeTab" class="event-overview__tabs" @tab-change="onTabChange">
       <el-tab-pane :label="t('settings.event.overview.tabSituation')" name="situation">
         <blank-card>
@@ -170,7 +174,7 @@
 
 <script lang="ts" setup>
   import type { Component } from 'vue';
-  import { computed, defineAsyncComponent, onMounted, reactive, ref } from 'vue';
+  import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
   import { Bell, CircleCheck, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
@@ -233,6 +237,15 @@
   };
 
   const loading = ref(false);
+  const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
+  const lastRefreshTime = ref<number>(Date.now());
+  const AUTO_REFRESH_INTERVAL = 30000;
+
+  const lastRefreshText = computed(() => {
+    const d = new Date(lastRefreshTime.value);
+    return d.toLocaleTimeString();
+  });
+
   const state = reactive({
     deviceTotal: 0,
     deviceUnconfirmed: 0,
@@ -305,6 +318,7 @@
       state.deviceDaily = trendRows.map((r) => Number(r.deviceCount || 0));
     } finally {
       loading.value = false;
+      lastRefreshTime.value = Date.now();
     }
   };
 
@@ -433,7 +447,21 @@
     router.push({ name, query }).catch(() => {});
   };
 
-  onMounted(load);
+  onMounted(() => {
+    load();
+    autoRefreshTimer.value = setInterval(() => {
+      if (!loading.value) {
+        load();
+      }
+    }, AUTO_REFRESH_INTERVAL);
+  });
+
+  onBeforeUnmount(() => {
+    if (autoRefreshTimer.value) {
+      clearInterval(autoRefreshTimer.value);
+      autoRefreshTimer.value = null;
+    }
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -564,5 +592,24 @@
     }
 
     // Diagnostic cards also set their own 440 min-height internally.
+
+    .auto-refresh-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: var(--el-text-color-secondary);
+      background: var(--el-fill-color-light);
+      border-radius: 4px;
+
+      &__label {
+        font-weight: 500;
+      }
+
+      &__time {
+        color: var(--el-text-color-placeholder);
+      }
+    }
   }
 </style>

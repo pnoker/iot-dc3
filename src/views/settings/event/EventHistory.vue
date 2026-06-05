@@ -45,6 +45,11 @@
       </template>
     </tool-card>
 
+    <div class="auto-refresh-bar">
+      <span class="auto-refresh-bar__label">{{ $t('common.autoRefresh') }} (30s)</span>
+      <span class="auto-refresh-bar__time">{{ $t('common.lastRefreshTime') }}: {{ lastRefreshText }}</span>
+    </div>
+
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
         <el-table-column :label="$t('eventHistory.recordId')" min-width="180" prop="recordId" show-overflow-tooltip />
@@ -133,7 +138,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
   import { getEventHistoryById, listEventHistory } from '@/api/event';
   import { usePagedList } from '@/composables/usePagedList';
   import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
@@ -158,6 +163,14 @@
   const formData = reactive<Record<string, string>>({});
   const detailVisible = ref(false);
   const detailRow = ref<EventHistory | null>(null);
+  const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
+  const lastRefreshTime = ref<number>(Date.now());
+  const AUTO_REFRESH_INTERVAL = 30000;
+
+  const lastRefreshText = computed(() => {
+    const d = new Date(lastRefreshTime.value);
+    return d.toLocaleTimeString();
+  });
 
   const formatJson = (value: unknown) => prettyJson(value);
 
@@ -170,7 +183,12 @@
     reset();
   };
 
-  const refresh = () => load();
+  const doRefresh = async () => {
+    await load();
+    lastRefreshTime.value = Date.now();
+  };
+
+  const refresh = () => doRefresh();
 
   const openDetail = (row: EventHistory) => {
     getEventHistoryById(row.recordId)
@@ -184,5 +202,42 @@
       });
   };
 
-  load();
+  onMounted(() => {
+    autoRefreshTimer.value = setInterval(async () => {
+      if (!reactiveData.loading) {
+        await doRefresh();
+      }
+    }, AUTO_REFRESH_INTERVAL);
+  });
+
+  onBeforeUnmount(() => {
+    if (autoRefreshTimer.value) {
+      clearInterval(autoRefreshTimer.value);
+      autoRefreshTimer.value = null;
+    }
+  });
+
+  doRefresh();
 </script>
+
+<style lang="scss" scoped>
+  .auto-refresh-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 12px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    background: var(--el-fill-color-light);
+    border-radius: 4px;
+
+    &__label {
+      font-weight: 500;
+    }
+
+    &__time {
+      color: var(--el-text-color-placeholder);
+    }
+  }
+</style>

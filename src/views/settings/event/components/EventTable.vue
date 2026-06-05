@@ -75,6 +75,11 @@
       </template>
     </tool-card>
 
+    <div class="auto-refresh-bar">
+      <span class="auto-refresh-bar__label">{{ $t('common.autoRefresh') }} (30s)</span>
+      <span class="auto-refresh-bar__time">{{ $t('common.lastRefreshTime') }}: {{ lastRefreshText }}</span>
+    </div>
+
     <blank-card>
       <el-table
         v-loading="loading"
@@ -160,7 +165,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref, watch } from 'vue';
+  import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
 
@@ -203,6 +208,14 @@
 
   const loading = ref(false);
   const bulkRunning = ref(false);
+  const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
+  const lastRefreshTime = ref<number>(Date.now());
+  const AUTO_REFRESH_INTERVAL = 30000;
+
+  const lastRefreshText = computed(() => {
+    const d = new Date(lastRefreshTime.value);
+    return d.toLocaleTimeString();
+  });
   const selection = ref<Row[]>([]);
   const rows = ref<Row[]>([]);
   const nameMap = reactive<Record<string, string>>({});
@@ -266,6 +279,7 @@
       // handled globally
     } finally {
       loading.value = false;
+      lastRefreshTime.value = Date.now();
     }
   };
 
@@ -385,6 +399,21 @@
     }
   );
 
+  onMounted(() => {
+    autoRefreshTimer.value = setInterval(() => {
+      if (!loading.value && !bulkRunning.value) {
+        load();
+      }
+    }, AUTO_REFRESH_INTERVAL);
+  });
+
+  onBeforeUnmount(() => {
+    if (autoRefreshTimer.value) {
+      clearInterval(autoRefreshTimer.value);
+      autoRefreshTimer.value = null;
+    }
+  });
+
   load();
 </script>
 
@@ -393,5 +422,25 @@
     margin-left: 6px;
     color: #909399;
     font-size: 12px;
+  }
+
+  .auto-refresh-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 12px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    background: var(--el-fill-color-light);
+    border-radius: 4px;
+
+    &__label {
+      font-weight: 500;
+    }
+
+    &__time {
+      color: var(--el-text-color-placeholder);
+    }
   }
 </style>
