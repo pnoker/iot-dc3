@@ -102,7 +102,7 @@
         <j60870.version>1.7.2</j60870.version>
 
         <!-- SNMP -->
-        <snmp4j.version>3.8.3</snmp4j.version>
+        <snmp4j.version>3.7.4</snmp4j.version>
     </properties>
 
     <modules>
