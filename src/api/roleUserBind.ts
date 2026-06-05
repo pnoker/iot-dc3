@@ -24,11 +24,11 @@ export const addRoleUserBind = (body: RoleUserBindForm) => httpPost(`${API_AUTH_
 export const deleteRoleUserBind = (id: string) =>
   httpPost(`${API_AUTH_BASE}/role_user/delete`, undefined, { params: { id } });
 
-export const listRoleUser = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_user/list`, query);
+export const listRoleUserBind = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_user/list`, query);
 
-export const listRoleByUserId = (userId: string, tenantId?: string | number) => {
-  const params: Record<string, string | number> = { user_id: userId };
-  if (typeof tenantId === 'number') {
+export const listRoleByUserId = (userId: string, tenantId?: string) => {
+  const params: Record<string, string> = { user_id: userId };
+  if (tenantId) {
     params.tenant_id = tenantId;
   }
   return httpGet(`${API_AUTH_BASE}/role_user/list_role_by_user`, { params });

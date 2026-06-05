@@ -42,7 +42,7 @@ export const listDeviceByProfileId = (profileId: string) =>
 export const listDevice = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
 
-export const getDeviceStatus = (query: Record<string, unknown>) =>
+export const listDeviceStatus = (query: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/device/status/list`, query);
 
 export const listDeviceStatusByDriverId = (driverId: string) =>
@@ -50,6 +50,12 @@ export const listDeviceStatusByDriverId = (driverId: string) =>
 
 export const listDeviceStatusByProfileId = (profileId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/list_by_profile_id`, { params: { profile_id: profileId } });
+
+export const listDeviceByPointId = (pointId: string) =>
+  httpGet<R<{ count: number; devices: DeviceRecord[] }>>(
+    `${API_MANAGER_BASE}/point/list_device_statistics_by_point_id`,
+    { params: { point_id: pointId } }
+  );
 
 export const importDeviceTemplate = (device: Record<string, unknown>) =>
   httpPost(`${API_MANAGER_BASE}/device/export/import_template`, device, { responseType: 'blob' });

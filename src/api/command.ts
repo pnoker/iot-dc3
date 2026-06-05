@@ -17,7 +17,7 @@
 import { crudAdd, crudDelete, crudGetById, crudList, crudUpdate, httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 import type { PageQuery, PageResult } from '@/config/types';
-import type { CommandHistory, CommandParamRecord, CommandRecord } from '@/config/types/command';
+import type { CommandHistoryRecord, CommandParamForm, CommandParamRecord, CommandRecord } from '@/config/types/command';
 
 const endpoints = {
   command: `${API_MANAGER_BASE}/command`,
@@ -37,7 +37,7 @@ export const listCommandByProfileId = (profileId: string) =>
 
 // Command Param CRUD
 
-export const addCommandParam = (payload: Partial<CommandParamRecord>) => crudAdd(endpoints.commandParam, payload);
+export const addCommandParam = (payload: CommandParamForm) => crudAdd(endpoints.commandParam, payload);
 export const updateCommandParam = (payload: Partial<CommandParamRecord>) => crudUpdate(endpoints.commandParam, payload);
 export const deleteCommandParam = (id: string) => crudDelete(endpoints.commandParam, id);
 export const listCommandParamByCommandId = (commandId: string) =>
@@ -47,7 +47,7 @@ export const listCommandParamByCommandId = (commandId: string) =>
 
 // Command History Queries
 
-export const getCommandHistoryById = (recordId: string) =>
-  httpGet<R<CommandHistory>>(`${endpoints.commandHistory}/${recordId}`);
+export const getCommandHistoryById = (id: string) =>
+  httpGet<R<CommandHistoryRecord>>(`${endpoints.commandHistory}/get_by_id`, { params: { id } });
 export const listCommandHistory = (query: PageQuery) =>
-  httpPost<R<PageResult<CommandHistory>>>(`${endpoints.commandHistory}/list`, query);
+  httpPost<R<PageResult<CommandHistoryRecord>>>(`${endpoints.commandHistory}/list`, query);

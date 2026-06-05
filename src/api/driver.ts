@@ -28,5 +28,5 @@ export const listDriverByIds = (driverIds: string[]) =>
 export const listDriver = <T = R<PageResult<DriverRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/driver/list`, query);
 
-export const getDriverStatus = (query: Record<string, unknown>) =>
+export const listDriverStatus = (query: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/driver/status/list`, query);

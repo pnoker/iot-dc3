@@ -17,7 +17,7 @@
 import { crudAdd, crudDelete, crudGetById, crudList, crudUpdate, httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 import type { PageQuery, PageResult } from '@/config/types';
-import type { EventHistory, EventParamRecord, EventRecord } from '@/config/types/event';
+import type { EventHistoryRecord, EventParamForm, EventParamRecord, EventRecord } from '@/config/types/event';
 
 const endpoints = {
   event: `${API_MANAGER_BASE}/event`,
@@ -37,7 +37,7 @@ export const listEventByProfileId = (profileId: string) =>
 
 // Event Param CRUD
 
-export const addEventParam = (payload: Partial<EventParamRecord>) => crudAdd(endpoints.eventParam, payload);
+export const addEventParam = (payload: EventParamForm) => crudAdd(endpoints.eventParam, payload);
 export const updateEventParam = (payload: Partial<EventParamRecord>) => crudUpdate(endpoints.eventParam, payload);
 export const deleteEventParam = (id: string) => crudDelete(endpoints.eventParam, id);
 export const listEventParamByEventId = (eventId: string) =>
@@ -45,7 +45,7 @@ export const listEventParamByEventId = (eventId: string) =>
 
 // Event History Queries
 
-export const getEventHistoryById = (recordId: string) =>
-  httpGet<R<EventHistory>>(`${endpoints.eventHistory}/${recordId}`);
+export const getEventHistoryById = (id: string) =>
+  httpGet<R<EventHistoryRecord>>(`${endpoints.eventHistory}/get_by_id`, { params: { id } });
 export const listEventHistory = (query: PageQuery) =>
-  httpPost<R<PageResult<EventHistory>>>(`${endpoints.eventHistory}/list`, query);
+  httpPost<R<PageResult<EventHistoryRecord>>>(`${endpoints.eventHistory}/list`, query);

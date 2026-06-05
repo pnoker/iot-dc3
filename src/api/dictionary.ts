@@ -18,14 +18,14 @@ import { httpPost } from '@/api/common';
 import { API_MANAGER_BASE } from '@/config/constant/api';
 import type { Dictionary, PageQuery, PageResult } from '@/config/types';
 
-export const getDriverDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
+export const listDriverDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/dictionary/driver`, query);
 
-export const getDeviceDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
+export const listDeviceDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/dictionary/device`, query);
 
-export const getProfileDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
+export const listProfileDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/dictionary/profile`, query);
 
-export const getPointDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
+export const listPointDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/dictionary/device_point`, query);
