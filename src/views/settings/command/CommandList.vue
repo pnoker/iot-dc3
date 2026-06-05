@@ -206,7 +206,7 @@
 
     const saveTasks = params.map((item) => {
       const payload = { ...item, commandId };
-      return item.id ? updateCommandParam(payload) : addCommandParam({ ...payload, id: undefined });
+      return item.id ? updateCommandParam(payload) : addCommandParam(payload);
     });
 
     return Promise.all(deleteTasks).then(() => Promise.all(saveTasks));

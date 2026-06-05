@@ -123,7 +123,7 @@
   import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
   import { copy } from '@/utils/commonUtil';
   import { timestamp } from '@/utils/dateUtil';
-  import { getPointValueHistory } from '@/api/point';
+  import { listPointValueHistory } from '@/api/point';
 
   const { t } = useI18n();
 
@@ -204,7 +204,7 @@
       historyData.value = [];
       return;
     }
-    getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
+    listPointValueHistory(props.data.deviceId, props.data.pointId, 100)
       .then((res) => {
         const pointValueType = (props.point.pointTypeFlag || '').toLowerCase();
         if (pointValueType === 'string') {

@@ -60,10 +60,10 @@
       </el-form-item>
     </template>
     <template #actions>
-      <el-button v-if="embedded === ''" :icon="Plus" type="success" @click="$emit('show-add')">
+      <el-button v-if="embedded === ''" :icon="Plus" type="success" @click="$emit('open-add')">
         {{ $t('common.add') }}
       </el-button>
-      <el-button v-if="embedded === ''" :icon="Upload" type="primary" @click="$emit('show-import')">
+      <el-button v-if="embedded === ''" :icon="Upload" type="primary" @click="$emit('open-import')">
         {{ $t('common.import') }}
       </el-button>
     </template>
@@ -76,7 +76,7 @@
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import type { Dictionary } from '@/config/types';
-  import { getDriverDictionary } from '@/api/dictionary';
+  import { listDriverDictionary } from '@/api/dictionary';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
@@ -93,8 +93,8 @@
   const emit = defineEmits([
     'search',
     'reset',
-    'show-add',
-    'show-import',
+    'open-add',
+    'open-import',
     'refresh',
     'sort',
     'size-change',
@@ -116,7 +116,7 @@
 
   const driverDictionary = (query?: string) => {
     driverLoading.value = true;
-    getDriverDictionary({
+    listDriverDictionary({
       page: { size: 50, current: 1 },
       label: query || '',
     })

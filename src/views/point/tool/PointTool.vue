@@ -74,7 +74,7 @@
       </el-button>
     </template>
     <template #actions>
-      <el-button v-if="embedded === '' || embedded === 'edit'" :icon="Plus" type="success" @click="$emit('show-add')">
+      <el-button v-if="embedded === '' || embedded === 'edit'" :icon="Plus" type="success" @click="$emit('open-add')">
         {{ $t('common.add') }}
       </el-button>
     </template>
@@ -87,7 +87,7 @@
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import type { Dictionary } from '@/config/types';
-  import { getProfileDictionary } from '@/api/dictionary';
+  import { listProfileDictionary } from '@/api/dictionary';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
@@ -112,7 +112,7 @@
   const emit = defineEmits([
     'search',
     'reset',
-    'show-add',
+    'open-add',
     'refresh',
     'sort',
     'size-change',
@@ -137,7 +137,7 @@
 
   const profileDictionary = (query?: string) => {
     profileLoading.value = true;
-    getProfileDictionary({
+    listProfileDictionary({
       page: { size: 50, current: 1 },
       label: query || '',
     })

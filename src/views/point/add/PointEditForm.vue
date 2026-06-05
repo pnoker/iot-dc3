@@ -137,8 +137,8 @@
   type DoneCallback = (close?: boolean) => void;
 
   const emit = defineEmits<{
-    (e: 'add-thing', form: PointFormData, done: DoneCallback): void;
-    (e: 'update-thing', form: PointFormData, done: DoneCallback): void;
+    (e: 'add', form: PointFormData, done: DoneCallback): void;
+    (e: 'update', form: PointFormData, done: DoneCallback): void;
   }>();
 
   const { t } = useI18n();
@@ -247,9 +247,9 @@
       reactiveData.submitting = true;
       if (isEdit.value) {
         Object.assign(data, { id: originalData.value?.id });
-        emit('update-thing', data, done);
+        emit('update', data, done);
       } else {
-        emit('add-thing', data, done);
+        emit('add', data, done);
       }
     } catch {
       // validation errors are displayed by Element Plus

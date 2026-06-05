@@ -96,8 +96,8 @@
   import {
     addAgenticModelConfig,
     deleteAgenticModelConfig,
-    getAgenticModelConfigs,
-    getAgenticProviders,
+    listAgenticModelConfigs,
+    listAgenticProviders,
     updateAgenticModelConfig,
   } from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -149,7 +149,7 @@
 
   const load = () =>
     withLoading(async () => {
-      const [configResponse, providerResponse] = await Promise.all([getAgenticModelConfigs(), getAgenticProviders()]);
+      const [configResponse, providerResponse] = await Promise.all([listAgenticModelConfigs(), listAgenticProviders()]);
       providers.value = providerResponse.data || [];
       setAllData(configResponse.data || []);
     });

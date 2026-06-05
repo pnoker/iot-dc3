@@ -19,7 +19,7 @@ import { computed, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import type { AlarmEntityRecord, Order, PageQuery } from '@/config/types';
+import type { AlarmEntity, Order, PageQuery } from '@/config/types';
 import { timestampLabel } from '@/utils/dateUtil';
 import { prettyJson } from '@/utils/jsonUtil';
 import { successMessage } from '@/utils/notificationUtil';
@@ -57,7 +57,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   const state = reactive({
     loading: false,
     saving: false,
-    rows: [] as AlarmEntityRecord[],
+    rows: [] as AlarmEntity[],
     page: {
       total: 0,
       size: 12,
@@ -197,7 +197,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     formRef.value?.clearValidate();
   };
 
-  const openEdit = (row: AlarmEntityRecord) => {
+  const openEdit = (row: AlarmEntity) => {
     editing.value = true;
     const value = activeConfig.value.defaultForm();
     value.id = row.id;
@@ -209,7 +209,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     formVisible.value = true;
   };
 
-  const openDetail = (row: AlarmEntityRecord) => {
+  const openDetail = (row: AlarmEntity) => {
     router.push({ name: ALARM_DETAIL_ROUTE_MAP[activeConfig.value.key], query: { id: String(row.id) } }).catch(() => {
       // handled globally
     });
@@ -313,7 +313,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     return 'info';
   };
 
-  const formatCell = (row: AlarmEntityRecord, column: AlarmColumnConfig) => {
+  const formatCell = (row: AlarmEntity, column: AlarmColumnConfig) => {
     const value = row[column.prop];
     if (column.kind === 'time') return timestampLabel(value);
     if (column.kind === 'tag') return enumLabel(value);

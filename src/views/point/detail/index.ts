@@ -19,9 +19,9 @@ import { defineComponent, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '@/config/router';
 
-import { listDeviceStatusByDriverId } from '@/api/device';
+import { listDeviceByPointId, listDeviceStatusByDriverId } from '@/api/device';
 import { listDriverByIds } from '@/api/driver';
-import { getPointById, listDeviceByPointId } from '@/api/point';
+import { getPointById } from '@/api/point';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';

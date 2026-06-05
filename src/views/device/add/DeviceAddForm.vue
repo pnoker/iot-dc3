@@ -105,7 +105,7 @@
 
   import { successMessage } from '@/utils/notificationUtil';
   import { nameRules, remarkRules } from '@/utils/formRuleUtil';
-  import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
+  import { listDriverDictionary, listProfileDictionary } from '@/api/dictionary';
 
   interface DeviceAddFormData {
     deviceName: string;
@@ -121,7 +121,7 @@
   type DictionaryResponse = R<DictionaryPage>;
 
   const emit = defineEmits<{
-    (e: 'add-thing', formData: DeviceAddFormData, done: () => void): void;
+    (e: 'add', formData: DeviceAddFormData, done: () => void): void;
   }>();
 
   const { t } = useI18n();
@@ -163,7 +163,7 @@
   const driverDictionary = async (query = '') => {
     reactiveData.driverLoading = true;
     try {
-      const res = await getDriverDictionary<DictionaryResponse>({
+      const res = await listDriverDictionary<DictionaryResponse>({
         page: { size: 50, current: 1 },
         label: query,
       });
@@ -184,7 +184,7 @@
   const profileDictionary = async (query = '') => {
     reactiveData.profileLoading = true;
     try {
-      const res = await getProfileDictionary<DictionaryResponse>({
+      const res = await listProfileDictionary<DictionaryResponse>({
         page: { size: 50, current: 1 },
         label: query,
       });
@@ -223,7 +223,7 @@
 
     try {
       await form.validate();
-      emit('add-thing', { ...reactiveData.formData }, () => {
+      emit('add', { ...reactiveData.formData }, () => {
         cancel();
         reset();
         successMessage();

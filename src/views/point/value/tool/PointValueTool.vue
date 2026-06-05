@@ -98,7 +98,7 @@
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { Dictionary } from '@/config/types';
-  import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary';
+  import { listDeviceDictionary, listPointDictionary } from '@/api/dictionary';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
 
   defineProps({
@@ -131,7 +131,7 @@
 
   const deviceDictionary = (query?: string) => {
     deviceLoading.value = true;
-    getDeviceDictionary({
+    listDeviceDictionary({
       page: { size: 50, current: 1 },
       label: query || '',
     })
@@ -148,7 +148,7 @@
 
   const pointDictionary = (query?: string) => {
     pointLoading.value = true;
-    getPointDictionary({
+    listPointDictionary({
       page: { size: 50, current: 1 },
       label: query || '',
       parentId: formData.deviceId,

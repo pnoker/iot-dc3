@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive, ref } from 'vue';
-  import { listPointByIds, getPointUnit, getPointValueLatest, listPointValue, writePointValue } from '@/api/point';
+  import { listPointUnit, getPointValueLatest, listPointByIds, listPointValue, writePointValue } from '@/api/point';
   import { listDeviceByIds } from '@/api/device';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
@@ -182,7 +182,7 @@
           // nothing to do
         });
 
-      getPointUnit(pointIds)
+      listPointUnit(pointIds)
         .then((res) => {
           reactiveData.unitTable = res.data;
         })

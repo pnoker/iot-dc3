@@ -144,7 +144,7 @@
   import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
   import { prettyJson } from '@/utils/jsonUtil';
   import { eventLevelLabel, eventLevelTag, eventTypeLabel } from '@/utils/thingModelFormatUtil';
-  import type { EventHistory } from '@/config/types';
+  import type { EventHistoryRecord } from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
@@ -156,13 +156,13 @@
     reset,
     sizeChange,
     currentChange,
-  } = usePagedList<EventHistory, Record<string, unknown>>({
+  } = usePagedList<EventHistoryRecord, Record<string, unknown>>({
     request: (query) => listEventHistory(query),
   });
 
   const formData = reactive<Record<string, string>>({});
   const detailVisible = ref(false);
-  const detailRow = ref<EventHistory | null>(null);
+  const detailRow = ref<EventHistoryRecord | null>(null);
   const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
   const lastRefreshTime = ref<number>(Date.now());
   const AUTO_REFRESH_INTERVAL = 30000;
@@ -190,7 +190,7 @@
 
   const refresh = () => doRefresh();
 
-  const openDetail = (row: EventHistory) => {
+  const openDetail = (row: EventHistoryRecord) => {
     getEventHistoryById(row.recordId)
       .then((res) => {
         detailRow.value = res.data || row;

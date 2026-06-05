@@ -151,7 +151,7 @@
   import type { ElTable } from 'element-plus';
 
   import { listRole } from '@/api/role';
-  import { listRoleByUserId, listRoleUser } from '@/api/roleUserBind';
+  import { listRoleByUserId, listRoleUserBind } from '@/api/roleUserBind';
 
   interface RoleRow {
     id: string;
@@ -210,7 +210,7 @@
       const [allRes, ownRes, bindsRes] = await Promise.all([
         listRole({ page: { size: 1000, current: 1 } }) as Promise<any>,
         listRoleByUserId(reactiveData.user.id) as Promise<any>,
-        listRoleUser({ page: { size: 1000, current: 1 }, userId: reactiveData.user.id }) as Promise<any>,
+        listRoleUserBind({ page: { size: 1000, current: 1 }, userId: reactiveData.user.id }) as Promise<any>,
       ]);
 
       const allRoles: RoleRow[] = ((allRes.data?.records as any[]) || []).map(toRow);

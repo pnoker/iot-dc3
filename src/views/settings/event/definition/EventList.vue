@@ -199,7 +199,7 @@
 
     const saveTasks = params.map((item) => {
       const payload = { ...item, eventId };
-      return item.id ? updateEventParam(payload) : addEventParam({ ...payload, id: undefined });
+      return item.id ? updateEventParam(payload) : addEventParam(payload);
     });
 
     return Promise.all(deleteTasks).then(() => Promise.all(saveTasks));

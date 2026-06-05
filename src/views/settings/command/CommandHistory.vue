@@ -153,7 +153,7 @@
   import { usePagedList } from '@/composables/usePagedList';
   import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
   import { prettyJson } from '@/utils/jsonUtil';
-  import type { CommandHistory } from '@/config/types';
+  import type { CommandHistoryRecord } from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
@@ -165,13 +165,13 @@
     reset,
     sizeChange,
     currentChange,
-  } = usePagedList<CommandHistory, Record<string, unknown>>({
+  } = usePagedList<CommandHistoryRecord, Record<string, unknown>>({
     request: (query) => listCommandHistory(query),
   });
 
   const formData = reactive<Record<string, string>>({});
   const detailVisible = ref(false);
-  const detailRow = ref<CommandHistory | null>(null);
+  const detailRow = ref<CommandHistoryRecord | null>(null);
   const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
   const lastRefreshTime = ref<number>(Date.now());
   const AUTO_REFRESH_INTERVAL = 30000;
@@ -199,7 +199,7 @@
 
   const refresh = () => doRefresh();
 
-  const openDetail = (row: CommandHistory) => {
+  const openDetail = (row: CommandHistoryRecord) => {
     getCommandHistoryById(row.recordId)
       .then((res) => {
         detailRow.value = res.data || row;

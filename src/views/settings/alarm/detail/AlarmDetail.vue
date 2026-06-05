@@ -60,7 +60,7 @@
   } from '@/api/alarm';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
-  import type { AlarmEntityRecord } from '@/config/types';
+  import type { AlarmEntity as AlarmEntityData } from '@/config/types';
   import { timestampLabel } from '@/utils/dateUtil';
   import { prettyJson } from '@/utils/jsonUtil';
 
@@ -96,7 +96,7 @@
   const reactiveData = reactive({
     id: route.query.id as string,
     active: (route.query.active as string) || 'detail',
-    data: {} as AlarmEntityRecord,
+    data: {} as AlarmEntityData,
   });
 
   const commonFields = (): DetailField[] => [

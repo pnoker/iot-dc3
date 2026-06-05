@@ -87,7 +87,12 @@
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
 
-  import { addAgenticProvider, deleteAgenticProvider, getAgenticProviders, updateAgenticProvider } from '@/api/agentic';
+  import {
+    addAgenticProvider,
+    deleteAgenticProvider,
+    listAgenticProviders,
+    updateAgenticProvider,
+  } from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DefaultTag from '@/components/tag/DefaultTag.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
@@ -137,7 +142,7 @@
 
   const load = () =>
     withLoading(async () => {
-      const response = await getAgenticProviders();
+      const response = await listAgenticProviders();
       setAllData(response.data || []);
     });
 

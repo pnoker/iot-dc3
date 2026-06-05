@@ -62,9 +62,9 @@
           :enabled="enabled"
           @delete="emitDelete"
           @detail="detail"
-          @disable="emitToggle('disable-thing')"
+          @disable="emitToggle('disable')"
           @edit="edit"
-          @enable="emitToggle('enable-thing')"
+          @enable="emitToggle('enable')"
         />
       </div>
     </el-card>
@@ -90,15 +90,15 @@
     icon: { type: String, default: 'images/common/device.png' },
   });
 
-  const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
+  const emit = defineEmits(['disable', 'enable', 'delete']);
   const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
-  const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
+  const emitToggle = (name: 'disable' | 'enable') => {
     emit(name, props.data.id, props.data.driverId, () => successMessage());
   };
 
   const emitDelete = () => {
-    emit('delete-thing', props.data.id, () => successMessage());
+    emit('delete', props.data.id, () => successMessage());
   };
 
   const edit = () => {

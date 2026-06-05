@@ -105,10 +105,10 @@
           :enable-title="$t('point.card.confirmEnable')"
           :enabled="enabled"
           @delete="emitDelete"
-          @detail="emit('detail-thing', data)"
-          @disable="emitToggle('disable-thing')"
-          @edit="emit('edit-thing', data)"
-          @enable="emitToggle('enable-thing')"
+          @detail="emit('detail', data)"
+          @disable="emitToggle('disable')"
+          @edit="emit('edit', data)"
+          @enable="emitToggle('enable')"
         />
       </div>
     </el-card>
@@ -133,15 +133,15 @@
     icon: { type: String, default: 'images/common/point.png' },
   });
 
-  const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing', 'edit-thing', 'detail-thing']);
+  const emit = defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
   const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
-  const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
+  const emitToggle = (name: 'disable' | 'enable') => {
     emit(name, props.data.id, props.data.profileId, () => successMessage());
   };
 
   const emitDelete = () => {
-    emit('delete-thing', props.data.id, () => successMessage());
+    emit('delete', props.data.id, () => successMessage());
   };
 </script>
 

@@ -51,7 +51,7 @@
   import { onMounted, reactive } from 'vue';
   import { useRoute } from 'vue-router';
 
-  import { getAgenticProviders } from '@/api/agentic';
+  import { listAgenticProviders } from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
   import DefaultTag from '@/components/tag/DefaultTag.vue';
@@ -68,7 +68,7 @@
 
   const load = () => {
     if (!reactiveData.id) return;
-    getAgenticProviders()
+    listAgenticProviders()
       .then((res) => {
         reactiveData.data =
           (res.data || []).find((item) => String(item.id) === reactiveData.id) || ({} as AgenticProvider);

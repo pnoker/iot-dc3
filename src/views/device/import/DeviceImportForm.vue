@@ -119,7 +119,7 @@
 
   import type { Dictionary } from '@/config/types';
 
-  import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
+  import { listDriverDictionary, listProfileDictionary } from '@/api/dictionary';
   import { successMessage } from '@/utils/notificationUtil';
 
   interface DictionaryPage {
@@ -136,7 +136,7 @@
 
   const emit = defineEmits<{
     (e: 'import-template', formData: DeviceImportFormData, done: () => void): void;
-    (e: 'import-thing', formData: DeviceImportFormData, done: () => void): void;
+    (e: 'import', formData: DeviceImportFormData, done: () => void): void;
   }>();
 
   const { t } = useI18n();
@@ -176,7 +176,7 @@
   const driverDictionary = async (query = '') => {
     reactiveData.driverLoading = true;
     try {
-      const res = await getDriverDictionary<DictionaryResponse>({
+      const res = await listDriverDictionary<DictionaryResponse>({
         page: { size: 50, current: 1 },
         label: query,
       });
@@ -197,7 +197,7 @@
   const profileDictionary = async (query = '') => {
     reactiveData.profileLoading = true;
     try {
-      const res = await getProfileDictionary<DictionaryResponse>({
+      const res = await listProfileDictionary<DictionaryResponse>({
         page: { size: 50, current: 1 },
         label: query,
       });
@@ -249,7 +249,7 @@
 
   const uploadRequest = (param: UploadRequestOptions): Promise<unknown> => {
     emit(
-      'import-thing',
+      'import',
       {
         ...reactiveData.formData,
         file: param.file as UploadRawFile,

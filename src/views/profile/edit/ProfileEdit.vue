@@ -38,7 +38,7 @@
               <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
                 <enable-flag-segmented v-model="reactiveData.profileFormData.enableFlag" />
               </el-form-item>
-              <el-form-item class="info-card-item-full" :label="$t('profile.edit.description')" prop="remark">
+              <el-form-item :label="$t('profile.edit.description')" class="info-card-item-full" prop="remark">
                 <el-input
                   v-model="reactiveData.profileFormData.remark"
                   :placeholder="$t('profile.edit.descriptionPlaceholder')"
