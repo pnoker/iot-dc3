@@ -102,7 +102,7 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             int exitCode = finished ? process.exitValue() : -1;
             return exitCode == 0 ? DeviceHealthState.online() : DeviceHealthState.offline();
         } catch (Exception e) {
-            log.warn("CAN interface health check failed, interface={}, message={}", interfaceName, e.getMessage());
+            log.warn("CAN interface health check failed, interface={}", interfaceName, e);
             return DeviceHealthState.offline();
         }
     }

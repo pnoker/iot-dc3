@@ -120,7 +120,7 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                     try {
                         removed.close();
                     } catch (IOException e) {
-                        log.warn("SNMP client close failed, deviceId={}, message={}", metadataEvent.getId(), e.getMessage());
+                        log.warn("SNMP client close failed, deviceId={}", metadataEvent.getId(), e);
                     }
                     log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
                             driverCode, metadataEvent.getId(), operateType);

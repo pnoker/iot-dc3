@@ -463,7 +463,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 socket.close();
             }
         } catch (IOException e) {
-            log.warn("FINS socket close failed, message={}", e.getMessage());
+            log.warn("FINS socket close failed", e);
         }
     }
 

@@ -59,7 +59,7 @@ public class HostUtil {
             InetAddress address = InetAddress.getLocalHost();
             return address.getHostAddress();
         } catch (Exception e) {
-            log.warn("Failed to resolve local host address: {}", e.getMessage());
+            log.warn("Failed to resolve local host address", e);
             log.debug("Local host address resolution failed", e);
         }
         return null;
@@ -103,7 +103,7 @@ public class HostUtil {
                 }
             }
         } catch (UnknownHostException | SocketException e) {
-            log.warn("Failed to get hostname for bind address '{}': {}", address, e.getMessage());
+            log.warn("Failed to get hostname for bind address '{}'", address, e);
             log.debug("Hostname lookup failed for bind address '{}'", address, e);
         }
 
@@ -130,7 +130,7 @@ public class HostUtil {
                 return macList.stream().distinct().toList();
             }
         } catch (Exception e) {
-            log.warn("Failed to get local mac address: {}", e.getMessage());
+            log.warn("Failed to get local mac address", e);
             log.debug("Local mac address lookup failed", e);
         }
         return macList;
