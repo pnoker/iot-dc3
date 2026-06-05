@@ -36,9 +36,13 @@
           >
             {{ t('device.edit.saveAll') }}
           </el-button>
-          <el-button :disabled="dirtyCount < 1" :icon="RefreshLeft" plain @click="$emit('discard')">
-            {{ t('device.edit.discardChanges') }}
-          </el-button>
+          <el-popconfirm :title="$t('common.discardConfirm')" @confirm="$emit('discard')">
+            <template #reference>
+              <el-button :disabled="dirtyCount < 1" :icon="RefreshLeft" plain>
+                {{ t('device.edit.discardChanges') }}
+              </el-button>
+            </template>
+          </el-popconfirm>
         </div>
         <div class="matrix-toolbar-footer-trailing">
           <slot name="trailing" />

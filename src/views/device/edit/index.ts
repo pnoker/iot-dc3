@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, watch } from 'vue';
+import { computed, defineComponent, onBeforeUnmount, onMounted, reactive, watch } from 'vue';
 import type { FormItemRule, FormRules } from 'element-plus';
 import { Search } from '@element-plus/icons-vue';
 
-import { useRoute } from 'vue-router';
+import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import router from '@/config/router';
 
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
@@ -1367,6 +1367,10 @@ export default defineComponent({
 
     const driverDirtyCount = computed(() => driverDirtySet.size);
 
+    const totalDirtyCount = computed(
+      () => pointDirtyCount.value + commandDirtyCount.value + eventDirtyCount.value + driverDirtyCount.value
+    );
+
     const saveDriverMatrix = async () => {
       reactiveData.driverSaving = true;
       const ok = await driverUpdate();
@@ -1438,6 +1442,32 @@ export default defineComponent({
       }
     );
 
+    const warnBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (totalDirtyCount.value > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    onMounted(() => {
+      window.addEventListener('beforeunload', warnBeforeUnload);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('beforeunload', warnBeforeUnload);
+    });
+
+    onBeforeRouteLeave((_to, _from, next) => {
+      if (totalDirtyCount.value > 0) {
+        const leave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
+        if (!leave) {
+          next(false);
+          return;
+        }
+      }
+      next();
+    });
+
     device();
 
     return {
@@ -1456,6 +1486,7 @@ export default defineComponent({
       pointDirtyCount,
       commandDirtyCount,
       eventDirtyCount,
+      totalDirtyCount,
       driverDictionary,
       driverDictionaryVisible,
       profileDictionary,
