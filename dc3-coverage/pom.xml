@@ -52,107 +52,86 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-agentic</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-auth</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-constant</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-data</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-driver</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-exception</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-facade-local-auth</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-facade-local-data</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-facade-local-manager</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-gateway</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-manager</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-model</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mqtt</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-postgres</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-public</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-quartz</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-rabbitmq</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-repository</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-resource-registrar</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-thread</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-web</artifactId>
-            <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>

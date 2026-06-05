@@ -36,7 +36,6 @@
         <dependency>
             <groupId>org.snmp4j</groupId>
             <artifactId>snmp4j</artifactId>
-            <version>3.7.4</version>
         </dependency>
 
     </dependencies>
