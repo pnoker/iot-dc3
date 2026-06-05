@@ -138,7 +138,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         }
 
         DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
-        entityBO.setOperateTime(null);
+        entityDO.setOperateTime(null);
         if (!driverAttributeConfigManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update driver attribute config");
         }

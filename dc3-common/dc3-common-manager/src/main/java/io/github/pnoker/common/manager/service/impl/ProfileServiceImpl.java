@@ -54,6 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -89,6 +90,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final DeviceMapper deviceMapper;
 
     @Override
+    @Transactional
     public void add(ProfileBO entityBO) {
         entityBO.setProfileCode(null);
         if (checkDuplicate(entityBO, false)) {
@@ -102,6 +104,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         getDOById(id, true);
 
@@ -113,6 +116,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    @Transactional
     public void update(ProfileBO entityBO) {
         ProfileDO current = getDOById(entityBO.getId(), true);
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {
@@ -125,7 +129,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
-        entityBO.setOperateTime(null);
+        entityDO.setOperateTime(null);
         if (!profileManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update profile");
         }
