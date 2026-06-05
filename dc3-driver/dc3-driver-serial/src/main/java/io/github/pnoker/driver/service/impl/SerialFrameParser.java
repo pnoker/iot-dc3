@@ -43,15 +43,6 @@ public class SerialFrameParser {
     private final int dataLength;
     private final ChecksumType checksumType;
 
-    /**
-     * Checksum algorithm enumeration.
-     */
-    public enum ChecksumType {
-        NONE,
-        CRC16,
-        XOR
-    }
-
     public SerialFrameParser(String frameHeaderHex, String frameFooterHex,
                              int dataOffset, int dataLength, String checksumTypeName) {
         this.frameHeader = isBlank(frameHeaderHex) ? null : hexToBytes(frameHeaderHex);
@@ -59,69 +50,6 @@ public class SerialFrameParser {
         this.dataOffset = Math.max(0, dataOffset);
         this.dataLength = Math.max(0, dataLength);
         this.checksumType = parseChecksumType(checksumTypeName);
-    }
-
-    /**
-     * Parse a raw byte response and extract the data region.
-     *
-     * @param raw raw response bytes
-     * @return extracted data bytes
-     * @throws ReadPointException if frame validation fails
-     */
-    public byte[] parse(byte[] raw) {
-        if (Objects.isNull(raw) || raw.length == 0) {
-            throw new ReadPointException("Empty serial response");
-        }
-
-        int start = 0;
-        int end = raw.length;
-
-        // Locate frame header
-        if (Objects.nonNull(frameHeader) && frameHeader.length > 0) {
-            start = indexOf(raw, frameHeader);
-            if (start < 0) {
-                throw new ReadPointException("Frame header not found in serial response");
-            }
-            start += frameHeader.length;
-        }
-
-        // Locate frame footer (search from end of header)
-        if (Objects.nonNull(frameFooter) && frameFooter.length > 0) {
-            int footerIndex = lastIndexOf(raw, frameFooter, start);
-            if (footerIndex < 0) {
-                throw new ReadPointException("Frame footer not found in serial response");
-            }
-            end = footerIndex;
-        }
-
-        // Apply data offset
-        int dataStart = start + dataOffset;
-
-        // Calculate checksum region and data region
-        int checksumLength = getChecksumLength();
-        int dataEnd = end - checksumLength;
-
-        if (dataEnd <= dataStart) {
-            throw new ReadPointException("No data region in serial frame: start={}, end={}", dataStart, dataEnd);
-        }
-
-        // Validate checksum
-        if (checksumType != ChecksumType.NONE && checksumLength > 0) {
-            byte[] payload = new byte[dataEnd - start];
-            System.arraycopy(raw, start, payload, 0, payload.length);
-            byte[] expectedChecksum = extractChecksum(raw, dataEnd, checksumLength);
-            byte[] actualChecksum = computeChecksum(payload);
-            if (!arrayEquals(expectedChecksum, actualChecksum)) {
-                throw new ReadPointException("Serial frame checksum mismatch: expected={}, actual={}",
-                        bytesToHex(expectedChecksum), bytesToHex(actualChecksum));
-            }
-        }
-
-        // Extract data region
-        int finalLength = dataLength > 0 ? Math.min(dataLength, dataEnd - dataStart) : dataEnd - dataStart;
-        byte[] data = new byte[finalLength];
-        System.arraycopy(raw, dataStart, data, 0, finalLength);
-        return data;
     }
 
     /**
@@ -149,57 +77,6 @@ public class SerialFrameParser {
             return "";
         }
         return HexFormat.of().formatHex(bytes).toUpperCase();
-    }
-
-    private int getChecksumLength() {
-        return switch (checksumType) {
-            case CRC16 -> 2;
-            case XOR -> 1;
-            case NONE -> 0;
-        };
-    }
-
-    private byte[] extractChecksum(byte[] raw, int offset, int length) {
-        byte[] checksum = new byte[length];
-        System.arraycopy(raw, offset, checksum, 0, length);
-        return checksum;
-    }
-
-    private byte[] computeChecksum(byte[] payload) {
-        return switch (checksumType) {
-            case CRC16 -> computeCrc16(payload);
-            case XOR -> computeXor(payload);
-            case NONE -> new byte[0];
-        };
-    }
-
-    /**
-     * Compute CRC16 (Modbus) checksum.
-     */
-    private byte[] computeCrc16(byte[] data) {
-        int crc = 0xFFFF;
-        for (byte b : data) {
-            crc ^= (b & 0xFF);
-            for (int i = 0; i < 8; i++) {
-                if ((crc & 0x0001) != 0) {
-                    crc = (crc >> 1) ^ 0xA001;
-                } else {
-                    crc >>= 1;
-                }
-            }
-        }
-        return new byte[]{(byte) (crc & 0xFF), (byte) ((crc >> 8) & 0xFF)};
-    }
-
-    /**
-     * Compute XOR checksum.
-     */
-    private byte[] computeXor(byte[] data) {
-        byte xor = 0;
-        for (byte b : data) {
-            xor ^= b;
-        }
-        return new byte[]{xor};
     }
 
     /**
@@ -265,5 +142,128 @@ public class SerialFrameParser {
 
     private static boolean isBlank(String s) {
         return s == null || s.isBlank();
+    }
+
+    /**
+     * Parse a raw byte response and extract the data region.
+     *
+     * @param raw raw response bytes
+     * @return extracted data bytes
+     * @throws ReadPointException if frame validation fails
+     */
+    public byte[] parse(byte[] raw) {
+        if (Objects.isNull(raw) || raw.length == 0) {
+            throw new ReadPointException("Empty serial response");
+        }
+
+        int start = 0;
+        int end = raw.length;
+
+        // Locate frame header
+        if (Objects.nonNull(frameHeader) && frameHeader.length > 0) {
+            start = indexOf(raw, frameHeader);
+            if (start < 0) {
+                throw new ReadPointException("Frame header not found in serial response");
+            }
+            start += frameHeader.length;
+        }
+
+        // Locate frame footer (search from end of header)
+        if (Objects.nonNull(frameFooter) && frameFooter.length > 0) {
+            int footerIndex = lastIndexOf(raw, frameFooter, start);
+            if (footerIndex < 0) {
+                throw new ReadPointException("Frame footer not found in serial response");
+            }
+            end = footerIndex;
+        }
+
+        // Apply data offset
+        int dataStart = start + dataOffset;
+
+        // Calculate checksum region and data region
+        int checksumLength = getChecksumLength();
+        int dataEnd = end - checksumLength;
+
+        if (dataEnd <= dataStart) {
+            throw new ReadPointException("No data region in serial frame: start={}, end={}", dataStart, dataEnd);
+        }
+
+        // Validate checksum
+        if (checksumType != ChecksumType.NONE && checksumLength > 0) {
+            byte[] payload = new byte[dataEnd - start];
+            System.arraycopy(raw, start, payload, 0, payload.length);
+            byte[] expectedChecksum = extractChecksum(raw, dataEnd, checksumLength);
+            byte[] actualChecksum = computeChecksum(payload);
+            if (!arrayEquals(expectedChecksum, actualChecksum)) {
+                throw new ReadPointException("Serial frame checksum mismatch: expected={}, actual={}",
+                        bytesToHex(expectedChecksum), bytesToHex(actualChecksum));
+            }
+        }
+
+        // Extract data region
+        int finalLength = dataLength > 0 ? Math.min(dataLength, dataEnd - dataStart) : dataEnd - dataStart;
+        byte[] data = new byte[finalLength];
+        System.arraycopy(raw, dataStart, data, 0, finalLength);
+        return data;
+    }
+
+    private int getChecksumLength() {
+        return switch (checksumType) {
+            case CRC16 -> 2;
+            case XOR -> 1;
+            case NONE -> 0;
+        };
+    }
+
+    private byte[] extractChecksum(byte[] raw, int offset, int length) {
+        byte[] checksum = new byte[length];
+        System.arraycopy(raw, offset, checksum, 0, length);
+        return checksum;
+    }
+
+    private byte[] computeChecksum(byte[] payload) {
+        return switch (checksumType) {
+            case CRC16 -> computeCrc16(payload);
+            case XOR -> computeXor(payload);
+            case NONE -> new byte[0];
+        };
+    }
+
+    /**
+     * Compute CRC16 (Modbus) checksum.
+     */
+    private byte[] computeCrc16(byte[] data) {
+        int crc = 0xFFFF;
+        for (byte b : data) {
+            crc ^= (b & 0xFF);
+            for (int i = 0; i < 8; i++) {
+                if ((crc & 0x0001) != 0) {
+                    crc = (crc >> 1) ^ 0xA001;
+                } else {
+                    crc >>= 1;
+                }
+            }
+        }
+        return new byte[]{(byte) (crc & 0xFF), (byte) ((crc >> 8) & 0xFF)};
+    }
+
+    /**
+     * Compute XOR checksum.
+     */
+    private byte[] computeXor(byte[] data) {
+        byte xor = 0;
+        for (byte b : data) {
+            xor ^= b;
+        }
+        return new byte[]{xor};
+    }
+
+    /**
+     * Checksum algorithm enumeration.
+     */
+    public enum ChecksumType {
+        NONE,
+        CRC16,
+        XOR
     }
 }

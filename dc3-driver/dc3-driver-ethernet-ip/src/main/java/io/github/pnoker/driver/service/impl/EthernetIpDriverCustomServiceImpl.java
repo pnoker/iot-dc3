@@ -75,6 +75,21 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
         this.driverSenderService = driverSenderService;
     }
 
+    private static void readFully(InputStream in, byte[] buffer) throws IOException {
+        int offset = 0;
+        while (offset < buffer.length) {
+            int read = in.read(buffer, offset, buffer.length - offset);
+            if (read < 0) throw new IOException("Connection closed");
+            offset += read;
+        }
+    }
+
+    private static String bytesToHex(byte[] data) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : data) sb.append(String.format("%02X", b));
+        return sb.toString();
+    }
+
     @Override
     public void initial() {
         connectMap = new ConcurrentHashMap<>(16);
@@ -108,7 +123,10 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 Socket removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
-                    try { removed.close(); } catch (IOException ignored) {}
+                    try {
+                        removed.close();
+                    } catch (IOException ignored) {
+                    }
                     log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
                             driverCode, metadataEvent.getId(), operateType);
                 }
@@ -183,7 +201,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
         connectMap.remove(deviceId, socket);
         try {
             if (Objects.nonNull(socket) && !socket.isClosed()) socket.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     /**
@@ -268,11 +287,26 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
     private byte[] encodeTagValue(String tagType, String value) {
         ByteBuffer buf;
         switch (tagType.toUpperCase()) {
-            case "BOOL" -> { buf = ByteBuffer.allocate(1); buf.put((byte)(Boolean.parseBoolean(value) ? 1 : 0)); }
-            case "SINT" -> { buf = ByteBuffer.allocate(1); buf.put(Byte.parseByte(value)); }
-            case "INT" -> { buf = ByteBuffer.allocate(2); buf.order(ByteOrder.LITTLE_ENDIAN).putShort(Short.parseShort(value)); }
-            case "DINT" -> { buf = ByteBuffer.allocate(4); buf.order(ByteOrder.LITTLE_ENDIAN).putInt(Integer.parseInt(value)); }
-            case "REAL" -> { buf = ByteBuffer.allocate(4); buf.order(ByteOrder.LITTLE_ENDIAN).putFloat(Float.parseFloat(value)); }
+            case "BOOL" -> {
+                buf = ByteBuffer.allocate(1);
+                buf.put((byte) (Boolean.parseBoolean(value) ? 1 : 0));
+            }
+            case "SINT" -> {
+                buf = ByteBuffer.allocate(1);
+                buf.put(Byte.parseByte(value));
+            }
+            case "INT" -> {
+                buf = ByteBuffer.allocate(2);
+                buf.order(ByteOrder.LITTLE_ENDIAN).putShort(Short.parseShort(value));
+            }
+            case "DINT" -> {
+                buf = ByteBuffer.allocate(4);
+                buf.order(ByteOrder.LITTLE_ENDIAN).putInt(Integer.parseInt(value));
+            }
+            case "REAL" -> {
+                buf = ByteBuffer.allocate(4);
+                buf.order(ByteOrder.LITTLE_ENDIAN).putFloat(Float.parseFloat(value));
+            }
             default -> buf = ByteBuffer.wrap(value.getBytes(StandardCharsets.US_ASCII));
         }
         return buf.array();
@@ -287,21 +321,6 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
             case "REAL" -> (byte) 0xCA;
             default -> (byte) 0xC4;
         };
-    }
-
-    private static void readFully(InputStream in, byte[] buffer) throws IOException {
-        int offset = 0;
-        while (offset < buffer.length) {
-            int read = in.read(buffer, offset, buffer.length - offset);
-            if (read < 0) throw new IOException("Connection closed");
-            offset += read;
-        }
-    }
-
-    private static String bytesToHex(byte[] data) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : data) sb.append(String.format("%02X", b));
-        return sb.toString();
     }
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {

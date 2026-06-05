@@ -31,7 +31,9 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -113,7 +115,8 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             invalidateConnection(device.getId(), myS7PLC);
             log.error("Driver point read failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                     point.getId(), e);
-            return null;
+            throw new ReadPointException("Driver point read failed, protocol={}, deviceId={}, pointId={}, message={}",
+                    driverCode, device.getId(), point.getId(), e.getMessage(), e);
         } finally {
             myS7PLC.lock.unlock();
         }
@@ -135,7 +138,8 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             invalidateConnection(device.getId(), myS7PLC);
             log.error("Driver point write failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
                     point.getId(), e);
-            return false;
+            throw new WritePointException("Driver point write failed, protocol={}, deviceId={}, pointId={}, message={}",
+                    driverCode, device.getId(), point.getId(), e.getMessage(), e);
         } finally {
             myS7PLC.lock.unlock();
         }

@@ -184,8 +184,8 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Parse the raw serial response using the configured frame parser.
      *
-     * @param rawResponse  raw response bytes
-     * @param pointConfig  point configuration with frame parsing parameters
+     * @param rawResponse raw response bytes
+     * @param pointConfig point configuration with frame parsing parameters
      * @return parsed value as string
      */
     private String parseResponse(byte[] rawResponse, Map<String, AttributeBO> pointConfig) {

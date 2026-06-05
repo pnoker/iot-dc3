@@ -26,15 +26,12 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openmuc.j60870.ClientConnectionBuilder;
 import org.openmuc.j60870.Connection;
 import org.openmuc.j60870.ConnectionEventListener;
-import org.openmuc.j60870.ie.InformationElement;
-import org.openmuc.j60870.ie.InformationObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -62,24 +59,22 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
     /**
      * Device connection cache keyed by device ID.
      */
     private final ConcurrentHashMap<Long, Connection> connectMap = new ConcurrentHashMap<>();
-
     /**
      * IOA value cache keyed by point ID for quick read access.
      */
     private final ConcurrentHashMap<Long, String> valueCache = new ConcurrentHashMap<>();
+    @Value("${dc3.driver.code}")
+    private String driverCode;
 
     /**
      * Explicit constructor for dependency injection.
      *
-     * @param driverMetadata       driver metadata service
-     * @param driverSenderService  driver sender service
+     * @param driverMetadata      driver metadata service
+     * @param driverSenderService driver sender service
      */
     public Iec104DriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;

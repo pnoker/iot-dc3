@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -26,7 +27,11 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.entity.dto.EventReportDTO;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.exception.ConnectorException;
+import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -52,9 +57,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Custom driver service implementation for the TCP/UDP Raw Driver.
  * <p>
- * This service provides generic TCP and UDP socket communication for reading
- * and writing data to devices that support raw socket protocols. It supports
- * configurable frame parsing with header, footer, offset, and length settings.
+ * Provides generic TCP and UDP socket communication with connection caching
+ * per device to avoid repeated TCP handshake overhead. Supports configurable
+ * frame parsing with header, footer, offset, and length settings.
  * </p>
  *
  * @author pnoker
@@ -65,21 +70,23 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
 
+    private static final int FAILURE_BACKOFF_THRESHOLD = 3;
+    private static final long FAILURE_BACKOFF_MS = 60_000;
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     @Value("${dc3.driver.code}")
     private String driverCode;
-
     /**
-     * Device connection cache keyed by device ID.
+     * Device TCP connection cache keyed by device ID.
      */
-    private final ConcurrentHashMap<Long, Socket> connectMap = new ConcurrentHashMap<>();
+    private Map<Long, Socket> tcpConnectMap;
+    /**
+     * Failure tracking for connection backoff.
+     */
+    private Map<Long, ConsecutiveFailure> failureMap;
 
     /**
      * Explicit constructor for dependency injection.
-     *
-     * @param driverMetadata       driver metadata service
-     * @param driverSenderService  driver sender service
      */
     public TcpUdpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
@@ -88,62 +95,98 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void initial() {
-        /*
-         * TCP/UDP Driver initialization logic
-         */
+        tcpConnectMap = new ConcurrentHashMap<>(16);
+        failureMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
     public void schedule() {
-        /*
-         * TCP/UDP Driver custom schedule logic
-         */
+    }
+
+    @Override
+    public DeviceHealthState health(Map<String, AttributeBO> driverConfig, DeviceBO device) {
+        if (Objects.isNull(device) || Objects.isNull(device.getId())) {
+            return DeviceHealthState.offline();
+        }
+        Long deviceId = device.getId();
+        // Check cached connection
+        Socket existing = tcpConnectMap.get(deviceId);
+        if (existing != null) {
+            return existing.isConnected() && !existing.isClosed()
+                    ? DeviceHealthState.online()
+                    : DeviceHealthState.offline();
+        }
+        // If in backoff, skip health check attempt
+        ConsecutiveFailure failure = failureMap.get(deviceId);
+        if (failure != null && failure.shouldBackoff()) {
+            return DeviceHealthState.offline();
+        }
+        // Try a quick TCP connection test (UDP is connectionless, reported online by default)
+        String protocol = getConfigValue(driverConfig, "protocol", "TCP");
+        if ("UDP".equalsIgnoreCase(protocol)) {
+            return DeviceHealthState.online();
+        }
+        try {
+            String host = getConfigValue(driverConfig, "host", "localhost");
+            int port = getConfigIntValue(driverConfig, "port", 502);
+            int connectTimeout = getConfigIntValue(driverConfig, "connectTimeout", 5000);
+            try (Socket test = new Socket()) {
+                test.connect(new InetSocketAddress(host, port), connectTimeout);
+                return DeviceHealthState.online();
+            }
+        } catch (Exception e) {
+            log.warn("TCP/UDP health check failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+            return DeviceHealthState.offline();
+        }
     }
 
     @Override
     public void event(MetadataEventDTO metadataEvent) {
-        /*
-         * TCP/UDP Driver metadata event handling
-         */
+        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+        MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
+        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode, metadataType, operateType, metadataEvent.getId());
+
+            if (MetadataOperateTypeEnum.DELETE.equals(operateType)
+                    || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
+                Socket removed = tcpConnectMap.remove(metadataEvent.getId());
+                if (removed != null) {
+                    closeQuietly(removed);
+                }
+                failureMap.remove(metadataEvent.getId());
+                log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                        driverCode, metadataEvent.getId(), operateType);
+            }
+        }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                               PointBO point) {
-        String host = getConfigValue(driverConfig, "host", "localhost");
-        int port = getConfigIntValue(driverConfig, "port", 502);
+    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
+                               DeviceBO device, PointBO point) {
         String protocol = getConfigValue(driverConfig, "protocol", "TCP");
-        int connectTimeout = getConfigIntValue(driverConfig, "connectTimeout", 5000);
-        int readTimeout = getConfigIntValue(driverConfig, "readTimeout", 3000);
-
         String sendCommand = getConfigValue(pointConfig, "sendCommand", "");
         String rawValue;
 
         try {
             if ("UDP".equalsIgnoreCase(protocol)) {
-                rawValue = sendUdp(host, port, sendCommand, readTimeout);
+                rawValue = sendUdp(driverConfig, sendCommand);
             } else {
-                rawValue = sendTcp(host, port, sendCommand, connectTimeout, readTimeout);
+                rawValue = sendTcp(device.getId(), driverConfig, sendCommand);
             }
-
             String parsedValue = parseFrame(rawValue, pointConfig);
             return new ReadPointValue(device, point, parsedValue);
-        } catch (Exception e) {
-            log.error("TCP/UDP read failed, deviceId={}, pointId={}, host={}, port={}",
-                    device.getId(), point.getId(), host, port, e);
-            throw new RuntimeException("TCP/UDP read failed: " + e.getMessage(), e);
+        } catch (IOException e) {
+            invalidateConnector(device.getId());
+            throw new ReadPointException("TCP/UDP read failed, protocol={}, deviceId={}, pointId={}, message={}",
+                    driverCode, device.getId(), point.getId(), e.getMessage(), e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WritePointValue writePointValue) {
-        String host = getConfigValue(driverConfig, "host", "localhost");
-        int port = getConfigIntValue(driverConfig, "port", 502);
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
+                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
         String protocol = getConfigValue(driverConfig, "protocol", "TCP");
-        int connectTimeout = getConfigIntValue(driverConfig, "connectTimeout", 5000);
-        int readTimeout = getConfigIntValue(driverConfig, "readTimeout", 3000);
-
         String sendCommand = getConfigValue(pointConfig, "sendCommand", "");
         if (StringUtils.isBlank(sendCommand)) {
             log.warn("TCP/UDP write failed, sendCommand is empty, deviceId={}, pointId={}",
@@ -156,15 +199,15 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
 
         try {
             if ("UDP".equalsIgnoreCase(protocol)) {
-                sendUdp(host, port, sendCommand, readTimeout);
+                sendUdp(driverConfig, sendCommand);
             } else {
-                sendTcp(host, port, sendCommand, connectTimeout, readTimeout);
+                sendTcp(device.getId(), driverConfig, sendCommand);
             }
             return true;
-        } catch (Exception e) {
-            log.error("TCP/UDP write failed, deviceId={}, pointId={}, host={}, port={}",
-                    device.getId(), point.getId(), host, port, e);
-            return false;
+        } catch (IOException e) {
+            invalidateConnector(device.getId());
+            throw new WritePointException("TCP/UDP write failed, protocol={}, deviceId={}, pointId={}, message={}",
+                    driverCode, device.getId(), point.getId(), e.getMessage(), e);
         }
     }
 
@@ -182,42 +225,89 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         return result;
     }
 
-    /**
-     * Send command via TCP and return response as hex string.
-     */
-    private String sendTcp(String host, int port, String sendCommand, int connectTimeout, int readTimeout) throws IOException {
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(host, port), connectTimeout);
-            socket.setSoTimeout(readTimeout);
+    // ---- TCP with connection caching ----
 
-            byte[] sendBytes = hexToBytes(sendCommand);
-            try (OutputStream out = socket.getOutputStream()) {
-                out.write(sendBytes);
-                out.flush();
-            }
+    private String sendTcp(Long deviceId, Map<String, AttributeBO> driverConfig, String sendCommand) throws IOException {
+        Socket socket = getTcpConnector(deviceId, driverConfig);
+        byte[] sendBytes = hexToBytes(sendCommand);
+        try {
+            OutputStream out = socket.getOutputStream();
+            out.write(sendBytes);
+            out.flush();
 
             byte[] buffer = new byte[4096];
-            try (InputStream in = socket.getInputStream()) {
-                int len = in.read(buffer);
-                if (len > 0) {
-                    byte[] response = new byte[len];
-                    System.arraycopy(buffer, 0, response, 0, len);
-                    return bytesToHex(response);
-                }
+            InputStream in = socket.getInputStream();
+            int len = in.read(buffer);
+            if (len > 0) {
+                byte[] response = new byte[len];
+                System.arraycopy(buffer, 0, response, 0, len);
+                // Successful communication clears failure tracking
+                failureMap.remove(deviceId);
+                return bytesToHex(response);
             }
+        } catch (IOException e) {
+            failureMap.compute(deviceId, (k, v) ->
+                    v == null ? new ConsecutiveFailure() : v.increment());
+            throw e;
         }
         return "";
     }
 
-    /**
-     * Send command via UDP and return response as hex string.
-     */
-    private String sendUdp(String host, int port, String sendCommand, int readTimeout) throws IOException {
+    private Socket getTcpConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
+        // Check backoff
+        ConsecutiveFailure failure = failureMap.get(deviceId);
+        if (failure != null && failure.shouldBackoff()) {
+            throw new ConnectorException(
+                    "Driver connection in backoff after {} consecutive failures, protocol={}, deviceId={}",
+                    failure.count, driverCode, deviceId);
+        }
+
+        Socket existing = tcpConnectMap.get(deviceId);
+        if (existing != null && existing.isConnected() && !existing.isClosed()) {
+            return existing;
+        }
+
+        // Remove stale socket
+        if (existing != null) {
+            closeQuietly(existing);
+            tcpConnectMap.remove(deviceId);
+        }
+
+        // Create new connection
+        String host = getConfigValue(driverConfig, "host", "localhost");
+        int port = getConfigIntValue(driverConfig, "port", 502);
+        int connectTimeout = getConfigIntValue(driverConfig, "connectTimeout", 5000);
+        int readTimeout = getConfigIntValue(driverConfig, "readTimeout", 3000);
+
+        try {
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(host, port), connectTimeout);
+            socket.setSoTimeout(readTimeout);
+            tcpConnectMap.put(deviceId, socket);
+            failureMap.remove(deviceId);
+            log.info("TCP connection established, protocol={}, deviceId={}, host={}, port={}",
+                    driverCode, deviceId, host, port);
+            return socket;
+        } catch (IOException e) {
+            failureMap.compute(deviceId, (k, v) ->
+                    v == null ? new ConsecutiveFailure() : v.increment());
+            throw new ConnectorException("TCP connection failed, protocol={}, deviceId={}, host={}, port={}, message={}",
+                    driverCode, deviceId, host, port, e.getMessage(), e);
+        }
+    }
+
+    // ---- UDP (stateless, connection-per-call) ----
+
+    private String sendUdp(Map<String, AttributeBO> driverConfig, String sendCommand) throws IOException {
+        String host = getConfigValue(driverConfig, "host", "localhost");
+        int port = getConfigIntValue(driverConfig, "port", 502);
+        int readTimeout = getConfigIntValue(driverConfig, "readTimeout", 3000);
+
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(readTimeout);
-
             byte[] sendBytes = hexToBytes(sendCommand);
-            DatagramPacket sendPacket = new DatagramPacket(sendBytes, sendBytes.length, java.net.InetAddress.getByName(host), port);
+            DatagramPacket sendPacket = new DatagramPacket(sendBytes, sendBytes.length,
+                    java.net.InetAddress.getByName(host), port);
             socket.send(sendPacket);
 
             byte[] buffer = new byte[4096];
@@ -231,27 +321,22 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    /**
-     * Parse the raw response using frame configuration.
-     */
+    // ---- Frame parsing ----
+
     private String parseFrame(String rawHex, Map<String, AttributeBO> pointConfig) {
         if (StringUtils.isBlank(rawHex)) {
             return "";
         }
-
         int offset = getConfigIntValue(pointConfig, "dataOffset", 0);
         int length = getConfigIntValue(pointConfig, "dataLength", 0);
         String dataFormat = getConfigValue(pointConfig, "dataFormat", "HEX");
-
         try {
             byte[] rawBytes = hexToBytes(rawHex);
-
             if (length > 0 && offset >= 0 && (offset + length) <= rawBytes.length) {
                 byte[] dataBytes = new byte[length];
                 System.arraycopy(rawBytes, offset, dataBytes, 0, length);
                 return parseDataValue(dataBytes, dataFormat, pointConfig);
             }
-
             return rawHex;
         } catch (Exception e) {
             log.warn("Frame parsing failed, rawHex={}, falling back to raw value", rawHex, e);
@@ -259,48 +344,45 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    /**
-     * Parse data bytes based on the specified format.
-     */
     private String parseDataValue(byte[] dataBytes, String dataFormat, Map<String, AttributeBO> pointConfig) {
         String byteOrder = getConfigValue(pointConfig, "byteOrder", "BIG");
         ByteOrder order = "LITTLE".equalsIgnoreCase(byteOrder) ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
-
         return switch (dataFormat.toUpperCase()) {
             case "HEX" -> bytesToHex(dataBytes);
             case "ASCII" -> new String(dataBytes, StandardCharsets.US_ASCII).trim();
-            case "INT16" -> {
-                if (dataBytes.length >= 2) {
-                    yield String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getShort());
-                }
-                yield bytesToHex(dataBytes);
-            }
-            case "UINT16" -> {
-                if (dataBytes.length >= 2) {
-                    byte[] unsigned = new byte[]{0, dataBytes[0], dataBytes[1]};
-                    yield String.valueOf((int) ByteBuffer.wrap(dataBytes).order(order).getShort() & 0xFFFF);
-                }
-                yield bytesToHex(dataBytes);
-            }
-            case "INT32" -> {
-                if (dataBytes.length >= 4) {
-                    yield String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getInt());
-                }
-                yield bytesToHex(dataBytes);
-            }
-            case "FLOAT" -> {
-                if (dataBytes.length >= 4) {
-                    yield String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getFloat());
-                }
-                yield bytesToHex(dataBytes);
-            }
+            case "INT16" -> dataBytes.length >= 2
+                    ? String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getShort())
+                    : bytesToHex(dataBytes);
+            case "UINT16" -> dataBytes.length >= 2
+                    ? String.valueOf((int) ByteBuffer.wrap(dataBytes).order(order).getShort() & 0xFFFF)
+                    : bytesToHex(dataBytes);
+            case "INT32" -> dataBytes.length >= 4
+                    ? String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getInt())
+                    : bytesToHex(dataBytes);
+            case "FLOAT" -> dataBytes.length >= 4
+                    ? String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getFloat())
+                    : bytesToHex(dataBytes);
             default -> bytesToHex(dataBytes);
         };
     }
 
-    /**
-     * Convert hex string to byte array.
-     */
+    // ---- Helpers ----
+
+    private void invalidateConnector(Long deviceId) {
+        Socket removed = tcpConnectMap.remove(deviceId);
+        if (removed != null) {
+            closeQuietly(removed);
+        }
+    }
+
+    private void closeQuietly(Socket socket) {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            log.warn("TCP socket close failed, protocol={}", driverCode, e);
+        }
+    }
+
     private byte[] hexToBytes(String hex) {
         if (StringUtils.isBlank(hex)) {
             return new byte[0];
@@ -309,9 +391,6 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         return HexFormat.of().parseHex(hex);
     }
 
-    /**
-     * Convert byte array to uppercase hex string.
-     */
     private String bytesToHex(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
             return "";
@@ -319,9 +398,6 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         return HexFormat.of().withUpperCase().formatHex(bytes);
     }
 
-    /**
-     * Get string config value with default.
-     */
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         if (Objects.isNull(config) || Objects.isNull(config.get(code))) {
             return defaultValue;
@@ -330,9 +406,6 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         return StringUtils.defaultIfBlank(value, defaultValue);
     }
 
-    /**
-     * Get int config value with default.
-     */
     private int getConfigIntValue(Map<String, AttributeBO> config, String code, int defaultValue) {
         String value = getConfigValue(config, code, String.valueOf(defaultValue));
         try {
@@ -340,6 +413,32 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         } catch (NumberFormatException e) {
             log.warn("Failed to parse int config value for code={}, using default={}", code, defaultValue);
             return defaultValue;
+        }
+    }
+
+    // ---- Backoff tracking ----
+
+    private static class ConsecutiveFailure {
+        final int count;
+        final long firstFailTime;
+
+        ConsecutiveFailure() {
+            this.count = 1;
+            this.firstFailTime = System.currentTimeMillis();
+        }
+
+        ConsecutiveFailure(int count, long firstFailTime) {
+            this.count = count;
+            this.firstFailTime = firstFailTime;
+        }
+
+        ConsecutiveFailure increment() {
+            return new ConsecutiveFailure(count + 1, firstFailTime);
+        }
+
+        boolean shouldBackoff() {
+            return count >= FAILURE_BACKOFF_THRESHOLD
+                    && (System.currentTimeMillis() - firstFailTime) < FAILURE_BACKOFF_MS;
         }
     }
 }
