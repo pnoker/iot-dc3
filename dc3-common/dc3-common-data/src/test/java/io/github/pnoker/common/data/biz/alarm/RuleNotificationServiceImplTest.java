@@ -303,7 +303,7 @@ class RuleNotificationServiceImplTest {
         RuleMatch match = recoveryMatch();
         NotifyBO notify = notify(match.getRule().getNotifyId());
         notify.setNotifyExt(dedupDisabledExt());
-        when(notifyConfigCache.findNotify(match.getRule().getNotifyId())).thenReturn(notify);
+        when(notifyConfigCache.getNotify(match.getRule().getNotifyId())).thenReturn(notify);
 
         // No existing state at all
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
@@ -318,7 +318,7 @@ class RuleNotificationServiceImplTest {
     @Test
     void notifyReturnsEmptyWhenNotifyPolicyMissing() {
         RuleMatch match = firingMatch();
-        when(notifyConfigCache.findNotify(anyLong())).thenReturn(null);
+        when(notifyConfigCache.getNotify(anyLong())).thenReturn(null);
 
         // No existing state
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null);
@@ -334,15 +334,15 @@ class RuleNotificationServiceImplTest {
         RuleMatch match = firingMatch();
         NotifyBO notify = notify(10L);
         notify.setNotifyExt(dedupDisabledExt());
-        when(notifyConfigCache.findNotify(10L)).thenReturn(notify);
-        when(notifyConfigCache.findMessage(20L)).thenReturn(message(20L));
+        when(notifyConfigCache.getNotify(10L)).thenReturn(notify);
+        when(notifyConfigCache.getMessage(20L)).thenReturn(message(20L));
 
         NotifyChannelBindBO bind = bind(30L, 7L);
         when(notifyConfigCache.findEnabledBinds(notify)).thenReturn(List.of(bind));
 
         NotifyChannelBO channel = channel(30L, 7L);
         channel.setEnableFlag(EnableFlagEnum.DISABLE);
-        when(notifyConfigCache.findChannel(30L, 7L)).thenReturn(channel);
+        when(notifyConfigCache.getChannel(30L, 7L)).thenReturn(channel);
 
         stubStateBuilderForSaveWhenNoExisting();
         stubHistoryBuilderForSave();
@@ -362,14 +362,14 @@ class RuleNotificationServiceImplTest {
         RuleMatch match = firingMatch();
         NotifyBO notify = notify(10L);
         notify.setNotifyExt(dedupDisabledExt());
-        when(notifyConfigCache.findNotify(10L)).thenReturn(notify);
-        when(notifyConfigCache.findMessage(20L)).thenReturn(null);
+        when(notifyConfigCache.getNotify(10L)).thenReturn(notify);
+        when(notifyConfigCache.getMessage(20L)).thenReturn(null);
 
         NotifyChannelBindBO bind = bind(30L, 7L);
         when(notifyConfigCache.findEnabledBinds(notify)).thenReturn(List.of(bind));
 
         NotifyChannelBO channel = channel(30L, 7L);
-        when(notifyConfigCache.findChannel(30L, 7L)).thenReturn(channel);
+        when(notifyConfigCache.getChannel(30L, 7L)).thenReturn(channel);
 
         stubStateBuilderForSaveWhenNoExisting();
         stubHistoryBuilderForSave();
@@ -434,13 +434,13 @@ class RuleNotificationServiceImplTest {
         RuleMatch match = firingMatch();
         NotifyBO notify = notify(10L);
         notify.setNotifyExt(dedupDisabledExt());
-        when(notifyConfigCache.findNotify(10L)).thenReturn(notify);
-        when(notifyConfigCache.findMessage(20L)).thenReturn(message(20L));
+        when(notifyConfigCache.getNotify(10L)).thenReturn(notify);
+        when(notifyConfigCache.getMessage(20L)).thenReturn(message(20L));
 
         NotifyChannelBindBO bind = bind(30L, 7L);
         when(notifyConfigCache.findEnabledBinds(notify)).thenReturn(List.of(bind));
         NotifyChannelBO channel = channel(30L, 7L);
-        when(notifyConfigCache.findChannel(30L, 7L)).thenReturn(channel);
+        when(notifyConfigCache.getChannel(30L, 7L)).thenReturn(channel);
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any())).thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any()))
                 .thenReturn(new MessagePayload(NotifyChannelTypeFlagEnum.WEBHOOK, "json", Map.of(), List.of()));
@@ -466,13 +466,13 @@ class RuleNotificationServiceImplTest {
     private void stubNotifyConfigLoaded(RuleMatch match) {
         NotifyBO notify = notify(match.getRule().getNotifyId());
         notify.setNotifyExt(dedupDisabledExt());
-        when(notifyConfigCache.findNotify(match.getRule().getNotifyId())).thenReturn(notify);
-        when(notifyConfigCache.findMessage(match.getRule().getMessageId())).thenReturn(message(match.getRule().getMessageId()));
+        when(notifyConfigCache.getNotify(match.getRule().getNotifyId())).thenReturn(notify);
+        when(notifyConfigCache.getMessage(match.getRule().getMessageId())).thenReturn(message(match.getRule().getMessageId()));
 
         NotifyChannelBindBO bind = bind(30L, 7L);
         when(notifyConfigCache.findEnabledBinds(notify)).thenReturn(List.of(bind));
         NotifyChannelBO channel = channel(30L, 7L);
-        when(notifyConfigCache.findChannel(30L, 7L)).thenReturn(channel);
+        when(notifyConfigCache.getChannel(30L, 7L)).thenReturn(channel);
 
     }
 

@@ -161,7 +161,7 @@ public class TenantController implements BaseController {
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
             TenantBO select = tenantService.getByCode(code);
             if (Objects.isNull(select)) {
-                return R.fail(ResponseEnum.NO_RESOURCE.getText());
+                return R.fail(ResponseEnum.NO_RESOURCE.getRemark());
             }
             if (!isSystemAdmin && !Objects.equals(select.getId(), tenantId)) {
                 return R.fail("Resource does not exist");

@@ -21,7 +21,7 @@ import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.bo.WindowAggregateResult;
 import io.github.pnoker.common.entity.query.WindowAggregateRequest;
 import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +66,7 @@ public class RepositoryWindowDataSource implements WindowDataSource {
     }
 
     @Override
-    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowMode mode) {
+    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
         if (!isPointFact(fact) || Objects.isNull(spec) || Objects.isNull(spec.duration())) {
             return AggregateOutcome.empty();
         }

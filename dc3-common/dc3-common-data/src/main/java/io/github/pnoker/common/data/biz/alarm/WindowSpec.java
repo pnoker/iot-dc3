@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 
 import java.time.Duration;
 
@@ -40,13 +40,13 @@ import java.time.Duration;
  * @version 2026.5.21
  * @since 2026.5.21
  */
-public record WindowSpec(WindowMode mode, Duration duration, int minSamples, boolean valid, String reason) {
+public record WindowSpec(WindowModeEnum mode, Duration duration, int minSamples, boolean valid, String reason) {
 
     public static WindowSpec last() {
-        return new WindowSpec(WindowMode.LAST, null, 1, true, null);
+        return new WindowSpec(WindowModeEnum.LAST, null, 1, true, null);
     }
 
-    public static WindowSpec ok(WindowMode mode, Duration duration, int minSamples) {
+    public static WindowSpec ok(WindowModeEnum mode, Duration duration, int minSamples) {
         return new WindowSpec(mode, duration, Math.max(0, minSamples), true, null);
     }
 

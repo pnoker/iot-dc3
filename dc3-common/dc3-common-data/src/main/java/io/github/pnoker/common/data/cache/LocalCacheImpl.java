@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-public class LocalCacheService {
+public class LocalCacheImpl {
 
     /**
      * Hooks fired exclusively on TTL-driven evictions. Copy-on-write list so registration

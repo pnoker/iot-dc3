@@ -56,7 +56,7 @@ public class TopicController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             TopicQuery query = Objects.isNull(topicQuery) ? new TopicQuery() : topicQuery;
             query.setTenantId(tenantId);
-            Page<TopicVO> topicVOList = topicService.query(query);
+            Page<TopicVO> topicVOList = topicService.list(query);
             return R.ok(topicVOList);
         }));
     }

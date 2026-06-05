@@ -45,9 +45,9 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-public class PointValueLocalCacheService {
+public class PointValueLocalCache {
 
-    private final LocalCacheService localCacheService;
+    private final LocalCacheImpl localCacheService;
 
     public void savePointValue(PointValueBO entityBO) {
         if (Objects.isNull(entityBO.getTenantId()) || Objects.isNull(entityBO.getDeviceId())

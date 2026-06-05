@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -74,7 +74,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
         if (!spec.valid()) {
             return false;
         }
-        if (spec.mode() != WindowMode.LAST) {
+        if (spec.mode() != WindowModeEnum.LAST) {
             return windowedRuleEvaluator.matches(rule, fact, spec);
         }
         RuleExt.Condition condition = condition(rule);
@@ -94,7 +94,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
         if (!spec.valid()) {
             return false;
         }
-        if (spec.mode() != WindowMode.LAST) {
+        if (spec.mode() != WindowModeEnum.LAST) {
             return windowedRuleEvaluator.recovers(rule, fact, spec);
         }
         RuleExt.Recovery recovery = rule.getRuleExt().getContent().getRecovery();

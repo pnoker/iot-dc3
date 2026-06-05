@@ -30,13 +30,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
-class LocalCacheServiceTest {
+class LocalCacheImplTest {
 
-    private LocalCacheService cache;
+    private LocalCacheImpl cache;
 
     @BeforeEach
     void setUp() {
-        cache = new LocalCacheService();
+        cache = new LocalCacheImpl();
         cache.init();
     }
 

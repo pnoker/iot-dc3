@@ -166,7 +166,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<DriverBO> selectByPointId(Long pointId, Long tenantId) {
+    public List<DriverBO> listByPointId(Long pointId, Long tenantId) {
         PointDO entityDO = pointManager.getById(pointId);
         if (Objects.isNull(entityDO)) {
             throw new NotFoundException("Point does not exist");
@@ -175,7 +175,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverBO listByDeviceId(Long deviceId, Long tenantId) {
+    public DriverBO getByDeviceId(Long deviceId, Long tenantId) {
         DeviceDO entityDO = deviceManager.getById(deviceId);
         if (Objects.isNull(entityDO)) {
             throw new NotFoundException("Device does not exist");

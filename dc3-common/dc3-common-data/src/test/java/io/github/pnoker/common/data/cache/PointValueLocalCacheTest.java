@@ -29,10 +29,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
-class PointValueLocalCacheServiceTest {
+class PointValueLocalCacheTest {
 
-    private LocalCacheService localCache;
-    private PointValueLocalCacheService service;
+    private LocalCacheImpl localCache;
+    private PointValueLocalCache service;
 
     private static PointValueBO pv(Long tenantId, Long deviceId, Long pointId, String raw) {
         return PointValueBO.builder()
@@ -45,9 +45,9 @@ class PointValueLocalCacheServiceTest {
 
     @BeforeEach
     void setUp() {
-        localCache = new LocalCacheService();
+        localCache = new LocalCacheImpl();
         localCache.init();
-        service = new PointValueLocalCacheService(localCache);
+        service = new PointValueLocalCache(localCache);
     }
 
     @Test

@@ -56,9 +56,9 @@ public enum ResponseEnum {
     private final String code;
 
     /**
-     * Text
+     * Remark
      */
-    private final String text;
+    private final String remark;
 
     /**
      * Get enum by index

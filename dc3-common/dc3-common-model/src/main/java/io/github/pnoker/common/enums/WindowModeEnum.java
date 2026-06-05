@@ -38,7 +38,7 @@ import java.util.Locale;
  * @since 2026.5.21
  */
 @Getter
-public enum WindowMode {
+public enum WindowModeEnum {
 
     /**
      * Evaluate against the most recent fact only.
@@ -84,7 +84,7 @@ public enum WindowMode {
      * Resolves a free-form string ({@code "AVG"}, {@code "avg"}, whitespace ok)
      * to the corresponding mode, returning {@code null} when unrecognized.
      */
-    public static WindowMode ofCode(String mode) {
+    public static WindowModeEnum ofCode(String mode) {
         if (StringUtils.isBlank(mode)) {
             return null;
         }

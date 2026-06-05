@@ -37,7 +37,7 @@ public interface EventService extends BaseService<EventBO, EventQuery> {
 
     List<EventBO> listByDeviceId(Long deviceId, Long tenantId);
 
-    List<EventBO> selectByProfileIds(List<Long> profileIds);
+    List<EventBO> listByProfileIds(List<Long> profileIds);
 
     List<EventBO> listByIds(Set<Long> ids);
 

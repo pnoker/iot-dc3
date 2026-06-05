@@ -80,7 +80,7 @@ class RuleServiceImplTest {
     }
 
     @Test
-    void rejectsAddWhenWindowModeIsUnknown() {
+    void rejectsAddWhenWindowModeEnumIsUnknown() {
         // The save validator now parses the spec instead of comparing strings;
         // unknown mode values are still rejected as they map to no enum.
         RuleBO rule = rule("FOOBAR");
@@ -109,7 +109,7 @@ class RuleServiceImplTest {
     }
 
     @Test
-    void allowsAddWhenWindowModeIsLast() {
+    void allowsAddWhenWindowModeEnumIsLast() {
         // The window-mode validator is the only behavior under test here; the
         // persistence path uses a MyBatis-Plus chain wrapper (`ruleManager.lambdaQuery()`)
         // we don't mock. We assert the *negative* — that the SUT did not throw
@@ -126,7 +126,7 @@ class RuleServiceImplTest {
     }
 
     @Test
-    void allowsAddWhenWindowModeIsAvgWithValidDuration() {
+    void allowsAddWhenWindowModeEnumIsAvgWithValidDuration() {
         // Phase 4 lifts the LAST-only gate; aggregation modes with valid
         // ISO-8601 durations are accepted at save. Runtime evaluation of
         // these modes lands in a follow-up commit.

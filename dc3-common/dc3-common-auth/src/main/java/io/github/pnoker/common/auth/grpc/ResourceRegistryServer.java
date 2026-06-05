@@ -80,7 +80,7 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
 
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
+            rBuilder.setMessage(ResponseEnum.OK.getRemark());
             builder.setData(GrpcSyncResultDTO.newBuilder()
                     .setInserted(result.getInserted())
                     .setUpdated(result.getUpdated())
@@ -91,7 +91,7 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
             log.error("Resource registry sync failed for service [{}]", request.getServiceName(), e);
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(Objects.nonNull(e.getMessage()) ? e.getMessage() : ResponseEnum.FAILURE.getText());
+            rBuilder.setMessage(Objects.nonNull(e.getMessage()) ? e.getMessage() : ResponseEnum.FAILURE.getRemark());
         }
         builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());

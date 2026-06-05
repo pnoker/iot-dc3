@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -31,14 +31,14 @@ class WindowSpecParserTest {
     void nullWindowParsesAsLast() {
         WindowSpec spec = WindowSpecParser.parse(null);
         assertThat(spec.valid()).isTrue();
-        assertThat(spec.mode()).isEqualTo(WindowMode.LAST);
+        assertThat(spec.mode()).isEqualTo(WindowModeEnum.LAST);
         assertThat(spec.duration()).isNull();
     }
 
     @Test
     void blankModeFallsBackToLast() {
         WindowSpec spec = WindowSpecParser.parse(new RuleExt.Window("  ", "PT5M", 1));
-        assertThat(spec.mode()).isEqualTo(WindowMode.LAST);
+        assertThat(spec.mode()).isEqualTo(WindowModeEnum.LAST);
         assertThat(spec.duration()).isNull();
     }
 
@@ -53,7 +53,7 @@ class WindowSpecParserTest {
     void avgWithValidDurationParsesCorrectly() {
         WindowSpec spec = WindowSpecParser.parse(new RuleExt.Window("AVG", "PT5M", 3));
         assertThat(spec.valid()).isTrue();
-        assertThat(spec.mode()).isEqualTo(WindowMode.AVG);
+        assertThat(spec.mode()).isEqualTo(WindowModeEnum.AVG);
         assertThat(spec.duration()).isEqualTo(Duration.ofMinutes(5));
         assertThat(spec.minSamples()).isEqualTo(3);
     }
@@ -61,7 +61,7 @@ class WindowSpecParserTest {
     @Test
     void caseInsensitiveModeAccepted() {
         WindowSpec spec = WindowSpecParser.parse(new RuleExt.Window("avg", "PT5M", 1));
-        assertThat(spec.mode()).isEqualTo(WindowMode.AVG);
+        assertThat(spec.mode()).isEqualTo(WindowModeEnum.AVG);
     }
 
     @Test
@@ -83,7 +83,7 @@ class WindowSpecParserTest {
     @Test
     void lastTreatsZeroMinSamplesAsOne() {
         WindowSpec spec = WindowSpecParser.parse(new RuleExt.Window("LAST", null, 0));
-        assertThat(spec.mode()).isEqualTo(WindowMode.LAST);
+        assertThat(spec.mode()).isEqualTo(WindowModeEnum.LAST);
         assertThat(spec.minSamples()).isEqualTo(1);
     }
 

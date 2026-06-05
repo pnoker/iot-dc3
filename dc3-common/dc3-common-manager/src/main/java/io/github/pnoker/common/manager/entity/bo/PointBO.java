@@ -120,7 +120,7 @@ public class PointBO extends BaseBO implements TenantOwned {
      */
     public void setByDefault() {
         this.pointTypeFlag = PointTypeFlagEnum.STRING;
-        this.rwFlag = RwFlagEnum.R;
+        this.rwFlag = RwFlagEnum.READ_ONLY;
         this.baseValue = BigDecimal.valueOf(0);
         this.multiple = BigDecimal.valueOf(1);
         this.valueDecimal = 6;

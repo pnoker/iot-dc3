@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.SystemHealthService;
-import io.github.pnoker.common.data.cache.LocalCacheService;
+import io.github.pnoker.common.data.cache.LocalCacheImpl;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
@@ -59,7 +59,7 @@ import java.util.concurrent.TimeoutException;
  *
  * <p>
  * Driver / device summaries have to live in this service: the online-status cache in
- * {@link LocalCacheService} is populated by the heartbeat receivers here, not in manager.
+ * {@link LocalCacheImpl} is populated by the heartbeat receivers here, not in manager.
  * The fleet facades are called with a tenantId so the manager-side query filters to the
  * caller's tenant (leaving it null routes through gRPC as 0 and matches no rows).
  * </p>

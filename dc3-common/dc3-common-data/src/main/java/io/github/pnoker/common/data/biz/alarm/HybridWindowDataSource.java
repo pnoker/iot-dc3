@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -54,7 +54,7 @@ public class HybridWindowDataSource implements WindowDataSource {
     private final AlarmWindowProperties properties;
 
     @Override
-    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowMode mode) {
+    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
         return select(spec).aggregate(spec, fact, mode);
     }
 

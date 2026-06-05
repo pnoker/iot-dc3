@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -47,7 +47,7 @@ public interface WindowDataSource {
      * the {@code minSamples} guard. Modes that do not reduce to a scalar
      * (LAST/ALL/ANY) should not be passed in.
      */
-    AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowMode mode);
+    AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode);
 
     /**
      * Pull the raw samples in the rule's window, ordered oldest → newest.

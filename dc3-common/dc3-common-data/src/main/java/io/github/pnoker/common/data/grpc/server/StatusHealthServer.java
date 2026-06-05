@@ -181,7 +181,7 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
         return GrpcR.newBuilder()
                 .setOk(true)
                 .setCode(ResponseEnum.OK.getCode())
-                .setMessage(ResponseEnum.OK.getText())
+                .setMessage(ResponseEnum.OK.getRemark())
                 .build();
     }
 
@@ -189,7 +189,7 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
         return GrpcR.newBuilder()
                 .setOk(false)
                 .setCode(ResponseEnum.NO_RESOURCE.getCode())
-                .setMessage(ResponseEnum.NO_RESOURCE.getText())
+                .setMessage(ResponseEnum.NO_RESOURCE.getRemark())
                 .build();
     }
 

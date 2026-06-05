@@ -117,7 +117,7 @@ public class NotifyConfigCache {
      * exist. Caches the result either way so a hot rule pointing at a missing
      * policy does not pound the database.
      */
-    public NotifyBO findNotify(Long id) {
+    public NotifyBO getNotify(Long id) {
         if (!isValidId(id)) {
             return null;
         }
@@ -128,7 +128,7 @@ public class NotifyConfigCache {
         return bo;
     }
 
-    public MessageBO findMessage(Long id) {
+    public MessageBO getMessage(Long id) {
         if (!isValidId(id)) {
             return null;
         }
@@ -144,7 +144,7 @@ public class NotifyConfigCache {
      * call site, so we encode that here to keep callers from forgetting the
      * tenant guard.
      */
-    public NotifyChannelBO findChannel(Long id, Long tenantId) {
+    public NotifyChannelBO getChannel(Long id, Long tenantId) {
         if (!isValidId(id)) {
             return null;
         }

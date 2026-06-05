@@ -137,7 +137,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public boolean checkLoginNameValid(String loginName) {
+    public boolean isLoginNameValid(String loginName) {
         UserLoginBO userLogin = getByLoginName(loginName, false);
         if (Objects.nonNull(userLogin)) {
             return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
@@ -147,7 +147,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public boolean checkLoginNameAvailable(String loginName, Long tenantId) {
+    public boolean isLoginNameAvailable(String loginName, Long tenantId) {
         List<Long> userIds = tenantBindService.listUserIdsByTenantId(tenantId);
         if (CollectionUtils.isEmpty(userIds)) {
             return true;

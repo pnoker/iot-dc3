@@ -224,14 +224,14 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         if (Objects.isNull(notifyId) || DefaultConstant.DEFAULT_ID == notifyId) {
             return null;
         }
-        return notifyConfigCache.findNotify(notifyId);
+        return notifyConfigCache.getNotify(notifyId);
     }
 
     private MessageBO loadMessage(Long messageId) {
         if (Objects.isNull(messageId) || DefaultConstant.DEFAULT_ID == messageId) {
             return null;
         }
-        return notifyConfigCache.findMessage(messageId);
+        return notifyConfigCache.getMessage(messageId);
     }
 
     private List<NotifyChannelBindBO> loadEnabledBinds(NotifyBO notify) {
@@ -239,7 +239,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
     }
 
     private NotifyChannelBO loadChannel(Long channelId, Long tenantId) {
-        return notifyConfigCache.findChannel(channelId, tenantId);
+        return notifyConfigCache.getChannel(channelId, tenantId);
     }
 
     private RuleStateBO persistRuleState(RuleMatch match, NotifyBO notify, Map<String, Object> variables) {

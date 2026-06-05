@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -49,10 +49,10 @@ public class LocalWindowDataSource implements WindowDataSource {
     private final WindowSampleBuffer windowSampleBuffer;
 
     @Override
-    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowMode mode) {
+    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
         List<WindowSample> samples = samples(spec, fact);
         long count = samples.size();
-        if (mode == WindowMode.COUNT) {
+        if (mode == WindowModeEnum.COUNT) {
             return new AggregateOutcome(BigDecimal.valueOf(count), count);
         }
         long numericCount = samples.stream().filter(WindowSample::isNumeric).count();

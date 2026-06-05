@@ -85,7 +85,7 @@ class RuleAlarmPersistenceServiceImplTest {
     @Test
     void persistsEntityAlarmWithSeverityFromRuleExt() {
         RuleMatch match = firingMatch("P0");
-        when(ruleStateLookup.findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
+        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
         when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenAnswer(inv -> {
             EntityAlarmDO d = inv.getArgument(0);
             d.setId(42L);
@@ -108,7 +108,7 @@ class RuleAlarmPersistenceServiceImplTest {
     @Test
     void defaultsToP2WhenSeverityIsBlank() {
         RuleMatch match = firingMatch(null);
-        when(ruleStateLookup.findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
+        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
         when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenAnswer(inv -> {
             EntityAlarmDO d = inv.getArgument(0);
             d.setId(99L);
@@ -125,7 +125,7 @@ class RuleAlarmPersistenceServiceImplTest {
     @Test
     void reusesExistingFiringAlarmIdAndSkipsInsert() {
         RuleMatch match = firingMatch("P1");
-        when(ruleStateLookup.findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(101L);
+        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(101L);
 
         service.ensureAlarm(match);
 
@@ -141,7 +141,7 @@ class RuleAlarmPersistenceServiceImplTest {
         // ensureAlarm should not create a new EntityAlarm row for a RECOVERY match
         // when no firing alarm exists to recover from.
         RuleMatch match = recoveryMatch();
-        when(ruleStateLookup.findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
+        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
 
         service.ensureAlarm(match);
 
@@ -158,7 +158,7 @@ class RuleAlarmPersistenceServiceImplTest {
         service.ensureAlarm(match);
 
         verify(entityAlarmManager, never()).save(any());
-        verify(ruleStateLookup, never()).findFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong());
+        verify(ruleStateLookup, never()).getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong());
     }
 
 }

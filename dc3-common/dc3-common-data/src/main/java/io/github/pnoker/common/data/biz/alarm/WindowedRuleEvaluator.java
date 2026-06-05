@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.WindowMode;
+import io.github.pnoker.common.enums.WindowModeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -28,15 +28,15 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Window-aware rule evaluation. Handles every {@link WindowMode} other than
- * {@link WindowMode#LAST} (which {@link RuleEvaluatorImpl} continues to
+ * Window-aware rule evaluation. Handles every {@link WindowModeEnum} other than
+ * {@link WindowModeEnum#LAST} (which {@link RuleEvaluatorImpl} continues to
  * service inline because it does not need the data-source plumbing).
  *
  * <p>Behavior:
  *
  * <ul>
  *   <li>AVG/MIN/MAX/SUM/COUNT — pull a scalar aggregate from
- *       {@link WindowDataSource#aggregate(WindowSpec, RuleFact, WindowMode)}
+ *       {@link WindowDataSource#aggregate(WindowSpec, RuleFact, WindowModeEnum)}
  *       and feed it into {@link ConditionEvaluator}; minSamples gate enforces
  *       the rule's "needs at least N samples" hint.</li>
  *   <li>ALL — every sample in the window must satisfy the rule's per-sample
@@ -88,7 +88,7 @@ public class WindowedRuleEvaluator {
      */
     public boolean matches(RuleBO rule, RuleFact fact, WindowSpec spec) {
         RuleExt.Condition condition = condition(rule);
-        if (Objects.isNull(condition) || Objects.isNull(spec) || !spec.valid() || spec.mode() == WindowMode.LAST) {
+        if (Objects.isNull(condition) || Objects.isNull(spec) || !spec.valid() || spec.mode() == WindowModeEnum.LAST) {
             return false;
         }
         return evaluate(spec, fact, condition);
@@ -109,7 +109,7 @@ public class WindowedRuleEvaluator {
         RuleExt.Condition condition = rule.getRuleExt().getContent().getCondition();
         if (Objects.isNull(recovery) || !Boolean.TRUE.equals(recovery.getEnabled())
                 || Objects.isNull(condition) || Objects.isNull(spec) || !spec.valid()
-                || spec.mode() == WindowMode.LAST) {
+                || spec.mode() == WindowModeEnum.LAST) {
             return false;
         }
         return evaluate(spec, fact, ConditionEvaluator.recoveryConditionOf(condition, recovery));
@@ -119,7 +119,7 @@ public class WindowedRuleEvaluator {
         if (Objects.isNull(condition)) {
             return false;
         }
-        WindowMode mode = spec.mode();
+        WindowModeEnum mode = spec.mode();
         return switch (mode) {
             case AVG, MIN, MAX, SUM, COUNT -> evaluateAggregate(spec, fact, mode, condition);
             case ALL, ANY -> evaluateFold(spec, fact, mode, condition);
@@ -127,7 +127,7 @@ public class WindowedRuleEvaluator {
         };
     }
 
-    private boolean evaluateAggregate(WindowSpec spec, RuleFact fact, WindowMode mode, RuleExt.Condition condition) {
+    private boolean evaluateAggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
         WindowDataSource.AggregateOutcome outcome = windowDataSource.aggregate(spec, fact, mode);
         if (outcome.sampleCount() < spec.minSamples()) {
             return false;
@@ -135,7 +135,7 @@ public class WindowedRuleEvaluator {
         return ConditionEvaluator.evaluate(condition, outcome.value());
     }
 
-    private boolean evaluateFold(WindowSpec spec, RuleFact fact, WindowMode mode, RuleExt.Condition condition) {
+    private boolean evaluateFold(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
         List<WindowSample> samples = windowDataSource.samples(spec, fact);
         if (samples.size() < spec.minSamples()) {
             return false;

@@ -37,7 +37,7 @@ public interface CommandService extends BaseService<CommandBO, CommandQuery> {
 
     List<CommandBO> listByDeviceId(Long deviceId, Long tenantId);
 
-    List<CommandBO> selectByProfileIds(List<Long> profileIds);
+    List<CommandBO> listByProfileIds(List<Long> profileIds);
 
     List<CommandBO> listByIds(Set<Long> ids);
 
