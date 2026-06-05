@@ -22,8 +22,8 @@ import { mountListPage } from './_helpers';
 const agenticMocks = vi.hoisted(() => ({
   addAgenticModelConfig: vi.fn(() => Promise.resolve({ data: true })),
   deleteAgenticModelConfig: vi.fn(() => Promise.resolve({ data: true })),
-  getAgenticModelConfigs: vi.fn(() => Promise.resolve({ data: [] })),
-  getAgenticProviders: vi.fn(() => Promise.resolve({ data: [] })),
+  listAgenticModelConfigs: vi.fn(() => Promise.resolve({ data: [] })),
+  listAgenticProviders: vi.fn(() => Promise.resolve({ data: [] })),
   updateAgenticModelConfig: vi.fn(() => Promise.resolve({ data: true })),
 }));
 
@@ -41,6 +41,6 @@ describe('AgenticSettings view', () => {
       },
     });
     await flushPromises();
-    expect(agenticMocks.getAgenticModelConfigs).toHaveBeenCalledTimes(1);
+    expect(agenticMocks.listAgenticModelConfigs).toHaveBeenCalledTimes(1);
   });
 });

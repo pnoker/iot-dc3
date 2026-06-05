@@ -16,6 +16,7 @@
 
 import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
+import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
 
 const chartInstanceMocks = vi.hoisted(() => ({
   area: vi.fn(),
@@ -44,19 +45,18 @@ vi.mock('@antv/g2', () => {
   chartInstanceMocks.line.mockReturnValue(builder);
 
   class Chart {
-    constructor() {
-      chartInstanceMocks.ChartCtor();
-    }
     area = chartInstanceMocks.area;
     line = chartInstanceMocks.line;
     interaction = chartInstanceMocks.interaction;
     render = chartInstanceMocks.render;
     destroy = chartInstanceMocks.destroy;
+
+    constructor() {
+      chartInstanceMocks.ChartCtor();
+    }
   }
   return { Chart };
 });
-
-import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
 
 describe('MiniAreaChart', () => {
   it('does not construct a chart when data is empty', async () => {

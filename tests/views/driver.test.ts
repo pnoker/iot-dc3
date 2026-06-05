@@ -20,7 +20,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mountListPage } from './_helpers';
 
 const driverMocks = vi.hoisted(() => ({
-  getDriverStatus: vi.fn(() => Promise.resolve({ data: {} })),
+  listDriverStatus: vi.fn(() => Promise.resolve({ data: {} })),
   listDriver: vi.fn(() => Promise.resolve({ data: { records: [{ id: 'd-1', driverName: 'Modbus' }], total: 1 } })),
 }));
 

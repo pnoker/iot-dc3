@@ -16,7 +16,22 @@
 
 import { expect, test } from '@playwright/test';
 
-import { ensureE2eData, expectHealthy, login, markHealth, waitForAppSettled, watchPageHealth } from '../fixtures/app';
+import {
+  ensureE2eData,
+  expectHealthy,
+  login,
+  markHealth,
+  waitForAppSettled,
+  watchPageHealth,
+} from '../fixtures/app'; /**
+ * Detail Pages e2e spec.
+ *
+ * Tests that entity detail pages load correctly and their tabs work:
+ *   - Device detail: Info, Points, Commands, Events, Data tabs
+ *   - Profile detail: Info, Points, Commands, Events, Devices tabs
+ *   - Driver detail: Info, Devices tabs
+ *   - Point detail: Info, Devices tabs
+ */
 
 /**
  * Detail Pages e2e spec.

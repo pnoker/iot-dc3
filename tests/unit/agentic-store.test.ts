@@ -24,11 +24,11 @@ const apiMocks = vi.hoisted(() => ({
   completeAgenticChatCompletion: vi.fn(),
   confirmAgenticAction: vi.fn(),
   deleteAgenticSession: vi.fn(),
-  getAgenticAttachments: vi.fn(),
-  getAgenticMessages: vi.fn(),
-  getAgenticModels: vi.fn(),
+  listAgenticAttachments: vi.fn(),
+  listAgenticMessages: vi.fn(),
+  listAgenticModels: vi.fn(),
   getPendingAgenticActions: vi.fn(),
-  getAgenticSessions: vi.fn(),
+  listAgenticSessions: vi.fn(),
   rejectAgenticAction: vi.fn(),
   streamAgenticChatCompletion: vi.fn(),
   updateAgenticSession: vi.fn(),
@@ -47,11 +47,11 @@ describe('agentic store', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
 
-    apiMocks.getAgenticMessages.mockResolvedValue({ data: undefined });
-    apiMocks.getAgenticAttachments.mockResolvedValue({ data: [] });
+    apiMocks.listAgenticMessages.mockResolvedValue({ data: undefined });
+    apiMocks.listAgenticAttachments.mockResolvedValue({ data: [] });
     apiMocks.getPendingAgenticActions.mockResolvedValue({ data: [] });
-    apiMocks.getAgenticModels.mockResolvedValue({ data: [] });
-    apiMocks.getAgenticSessions.mockResolvedValue({ data: { records: [] } });
+    apiMocks.listAgenticModels.mockResolvedValue({ data: [] });
+    apiMocks.listAgenticSessions.mockResolvedValue({ data: { records: [] } });
     apiMocks.updateAgenticSession.mockImplementation((conversationId: string, data: Record<string, unknown>) =>
       Promise.resolve({ data: { conversationId, ...data } })
     );
@@ -65,7 +65,7 @@ describe('agentic store', () => {
         callbacks.onDelta?.('设备运行正常。');
       }
     );
-    apiMocks.getAgenticMessages.mockResolvedValue({
+    apiMocks.listAgenticMessages.mockResolvedValue({
       data: [
         {
           id: 'persisted-user-1',
@@ -135,11 +135,11 @@ describe('agentic store', () => {
       expect(payload).not.toHaveProperty('sessionConfig');
       expect(payload).not.toHaveProperty('sessionExt');
     }
-    expect(apiMocks.getAgenticSessions).not.toHaveBeenCalled();
+    expect(apiMocks.listAgenticSessions).not.toHaveBeenCalled();
   });
 
   it('restores session preferences from persisted session_ext metadata', async () => {
-    apiMocks.getAgenticModels.mockResolvedValue({
+    apiMocks.listAgenticModels.mockResolvedValue({
       data: [
         {
           model: 'deepseek-v4-pro',
@@ -153,7 +153,7 @@ describe('agentic store', () => {
         },
       ],
     });
-    apiMocks.getAgenticSessions.mockResolvedValue({
+    apiMocks.listAgenticSessions.mockResolvedValue({
       data: {
         records: [
           {

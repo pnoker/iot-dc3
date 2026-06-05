@@ -22,7 +22,7 @@ import { mountListPage } from './_helpers';
 const deviceMocks = vi.hoisted(() => ({
   addDevice: vi.fn(() => Promise.resolve({ data: true })),
   deleteDevice: vi.fn(() => Promise.resolve({ data: true })),
-  getDeviceStatus: vi.fn(() => Promise.resolve({ data: {} })),
+  listDeviceStatus: vi.fn(() => Promise.resolve({ data: {} })),
   importDevice: vi.fn(() => Promise.resolve({ data: true })),
   importDeviceTemplate: vi.fn(() => Promise.resolve({ data: '' })),
   listDevice: vi.fn(() =>

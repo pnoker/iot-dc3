@@ -19,7 +19,7 @@ import { describe, expect, it } from 'vitest';
 
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 
-import { layoutStubs } from '../setup/stubs/element-plus';
+import { layoutStubs } from '../setup/stubs/element-plus'; // el-skeleton renders the `template` slot (skeleton placeholder) when
 
 // el-skeleton renders the `template` slot (skeleton placeholder) when
 // loading=true, and the `default` slot when loading=false. We stub it

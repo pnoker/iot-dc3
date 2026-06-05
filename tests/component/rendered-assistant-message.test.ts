@@ -17,7 +17,7 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 
-import RenderedAssistantMessage from '@/components/agentic/RenderedAssistantMessage.vue';
+import RenderedAssistantMessage from '@/components/agentic/RenderedAssistantMessage.vue'; // Stub ChartBlock — its internals (G2, getContext, ResizeObserver) aren't
 
 // Stub ChartBlock — its internals (G2, getContext, ResizeObserver) aren't
 // the subject under test here. The contract we care about is "one

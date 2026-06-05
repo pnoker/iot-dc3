@@ -20,7 +20,7 @@ import { describe, expect, it } from 'vitest';
 import i18n from '@/config/i18n';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
 
-import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus';
+import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus'; // Popconfirm stub that surfaces the `confirm` event so we can simulate
 
 // Popconfirm stub that surfaces the `confirm` event so we can simulate
 // a user accepting the dialog. The real ElPopconfirm renders the

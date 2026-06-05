@@ -17,7 +17,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 
-import { mountListPage } from './_helpers';
+import { mountListPage } from './_helpers'; // DeviceEdit is the wizard that the recent thing-model-matrix work landed.
 
 // DeviceEdit is the wizard that the recent thing-model-matrix work landed.
 // We lock in the mount flow + the changeProfile fan-out (point/command/event

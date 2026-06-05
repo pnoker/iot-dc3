@@ -19,7 +19,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import request from '@/config/axios';
 import { AUTH_HEADERS } from '@/config/constant/common';
-import { setStorage } from '@/utils/storageUtil';
+import { getStorage, setStorage } from '@/utils/storageUtil';
 
 const notificationSpies = vi.hoisted(() => ({
   failMessage: vi.fn(),
@@ -27,6 +27,14 @@ const notificationSpies = vi.hoisted(() => ({
 }));
 
 vi.mock('@/utils/notificationUtil', () => notificationSpies);
+
+const routerMocks = vi.hoisted(() => ({
+  push: vi.fn(() => Promise.resolve()),
+}));
+
+vi.mock('@/config/router', () => ({
+  default: { push: routerMocks.push },
+}));
 
 const responseOf = (config: InternalAxiosRequestConfig, status: number, data: unknown) => ({
   data,
@@ -71,7 +79,7 @@ describe('axios request instance', () => {
     });
   });
 
-  it('clears credentials and redirects to login on unauthorized responses', async () => {
+  it('removes auth keys and routes to login on unauthorized responses', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'default');
     setStorage(AUTH_HEADERS.LOGIN, 'dc3');
     setStorage(AUTH_HEADERS.TOKEN, { salt: 'salt', token: 'token' });
@@ -84,14 +92,18 @@ describe('axios request instance', () => {
     });
 
     expect(notificationSpies.warnMessage).toHaveBeenCalledTimes(1);
-    expect(localStorage.length).toBe(0);
-    expect(sessionStorage.length).toBe(0);
-    expect(window.location.hash).toBe('#/login');
+    // Only auth keys are removed — not the entire localStorage
+    expect(getStorage(AUTH_HEADERS.TENANT)).toBeUndefined();
+    expect(getStorage(AUTH_HEADERS.LOGIN)).toBeUndefined();
+    expect(getStorage(AUTH_HEADERS.TOKEN)).toBeUndefined();
+    // Routes via router.push instead of raw hash manipulation
+    expect(routerMocks.push).toHaveBeenCalledWith({ name: 'login' });
   });
 
   it('rejects non-ok business responses and surfaces the server payload', async () => {
     const payload = { ok: false, code: 50001, message: 'business failed' };
-    const adapter: AxiosAdapter = async (config) => responseOf(config, 500, payload);
+    // Use status 400 — non-ok, non-401, non-5xx hits the failMessage branch
+    const adapter: AxiosAdapter = async (config) => responseOf(config, 400, payload);
 
     await expect(request({ url: 'api/v3/data/dashboard/stats/today', method: 'get', adapter })).rejects.toBe(payload);
 

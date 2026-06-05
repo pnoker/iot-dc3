@@ -170,7 +170,7 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   alertConfirm: ['driver', 'alert-1'],
   alertUnconfirm: ['driver', 'alert-1'],
   alertBulkConfirm: [[{ source: 'driver', id: 'alert-1' }], true],
-  getPointValueHistory: [1001, 2002, 30],
+  listPointValueHistory: ['1001', '2002', 30],
   listRoleByUserId: ['user-1', 1000],
   getDriverInfoByDeviceIdAndAttributeId: ['device-1', 'attribute-1'],
   getPointInfoByDeviceIdAndPointId: ['device-1', 'point-1'],

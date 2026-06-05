@@ -19,7 +19,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import StatCard from '@/components/card/stat/StatCard.vue';
 
-import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus';
+import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus'; // MiniAreaChart drags @antv/g2 in. We stub it because the StatCard
 
 // MiniAreaChart drags @antv/g2 in. We stub it because the StatCard
 // contract under test is "tone, formatted value, refresh button" — not

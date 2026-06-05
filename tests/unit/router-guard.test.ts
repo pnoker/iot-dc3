@@ -15,12 +15,25 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createPinia, setActivePinia } from 'pinia';
 import type { RouteRecordRaw } from 'vue-router';
 
 import { AUTH_HEADERS } from '@/config/constant/common';
 import { setStorage } from '@/utils/storageUtil';
 
 import { seedAuthStorage } from '../fixtures/auth';
+
+// Mock the menu store so the guard doesn't crash calling fetchTree
+vi.mock('@/store/modules/menu', () => ({
+  useMenuStore: vi.fn(() => ({
+    tree: [],
+    loaded: true,
+    loading: false,
+    fetchTree: vi.fn(() => Promise.resolve()),
+    reset: vi.fn(),
+    findByCode: vi.fn(() => undefined),
+  })),
+}));
 
 // CLAUDE.md flags this guard as a recurrent regression hotspot — every branch
 // of `beforeEach` must call next() (or return true / a redirect target).
@@ -80,6 +93,7 @@ async function loadRouter() {
 
 describe('router beforeEach guard', () => {
   beforeEach(() => {
+    setActivePinia(createPinia());
     localStorage.clear();
     document.title = '';
   });

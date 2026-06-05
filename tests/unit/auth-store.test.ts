@@ -50,6 +50,12 @@ vi.mock('@/config/router', () => ({
   default: { push: routerMocks.push },
 }));
 
+const notificationMocks = vi.hoisted(() => ({
+  failMessage: vi.fn(),
+}));
+
+vi.mock('@/utils/notificationUtil', () => notificationMocks);
+
 const loadingService = elementPlusMocks.service;
 const loadingClose = elementPlusMocks.close;
 const routerPush = routerMocks.push;
@@ -109,17 +115,16 @@ describe('auth store', () => {
       expect(loadingClose).toHaveBeenCalledTimes(1);
     });
 
-    it('closes the loading overlay even when the API rejects', async () => {
+    it('closes the loading overlay and does not navigate when the API rejects', async () => {
       tokenMocks.generateSalt.mockRejectedValueOnce(new Error('network down'));
       const store = useAuthStore();
 
-      await expect(
-        store.login({
-          tenant: TEST_CREDENTIALS.tenant,
-          name: TEST_CREDENTIALS.name,
-          password: 'x',
-        })
-      ).rejects.toThrow('network down');
+      // login now catches errors internally and shows failMessage
+      await store.login({
+        tenant: TEST_CREDENTIALS.tenant,
+        name: TEST_CREDENTIALS.name,
+        password: 'x',
+      });
 
       expect(loadingClose).toHaveBeenCalledTimes(1);
       expect(tokenMocks.generateToken).not.toHaveBeenCalled();

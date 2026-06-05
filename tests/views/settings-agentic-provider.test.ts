@@ -22,7 +22,7 @@ import { mountListPage } from './_helpers';
 const agenticMocks = vi.hoisted(() => ({
   addAgenticProvider: vi.fn(() => Promise.resolve({ data: true })),
   deleteAgenticProvider: vi.fn(() => Promise.resolve({ data: true })),
-  getAgenticProviders: vi.fn(() => Promise.resolve({ data: [] })),
+  listAgenticProviders: vi.fn(() => Promise.resolve({ data: [] })),
   updateAgenticProvider: vi.fn(() => Promise.resolve({ data: true })),
 }));
 
@@ -41,6 +41,6 @@ describe('ProviderSettings view', () => {
       },
     });
     await flushPromises();
-    expect(agenticMocks.getAgenticProviders).toHaveBeenCalledTimes(1);
+    expect(agenticMocks.listAgenticProviders).toHaveBeenCalledTimes(1);
   });
 });

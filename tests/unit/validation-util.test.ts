@@ -16,7 +16,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { isEmail, isNull, isNum, isNumord, isPhone, isUrl } from '@/utils/validationUtil';
+import { isEmail, isNull, isNum, isPhone, isUrl } from '@/utils/validationUtil';
 
 describe('validationUtil', () => {
   describe('isUrl', () => {
@@ -63,7 +63,11 @@ describe('validationUtil', () => {
       ['13912345678', true],
       ['18512345678', true],
       ['14712345678', true],
-      ['10000000000', false], // invalid prefix
+      ['16612345678', true], // 16x prefix (China Unicom IoT)
+      ['17812345678', true], // 17x prefix (virtual operator)
+      ['19912345678', true], // 19x prefix (China Telecom)
+      ['10000000000', false], // invalid prefix (10x)
+      ['12000000000', false], // invalid prefix (12x)
       ['1391234567', false], // too short
       ['139123456789', false], // too long
       ['abcdefghijk', false],
@@ -76,44 +80,27 @@ describe('validationUtil', () => {
   });
 
   describe('isNum', () => {
-    // isNum returns true for empty string and pure numbers (the regex matches
-    // strings starting with non-digit/dot characters, so the inverse defines
-    // a "looks like number" check). These cases pin the actual behaviour so
-    // refactors of the regex don't accidentally invert the semantics.
-    it('returns false for type=1 when input starts with a digit or dot', () => {
-      expect(isNum('123', 1)).toBe(false);
-      expect(isNum('.5', 1)).toBe(false);
-    });
-
-    it('returns true for type=1 when input starts with a non-digit non-dot', () => {
-      expect(isNum('abc', 1)).toBe(true);
-    });
-
-    it('returns false for type=2 when input starts with a digit', () => {
-      expect(isNum('5', 2)).toBe(false);
-    });
-
-    it('returns true for type=2 when input starts with a non-digit', () => {
-      expect(isNum('a5', 2)).toBe(true);
-    });
-
-    it('returns true for unknown type values without inspecting input', () => {
-      // The function falls through to `return true` when type is neither 1 nor 2.
-      expect(isNum('123', 0)).toBe(true);
-      expect(isNum('abc', 99)).toBe(true);
-    });
-  });
-
-  describe('isNumord', () => {
-    it('treats both type=1 and type=2 the same way (decimal-aware regex)', () => {
-      expect(isNumord('1.5', 1)).toBe(false);
-      expect(isNumord('1.5', 2)).toBe(false);
-      expect(isNumord('a', 1)).toBe(true);
-      expect(isNumord('a', 2)).toBe(true);
-    });
-
-    it('falls through to true for unknown types', () => {
-      expect(isNumord('1.5', 99)).toBe(true);
+    // type=1: decimal-aware (digits and optional dot)
+    // type=2: integer-only (pure digits)
+    // default: always true (backward-compatible fallthrough)
+    it.each([
+      // type=1 (decimal)
+      ['123', 1, true],
+      ['1.5', 1, true],
+      ['.5', 1, true],
+      ['0', 1, true],
+      ['abc', 1, false],
+      ['12a', 1, false],
+      // type=2 (integer)
+      ['5', 2, true],
+      ['123', 2, true],
+      ['1.5', 2, false],
+      ['a5', 2, false],
+      // unknown type — fallthrough to true
+      ['123', 0, true],
+      ['abc', 99, true],
+    ])('isNum(%p, %i) → %p', (input, type, expected) => {
+      expect(isNum(input, type)).toBe(expected);
     });
   });
 

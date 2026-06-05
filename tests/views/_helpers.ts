@@ -21,7 +21,7 @@ import { createMemoryHistory, createRouter, type RouteRecordRaw } from 'vue-rout
 
 import i18n from '@/config/i18n';
 
-import { createElButtonStub, createElFormStub, createElPaginationStub, layoutStubs } from '../setup/stubs/element-plus';
+import { createElButtonStub, createElFormStub, createElPaginationStub, layoutStubs } from '../setup/stubs/element-plus'; // Shared scaffolding for `tests/views/*.test.ts`. Most list pages share the
 
 // Shared scaffolding for `tests/views/*.test.ts`. Most list pages share the
 // same Element Plus surface (Card / Tool toolbar / Pagination / Tag) and the
