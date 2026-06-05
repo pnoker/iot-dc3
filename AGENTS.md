@@ -30,7 +30,8 @@ pnpm test:e2e:headed                 # visible browser (E2E_HEADLESS=false)
 make ci                              # lint-check + check + test-guard + test-ci + build
 ```
 
-The backend API lives at `http://localhost:8000` (see `src/config/env/.env.dev`). The dev server proxies `/api` there via Vite. **The dev server runs without the backend**, but login and data endpoints will fail.
+The backend API lives at `http://localhost:8000` (see `src/config/env/.env.dev`). The dev server proxies `/api` there
+via Vite. **The dev server runs without the backend**, but login and data endpoints will fail.
 
 ## Package Manager
 
@@ -59,7 +60,9 @@ The backend API lives at `http://localhost:8000` (see `src/config/env/.env.dev`)
 
 ## Domain Model: Four-Layer IoT Entity
 
-The core domain follows a strict hierarchy: **Driver** (protocol adapter) → **Profile** (device template) → **Device** (physical equipment) → **Point** (data signal). This hierarchy is reflected everywhere — API paths, types, dashboard palette colors, routing, entity enums.
+The core domain follows a strict hierarchy: **Driver** (protocol adapter) → **Profile** (device template) → **Device** (
+physical equipment) → **Point** (data signal). This hierarchy is reflected everywhere — API paths, types, dashboard
+palette colors, routing, entity enums.
 
 ## Project Layout
 
@@ -87,7 +90,9 @@ src/
 
 ### 1. `import type` is mandatory for type-only imports
 
-`tsconfig.json` enables `verbatimModuleSyntax: true`. Any import used only as a type **must** use `import type` — otherwise Vite keeps the import at runtime, the browser can't find the named export, and you get a `SyntaxError` → blank page.
+`tsconfig.json` enables `verbatimModuleSyntax: true`. Any import used only as a type **must** use `import type` —
+otherwise Vite keeps the import at runtime, the browser can't find the named export, and you get a `SyntaxError` → blank
+page.
 
 ```ts
 // ❌ Crashes at runtime
@@ -104,7 +109,8 @@ Common type-only names to watch out for:
 - `vue-router`: `RouteRecordRaw`, `RouteLocationNormalized`, `NavigationGuardNext`, `RouteMeta`.
 - `axios`: `AxiosInstance`, `AxiosError`, `AxiosResponse`, `InternalAxiosRequestConfig`.
 
-Icons from `@element-plus/icons-vue` (`Box`, `Edit`, …) are **values (Vue components)** — regular `import { ... }` is correct.
+Icons from `@element-plus/icons-vue` (`Box`, `Edit`, …) are **values (Vue components)** — regular `import { ... }` is
+correct.
 
 ### 2. API verb convention: `get*` / `list*` / `add*` / `update*` / `delete*`
 
@@ -126,37 +132,47 @@ export const listDeviceByDriverId = (driverId: string) =>
 //   getDeviceList, getDriverByIds, /select_by_id, /tree
 ```
 
-- Function names: `getXxx` returns a single record, `listXxx` returns a collection (list, page or map). `addXxx`/`deleteXxx`/`updateXxx` are for mutations.
-- HTTP paths use snake*case and mirror the function name (`/get_by_id`, `/list_by_driver_id`, `/list`, `/list_tree`). `/select*\*` paths are no longer accepted.
+- Function names: `getXxx` returns a single record, `listXxx` returns a collection (list, page or map). `addXxx`/
+  `deleteXxx`/`updateXxx` are for mutations.
+- HTTP paths use snake*case and mirror the function name (`/get_by_id`, `/list_by_driver_id`, `/list`, `/list_tree`).
+  `/select*\*` paths are no longer accepted.
 - Use `getXxxCountByYyy` when the endpoint returns a single count value (the backend exposes `/get_count_by_*`).
 
 API modules use generic helpers from `api/common.ts`: `crudAdd`, `crudUpdate`, `crudDelete`, `crudGetById`, `crudList`.
 
 ### 3. Type naming: Form vs Record
 
-Every entity has a `<Entity>Form` type (create/update payloads, optional `id`) and a `<Entity>Record` type (read responses, required `id` + timestamps `createTime`, `operateTime`).
+Every entity has a `<Entity>Form` type (create/update payloads, optional `id`) and a `<Entity>Record` type (read
+responses, required `id` + timestamps `createTime`, `operateTime`).
 
 ### 4. Router guards must always resolve
 
-Every branch of `beforeEach` in `src/config/router/index.ts` must eventually call `next()` or return a route/undefined. A missing resolution leaves navigation pending → blank page with NProgress stuck.
+Every branch of `beforeEach` in `src/config/router/index.ts` must eventually call `next()` or return a route/undefined.
+A missing resolution leaves navigation pending → blank page with NProgress stuck.
 
-Note: vue-router 5 has deprecated the callback style (`next(...)`) in favor of returning a value. It still works (warn only), but new code should prefer the return style.
+Note: vue-router 5 has deprecated the callback style (`next(...)`) in favor of returning a value. It still works (warn
+only), but new code should prefer the return style.
 
 ### 5. Auth flow
 
-Login: `generateSalt` → MD5(password) → `generateToken` → store `{tenant, login, {salt, token}}` in localStorage. Every request includes `X-Auth-Tenant`, `X-Auth-Login`, `X-Auth-Token` headers. The router guard validates the token on every navigation.
+Login: `generateSalt` → MD5(password) → `generateToken` → store `{tenant, login, {salt, token}}` in localStorage. Every
+request includes `X-Auth-Tenant`, `X-Auth-Login`, `X-Auth-Token` headers. The router guard validates the token on every
+navigation.
 
 ### 6. SCSS and element-plus variables
 
-Global `element-variables.scss` is injected into every component via Vite's `additionalData` (with circular-import guard). Do not add duplicate `@use` directives for Element Plus variables in individual components.
+Global `element-variables.scss` is injected into every component via Vite's `additionalData` (with circular-import
+guard). Do not add duplicate `@use` directives for Element Plus variables in individual components.
 
 ### 7. `envDir` is under `src/config/env`
 
-Vite is configured with `envDir: './src/config/env'`, so dotenv files are **not** at the repo root. The env-var prefix is `APP_`.
+Vite is configured with `envDir: './src/config/env'`, so dotenv files are **not** at the repo root. The env-var prefix
+is `APP_`.
 
 ## API Gateway Routing
 
-Frontend calls go through `dc3-gateway` at `/api/v3/{auth|data|manager|agentic}`. The gateway strips the prefix and routes to the appropriate center microservice. Base paths are defined in `src/config/constant/api.ts`:
+Frontend calls go through `dc3-gateway` at `/api/v3/{auth|data|manager|agentic}`. The gateway strips the prefix and
+routes to the appropriate center microservice. Base paths are defined in `src/config/constant/api.ts`:
 
 - `API_AUTH_BASE = 'api/v3/auth'`
 - `API_DATA_BASE = 'api/v3/data'`
@@ -180,9 +196,12 @@ Frontend calls go through `dc3-gateway` at `/api/v3/{auth|data|manager|agentic}`
 
 ## Known Issues
 
-- **`auto-imports.d.ts`** declarations like `const FormInstance: typeof import(...)` are for TS only — you still must write `import type` in source files; auto-import would inject a runtime import and crash.
-- **`src/components/particles/particles.vue`**: login page particle background. Under Vue 3.5 `mounted` may fire before the canvas ref is ready. Wrap init in `onMounted(() => nextTick(...))` if fixing.
-- **Ignored build scripts for `@parcel/watcher` / `core-js`**: disabled by default in pnpm 10 as security hardening. Harmless; run `pnpm approve-builds` to silence the warning.
+- **`auto-imports.d.ts`** declarations like `const FormInstance: typeof import(...)` are for TS only — you still must
+  write `import type` in source files; auto-import would inject a runtime import and crash.
+- **`src/components/particles/particles.vue`**: login page particle background. Under Vue 3.5 `mounted` may fire before
+  the canvas ref is ready. Wrap init in `onMounted(() => nextTick(...))` if fixing.
+- **Ignored build scripts for `@parcel/watcher` / `core-js`**: disabled by default in pnpm 10 as security hardening.
+  Harmless; run `pnpm approve-builds` to silence the warning.
 - **Tauri desktop**: `src-tauri/` exists; `@tauri-apps/api` is not currently imported in `src/`.
 
 ## Commit Rules
@@ -193,18 +212,23 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 <type>(<scope>): <lowercase imperative description>
 ```
 
-**Allowed types**: `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `test`, `chore`, `style`, `security`, `revert`. Max 100 chars, English only. Install hooks with `make install-hooks` (from `iot-dc3/`).
+**Allowed types**: `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `test`, `chore`, `style`, `security`,
+`revert`. Max 100 chars, English only. Install hooks with `make install-hooks` (from `iot-dc3/`).
 
 ## Cross-Repo References
 
-The canonical project instructions are in `../AGENTS.md` (shared across AI tools). The backend lives in `../iot-dc3/`, container infrastructure in `../dc3-docker/`, parent POM in `../dc3-parent/`. See the root `CLAUDE.md` for the full monorepo map.
+The canonical project instructions are in `../AGENTS.md` (shared across AI tools). The backend lives in `../iot-dc3/`,
+container infrastructure in `../dc3-docker/`, parent POM in `../dc3-parent/`. See the root `CLAUDE.md` for the full
+monorepo map.
 
 ### Menu system (frontend ↔ backend)
 
-Settings sidebar is driven by **both** frontend config and backend database. When renaming/moving a menu item, update ALL layers:
+Settings sidebar is driven by **both** frontend config and backend database. When renaming/moving a menu item, update
+ALL layers:
 
 - Seed data SQL (`menu_code`, `menu_ext.url`, `parent_menu_id`, `menu_index`)
-- `src/config/settingsNav.ts` (TITLE_KEYS, \*\_CHILDREN, GROUP_OPENERS, BREADCRUMB_PARENTS, FALLBACK_ICON, ACTIVE_ALIAS, ROUTE_ALIAS)
+- `src/config/settingsNav.ts` (TITLE_KEYS, \*\_CHILDREN, GROUP_OPENERS, BREADCRUMB_PARENTS, FALLBACK_ICON, ACTIVE_ALIAS,
+  ROUTE_ALIAS)
 - Router (`settings.ts` route name + `operate.ts` detail routes)
 - i18n (`src/config/i18n/locales/{en,zh}.ts` `nav.*` keys)
 - `Layout.vue` (nameMap + icon fallback)
@@ -212,8 +236,11 @@ Settings sidebar is driven by **both** frontend config and backend database. Whe
 
 ### Settings route naming
 
-All settings route names use the pattern `settings<Group><Item>`, e.g. `settingsAlarmOverview`. Group menu codes: `settingsAlarm`, `settingsEvent`, `settingsCommand`, `settingsModel`.
+All settings route names use the pattern `settings<Group><Item>`, e.g. `settingsAlarmOverview`. Group menu codes:
+`settingsAlarm`, `settingsEvent`, `settingsCommand`, `settingsModel`.
 
 ## Dockerfile Build
 
-Uses `pnpm@10.33.2`, matching `package.json`'s `packageManager` field. **When bumping pnpm, update the `corepack prepare pnpm@X --activate` line in `Dockerfile` in lockstep** — otherwise CI will resolve a different version than local.
+Uses `pnpm@10.33.2`, matching `package.json`'s `packageManager` field. **When bumping pnpm, update
+the `corepack prepare pnpm@X --activate` line in `Dockerfile` in lockstep** — otherwise CI will resolve a different
+version than local.

@@ -21,7 +21,7 @@ import plugins from '@/config/plugins/index';
 import router from '@/config/router';
 import { createApp } from 'vue';
 
-import '@/styles/global.scss';
+import '@/styles/global.scss'; // config app
 
 // config app
 const app = createApp(App);
