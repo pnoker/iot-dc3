@@ -32,7 +32,11 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @Slf4j
-public class TreeUtil {
+public final class TreeUtil {
+
+    private TreeUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * Build a tree structure using a two-level loop.
@@ -42,7 +46,7 @@ public class TreeUtil {
      * @param root      Root node identifier
      * @return T Tree
      */
-    public <T extends TreeNode> List<T> buildByLoop(List<T> treeNodes, Object root) {
+    public static <T extends TreeNode> List<T> buildByLoop(List<T> treeNodes, Object root) {
         List<T> trees = new ArrayList<>(16);
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
@@ -68,7 +72,7 @@ public class TreeUtil {
      * @param root      Root node identifier
      * @return T Tree
      */
-    public <T extends TreeNode> List<T> buildByRecursive(List<T> treeNodes, Object root) {
+    public static <T extends TreeNode> List<T> buildByRecursive(List<T> treeNodes, Object root) {
         List<T> trees = new ArrayList<>(16);
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
@@ -86,7 +90,7 @@ public class TreeUtil {
      * @param treeNodes List of all tree nodes
      * @return T Tree
      */
-    public <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
+    public static <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
         for (T it : treeNodes) {
             if (treeNode.getId() == it.getParentId()) {
                 if (Objects.isNull(treeNode.getChildren())) {

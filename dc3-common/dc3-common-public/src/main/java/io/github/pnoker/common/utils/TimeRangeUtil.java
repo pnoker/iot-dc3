@@ -43,6 +43,7 @@ public final class TimeRangeUtil {
     public static final int HOURS_30D = 24 * 30;
 
     private TimeRangeUtil() {
+        throw new IllegalStateException("Utility class");
     }
 
     /**
