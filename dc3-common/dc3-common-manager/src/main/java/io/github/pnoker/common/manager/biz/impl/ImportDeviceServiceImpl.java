@@ -63,7 +63,7 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
     private final PointAttributeConfigManager pointAttributeConfigManager;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public DeviceBO importDevice(DeviceBO deviceBO, List<PointBO> pointBOList,
                                  List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet,
                                  int row) {

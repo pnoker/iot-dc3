@@ -117,7 +117,7 @@ public class DeviceServiceImpl implements DeviceService {
     private final MetadataEventPublisher metadataEventPublisher;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(DeviceBO entityBO) {
         validateTenantRelations(entityBO);
         entityBO.setDeviceCode(null);
@@ -139,7 +139,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         DeviceDO entityDO = getDOById(id, true);
         Set<String> targetServices = driverServiceNames(entityDO.getDriverId());
@@ -156,7 +156,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void update(DeviceBO entityBO) {
         DeviceDO entityDO = getDOById(entityBO.getId(), true);
         Long oldDriverId = entityDO.getDriverId();

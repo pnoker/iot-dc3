@@ -98,7 +98,7 @@ public class PointServiceImpl implements PointService {
     private final DriverService driverService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(PointBO entityBO) {
         validateTenantRelations(entityBO);
         entityBO.setPointCode(null);
@@ -118,7 +118,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         PointDO entityDO = getDOById(id, true);
         List<Long> deviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
@@ -136,7 +136,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void update(PointBO entityBO) {
         PointDO current = getDOById(entityBO.getId(), true);
         List<Long> oldDeviceIds = listDeviceIdsByProfileId(current.getProfileId());

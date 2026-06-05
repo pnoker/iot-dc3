@@ -90,7 +90,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final DeviceMapper deviceMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(ProfileBO entityBO) {
         entityBO.setProfileCode(null);
         if (checkDuplicate(entityBO, false)) {
@@ -104,7 +104,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         getDOById(id, true);
 
@@ -116,7 +116,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void update(ProfileBO entityBO) {
         ProfileDO current = getDOById(entityBO.getId(), true);
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {

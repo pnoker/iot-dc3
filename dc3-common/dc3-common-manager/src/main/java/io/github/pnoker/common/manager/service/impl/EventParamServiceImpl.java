@@ -85,7 +85,7 @@ public class EventParamServiceImpl implements EventParamService {
     private final DriverService driverService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(EventParamBO entityBO) {
         validateTenantRelations(entityBO);
         checkDuplicate(entityBO, false, true);
@@ -98,7 +98,7 @@ public class EventParamServiceImpl implements EventParamService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         EventParamDO entityDO = getDOById(id, true);
         if (!eventParamManager.removeById(id)) {
@@ -108,7 +108,7 @@ public class EventParamServiceImpl implements EventParamService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void update(EventParamBO entityBO) {
         EventParamDO current = getDOById(entityBO.getId(), true);
         Long oldEventId = current.getEventId();
