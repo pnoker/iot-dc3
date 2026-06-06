@@ -29,6 +29,7 @@ import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -49,6 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -95,6 +98,51 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      */
     private Map<Long, ConsecutiveFailure> failureMap;
 
+    private static void checkRequired(Map<String, AttributeBO> config, String code,
+                                      List<ValidationReport.AttributeIssue> issues) {
+        if (!config.containsKey(code) || config.get(code).getValue() == null) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
+        }
+    }
+
+    private static void checkPort(Map<String, AttributeBO> driverConfig,
+                                  List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO portAttr = driverConfig.get("port");
+        if (portAttr == null || portAttr.getValue() == null) {
+            return; // already reported by checkRequired
+        }
+        int port = portAttr.getValue(Integer.class);
+        if (port < 1 || port > 65535) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode("port")
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Port out of valid range: " + port)
+                    .expected("1-65535")
+                    .build());
+        }
+    }
+
+    private static void checkFunctionCode(Map<String, AttributeBO> pointConfig,
+                                          List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO funcAttr = pointConfig.get("functionCode");
+        if (funcAttr == null || funcAttr.getValue() == null) {
+            return; // already reported by checkRequired
+        }
+        int functionCode = funcAttr.getValue(Integer.class);
+        if (functionCode < 1 || functionCode > 4) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode("functionCode")
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Unsupported Modbus function code: " + functionCode)
+                    .expected("1-4 (1=coil, 2=input, 3=holding, 4=input-register)")
+                    .build());
+        }
+    }
+
     @Override
     public void initial() {
         connectMap = new ConcurrentHashMap<>(16);
@@ -104,6 +152,37 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void schedule() {
         // Device state lease renewal is owned by the SDK device health job.
+    }
+
+    @Override
+    public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+
+        checkRequired(driverConfig, "host", issues);
+        checkRequired(driverConfig, "port", issues);
+        checkPort(driverConfig, issues);
+
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(
+                        i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues)
+                .build();
+    }
+
+    @Override
+    public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+
+        checkRequired(pointConfig, "slaveId", issues);
+        checkRequired(pointConfig, "functionCode", issues);
+        checkRequired(pointConfig, "offset", issues);
+        checkFunctionCode(pointConfig, issues);
+
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(
+                        i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues)
+                .build();
     }
 
     @Override

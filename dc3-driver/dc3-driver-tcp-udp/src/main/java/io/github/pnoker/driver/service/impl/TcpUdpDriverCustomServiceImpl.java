@@ -19,6 +19,7 @@ package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -48,8 +49,10 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,6 +94,16 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
     public TcpUdpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
+    }
+
+    private static void checkRequired(Map<String, AttributeBO> config, String code,
+                                      List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO attr = config.get(code);
+        if (attr == null || attr.getValue() == null) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code).build());
+        }
     }
 
     @Override
@@ -211,6 +224,8 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    // ---- TCP with connection caching ----
+
     @Override
     public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
                                        DeviceBO device, FacadeCommandBO command, Map<String, String> paramValues) {
@@ -224,8 +239,6 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         result.put("sendCommand", sendCommand);
         return result;
     }
-
-    // ---- TCP with connection caching ----
 
     private String sendTcp(Long deviceId, Map<String, AttributeBO> driverConfig, String sendCommand) throws IOException {
         Socket socket = getTcpConnector(deviceId, driverConfig);
@@ -252,6 +265,8 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         }
         return "";
     }
+
+    // ---- UDP (stateless, connection-per-call) ----
 
     private Socket getTcpConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         // Check backoff
@@ -296,7 +311,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    // ---- UDP (stateless, connection-per-call) ----
+    // ---- Frame parsing ----
 
     private String sendUdp(Map<String, AttributeBO> driverConfig, String sendCommand) throws IOException {
         String host = getConfigValue(driverConfig, "host", "localhost");
@@ -321,8 +336,6 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    // ---- Frame parsing ----
-
     private String parseFrame(String rawHex, Map<String, AttributeBO> pointConfig) {
         if (StringUtils.isBlank(rawHex)) {
             return "";
@@ -343,6 +356,8 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             return rawHex;
         }
     }
+
+    // ---- Helpers ----
 
     private String parseDataValue(byte[] dataBytes, String dataFormat, Map<String, AttributeBO> pointConfig) {
         String byteOrder = getConfigValue(pointConfig, "byteOrder", "BIG");
@@ -365,8 +380,6 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             default -> bytesToHex(dataBytes);
         };
     }
-
-    // ---- Helpers ----
 
     private void invalidateConnector(Long deviceId) {
         Socket removed = tcpConnectMap.remove(deviceId);
@@ -406,6 +419,8 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         return StringUtils.defaultIfBlank(value, defaultValue);
     }
 
+    // ---- Backoff tracking ----
+
     private int getConfigIntValue(Map<String, AttributeBO> config, String code, int defaultValue) {
         String value = getConfigValue(config, code, String.valueOf(defaultValue));
         try {
@@ -416,7 +431,25 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    // ---- Backoff tracking ----
+    @Override
+    public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(driverConfig, "protocol", issues);
+        checkRequired(driverConfig, "host", issues);
+        checkRequired(driverConfig, "port", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
+
+    @Override
+    public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(pointConfig, "sendCommand", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
 
     private static class ConsecutiveFailure {
         final int count;
@@ -441,4 +474,5 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
                     && (System.currentTimeMillis() - firstFailureTime) < FAILURE_BACKOFF_MS;
         }
     }
+
 }
