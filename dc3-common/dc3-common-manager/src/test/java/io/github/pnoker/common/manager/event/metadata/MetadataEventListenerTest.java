@@ -66,7 +66,7 @@ class MetadataEventListenerTest {
 
     @Test
     void deviceEventNotifiesOwningDriverViaRabbit() {
-        when(driverService.getByDeviceId(10L)).thenReturn(driver);
+        when(driverService.getByDeviceId(10L, 1L)).thenReturn(driver);
 
         listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE));
@@ -81,7 +81,7 @@ class MetadataEventListenerTest {
     void pointEventFansOutToEveryAffectedDriver() {
         DriverBO secondary = new DriverBO();
         secondary.setServiceName("dc3-driver-mqtt");
-        when(driverService.listByPointId(20L)).thenReturn(List.of(driver, secondary));
+        when(driverService.listByPointId(20L, 1L)).thenReturn(List.of(driver, secondary));
 
         listener.onApplicationEvent(new MetadataEvent(this, 20L, MetadataTypeEnum.POINT,
                 MetadataOperateTypeEnum.ADD));
@@ -100,7 +100,7 @@ class MetadataEventListenerTest {
 
     @Test
     void pointEventWithEmptyDriverListEmitsNothing() {
-        when(driverService.listByPointId(20L)).thenReturn(List.of());
+        when(driverService.listByPointId(20L, 1L)).thenReturn(List.of());
 
         listener.onApplicationEvent(new MetadataEvent(this, 20L, MetadataTypeEnum.POINT,
                 MetadataOperateTypeEnum.UPDATE));
@@ -113,7 +113,7 @@ class MetadataEventListenerTest {
         listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.DELETE, Set.of("dc3-driver-old")));
 
-        verify(driverService, never()).getByDeviceId(10L);
+        verify(driverService, never()).getByDeviceId(10L, 1L);
         verify(rabbitTemplate).convertAndSend(
                 eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
                 eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-old"),
@@ -135,7 +135,7 @@ class MetadataEventListenerTest {
 
     @Test
     void serviceFailureIsSwallowedSilently() {
-        when(driverService.getByDeviceId(10L)).thenThrow(new RuntimeException("downstream offline"));
+        when(driverService.getByDeviceId(10L, 1L)).thenThrow(new RuntimeException("downstream offline"));
 
         listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.DELETE));

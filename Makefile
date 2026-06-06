@@ -37,7 +37,7 @@ GROUP_SERVICES_core := $(GROUP_SERVICES_center) gateway
 GROUP_SERVICES_drivers := listening-virtual modbus-tcp mqtt opc-da opc-ua plcs7 virtual
 SELECTED_SERVICES := $(strip $(SERVICES) $(GROUP_SERVICES_$(GROUP)))
 
-MVN_SETTINGS ?=
+MVN_SETTINGS ?= .mvn/settings.xml
 MVN_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s $(MVN_SETTINGS),)
 MVN_SUB_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s ../$(MVN_SETTINGS),)
 MVN := mvn $(MVN_SETTINGS_ARG)

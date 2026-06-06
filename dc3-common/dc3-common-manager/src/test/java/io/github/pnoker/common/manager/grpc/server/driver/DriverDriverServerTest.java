@@ -155,7 +155,7 @@ class DriverDriverServerTest {
                 .thenReturn(GrpcCommandAttributeDTO.newBuilder().build());
         when(grpcEventAttributeBuilder.buildGrpcDTOByBO(eventAttribute))
                 .thenReturn(GrpcEventAttributeDTO.newBuilder().build());
-        when(deviceService.listIdsByDriverId(7L)).thenReturn(List.of(1L, 2L));
+        when(deviceService.listIdsByDriverId(7L, 1L)).thenReturn(List.of(1L, 2L));
 
         GrpcRDriverRegisterDTO response = stub.getById(GrpcDriverQuery.newBuilder().setDriverId(7L).build());
 
