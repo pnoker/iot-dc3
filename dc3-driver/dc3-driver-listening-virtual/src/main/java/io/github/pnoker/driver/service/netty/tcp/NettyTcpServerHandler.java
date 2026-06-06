@@ -74,7 +74,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
             if (msg instanceof ByteBuf byteBuf) {
                 nettyServerHandler.read(context, byteBuf);
             } else {
-                log.warn("Driver message skipped, protocol={}, remoteAddress={}, reason=unsupportedMessageType, type={}", PROTOCOL, 
+                log.warn("Driver message skipped, protocol={}, remoteAddress={}, reason=unsupportedMessageType, type={}", PROTOCOL,
                         context.channel().remoteAddress(), msg == null ? null : msg.getClass().getName());
             }
         } finally {
@@ -98,7 +98,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.warn("Driver channel error, protocol={}, remoteAddress={}", PROTOCOL,  context.channel().remoteAddress(), throwable);
+        log.warn("Driver channel error, protocol={}, remoteAddress={}", PROTOCOL, context.channel().remoteAddress(), throwable);
         context.disconnect();
     }
 

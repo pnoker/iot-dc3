@@ -19,16 +19,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-parent</artifactId>
-        <version>2026.5.22</version>
-    </parent>
-
-    <name>${project.artifactId}</name>
+    <groupId>io.github.pnoker</groupId>
     <artifactId>iot-dc3</artifactId>
+    <version>2026.5.22</version>
     <packaging>pom</packaging>
 
+    <name>${project.artifactId}</name>
     <inceptionYear>2016</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
@@ -65,10 +61,91 @@
     </scm>
 
     <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
+        <!-- Build basics -->
+        <java.version>21</java.version>
+        <maven.plugin.validation>VERBOSE</maven.plugin.validation>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- DC3 Version -->
+        <!-- Framework BOMs -->
+        <spring.boot.version>4.0.6</spring.boot.version>
+        <spring.cloud.version>2025.1.1</spring.cloud.version>
+        <spring-ai.version>2.0.0-M6</spring-ai.version>
+
+        <!-- RPC and messaging -->
+        <grpc.version>1.81.0</grpc.version>
+        <protobuf.version>4.35.0</protobuf.version>
+        <spring-grpc.version>1.0.3</spring-grpc.version>
+        <okhttp.version>5.3.2</okhttp.version>
+        <netty.version>4.2.10.Final</netty.version>
+        <paho.mqttv3.version>1.2.5</paho.mqttv3.version>
+
+        <!-- Data access -->
+        <mybatis.plus.version>3.5.16</mybatis.plus.version>
+        <mybatis.plus.dynamic.version>4.5.0</mybatis.plus.dynamic.version>
+
+        <!-- Serialization and data formats -->
+        <tools.jackson.version>3.1.3</tools.jackson.version>
+        <jackson.version>2.21.3</jackson.version>
+        <jackson.annotations.version>2.21</jackson.annotations.version>
+        <jaxb.version>4.0.8</jaxb.version>
+        <snakeyaml.version>2.6</snakeyaml.version>
+
+        <!-- Platform and core utilities -->
+        <activation.version>2.1.4</activation.version>
+        <commons.io.version>2.22.0</commons.io.version>
+        <apache.commons.compress.version>1.28.0</apache.commons.compress.version>
+        <apache.commons.lang3.version>3.20.0</apache.commons.lang3.version>
+        <apache.poi.version>5.5.1</apache.poi.version>
+        <freemarker.version>2.3.34</freemarker.version>
+        <jna.version>5.18.1</jna.version>
+        <oshi.version>7.1.0</oshi.version>
+        <jakarta.json.version>2.1.3</jakarta.json.version>
+        <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
+        <jakarta.validation.version>3.1.1</jakarta.validation.version>
+        <hibernate.validator.version>9.1.0.Final</hibernate.validator.version>
+        <expressly.version>6.0.0</expressly.version>
+        <lombok.version>1.18.46</lombok.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+
+        <!-- Security and observability -->
+        <jwt.version>0.13.0</jwt.version>
+        <bouncycastle.version>1.84</bouncycastle.version>
+        <micrometer.version>1.16.5</micrometer.version>
+
+        <!-- Legacy integration -->
+        <j.interop.version>2.0.4</j.interop.version>
+
+        <!-- Test toolchain -->
+        <testcontainers.version>2.0.5</testcontainers.version>
+        <junit.bom.version>6.1.0</junit.bom.version>
+        <assertj.version>3.27.7</assertj.version>
+        <awaitility.version>4.3.0</awaitility.version>
+        <instancio.version>5.5.1</instancio.version>
+        <rest-assured.version>6.0.0</rest-assured.version>
+        <wiremock.version>3.13.2</wiremock.version>
+        <surefire.version>3.5.2</surefire.version>
+        <jacoco.version>0.8.12</jacoco.version>
+
+        <!-- Build plugins -->
+        <os.maven.plugin.version>1.7.1</os.maven.plugin.version>
+        <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
+        <graalvm.native.version>1.1.0</graalvm.native.version>
+        <maven.gpg.plugin>3.2.8</maven.gpg.plugin>
+        <maven.source.plugin>3.4.0</maven.source.plugin>
+        <maven.javadoc.plugin>3.12.0</maven.javadoc.plugin>
+        <maven.compiler.plugin>3.15.0</maven.compiler.plugin>
+        <maven.resource.plugin>3.5.0</maven.resource.plugin>
+        <maven.dependency.plugin>3.10.0</maven.dependency.plugin>
+        <maven.version.plugin>2.21.0</maven.version.plugin>
+        <maven.enforcer.plugin.version>3.6.3</maven.enforcer.plugin.version>
+        <maven.central.plugin.version>0.10.0</maven.central.plugin.version>
+
+        <!-- DC3 version (self-reference for internal dependency management) -->
         <dc3.version>2026.5.22</dc3.version>
+
+        <!-- Deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
 
         <!-- Test execution toggles (consumed by surefire/failsafe) -->
         <skip.unit.tests>false</skip.unit.tests>
@@ -78,46 +155,405 @@
             -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
         </mockito.javaagent.argLine>
 
-        <!-- Modbus -->
-        <modbus4j.version>3.0.3</modbus4j.version>
-        <jserialcomm.version>2.11.0</jserialcomm.version>
-
-        <!-- LwM2M -->
-        <leshan.version>2.0.0-M14</leshan.version>
-
-        <!-- BACnet -->
-        <bacnet4j.version>6.0.1</bacnet4j.version>
-
-        <!-- DLMS/COSEM -->
-        <gurux.dlms.version>4.0.79</gurux.dlms.version>
-
-        <!-- Bluetooth LE -->
-        <bluetooth.manager.version>1.5.3</bluetooth.manager.version>
-        <bluetooth.manager.tinyb.version>1.3.3</bluetooth.manager.tinyb.version>
-
-        <!-- Zigbee -->
-        <zigbee.version>1.4.16.1</zigbee.version>
-
-        <!-- IEC 104 -->
-        <j60870.version>1.7.2</j60870.version>
-
-        <!-- SNMP -->
-        <snmp4j.version>3.7.4</snmp4j.version>
     </properties>
 
-    <modules>
-        <module>dc3-api</module>
-        <module>dc3-common</module>
-        <module>dc3-center</module>
-        <module>dc3-driver</module>
-        <module>dc3-gateway</module>
-        <module>dc3-coverage</module>
-        <module>dc3-e2e</module>
-    </modules>
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- Common compile/test dependencies -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
-            <!-- DC3 API Related -->
+            <!-- BOM imports -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>${grpc.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-bom</artifactId>
+                <version>${okhttp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Test toolchain -->
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.instancio</groupId>
+                <artifactId>instancio-junit</artifactId>
+                <version>${instancio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>${rest-assured.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wiremock</groupId>
+                <artifactId>wiremock-standalone</artifactId>
+                <version>${wiremock.version}</version>
+            </dependency>
+
+            <!-- RPC and messaging -->
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-protobuf</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-stub</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.grpc</groupId>
+                <artifactId>spring-grpc-spring-boot-starter</artifactId>
+                <version>${spring-grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.paho</groupId>
+                <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+                <version>${paho.mqttv3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.paho</groupId>
+                <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
+                <version>${paho.mqttv3.version}</version>
+            </dependency>
+
+            <!-- Serialization and protocol -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java-util</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${tools.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${tools.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${tools.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jdk8</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-parameter-names</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>4.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+
+            <!-- Data access -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot4-starter</artifactId>
+                <version>${mybatis.plus.dynamic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-annotation</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-core</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+
+            <!-- Platform and APIs -->
+            <dependency>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>${activation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta.annotation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.json</groupId>
+                <artifactId>jakarta.json-api</artifactId>
+                <version>${jakarta.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${jakarta.validation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate.validator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator-cdi</artifactId>
+                <version>${hibernate.validator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.expressly</groupId>
+                <artifactId>expressly</artifactId>
+                <version>${expressly.version}</version>
+            </dependency>
+
+            <!-- Security and observability -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-registry-prometheus</artifactId>
+                <version>${micrometer.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+
+            <!-- Runtime and utility -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-resolver-dns-native-macos</artifactId>
+                <version>${netty.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna-platform</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${apache.commons.compress.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${apache.commons.lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${apache.poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${apache.poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-mapstruct-binding</artifactId>
+                <version>${lombok-mapstruct-binding.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- IoT and system integration -->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jinterop</groupId>
+                <artifactId>j-interop</artifactId>
+                <version>${j.interop.version}</version>
+            </dependency>
+
+            <!-- DC3 API modules -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-api-auth</artifactId>
@@ -139,7 +575,7 @@
                 <version>${dc3.version}</version>
             </dependency>
 
-            <!-- DC3 Common Related -->
+            <!-- DC3 Common modules -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-agentic</artifactId>
@@ -268,6 +704,11 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-sql</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-test</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
@@ -281,102 +722,316 @@
                 <artifactId>dc3-common-web</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
-
-            <!-- Modbus Related -->
-            <dependency>
-                <groupId>com.infiniteautomation</groupId>
-                <artifactId>modbus4j</artifactId>
-                <version>${modbus4j.version}</version>
-            </dependency>
-
-            <!-- Serial Communication -->
-            <dependency>
-                <groupId>com.fazecast</groupId>
-                <artifactId>jSerialComm</artifactId>
-                <version>${jserialcomm.version}</version>
-            </dependency>
-
-            <!-- DC3 Common SQL -->
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-sql</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-
-            <!-- LwM2M Related -->
-            <dependency>
-                <groupId>org.eclipse.leshan</groupId>
-                <artifactId>leshan-server-cf</artifactId>
-                <version>${leshan.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.leshan</groupId>
-                <artifactId>leshan-core</artifactId>
-                <version>${leshan.version}</version>
-            </dependency>
-
-            <!-- BACnet Related -->
-            <dependency>
-                <groupId>com.infiniteautomation</groupId>
-                <artifactId>bacnet4j</artifactId>
-                <version>${bacnet4j.version}</version>
-            </dependency>
-
-            <!-- DLMS/COSEM Related -->
-            <dependency>
-                <groupId>org.gurux</groupId>
-                <artifactId>gurux.dlms</artifactId>
-                <version>${gurux.dlms.version}</version>
-            </dependency>
-
-            <!-- Bluetooth LE Related -->
-            <dependency>
-                <groupId>org.sputnikdev</groupId>
-                <artifactId>bluetooth-manager</artifactId>
-                <version>${bluetooth.manager.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.sputnikdev</groupId>
-                <artifactId>bluetooth-manager-tinyb</artifactId>
-                <version>${bluetooth.manager.tinyb.version}</version>
-            </dependency>
-
-            <!-- Zigbee Related -->
-            <dependency>
-                <groupId>com.zsmartsystems.zigbee</groupId>
-                <artifactId>com.zsmartsystems.zigbee</artifactId>
-                <version>${zigbee.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zsmartsystems.zigbee</groupId>
-                <artifactId>com.zsmartsystems.zigbee.serial</artifactId>
-                <version>${zigbee.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zsmartsystems.zigbee</groupId>
-                <artifactId>com.zsmartsystems.zigbee.dongle.telegesis</artifactId>
-                <version>${zigbee.version}</version>
-            </dependency>
-
-            <!-- IEC 104 Related -->
-            <dependency>
-                <groupId>org.openmuc</groupId>
-                <artifactId>j60870</artifactId>
-                <version>${j60870.version}</version>
-            </dependency>
-
-            <!-- SNMP Related -->
-            <dependency>
-                <groupId>org.snmp4j</groupId>
-                <artifactId>snmp4j</artifactId>
-                <version>${snmp4j.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
+    <modules>
+        <module>dc3-api</module>
+        <module>dc3-common</module>
+        <module>dc3-center</module>
+        <module>dc3-driver</module>
+        <module>dc3-gateway</module>
+        <module>dc3-coverage</module>
+        <module>dc3-e2e</module>
+    </modules>
+
     <build>
+        <finalName>${project.artifactId}</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-jdk-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[21,)</version>
+                                    <message>
+                                        This project targets Java 21 bytecode (via --release 21).
+                                        JDK 21 or newer is required to build.
+                                        Current JDK: ${java.version}
+                                    </message>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>3.9.0</version>
+                                </requireMavenVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+
         <pluginManagement>
             <plugins>
+                <!-- Enforcer plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven.enforcer.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-maven</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>3.8.0</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Spring Boot Maven plugin -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+
+                <!-- Protobuf plugin -->
+                <plugin>
+                    <groupId>org.xolstice.maven.plugins</groupId>
+                    <artifactId>protobuf-maven-plugin</artifactId>
+                    <version>${protobuf.plugin.version}</version>
+                    <configuration>
+                        <pluginId>grpc-java</pluginId>
+                        <protoSourceRoot>src/main/protobuf</protoSourceRoot>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}
+                        </protocArtifact>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
+                        </pluginArtifact>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compile</goal>
+                                <goal>compile-custom</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Graalvm plugin -->
+                <plugin>
+                    <groupId>org.graalvm.buildtools</groupId>
+                    <artifactId>native-maven-plugin</artifactId>
+                    <version>${graalvm.native.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-native</id>
+                            <goals>
+                                <goal>compile-no-fork</goal>
+                            </goals>
+                            <phase>package</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- GPG plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${maven.gpg.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sign</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                            <configuration>
+                                <keyname>pnoker</keyname>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Source Plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven.source.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Javadoc plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven.javadoc.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Compile plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin}</version>
+                    <configuration>
+                        <parameters>true</parameters>
+                        <release>${java.version}</release>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <useIncrementalCompilation>true</useIncrementalCompilation>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok-mapstruct-binding</artifactId>
+                                <version>${lombok-mapstruct-binding.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
+                <!-- Filter file plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resource.plugin}</version>
+                    <configuration>
+                        <nonFilteredFileExtensions>
+                            <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>db</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>key</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>crt</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>p12</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>proto</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>json</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+                        </nonFilteredFileExtensions>
+                    </configuration>
+                </plugin>
+
+                <!-- Maven Dependency plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven.dependency.plugin}</version>
+                </plugin>
+
+                <!-- Maven Version plugin -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>${maven.version.plugin}</version>
+                    <configuration>
+                        <ruleSet>
+                            <ignoreVersions>
+                                <ignoreVersion>
+                                    <type>regex</type>
+                                    <version>(?i).*(alpha|beta|rc|m|cr|preview|b|a).*</version>
+                                </ignoreVersion>
+                            </ignoreVersions>
+                        </ruleSet>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>display-plugin-updates</goal>
+                                <goal>display-property-updates</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Central Maven plugin -->
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>${maven.central.plugin.version}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>pnoker</publishingServerId>
+                        <autoPublish>true</autoPublish>
+                    </configuration>
+                </plugin>
+
+                <!-- Surefire plugin -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -396,6 +1051,8 @@
                         </excludes>
                     </configuration>
                 </plugin>
+
+                <!-- Failsafe plugin -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
@@ -419,6 +1076,8 @@
                         </execution>
                     </executions>
                 </plugin>
+
+                <!-- JaCoCo plugin -->
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
@@ -464,56 +1123,81 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>enforce-jdk-version</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireJavaVersion>
-                                    <version>[21,)</version>
-                                    <message>
-                                        This project targets Java 21 bytecode (via --release 21).
-                                        JDK 21 or newer is required to build.
-                                        Current JDK: ${java.version}
-                                    </message>
-                                </requireJavaVersion>
-                                <requireMavenVersion>
-                                    <version>3.9.0</version>
-                                </requireMavenVersion>
-                            </rules>
-                            <fail>true</fail>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
     </build>
 
     <profiles>
         <profile>
+            <id>version</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>versions-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>dep-tree</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>display-dependency-tree</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>tree</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
             <id>dev</id>
             <properties>
-                <!-- You can configure environment variables commonly used in development -->
                 <NODE_ENV>dev</NODE_ENV>
             </properties>
             <activation>

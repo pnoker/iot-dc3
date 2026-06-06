@@ -72,11 +72,11 @@ public class NettyUdpServer {
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();
-            log.info("Driver listener started, protocol={}, port={}", PROTOCOL,  port);
+            log.info("Driver listener started, protocol={}, port={}", PROTOCOL, port);
             future.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully().sync();
-            log.info("Driver listener stopped, protocol={}, port={}", PROTOCOL,  port);
+            log.info("Driver listener stopped, protocol={}, port={}", PROTOCOL, port);
         }
     }
 

@@ -145,11 +145,11 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             // to do something for device event
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             // to do something for point event
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
         }
     }

@@ -39,6 +39,15 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @EnableScheduling
 public class DataApplication {
 
+    /**
+     * Main entry point for the Data Center Service.
+     *
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(DataApplication.class, args);
+    }
+
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
@@ -47,15 +56,6 @@ public class DataApplication {
         scheduler.setAwaitTerminationSeconds(60);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         return scheduler;
-    }
-
-    /**
-     * Main entry point for the Data Center Service.
-     *
-     * @param args command line arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(DataApplication.class, args);
     }
 
 }

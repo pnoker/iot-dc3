@@ -24,14 +24,12 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-parent</artifactId>
+        <artifactId>iot-dc3</artifactId>
         <version>2026.5.22</version>
-        <relativePath/>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <name>${project.artifactId}</name>
     <artifactId>dc3-api</artifactId>
-    <version>2026.5.22</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016</inceptionYear>
@@ -68,9 +66,6 @@
     </scm>
 
     <properties>
-        <!-- DC3 Version -->
-        <dc3.version>2026.5.22</dc3.version>
-
         <!-- Test execution toggles (consumed by surefire/failsafe) -->
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>

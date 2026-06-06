@@ -22,9 +22,9 @@
 
   Difference from .mvn/settings.xml: no <mirrors>. Pulling directly from
   Maven Central avoids the situation where a freshly-released artifact
-  (e.g. a new dc3-parent version) is available on Maven Central but has
-  not yet propagated to the Aliyun mirror — which would otherwise break
-  container builds for hours after a release.
+  is available on Maven Central but has not yet propagated to the
+  Aliyun mirror — which would otherwise break container builds for
+  hours after a release.
 
   Local developers continue to use .mvn/settings.xml (with Aliyun mirror)
   for faster everyday builds.

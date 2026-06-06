@@ -130,7 +130,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
@@ -140,11 +140,11 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                 if (Objects.nonNull(removed)) {
                     removed.disconnect();
                 }
-                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}", driverCode, 
+                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}", driverCode,
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
         }
     }
