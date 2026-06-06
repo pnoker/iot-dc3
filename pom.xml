@@ -84,10 +84,10 @@
         <mybatis.plus.dynamic.version>4.5.0</mybatis.plus.dynamic.version>
 
         <!-- Serialization and data formats -->
-        <tools.jackson.version>3.1.3</tools.jackson.version>
+        <tools.jackson.version>3.1.4</tools.jackson.version>
         <jackson.version>2.21.3</jackson.version>
         <jackson.annotations.version>2.21</jackson.annotations.version>
-        <jaxb.version>4.0.8</jaxb.version>
+        <jaxb.version>4.0.9</jaxb.version>
         <snakeyaml.version>2.6</snakeyaml.version>
 
         <!-- Platform and core utilities -->
@@ -97,7 +97,7 @@
         <apache.commons.lang3.version>3.20.0</apache.commons.lang3.version>
         <apache.poi.version>5.5.1</apache.poi.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <jna.version>5.18.1</jna.version>
+        <jna.version>5.19.0</jna.version>
         <oshi.version>7.1.0</oshi.version>
         <jakarta.json.version>2.1.3</jakarta.json.version>
         <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
@@ -124,19 +124,19 @@
         <instancio.version>5.5.1</instancio.version>
         <rest-assured.version>6.0.0</rest-assured.version>
         <wiremock.version>3.13.2</wiremock.version>
-        <surefire.version>3.5.2</surefire.version>
-        <jacoco.version>0.8.12</jacoco.version>
+        <surefire.version>3.5.6</surefire.version>
+        <jacoco.version>0.8.15</jacoco.version>
 
         <!-- Build plugins -->
         <os.maven.plugin.version>1.7.1</os.maven.plugin.version>
         <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
-        <graalvm.native.version>1.1.0</graalvm.native.version>
+        <graalvm.native.version>1.1.1</graalvm.native.version>
         <maven.gpg.plugin>3.2.8</maven.gpg.plugin>
         <maven.source.plugin>3.4.0</maven.source.plugin>
         <maven.javadoc.plugin>3.12.0</maven.javadoc.plugin>
         <maven.compiler.plugin>3.15.0</maven.compiler.plugin>
         <maven.resource.plugin>3.5.0</maven.resource.plugin>
-        <maven.dependency.plugin>3.10.0</maven.dependency.plugin>
+        <maven.dependency.plugin>3.11.0</maven.dependency.plugin>
         <maven.version.plugin>2.21.0</maven.version.plugin>
         <maven.enforcer.plugin.version>3.6.3</maven.enforcer.plugin.version>
         <maven.central.plugin.version>0.10.0</maven.central.plugin.version>
