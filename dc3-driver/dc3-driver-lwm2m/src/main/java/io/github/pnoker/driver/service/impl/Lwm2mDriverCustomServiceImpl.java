@@ -20,6 +20,7 @@ package io.github.pnoker.driver.service.impl;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -37,6 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -63,6 +66,16 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
 
     @Value("${dc3.driver.code}")
     private String driverCode;
+
+    private static void checkRequired(Map<String, AttributeBO> config, String code,
+                                      List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO attr = config.get(code);
+        if (attr == null || attr.getValue() == null) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code).build());
+        }
+    }
 
     @Override
     public void initial() {
@@ -191,4 +204,27 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
             return defaultValue;
         }
     }
+
+    @Override
+    public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(driverConfig, "endpoint", issues);
+        checkRequired(driverConfig, "serverHost", issues);
+        checkRequired(driverConfig, "serverPort", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
+
+    @Override
+    public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(pointConfig, "objectId", issues);
+        checkRequired(pointConfig, "objectInstanceId", issues);
+        checkRequired(pointConfig, "resourceId", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
+
 }

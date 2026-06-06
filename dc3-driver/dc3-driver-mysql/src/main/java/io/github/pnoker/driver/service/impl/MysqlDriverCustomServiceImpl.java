@@ -17,12 +17,16 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.sql.AbstractJdbcDriverCustomService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,6 +53,16 @@ public class MysqlDriverCustomServiceImpl extends AbstractJdbcDriverCustomServic
         super(driverSenderService);
     }
 
+    private static void checkRequired(Map<String, AttributeBO> config, String code,
+                                      List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO attr = config.get(code);
+        if (attr == null || attr.getValue() == null) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code).build());
+        }
+    }
+
     @Override
     protected String buildJdbcUrl(Map<String, AttributeBO> driverConfig) {
         String host = getConfigValue(driverConfig, "host", "localhost");
@@ -65,6 +79,28 @@ public class MysqlDriverCustomServiceImpl extends AbstractJdbcDriverCustomServic
     @Override
     protected int getDefaultPort() {
         return 3306;
+    }
+
+    @Override
+    public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(driverConfig, "host", issues);
+        checkRequired(driverConfig, "port", issues);
+        checkRequired(driverConfig, "database", issues);
+        checkRequired(driverConfig, "username", issues);
+        checkRequired(driverConfig, "password", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
+
+    @Override
+    public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(pointConfig, "readQuery", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
     }
 
 }

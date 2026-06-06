@@ -20,6 +20,7 @@ package io.github.pnoker.driver.service.impl;
 import com.github.xingshuangs.iot.protocol.s7.enums.EPlcType;
 import com.github.xingshuangs.iot.protocol.s7.service.S7PLC;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -41,6 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,6 +68,16 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     private String driverCode;
 
     private Map<Long, MyS7PLC> connectMap;
+
+    private static void checkRequired(Map<String, AttributeBO> config, String code,
+                                      List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO attr = config.get(code);
+        if (attr == null || attr.getValue() == null) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code).build());
+        }
+    }
 
     @Override
     public void initial() {
@@ -122,6 +135,10 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    // ------------------------------------------------------------------------
+    //  private helpers
+    // ------------------------------------------------------------------------
+
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                          DeviceBO device, PointBO point, WritePointValue writePointValue) {
@@ -144,10 +161,6 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             myS7PLC.lock.unlock();
         }
     }
-
-    // ------------------------------------------------------------------------
-    //  private helpers
-    // ------------------------------------------------------------------------
 
     private MyS7PLC getS7PLC(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return connectMap.computeIfAbsent(deviceId, id -> {
@@ -267,6 +280,27 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         } finally {
             myS7PLC.lock.unlock();
         }
+    }
+
+    @Override
+    public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(driverConfig, "host", issues);
+        checkRequired(driverConfig, "port", issues);
+        checkRequired(driverConfig, "plcType", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
+
+    @Override
+    public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(pointConfig, "dbNum", issues);
+        checkRequired(pointConfig, "byteOffset", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
     }
 
     @Getter

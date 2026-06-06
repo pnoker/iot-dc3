@@ -26,6 +26,7 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -332,6 +333,63 @@ class ModbusTcpDriverCustomServiceImplTest {
                 point(PointTypeFlagEnum.FLOAT), writePointValue("1.0", PointTypeFlagEnum.FLOAT)))
                 .isInstanceOf(WritePointException.class)
                 .hasMessageContaining("offline");
+    }
+
+    // ── DriverValidator ─────────────────────────────────────────────────
+
+    @Test
+    void validateReportsMissingHostAndPortAsErrors() {
+        Map<String, AttributeBO> empty = Map.of();
+        ValidationReport report = service.validate(empty);
+        assertThat(report.isPassed()).isFalse();
+        assertThat(report.getIssues()).hasSize(2);
+        assertThat(report.getIssues()).extracting("attributeCode").contains("host", "port");
+        report.getIssues().forEach(i -> assertThat(i.getLevel())
+                .isEqualTo(ValidationReport.IssueLevel.ERROR));
+    }
+
+    @Test
+    void validateReportsPortOutOfRange() {
+        Map<String, AttributeBO> config = driverConfig("localhost", 99999);
+        ValidationReport report = service.validate(config);
+        assertThat(report.isPassed()).isFalse();
+        assertThat(report.getIssues()).extracting("attributeCode").contains("port");
+    }
+
+    @Test
+    void validatePassesWithCompleteConfig() {
+        Map<String, AttributeBO> config = driverConfig("192.168.1.10", 502);
+        ValidationReport report = service.validate(config);
+        assertThat(report.isPassed()).isTrue();
+    }
+
+    @Test
+    void validatePointReportsMissingAttributes() {
+        Map<String, AttributeBO> empty = Map.of();
+        ValidationReport report = service.validatePoint(empty,
+                point(PointTypeFlagEnum.INT));
+        assertThat(report.isPassed()).isFalse();
+        assertThat(report.getIssues()).hasSize(3);
+        assertThat(report.getIssues()).extracting("attributeCode")
+                .contains("slaveId", "functionCode", "offset");
+    }
+
+    @Test
+    void validatePointReportsInvalidFunctionCode() {
+        Map<String, AttributeBO> config = pointConfig(1, 99, 0);
+        ValidationReport report = service.validatePoint(config,
+                point(PointTypeFlagEnum.INT));
+        assertThat(report.isPassed()).isFalse();
+        assertThat(report.getIssues()).extracting("attributeCode")
+                .contains("functionCode");
+    }
+
+    @Test
+    void validatePointPassesWithValidConfig() {
+        Map<String, AttributeBO> config = pointConfig(1, 3, 100);
+        ValidationReport report = service.validatePoint(config,
+                point(PointTypeFlagEnum.INT));
+        assertThat(report.isPassed()).isTrue();
     }
 
     @Test

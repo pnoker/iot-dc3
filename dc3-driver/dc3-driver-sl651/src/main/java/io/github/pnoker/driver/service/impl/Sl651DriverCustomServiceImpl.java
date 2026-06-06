@@ -19,6 +19,7 @@ package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -95,6 +96,16 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         return sb.toString();
     }
 
+    private static void checkRequired(Map<String, AttributeBO> config, String code,
+                                      List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO attr = config.get(code);
+        if (attr == null || attr.getValue() == null) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code).build());
+        }
+    }
+
     @Override
     public void initial() {
         log.info("Driver initializing, protocol={}", driverCode);
@@ -131,15 +142,15 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    // ------------------------------------------------------------------------
+    //  server lifecycle
+    // ------------------------------------------------------------------------
+
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                                DeviceBO device, PointBO point) {
         return null;
     }
-
-    // ------------------------------------------------------------------------
-    //  server lifecycle
-    // ------------------------------------------------------------------------
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
@@ -151,6 +162,10 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         stopServer();
         startServer();
     }
+
+    // ------------------------------------------------------------------------
+    //  message listener
+    // ------------------------------------------------------------------------
 
     private void startServer() {
         try {
@@ -175,10 +190,6 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             log.error("Driver SL651 server start failed, protocol={}, port={}", driverCode, serverPort, e);
         }
     }
-
-    // ------------------------------------------------------------------------
-    //  message listener
-    // ------------------------------------------------------------------------
 
     private void stopServer() {
         Object server = sl651Server;
@@ -308,6 +319,24 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             log.warn("Driver SL651 body elements unavailable, protocol={}", driverCode, e);
             return List.of();
         }
+    }
+
+    @Override
+    public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(driverConfig, "port", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
+
+    @Override
+    public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(pointConfig, "index", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
     }
 
 }

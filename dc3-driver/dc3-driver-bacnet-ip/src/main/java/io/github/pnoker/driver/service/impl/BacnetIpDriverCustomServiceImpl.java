@@ -33,6 +33,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.RequestUtils;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -50,6 +51,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,6 +83,16 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
     public BacnetIpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
+    }
+
+    private static void checkRequired(Map<String, AttributeBO> config, String code,
+                                      List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO attr = config.get(code);
+        if (attr == null || attr.getValue() == null) {
+            issues.add(ValidationReport.AttributeIssue.builder()
+                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code).build());
+        }
     }
 
     @Override
@@ -322,4 +335,28 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         }
         return attr.getValue(Integer.class);
     }
+
+    @Override
+    public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(driverConfig, "localDeviceId", issues);
+        checkRequired(driverConfig, "bindAddress", issues);
+        checkRequired(driverConfig, "port", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
+
+    @Override
+    public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
+        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
+        checkRequired(pointConfig, "remoteDeviceId", issues);
+        checkRequired(pointConfig, "objectType", issues);
+        checkRequired(pointConfig, "objectInstance", issues);
+        checkRequired(pointConfig, "propertyId", issues);
+        return ValidationReport.builder()
+                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
+                .issues(issues).build();
+    }
+
 }
