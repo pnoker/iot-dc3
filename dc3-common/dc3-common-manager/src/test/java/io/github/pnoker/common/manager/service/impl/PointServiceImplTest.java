@@ -254,6 +254,6 @@ class PointServiceImplTest {
     @Test
     void listByDeviceIdReturnsEmptyWhenDeviceMissing() {
         when(deviceMapper.selectById(eq(99L))).thenReturn(null);
-        assertThat(service.listByDeviceId(99L)).isEmpty();
+        assertThat(service.listByDeviceId(99L, 1L)).isEmpty();
     }
 }

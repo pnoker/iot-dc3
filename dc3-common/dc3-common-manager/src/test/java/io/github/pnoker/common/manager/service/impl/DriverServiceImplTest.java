@@ -191,7 +191,7 @@ class DriverServiceImplTest {
     @Test
     void listByProfileIdReturnsEmptyWhenNoDeviceBound() {
         when(deviceManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of());
-        assertThat(service.listByProfileId(5L)).isEmpty();
+        assertThat(service.listByProfileId(5L, 1L)).isEmpty();
         verify(deviceManager, never()).listByIds(any());
     }
 
@@ -207,6 +207,6 @@ class DriverServiceImplTest {
         when(driverManager.listByIds(Set.of(1L))).thenReturn(List.of(doRow));
         when(driverBuilder.buildBOListByDOList(List.of(doRow))).thenReturn(List.of(bo));
 
-        assertThat(service.listByProfileId(5L)).containsExactly(bo);
+        assertThat(service.listByProfileId(5L, 1L)).containsExactly(bo);
     }
 }

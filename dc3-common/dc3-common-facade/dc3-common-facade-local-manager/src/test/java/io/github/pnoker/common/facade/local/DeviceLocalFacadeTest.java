@@ -142,34 +142,34 @@ class DeviceLocalFacadeTest {
     void listByProfileIdMapsResults() {
         DeviceBO bo = new DeviceBO();
         FacadeDeviceBO mapped = new FacadeDeviceBO();
-        when(deviceService.listByProfileId(5L)).thenReturn(List.of(bo));
+        when(deviceService.listByProfileId(5L, 1L)).thenReturn(List.of(bo));
         when(facadeDeviceBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.listByProfileId(5L)).containsExactly(mapped);
+        assertThat(facade.listByProfileId(5L, 1L)).containsExactly(mapped);
     }
 
     @Test
     void listByProfileIdReturnsEmptyWhenServiceReturnsNullOrEmpty() {
-        when(deviceService.listByProfileId(5L)).thenReturn(null);
-        assertThat(facade.listByProfileId(5L)).isEmpty();
-        when(deviceService.listByProfileId(5L)).thenReturn(List.of());
-        assertThat(facade.listByProfileId(5L)).isEmpty();
+        when(deviceService.listByProfileId(5L, 1L)).thenReturn(null);
+        assertThat(facade.listByProfileId(5L, 1L)).isEmpty();
+        when(deviceService.listByProfileId(5L, 1L)).thenReturn(List.of());
+        assertThat(facade.listByProfileId(5L, 1L)).isEmpty();
     }
 
     @Test
     void listByDriverIdMapsResults() {
         DeviceBO bo = new DeviceBO();
         FacadeDeviceBO mapped = new FacadeDeviceBO();
-        when(deviceService.listByDriverId(9L)).thenReturn(List.of(bo));
+        when(deviceService.listByDriverId(9L, 1L)).thenReturn(List.of(bo));
         when(facadeDeviceBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.listByDriverId(9L)).containsExactly(mapped);
+        assertThat(facade.listByDriverId(9L, 1L)).containsExactly(mapped);
     }
 
     @Test
     void listByDriverIdReturnsEmptyWhenServiceReturnsNullOrEmpty() {
-        when(deviceService.listByDriverId(9L)).thenReturn(null);
-        assertThat(facade.listByDriverId(9L)).isEmpty();
-        when(deviceService.listByDriverId(9L)).thenReturn(List.of());
-        assertThat(facade.listByDriverId(9L)).isEmpty();
+        when(deviceService.listByDriverId(9L, 1L)).thenReturn(null);
+        assertThat(facade.listByDriverId(9L, 1L)).isEmpty();
+        when(deviceService.listByDriverId(9L, 1L)).thenReturn(List.of());
+        assertThat(facade.listByDriverId(9L, 1L)).isEmpty();
     }
 
 }
