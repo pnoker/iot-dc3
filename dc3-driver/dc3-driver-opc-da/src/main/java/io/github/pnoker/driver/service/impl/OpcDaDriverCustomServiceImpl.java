@@ -96,7 +96,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
@@ -107,15 +107,15 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
                     try {
                         removed.dispose();
                     } catch (Exception e) {
-                        log.warn("Driver connection disconnect failed, protocol={}, deviceId={}", driverCode, 
+                        log.warn("Driver connection disconnect failed, protocol={}, deviceId={}", driverCode,
                                 metadataEvent.getId(), e);
                     }
                 }
-                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}", driverCode, 
+                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}", driverCode,
                         metadataEvent.getId(), operateType, Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -148,7 +148,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
             String clsId = driverConfig.get("clsId").getValue(String.class);
             String user = driverConfig.get("username").getValue(String.class);
             String password = driverConfig.get("password").getValue(String.class);
-            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, clsId={}, usernamePresent={}", driverCode, 
+            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, clsId={}, usernamePresent={}", driverCode,
                     deviceId, host, clsId, Objects.nonNull(user));
             ConnectionInformation connectionInformation = new ConnectionInformation(host, clsId, user, password);
             Server server = new Server(connectionInformation, scheduledThreadPoolExecutor);

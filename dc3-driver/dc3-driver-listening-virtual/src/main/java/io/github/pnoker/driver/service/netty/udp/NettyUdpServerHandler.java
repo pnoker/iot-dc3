@@ -81,7 +81,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.warn("Driver channel error, protocol={}, remoteAddress={}", PROTOCOL,  context.channel().remoteAddress(), throwable);
+        log.warn("Driver channel error, protocol={}, remoteAddress={}", PROTOCOL, context.channel().remoteAddress(), throwable);
         context.disconnect();
     }
 

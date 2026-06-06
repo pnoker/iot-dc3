@@ -112,10 +112,10 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -161,7 +161,7 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.getDeviceChannel(deviceId);
         if (Objects.isNull(channel) || !channel.isActive()) {
-            log.warn("Driver point write skipped, protocol={}, deviceId={}, pointId={}, reason=channelMissing", PROTOCOL_TCP, 
+            log.warn("Driver point write skipped, protocol={}, deviceId={}, pointId={}, reason=channelMissing", PROTOCOL_TCP,
                     deviceId, point.getId());
             return false;
         }
@@ -181,7 +181,7 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("Driver point write interrupted, protocol={}, deviceId={}, pointId={}", PROTOCOL_TCP, 
+            log.warn("Driver point write interrupted, protocol={}, deviceId={}, pointId={}", PROTOCOL_TCP,
                     deviceId, point.getId(), e);
             return false;
         }

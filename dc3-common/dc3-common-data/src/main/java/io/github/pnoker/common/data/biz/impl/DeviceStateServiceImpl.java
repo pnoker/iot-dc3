@@ -18,13 +18,13 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.data.biz.DeviceStateService;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
-import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;

@@ -140,7 +140,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
@@ -149,12 +149,12 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                 ModbusMaster removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.destroy();
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}", driverCode, 
+                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}", driverCode,
                             metadataEvent.getId(), operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode, 
+            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
                     metadataType, operateType, metadataEvent.getId());
         }
     }
@@ -212,7 +212,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
             ModbusMaster modbusMaster = modbusFactory.createRtuMaster(wrapper);
             try {
                 modbusMaster.init();
-                log.info("Driver connection established, protocol={}, deviceId={}, port={}, baudRate={}", driverCode, 
+                log.info("Driver connection established, protocol={}, deviceId={}, port={}, baudRate={}", driverCode,
                         deviceId, port, baudRate);
                 // Successful connection clears failure tracking
                 failureMap.remove(deviceId);

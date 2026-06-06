@@ -85,14 +85,14 @@ public class NettyServerHandler {
      */
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
         int readableBytes = byteBuf.readableBytes();
-        log.debug("Driver message received, protocol={}, remoteAddress={}, bytes={}", PROTOCOL, 
+        log.debug("Driver message received, protocol={}, remoteAddress={}, bytes={}", PROTOCOL,
                 context.channel().remoteAddress(), readableBytes);
         if (log.isTraceEnabled()) {
-            log.trace("Driver message payload received, protocol={}, remoteAddress={}, payload={}", PROTOCOL, 
+            log.trace("Driver message payload received, protocol={}, remoteAddress={}, payload={}", PROTOCOL,
                     context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         }
         if (readableBytes < MIN_MESSAGE_LENGTH) {
-            log.warn("Driver message skipped, protocol={}, remoteAddress={}, reason=payloadTooShort, bytes={}", PROTOCOL, 
+            log.warn("Driver message skipped, protocol={}, remoteAddress={}, reason=payloadTooShort, bytes={}", PROTOCOL,
                     context.channel().remoteAddress(), readableBytes);
             return;
         }
@@ -104,7 +104,7 @@ public class NettyServerHandler {
         }
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
-            log.warn("Driver message skipped, protocol={}, remoteAddress={}, deviceId={}, reason=deviceMissing", PROTOCOL, 
+            log.warn("Driver message skipped, protocol={}, remoteAddress={}, deviceId={}, reason=deviceMissing", PROTOCOL,
                     context.channel().remoteAddress(), deviceId);
             return;
         }
@@ -114,7 +114,7 @@ public class NettyServerHandler {
 
         Map<Long, Map<String, AttributeBO>> pointConfigMap = deviceMetadata.getPointConfig(deviceId);
         if (Objects.isNull(pointConfigMap)) {
-            log.warn("Driver message skipped, protocol={}, remoteAddress={}, deviceId={}, reason=pointConfigMissing", PROTOCOL, 
+            log.warn("Driver message skipped, protocol={}, remoteAddress={}, deviceId={}, reason=pointConfigMissing", PROTOCOL,
                     context.channel().remoteAddress(), deviceId);
             return;
         }
@@ -143,7 +143,7 @@ public class NettyServerHandler {
         if (!pointValues.isEmpty()) {
             driverSenderService.pointValueSender(pointValues);
         }
-        log.debug("Driver point values forwarded, protocol={}, deviceId={}, key={}, count={}", PROTOCOL,  deviceId, hexKey,
+        log.debug("Driver point values forwarded, protocol={}, deviceId={}, key={}, count={}", PROTOCOL, deviceId, hexKey,
                 pointValues.size());
     }
 
@@ -168,7 +168,7 @@ public class NettyServerHandler {
         try {
             return Long.parseLong(deviceName);
         } catch (NumberFormatException e) {
-            log.warn("Driver message skipped, protocol={}, remoteAddress={}, deviceName={}, reason=deviceIdInvalid", PROTOCOL, 
+            log.warn("Driver message skipped, protocol={}, remoteAddress={}, deviceName={}, reason=deviceIdInvalid", PROTOCOL,
                     context.channel().remoteAddress(), deviceName);
             return null;
         }
