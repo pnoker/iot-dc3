@@ -20,6 +20,8 @@ package io.github.pnoker.common.utils;
 import io.github.pnoker.common.entity.auth.Keys;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.SignatureException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -33,6 +35,16 @@ class KeyUtilTest {
     private static final String SALT = "0123456789abcdef0123456789abcdef";
 
     private static final String OTHER_SALT = "fedcba9876543210fedcba9876543210";
+
+    @BeforeAll
+    static void setUpSecurityKey() {
+        System.setProperty("dc3.security.key", "test-security-key-for-junit");
+    }
+
+    @AfterAll
+    static void tearDownSecurityKey() {
+        System.clearProperty("dc3.security.key");
+    }
 
     @Test
     void aesEncryptDecryptRoundTrip() throws Exception {
