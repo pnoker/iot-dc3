@@ -34,6 +34,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for resource API responses.
@@ -48,11 +49,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Resource view object")
 public class ResourceVO extends BaseVO {
 
     /**
      * ID
      */
+    @Schema(description = "Parent resource ID")
     @NotNull(message = "Resource parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentResourceId;
 
@@ -60,6 +63,7 @@ public class ResourceVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Role name can't be empty", groups = {Add.class, Auth.class})
+    @Schema(description = "Resource name")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
             groups = {Add.class, Update.class})
     private String resourceName;
@@ -67,16 +71,19 @@ public class ResourceVO extends BaseVO {
     /**
      * Code
      */
+    @Schema(description = "Resource permission code")
     private String resourceCode;
 
     /**
      * Service name.
      */
+    @Schema(description = "Service name")
     private String serviceName;
 
     /**
      * Type
      */
+    @Schema(description = "Resource type flag")
     private ResourceTypeFlagEnum resourceTypeFlag;
 
     /**
@@ -89,22 +96,26 @@ public class ResourceVO extends BaseVO {
      * </ul>
      *
      */
+    @Schema(description = "Resource scope flag")
     private ResourceScopeFlagEnum resourceScopeFlag;
 
     /**
      * Entity ID
      */
+    @Schema(description = "Associated entity ID")
     @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
 
     /**
      *
      */
+    @Schema(description = "Resource extension information (JSON)")
     private ResourceExt resourceExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

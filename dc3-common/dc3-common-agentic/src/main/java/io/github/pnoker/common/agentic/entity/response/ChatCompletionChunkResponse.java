@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * A single SSE chunk in the OpenAI streaming chat completion response.
@@ -41,15 +42,26 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "Chat Completion Chunk response body")
 public class ChatCompletionChunkResponse {
+
+    @Schema(description = "Primary key")
 
     private String id;
 
+    @Schema(description = "object")
+
     private String object;
+
+    @Schema(description = "created")
 
     private long created;
 
+    @Schema(description = "model")
+
     private String model;
+
+    @Schema(description = "choices")
 
     private List<ChunkChoice> choices;
 
@@ -60,9 +72,15 @@ public class ChatCompletionChunkResponse {
     @Builder
     public static class ChunkChoice {
 
+        @Schema(description = "index")
+
         private int index;
 
+        @Schema(description = "delta")
+
         private Delta delta;
+
+        @Schema(description = "finish reason")
 
         @JsonProperty("finish_reason")
         private String finishReason;
@@ -76,9 +94,15 @@ public class ChatCompletionChunkResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Delta {
 
+        @Schema(description = "role")
+
         private String role;
 
+        @Schema(description = "content")
+
         private String content;
+
+        @Schema(description = "reasoning content")
 
         @JsonProperty("reasoning_content")
         private String reasoningContent;

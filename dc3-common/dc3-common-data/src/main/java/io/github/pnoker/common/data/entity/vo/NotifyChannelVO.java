@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for notification channel API responses.
@@ -41,17 +42,30 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Notify Channel view object")
 public class NotifyChannelVO extends BaseVO {
+
+    @Schema(description = "channel name")
 
     private String channelName;
 
+    @Schema(description = "channel code")
+
     private String channelCode;
+
+    @Schema(description = "channel type flag")
 
     private NotifyChannelTypeFlagEnum channelTypeFlag;
 
+    @Schema(description = "credential ref")
+
     private String credentialRef;
 
+    @Schema(description = "channel extension information (JSON)")
+
     private NotifyChannelExt channelExt;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 

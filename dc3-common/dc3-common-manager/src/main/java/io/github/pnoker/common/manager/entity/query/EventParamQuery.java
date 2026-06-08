@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for event param listing and filtering.
@@ -43,24 +44,41 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Event Param query parameters")
 public class EventParamQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination object")
+
     private Pages page;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "param name")
+
     private String paramName;
+
+    @Schema(description = "param code")
 
     private String paramCode;
 
+    @Schema(description = "param type flag")
+
     private PointTypeFlagEnum paramTypeFlag;
+
+    @Schema(description = "event ID")
 
     private Long eventId;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

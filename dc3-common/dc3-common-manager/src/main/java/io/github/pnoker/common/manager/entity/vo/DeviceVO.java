@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for device API responses.
@@ -46,12 +47,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Device view object")
 public class DeviceVO extends BaseVO {
 
     /**
      * Device Name
      */
     @NotBlank(message = "Device name can't be empty", groups = {Add.class})
+    @Schema(description = "device name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid device name format",
             groups = {Add.class, Update.class})
     private String deviceName;
@@ -59,37 +62,44 @@ public class DeviceVO extends BaseVO {
     /**
      * Device ID
      */
+    @Schema(description = "device code")
     private String deviceCode;
 
     /**
      * Driver ID
      */
+    @Schema(description = "driver ID")
     @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class, Upload.class})
     private Long driverId;
 
     /**
      *
      */
+    @Schema(description = "device extension information (JSON)")
     private DeviceExt deviceExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
+    @Schema(description = "signature")
     private String signature;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
     /**
      * Profile ID
      */
+    @Schema(description = "profile ID")
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Upload.class})
     private Long profileId;
 

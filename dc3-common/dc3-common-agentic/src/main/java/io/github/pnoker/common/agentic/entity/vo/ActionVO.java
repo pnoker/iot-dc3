@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic action API responses.
@@ -35,21 +36,36 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString(callSuper = true)
+@Schema(description = "Action view object")
 public class ActionVO extends BaseVO {
+
+    @Schema(description = "action ID")
 
     private String actionId;
 
+    @Schema(description = "conversation ID")
+
     private String conversationId;
+
+    @Schema(description = "action type")
 
     private String actionType;
 
+    @Schema(description = "title")
+
     private String title;
+
+    @Schema(description = "Description")
 
     private String description;
 
     private Map<String, Object> payload;
 
+    @Schema(description = "status")
+
     private AgenticActionStatusEnum status;
+
+    @Schema(description = "expire time")
 
     private LocalDateTime expireTime;
 

@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for menu listing and filtering.
@@ -43,10 +44,13 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Menu query parameters")
 public class MenuQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
@@ -55,26 +59,31 @@ public class MenuQuery implements Serializable {
     /**
      * Parent menu id filter (optional).
      */
+    @Schema(description = "Parent menu ID")
     private Long parentMenuId;
 
     /**
      * Type
      */
+    @Schema(description = "menu type flag")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
      * Name
      */
+    @Schema(description = "Menu name")
     private String menuName;
 
     /**
      * Code, URLMD5
      */
+    @Schema(description = "Menu code")
     private String menuCode;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

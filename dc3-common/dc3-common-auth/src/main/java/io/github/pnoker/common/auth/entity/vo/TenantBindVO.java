@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for tenant binding API responses.
@@ -41,17 +42,20 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Tenant Bind view object")
 public class TenantBindVO extends BaseVO {
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     @NotNull(message = "Tenant id can't be empty", groups = {Add.class, Update.class})
     private Long tenantId;
 
     /**
      * ID
      */
+    @Schema(description = "User ID")
     @NotNull(message = "User id can't be empty", groups = {Add.class, Update.class})
     private Long userId;
 

@@ -28,6 +28,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for tenant listing and filtering.
@@ -42,10 +43,13 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Tenant query parameters")
 public class TenantQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
@@ -54,16 +58,19 @@ public class TenantQuery implements Serializable {
     /**
      * TenantName
      */
+    @Schema(description = "tenant name")
     private String tenantName;
 
     /**
      * TenantCode
      */
+    @Schema(description = "tenant code")
     private String tenantCode;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

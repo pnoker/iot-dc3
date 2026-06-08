@@ -27,6 +27,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for event history API responses.
@@ -41,46 +42,85 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Event History view object")
 public class EventHistoryVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Primary key")
+
     private Long id;
+
+    @Schema(description = "record ID")
 
     private String recordId;
 
+    @Schema(description = "Tenant ID")
+
     private Long tenantId;
+
+    @Schema(description = "device ID")
 
     private Long deviceId;
 
+    @Schema(description = "event ID")
+
     private Long eventId;
+
+    @Schema(description = "event code")
 
     private String eventCode;
 
+    @Schema(description = "event type flag")
+
     private Byte eventTypeFlag;
+
+    @Schema(description = "event level flag")
 
     private Byte eventLevelFlag;
 
+    @Schema(description = "param values")
+
     private String paramValues;
+
+    @Schema(description = "config snapshot")
 
     private String configSnapshot;
 
+    @Schema(description = "message")
+
     private String message;
+
+    @Schema(description = "occur time")
 
     private LocalDateTime occurTime;
 
+    @Schema(description = "receive time")
+
     private LocalDateTime receiveTime;
+
+    @Schema(description = "acknowledge flag")
 
     private Byte acknowledgeFlag;
 
+    @Schema(description = "acknowledge time")
+
     private LocalDateTime acknowledgeTime;
+
+    @Schema(description = "acknowledge user ID")
 
     private Long acknowledgeUserId;
 
+    @Schema(description = "schema version")
+
     private Short schemaVersion;
 
+    @Schema(description = "Creation time")
+
     private LocalDateTime createTime;
+
+    @Schema(description = "Last operation time")
 
     private LocalDateTime operateTime;
 

@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for notification channel binding listing and filtering.
@@ -44,18 +45,29 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Notify Channel Bind query parameters")
 public class NotifyChannelBindQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination object")
+
     private Pages page;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "notify ID")
+
     private Long notifyId;
 
+    @Schema(description = "channel ID")
+
     private Long channelId;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 

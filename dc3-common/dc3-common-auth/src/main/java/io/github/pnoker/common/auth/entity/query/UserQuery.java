@@ -28,6 +28,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for user listing and filtering.
@@ -42,10 +43,13 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "User query parameters")
 public class UserQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
@@ -53,31 +57,37 @@ public class UserQuery implements Serializable {
      * Tenant scope. Populated by the controller from the request context; any value
      * supplied by the client is overwritten so a caller cannot reach across tenants.
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     /**
      *
      */
+    @Schema(description = "User nickname")
     private String nickName;
 
     /**
      * Name
      */
+    @Schema(description = "Username")
     private String userName;
 
     /**
      *
      */
+    @Schema(description = "Phone number")
     private String phone;
 
     /**
      *
      */
+    @Schema(description = "Email address")
     private String email;
 
     /**
      * Enable flag.
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

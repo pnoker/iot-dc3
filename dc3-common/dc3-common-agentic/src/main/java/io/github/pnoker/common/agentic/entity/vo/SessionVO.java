@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for session API responses.
@@ -38,15 +39,26 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Session view object")
 public class SessionVO extends BaseVO {
+
+    @Schema(description = "conversation ID")
 
     private String conversationId;
 
+    @Schema(description = "title")
+
     private String title;
+
+    @Schema(description = "session extension information (JSON)")
 
     private SessionExt sessionExt;
 
+    @Schema(description = "Tenant ID")
+
     private Long tenantId;
+
+    @Schema(description = "User ID")
 
     private Long userId;
 

@@ -26,6 +26,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Transport-neutral system health snapshot.
@@ -39,6 +40,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Schema(description = "Facade System Health business object")
 public class FacadeSystemHealthBO implements Serializable {
 
     @Serial
@@ -48,7 +50,11 @@ public class FacadeSystemHealthBO implements Serializable {
 
     private Map<String, String> infra;
 
+    @Schema(description = "drivers")
+
     private FleetSummary drivers;
+
+    @Schema(description = "devices")
 
     private FleetSummary devices;
 
@@ -62,7 +68,11 @@ public class FacadeSystemHealthBO implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
 
+        @Schema(description = "Total record count")
+
         private int total;
+
+        @Schema(description = "online")
 
         private int online;
 

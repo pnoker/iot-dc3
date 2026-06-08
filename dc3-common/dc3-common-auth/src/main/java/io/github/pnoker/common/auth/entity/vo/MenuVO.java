@@ -34,6 +34,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for menu API responses.
@@ -48,23 +49,27 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Menu view object")
 public class MenuVO extends BaseVO {
 
     /**
      * ID
      */
+    @Schema(description = "Parent menu ID")
     @NotNull(message = "Menu parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentMenuId;
 
     /**
      * Type
      */
+    @Schema(description = "menu type flag")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
      * Name
      */
     @NotBlank(message = "Menu name can't be empty", groups = {Add.class, Auth.class})
+    @Schema(description = "Menu name")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid menu name",
             groups = {Add.class, Update.class})
     private String menuName;
@@ -72,26 +77,31 @@ public class MenuVO extends BaseVO {
     /**
      * Code, URLMD5
      */
+    @Schema(description = "Menu code")
     private String menuCode;
 
     /**
      *
      */
+    @Schema(description = "menu level")
     private MenuLevelFlagEnum menuLevel;
 
     /**
      *
      */
+    @Schema(description = "menu index")
     private Integer menuIndex;
 
     /**
      *
      */
+    @Schema(description = "Menu extension information (JSON)")
     private MenuExt menuExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

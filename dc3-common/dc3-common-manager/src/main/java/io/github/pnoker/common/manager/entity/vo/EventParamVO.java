@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for event param API responses.
@@ -46,27 +47,43 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Event Param view object")
 public class EventParamVO extends BaseVO {
 
     @NotBlank(message = "Param name can't be empty", groups = {Add.class})
+    @Schema(description = "param name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid param name format",
             groups = {Add.class, Update.class})
     private String paramName;
 
+    @Schema(description = "param code")
+
     @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
+
+    @Schema(description = "param type flag")
 
     @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeFlagEnum paramTypeFlag;
 
+    @Schema(description = "param extension information (JSON)")
+
     private EventParamExt paramExt;
+
+    @Schema(description = "event ID")
 
     @NotNull(message = "Event ID can't be empty", groups = {Add.class, Update.class})
     private Long eventId;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
 
+    @Schema(description = "signature")
+
     private String signature;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

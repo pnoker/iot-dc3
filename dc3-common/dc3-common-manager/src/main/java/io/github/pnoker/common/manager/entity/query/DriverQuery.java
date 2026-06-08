@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for driver listing and filtering.
@@ -43,16 +44,20 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Driver query parameters")
 public class DriverQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     //
@@ -60,46 +65,55 @@ public class DriverQuery implements Serializable {
     /**
      * Name
      */
+    @Schema(description = "driver name")
     private String driverName;
 
     /**
      * Driver ID
      */
+    @Schema(description = "driver code")
     private String driverCode;
 
     /**
      * Driver service name
      */
+    @Schema(description = "Service name")
     private String serviceName;
 
     /**
      *
      */
+    @Schema(description = "service host")
     private String serviceHost;
 
     /**
      * Type
      */
+    @Schema(description = "driver type flag")
     private DriverTypeFlagEnum driverTypeFlag;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      * Group ID
      */
+    @Schema(description = "group ID")
     private Long groupId;
 
     /**
      * Label ID
      */
+    @Schema(description = "label ID")
     private Long labelId;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
 }

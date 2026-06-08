@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for alarm rule listing and filtering.
@@ -45,16 +46,20 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Rule query parameters")
 public class RuleQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     //
@@ -62,26 +67,31 @@ public class RuleQuery implements Serializable {
     /**
      * Rule name
      */
+    @Schema(description = "rule name")
     private String ruleName;
 
     /**
      * Rule code
      */
+    @Schema(description = "rule code")
     private String ruleCode;
 
     /**
      * Entity ID
      */
+    @Schema(description = "Associated entity ID")
     private Long entityId;
 
     /**
      * Alarm target type flag
      */
+    @Schema(description = "alarm target type flag")
     private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for user API responses.
@@ -46,12 +47,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "User view object")
 public class UserVO extends BaseVO {
 
     /**
      *
      */
     @NotBlank(message = "Nick name can't be empty", groups = {Add.class, Auth.class})
+    @Schema(description = "User nickname")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "Invalid nick name", groups = {Add.class, Update.class})
     private String nickName;
@@ -60,6 +63,7 @@ public class UserVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "User name can't be empty", groups = {Add.class, Auth.class})
+    @Schema(description = "Username")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid user name",
             groups = {Add.class, Update.class})
     private String userName;
@@ -68,11 +72,13 @@ public class UserVO extends BaseVO {
      *
      */
     @Pattern(regexp = "^1([3-9])\\d{9}$", message = "Invalid phone", groups = {Add.class, Update.class})
+    @Schema(description = "Phone number")
     private String phone;
 
     /**
      *
      */
+    @Schema(description = "Email address")
     @Pattern(regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$", message = "Invalid email",
             groups = {Add.class, Update.class})
     private String email;
@@ -80,16 +86,19 @@ public class UserVO extends BaseVO {
     /**
      *
      */
+    @Schema(description = "Social extension information (JSON)")
     private UserSocialExt socialExt;
 
     /**
      *
      */
+    @Schema(description = "Identity extension information (JSON)")
     private UserIdentityExt identityExt;
 
     /**
      * Enable flag.
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

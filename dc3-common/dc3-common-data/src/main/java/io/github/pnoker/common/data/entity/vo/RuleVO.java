@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for alarm rule API responses.
@@ -41,46 +42,55 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Rule view object")
 public class RuleVO extends BaseVO {
 
     /**
      * Alarm target type flag
      */
+    @Schema(description = "alarm target type flag")
     private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
 
     /**
      * Rule name
      */
+    @Schema(description = "rule name")
     private String ruleName;
 
     /**
      * Rule code
      */
+    @Schema(description = "rule code")
     private String ruleCode;
 
     /**
      * Entity ID
      */
+    @Schema(description = "Associated entity ID")
     private Long entityId;
 
     /**
      * Alarm notification template ID
      */
+    @Schema(description = "notify ID")
     private Long notifyId;
 
     /**
      * Alarm message template ID
      */
+    @Schema(description = "message ID")
     private Long messageId;
 
     /**
      * Alarm rule
      */
+    @Schema(description = "rule extension information (JSON)")
     private RuleExt ruleExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

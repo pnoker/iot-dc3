@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for event listing and filtering.
@@ -44,28 +45,49 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Event query parameters")
 public class EventQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination object")
+
     private Pages page;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "event name")
+
     private String eventName;
+
+    @Schema(description = "event code")
 
     private String eventCode;
 
+    @Schema(description = "event type")
+
     private EventTypeFlagEnum eventType;
+
+    @Schema(description = "event level")
 
     private EventLevelFlagEnum eventLevel;
 
+    @Schema(description = "profile ID")
+
     private Long profileId;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 
+    @Schema(description = "Version number")
+
     private Integer version;
+
+    @Schema(description = "device ID")
 
     private Long deviceId;
 

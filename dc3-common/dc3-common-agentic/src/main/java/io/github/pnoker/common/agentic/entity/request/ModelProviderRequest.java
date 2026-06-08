@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Agentic model provider mutation request.
@@ -34,24 +35,41 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Schema(description = "Model Provider request body")
 public class ModelProviderRequest {
+
+    @Schema(description = "Primary key")
 
     @NotNull(message = "Provider ID is required", groups = {Update.class})
     private Long id;
 
+    @Schema(description = "name")
+
     @NotBlank(message = "Provider name is required", groups = {Add.class, Update.class})
     private String name;
 
+    @Schema(description = "provider type")
+
     private String providerType;
+
+    @Schema(description = "base url")
 
     @NotBlank(message = "Provider base URL is required", groups = {Add.class, Update.class})
     private String baseUrl;
 
+    @Schema(description = "api key")
+
     private String apiKey;
+
+    @Schema(description = "Default flag")
 
     private DefaultFlagEnum defaultFlag;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Description / remark")
 
     private String remark;
 

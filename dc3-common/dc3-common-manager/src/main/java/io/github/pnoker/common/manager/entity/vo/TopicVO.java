@@ -26,6 +26,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for topic API responses.
@@ -40,14 +41,21 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Topic view object")
 public class TopicVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "topic")
+
     private String topic;
 
+    @Schema(description = "device name")
+
     private String deviceName;
+
+    @Schema(description = "point name")
 
     private String pointName;
 

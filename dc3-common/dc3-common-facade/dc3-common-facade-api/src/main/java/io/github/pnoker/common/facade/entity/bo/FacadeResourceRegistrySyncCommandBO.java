@@ -25,6 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level command driving a resource-registry sync call.
@@ -39,11 +40,18 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Facade Resource Registry Sync Command business object")
 public class FacadeResourceRegistrySyncCommandBO {
+
+    @Schema(description = "Service name")
 
     private String serviceName;
 
+    @Schema(description = "delete missing")
+
     private boolean deleteMissing;
+
+    @Schema(description = "apis")
 
     private List<FacadeScannedApiBO> apis;
 

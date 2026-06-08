@@ -31,6 +31,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for rule runtime state API responses.
@@ -45,33 +46,58 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Rule State view object")
 public class RuleStateVO extends BaseVO {
+
+    @Schema(description = "rule ID")
 
     private Long ruleId;
 
+    @Schema(description = "alarm target type flag")
+
     private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
+
+    @Schema(description = "Associated entity ID")
 
     private Long entityId;
 
+    @Schema(description = "fingerprint")
+
     private String fingerprint;
 
+    @Schema(description = "entity state flag")
+
     private RuleStateFlagEnum entityStateFlag;
+
+    @Schema(description = "first trigger time")
 
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime firstTriggerTime;
 
+    @Schema(description = "last trigger time")
+
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastTriggerTime;
+
+    @Schema(description = "last recover time")
 
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastRecoverTime;
 
+    @Schema(description = "last notify time")
+
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastNotifyTime;
 
+    @Schema(description = "trigger count")
+
     private Long triggerCount;
 
+    @Schema(description = "alarm ID")
+
     private Long alarmId;
+
+    @Schema(description = "entity state extension information (JSON)")
 
     private RuleStateExt entityStateExt;
 

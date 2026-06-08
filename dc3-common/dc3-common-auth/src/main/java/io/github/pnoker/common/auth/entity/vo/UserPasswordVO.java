@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for user password API responses.
@@ -43,6 +44,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "User Password view object")
 public class UserPasswordVO extends BaseVO {
 
     /**
@@ -51,6 +53,7 @@ public class UserPasswordVO extends BaseVO {
     @NotBlank(message = "Login password can't be empty", groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "Invalid login password", groups = {Add.class, Update.class})
     @ToString.Exclude
+    @Schema(description = "login password")
     private String loginPassword;
 
 }

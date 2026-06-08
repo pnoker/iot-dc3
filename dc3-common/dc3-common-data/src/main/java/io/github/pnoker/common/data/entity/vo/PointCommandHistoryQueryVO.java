@@ -27,6 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query view object for point command list API.
@@ -40,16 +41,25 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Point Command History view object")
 public class PointCommandHistoryQueryVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "device ID")
+
     private Long deviceId;
+
+    @Schema(description = "point ID")
 
     private Long pointId;
 
+    @Schema(description = "status")
+
     private String status;
+
+    @Schema(description = "type")
 
     private String type;
 

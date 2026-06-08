@@ -27,6 +27,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for command history API responses.
@@ -41,50 +42,93 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Command History view object")
 public class CommandHistoryVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Primary key")
+
     private Long id;
+
+    @Schema(description = "record ID")
 
     private String recordId;
 
+    @Schema(description = "Tenant ID")
+
     private Long tenantId;
+
+    @Schema(description = "device ID")
 
     private Long deviceId;
 
+    @Schema(description = "command ID")
+
     private Long commandId;
+
+    @Schema(description = "command code")
 
     private String commandCode;
 
+    @Schema(description = "param values")
+
     private String paramValues;
+
+    @Schema(description = "result values")
 
     private String resultValues;
 
+    @Schema(description = "config snapshot")
+
     private String configSnapshot;
+
+    @Schema(description = "status")
 
     private String status;
 
+    @Schema(description = "error code")
+
     private String errorCode;
+
+    @Schema(description = "error message")
 
     private String errorMessage;
 
+    @Schema(description = "source")
+
     private String source;
+
+    @Schema(description = "source user ID")
 
     private Long sourceUserId;
 
+    @Schema(description = "occur time")
+
     private LocalDateTime occurTime;
+
+    @Schema(description = "send time")
 
     private LocalDateTime sendTime;
 
+    @Schema(description = "finish time")
+
     private LocalDateTime finishTime;
+
+    @Schema(description = "expire time")
 
     private LocalDateTime expireTime;
 
+    @Schema(description = "schema version")
+
     private Short schemaVersion;
 
+    @Schema(description = "Creation time")
+
     private LocalDateTime createTime;
+
+    @Schema(description = "Last operation time")
 
     private LocalDateTime operateTime;
 

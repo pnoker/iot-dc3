@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * OpenAI-compatible chat completion request body.
@@ -36,48 +37,57 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Chat Completion request body")
 public class ChatCompletionRequest {
 
     /**
      * Model identifier (advisory — the actual model is configured server-side).
      */
+    @Schema(description = "model")
     private String model;
 
     /**
      * Conversation messages in chronological order.
      */
+    @Schema(description = "messages")
     private List<ChatMessageDTO> messages;
 
     /**
      * Sampling temperature override (0.0–2.0). Null uses the server default.
      */
+    @Schema(description = "temperature")
     private Double temperature;
 
     /**
      * Maximum tokens to generate. Null uses the server default.
      */
+    @Schema(description = "max tokens")
     private Integer maxTokens;
 
     /**
      * Whether to stream the response as SSE events.
      */
+    @Schema(description = "stream")
     private Boolean stream;
 
     /**
      * Conversation ID for chat memory correlation. If omitted, a new conversation is
      * started each request.
      */
+    @Schema(description = "conversation ID")
     private String conversationId;
 
     /**
      * Uploaded attachment database IDs associated with this request.
      */
+    @Schema(description = "attachments")
     private List<Long> attachments;
 
     /**
      * Whether the client asked for model reasoning. Current OpenAI-compatible text
      * endpoint treats this as advisory metadata.
      */
+    @Schema(description = "reasoning")
     private Boolean reasoning;
 
     public boolean isStream() {

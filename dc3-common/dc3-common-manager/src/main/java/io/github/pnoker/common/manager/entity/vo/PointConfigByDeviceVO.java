@@ -26,6 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point-configuration-by-device API responses.
@@ -41,21 +42,25 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Point Config By Device view object")
 public class PointConfigByDeviceVO {
 
     /**
      *
      */
+    @Schema(description = "un config count")
     private Long unConfigCount;
 
     /**
      *
      */
+    @Schema(description = "config count")
     private Long configCount;
 
     /**
      *
      */
+    @Schema(description = "points")
     private List<PointDO> points;
 
 }

@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for command listing and filtering.
@@ -44,28 +45,49 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Command query parameters")
 public class CommandQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination object")
+
     private Pages page;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "command name")
+
     private String commandName;
+
+    @Schema(description = "command code")
 
     private String commandCode;
 
+    @Schema(description = "command type")
+
     private CommandTypeFlagEnum commandType;
+
+    @Schema(description = "call type")
 
     private CallTypeFlagEnum callType;
 
+    @Schema(description = "profile ID")
+
     private Long profileId;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 
+    @Schema(description = "Version number")
+
     private Integer version;
+
+    @Schema(description = "device ID")
 
     private Long deviceId;
 

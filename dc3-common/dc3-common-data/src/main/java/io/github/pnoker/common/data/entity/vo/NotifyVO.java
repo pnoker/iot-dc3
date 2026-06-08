@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for alarm notification template API responses.
@@ -41,36 +42,43 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Notify view object")
 public class NotifyVO extends BaseVO {
 
     /**
      * Alarm notification template name
      */
+    @Schema(description = "notify name")
     private String notifyName;
 
     /**
      * Alarm notification template code
      */
+    @Schema(description = "notify code")
     private String notifyCode;
 
     /**
      * Auto confirm flag
      */
+    @Schema(description = "auto confirm flag")
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
      * Alarm notification interval, milliseconds
      */
+    @Schema(description = "notify interval")
     private Long notifyInterval;
 
     /**
      * Alarm notification template configuration
      */
+    @Schema(description = "notify extension information (JSON)")
     private NotifyExt notifyExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

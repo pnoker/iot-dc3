@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level driver query.
@@ -43,26 +44,45 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Facade Driver query parameters")
 public class FacadeDriverQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination object")
+
     private Pages page;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "driver name")
+
     private String driverName;
+
+    @Schema(description = "driver code")
 
     private String driverCode;
 
+    @Schema(description = "Service name")
+
     private String serviceName;
+
+    @Schema(description = "service host")
 
     private String serviceHost;
 
+    @Schema(description = "driver type flag")
+
     private DriverTypeFlagEnum driverTypeFlag;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

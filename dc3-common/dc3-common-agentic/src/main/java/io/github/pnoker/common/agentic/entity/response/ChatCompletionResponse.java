@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * OpenAI-compatible non-streaming chat completion response.
@@ -42,17 +43,30 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "Chat Completion response body")
 public class ChatCompletionResponse {
+
+    @Schema(description = "Primary key")
 
     private String id;
 
+    @Schema(description = "object")
+
     private String object;
+
+    @Schema(description = "created")
 
     private long created;
 
+    @Schema(description = "model")
+
     private String model;
 
+    @Schema(description = "choices")
+
     private List<Choice> choices;
+
+    @Schema(description = "usage")
 
     private Usage usage;
 
@@ -63,9 +77,15 @@ public class ChatCompletionResponse {
     @Builder
     public static class Choice {
 
+        @Schema(description = "index")
+
         private int index;
 
+        @Schema(description = "message")
+
         private Message message;
+
+        @Schema(description = "finish reason")
 
         private String finishReason;
 
@@ -77,9 +97,15 @@ public class ChatCompletionResponse {
     @AllArgsConstructor
     public static class Message {
 
+        @Schema(description = "role")
+
         private String role;
 
+        @Schema(description = "content")
+
         private String content;
+
+        @Schema(description = "content extension information (JSON)")
 
         @JsonProperty("content_ext")
         private AgenticMessageContent contentExt;
@@ -92,9 +118,15 @@ public class ChatCompletionResponse {
     @AllArgsConstructor
     public static class Usage {
 
+        @Schema(description = "prompt tokens")
+
         private int promptTokens;
 
+        @Schema(description = "completion tokens")
+
         private int completionTokens;
+
+        @Schema(description = "total tokens")
 
         private int totalTokens;
 

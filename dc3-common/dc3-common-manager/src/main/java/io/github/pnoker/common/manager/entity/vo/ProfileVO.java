@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for profile API responses.
@@ -46,12 +47,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Profile view object")
 public class ProfileVO extends BaseVO {
 
     /**
      * Name
      */
     @NotBlank(message = "Profile name can't be empty", groups = {Add.class})
+    @Schema(description = "profile name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid profile name format",
             groups = {Add.class, Update.class})
     private String profileName;
@@ -59,36 +62,43 @@ public class ProfileVO extends BaseVO {
     /**
      * Code
      */
+    @Schema(description = "profile code")
     private String profileCode;
 
     /**
      * Type
      */
+    @Schema(description = "profile share flag")
     private ProfileShareFlagEnum profileShareFlag;
 
     /**
      * Type
      */
+    @Schema(description = "Profile type flag")
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
      *
      */
+    @Schema(description = "profile extension information (JSON)")
     private ProfileExt profileExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
+    @Schema(description = "signature")
     private String signature;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
 }

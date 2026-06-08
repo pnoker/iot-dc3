@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for profile listing and filtering.
@@ -44,16 +45,20 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Profile query parameters")
 public class ProfileQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     //
@@ -61,41 +66,49 @@ public class ProfileQuery implements Serializable {
     /**
      * Name
      */
+    @Schema(description = "profile name")
     private String profileName;
 
     /**
      * Code
      */
+    @Schema(description = "profile code")
     private String profileCode;
 
     /**
      * Type
      */
+    @Schema(description = "profile share flag")
     private ProfileShareFlagEnum profileShareFlag;
 
     /**
      * Type
      */
+    @Schema(description = "Profile type flag")
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      * Group ID
      */
+    @Schema(description = "group ID")
     private Long groupId;
 
     /**
      * Label ID
      */
+    @Schema(description = "label ID")
     private Long labelId;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
     //
@@ -103,6 +116,7 @@ public class ProfileQuery implements Serializable {
     /**
      * Device ID
      */
+    @Schema(description = "device ID")
     private Long deviceId;
 
 }

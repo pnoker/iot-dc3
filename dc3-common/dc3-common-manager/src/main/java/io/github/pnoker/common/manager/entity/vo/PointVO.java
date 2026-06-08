@@ -35,6 +35,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point API responses.
@@ -49,12 +50,14 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Point view object")
 public class PointVO extends BaseVO {
 
     /**
      * Name
      */
     @NotBlank(message = "Point name can't be empty", groups = {Add.class})
+    @Schema(description = "point name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid point name format",
             groups = {Add.class, Update.class})
     private String pointName;
@@ -62,65 +65,77 @@ public class PointVO extends BaseVO {
     /**
      * Code
      */
+    @Schema(description = "point code")
     private String pointCode;
 
     /**
      * Type
      */
+    @Schema(description = "point type flag")
     @NotNull(message = "Point type can't be empty", groups = {Add.class, Update.class})
     private PointTypeFlagEnum pointTypeFlag;
 
     /**
      *
      */
+    @Schema(description = "rw flag")
     @NotNull(message = "Read/write flag can't be empty", groups = {Add.class, Update.class})
     private RwFlagEnum rwFlag;
 
     /**
      *
      */
+    @Schema(description = "base value")
     private BigDecimal baseValue;
 
     /**
      *
      */
+    @Schema(description = "multiple")
     private BigDecimal multiple;
 
     /**
      *
      */
+    @Schema(description = "value decimal")
     @NotNull(message = "Value decimal can't be empty", groups = {Add.class, Update.class})
     private Byte valueDecimal;
 
     /**
      *
      */
+    @Schema(description = "unit")
     private String unit;
 
     /**
      * ID
      */
+    @Schema(description = "profile ID")
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
     private Long profileId;
 
     /**
      *
      */
+    @Schema(description = "point extension information (JSON)")
     private PointExt pointExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
+    @Schema(description = "signature")
     private String signature;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
 }

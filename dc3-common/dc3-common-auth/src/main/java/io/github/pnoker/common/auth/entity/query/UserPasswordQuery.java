@@ -27,6 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for user password listing and filtering.
@@ -41,10 +42,13 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "User Password query parameters")
 public class UserPasswordQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
@@ -54,6 +58,7 @@ public class UserPasswordQuery implements Serializable {
      *
      */
     @ToString.Exclude
+    @Schema(description = "login password")
     private String loginPassword;
 
 }

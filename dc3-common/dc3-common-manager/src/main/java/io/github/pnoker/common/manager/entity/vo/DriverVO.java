@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for driver API responses.
@@ -45,12 +46,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Driver view object")
 public class DriverVO extends BaseVO {
 
     /**
      * Name
      */
     @NotBlank(message = "Driver name can't be empty", groups = {Add.class})
+    @Schema(description = "driver name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid driver name format",
             groups = {Add.class, Update.class})
     private String driverName;
@@ -58,12 +61,14 @@ public class DriverVO extends BaseVO {
     /**
      * Driver ID
      */
+    @Schema(description = "driver code")
     private String driverCode;
 
     /**
      * Driver service name
      */
     @NotBlank(message = "Service name can't be empty", groups = {Add.class})
+    @Schema(description = "Service name")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$", message = "Invalid service name format",
             groups = {Add.class, Update.class})
     private String serviceName;
@@ -74,31 +79,37 @@ public class DriverVO extends BaseVO {
     @NotBlank(message = "Service host can't be empty", groups = {Add.class})
     @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
             message = "Invalid service host format", groups = {Add.class, Update.class})
+    @Schema(description = "service host")
     private String serviceHost;
 
     /**
      * Type
      */
+    @Schema(description = "driver type flag")
     private DriverTypeFlagEnum driverTypeFlag;
 
     /**
      *
      */
+    @Schema(description = "driver extension information (JSON)")
     private DriverExt driverExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
+    @Schema(description = "signature")
     private String signature;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
 }

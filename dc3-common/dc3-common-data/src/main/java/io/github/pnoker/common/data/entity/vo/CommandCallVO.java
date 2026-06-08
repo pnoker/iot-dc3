@@ -25,6 +25,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * VO for submitting a custom command call.
@@ -36,19 +37,28 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString
+@Schema(description = "Command Call view object")
 public class CommandCallVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "device ID")
+
     @NotNull
     private Long deviceId;
 
+    @Schema(description = "command ID")
+
     private Long commandId;
+
+    @Schema(description = "command code")
 
     private String commandCode;
 
     private Map<String, String> paramValues;
+
+    @Schema(description = "command id_")
 
     private String commandId_;
 

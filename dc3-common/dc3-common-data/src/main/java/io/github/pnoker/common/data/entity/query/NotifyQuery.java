@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for alarm notification template listing and filtering.
@@ -45,16 +46,20 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Notify query parameters")
 public class NotifyQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     //
@@ -62,26 +67,31 @@ public class NotifyQuery implements Serializable {
     /**
      * Alarm notification template name
      */
+    @Schema(description = "notify name")
     private String notifyName;
 
     /**
      * Alarm notification template code
      */
+    @Schema(description = "notify code")
     private String notifyCode;
 
     /**
      * Auto confirm flag
      */
+    @Schema(description = "auto confirm flag")
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
      * Alarm notification interval, milliseconds
      */
+    @Schema(description = "notify interval")
     private Long notifyInterval;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

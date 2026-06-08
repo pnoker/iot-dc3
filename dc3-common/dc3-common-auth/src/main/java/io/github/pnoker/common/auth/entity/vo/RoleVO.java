@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for role API responses.
@@ -46,11 +47,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Role view object")
 public class RoleVO extends BaseVO {
 
     /**
      * ID
      */
+    @Schema(description = "Parent role ID")
     @NotNull(message = "Role parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentRoleId;
 
@@ -58,6 +61,7 @@ public class RoleVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Role name can't be empty", groups = {Add.class, Auth.class})
+    @Schema(description = "Role name")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
             groups = {Add.class, Update.class})
     private String roleName;
@@ -65,16 +69,19 @@ public class RoleVO extends BaseVO {
     /**
      * Code
      */
+    @Schema(description = "Role code")
     private String roleCode;
 
     /**
      *
      */
+    @Schema(description = "Role extension information (JSON)")
     private RoleExt roleExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for command attribute configuration API responses.
@@ -43,50 +44,59 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Command Attribute Config view object")
 public class CommandAttributeConfigVO extends BaseVO {
 
     /**
      * ID
      */
+    @Schema(description = "attribute ID")
     @NotNull(message = "Command attribute ID can't be empty", groups = {Add.class, Update.class})
     private Long attributeId;
 
     /**
      *
      */
+    @Schema(description = "config value")
     @NotNull(message = "Command attribute config value can't be empty")
     private String configValue;
 
     /**
      * Device ID
      */
+    @Schema(description = "device ID")
     @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
     private Long deviceId;
 
     /**
      *
      */
+    @Schema(description = "config extension information (JSON)")
     private JsonExt configExt;
 
     /**
      * Command ID
      */
+    @Schema(description = "command ID")
     @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
     private Long commandId;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
+    @Schema(description = "signature")
     private String signature;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
 }

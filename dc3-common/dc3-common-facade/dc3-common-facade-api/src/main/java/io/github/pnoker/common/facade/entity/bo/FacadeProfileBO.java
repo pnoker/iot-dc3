@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level profile/template BO.
@@ -40,23 +41,42 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+@Schema(description = "Facade Profile business object")
 public class FacadeProfileBO extends BaseBO {
+
+    @Schema(description = "profile name")
 
     private String profileName;
 
+    @Schema(description = "profile code")
+
     private String profileCode;
+
+    @Schema(description = "profile share flag")
 
     private ProfileShareFlagEnum profileShareFlag;
 
+    @Schema(description = "Profile type flag")
+
     private ProfileTypeFlagEnum profileTypeFlag;
+
+    @Schema(description = "profile extension information (JSON)")
 
     private ProfileExt profileExt;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "signature")
+
     private String signature;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

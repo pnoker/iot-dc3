@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for driver token listing and filtering.
@@ -43,16 +44,20 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Driver Token query parameters")
 public class DriverTokenQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     //
@@ -60,21 +65,25 @@ public class DriverTokenQuery implements Serializable {
     /**
      * Driver ID
      */
+    @Schema(description = "driver code")
     private String driverCode;
 
     /**
      * AppID
      */
+    @Schema(description = "driver app ID")
     private String driverAppId;
 
     /**
      *
      */
+    @Schema(description = "expire flag")
     private ExpireFlagEnum expireFlag;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

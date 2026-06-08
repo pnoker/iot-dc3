@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for alarm message template listing and filtering.
@@ -45,16 +46,20 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Message query parameters")
 public class MessageQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     //
@@ -62,21 +67,25 @@ public class MessageQuery implements Serializable {
     /**
      * Alarm message template title
      */
+    @Schema(description = "message name")
     private String messageName;
 
     /**
      * Alarm message template code
      */
+    @Schema(description = "message code")
     private String messageCode;
 
     /**
      * Alarm message template level
      */
+    @Schema(description = "message level")
     private AlarmMessageLevelFlagEnum messageLevel;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

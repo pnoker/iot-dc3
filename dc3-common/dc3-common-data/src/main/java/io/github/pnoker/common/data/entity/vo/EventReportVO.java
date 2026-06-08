@@ -25,6 +25,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * VO for reporting an event from a device or external system.
@@ -36,19 +37,28 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString
+@Schema(description = "Event Report view object")
 public class EventReportVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "device ID")
+
     @NotNull
     private Long deviceId;
 
+    @Schema(description = "event ID")
+
     private Long eventId;
+
+    @Schema(description = "event code")
 
     private String eventCode;
 
     private Map<String, String> paramValues;
+
+    @Schema(description = "message")
 
     private String message;
 

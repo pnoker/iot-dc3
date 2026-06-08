@@ -21,6 +21,7 @@ import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.Getter;
 import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Structured SSE payload for one agentic visualization.
@@ -32,11 +33,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "Agentic Visualization response body")
 public class AgenticVisualizationResponse {
+
+    @Schema(description = "object")
 
     private String object;
 
+    @Schema(description = "visualization")
+
     private AgenticVisualizationSpec visualization;
+
+    @Schema(description = "created")
 
     private Long created;
 

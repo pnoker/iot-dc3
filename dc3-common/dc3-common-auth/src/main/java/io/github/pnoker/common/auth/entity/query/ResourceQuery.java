@@ -31,6 +31,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for resource listing and filtering.
@@ -45,10 +46,13 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Resource query parameters")
 public class ResourceQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
@@ -57,21 +61,25 @@ public class ResourceQuery implements Serializable {
     /**
      * Name
      */
+    @Schema(description = "Resource name")
     private String resourceName;
 
     /**
      * Code
      */
+    @Schema(description = "Resource permission code")
     private String resourceCode;
 
     /**
      * Type
      */
+    @Schema(description = "Resource type flag")
     private ResourceTypeFlagEnum resourceTypeFlag;
 
     /**
      * Type multi-select — takes precedence over {@link #resourceTypeFlag} when non-empty.
      */
+    @Schema(description = "resource type flags")
     private List<ResourceTypeFlagEnum> resourceTypeFlags;
 
     /**
@@ -84,22 +92,26 @@ public class ResourceQuery implements Serializable {
      * </ul>
      *
      */
+    @Schema(description = "Resource scope flag")
     private ResourceScopeFlagEnum resourceScopeFlag;
 
     /**
      * Scope multi-select — takes precedence over {@link #resourceScopeFlag} when
      * non-empty.
      */
+    @Schema(description = "resource scope flags")
     private List<ResourceScopeFlagEnum> resourceScopeFlags;
 
     /**
      * Parent resource id filter (optional).
      */
+    @Schema(description = "Parent resource ID")
     private Long parentResourceId;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

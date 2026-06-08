@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level event BO.
@@ -40,25 +41,46 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+@Schema(description = "Facade Event business object")
 public class FacadeEventBO extends BaseBO {
+
+    @Schema(description = "event name")
 
     private String eventName;
 
+    @Schema(description = "event code")
+
     private String eventCode;
+
+    @Schema(description = "event type flag")
 
     private EventTypeFlagEnum eventTypeFlag;
 
+    @Schema(description = "event level flag")
+
     private EventLevelFlagEnum eventLevelFlag;
+
+    @Schema(description = "event extension information (JSON)")
 
     private EventExt eventExt;
 
+    @Schema(description = "profile ID")
+
     private Long profileId;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 
+    @Schema(description = "Tenant ID")
+
     private Long tenantId;
 
+    @Schema(description = "signature")
+
     private String signature;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

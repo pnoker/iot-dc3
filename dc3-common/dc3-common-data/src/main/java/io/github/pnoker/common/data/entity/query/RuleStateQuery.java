@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for rule runtime state listing and filtering.
@@ -45,24 +46,41 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Rule State query parameters")
 public class RuleStateQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination object")
+
     private Pages page;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "rule ID")
+
     private Long ruleId;
+
+    @Schema(description = "alarm target type flag")
 
     private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
 
+    @Schema(description = "Associated entity ID")
+
     private Long entityId;
+
+    @Schema(description = "fingerprint")
 
     private String fingerprint;
 
+    @Schema(description = "entity state flag")
+
     private RuleStateFlagEnum entityStateFlag;
+
+    @Schema(description = "alarm ID")
 
     private Long alarmId;
 

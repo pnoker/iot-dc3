@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level point query.
@@ -44,32 +45,52 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Facade Point query parameters")
 public class FacadePointQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination object")
+
     private Pages page;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "point name")
+
     private String pointName;
+
+    @Schema(description = "point code")
 
     private String pointCode;
 
+    @Schema(description = "point type flag")
+
     private PointTypeFlagEnum pointTypeFlag;
+
+    @Schema(description = "rw flag")
 
     private RwFlagEnum rwFlag;
 
+    @Schema(description = "profile ID")
+
     private Long profileId;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 
     /**
      * Device ID — filter points bound to a specific device.
      */
+    @Schema(description = "device ID")
     private Long deviceId;
 
 }
