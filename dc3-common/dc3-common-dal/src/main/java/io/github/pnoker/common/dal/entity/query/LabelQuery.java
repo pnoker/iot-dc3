@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for label listing and filtering.
@@ -43,16 +44,20 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Label query parameters")
 public class LabelQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID.
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     // Query fields
@@ -60,21 +65,25 @@ public class LabelQuery implements Serializable {
     /**
      * Label name.
      */
+    @Schema(description = "label name")
     private String labelName;
 
     /**
      * Label color.
      */
+    @Schema(description = "color")
     private String color;
 
     /**
      * Entity type flag.
      */
+    @Schema(description = "entity type flag")
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
      * Enable status flag.
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

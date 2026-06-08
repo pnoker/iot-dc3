@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Label binding view object (VO) representing the association between labels and
@@ -43,23 +44,27 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Label Bind view object")
 public class LabelBindVO extends BaseVO {
 
     /**
      * Entity type flag.
      */
+    @Schema(description = "entity type flag")
     @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
      * Label ID.
      */
+    @Schema(description = "label ID")
     @NotNull(message = "Label ID can't be empty", groups = {Add.class, Update.class})
     private Long labelId;
 
     /**
      * Entity ID.
      */
+    @Schema(description = "Associated entity ID")
     @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
 

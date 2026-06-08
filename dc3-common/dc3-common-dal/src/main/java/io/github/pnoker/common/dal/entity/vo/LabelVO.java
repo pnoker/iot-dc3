@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Label view object (VO) used for API responses and client interactions.
@@ -45,12 +46,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Label view object")
 public class LabelVO extends BaseVO {
 
     /**
      * Label name.
      */
     @NotBlank(message = "Label name can't be empty", groups = {Add.class})
+    @Schema(description = "label name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid label name format",
             groups = {Add.class, Update.class})
     private String labelName;
@@ -58,22 +61,26 @@ public class LabelVO extends BaseVO {
     /**
      * Label code.
      */
+    @Schema(description = "label code")
     private String labelCode;
 
     /**
      * Label color.
      */
+    @Schema(description = "label color")
     private String labelColor;
 
     /**
      * Entity type flag.
      */
+    @Schema(description = "entity type flag")
     @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
      * Enable status flag.
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }
