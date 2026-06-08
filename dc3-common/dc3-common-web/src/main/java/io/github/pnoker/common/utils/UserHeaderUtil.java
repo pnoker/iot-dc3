@@ -18,11 +18,13 @@
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -30,13 +32,12 @@ import java.util.Objects;
 /**
  * User Header Utility Class
  * <p>
- * Utility class for extracting user information from HTTP request headers in reactive
- * applications. Provides methods to get user header information from Reactor context and
- * extract specific user details.
+ * Utility class for extracting user information from the Spring Security
+ * {@link ReactiveSecurityContextHolder} in reactive applications.
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.6.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -47,22 +48,22 @@ public class UserHeaderUtil {
     }
 
     /**
-     * Get user header information from Reactor context
+     * Get user header from Spring Security context.
      *
-     * @return User header information as Mono
+     * @return User header as Mono
      */
     public static Mono<RequestHeader.UserHeader> getUserHeader() {
-        return Mono.deferContextual(context -> {
-            if (!context.hasKey(RequestConstant.Key.USER_HEADER)) {
-                return Mono.error(new UnAuthorizedException("Unable to get user header"));
-            }
-            RequestHeader.UserHeader userHeader = context.get(RequestConstant.Key.USER_HEADER);
-            return Mono.just(userHeader);
-        });
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(auth -> auth instanceof GatewayAuthenticationToken)
+                .cast(GatewayAuthenticationToken.class)
+                .map(GatewayAuthenticationToken::getUserHeader)
+                .switchIfEmpty(Mono.error(
+                        new UnAuthorizedException("Unable to get user header from security context")));
     }
 
     /**
-     * Get tenant ID from user header
+     * Get tenant ID from user header.
      *
      * @return Tenant ID as Mono
      */
@@ -70,14 +71,15 @@ public class UserHeaderUtil {
         return getUserHeader().flatMap(userHeader -> {
             Long tenantId = userHeader.getTenantId();
             if (Objects.isNull(tenantId)) {
-                return Mono.error(new UnAuthorizedException("Unable to get tenant id of user header"));
+                return Mono.error(
+                        new UnAuthorizedException("Unable to get tenant id of user header"));
             }
             return Mono.just(tenantId);
         });
     }
 
     /**
-     * Get user ID from user header
+     * Get user ID from user header.
      *
      * @return User ID as Mono
      */
@@ -85,14 +87,15 @@ public class UserHeaderUtil {
         return getUserHeader().flatMap(userHeader -> {
             Long userId = userHeader.getUserId();
             if (Objects.isNull(userId)) {
-                return Mono.error(new UnAuthorizedException("Unable to get user id of user header"));
+                return Mono.error(
+                        new UnAuthorizedException("Unable to get user id of user header"));
             }
             return Mono.just(userId);
         });
     }
 
     /**
-     * Get user nickname from user header
+     * Get user nickname from user header.
      *
      * @return User nickname as Mono
      */
@@ -100,14 +103,15 @@ public class UserHeaderUtil {
         return getUserHeader().flatMap(userHeader -> {
             String nickName = userHeader.getNickName();
             if (StringUtils.isEmpty(nickName)) {
-                return Mono.error(new UnAuthorizedException("Unable to get nick name of user header"));
+                return Mono.error(
+                        new UnAuthorizedException("Unable to get nick name of user header"));
             }
             return Mono.just(nickName);
         });
     }
 
     /**
-     * Get username from user header
+     * Get username from user header.
      *
      * @return Username as Mono
      */
@@ -115,10 +119,10 @@ public class UserHeaderUtil {
         return getUserHeader().flatMap(userHeader -> {
             String userName = userHeader.getUserName();
             if (StringUtils.isEmpty(userName)) {
-                return Mono.error(new UnAuthorizedException("Unable to get user name of user header"));
+                return Mono.error(
+                        new UnAuthorizedException("Unable to get user name of user header"));
             }
             return Mono.just(userName);
         });
     }
-
 }

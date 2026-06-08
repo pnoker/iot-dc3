@@ -70,6 +70,11 @@ public class ResourceVO extends BaseVO {
     private String resourceCode;
 
     /**
+     * Service name.
+     */
+    private String serviceName;
+
+    /**
      * Type
      */
     private ResourceTypeFlagEnum resourceTypeFlag;

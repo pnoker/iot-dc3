@@ -54,6 +54,11 @@ public enum ResourceScopeFlagEnum {
      * List
      */
     LIST((byte) 3, "list", "List"),
+
+    /**
+     * Get (single entity query)
+     */
+    GET((byte) 4, "get", "Get"),
     ;
 
     /**
