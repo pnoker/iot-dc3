@@ -95,6 +95,12 @@
             <scope>test</scope>
         </dependency>
 
+
+        <!-- OpenAPI annotations -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

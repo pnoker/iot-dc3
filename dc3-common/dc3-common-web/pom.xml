@@ -112,6 +112,12 @@
             <artifactId>dc3-common-public</artifactId>
         </dependency>
 
+        <!-- OpenAPI documentation -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+        </dependency>
+
         <!-- Reactive test utilities for global handler verification -->
         <dependency>
             <groupId>io.projectreactor</groupId>

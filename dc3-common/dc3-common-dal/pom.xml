@@ -88,6 +88,12 @@
             <artifactId>dc3-common-public</artifactId>
         </dependency>
 
+
+        <!-- OpenAPI annotations -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
