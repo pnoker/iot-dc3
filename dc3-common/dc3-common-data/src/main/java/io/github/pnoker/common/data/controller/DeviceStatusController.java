@@ -36,6 +36,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing device status management endpoints.
@@ -44,6 +47,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "device_status", description = "设备状态")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DEVICE_STATUS_URL_PREFIX)

@@ -53,6 +53,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing role-resource binding management endpoints.
@@ -61,6 +64,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
+@Tag(name = "role_resource_bind", description = "角色资源绑定")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.ROLE_RESOURCE_URL_PREFIX)
@@ -80,6 +84,7 @@ public class RoleResourceBindController implements BaseController {
     private final TenantBindService tenantBindService;
 
     @PreAuthorize("@perm.can('role_resource_bind', 'add')")
+    @Operation(summary = "新增RoleResourceBind", description = "新增一条RoleResourceBind记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleResourceBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -91,6 +96,7 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'delete')")
+    @Operation(summary = "删除RoleResourceBind", description = "删除指定ID的RoleResourceBind")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,6 +108,7 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
+    @Operation(summary = "查询RoleResourceBind列表", description = "分页查询RoleResourceBind列表")
     @PostMapping("/list")
     public Mono<R<Page<RoleResourceBindVO>>> list(@RequestBody(required = false) RoleResourceBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -113,6 +120,7 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
+    @Operation(summary = "查询RoleResourceBind列表", description = "分页查询RoleResourceBind列表")
     @GetMapping("/list_resource_by_role")
     public Mono<R<List<ResourceVO>>> listResourceByRole(@NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -124,6 +132,7 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
+    @Operation(summary = "查询RoleResourceBind列表", description = "分页查询RoleResourceBind列表")
     @GetMapping("/list_resource_by_user")
     public Mono<R<List<ResourceVO>>> listResourceByUser(@NotNull @RequestParam(value = "user_id") Long userId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -135,6 +144,7 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
+    @Operation(summary = "查询RoleResourceBind列表", description = "分页查询RoleResourceBind列表")
     @GetMapping("/list_role_by_resource")
     public Mono<R<List<RoleVO>>> listRoleByResource(@NotNull @RequestParam(value = "resource_id") Long resourceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

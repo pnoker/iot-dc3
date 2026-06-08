@@ -47,6 +47,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing user login record endpoints.
@@ -55,6 +58,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "user_login", description = "用户登录")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.USER_URL_PREFIX)
@@ -74,6 +78,7 @@ public class UserLoginController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('user_login', 'add')")
+    @Operation(summary = "新增用户登录", description = "新增一条用户登录记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserLoginVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -91,6 +96,7 @@ public class UserLoginController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('user_login', 'delete')")
+    @Operation(summary = "删除用户登录", description = "删除指定ID的用户登录")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -112,6 +118,7 @@ public class UserLoginController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('user_login', 'update')")
+    @Operation(summary = "更新用户登录", description = "更新用户登录信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserLoginVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -131,6 +138,7 @@ public class UserLoginController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('user_login', 'list')")
+    @Operation(summary = "用户登录 - rest password", description = "用户登录 - rest password")
     @PostMapping("/reset")
     public Mono<R<Boolean>> restPassword(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -152,6 +160,7 @@ public class UserLoginController implements BaseController {
      * @return UserLoginVO {@link UserLoginVO}
      */
     @PreAuthorize("@perm.can('user_login', 'get')")
+    @Operation(summary = "查询用户登录", description = "根据ID查询用户登录详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<UserLoginVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -169,6 +178,7 @@ public class UserLoginController implements BaseController {
      * @return {@link UserLoginBO}
      */
     @PreAuthorize("@perm.can('user_login', 'get')")
+    @Operation(summary = "查询用户登录", description = "根据条件查询用户登录")
     @GetMapping("/get_by_name")
     public Mono<R<UserLoginVO>> getByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -191,6 +201,7 @@ public class UserLoginController implements BaseController {
      * @return {@link UserLoginBO}
      */
     @PreAuthorize("@perm.can('user_login', 'list')")
+    @Operation(summary = "查询用户登录列表", description = "分页查询用户登录列表")
     @PostMapping("/list")
     public Mono<R<Page<UserLoginVO>>> list(@RequestBody(required = false) UserLoginQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -211,6 +222,7 @@ public class UserLoginController implements BaseController {
      * @return {@code true} when the name is free to use
      */
     @PreAuthorize("@perm.can('user_login', 'get')")
+    @Operation(summary = "校验用户登录", description = "校验用户登录有效性")
     @GetMapping("/check")
     public Mono<R<Boolean>> checkLoginNameValid(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {

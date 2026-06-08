@@ -34,6 +34,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing chat message history endpoints.
@@ -42,6 +45,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "message", description = "消息")
 @RestController
 @RequestMapping(AgenticConstant.MESSAGE_URL_PREFIX)
 @RequiredArgsConstructor
@@ -52,6 +56,7 @@ public class MessageController implements BaseController {
     private final MessageService messageService;
 
     @PreAuthorize("@perm.can('message', 'list')")
+    @Operation(summary = "查询消息管理列表", description = "分页查询消息管理列表")
     @GetMapping("/list")
     public Mono<R<List<MessageVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {

@@ -47,6 +47,9 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing menu management endpoints.
@@ -55,6 +58,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
+@Tag(name = "menu", description = "菜单")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.MENU_URL_PREFIX)
@@ -66,6 +70,7 @@ public class MenuController implements BaseController {
     private final MenuService menuService;
 
     @PreAuthorize("@perm.can('menu', 'add')")
+    @Operation(summary = "新增菜单管理", description = "新增一条菜单记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {
         // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
@@ -81,6 +86,7 @@ public class MenuController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('menu', 'delete')")
+    @Operation(summary = "删除菜单管理", description = "删除指定ID的菜单")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
@@ -91,6 +97,7 @@ public class MenuController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('menu', 'update')")
+    @Operation(summary = "更新菜单管理", description = "更新菜单信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MenuVO entityVO) {
         // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
@@ -104,6 +111,7 @@ public class MenuController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('menu', 'get')")
+    @Operation(summary = "查询菜单管理", description = "根据ID查询菜单管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<MenuVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         // Read access to global menu data is open to all authenticated users.
@@ -115,6 +123,7 @@ public class MenuController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('menu', 'list')")
+    @Operation(summary = "查询菜单管理列表", description = "分页查询菜单管理列表")
     @PostMapping("/list")
     public Mono<R<Page<MenuVO>>> list(@RequestBody(required = false) MenuQuery entityQuery) {
         // Read access to global menu data is open to all authenticated users.
@@ -127,6 +136,7 @@ public class MenuController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('menu', 'list')")
+    @Operation(summary = "查询菜单管理列表", description = "分页查询菜单管理列表")
     @PostMapping("/list_tree")
     public Mono<R<List<MenuTreeVO>>> listTree(@RequestBody(required = false) MenuQuery entityQuery) {
         // Read access to global menu data is open to all authenticated users.

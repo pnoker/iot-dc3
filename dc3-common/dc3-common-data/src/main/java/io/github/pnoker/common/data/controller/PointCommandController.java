@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing point command management endpoints.
@@ -40,6 +43,7 @@ import reactor.core.publisher.Mono;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "point_command", description = "位号指令")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_COMMAND_URL_PREFIX)
@@ -55,6 +59,7 @@ public class PointCommandController implements BaseController {
      * @return commandId for status polling
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
+    @Operation(summary = "位号指令 - read", description = "位号指令 - read")
     @PostMapping("/read")
     public Mono<R<String>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -72,6 +77,7 @@ public class PointCommandController implements BaseController {
      * @return commandId for status polling
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
+    @Operation(summary = "位号指令 - write", description = "位号指令 - write")
     @PostMapping("/write")
     public Mono<R<String>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

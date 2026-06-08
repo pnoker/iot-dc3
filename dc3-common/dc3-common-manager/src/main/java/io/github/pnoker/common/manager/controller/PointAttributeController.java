@@ -47,6 +47,9 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing point attribute management endpoints.
@@ -55,6 +58,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "point_attribute", description = "位号属性")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
@@ -68,12 +72,13 @@ public class PointAttributeController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * PointAttribute
+     * 位号属性
      *
      * @param entityVO {@link PointAttributeVO}
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute', 'add')")
+    @Operation(summary = "新增PointAttribute", description = "新增一条PointAttribute记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -85,12 +90,13 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * ID PointAttribute
+     * ID 位号属性
      *
      * @param id ID
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute', 'delete')")
+    @Operation(summary = "删除PointAttribute", description = "删除指定ID的PointAttribute")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -101,12 +107,13 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * PointAttribute
+     * 位号属性
      *
      * @param entityVO {@link PointAttributeVO}
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute', 'update')")
+    @Operation(summary = "更新PointAttribute", description = "更新PointAttribute信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -119,12 +126,13 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * ID PointAttribute
+     * ID 位号属性
      *
      * @param id ID
      * @return PointAttributeVO {@link PointAttributeVO}
      */
     @PreAuthorize("@perm.can('point_attribute', 'get')")
+    @Operation(summary = "查询PointAttribute", description = "根据ID查询PointAttribute详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<PointAttributeVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -135,12 +143,13 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * Driver ID PointAttribute
+     * Driver ID 位号属性
      *
      * @param id ID
      * @return Array
      */
     @PreAuthorize("@perm.can('point_attribute', 'list')")
+    @Operation(summary = "查询PointAttribute列表", description = "根据关联条件查询PointAttribute列表")
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<PointAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -156,12 +165,13 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * PointAttribute
+     * 位号属性
      *
      * @param entityQuery
-     * @return Page Of PointAttribute
+     * @return Page Of 位号属性
      */
     @PreAuthorize("@perm.can('point_attribute', 'list')")
+    @Operation(summary = "查询PointAttribute列表", description = "分页查询PointAttribute列表")
     @PostMapping("/list")
     public Mono<R<Page<PointAttributeVO>>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -47,6 +47,9 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing resource management endpoints.
@@ -55,6 +58,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
+@Tag(name = "resource", description = "资源")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.RESOURCE_URL_PREFIX)
@@ -66,6 +70,7 @@ public class ResourceController implements BaseController {
     private final ResourceService resourceService;
 
     @PreAuthorize("@perm.can('resource', 'add')")
+    @Operation(summary = "新增资源管理", description = "新增一条资源记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ResourceVO entityVO) {
         // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
@@ -81,6 +86,7 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'delete')")
+    @Operation(summary = "删除资源管理", description = "删除指定ID的资源")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
@@ -91,6 +97,7 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'update')")
+    @Operation(summary = "更新资源管理", description = "更新资源信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ResourceVO entityVO) {
         // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
@@ -104,6 +111,7 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'get')")
+    @Operation(summary = "查询资源管理", description = "根据ID查询资源管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<ResourceVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         // Read access to global resource data is open to all authenticated users.
@@ -115,6 +123,7 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'list')")
+    @Operation(summary = "查询资源管理列表", description = "分页查询资源管理列表")
     @PostMapping("/list")
     public Mono<R<Page<ResourceVO>>> list(@RequestBody(required = false) ResourceQuery entityQuery) {
         // Read access to global resource data is open to all authenticated users.
@@ -127,6 +136,7 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'list')")
+    @Operation(summary = "查询资源管理列表", description = "分页查询资源管理列表")
     @PostMapping("/list_tree")
     public Mono<R<List<ResourceTreeVO>>> listTree(@RequestBody(required = false) ResourceQuery entityQuery) {
         // Read access to global resource data is open to all authenticated users.

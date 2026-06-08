@@ -47,6 +47,9 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing role management endpoints.
@@ -55,6 +58,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
+@Tag(name = "role", description = "角色")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.ROLE_URL_PREFIX)
@@ -66,6 +70,7 @@ public class RoleController implements BaseController {
     private final RoleService roleService;
 
     @PreAuthorize("@perm.can('role', 'add')")
+    @Operation(summary = "新增角色管理", description = "新增一条角色记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -81,6 +86,7 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'delete')")
+    @Operation(summary = "删除角色管理", description = "删除指定ID的角色")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -91,6 +97,7 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'update')")
+    @Operation(summary = "更新角色管理", description = "更新角色信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -105,6 +112,7 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'get')")
+    @Operation(summary = "查询角色管理", description = "根据ID查询角色管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<RoleVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -115,6 +123,7 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'list')")
+    @Operation(summary = "查询角色列表", description = "分页查询角色管理列表")
     @PostMapping("/list")
     public Mono<R<Page<RoleVO>>> list(@RequestBody(required = false) RoleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -127,6 +136,7 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'list')")
+    @Operation(summary = "查询角色列表", description = "分页查询角色管理列表")
     @PostMapping("/list_tree")
     public Mono<R<List<RoleTreeVO>>> listTree(@RequestBody(required = false) RoleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

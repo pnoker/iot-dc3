@@ -37,6 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing attachment upload and listing endpoints.
@@ -45,6 +48,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "attachment", description = "AI附件")
 @RestController
 @RequestMapping(AgenticConstant.ATTACHMENT_URL_PREFIX)
 @RequiredArgsConstructor
@@ -55,6 +59,7 @@ public class AttachmentController implements BaseController {
     private final AttachmentService attachmentService;
 
     @PreAuthorize("@perm.can('attachment', 'list')")
+    @Operation(summary = "AI附件 - upload", description = "AI附件 - upload")
     @PostMapping("/upload")
     public Mono<R<AttachmentVO>> upload(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {
@@ -70,6 +75,7 @@ public class AttachmentController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('attachment', 'list')")
+    @Operation(summary = "查询附件列表", description = "分页查询AI附件列表")
     @GetMapping("/list")
     public Mono<R<List<AttachmentVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {

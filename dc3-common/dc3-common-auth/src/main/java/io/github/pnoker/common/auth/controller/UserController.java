@@ -46,6 +46,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * User Profile Controller (dc3_user)
@@ -54,6 +57,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
+@Tag(name = "user", description = "用户")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.USER_PROFILE_URL_PREFIX)
@@ -67,6 +71,7 @@ public class UserController implements BaseController {
     private final TenantBindService tenantBindService;
 
     @PreAuthorize("@perm.can('user', 'add')")
+    @Operation(summary = "新增用户管理", description = "新增一条用户记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -90,6 +95,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'delete')")
+    @Operation(summary = "删除用户管理", description = "删除指定ID的用户")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,6 +110,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'update')")
+    @Operation(summary = "更新用户管理", description = "更新用户信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -117,6 +124,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'get')")
+    @Operation(summary = "查询用户管理", description = "根据ID查询用户管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<UserVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -128,6 +136,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'get')")
+    @Operation(summary = "查询用户管理", description = "根据条件查询用户管理")
     @GetMapping("/get_by_name")
     public Mono<R<UserVO>> getByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -144,6 +153,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'list')")
+    @Operation(summary = "查询用户列表", description = "分页查询用户管理列表")
     @PostMapping("/list")
     public Mono<R<Page<UserVO>>> list(@RequestBody(required = false) UserQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
