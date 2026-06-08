@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level driver BO. Field set matches {@code api.center.manager.DriverApi}.
@@ -39,25 +40,46 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+@Schema(description = "Facade Driver business object")
 public class FacadeDriverBO extends BaseBO {
+
+    @Schema(description = "driver name")
 
     private String driverName;
 
+    @Schema(description = "driver code")
+
     private String driverCode;
+
+    @Schema(description = "Service name")
 
     private String serviceName;
 
+    @Schema(description = "service host")
+
     private String serviceHost;
+
+    @Schema(description = "driver type flag")
 
     private DriverTypeFlagEnum driverTypeFlag;
 
+    @Schema(description = "driver extension information (JSON)")
+
     private DriverExt driverExt;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 
+    @Schema(description = "Tenant ID")
+
     private Long tenantId;
 
+    @Schema(description = "signature")
+
     private String signature;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

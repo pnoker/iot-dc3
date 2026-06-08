@@ -26,6 +26,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * VO for querying command records with pagination and filters.
@@ -37,16 +38,25 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@Schema(description = "Command History view object")
 public class CommandHistoryQueryVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "device ID")
+
     private Long deviceId;
+
+    @Schema(description = "command ID")
 
     private Long commandId;
 
+    @Schema(description = "status")
+
     private String status;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 

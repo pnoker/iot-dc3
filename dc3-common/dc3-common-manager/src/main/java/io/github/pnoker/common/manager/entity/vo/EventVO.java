@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for event API responses.
@@ -47,29 +48,47 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Event view object")
 public class EventVO extends BaseVO {
 
     @NotBlank(message = "Event name can't be empty", groups = {Add.class})
+    @Schema(description = "event name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid event name format",
             groups = {Add.class, Update.class})
     private String eventName;
 
+    @Schema(description = "event code")
+
     private String eventCode;
+
+    @Schema(description = "event type flag")
 
     @NotNull(message = "Event type can't be empty", groups = {Add.class, Update.class})
     private EventTypeFlagEnum eventTypeFlag;
 
+    @Schema(description = "event level flag")
+
     @NotNull(message = "Event level can't be empty", groups = {Add.class, Update.class})
     private EventLevelFlagEnum eventLevelFlag;
 
+    @Schema(description = "event extension information (JSON)")
+
     private EventExt eventExt;
+
+    @Schema(description = "profile ID")
 
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
     private Long profileId;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
 
+    @Schema(description = "signature")
+
     private String signature;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

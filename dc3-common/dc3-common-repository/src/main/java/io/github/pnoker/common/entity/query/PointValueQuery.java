@@ -28,6 +28,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Point Value Query Object
@@ -47,16 +48,20 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Point Value query parameters")
 public class PointValueQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID for multi-tenant data isolation
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     // Query fields
@@ -64,31 +69,37 @@ public class PointValueQuery implements Serializable {
     /**
      * Device ID to filter by specific device
      */
+    @Schema(description = "device ID")
     private Long deviceId;
 
     /**
      * Device name for text-based filtering
      */
+    @Schema(description = "device name")
     private String deviceName;
 
     /**
      * Point ID to filter by specific point
      */
+    @Schema(description = "point ID")
     private Long pointId;
 
     /**
      * Point name for text-based filtering
      */
+    @Schema(description = "point name")
     private String pointName;
 
     /**
      * Enable flag to filter active/inactive points
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      * Optional lower bound for create_time filtering (time range feature).
      */
+    @Schema(description = "create time from")
     private java.time.LocalDateTime createTimeFrom;
 
     /**
@@ -96,6 +107,7 @@ public class PointValueQuery implements Serializable {
      * createTimeFrom = now - rangeHours. Retained for backward compatibility; new callers
      * should set {@link #rangeKey}.
      */
+    @Schema(description = "range hours")
     private Integer rangeHours;
 
     /**
@@ -104,6 +116,7 @@ public class PointValueQuery implements Serializable {
      * {@code 24h}, {@code 7d}, {@code 30d}). Takes precedence over {@link #rangeHours}
      * when both are supplied.
      */
+    @Schema(description = "range key")
     private String rangeKey;
 
 }

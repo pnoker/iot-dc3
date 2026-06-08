@@ -26,6 +26,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Tree-shaped variant of {@link RoleVO} — adds nested children so the frontend's
@@ -41,6 +42,7 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Role Tree view object")
 public class RoleTreeVO extends RoleVO {
 
     @ToString.Exclude

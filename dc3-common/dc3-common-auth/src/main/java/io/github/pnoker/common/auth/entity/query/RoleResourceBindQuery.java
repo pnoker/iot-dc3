@@ -27,6 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for role-resource binding listing and filtering.
@@ -41,10 +42,13 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Role Resource Bind query parameters")
 public class RoleResourceBindQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
@@ -53,11 +57,13 @@ public class RoleResourceBindQuery implements Serializable {
     /**
      * ID
      */
+    @Schema(description = "role ID")
     private Long roleId;
 
     /**
      * ID
      */
+    @Schema(description = "resource ID")
     private Long resourceId;
 
 }

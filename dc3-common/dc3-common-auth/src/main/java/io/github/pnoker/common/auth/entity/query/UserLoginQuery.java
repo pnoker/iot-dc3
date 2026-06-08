@@ -28,6 +28,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for user login record listing and filtering.
@@ -42,10 +43,13 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "User Login query parameters")
 public class UserLoginQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
@@ -54,26 +58,31 @@ public class UserLoginQuery implements Serializable {
     /**
      * Name
      */
+    @Schema(description = "login name")
     private String loginName;
 
     /**
      * ID
      */
+    @Schema(description = "User ID")
     private Long userId;
 
     /**
      * ID
      */
+    @Schema(description = "user password ID")
     private Long userPasswordId;
 
     /**
      * Tenant scope resolved through user-tenant binding.
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

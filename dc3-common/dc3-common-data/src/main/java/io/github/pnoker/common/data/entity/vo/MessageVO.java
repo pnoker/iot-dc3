@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for alarm message template API responses.
@@ -41,31 +42,37 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Message view object")
 public class MessageVO extends BaseVO {
 
     /**
      * Alarm message template title
      */
+    @Schema(description = "message name")
     private String messageName;
 
     /**
      * Alarm message template code
      */
+    @Schema(description = "message code")
     private String messageCode;
 
     /**
      * Alarm message template level
      */
+    @Schema(description = "message level")
     private AlarmMessageLevelFlagEnum messageLevel;
 
     /**
      * Alarm message template content
      */
+    @Schema(description = "message extension information (JSON)")
     private MessageExt messageExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

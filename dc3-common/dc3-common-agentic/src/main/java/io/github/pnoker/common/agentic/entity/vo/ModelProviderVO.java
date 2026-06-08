@@ -23,6 +23,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic model provider API responses.
@@ -34,17 +35,30 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
+@Schema(description = "Model Provider view object")
 public class ModelProviderVO extends BaseVO {
+
+    @Schema(description = "name")
 
     private String name;
 
+    @Schema(description = "provider type")
+
     private AgenticModelProviderTypeEnum providerType;
+
+    @Schema(description = "base url")
 
     private String baseUrl;
 
+    @Schema(description = "Default flag")
+
     private DefaultFlagEnum defaultFlag;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 

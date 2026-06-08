@@ -22,6 +22,7 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Structured SSE payload for one agentic runtime event.
@@ -33,23 +34,42 @@ import org.apache.commons.lang3.StringUtils;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "Agentic Run Event response body")
 public class AgenticRunEventResponse {
+
+    @Schema(description = "object")
 
     private String object;
 
+    @Schema(description = "type")
+
     private String type;
+
+    @Schema(description = "title")
 
     private String title;
 
+    @Schema(description = "detail")
+
     private String detail;
+
+    @Schema(description = "name")
 
     private String name;
 
+    @Schema(description = "phase")
+
     private String phase;
+
+    @Schema(description = "status")
 
     private String status;
 
+    @Schema(description = "code")
+
     private String code;
+
+    @Schema(description = "created")
 
     private Long created;
 

@@ -27,6 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point command write API requests.
@@ -40,16 +41,23 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Point Command Write view object")
 public class PointCommandWriteVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "device ID")
+
     @NotNull(message = "Device ID can't be empty")
     private Long deviceId;
 
+    @Schema(description = "point ID")
+
     @NotNull(message = "Point ID can't be empty")
     private Long pointId;
+
+    @Schema(description = "value")
 
     @NotBlank(message = "Value can't be empty")
     private String value;
@@ -59,6 +67,7 @@ public class PointCommandWriteVO implements Serializable {
      * When provided and already exists, returns the existing command status.
      * When omitted, the server generates a new UUID.
      */
+    @Schema(description = "command ID")
     private String commandId;
 
 }

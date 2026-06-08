@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Device online/offline summary under one driver.
@@ -41,6 +42,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Schema(description = "Facade Driver Device Status Summary business object")
 public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
 
     public static final String DRIVER_ID = "driverId";
@@ -49,11 +51,18 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
     public static final String OFFLINE = "OFFLINE";
     @Serial
     private static final long serialVersionUID = 1L;
+    @Schema(description = "driver ID")
     private Long driverId;
+
+    @Schema(description = "Total record count")
 
     private int total;
 
+    @Schema(description = "online")
+
     private int online;
+
+    @Schema(description = "offline")
 
     private int offline;
 

@@ -28,6 +28,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point value API responses.
@@ -41,6 +42,7 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Point Value view object")
 public class PointValueVO implements Serializable {
 
     @Serial
@@ -49,26 +51,31 @@ public class PointValueVO implements Serializable {
     /**
      * Device ID
      */
+    @Schema(description = "device ID")
     private Long deviceId;
 
     /**
      * Point ID
      */
+    @Schema(description = "point ID")
     private Long pointId;
 
     /**
      * Raw value
      */
+    @Schema(description = "raw value")
     private String rawValue;
 
     /**
      * Processed value
      */
+    @Schema(description = "cal value")
     private String calValue;
 
     /**
      * Numeric projection of calValue for aggregation queries.
      */
+    @Schema(description = "num value")
     private Double numValue;
 
     /**
@@ -79,22 +86,26 @@ public class PointValueVO implements Serializable {
     /**
      * Driver ID
      */
+    @Schema(description = "driver ID")
     private Long driverId;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     /**
      * Create Time
      */
+    @Schema(description = "Creation time")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
 
     /**
      * Operate Time
      */
+    @Schema(description = "Last operation time")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime operateTime;
 

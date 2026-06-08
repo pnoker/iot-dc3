@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for role-resource binding API responses.
@@ -41,17 +42,20 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Role Resource Bind view object")
 public class RoleResourceBindVO extends BaseVO {
 
     /**
      * ID
      */
+    @Schema(description = "role ID")
     @NotNull(message = "Role id can't be empty", groups = {Add.class, Update.class})
     private Long roleId;
 
     /**
      * ID
      */
+    @Schema(description = "resource ID")
     @NotNull(message = "Resource id can't be empty", groups = {Add.class, Update.class})
     private Long resourceId;
 

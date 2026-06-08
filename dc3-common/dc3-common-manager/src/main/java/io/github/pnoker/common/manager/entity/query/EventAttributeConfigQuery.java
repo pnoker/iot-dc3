@@ -28,6 +28,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for event attribute configuration listing.
@@ -42,16 +43,20 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Event Attribute Config query parameters")
 public class EventAttributeConfigQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     //
@@ -59,26 +64,31 @@ public class EventAttributeConfigQuery implements Serializable {
     /**
      * ID
      */
+    @Schema(description = "attribute ID")
     private Long attributeId;
 
     /**
      * Device ID
      */
+    @Schema(description = "device ID")
     private Long deviceId;
 
     /**
      * Event ID
      */
+    @Schema(description = "event ID")
     private Long eventId;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
 }

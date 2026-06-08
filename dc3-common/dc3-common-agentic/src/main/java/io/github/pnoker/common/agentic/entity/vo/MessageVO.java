@@ -22,6 +22,7 @@ import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic message API responses.
@@ -33,19 +34,34 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
+@Schema(description = "Message view object")
 public class MessageVO extends BaseVO {
+
+    @Schema(description = "conversation ID")
 
     private String conversationId;
 
+    @Schema(description = "role")
+
     private String role;
+
+    @Schema(description = "content")
 
     private String content;
 
+    @Schema(description = "content extension information (JSON)")
+
     private AgenticMessageContent contentExt;
+
+    @Schema(description = "model")
 
     private String model;
 
+    @Schema(description = "message index")
+
     private Long messageIndex;
+
+    @Schema(description = "status")
 
     private AgenticMessageStatusEnum status;
 

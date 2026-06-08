@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for tenant API responses.
@@ -45,12 +46,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Tenant view object")
 public class TenantVO extends BaseVO {
 
     /**
      * TenantName
      */
     @NotBlank(message = "Tenant name can't be empty", groups = {Add.class, Auth.class})
+    @Schema(description = "tenant name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "Invalid tenant name", groups = {Add.class, Update.class})
     private String tenantName;
@@ -59,6 +62,7 @@ public class TenantVO extends BaseVO {
      * TenantCode
      */
     @NotBlank(message = "Tenant code can't be empty", groups = {Add.class})
+    @Schema(description = "tenant code")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid tenant code",
             groups = {Add.class, Update.class})
     private String tenantCode;
@@ -66,11 +70,13 @@ public class TenantVO extends BaseVO {
     /**
      * Tenant
      */
+    @Schema(description = "tenant extension information (JSON)")
     private TenantExt tenantExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

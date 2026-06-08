@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for token validation and generation.
@@ -36,33 +37,39 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Token query parameters")
 public class TokenQuery {
 
     /**
      * Tenant
      */
+    @Schema(description = "tenant")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid tenant code")
     private String tenant;
 
     /**
      *
      */
+    @Schema(description = "name")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid username")
     private String name;
 
     /**
      *
      */
+    @Schema(description = "Random salt value")
     private String salt;
 
     /**
      *
      */
+    @Schema(description = "Password")
     private String password;
 
     /**
      *
      */
+    @Schema(description = "Authentication token")
     private String token;
 
 }

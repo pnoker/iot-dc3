@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level user-login BO. Field set matches {@code api.center.auth.UserLoginApi} wire
@@ -38,13 +39,22 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+@Schema(description = "Facade User Login business object")
 public class FacadeUserLoginBO extends BaseBO {
+
+    @Schema(description = "login name")
 
     private String loginName;
 
+    @Schema(description = "User ID")
+
     private Long userId;
 
+    @Schema(description = "user password ID")
+
     private Long userPasswordId;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 

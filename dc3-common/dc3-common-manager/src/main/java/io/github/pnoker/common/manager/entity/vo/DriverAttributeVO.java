@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for driver attribute API responses.
@@ -46,12 +47,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Driver Attribute view object")
 public class DriverAttributeVO extends BaseVO {
 
     /**
      * Name
      */
     @NotBlank(message = "Attribute name can't be empty", groups = {Add.class})
+    @Schema(description = "attribute name")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid attribute name format",
             groups = {Add.class, Update.class})
     private String attributeName;
@@ -60,6 +63,7 @@ public class DriverAttributeVO extends BaseVO {
      * Code
      */
     @NotBlank(message = "Attribute code can't be empty", groups = {Add.class})
+    @Schema(description = "attribute code")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid attribute code format",
             groups = {Add.class, Update.class})
     private String attributeCode;
@@ -67,37 +71,44 @@ public class DriverAttributeVO extends BaseVO {
     /**
      * Type
      */
+    @Schema(description = "attribute type flag")
     private AttributeTypeFlagEnum attributeTypeFlag;
 
     /**
      *
      */
+    @Schema(description = "default value")
     private String defaultValue;
 
     /**
      * Driver ID
      */
+    @Schema(description = "driver ID")
     @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class})
     private Long driverId;
 
     /**
      *
      */
+    @Schema(description = "attribute extension information (JSON)")
     private DriverAttributeExt attributeExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
+    @Schema(description = "signature")
     private String signature;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
 }

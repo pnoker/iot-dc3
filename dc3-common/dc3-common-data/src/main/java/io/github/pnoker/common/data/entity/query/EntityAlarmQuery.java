@@ -27,6 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for entity alarm listing and filtering.
@@ -41,36 +42,44 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Entity Alarm query parameters")
 public class EntityAlarmQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     /**
      * Alarm target type flag
      */
+    @Schema(description = "alarm target type flag")
     private Byte alarmTargetTypeFlag;
 
     /**
      * Driver ID
      */
+    @Schema(description = "driver ID")
     private Long driverId;
 
     /**
      * Device ID
      */
+    @Schema(description = "device ID")
     private Long deviceId;
 
     /**
      * Point ID
      */
+    @Schema(description = "point ID")
     private Long pointId;
 
 }

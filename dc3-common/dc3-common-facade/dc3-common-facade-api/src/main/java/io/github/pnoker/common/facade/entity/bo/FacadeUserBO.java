@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level user BO. Field set matches {@code api.center.auth.UserApi} wire shape —
@@ -38,17 +39,30 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+@Schema(description = "Facade User business object")
 public class FacadeUserBO extends BaseBO {
+
+    @Schema(description = "User nickname")
 
     private String nickName;
 
+    @Schema(description = "Username")
+
     private String userName;
+
+    @Schema(description = "Phone number")
 
     private String phone;
 
+    @Schema(description = "Email address")
+
     private String email;
 
+    @Schema(description = "Social extension information (JSON)")
+
     private String socialExt;
+
+    @Schema(description = "Identity extension information (JSON)")
 
     private String identityExt;
 

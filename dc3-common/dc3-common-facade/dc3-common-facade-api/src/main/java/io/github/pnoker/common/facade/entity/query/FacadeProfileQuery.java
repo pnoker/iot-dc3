@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level profile/template query.
@@ -44,30 +45,53 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Facade Profile query parameters")
 public class FacadeProfileQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination object")
+
     private Pages page;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "profile name")
+
     private String profileName;
+
+    @Schema(description = "profile code")
 
     private String profileCode;
 
+    @Schema(description = "profile share flag")
+
     private ProfileShareFlagEnum profileShareFlag;
+
+    @Schema(description = "Profile type flag")
 
     private ProfileTypeFlagEnum profileTypeFlag;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "group ID")
 
     private Long groupId;
 
+    @Schema(description = "label ID")
+
     private Long labelId;
 
+    @Schema(description = "Version number")
+
     private Integer version;
+
+    @Schema(description = "device ID")
 
     private Long deviceId;
 

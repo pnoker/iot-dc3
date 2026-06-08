@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level tenant BO. Field set matches {@code api.center.auth.TenantApi} wire shape
@@ -38,11 +39,18 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+@Schema(description = "Facade Tenant business object")
 public class FacadeTenantBO extends BaseBO {
+
+    @Schema(description = "tenant name")
 
     private String tenantName;
 
+    @Schema(description = "tenant code")
+
     private String tenantCode;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 

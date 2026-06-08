@@ -28,6 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for driver token API responses.
@@ -42,36 +43,43 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Driver Token view object")
 public class DriverTokenVO extends BaseVO {
 
     /**
      * Driver ID
      */
+    @Schema(description = "driver code")
     private String driverCode;
 
     /**
      * AppID
      */
+    @Schema(description = "driver app ID")
     private String driverAppId;
 
     /**
      * AppKey
      */
+    @Schema(description = "driver app key")
     private String driverAppKey;
 
     /**
      *
      */
+    @Schema(description = "expire flag")
     private ExpireFlagEnum expireFlag;
 
     /**
      *
      */
+    @Schema(description = "expire time")
     private LocalDateTime expireTime;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

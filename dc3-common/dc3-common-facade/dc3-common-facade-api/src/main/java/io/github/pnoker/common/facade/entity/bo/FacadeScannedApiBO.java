@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level representation of a single scanned HTTP endpoint.
@@ -37,21 +38,33 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Facade Scanned Api business object")
 public class FacadeScannedApiBO {
+
+    @Schema(description = "method")
 
     private String method;
 
+    @Schema(description = "path")
+
     private String path;
+
+    @Schema(description = "API name")
 
     private String apiName;
 
+    @Schema(description = "title")
+
     private String title;
+
+    @Schema(description = "Description / remark")
 
     private String remark;
 
     /**
      * API grouping label — usually the owning controller's simple class name.
      */
+    @Schema(description = "API grouping label")
     private String apiGroup;
 
 }

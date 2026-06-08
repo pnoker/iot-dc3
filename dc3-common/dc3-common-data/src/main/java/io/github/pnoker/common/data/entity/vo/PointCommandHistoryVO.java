@@ -27,6 +27,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point command history API responses.
@@ -41,48 +42,89 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Point Command History view object")
 public class PointCommandHistoryVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Primary key")
+
     private Long id;
+
+    @Schema(description = "command ID")
 
     private String commandId;
 
+    @Schema(description = "Tenant ID")
+
     private Long tenantId;
+
+    @Schema(description = "type")
 
     private String type;
 
+    @Schema(description = "device ID")
+
     private Long deviceId;
+
+    @Schema(description = "point ID")
 
     private Long pointId;
 
+    @Schema(description = "request value")
+
     private String requestValue;
+
+    @Schema(description = "response value")
 
     private String responseValue;
 
+    @Schema(description = "status")
+
     private String status;
+
+    @Schema(description = "error code")
 
     private String errorCode;
 
+    @Schema(description = "error message")
+
     private String errorMessage;
+
+    @Schema(description = "source")
 
     private String source;
 
+    @Schema(description = "source user ID")
+
     private Long sourceUserId;
+
+    @Schema(description = "occur time")
 
     private LocalDateTime occurTime;
 
+    @Schema(description = "send time")
+
     private LocalDateTime sendTime;
+
+    @Schema(description = "finish time")
 
     private LocalDateTime finishTime;
 
+    @Schema(description = "expire time")
+
     private LocalDateTime expireTime;
+
+    @Schema(description = "schema version")
 
     private Short schemaVersion;
 
+    @Schema(description = "Creation time")
+
     private LocalDateTime createTime;
+
+    @Schema(description = "Last operation time")
 
     private LocalDateTime operateTime;
 

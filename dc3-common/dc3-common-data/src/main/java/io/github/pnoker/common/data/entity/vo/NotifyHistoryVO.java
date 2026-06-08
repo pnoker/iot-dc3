@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for notification delivery history API responses.
@@ -42,29 +43,54 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Notify History view object")
 public class NotifyHistoryVO extends BaseVO {
+
+    @Schema(description = "rule ID")
 
     private Long ruleId;
 
+    @Schema(description = "notify ID")
+
     private Long notifyId;
+
+    @Schema(description = "message ID")
 
     private Long messageId;
 
+    @Schema(description = "channel ID")
+
     private Long channelId;
+
+    @Schema(description = "alarm ID")
 
     private Long alarmId;
 
+    @Schema(description = "channel type flag")
+
     private NotifyChannelTypeFlagEnum channelTypeFlag;
+
+    @Schema(description = "target")
 
     private String target;
 
+    @Schema(description = "status flag")
+
     private NotifyHistoryStatusEnum statusFlag;
+
+    @Schema(description = "request extension information (JSON)")
 
     private NotifyHistoryRequestExt requestExt;
 
+    @Schema(description = "response extension information (JSON)")
+
     private NotifyHistoryResponseExt responseExt;
 
+    @Schema(description = "error message")
+
     private String errorMessage;
+
+    @Schema(description = "retry count")
 
     private Integer retryCount;
 

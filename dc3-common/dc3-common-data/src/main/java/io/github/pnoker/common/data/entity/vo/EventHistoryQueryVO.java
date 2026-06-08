@@ -26,6 +26,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * VO for querying event records with pagination and filters.
@@ -37,16 +38,25 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@Schema(description = "Event History view object")
 public class EventHistoryQueryVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "device ID")
+
     private Long deviceId;
+
+    @Schema(description = "event ID")
 
     private Long eventId;
 
+    @Schema(description = "event type flag")
+
     private Byte eventTypeFlag;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 

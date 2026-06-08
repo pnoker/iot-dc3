@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for user login record API responses.
@@ -39,26 +40,31 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "User Login view object")
 public class UserLoginVO extends BaseVO {
 
     /**
      * Name
      */
+    @Schema(description = "login name")
     private String loginName;
 
     /**
      * ID
      */
+    @Schema(description = "User ID")
     private Long userId;
 
     /**
      * ID
      */
+    @Schema(description = "user password ID")
     private Long userPasswordId;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

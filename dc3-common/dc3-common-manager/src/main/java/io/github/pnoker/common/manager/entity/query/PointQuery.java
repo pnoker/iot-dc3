@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for point listing and filtering.
@@ -44,16 +45,20 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Point query parameters")
 public class PointQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     //
@@ -61,46 +66,55 @@ public class PointQuery implements Serializable {
     /**
      * Name
      */
+    @Schema(description = "point name")
     private String pointName;
 
     /**
      * Code
      */
+    @Schema(description = "point code")
     private String pointCode;
 
     /**
      * Type
      */
+    @Schema(description = "point type flag")
     private PointTypeFlagEnum pointTypeFlag;
 
     /**
      *
      */
+    @Schema(description = "rw flag")
     private RwFlagEnum rwFlag;
 
     /**
      * ID
      */
+    @Schema(description = "profile ID")
     private Long profileId;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
     /**
      * Group ID
      */
+    @Schema(description = "group ID")
     private Long groupId;
 
     /**
      * Label ID
      */
+    @Schema(description = "label ID")
     private Long labelId;
 
     /**
      *
      */
+    @Schema(description = "Version number")
     private Integer version;
 
     //
@@ -108,6 +122,7 @@ public class PointQuery implements Serializable {
     /**
      * Device ID
      */
+    @Schema(description = "device ID")
     private Long deviceId;
 
 }

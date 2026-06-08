@@ -29,6 +29,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level point BO. Field set matches {@code api.center.manager.PointApi}.
@@ -42,33 +43,62 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+@Schema(description = "Facade Point business object")
 public class FacadePointBO extends BaseBO {
+
+    @Schema(description = "point name")
 
     private String pointName;
 
+    @Schema(description = "point code")
+
     private String pointCode;
+
+    @Schema(description = "point type flag")
 
     private PointTypeFlagEnum pointTypeFlag;
 
+    @Schema(description = "rw flag")
+
     private RwFlagEnum rwFlag;
+
+    @Schema(description = "base value")
 
     private BigDecimal baseValue;
 
+    @Schema(description = "multiple")
+
     private BigDecimal multiple;
+
+    @Schema(description = "value decimal")
 
     private Byte valueDecimal;
 
+    @Schema(description = "unit")
+
     private String unit;
+
+    @Schema(description = "profile ID")
 
     private Long profileId;
 
+    @Schema(description = "point extension information (JSON)")
+
     private PointExt pointExt;
+
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
 
     private EnableFlagEnum enableFlag;
 
+    @Schema(description = "Tenant ID")
+
     private Long tenantId;
 
+    @Schema(description = "signature")
+
     private String signature;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

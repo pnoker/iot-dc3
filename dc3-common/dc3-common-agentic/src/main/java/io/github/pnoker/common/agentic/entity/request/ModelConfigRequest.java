@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Agentic model configuration mutation request.
@@ -37,39 +38,65 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Schema(description = "Model Config request body")
 public class ModelConfigRequest {
+
+    @Schema(description = "Primary key")
 
     @NotNull(message = "Model config ID is required", groups = {Update.class})
     private Long id;
 
+    @Schema(description = "model")
+
     @NotBlank(message = "Model is required", groups = {Add.class, Update.class})
     private String model;
 
+    @Schema(description = "label")
+
     private String label;
+
+    @Schema(description = "provider ID")
 
     @NotNull(message = "Provider is required", groups = {Add.class, Update.class})
     private Long providerId;
 
+    @Schema(description = "stream")
+
     private Boolean stream;
+
+    @Schema(description = "tool call")
 
     private Boolean toolCall;
 
+    @Schema(description = "vision")
+
     private Boolean vision;
+
+    @Schema(description = "reasoning")
 
     private Boolean reasoning;
 
     @DecimalMin(value = "0.0", message = "Temperature must be between 0.0 and 2.0",
             groups = {Add.class, Update.class})
+    @Schema(description = "temperature")
     @DecimalMax(value = "2.0", message = "Temperature must be between 0.0 and 2.0",
             groups = {Add.class, Update.class})
     private Double temperature;
 
+    @Schema(description = "max tokens")
+
     @Min(value = 1, message = "Max tokens must be greater than 0", groups = {Add.class, Update.class})
     private Integer maxTokens;
 
+    @Schema(description = "Default flag")
+
     private DefaultFlagEnum defaultFlag;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Description / remark")
 
     private String remark;
 

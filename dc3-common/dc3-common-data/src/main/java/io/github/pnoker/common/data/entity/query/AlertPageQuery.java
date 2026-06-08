@@ -23,6 +23,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Request body for {@code POST /dashboard/alert/page}. Replaces the earlier
@@ -36,6 +37,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@Schema(description = "Alert Page query parameters")
 public class AlertPageQuery implements Serializable {
 
     @Serial
@@ -44,29 +46,38 @@ public class AlertPageQuery implements Serializable {
     /**
      * {@code "device"} / {@code "driver"} / {@code null} (both).
      */
+    @Schema(description = "source")
     private String source;
+
+    @Schema(description = "alarm type flag")
 
     private Integer alarmTypeFlag;
 
     /**
      * 0 = unconfirmed, 1 = confirmed, null = both.
      */
+    @Schema(description = "confirm flag")
     private Integer confirmFlag;
 
     /**
      * Legacy integer window; {@code rangeKey} wins when both set.
      */
+    @Schema(description = "range hours")
     private Integer rangeHours;
 
     /**
      * Preset time-range key — resolved server-side via TimeRangeUtil.
      */
+    @Schema(description = "range key")
     private String rangeKey;
 
     /**
      * 1-based page index. Defaults to 1 if null or less.
      */
+    @Schema(description = "Current page number")
     private Long current;
+
+    @Schema(description = "Page size")
 
     private Long size;
 

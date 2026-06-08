@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level command BO.
@@ -40,27 +41,50 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+@Schema(description = "Facade Command business object")
 public class FacadeCommandBO extends BaseBO {
+
+    @Schema(description = "command name")
 
     private String commandName;
 
+    @Schema(description = "command code")
+
     private String commandCode;
+
+    @Schema(description = "command type flag")
 
     private CommandTypeFlagEnum commandTypeFlag;
 
+    @Schema(description = "call type flag")
+
     private CallTypeFlagEnum callTypeFlag;
+
+    @Schema(description = "timeout")
 
     private Integer timeout;
 
+    @Schema(description = "command extension information (JSON)")
+
     private CommandExt commandExt;
+
+    @Schema(description = "profile ID")
 
     private Long profileId;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
+    @Schema(description = "signature")
+
     private String signature;
+
+    @Schema(description = "Version number")
 
     private Integer version;
 

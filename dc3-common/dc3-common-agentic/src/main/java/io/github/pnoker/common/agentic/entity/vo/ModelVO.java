@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic model API responses.
@@ -32,21 +33,38 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Model view object")
 public class ModelVO {
+
+    @Schema(description = "model")
 
     private String model;
 
+    @Schema(description = "label")
+
     private String label;
+
+    @Schema(description = "stream")
 
     private boolean stream;
 
+    @Schema(description = "tool call")
+
     private boolean toolCall;
+
+    @Schema(description = "vision")
 
     private boolean vision;
 
+    @Schema(description = "reasoning")
+
     private boolean reasoning;
 
+    @Schema(description = "temperature")
+
     private Double temperature;
+
+    @Schema(description = "max tokens")
 
     private Integer maxTokens;
 

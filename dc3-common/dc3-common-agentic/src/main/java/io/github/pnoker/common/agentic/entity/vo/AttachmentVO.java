@@ -20,6 +20,7 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic attachment API responses.
@@ -31,15 +32,26 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
+@Schema(description = "Attachment view object")
 public class AttachmentVO extends BaseVO {
+
+    @Schema(description = "conversation ID")
 
     private String conversationId;
 
+    @Schema(description = "file name")
+
     private String fileName;
+
+    @Schema(description = "content type")
 
     private String contentType;
 
+    @Schema(description = "Page size")
+
     private Long size;
+
+    @Schema(description = "file path")
 
     private String filePath;
 

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for API API responses.
@@ -46,43 +47,51 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Api view object")
 public class ApiVO extends BaseVO {
 
     /**
      * Owning service name, populated by resource registrar
      */
+    @Schema(description = "Service name")
     private String serviceName;
 
     /**
      * ApiType
      */
+    @Schema(description = "API type flag")
     private ApiTypeFlagEnum apiTypeFlag;
 
     /**
      * ApiName
      */
     @NotBlank(message = "API name can't be empty", groups = {Add.class, Auth.class})
+    @Schema(description = "API name")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid API name", groups = {Add.class, Update.class})
     private String apiName;
 
     /**
      * ApiCode, URLMD5
      */
+    @Schema(description = "API code identifier")
     private String apiCode;
 
     /**
      * API grouping, usually the owning controller simple class name
      */
+    @Schema(description = "API grouping label")
     private String apiGroup;
 
     /**
      * Api
      */
+    @Schema(description = "api extension information (JSON)")
     private ApiExt apiExt;
 
     /**
      * Enable flag
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }

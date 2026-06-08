@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level point value BO.
@@ -41,36 +42,43 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Facade Point Value business object")
 public class FacadePointValueBO {
 
     /**
      * Device ID associated with the point value
      */
+    @Schema(description = "device ID")
     private Long deviceId;
 
     /**
      * Point ID associated with the value
      */
+    @Schema(description = "point ID")
     private Long pointId;
 
     /**
      * Processed/calculated value after transformations
      */
+    @Schema(description = "value")
     private String value;
 
     /**
      * Raw value as received from the device
      */
+    @Schema(description = "raw value")
     private String rawValue;
 
     /**
      * Numeric projection of {@link #value}; null when value is non-numeric
      */
+    @Schema(description = "num value")
     private Double numValue;
 
     /**
      * Storage timestamp (epoch seconds)
      */
+    @Schema(description = "Creation time")
     private long createTime;
 
 }

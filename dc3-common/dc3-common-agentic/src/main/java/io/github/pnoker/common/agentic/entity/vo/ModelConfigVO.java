@@ -22,6 +22,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic model configuration API responses.
@@ -33,31 +34,58 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
+@Schema(description = "Model Config view object")
 public class ModelConfigVO extends BaseVO {
+
+    @Schema(description = "model")
 
     private String model;
 
+    @Schema(description = "label")
+
     private String label;
+
+    @Schema(description = "provider ID")
 
     private Long providerId;
 
+    @Schema(description = "provider name")
+
     private String providerName;
+
+    @Schema(description = "stream")
 
     private Boolean stream;
 
+    @Schema(description = "tool call")
+
     private Boolean toolCall;
+
+    @Schema(description = "vision")
 
     private Boolean vision;
 
+    @Schema(description = "reasoning")
+
     private Boolean reasoning;
+
+    @Schema(description = "temperature")
 
     private Double temperature;
 
+    @Schema(description = "max tokens")
+
     private Integer maxTokens;
+
+    @Schema(description = "Default flag")
 
     private DefaultFlagEnum defaultFlag;
 
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+
     private EnableFlagEnum enableFlag;
+
+    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
