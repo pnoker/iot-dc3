@@ -27,6 +27,7 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
 import io.github.pnoker.common.manager.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,11 +55,13 @@ public class DashboardController implements BaseController {
 
     private final DashboardService dashboardService;
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/driver/stats")
     public Mono<R<DriverStatsVO>> driverStats() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.driverStats(tenantId))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/device/stats")
     public Mono<R<DeviceStatsVO>> deviceStats(@RequestParam(value = "top_n", defaultValue = "10") int topN) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.deviceStats(tenantId, topN))));
@@ -69,6 +72,7 @@ public class DashboardController implements BaseController {
      * {@code days} days. Backs the stat-card sparklines. Returns fixed-length zero-padded
      * arrays so the frontend never has to reason about missing days.
      */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/growth")
     public Mono<R<GrowthVO>> dailyGrowth(@RequestParam(value = "days", defaultValue = "7") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.dailyGrowth(tenantId, days))));
@@ -86,6 +90,7 @@ public class DashboardController implements BaseController {
      * dialog.
      * </p>
      */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/topology")
     public Mono<R<TopologyVO>> topology(@RequestParam(value = "mode", defaultValue = "cardinality") String mode,
                                         @RequestParam(value = "range_key", required = false) String rangeKey) {

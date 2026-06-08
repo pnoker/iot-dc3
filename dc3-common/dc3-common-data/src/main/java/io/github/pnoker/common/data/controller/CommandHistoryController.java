@@ -30,6 +30,7 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +59,7 @@ public class CommandHistoryController implements BaseController {
 
     private final CommandHistoryBuilder commandHistoryBuilder;
 
+    @PreAuthorize("@perm.can('command_history', 'add')")
     @PostMapping("/call")
     public Mono<R<String>> call(@Validated @RequestBody CommandCallVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -68,6 +70,7 @@ public class CommandHistoryController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('command_history', 'get')")
     @GetMapping("/get_by_record_id")
     public Mono<R<CommandHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -76,6 +79,7 @@ public class CommandHistoryController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('command_history', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<CommandHistoryVO>>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

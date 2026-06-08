@@ -41,6 +41,7 @@ import io.github.pnoker.common.valid.Add;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +79,7 @@ public class RoleUserBindController implements BaseController {
 
     private final TenantBindService tenantBindService;
 
+    @PreAuthorize("@perm.can('role_user_bind', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleUserBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -89,6 +91,7 @@ public class RoleUserBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_user_bind', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,6 +103,7 @@ public class RoleUserBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_user_bind', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<RoleUserBindVO>>> list(@RequestBody(required = false) RoleUserBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -110,6 +114,7 @@ public class RoleUserBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_user_bind', 'list')")
     @GetMapping("/list_role_by_user")
     public Mono<R<List<RoleVO>>> listRoleByUser(@NotNull @RequestParam(value = "user_id") Long userId,
                                                 @RequestParam(value = "tenant_id", required = false) Long ignoredTenantId) {
@@ -121,6 +126,7 @@ public class RoleUserBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_user_bind', 'list')")
     @GetMapping("/list_user_by_role")
     public Mono<R<List<UserVO>>> listUserByRole(@NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

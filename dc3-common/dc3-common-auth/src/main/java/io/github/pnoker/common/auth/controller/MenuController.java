@@ -34,6 +34,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,6 +65,7 @@ public class MenuController implements BaseController {
 
     private final MenuService menuService;
 
+    @PreAuthorize("@perm.can('menu', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {
         // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
@@ -78,6 +80,7 @@ public class MenuController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('menu', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
@@ -87,6 +90,7 @@ public class MenuController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('menu', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MenuVO entityVO) {
         // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
@@ -99,6 +103,7 @@ public class MenuController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('menu', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<MenuVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         // Read access to global menu data is open to all authenticated users.
@@ -109,6 +114,7 @@ public class MenuController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('menu', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<MenuVO>>> list(@RequestBody(required = false) MenuQuery entityQuery) {
         // Read access to global menu data is open to all authenticated users.
@@ -120,6 +126,7 @@ public class MenuController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('menu', 'list')")
     @PostMapping("/list_tree")
     public Mono<R<List<MenuTreeVO>>> listTree(@RequestBody(required = false) MenuQuery entityQuery) {
         // Read access to global menu data is open to all authenticated users.

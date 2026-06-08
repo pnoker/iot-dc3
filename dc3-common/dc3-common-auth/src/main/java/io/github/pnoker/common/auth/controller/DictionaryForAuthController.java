@@ -26,6 +26,7 @@ import io.github.pnoker.common.dal.entity.vo.DictionaryVO;
 import io.github.pnoker.common.entity.R;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,7 @@ public class DictionaryForAuthController implements BaseController {
      *
      * @return
      */
+    @PreAuthorize("@perm.can('dictionary_for_auth', 'get')")
     @GetMapping("/tenant")
     public Mono<R<List<DictionaryVO>>> tenantDictionary() {
         return async(() -> {

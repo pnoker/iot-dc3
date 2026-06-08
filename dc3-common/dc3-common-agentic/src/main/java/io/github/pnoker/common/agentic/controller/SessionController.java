@@ -31,6 +31,7 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,6 +60,7 @@ public class SessionController implements BaseController {
 
     private final SessionBuilder sessionBuilder;
 
+    @PreAuthorize("@perm.can('session', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -72,6 +74,7 @@ public class SessionController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('session', 'get')")
     @GetMapping("/get_by_conversation_id")
     public Mono<R<SessionVO>> get(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -86,6 +89,7 @@ public class SessionController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('session', 'delete')")
     @DeleteMapping("/delete")
     public Mono<R<Boolean>> delete(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -95,6 +99,7 @@ public class SessionController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('session', 'update')")
     @PostMapping("/update")
     public Mono<R<SessionVO>> update(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionUpdateRequest request) {

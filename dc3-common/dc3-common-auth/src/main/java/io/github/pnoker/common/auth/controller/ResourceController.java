@@ -34,6 +34,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,6 +65,7 @@ public class ResourceController implements BaseController {
 
     private final ResourceService resourceService;
 
+    @PreAuthorize("@perm.can('resource', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ResourceVO entityVO) {
         // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
@@ -78,6 +80,7 @@ public class ResourceController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('resource', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
@@ -87,6 +90,7 @@ public class ResourceController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('resource', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ResourceVO entityVO) {
         // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
@@ -99,6 +103,7 @@ public class ResourceController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('resource', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<ResourceVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         // Read access to global resource data is open to all authenticated users.
@@ -109,6 +114,7 @@ public class ResourceController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('resource', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<ResourceVO>>> list(@RequestBody(required = false) ResourceQuery entityQuery) {
         // Read access to global resource data is open to all authenticated users.
@@ -120,6 +126,7 @@ public class ResourceController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('resource', 'list')")
     @PostMapping("/list_tree")
     public Mono<R<List<ResourceTreeVO>>> listTree(@RequestBody(required = false) ResourceQuery entityQuery) {
         // Read access to global resource data is open to all authenticated users.

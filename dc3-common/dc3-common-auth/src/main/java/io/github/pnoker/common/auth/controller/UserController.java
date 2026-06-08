@@ -35,6 +35,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,6 +66,7 @@ public class UserController implements BaseController {
 
     private final TenantBindService tenantBindService;
 
+    @PreAuthorize("@perm.can('user', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -87,6 +89,7 @@ public class UserController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('user', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,6 +103,7 @@ public class UserController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('user', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -112,6 +116,7 @@ public class UserController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('user', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<UserVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -122,6 +127,7 @@ public class UserController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('user', 'get')")
     @GetMapping("/get_by_name")
     public Mono<R<UserVO>> getByName(@NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -137,6 +143,7 @@ public class UserController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('user', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<UserVO>>> list(@RequestBody(required = false) UserQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

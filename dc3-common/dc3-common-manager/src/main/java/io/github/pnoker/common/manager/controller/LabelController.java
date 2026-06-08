@@ -32,6 +32,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,6 +65,7 @@ public class LabelController implements BaseController {
      * @param entityVO {@link LabelVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('label', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,6 +80,7 @@ public class LabelController implements BaseController {
      * @param id ID
      * @return R of String
      */
+    @PreAuthorize("@perm.can('label', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -91,6 +94,7 @@ public class LabelController implements BaseController {
      * @param entityVO {@link LabelVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('label', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -106,6 +110,7 @@ public class LabelController implements BaseController {
      * @param id ID
      * @return LabelVO {@link LabelVO}
      */
+    @PreAuthorize("@perm.can('label', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<LabelVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -119,6 +124,7 @@ public class LabelController implements BaseController {
      * @param entityQuery {@link LabelQuery}
      * @return R Of LabelVO Page
      */
+    @PreAuthorize("@perm.can('label', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

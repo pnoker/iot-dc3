@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeRangeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,6 +71,7 @@ public class DashboardController implements BaseController {
 
     private final io.github.pnoker.common.data.biz.SystemHealthService systemHealthService;
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/stats/today")
     public Mono<R<TodayStatsVO>> today() {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -84,6 +86,7 @@ public class DashboardController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/stats/timeseries")
     public Mono<R<List<TimeseriesPointVO>>> timeseries(
             @RequestParam(value = "granularity", defaultValue = "hour") String granularity,
@@ -93,6 +96,7 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.timeseries(tenantId, granularity, effectiveHours))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/top")
     public Mono<R<List<TopEntityVO>>> top(@RequestParam(value = "dimension", defaultValue = "device") String dimension,
                                           @RequestParam(value = "range_hours", defaultValue = "24") int rangeHours,
@@ -102,21 +106,25 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.top(tenantId, dimension, effectiveHours, limit))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/stream")
     public Mono<R<List<LatestPointValueVO>>> stream(@RequestParam(value = "size", defaultValue = "20") int size) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.latestStream(tenantId, size))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/stats")
     public Mono<R<AlertStatsVO>> alertStats() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertStats(tenantId))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/latest")
     public Mono<R<List<AlertItemVO>>> alertLatest(@RequestParam(value = "size", defaultValue = "10") int size) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertLatest(tenantId, size))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/stats/latency")
     public Mono<R<List<LatencyBucketVO>>> latencyHistogram(
             @RequestParam(value = "range_hours", defaultValue = "24") int rangeHours,
@@ -125,6 +133,7 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.latencyHistogram(tenantId, effectiveHours))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/stats/activity")
     public Mono<R<List<ActivityCellVO>>> hourlyActivity(
             @RequestParam(value = "range_hours", defaultValue = "168") int rangeHours,
@@ -138,11 +147,13 @@ public class DashboardController implements BaseController {
      * platform-wide but driver / device fleet summaries are tenant-scoped, so we thread
      * tenantId through to match the gRPC facades' tenant filter.
      */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/system/health")
     public Mono<R<SystemHealthVO>> systemHealth() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(systemHealthService.snapshot(tenantId))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'list')")
     @PostMapping("/alert/page")
     public Mono<R<Page<AlertItemVO>>> alertPage(
             @RequestBody(required = false) AlertPageQuery query) {
@@ -157,12 +168,14 @@ public class DashboardController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'list')")
     @PostMapping("/alert/confirm")
     public Mono<R<Boolean>> alertConfirm(@RequestParam String source,
                                          @RequestParam Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.confirmAlert(tenantId, source, id))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'list')")
     @PostMapping("/alert/unconfirm")
     public Mono<R<Boolean>> alertUnconfirm(@RequestParam String source,
                                            @RequestParam Long id) {
@@ -173,6 +186,7 @@ public class DashboardController implements BaseController {
      * Bulk confirm or unconfirm. Body = { confirm: true|false, items: [{source, id}, ...]
      * }. Returns the number of rows actually changed.
      */
+    @PreAuthorize("@perm.can('dashboard', 'list')")
     @PostMapping("/alert/bulk_confirm")
     public Mono<R<Integer>> alertBulkConfirm(
             @RequestBody AlertBulkConfirmRequest body) {
@@ -185,6 +199,7 @@ public class DashboardController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/trend")
     public Mono<R<List<AlertTrendVO>>> alertTrend(@RequestParam(value = "days", defaultValue = "30") int days,
                                                   @RequestParam(value = "range_key", required = false) String rangeKey) {
@@ -192,6 +207,7 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertTrend(tenantId, effectiveDays))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/top_sources")
     public Mono<R<List<AlertTopSourceVO>>> alertTopSources(@RequestParam(value = "days", defaultValue = "30") int days,
                                                            @RequestParam(value = "range_key", required = false) String rangeKey,
@@ -220,6 +236,7 @@ public class DashboardController implements BaseController {
         return Objects.nonNull(resolved) ? resolved : days;
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/activity")
     public Mono<R<List<AlertActivityCellVO>>> alertActivity(@RequestParam(value = "days", defaultValue = "7") int days,
                                                             @RequestParam(value = "range_key", required = false) String rangeKey) {
@@ -227,6 +244,7 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertActivity(tenantId, effectiveDays))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/type_distribution")
     public Mono<R<List<AlertTypeBucketVO>>> alertTypeDistribution(
             @RequestParam(value = "days", defaultValue = "30") int days,
@@ -235,6 +253,7 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertTypeDistribution(tenantId, effectiveDays))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/storm_sources")
     public Mono<R<List<AlertTopSourceVO>>> alertStormSources(
             @RequestParam(value = "hours", defaultValue = "1") int hours,
@@ -245,6 +264,7 @@ public class DashboardController implements BaseController {
 
     // ===== Phase-2 insights =====================================================
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/flapping")
     public Mono<R<List<FlappingSourceVO>>> alertFlapping(@RequestParam(value = "hours", defaultValue = "6") int hours,
                                                          @RequestParam(value = "min_count", defaultValue = "5") int minCount,
@@ -252,6 +272,7 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertFlapping(tenantId, hours, minCount, limit))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/correlation")
     public Mono<R<List<CorrelationPairVO>>> alertCorrelation(
             @RequestParam(value = "hours", defaultValue = "24") int hours,
@@ -260,33 +281,39 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertCorrelation(tenantId, hours, windowSec, limit))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/peer_deviation")
     public Mono<R<List<PeerDeviationVO>>> alertPeerDeviation(
             @RequestParam(value = "days", defaultValue = "7") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertPeerDeviation(tenantId, days))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/aging")
     public Mono<R<AgingBacklogVO>> alertAging() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertAgingBacklog(tenantId))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/mtta")
     public Mono<R<List<MttaTrendVO>>> alertMtta(@RequestParam(value = "days", defaultValue = "30") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertMtta(tenantId, days))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/protocol/health")
     public Mono<R<List<ProtocolHealthVO>>> protocolHealth() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.protocolHealth(tenantId))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/alert/change_impact")
     public Mono<R<List<ChangeImpactVO>>> changeImpact(@RequestParam(value = "days", defaultValue = "30") int days,
                                                       @RequestParam(value = "limit", defaultValue = "30") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.changeImpact(tenantId, days, limit))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/silent/sources")
     public Mono<R<List<SilentSourceVO>>> silentSources(
             @RequestParam(value = "baseline_days", defaultValue = "7") int baselineDays,
@@ -295,6 +322,7 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.silentSources(tenantId, baselineDays, silentMinutes, limit))));
     }
 
+    @PreAuthorize("@perm.can('dashboard', 'get')")
     @GetMapping("/coverage/gap")
     public Mono<R<CoverageGapVO>> coverageGap(@RequestParam(value = "limit", defaultValue = "100") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.coverageGap(tenantId, limit))));

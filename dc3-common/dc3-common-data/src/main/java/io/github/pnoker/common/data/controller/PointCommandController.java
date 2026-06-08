@@ -25,6 +25,7 @@ import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.entity.R;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,6 +54,7 @@ public class PointCommandController implements BaseController {
      * @param entityVO PointCommandReadVO
      * @return commandId for status polling
      */
+    @PreAuthorize("@perm.can('point_command', 'list')")
     @PostMapping("/read")
     public Mono<R<String>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -69,6 +71,7 @@ public class PointCommandController implements BaseController {
      * @param entityVO PointCommandWriteVO
      * @return commandId for status polling
      */
+    @PreAuthorize("@perm.can('point_command', 'list')")
     @PostMapping("/write")
     public Mono<R<String>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

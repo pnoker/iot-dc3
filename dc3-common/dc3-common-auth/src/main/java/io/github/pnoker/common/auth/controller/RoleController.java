@@ -34,6 +34,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,6 +65,7 @@ public class RoleController implements BaseController {
 
     private final RoleService roleService;
 
+    @PreAuthorize("@perm.can('role', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -78,6 +80,7 @@ public class RoleController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -87,6 +90,7 @@ public class RoleController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -100,6 +104,7 @@ public class RoleController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<RoleVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -109,6 +114,7 @@ public class RoleController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<RoleVO>>> list(@RequestBody(required = false) RoleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -120,6 +126,7 @@ public class RoleController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role', 'list')")
     @PostMapping("/list_tree")
     public Mono<R<List<RoleTreeVO>>> listTree(@RequestBody(required = false) RoleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

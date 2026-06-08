@@ -32,6 +32,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +61,7 @@ public class NotifyChannelController implements BaseController {
 
     private final NotifyChannelService notifyChannelService;
 
+    @PreAuthorize("@perm.can('notify_channel', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -70,6 +72,7 @@ public class NotifyChannelController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify_channel', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -79,6 +82,7 @@ public class NotifyChannelController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify_channel', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyChannelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,6 +94,7 @@ public class NotifyChannelController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify_channel', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<NotifyChannelVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -98,6 +103,7 @@ public class NotifyChannelController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify_channel', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<NotifyChannelVO>>> list(@RequestBody(required = false) NotifyChannelQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

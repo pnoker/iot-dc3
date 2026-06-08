@@ -32,6 +32,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +61,7 @@ public class NotifyController implements BaseController {
 
     private final NotifyService notifyService;
 
+    @PreAuthorize("@perm.can('notify', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -70,6 +72,7 @@ public class NotifyController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -79,6 +82,7 @@ public class NotifyController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,6 +94,7 @@ public class NotifyController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<NotifyVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -98,6 +103,7 @@ public class NotifyController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<NotifyVO>>> list(@RequestBody(required = false) NotifyQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -34,6 +34,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,6 +68,7 @@ public class CommandController implements BaseController {
 
     private final DeviceService deviceService;
 
+    @PreAuthorize("@perm.can('command', 'add')")
     @PostMapping("/add")
     public Mono<R<Long>> add(@Validated(Add.class) @RequestBody CommandVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -77,6 +79,7 @@ public class CommandController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('command', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -86,6 +89,7 @@ public class CommandController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('command', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -97,6 +101,7 @@ public class CommandController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('command', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<CommandVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -106,6 +111,7 @@ public class CommandController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('command', 'list')")
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<CommandVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -116,6 +122,7 @@ public class CommandController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('command', 'list')")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<CommandVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -126,6 +133,7 @@ public class CommandController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('command', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<CommandVO>>> list(@RequestBody(required = false) CommandQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

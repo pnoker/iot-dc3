@@ -37,6 +37,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -76,6 +77,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @param entityVO {@link DriverAttributeConfigVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('driver_attribute_config', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -92,6 +94,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @param id ID
      * @return R of String
      */
+    @PreAuthorize("@perm.can('driver_attribute_config', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -107,6 +110,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @param entityVO {@link DriverAttributeConfigVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('driver_attribute_config', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -124,6 +128,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @param id ID
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
+    @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<DriverAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -140,6 +145,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @param deviceId    Device ID
      * @return DriverConfig
      */
+    @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
     @GetMapping("/get_by_device_id_and_attribute_id")
     public Mono<R<DriverAttributeConfigVO>> getByDeviceIdAndAttributeId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -160,6 +166,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @param deviceId Device ID
      * @return DriverConfig
      */
+    @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<DriverAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -177,6 +184,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @param entityQuery DriverConfig Dto
      * @return Page Of DriverConfig
      */
+    @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<DriverAttributeConfigVO>>> list(
             @RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {

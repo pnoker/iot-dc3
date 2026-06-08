@@ -39,6 +39,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,6 +81,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @param entityVO {@link CommandAttributeConfigVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('command_attribute_config', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,6 +98,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @param id ID
      * @return R of String
      */
+    @PreAuthorize("@perm.can('command_attribute_config', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -111,6 +114,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @param entityVO {@link CommandAttributeConfigVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('command_attribute_config', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -128,6 +132,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @param id ID
      * @return CommandAttributeConfigVO {@link CommandAttributeConfigVO}
      */
+    @PreAuthorize("@perm.can('command_attribute_config', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<CommandAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -145,6 +150,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @param commandId   Command ID
      * @return CommandConfig
      */
+    @PreAuthorize("@perm.can('command_attribute_config', 'get')")
     @GetMapping("/get_by_attribute_id_and_device_id_and_command_id")
     public Mono<R<CommandAttributeConfigVO>> getByAttributeIdAndDeviceIdAndCommandId(
             @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -167,6 +173,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @param commandId Command ID
      * @return CommandConfig
      */
+    @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @GetMapping("/list_by_device_id_and_command_id")
     public Mono<R<List<CommandAttributeConfigVO>>> listByDeviceIdAndCommandId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -186,6 +193,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @param deviceId Device ID
      * @return CommandConfig
      */
+    @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<CommandAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -204,6 +212,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @param entityQuery CommandConfig Dto
      * @return Page Of CommandConfig
      */
+    @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<CommandAttributeConfigVO>>> list(
             @RequestBody(required = false) CommandAttributeConfigQuery entityQuery) {
