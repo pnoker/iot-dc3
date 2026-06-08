@@ -26,7 +26,13 @@ import org.springframework.web.reactive.result.method.RequestMappingInfo;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Auto-discovery endpoint for MCP tool definitions.
@@ -77,8 +83,8 @@ public class ServiceMcpToolsController {
             // Extract path patterns
             Set<String> patterns = info.getPatternsCondition() != null
                     ? info.getPatternsCondition().getPatterns().stream()
-                        .map(p -> p.getPatternString())
-                        .collect(java.util.stream.Collectors.toSet())
+                    .map(p -> p.getPatternString())
+                    .collect(java.util.stream.Collectors.toSet())
                     : Set.of();
             if (patterns.isEmpty()) continue;
 
