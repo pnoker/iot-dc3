@@ -21,6 +21,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 /**
  * SPI for checking whether an authenticated user holds a given resource permission.
  * The auth module provides an implementation backed by the role-resource binding system.
@@ -30,7 +32,6 @@ import reactor.core.publisher.Mono;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@FunctionalInterface
 public interface PermissionProvider {
 
     /**
@@ -44,6 +45,17 @@ public interface PermissionProvider {
     Mono<Boolean> hasPermission(Long tenantId, Long userId, String resourceCode);
 
     /**
+     * Return all resource codes held by the given user within the tenant.
+     * Used to populate Spring Security {@code GrantedAuthority} set at authentication
+     * time.
+     *
+     * @param tenantId tenant scope
+     * @param userId   target user
+     * @return Mono of resource code set (never null; empty set when user has no roles)
+     */
+    Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId);
+
+    /**
      * Permissive default: grants every permission when no auth-specific implementation
      * is present on the classpath. Replaced by AuthPermissionProvider in full deployments.
      */
@@ -53,6 +65,11 @@ public interface PermissionProvider {
         @Override
         public Mono<Boolean> hasPermission(Long tenantId, Long userId, String resourceCode) {
             return Mono.just(true);
+        }
+
+        @Override
+        public Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId) {
+            return Mono.just(Set.of());
         }
     }
 }

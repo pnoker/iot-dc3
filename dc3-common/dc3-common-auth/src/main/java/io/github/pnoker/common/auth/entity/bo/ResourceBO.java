@@ -58,6 +58,11 @@ public class ResourceBO extends BaseBO {
     private String resourceCode;
 
     /**
+     * Service name.
+     */
+    private String serviceName;
+
+    /**
      * Type
      */
     private ResourceTypeFlagEnum resourceTypeFlag;

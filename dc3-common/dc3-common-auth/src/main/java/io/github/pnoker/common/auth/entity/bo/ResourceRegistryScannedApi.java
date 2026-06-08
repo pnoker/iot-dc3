@@ -50,7 +50,8 @@ public class ResourceRegistryScannedApi {
     private String path;
 
     /**
-     * Human-readable name, typically ClassSimpleName.methodName.
+     * Resource code fragment in {@code domain:scope} format, e.g. {@code device:get}.
+     * The full resource code is composed by prefixing the service name at sync time.
      */
     private String apiName;
 

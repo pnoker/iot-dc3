@@ -53,7 +53,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.github.pnoker.common.constant.service.AuthConstant.API_GROUP_NODE_CODE_PREFIX;
-import static io.github.pnoker.common.constant.service.AuthConstant.API_RESOURCE_CODE_PREFIX;
 import static io.github.pnoker.common.constant.service.AuthConstant.API_SERVICE_NODE_CODE_PREFIX;
 import static io.github.pnoker.common.constant.service.AuthConstant.MENU_RESOURCE_CODE_PREFIX;
 
@@ -100,8 +99,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             case POST -> ResourceScopeFlagEnum.ADD;
             case DELETE -> ResourceScopeFlagEnum.DELETE;
             case PUT -> ResourceScopeFlagEnum.UPDATE;
-            case GET -> ResourceScopeFlagEnum.LIST;
+            case GET -> ResourceScopeFlagEnum.GET;
         };
+    }
+
+    private static String buildResourceCode(String serviceName, String apiName) {
+        return Objects.requireNonNullElse(serviceName, "") + SymbolConstant.COLON
+                + Objects.requireNonNullElse(apiName, "");
     }
 
     @Override
@@ -277,7 +281,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         ResourceDO resource = new ResourceDO();
         resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
         resource.setResourceName(api.getApiName());
-        resource.setResourceCode(API_RESOURCE_CODE_PREFIX + api.getApiCode());
+        resource.setResourceCode(buildResourceCode(api.getServiceName(), api.getApiName()));
+        resource.setServiceName(api.getServiceName());
         resource.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
         resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
         resource.setEntityId(api.getId());
@@ -362,7 +367,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private void applyLeafResourceUpdates(ResourceDO resource, ApiDO api, Long groupNodeId) {
         resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
         resource.setResourceName(api.getApiName());
-        resource.setResourceCode(API_RESOURCE_CODE_PREFIX + api.getApiCode());
+        resource.setResourceCode(buildResourceCode(api.getServiceName(), api.getApiName()));
+        resource.setServiceName(api.getServiceName());
         resource.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
         resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
         resource.setEntityId(api.getId());
@@ -380,7 +386,10 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!Objects.equals(resource.getResourceName(), api.getApiName())) {
             return true;
         }
-        if (!Objects.equals(resource.getResourceCode(), API_RESOURCE_CODE_PREFIX + api.getApiCode())) {
+        if (!Objects.equals(resource.getResourceCode(), buildResourceCode(api.getServiceName(), api.getApiName()))) {
+            return true;
+        }
+        if (!Objects.equals(resource.getServiceName(), api.getServiceName())) {
             return true;
         }
         if (!Objects.equals(resource.getResourceTypeFlag(), ResourceTypeFlagEnum.API.getIndex())) {

@@ -76,6 +76,13 @@ public class ResourceDO implements Serializable {
     private String resourceCode;
 
     /**
+     * Service name — the Spring application name of the service that owns this resource
+     * (e.g. dc3-center-manager, dc3-center-data).
+     */
+    @TableField("service_name")
+    private String serviceName;
+
+    /**
      * Type
      */
     @TableField("resource_type_flag")

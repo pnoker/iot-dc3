@@ -47,6 +47,27 @@ public class AuthPermissionProvider implements PermissionProvider {
     private final ConcurrentHashMap<String, CacheEntry> cache = new ConcurrentHashMap<>();
 
     @Override
+    public Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId) {
+        if (tenantId == null || userId == null) {
+            return Mono.just(Set.of());
+        }
+        String cacheKey = tenantId + ":" + userId;
+        CacheEntry entry = cache.get(cacheKey);
+        if (entry != null && entry.isValid()) {
+            return Mono.just(entry.resourceCodes);
+        }
+        return Mono.fromCallable(() -> {
+            var resources = roleResourceBindService.listResourceByUserId(userId, tenantId);
+            Set<String> codes = resources.stream()
+                    .map(r -> r.getResourceCode())
+                    .filter(code -> code != null && !code.isBlank())
+                    .collect(Collectors.toSet());
+            cache.put(cacheKey, new CacheEntry(codes, CACHE_TTL_MS));
+            return codes;
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
     public Mono<Boolean> hasPermission(Long tenantId, Long userId, String resourceCode) {
         if (tenantId == null || userId == null || resourceCode == null) {
             return Mono.just(false);

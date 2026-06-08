@@ -22,16 +22,21 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import io.github.pnoker.common.security.PermissionProvider;
 import io.github.pnoker.common.utils.UserHeaderUtil;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Base Controller Interface
@@ -130,27 +135,55 @@ public interface BaseController {
 
     /**
      * Assert that the current user holds at least one of the given resource permissions.
-     * Throws AccessDeniedException if none are granted.
+     * <p>
+     * Checks the Spring Security context first (authority set loaded at authentication
+     * time).  Falls back to {@link PermissionProvider#hasPermission} only when no
+     * {@link GatewayAuthenticationToken} is present in the context — for example during
+     * tests or in modules that do not include Spring Security.
      *
      * @param provider      PermissionProvider (injected by caller)
      * @param resourceCodes resource permission codes to check
      * @return Mono that completes empty on success, errors on denial
      */
     default Mono<Void> requireAnyPermission(PermissionProvider provider, String... resourceCodes) {
-        return getTenantId().flatMap(tenantId ->
-                getUserId().flatMap(userId ->
-                        Flux.fromArray(resourceCodes)
-                                .flatMap(code -> provider.hasPermission(tenantId, userId, code))
-                                .any(granted -> granted)
-                                .flatMap(hasPermission -> {
-                                    if (Boolean.TRUE.equals(hasPermission)) {
-                                        return Mono.empty();
-                                    }
-                                    return Mono.error(new AccessDeniedException(
-                                            "Access denied: none of the required permissions are granted"));
-                                })
-                )
-        );
+        Set<String> required = Arrays.stream(resourceCodes)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (required.isEmpty()) {
+            return Mono.empty();
+        }
+
+        return ReactiveSecurityContextHolder.getContext()
+                .map(ctx -> ctx.getAuthentication())
+                .filter(auth -> auth instanceof GatewayAuthenticationToken)
+                .cast(GatewayAuthenticationToken.class)
+                .flatMap(token -> {
+                    Set<String> authorities = token.getAuthorities().stream()
+                            .map(a -> a.getAuthority())
+                            .collect(Collectors.toSet());
+                    boolean granted = required.stream().anyMatch(authorities::contains);
+                    if (granted) {
+                        return Mono.<Void>empty();
+                    }
+                    return Mono.error(new AccessDeniedException(
+                            "Access denied: none of the required permissions are granted"));
+                })
+                // Fallback: SecurityContext not available — use provider directly
+                .switchIfEmpty(Mono.defer(() ->
+                        getTenantId().flatMap(tenantId ->
+                                getUserId().flatMap(userId ->
+                                        Flux.fromIterable(required)
+                                                .flatMap(code -> provider.hasPermission(tenantId, userId, code))
+                                                .any(granted -> granted)
+                                                .flatMap(hasPermission -> {
+                                                    if (Boolean.TRUE.equals(hasPermission)) {
+                                                        return Mono.empty();
+                                                    }
+                                                    return Mono.error(new AccessDeniedException(
+                                                            "Access denied: none of the required permissions are granted"));
+                                                })
+                                )
+                        )));
     }
 
 }

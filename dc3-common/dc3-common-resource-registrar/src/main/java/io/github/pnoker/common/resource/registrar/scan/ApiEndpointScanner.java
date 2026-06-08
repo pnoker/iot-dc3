@@ -67,9 +67,26 @@ public class ApiEndpointScanner {
      * @param properties     registrar scan configuration
      */
 
-    private static String buildApiName(HandlerMethod handler) {
+    private static String buildApiName(HandlerMethod handler, String httpMethod, boolean isSingleGet) {
         String className = handler.getBeanType().getSimpleName();
-        return className + SymbolConstant.DOT + handler.getMethod().getName();
+        // Strip "Controller" suffix, convert camelCase to snake_case → domain
+        String domain = className
+                .replace("Controller", "")
+                .replaceAll("([a-z])([A-Z])", "$1_$2")
+                .toLowerCase();
+        // Map HTTP method to scope
+        String scope;
+        if (isSingleGet && "GET".equals(httpMethod)) {
+            scope = "get";
+        } else {
+            scope = switch (httpMethod) {
+                case "POST" -> "add";
+                case "PUT" -> "update";
+                case "DELETE" -> "delete";
+                default -> "list";
+            };
+        }
+        return domain + SymbolConstant.COLON + scope;
     }
 
     /**
@@ -117,11 +134,13 @@ public class ApiEndpointScanner {
                 if (out.containsKey(key)) {
                     continue;
                 }
+                boolean isSingleGet = "GET".equals(method.name())
+                        && (path.contains("{") || path.contains("*"));
                 out.put(key,
                         FacadeScannedApiBO.builder()
                                 .method(method.name())
                                 .path(path)
-                                .apiName(buildApiName(handler))
+                                .apiName(buildApiName(handler, method.name(), isSingleGet))
                                 .title(handler.getMethod().getName())
                                 .remark("")
                                 .apiGroup(handler.getBeanType().getSimpleName())
