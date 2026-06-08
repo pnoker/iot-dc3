@@ -59,7 +59,7 @@ public class AgenticPromptBuilder {
         ChatClient chatClient = chatClientFactory.getOrCreate(prepared.model());
         ChatClient.ChatClientRequestSpec promptSpec = chatClient.prompt()
                 .user(prepared.userMessage())
-                .toolContext(prepared.toolContext())
+                .tools(toolSpec -> toolSpec.context(prepared.toolContext()))
                 .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, prepared.scopedConversationId()));
 
         String systemPrompt = buildSystemPrompt(prepared);
@@ -76,7 +76,7 @@ public class AgenticPromptBuilder {
         if (!prepared.toolCallingEnabled()) {
             return promptSpec;
         }
-        return promptSpec.toolCallbacks(toolCallbackProvider).advisors(toolCallAdvisor);
+        return promptSpec.tools(toolSpec -> toolSpec.callbacks(toolCallbackProvider)).advisors(toolCallAdvisor);
     }
 
     private ChatClient.ChatClientRequestSpec applyRequestOptions(ChatClient.ChatClientRequestSpec promptSpec,
