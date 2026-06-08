@@ -32,6 +32,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +61,7 @@ public class ApiController implements BaseController {
 
     private final ApiService apiService;
 
+    @PreAuthorize("@perm.can('api', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
         // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
@@ -70,6 +72,7 @@ public class ApiController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('api', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
@@ -79,6 +82,7 @@ public class ApiController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('api', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
         // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
@@ -89,6 +93,7 @@ public class ApiController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('api', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<ApiVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         // Read access to global API data is open to all authenticated users.
@@ -99,6 +104,7 @@ public class ApiController implements BaseController {
         });
     }
 
+    @PreAuthorize("@perm.can('api', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
         // Read access to global API data is open to all authenticated users.

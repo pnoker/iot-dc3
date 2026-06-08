@@ -26,12 +26,12 @@ import io.github.pnoker.common.manager.entity.vo.TopicVO;
 import io.github.pnoker.common.manager.service.TopicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
 
 import java.util.Objects;
 
@@ -51,6 +51,7 @@ public class TopicController implements BaseController {
 
     private final TopicService topicService;
 
+    @PreAuthorize("@perm.can('topic', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<TopicVO>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

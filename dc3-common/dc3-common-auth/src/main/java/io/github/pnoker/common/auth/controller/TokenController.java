@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,6 +57,7 @@ public class TokenController implements BaseController {
      * @return
      */
     @PublicEndpoint
+    @PreAuthorize("@perm.can('token', 'get')")
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -71,6 +73,7 @@ public class TokenController implements BaseController {
      * @return Token
      */
     @PublicEndpoint
+    @PreAuthorize("@perm.can('token', 'add')")
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -86,6 +89,7 @@ public class TokenController implements BaseController {
      * @param entityVO {@link TokenQuery}
      * @return true when the logout was accepted
      */
+    @PreAuthorize("@perm.can('token', 'delete')")
     @PostMapping("/cancel")
     public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -100,6 +104,7 @@ public class TokenController implements BaseController {
      * @param entityVO {@link TokenQuery}
      * @return ,
      */
+    @PreAuthorize("@perm.can('token', 'get')")
     @PostMapping("/check")
     public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {

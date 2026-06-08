@@ -41,6 +41,7 @@ import io.github.pnoker.common.valid.Add;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +79,7 @@ public class RoleResourceBindController implements BaseController {
 
     private final TenantBindService tenantBindService;
 
+    @PreAuthorize("@perm.can('role_resource_bind', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleResourceBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -88,6 +90,7 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_resource_bind', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -98,6 +101,7 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<RoleResourceBindVO>>> list(@RequestBody(required = false) RoleResourceBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -108,6 +112,7 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @GetMapping("/list_resource_by_role")
     public Mono<R<List<ResourceVO>>> listResourceByRole(@NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -118,6 +123,7 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @GetMapping("/list_resource_by_user")
     public Mono<R<List<ResourceVO>>> listResourceByUser(@NotNull @RequestParam(value = "user_id") Long userId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -128,6 +134,7 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @GetMapping("/list_role_by_resource")
     public Mono<R<List<RoleVO>>> listRoleByResource(@NotNull @RequestParam(value = "resource_id") Long resourceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

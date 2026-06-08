@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -85,6 +86,7 @@ public class DeviceController implements BaseController {
      * @param entityVO {@link DeviceVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('device', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -101,6 +103,7 @@ public class DeviceController implements BaseController {
      * @param id ID
      * @return R of String
      */
+    @PreAuthorize("@perm.can('device', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -114,6 +117,7 @@ public class DeviceController implements BaseController {
      * @param entityVO {@link DeviceVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('device', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -131,6 +135,7 @@ public class DeviceController implements BaseController {
      * @param id ID
      * @return DeviceVO {@link DeviceVO}
      */
+    @PreAuthorize("@perm.can('device', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<DeviceVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -146,6 +151,7 @@ public class DeviceController implements BaseController {
      * @param deviceIds Device ID
      * @return Map(ID, DeviceVO)
      */
+    @PreAuthorize("@perm.can('device', 'list')")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, DeviceVO>>> listByIds(@RequestBody List<Long> deviceIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -162,6 +168,7 @@ public class DeviceController implements BaseController {
      * @param profileId Profile ID
      * @return Device array
      */
+    @PreAuthorize("@perm.can('device', 'list')")
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<DeviceVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -177,6 +184,7 @@ public class DeviceController implements BaseController {
      * @param entityQuery
      * @return R Of DeviceVO Page
      */
+    @PreAuthorize("@perm.can('device', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<DeviceVO>>> list(@RequestBody(required = false) DeviceQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -194,6 +202,7 @@ public class DeviceController implements BaseController {
      * @param entityVO {@link DeviceVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('device', 'add')")
     @PostMapping("/import")
     public Mono<R<String>> importDevice(@Validated(Upload.class) DeviceVO entityVO,
                                         @RequestPart("file") Mono<FilePart> filePart) {
@@ -223,6 +232,7 @@ public class DeviceController implements BaseController {
      * @param entityVO {@link DeviceVO}
      * @return
      */
+    @PreAuthorize("@perm.can('device', 'list')")
     @PostMapping("/export/import_template")
     public Mono<ResponseEntity<Resource>> importTemplate(@Validated(Upload.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> Mono.fromCallable(() -> {
@@ -237,6 +247,7 @@ public class DeviceController implements BaseController {
      * @param driverId
      * @return
      */
+    @PreAuthorize("@perm.can('device', 'list')")
     @GetMapping("/get_count_by_driver_id")
     public Mono<R<Integer>> getCountByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

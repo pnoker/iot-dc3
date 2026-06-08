@@ -34,6 +34,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,6 +69,7 @@ public class TenantController implements BaseController {
      * @param entityVO {@link TenantVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('tenant', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -91,6 +93,7 @@ public class TenantController implements BaseController {
      * @param id ID
      * @return R of String
      */
+    @PreAuthorize("@perm.can('tenant', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -114,6 +117,7 @@ public class TenantController implements BaseController {
      * @param entityVO {@link TenantVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('tenant', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody TenantVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -134,6 +138,7 @@ public class TenantController implements BaseController {
      * @param id ID
      * @return TenantVO {@link TenantVO}
      */
+    @PreAuthorize("@perm.can('tenant', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<TenantVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -154,6 +159,7 @@ public class TenantController implements BaseController {
      * @param code TenantCode
      * @return {@link TenantVO}
      */
+    @PreAuthorize("@perm.can('tenant', 'get')")
     @GetMapping("/get_by_code")
     public Mono<R<TenantVO>> getByCode(@NotNull @RequestParam(value = "code") String code) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -176,6 +182,7 @@ public class TenantController implements BaseController {
      * @param entityQuery Tenant
      * @return {@link TenantBO}
      */
+    @PreAuthorize("@perm.can('tenant', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<TenantVO>>> list(@RequestBody(required = false) TenantQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

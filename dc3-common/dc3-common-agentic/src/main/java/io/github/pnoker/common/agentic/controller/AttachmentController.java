@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +54,7 @@ public class AttachmentController implements BaseController {
 
     private final AttachmentService attachmentService;
 
+    @PreAuthorize("@perm.can('attachment', 'list')")
     @PostMapping("/upload")
     public Mono<R<AttachmentVO>> upload(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {
@@ -67,6 +69,7 @@ public class AttachmentController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('attachment', 'list')")
     @GetMapping("/list")
     public Mono<R<List<AttachmentVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {

@@ -29,6 +29,7 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,6 +57,7 @@ public class RuleStateController implements BaseController {
 
     private final RuleStateService ruleStateService;
 
+    @PreAuthorize("@perm.can('rule_state', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<RuleStateVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -64,6 +66,7 @@ public class RuleStateController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('rule_state', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<RuleStateVO>>> list(@RequestBody(required = false) RuleStateQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

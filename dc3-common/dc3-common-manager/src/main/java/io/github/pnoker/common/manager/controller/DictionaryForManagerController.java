@@ -29,6 +29,7 @@ import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.common.valid.Parent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +62,7 @@ public class DictionaryForManagerController implements BaseController {
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
      */
+    @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @PostMapping("/driver")
     public Mono<R<Page<DictionaryVO>>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,6 +80,7 @@ public class DictionaryForManagerController implements BaseController {
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
      */
+    @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @PostMapping("/profile")
     public Mono<R<Page<DictionaryVO>>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -95,6 +98,7 @@ public class DictionaryForManagerController implements BaseController {
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
      */
+    @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @PostMapping("/profile_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForProfile(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -113,6 +117,7 @@ public class DictionaryForManagerController implements BaseController {
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
      */
+    @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @PostMapping("/device_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForDevice(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -131,6 +136,7 @@ public class DictionaryForManagerController implements BaseController {
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
      */
+    @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @PostMapping("/device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -148,6 +154,7 @@ public class DictionaryForManagerController implements BaseController {
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
      */
+    @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @PostMapping("/driver_device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionaryForDriver(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {

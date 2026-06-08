@@ -28,6 +28,7 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,11 +56,13 @@ public class ProviderController implements BaseController {
 
     private final ModelProviderService modelProviderService;
 
+    @PreAuthorize("@perm.can('provider', 'list')")
     @GetMapping("/list")
     public Mono<R<List<ModelProviderVO>>> list() {
         return async(() -> R.ok(modelProviderBuilder.buildVOListByBOList(modelProviderService.list())));
     }
 
+    @PreAuthorize("@perm.can('provider', 'add')")
     @PostMapping("/config/add")
     public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -68,6 +71,7 @@ public class ProviderController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('provider', 'update')")
     @PostMapping("/config/update")
     public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -76,6 +80,7 @@ public class ProviderController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('provider', 'delete')")
     @PostMapping("/config/delete")
     public Mono<R<Boolean>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {

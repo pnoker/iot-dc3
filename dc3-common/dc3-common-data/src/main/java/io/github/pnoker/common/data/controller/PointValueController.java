@@ -29,6 +29,7 @@ import io.github.pnoker.common.entity.query.PointValueQuery;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,6 +65,7 @@ public class PointValueController implements BaseController {
      * @return Page of PointValueVO, where each PointValueVO contains the latest value for
      * a point in the device
      */
+    @PreAuthorize("@perm.can('point_value', 'list')")
     @PostMapping("/latest")
     public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -82,6 +84,7 @@ public class PointValueController implements BaseController {
      * @return Page of PointValueVO, where each PointValueVO contains the historical value
      * for a point in the device
      */
+    @PreAuthorize("@perm.can('point_value', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,6 +103,7 @@ public class PointValueController implements BaseController {
      * @param pointId  Point ID
      * @return List of String, where each String is the historical value for the point
      */
+    @PreAuthorize("@perm.can('point_value', 'list')")
     @GetMapping("/list_history_by_device_id_and_point_id")
     public Mono<R<List<String>>> history(@NotNull @RequestParam(name = "device_id") Long deviceId,
                                          @NotNull @RequestParam(name = "point_id") Long pointId,

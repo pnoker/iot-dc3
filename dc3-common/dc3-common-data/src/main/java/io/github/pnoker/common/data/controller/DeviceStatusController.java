@@ -25,6 +25,7 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +58,7 @@ public class DeviceStatusController implements BaseController {
      * @param deviceQuery Device Dto
      * @return Map String:String
      */
+    @PreAuthorize("@perm.can('device_status', 'list')")
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -73,6 +75,7 @@ public class DeviceStatusController implements BaseController {
      * @param driverId Driver ID
      * @return Map String:String
      */
+    @PreAuthorize("@perm.can('device_status', 'list')")
     @GetMapping("/list_by_driver_id")
     public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,6 +93,7 @@ public class DeviceStatusController implements BaseController {
      * @param profileId Profile ID
      * @return Map String:String
      */
+    @PreAuthorize("@perm.can('device_status', 'list')")
     @GetMapping("/list_by_profile_id")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
             @NotNull @RequestParam(value = "profile_id") Long profileId) {

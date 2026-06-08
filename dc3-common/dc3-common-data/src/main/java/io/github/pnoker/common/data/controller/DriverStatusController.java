@@ -25,6 +25,7 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +58,7 @@ public class DriverStatusController implements BaseController {
      * @param entityQuery Driver and pagination parameters
      * @return Map String:String
      */
+    @PreAuthorize("@perm.can('driver_status', 'list')")
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -73,6 +75,7 @@ public class DriverStatusController implements BaseController {
      * @param driverId Driver ID
      * @return Number of devices currently online
      */
+    @PreAuthorize("@perm.can('driver_status', 'get')")
     @GetMapping("/get_device_online_by_driver_id")
     public Mono<R<Long>> getDeviceOnlineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -87,6 +90,7 @@ public class DriverStatusController implements BaseController {
      * @param driverId Driver ID
      * @return Number of devices currently offline
      */
+    @PreAuthorize("@perm.can('driver_status', 'get')")
     @GetMapping("/get_device_offline_by_driver_id")
     public Mono<R<Long>> getDeviceOfflineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

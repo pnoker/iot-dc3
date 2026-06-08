@@ -33,6 +33,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,6 +65,7 @@ public class EventParamController implements BaseController {
 
     private final EventService eventService;
 
+    @PreAuthorize("@perm.can('event_param', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -74,6 +76,7 @@ public class EventParamController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('event_param', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -83,6 +86,7 @@ public class EventParamController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('event_param', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -94,6 +98,7 @@ public class EventParamController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('event_param', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<EventParamVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -103,6 +108,7 @@ public class EventParamController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('event_param', 'list')")
     @GetMapping("/list_by_event_id")
     public Mono<R<List<EventParamVO>>> listByEventId(@NotNull @RequestParam(value = "event_id") Long eventId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -113,6 +119,7 @@ public class EventParamController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('event_param', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<EventParamVO>>> list(@RequestBody(required = false) EventParamQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

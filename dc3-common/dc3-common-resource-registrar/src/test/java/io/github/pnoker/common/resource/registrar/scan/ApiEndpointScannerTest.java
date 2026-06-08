@@ -59,7 +59,7 @@ class ApiEndpointScannerTest {
                         org.assertj.core.groups.Tuple.tuple("DELETE", "/api/sample/{id}"));
         assertThat(apis).allSatisfy(api -> {
             assertThat(api.getApiGroup()).isEqualTo("SampleController");
-            assertThat(api.getApiName()).startsWith("SampleController.");
+            assertThat(api.getApiName()).matches("sample:(get|add|update|delete)");
         });
     }
 

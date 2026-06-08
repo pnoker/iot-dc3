@@ -40,6 +40,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,6 +83,7 @@ public class LabelBindController implements BaseController {
      * @param entityVO {@link LabelBindVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('label_bind', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -97,6 +99,7 @@ public class LabelBindController implements BaseController {
      * @param id ID
      * @return R of String
      */
+    @PreAuthorize("@perm.can('label_bind', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -110,6 +113,7 @@ public class LabelBindController implements BaseController {
      * @param entityVO {@link LabelBindVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('label_bind', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -126,6 +130,7 @@ public class LabelBindController implements BaseController {
      * @param id ID
      * @return LabelBindVO {@link LabelBindVO}
      */
+    @PreAuthorize("@perm.can('label_bind', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<LabelBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -139,6 +144,7 @@ public class LabelBindController implements BaseController {
      * @param entityQuery {@link LabelBindQuery}
      * @return R Of LabelBindVO Page
      */
+    @PreAuthorize("@perm.can('label_bind', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<LabelBindVO>>> list(@RequestBody(required = false) LabelBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -39,6 +39,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -83,6 +84,7 @@ public class PointController implements BaseController {
      * @param entityVO {@link PointVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('point', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -99,6 +101,7 @@ public class PointController implements BaseController {
      * @param id ID
      * @return R of String
      */
+    @PreAuthorize("@perm.can('point', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -114,6 +117,7 @@ public class PointController implements BaseController {
      * @param entityVO {@link PointVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('point', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -131,6 +135,7 @@ public class PointController implements BaseController {
      * @param id ID
      * @return PointVO {@link PointVO}
      */
+    @PreAuthorize("@perm.can('point', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<PointVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -146,6 +151,7 @@ public class PointController implements BaseController {
      * @param pointIds Point ID
      * @return Map(ID, PointVO)
      */
+    @PreAuthorize("@perm.can('point', 'list')")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, PointVO>>> listByIds(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -162,6 +168,7 @@ public class PointController implements BaseController {
      * @param profileId Point ID
      * @return Point
      */
+    @PreAuthorize("@perm.can('point', 'list')")
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<PointVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -178,6 +185,7 @@ public class PointController implements BaseController {
      * @param deviceId Device ID
      * @return Point Array
      */
+    @PreAuthorize("@perm.can('point', 'list')")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<PointVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -194,6 +202,7 @@ public class PointController implements BaseController {
      * @param entityQuery Point Dto
      * @return Page Of Point
      */
+    @PreAuthorize("@perm.can('point', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<PointVO>>> list(@RequestBody(required = false) PointQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -209,6 +218,7 @@ public class PointController implements BaseController {
      * @param pointIds Point ID
      * @return Map String:String
      */
+    @PreAuthorize("@perm.can('point', 'list')")
     @PostMapping("/unit")
     public Mono<R<Map<Long, String>>> unit(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -230,6 +240,7 @@ public class PointController implements BaseController {
      * @param pointId id
      * @return {@link R}<{@link Set}<{@link Long}>>
      */
+    @PreAuthorize("@perm.can('point', 'list')")
     @GetMapping("/list_device_statistics_by_point_id")
     public Mono<R<DeviceByPointVO>> getPointStatisticsWithDevice(
             @NotNull @RequestParam(value = "point_id") Long pointId) {
@@ -245,6 +256,7 @@ public class PointController implements BaseController {
      * @param deviceId
      * @return
      */
+    @PreAuthorize("@perm.can('point', 'list')")
     @GetMapping("/get_count_by_device_id")
     public Mono<R<Long>> getPointByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -258,6 +270,7 @@ public class PointController implements BaseController {
      * @param deviceId
      * @return
      */
+    @PreAuthorize("@perm.can('point', 'get')")
     @GetMapping("/get_point_config_by_device_id")
     public Mono<R<PointConfigByDeviceVO>> getPointConfigByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {

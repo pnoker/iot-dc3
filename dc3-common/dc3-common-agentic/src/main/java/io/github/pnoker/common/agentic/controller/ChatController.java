@@ -24,6 +24,7 @@ import io.github.pnoker.common.entity.R;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +54,7 @@ public class ChatController implements BaseController {
      * Chat completion endpoint. Returns SSE when {@code request.stream == true};
      * otherwise returns the OpenAI-compatible JSON response.
      */
+    @PreAuthorize("@perm.can('chat', 'list')")
     @PostMapping("/completions")
     public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequest request) {
         return getUserHeader().flatMap(header -> {

@@ -29,6 +29,7 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,6 +57,7 @@ public class PointCommandHistoryController implements BaseController {
 
     private final PointCommandHistoryBuilder pointCommandHistoryBuilder;
 
+    @PreAuthorize("@perm.can('point_command_history', 'get')")
     @GetMapping("/get_by_command_id")
     public Mono<R<PointCommandHistoryVO>> getByCommandId(@NotBlank @RequestParam String commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -64,6 +66,7 @@ public class PointCommandHistoryController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('point_command_history', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<PointCommandHistoryVO>>> list(@RequestBody(required = false) PointCommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

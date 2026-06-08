@@ -29,6 +29,7 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,6 +57,7 @@ public class NotifyHistoryController implements BaseController {
 
     private final NotifyHistoryService notifyHistoryService;
 
+    @PreAuthorize("@perm.can('notify_history', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<NotifyHistoryVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -64,6 +66,7 @@ public class NotifyHistoryController implements BaseController {
         }));
     }
 
+    @PreAuthorize("@perm.can('notify_history', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<NotifyHistoryVO>>> list(@RequestBody(required = false) NotifyHistoryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

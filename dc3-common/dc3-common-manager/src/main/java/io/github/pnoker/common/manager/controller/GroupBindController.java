@@ -40,6 +40,7 @@ import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,6 +83,7 @@ public class GroupBindController implements BaseController {
      * @param entityVO {@link GroupBindVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('group_bind', 'add')")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -97,6 +99,7 @@ public class GroupBindController implements BaseController {
      * @param id ID
      * @return R of String
      */
+    @PreAuthorize("@perm.can('group_bind', 'delete')")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -110,6 +113,7 @@ public class GroupBindController implements BaseController {
      * @param entityVO {@link GroupBindVO}
      * @return R of String
      */
+    @PreAuthorize("@perm.can('group_bind', 'update')")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -126,6 +130,7 @@ public class GroupBindController implements BaseController {
      * @param id ID
      * @return GroupBindVO {@link GroupBindVO}
      */
+    @PreAuthorize("@perm.can('group_bind', 'get')")
     @GetMapping("/get_by_id")
     public Mono<R<GroupBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -139,6 +144,7 @@ public class GroupBindController implements BaseController {
      * @param entityQuery {@link GroupBindQuery}
      * @return R Of GroupBindVO Page
      */
+    @PreAuthorize("@perm.can('group_bind', 'list')")
     @PostMapping("/list")
     public Mono<R<Page<GroupBindVO>>> list(@RequestBody(required = false) GroupBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
