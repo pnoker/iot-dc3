@@ -39,6 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller for point command history queries.
@@ -47,6 +50,7 @@ import java.util.Objects;
  * @version 2026.5.23
  * @since 2026.5.23
  */
+@Tag(name = "point_command_history", description = "位号指令历史")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_COMMAND_HISTORY_URL_PREFIX)
@@ -58,6 +62,7 @@ public class PointCommandHistoryController implements BaseController {
     private final PointCommandHistoryBuilder pointCommandHistoryBuilder;
 
     @PreAuthorize("@perm.can('point_command_history', 'get')")
+    @Operation(summary = "查询PointCommandHistory", description = "根据条件查询PointCommandHistory")
     @GetMapping("/get_by_command_id")
     public Mono<R<PointCommandHistoryVO>> getByCommandId(@NotBlank @RequestParam String commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -67,6 +72,7 @@ public class PointCommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('point_command_history', 'list')")
+    @Operation(summary = "查询PointCommandHistory列表", description = "分页查询PointCommandHistory列表")
     @PostMapping("/list")
     public Mono<R<Page<PointCommandHistoryVO>>> list(@RequestBody(required = false) PointCommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

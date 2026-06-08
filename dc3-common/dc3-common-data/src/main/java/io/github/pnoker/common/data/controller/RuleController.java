@@ -43,6 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Alarm rule controller.
@@ -51,6 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "rule", description = "规则引擎")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.RULE_URL_PREFIX)
@@ -62,6 +66,7 @@ public class RuleController implements BaseController {
     private final RuleService ruleService;
 
     @PreAuthorize("@perm.can('rule', 'add')")
+    @Operation(summary = "新增规则引擎", description = "新增规则")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RuleVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -73,6 +78,7 @@ public class RuleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule', 'delete')")
+    @Operation(summary = "删除规则引擎", description = "删除规则")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -83,6 +89,7 @@ public class RuleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule', 'update')")
+    @Operation(summary = "更新规则引擎", description = "更新规则配置")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RuleVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -95,6 +102,7 @@ public class RuleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule', 'get')")
+    @Operation(summary = "查询规则引擎", description = "根据ID查询规则引擎详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<RuleVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,6 +112,7 @@ public class RuleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule', 'list')")
+    @Operation(summary = "查询规则引擎列表", description = "分页查询规则引擎列表")
     @PostMapping("/list")
     public Mono<R<Page<RuleVO>>> list(@RequestBody(required = false) RuleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

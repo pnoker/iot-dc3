@@ -39,6 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Notification delivery history controller.
@@ -47,6 +50,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "notify_history", description = "通知历史")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_HISTORY_URL_PREFIX)
@@ -58,6 +62,7 @@ public class NotifyHistoryController implements BaseController {
     private final NotifyHistoryService notifyHistoryService;
 
     @PreAuthorize("@perm.can('notify_history', 'get')")
+    @Operation(summary = "查询NotifyHistory", description = "根据ID查询NotifyHistory详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<NotifyHistoryVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -67,6 +72,7 @@ public class NotifyHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_history', 'list')")
+    @Operation(summary = "查询NotifyHistory列表", description = "分页查询NotifyHistory列表")
     @PostMapping("/list")
     public Mono<R<Page<NotifyHistoryVO>>> list(@RequestBody(required = false) NotifyHistoryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

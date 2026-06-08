@@ -51,6 +51,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing point attribute config management endpoints.
@@ -59,6 +62,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "point_attribute_config", description = "位号属性配置")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -82,6 +86,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'add')")
+    @Operation(summary = "新增PointAttributeConfig", description = "新增一条PointAttributeConfig记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -99,6 +104,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'delete')")
+    @Operation(summary = "删除PointAttributeConfig", description = "删除指定ID的PointAttributeConfig")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -115,6 +121,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'update')")
+    @Operation(summary = "更新PointAttributeConfig", description = "更新PointAttributeConfig信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -133,6 +140,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
+    @Operation(summary = "查询PointAttributeConfig", description = "根据ID查询PointAttributeConfig详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<PointAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -151,6 +159,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
+    @Operation(summary = "查询PointAttributeConfig", description = "根据条件查询PointAttributeConfig")
     @GetMapping("/get_by_attribute_id_and_device_id_and_point_id")
     public Mono<R<PointAttributeConfigVO>> getByAttributeIdAndDeviceIdAndPointId(
             @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -174,6 +183,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
+    @Operation(summary = "查询PointAttributeConfig列表", description = "根据关联条件查询PointAttributeConfig列表")
     @GetMapping("/list_by_device_id_and_point_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceIdAndPointId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -194,6 +204,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
+    @Operation(summary = "查询PointAttributeConfig列表", description = "根据关联条件查询PointAttributeConfig列表")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -213,6 +224,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return Page Of PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
+    @Operation(summary = "查询PointAttributeConfig列表", description = "分页查询PointAttributeConfig列表")
     @PostMapping("/list")
     public Mono<R<Page<PointAttributeConfigVO>>> list(
             @RequestBody(required = false) PointAttributeConfigQuery entityQuery) {

@@ -53,6 +53,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing role-user binding management endpoints.
@@ -61,6 +64,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
+@Tag(name = "role_user_bind", description = "角色用户绑定")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.ROLE_USER_URL_PREFIX)
@@ -80,6 +84,7 @@ public class RoleUserBindController implements BaseController {
     private final TenantBindService tenantBindService;
 
     @PreAuthorize("@perm.can('role_user_bind', 'add')")
+    @Operation(summary = "新增RoleUserBind", description = "新增一条RoleUserBind记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleUserBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -92,6 +97,7 @@ public class RoleUserBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_user_bind', 'delete')")
+    @Operation(summary = "删除RoleUserBind", description = "删除指定ID的RoleUserBind")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,6 +110,7 @@ public class RoleUserBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_user_bind', 'list')")
+    @Operation(summary = "查询RoleUserBind列表", description = "分页查询RoleUserBind列表")
     @PostMapping("/list")
     public Mono<R<Page<RoleUserBindVO>>> list(@RequestBody(required = false) RoleUserBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -115,8 +122,10 @@ public class RoleUserBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_user_bind', 'list')")
+    @Operation(summary = "查询RoleUserBind列表", description = "分页查询RoleUserBind列表")
     @GetMapping("/list_role_by_user")
     public Mono<R<List<RoleVO>>> listRoleByUser(@NotNull @RequestParam(value = "user_id") Long userId,
+                                                @Parameter(description = "ignored tenant ID", required = true)
                                                 @RequestParam(value = "tenant_id", required = false) Long ignoredTenantId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenantMember(tenantId, userId);
@@ -127,6 +136,7 @@ public class RoleUserBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_user_bind', 'list')")
+    @Operation(summary = "查询RoleUserBind列表", description = "分页查询RoleUserBind列表")
     @GetMapping("/list_user_by_role")
     public Mono<R<List<UserVO>>> listUserByRole(@NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

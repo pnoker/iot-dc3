@@ -46,6 +46,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing event management endpoints.
@@ -54,6 +57,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "event", description = "事件")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.EVENT_URL_PREFIX)
@@ -69,6 +73,7 @@ public class EventController implements BaseController {
     private final DeviceService deviceService;
 
     @PreAuthorize("@perm.can('event', 'add')")
+    @Operation(summary = "新增事件管理", description = "新增一条事件记录")
     @PostMapping("/add")
     public Mono<R<Long>> add(@Validated(Add.class) @RequestBody EventVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -80,6 +85,7 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'delete')")
+    @Operation(summary = "删除事件管理", description = "删除指定ID的事件")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,6 +96,7 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'update')")
+    @Operation(summary = "更新事件管理", description = "更新事件信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,6 +109,7 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'get')")
+    @Operation(summary = "查询事件管理", description = "根据ID查询事件管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<EventVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -112,6 +120,7 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'list')")
+    @Operation(summary = "查询事件列表", description = "根据关联条件查询事件管理列表")
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<EventVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -123,6 +132,7 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'list')")
+    @Operation(summary = "查询事件列表", description = "根据关联条件查询事件管理列表")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<EventVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -134,6 +144,7 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'list')")
+    @Operation(summary = "查询事件列表", description = "分页查询事件管理列表")
     @PostMapping("/list")
     public Mono<R<Page<EventVO>>> list(@RequestBody(required = false) EventQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

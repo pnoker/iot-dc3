@@ -43,6 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing label management endpoints.
@@ -51,6 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "label", description = "Label")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
@@ -66,6 +70,7 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label', 'add')")
+    @Operation(summary = "新增标签绑定", description = "新增一条标签绑定记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -81,6 +86,7 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label', 'delete')")
+    @Operation(summary = "删除标签绑定", description = "删除指定ID的标签绑定")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -95,6 +101,7 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label', 'update')")
+    @Operation(summary = "更新标签绑定", description = "更新标签绑定信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -111,6 +118,7 @@ public class LabelController implements BaseController {
      * @return LabelVO {@link LabelVO}
      */
     @PreAuthorize("@perm.can('label', 'get')")
+    @Operation(summary = "查询标签绑定", description = "根据ID查询标签绑定详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<LabelVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -125,6 +133,7 @@ public class LabelController implements BaseController {
      * @return R Of LabelVO Page
      */
     @PreAuthorize("@perm.can('label', 'list')")
+    @Operation(summary = "查询标签绑定列表", description = "分页查询标签绑定列表")
     @PostMapping("/list")
     public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

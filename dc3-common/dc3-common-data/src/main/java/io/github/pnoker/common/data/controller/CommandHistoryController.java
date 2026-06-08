@@ -41,6 +41,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller for custom command call management.
@@ -49,6 +52,7 @@ import java.util.Objects;
  * @version 2026.5.23
  * @since 2026.5.23
  */
+@Tag(name = "command_history", description = "指令历史")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.COMMAND_HISTORY_URL_PREFIX)
@@ -60,6 +64,7 @@ public class CommandHistoryController implements BaseController {
     private final CommandHistoryBuilder commandHistoryBuilder;
 
     @PreAuthorize("@perm.can('command_history', 'add')")
+    @Operation(summary = "执行CommandHistory调用", description = "执行CommandHistory指令调用")
     @PostMapping("/call")
     public Mono<R<String>> call(@Validated @RequestBody CommandCallVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -71,6 +76,7 @@ public class CommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_history', 'get')")
+    @Operation(summary = "查询CommandHistory", description = "根据条件查询CommandHistory")
     @GetMapping("/get_by_record_id")
     public Mono<R<CommandHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -80,6 +86,7 @@ public class CommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_history', 'list')")
+    @Operation(summary = "查询CommandHistory列表", description = "分页查询CommandHistory列表")
     @PostMapping("/list")
     public Mono<R<Page<CommandHistoryVO>>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

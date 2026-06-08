@@ -36,6 +36,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing agentic action management endpoints.
@@ -44,6 +47,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "action", description = "AI动作")
 @RestController
 @RequestMapping(AgenticConstant.ACTION_URL_PREFIX)
 @RequiredArgsConstructor
@@ -54,6 +58,7 @@ public class ActionController implements BaseController {
     private final ActionService actionService;
 
     @PreAuthorize("@perm.can('action', 'get')")
+    @Operation(summary = "AI动作 - pending", description = "AI动作 - pending")
     @GetMapping("/pending")
     public Mono<R<List<ActionVO>>> pending(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -67,6 +72,7 @@ public class ActionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('action', 'list')")
+    @Operation(summary = "AI动作 - confirm", description = "AI动作 - confirm")
     @PostMapping("/confirm")
     public Mono<R<ActionVO>> confirm(@NotBlank @RequestParam(value = "action_id") String actionId) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -78,6 +84,7 @@ public class ActionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('action', 'list')")
+    @Operation(summary = "AI动作 - reject", description = "AI动作 - reject")
     @PostMapping("/reject")
     public Mono<R<ActionVO>> reject(@NotBlank @RequestParam(value = "action_id") String actionId) {
         return getUserHeader().flatMap(header -> async(() -> {

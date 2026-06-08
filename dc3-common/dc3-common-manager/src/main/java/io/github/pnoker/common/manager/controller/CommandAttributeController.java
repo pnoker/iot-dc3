@@ -47,6 +47,9 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing command attribute management endpoints.
@@ -55,6 +58,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "command_attribute", description = "指令属性")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.COMMAND_ATTRIBUTE_URL_PREFIX)
@@ -68,12 +72,13 @@ public class CommandAttributeController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * CommandAttribute
+     * 指令属性
      *
      * @param entityVO {@link CommandAttributeVO}
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute', 'add')")
+    @Operation(summary = "新增CommandAttribute", description = "新增一条CommandAttribute记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -85,12 +90,13 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * ID CommandAttribute
+     * ID 指令属性
      *
      * @param id ID
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute', 'delete')")
+    @Operation(summary = "删除CommandAttribute", description = "删除指定ID的CommandAttribute")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -101,12 +107,13 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * CommandAttribute
+     * 指令属性
      *
      * @param entityVO {@link CommandAttributeVO}
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute', 'update')")
+    @Operation(summary = "更新CommandAttribute", description = "更新CommandAttribute信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -119,12 +126,13 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * ID CommandAttribute
+     * ID 指令属性
      *
      * @param id ID
      * @return CommandAttributeVO {@link CommandAttributeVO}
      */
     @PreAuthorize("@perm.can('command_attribute', 'get')")
+    @Operation(summary = "查询CommandAttribute", description = "根据ID查询CommandAttribute详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<CommandAttributeVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -135,12 +143,13 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * Driver ID CommandAttribute
+     * Driver ID 指令属性
      *
      * @param id ID
-     * @return CommandAttribute
+     * @return 指令属性
      */
     @PreAuthorize("@perm.can('command_attribute', 'list')")
+    @Operation(summary = "查询CommandAttribute列表", description = "根据关联条件查询CommandAttribute列表")
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<CommandAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -156,12 +165,13 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * CommandAttribute
+     * 指令属性
      *
      * @param entityQuery Dto
-     * @return Page Of CommandAttribute
+     * @return Page Of 指令属性
      */
     @PreAuthorize("@perm.can('command_attribute', 'list')")
+    @Operation(summary = "查询CommandAttribute列表", description = "分页查询CommandAttribute列表")
     @PostMapping("/list")
     public Mono<R<Page<CommandAttributeVO>>> list(@RequestBody(required = false) CommandAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

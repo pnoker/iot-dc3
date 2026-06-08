@@ -43,6 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Alarm message template controller.
@@ -51,6 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "message", description = "消息")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.MESSAGE_URL_PREFIX)
@@ -62,6 +66,7 @@ public class MessageController implements BaseController {
     private final MessageService messageService;
 
     @PreAuthorize("@perm.can('message', 'add')")
+    @Operation(summary = "新增消息管理", description = "新增一条消息管理记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MessageVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -73,6 +78,7 @@ public class MessageController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('message', 'delete')")
+    @Operation(summary = "删除消息管理", description = "删除指定ID的消息管理")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -83,6 +89,7 @@ public class MessageController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('message', 'update')")
+    @Operation(summary = "更新消息管理", description = "更新消息管理信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MessageVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -95,6 +102,7 @@ public class MessageController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('message', 'get')")
+    @Operation(summary = "查询消息管理", description = "根据ID查询消息管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<MessageVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,6 +112,7 @@ public class MessageController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('message', 'list')")
+    @Operation(summary = "查询消息管理列表", description = "分页查询消息管理列表")
     @PostMapping("/list")
     public Mono<R<Page<MessageVO>>> list(@RequestBody(required = false) MessageQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

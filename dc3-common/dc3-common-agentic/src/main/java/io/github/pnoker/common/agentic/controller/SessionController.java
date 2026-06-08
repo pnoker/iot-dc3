@@ -42,6 +42,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing session management endpoints.
@@ -50,6 +53,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "session", description = "AI会话")
 @Slf4j
 @RestController
 @RequestMapping(AgenticConstant.SESSION_URL_PREFIX)
@@ -61,6 +65,7 @@ public class SessionController implements BaseController {
     private final SessionBuilder sessionBuilder;
 
     @PreAuthorize("@perm.can('session', 'list')")
+    @Operation(summary = "查询会话列表", description = "分页查询AI会话列表")
     @PostMapping("/list")
     public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -75,6 +80,7 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'get')")
+    @Operation(summary = "AI会话 - get", description = "AI会话 - get")
     @GetMapping("/get_by_conversation_id")
     public Mono<R<SessionVO>> get(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -90,6 +96,7 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'delete')")
+    @Operation(summary = "删除AI会话", description = "删除指定ID的AI会话")
     @DeleteMapping("/delete")
     public Mono<R<Boolean>> delete(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -100,6 +107,7 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'update')")
+    @Operation(summary = "更新AI会话", description = "更新AI会话信息")
     @PostMapping("/update")
     public Mono<R<SessionVO>> update(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionUpdateRequest request) {

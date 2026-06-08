@@ -48,6 +48,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing profile management endpoints.
@@ -56,6 +59,7 @@ import java.util.stream.Collectors;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "profile", description = "模板")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
@@ -75,6 +79,7 @@ public class ProfileController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('profile', 'add')")
+    @Operation(summary = "新增模板管理", description = "新增一条模板记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -92,6 +97,7 @@ public class ProfileController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('profile', 'delete')")
+    @Operation(summary = "删除模板管理", description = "删除指定ID的模板")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -108,6 +114,7 @@ public class ProfileController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('profile', 'update')")
+    @Operation(summary = "更新模板管理", description = "更新模板信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -126,6 +133,7 @@ public class ProfileController implements BaseController {
      * @return ProfileVO {@link ProfileVO}
      */
     @PreAuthorize("@perm.can('profile', 'get')")
+    @Operation(summary = "查询模板管理", description = "根据ID查询模板管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<ProfileVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -159,6 +167,7 @@ public class ProfileController implements BaseController {
      * @return Profile
      */
     @PreAuthorize("@perm.can('profile', 'list')")
+    @Operation(summary = "查询模板列表", description = "根据关联条件查询模板管理列表")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<ProfileVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -176,6 +185,7 @@ public class ProfileController implements BaseController {
      * @return Page Of Profile
      */
     @PreAuthorize("@perm.can('profile', 'list')")
+    @Operation(summary = "查询模板列表", description = "分页查询模板管理列表")
     @PostMapping("/list")
     public Mono<R<Page<ProfileVO>>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

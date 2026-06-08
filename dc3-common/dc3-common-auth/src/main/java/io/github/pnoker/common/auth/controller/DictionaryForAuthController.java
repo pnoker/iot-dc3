@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing auth-related dictionary lookup endpoints.
@@ -41,6 +44,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "dictionary_auth", description = "字典(Auth)")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
@@ -57,6 +61,7 @@ public class DictionaryForAuthController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('dictionary_for_auth', 'get')")
+    @Operation(summary = "字典(Auth) - tenant dictionary", description = "字典(Auth) - tenant dictionary")
     @GetMapping("/tenant")
     public Mono<R<List<DictionaryVO>>> tenantDictionary() {
         return async(() -> {

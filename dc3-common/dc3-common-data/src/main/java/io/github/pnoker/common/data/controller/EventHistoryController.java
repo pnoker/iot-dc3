@@ -41,6 +41,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller for event report management.
@@ -49,6 +52,7 @@ import java.util.Objects;
  * @version 2026.5.23
  * @since 2026.5.23
  */
+@Tag(name = "event_history", description = "事件历史")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.EVENT_HISTORY_URL_PREFIX)
@@ -60,6 +64,7 @@ public class EventHistoryController implements BaseController {
     private final EventHistoryBuilder eventHistoryBuilder;
 
     @PreAuthorize("@perm.can('event_history', 'list')")
+    @Operation(summary = "事件历史 - report", description = "事件历史 - report")
     @PostMapping("/report")
     public Mono<R<String>> report(@Validated @RequestBody EventReportVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -71,6 +76,7 @@ public class EventHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_history', 'get')")
+    @Operation(summary = "查询EventHistory", description = "根据条件查询EventHistory")
     @GetMapping("/get_by_record_id")
     public Mono<R<EventHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -80,6 +86,7 @@ public class EventHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_history', 'list')")
+    @Operation(summary = "查询EventHistory列表", description = "分页查询EventHistory列表")
     @PostMapping("/list")
     public Mono<R<Page<EventHistoryVO>>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

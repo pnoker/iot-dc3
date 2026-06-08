@@ -45,6 +45,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing command param management endpoints.
@@ -53,6 +56,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "command_param", description = "指令参数")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.COMMAND_PARAM_URL_PREFIX)
@@ -66,6 +70,7 @@ public class CommandParamController implements BaseController {
     private final CommandService commandService;
 
     @PreAuthorize("@perm.can('command_param', 'add')")
+    @Operation(summary = "新增CommandParam", description = "新增一条CommandParam记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -77,6 +82,7 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'delete')")
+    @Operation(summary = "删除CommandParam", description = "删除指定ID的CommandParam")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -87,6 +93,7 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'update')")
+    @Operation(summary = "更新CommandParam", description = "更新CommandParam信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -99,6 +106,7 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'get')")
+    @Operation(summary = "查询CommandParam", description = "根据ID查询CommandParam详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<CommandParamVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -109,6 +117,7 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'list')")
+    @Operation(summary = "查询CommandParam列表", description = "根据关联条件查询CommandParam列表")
     @GetMapping("/list_by_command_id")
     public Mono<R<List<CommandParamVO>>> listByCommandId(@NotNull @RequestParam(value = "command_id") Long commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -120,6 +129,7 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'list')")
+    @Operation(summary = "查询CommandParam列表", description = "分页查询CommandParam列表")
     @PostMapping("/list")
     public Mono<R<Page<CommandParamVO>>> list(@RequestBody(required = false) CommandParamQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

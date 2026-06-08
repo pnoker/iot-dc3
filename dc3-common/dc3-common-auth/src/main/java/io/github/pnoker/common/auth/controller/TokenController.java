@@ -36,6 +36,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller for token validation and management.
@@ -44,6 +47,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "token", description = "令牌认证")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TOKEN_URL_PREFIX)
@@ -58,6 +62,7 @@ public class TokenController implements BaseController {
      */
     @PublicEndpoint
     @PreAuthorize("@perm.can('token', 'get')")
+    @Operation(summary = "生成随机盐值", description = "为令牌认证生成随机salt值，有效期5分钟")
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -74,6 +79,7 @@ public class TokenController implements BaseController {
      */
     @PublicEndpoint
     @PreAuthorize("@perm.can('token', 'add')")
+    @Operation(summary = "生成认证令牌", description = "为令牌认证生成认证令牌，有效期12小时")
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -90,6 +96,7 @@ public class TokenController implements BaseController {
      * @return true when the logout was accepted
      */
     @PreAuthorize("@perm.can('token', 'delete')")
+    @Operation(summary = "取消令牌认证", description = "取消指定令牌认证")
     @PostMapping("/cancel")
     public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -105,6 +112,7 @@ public class TokenController implements BaseController {
      * @return ,
      */
     @PreAuthorize("@perm.can('token', 'get')")
+    @Operation(summary = "校验令牌认证", description = "校验令牌认证有效性")
     @PostMapping("/check")
     public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {

@@ -36,6 +36,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing driver status management endpoints.
@@ -44,6 +47,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "driver_status", description = "驱动状态")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DRIVER_STATUS_URL_PREFIX)
@@ -76,6 +80,7 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently online
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
+    @Operation(summary = "驱动状态 - get device online by driver id", description = "驱动状态 - get device online by driver id")
     @GetMapping("/get_device_online_by_driver_id")
     public Mono<R<Long>> getDeviceOnlineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -91,6 +96,7 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently offline
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
+    @Operation(summary = "驱动状态 - get device offline by driver id", description = "驱动状态 - get device offline by driver id")
     @GetMapping("/get_device_offline_by_driver_id")
     public Mono<R<Long>> getDeviceOfflineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

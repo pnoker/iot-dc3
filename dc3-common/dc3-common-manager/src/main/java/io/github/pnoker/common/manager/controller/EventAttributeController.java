@@ -47,6 +47,9 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing event attribute management endpoints.
@@ -55,6 +58,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "event_attribute", description = "事件属性")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.EVENT_ATTRIBUTE_URL_PREFIX)
@@ -68,12 +72,13 @@ public class EventAttributeController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * EventAttribute
+     * 事件属性
      *
      * @param entityVO {@link EventAttributeVO}
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute', 'add')")
+    @Operation(summary = "新增EventAttribute", description = "新增一条EventAttribute记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -85,12 +90,13 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * ID EventAttribute
+     * ID 事件属性
      *
      * @param id ID
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute', 'delete')")
+    @Operation(summary = "删除EventAttribute", description = "删除指定ID的EventAttribute")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -101,12 +107,13 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * EventAttribute
+     * 事件属性
      *
      * @param entityVO {@link EventAttributeVO}
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute', 'update')")
+    @Operation(summary = "更新EventAttribute", description = "更新EventAttribute信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -119,12 +126,13 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * ID EventAttribute
+     * ID 事件属性
      *
      * @param id ID
      * @return EventAttributeVO {@link EventAttributeVO}
      */
     @PreAuthorize("@perm.can('event_attribute', 'get')")
+    @Operation(summary = "查询EventAttribute", description = "根据ID查询EventAttribute详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<EventAttributeVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -135,12 +143,13 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * Driver ID EventAttribute
+     * Driver ID 事件属性
      *
      * @param id ID
-     * @return EventAttribute
+     * @return 事件属性
      */
     @PreAuthorize("@perm.can('event_attribute', 'list')")
+    @Operation(summary = "查询EventAttribute列表", description = "根据关联条件查询EventAttribute列表")
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<EventAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -156,12 +165,13 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * EventAttribute
+     * 事件属性
      *
      * @param entityQuery Dto
-     * @return Page Of EventAttribute
+     * @return Page Of 事件属性
      */
     @PreAuthorize("@perm.can('event_attribute', 'list')")
+    @Operation(summary = "查询EventAttribute列表", description = "分页查询EventAttribute列表")
     @PostMapping("/list")
     public Mono<R<Page<EventAttributeVO>>> list(@RequestBody(required = false) EventAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

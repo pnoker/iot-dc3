@@ -47,6 +47,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing driver management endpoints.
@@ -55,6 +58,7 @@ import java.util.stream.Collectors;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "driver", description = "驱动")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_URL_PREFIX)
@@ -72,6 +76,7 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver', 'add')")
+    @Operation(summary = "新增驱动管理", description = "新增一条驱动记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -89,6 +94,7 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver', 'delete')")
+    @Operation(summary = "删除驱动管理", description = "删除指定ID的驱动")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -105,6 +111,7 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver', 'update')")
+    @Operation(summary = "更新驱动管理", description = "更新驱动信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -123,6 +130,7 @@ public class DriverController implements BaseController {
      * @return DriverVO {@link DriverVO}
      */
     @PreAuthorize("@perm.can('driver', 'get')")
+    @Operation(summary = "查询驱动管理", description = "根据ID查询驱动管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<DriverVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -156,6 +164,7 @@ public class DriverController implements BaseController {
      * @return Driver
      */
     @PreAuthorize("@perm.can('driver', 'get')")
+    @Operation(summary = "查询驱动管理", description = "根据条件查询驱动管理")
     @GetMapping("/get_by_service_name")
     public Mono<R<DriverVO>> getByServiceName(@NotNull @RequestParam(value = "service_name") String serviceName) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -172,6 +181,7 @@ public class DriverController implements BaseController {
      * @return Page Of Driver
      */
     @PreAuthorize("@perm.can('driver', 'list')")
+    @Operation(summary = "查询驱动列表", description = "分页查询驱动管理列表")
     @PostMapping("/list")
     public Mono<R<Page<DriverVO>>> list(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

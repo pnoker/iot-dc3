@@ -40,6 +40,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing point value management endpoints.
@@ -48,6 +51,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "point_value", description = "位号值")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_VALUE_URL_PREFIX)
@@ -59,13 +63,14 @@ public class PointValueController implements BaseController {
     private final PointValueService pointValueService;
 
     /**
-     * Query the latest PointValue for each point in the device
+     * Query the latest 位号值 for each point in the device
      *
      * @param entityQuery PointValueQuery, including pagination parameters
      * @return Page of PointValueVO, where each PointValueVO contains the latest value for
      * a point in the device
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
+    @Operation(summary = "位号值 - latest", description = "位号值 - latest")
     @PostMapping("/latest")
     public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,13 +83,14 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * Query the historical PointValue for each point in the device
+     * Query the historical 位号值 for each point in the device
      *
      * @param entityQuery PointValueQuery, including pagination parameters
      * @return Page of PointValueVO, where each PointValueVO contains the historical value
      * for a point in the device
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
+    @Operation(summary = "查询PointValue列表", description = "分页查询PointValue列表")
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -97,16 +103,18 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * Query the historical PointValue for a specific point in the device
+     * Query the historical 位号值 for a specific point in the device
      *
      * @param deviceId Device ID
      * @param pointId  Point ID
      * @return List of String, where each String is the historical value for the point
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
+    @Operation(summary = "查询PointValue历史", description = "查询PointValue历史记录")
     @GetMapping("/list_history_by_device_id_and_point_id")
     public Mono<R<List<String>>> history(@NotNull @RequestParam(name = "device_id") Long deviceId,
                                          @NotNull @RequestParam(name = "point_id") Long pointId,
+                                         @Parameter(description = "count", required = true)
                                          @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);

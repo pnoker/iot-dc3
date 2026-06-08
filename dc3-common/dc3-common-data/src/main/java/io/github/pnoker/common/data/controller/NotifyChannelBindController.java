@@ -43,6 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Notification channel binding controller.
@@ -51,6 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "notify_channel_bind", description = "通知通道绑定")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_CHANNEL_BIND_URL_PREFIX)
@@ -62,6 +66,7 @@ public class NotifyChannelBindController implements BaseController {
     private final NotifyChannelBindService notifyChannelBindService;
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'add')")
+    @Operation(summary = "新增NotifyChannelBind", description = "新增一条NotifyChannelBind记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -73,6 +78,7 @@ public class NotifyChannelBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'delete')")
+    @Operation(summary = "删除NotifyChannelBind", description = "删除指定ID的NotifyChannelBind")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -83,6 +89,7 @@ public class NotifyChannelBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'update')")
+    @Operation(summary = "更新NotifyChannelBind", description = "更新NotifyChannelBind信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyChannelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -95,6 +102,7 @@ public class NotifyChannelBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'get')")
+    @Operation(summary = "查询NotifyChannelBind", description = "根据ID查询NotifyChannelBind详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<NotifyChannelBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,6 +112,7 @@ public class NotifyChannelBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'list')")
+    @Operation(summary = "查询NotifyChannelBind列表", description = "分页查询NotifyChannelBind列表")
     @PostMapping("/list")
     public Mono<R<Page<NotifyChannelBindVO>>> list(@RequestBody(required = false) NotifyChannelBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

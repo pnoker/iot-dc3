@@ -60,6 +60,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing device management endpoints.
@@ -68,6 +71,7 @@ import java.util.stream.Collectors;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Tag(name = "device", description = "设备")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DEVICE_URL_PREFIX)
@@ -87,6 +91,7 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('device', 'add')")
+    @Operation(summary = "新增设备管理", description = "新增一条设备记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,6 +109,7 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('device', 'delete')")
+    @Operation(summary = "删除设备管理", description = "删除指定ID的设备")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -118,6 +124,7 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('device', 'update')")
+    @Operation(summary = "更新设备管理", description = "更新设备信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -136,6 +143,7 @@ public class DeviceController implements BaseController {
      * @return DeviceVO {@link DeviceVO}
      */
     @PreAuthorize("@perm.can('device', 'get')")
+    @Operation(summary = "查询设备管理", description = "根据ID查询设备管理详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<DeviceVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -169,6 +177,7 @@ public class DeviceController implements BaseController {
      * @return Device array
      */
     @PreAuthorize("@perm.can('device', 'list')")
+    @Operation(summary = "查询设备列表", description = "根据关联条件查询设备管理列表")
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<DeviceVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -185,6 +194,7 @@ public class DeviceController implements BaseController {
      * @return R Of DeviceVO Page
      */
     @PreAuthorize("@perm.can('device', 'list')")
+    @Operation(summary = "查询设备列表", description = "分页查询设备管理列表")
     @PostMapping("/list")
     public Mono<R<Page<DeviceVO>>> list(@RequestBody(required = false) DeviceQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -203,6 +213,7 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('device', 'add')")
+    @Operation(summary = "导入设备管理", description = "通过Excel文件批量导入设备管理数据")
     @PostMapping("/import")
     public Mono<R<String>> importDevice(@Validated(Upload.class) DeviceVO entityVO,
                                         @RequestPart("file") Mono<FilePart> filePart) {
@@ -233,6 +244,7 @@ public class DeviceController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('device', 'list')")
+    @Operation(summary = "下载导入模板", description = "下载设备管理Excel导入模板")
     @PostMapping("/export/import_template")
     public Mono<ResponseEntity<Resource>> importTemplate(@Validated(Upload.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> Mono.fromCallable(() -> {
@@ -248,6 +260,7 @@ public class DeviceController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('device', 'list')")
+    @Operation(summary = "统计设备管理数量", description = "统计设备管理的数量")
     @GetMapping("/get_count_by_driver_id")
     public Mono<R<Integer>> getCountByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
