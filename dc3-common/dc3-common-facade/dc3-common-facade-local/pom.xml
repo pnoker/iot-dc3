@@ -56,6 +56,12 @@
             <artifactId>dc3-common-facade-local-manager</artifactId>
         </dependency>
 
+
+        <!-- OpenAPI annotations -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
