@@ -27,6 +27,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Dictionary view object (VO) representing hierarchical dictionary items.
@@ -41,6 +42,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Dictionary view object")
 public class DictionaryVO implements Serializable {
 
     @Serial
@@ -49,31 +51,37 @@ public class DictionaryVO implements Serializable {
     /**
      * Dictionary type.
      */
+    @Schema(description = "type")
     private String type;
 
     /**
      * Dictionary label name.
      */
+    @Schema(description = "label")
     private String label;
 
     /**
      * Dictionary label value.
      */
+    @Schema(description = "value")
     private String value;
 
     /**
      * Whether the dictionary item is disabled.
      */
+    @Schema(description = "Whether the entity is disabled")
     private boolean disabled;
 
     /**
      * Whether the dictionary node is expanded.
      */
+    @Schema(description = "expand")
     private boolean expand;
 
     /**
      * Child dictionary nodes.
      */
+    @Schema(description = "children")
     private List<DictionaryVO> children;
 
 }

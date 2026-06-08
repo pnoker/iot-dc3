@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Group binding view object representing the association between groups and
@@ -43,23 +44,27 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(description = "Group Bind view object")
 public class GroupBindVO extends BaseVO {
 
     /**
      * Entity type flag.
      */
+    @Schema(description = "entity type flag")
     @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
      * Group ID.
      */
+    @Schema(description = "group ID")
     @NotNull(message = "Group ID can't be empty", groups = {Add.class, Update.class})
     private Long groupId;
 
     /**
      * Entity ID.
      */
+    @Schema(description = "Associated entity ID")
     @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
 

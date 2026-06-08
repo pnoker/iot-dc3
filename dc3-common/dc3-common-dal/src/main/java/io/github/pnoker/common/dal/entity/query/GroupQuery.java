@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for group listing and filtering.
@@ -43,16 +44,20 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Group query parameters")
 public class GroupQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Pagination object")
 
     private Pages page;
 
     /**
      * Tenant ID.
      */
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
     // Query fields
@@ -60,26 +65,31 @@ public class GroupQuery implements Serializable {
     /**
      * Group name.
      */
+    @Schema(description = "group name")
     private String groupName;
 
     /**
      * Parent group ID.
      */
+    @Schema(description = "parent group ID")
     private Long parentGroupId;
 
     /**
      * Group sort position.
      */
+    @Schema(description = "position")
     private Integer position;
 
     /**
      * Group type flag.
      */
+    @Schema(description = "group type flag")
     private EntityTypeFlagEnum groupTypeFlag;
 
     /**
      * Enable status flag.
      */
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
     private EnableFlagEnum enableFlag;
 
 }
