@@ -69,7 +69,7 @@
         <!-- Framework BOMs -->
         <spring.boot.version>4.0.6</spring.boot.version>
         <spring.cloud.version>2025.1.1</spring.cloud.version>
-        <spring-ai.version>2.0.0-M6</spring-ai.version>
+        <spring-ai.version>2.0.0-M8</spring-ai.version>
 
         <!-- RPC and messaging -->
         <grpc.version>1.81.0</grpc.version>
