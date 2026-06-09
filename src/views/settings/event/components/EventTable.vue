@@ -119,8 +119,8 @@
         <el-table-column :label="$t('settings.event.message')" min-width="240" prop="message" show-overflow-tooltip />
         <el-table-column :label="$t('settings.event.confirmFlag')" width="110">
           <template #default="{ row }">
-            <el-tag :type="row.confirmFlag === 1 ? 'success' : 'warning'" size="small">
-              {{ row.confirmFlag === 1 ? $t('common.confirmed') : $t('common.unconfirmed') }}
+            <el-tag :type="row.confirmFlag === 'CONFIRMED' ? 'success' : 'warning'" size="small">
+              {{ row.confirmFlag === 'CONFIRMED' ? $t('common.confirmed') : $t('common.unconfirmed') }}
             </el-tag>
           </template>
         </el-table-column>
@@ -133,7 +133,7 @@
         <el-table-column :label="$t('common.operation')" fixed="right" width="140">
           <template #default="{ row }">
             <el-popconfirm
-              v-if="row.confirmFlag !== 1"
+              v-if="row.confirmFlag !== 'CONFIRMED'"
               :cancel-button-text="$t('common.cancel')"
               :confirm-button-text="$t('common.confirm')"
               :title="$t('settings.event.confirmTitle')"
@@ -194,7 +194,7 @@
     pointId: number | string;
     eventTypeFlag: number;
     alarmLevelFlag?: number;
-    confirmFlag: number;
+    confirmFlag: string;
     createTime: string;
     message: string;
   }

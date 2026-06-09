@@ -163,7 +163,7 @@ export function commandTimeoutLabel(value: TimeoutValue): string {
 
 // Alarm helpers — wire format is integer (0..4 for type, 0..3 for level),
 // distinct from the string-coded EventTypeFlag/EventLevelFlag enums above.
-// Backend enum is `AlarmTypeFlagEnum`; level uses P0..P3 priority labels.
+// Backend enum is `AlarmTypeEnum`; level uses P0..P3 priority labels.
 
 const ALARM_TYPE_LABEL_BY_INDEX: Record<number, string> = {
   0: 'RULE',

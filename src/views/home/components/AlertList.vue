@@ -32,7 +32,7 @@
         <el-timeline-item
           v-for="row in group.items"
           :key="row.id"
-          :hollow="row.confirmFlag === 1"
+          :hollow="row.confirmFlag === 'CONFIRMED'"
           :timestamp="formatClock(row.createTime)"
           :type="timelineColour(row.eventTypeFlag)"
           placement="top"
@@ -46,7 +46,7 @@
                 {{ sourceLabel(row) }}
               </el-tag>
               <span class="alert-list__name">{{ nameFor(row) }}</span>
-              <el-tag v-if="row.confirmFlag === 1" effect="plain" size="small" type="success">
+              <el-tag v-if="row.confirmFlag === 'CONFIRMED'" effect="plain" size="small" type="success">
                 {{ $t('common.confirmed') }}
               </el-tag>
             </div>
@@ -73,7 +73,7 @@
     sourceId: number | string;
     pointId: number | string;
     eventTypeFlag: number;
-    confirmFlag: number;
+    confirmFlag: string;
     createTime: string;
     message?: string;
   }

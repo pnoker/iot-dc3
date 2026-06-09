@@ -73,7 +73,7 @@ export const MENU_LEVEL_OPTIONS: EnumOption[] = [
   { label: 'C4', value: 'C4' },
 ];
 
-// Backend: DriverTypeFlagEnum
+// Backend: DriverTypeEnum
 export const DRIVER_TYPE_OPTIONS: EnumOption[] = [
   { label: 'DRIVER_CLIENT', value: 'DRIVER_CLIENT' },
   { label: 'DRIVER_SERVER', value: 'DRIVER_SERVER' },
@@ -81,14 +81,14 @@ export const DRIVER_TYPE_OPTIONS: EnumOption[] = [
   { label: 'CONNECT', value: 'CONNECT' },
 ];
 
-// Backend: ProfileTypeFlagEnum
+// Backend: ProfileTypeEnum
 export const PROFILE_TYPE_OPTIONS: EnumOption[] = [
   { label: 'SYSTEM', value: 'SYSTEM' },
   { label: 'DRIVER', value: 'DRIVER' },
   { label: 'USER', value: 'USER' },
 ];
 
-// Backend: PointTypeFlagEnum
+// Backend: PointTypeEnum
 export const POINT_TYPE_OPTIONS: EnumOption[] = [
   { label: 'STRING', value: 'STRING' },
   { label: 'BYTE', value: 'BYTE' },
@@ -100,21 +100,21 @@ export const POINT_TYPE_OPTIONS: EnumOption[] = [
   { label: 'BOOLEAN', value: 'BOOLEAN' },
 ];
 
-// Backend: ProfileShareFlagEnum
+// Backend: ProfileShareTypeEnum
 export const PROFILE_SHARE_OPTIONS: EnumOption[] = [
   { label: 'TENANT', value: 'TENANT' },
   { label: 'DRIVER', value: 'DRIVER' },
   { label: 'USER', value: 'USER' },
 ];
 
-// Backend: RwFlagEnum
+// Backend: RwTypeEnum
 export const RW_FLAG_OPTIONS: EnumOption[] = [
   { label: 'R', value: 'R' },
   { label: 'W', value: 'W' },
   { label: 'RW', value: 'RW' },
 ];
 
-// Backend: AlarmTypeFlagEnum
+// Backend: AlarmTypeEnum
 export const ALARM_TYPE_OPTIONS: EnumOption[] = [
   { label: 'RULE', value: 'RULE' },
   { label: 'OFFLINE', value: 'OFFLINE' },
@@ -123,20 +123,20 @@ export const ALARM_TYPE_OPTIONS: EnumOption[] = [
   { label: 'REPORT', value: 'REPORT' },
 ];
 
-// Backend: CommandTypeFlagEnum
+// Backend: CommandTypeEnum
 export const COMMAND_TYPE_OPTIONS: EnumOption[] = [
   { label: 'CUSTOM', value: 'CUSTOM' },
   { label: 'CONFIG', value: 'CONFIG' },
   { label: 'ACTION', value: 'ACTION' },
 ];
 
-// Backend: CallTypeFlagEnum
+// Backend: CallTypeEnum
 export const CALL_TYPE_OPTIONS: EnumOption[] = [
   { label: 'SYNC', value: 'SYNC' },
   { label: 'ASYNC', value: 'ASYNC' },
 ];
 
-// Backend: ParamDirectionFlagEnum
+// Backend: ParamDirectionTypeEnum
 export const PARAM_DIRECTION_OPTIONS: EnumOption[] = [
   { label: 'INPUT', value: 'INPUT' },
   { label: 'OUTPUT', value: 'OUTPUT' },
@@ -150,7 +150,7 @@ export const EVENT_TYPE_OPTIONS: EnumOption[] = [
   { label: 'LIFECYCLE', value: 'LIFECYCLE' },
 ];
 
-// Backend: EventLevelFlagEnum
+// Backend: EventLevelEnum
 export const EVENT_LEVEL_OPTIONS: EnumOption[] = [
   { label: 'LOW', value: 'LOW' },
   { label: 'MEDIUM', value: 'MEDIUM' },

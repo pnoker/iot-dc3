@@ -67,14 +67,16 @@ export interface EventHistoryRecord {
   deviceId?: string;
   eventId?: string;
   eventCode?: string;
-  eventTypeFlag?: number;
-  eventLevelFlag?: number;
+  // Backend serializes these as domain enum names (e.g. "ALERT", "HIGH", "NO").
+  // Kept as string | number for backward compatibility with older numeric payloads.
+  eventTypeFlag?: string | number;
+  eventLevelFlag?: string | number;
   paramValues?: Record<string, string>;
   configSnapshot?: string;
   message?: string;
   occurTime?: string;
   receiveTime?: string;
-  acknowledgeFlag?: number;
+  acknowledgeFlag?: string | number;
   acknowledgeTime?: string;
   acknowledgeUserId?: string;
   schemaVersion?: number;

@@ -62,6 +62,12 @@ export interface CommandParamRecord extends CommandParamForm {
 }
 
 /**
+ * Command status (matches backend PointCommandStatusEnum constant names).
+ * Backend serializes enums by name, so the wire value is one of these strings.
+ */
+export type CommandStatus = 'PENDING' | 'SENT' | 'SUCCESS' | 'FAILED' | 'TIMEOUT' | 'EXPIRED' | 'DEAD' | 'DUPLICATE';
+
+/**
  * Command call history (dc3_command_history).
  */
 export interface CommandHistoryRecord {
@@ -72,7 +78,7 @@ export interface CommandHistoryRecord {
   commandId?: string;
   commandCode?: string;
   paramValues?: Record<string, string>;
-  status?: string;
+  status?: CommandStatus;
   errorCode?: string;
   errorMessage?: string;
   resultValues?: Record<string, string>;
