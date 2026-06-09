@@ -23,6 +23,16 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  # The gateway authenticates via AuthenticGatewayFilter, not Spring Security.
+  # spring-security is on the classpath transitively (dc3-common-web), so disable
+  # its default reactive auto-config; otherwise it would lock every route behind a
+  # generated password. WebFluxSecurityConfig is also skipped here (see its
+  # @ConditionalOnMissingClass on the gateway marker class).
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.security.autoconfigure.ReactiveUserDetailsServiceAutoConfiguration
+      - org.springframework.boot.security.autoconfigure.web.reactive.ReactiveWebSecurityAutoConfiguration
+      - org.springframework.boot.security.autoconfigure.actuate.web.reactive.ReactiveManagementWebSecurityAutoConfiguration
   # Active profile configuration, defaults to 'dev' if NODE_ENV is not set
   profiles:
     active:
@@ -31,6 +41,24 @@ spring:
 dc3:
   facade:
     mode: ${DC3_FACADE_MODE:grpc}
+
+# Aggregated Swagger UI. The gateway has no controllers of its own; it federates
+# the per-center API docs into a single UI with a service selector. Each entry's
+# url is served by the api-docs aggregation routes defined in
+# application-gateway.yml (which proxy to each center's /{svc}/v3/api-docs).
+# Disabled in production via the shared application-web.yml "pro" block.
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Auth Center
+        url: /v3/api-docs/auth
+      - name: Manager Center
+        url: /v3/api-docs/manager
+      - name: Data Center
+        url: /v3/api-docs/data
+      - name: Agentic Center
+        url: /v3/api-docs/agentic
 
 management:
   endpoint:

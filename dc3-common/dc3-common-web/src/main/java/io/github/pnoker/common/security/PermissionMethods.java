@@ -63,6 +63,13 @@ public class PermissionMethods {
      * @param scope  operation scope (e.g. "get", "search", "add", "update", "delete")
      * @return true if granted
      */
+    /**
+     * Wildcard authority granted by the permissive {@code DefaultPermissionProvider}
+     * (services without the auth module). When present it satisfies every check, so
+     * service-to-service trust works without role data.
+     */
+    public static final String WILDCARD = "*";
+
     public boolean can(String domain, String scope) {
         String resourceCode = serviceName + ":" + domain + ":" + scope;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -72,7 +79,7 @@ public class PermissionMethods {
         Set<String> authorities = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
-        boolean granted = authorities.contains(resourceCode);
+        boolean granted = authorities.contains(WILDCARD) || authorities.contains(resourceCode);
         if (!granted && log.isDebugEnabled()) {
             log.debug("Permission check failed: required={}, user has={}", resourceCode, authorities);
         }
@@ -95,6 +102,9 @@ public class PermissionMethods {
         Set<String> authorities = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
+        if (authorities.contains(WILDCARD)) {
+            return true;
+        }
         for (String spec : specs) {
             String resourceCode = serviceName + ":" + spec;
             if (authorities.contains(resourceCode)) {

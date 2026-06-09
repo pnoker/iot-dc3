@@ -23,7 +23,6 @@ spring:
   transaction:
     # Enable rollback if a failure occurs during transaction commit.
     rollback-on-commit-failure: true
-  main:
   web:
     resources:
       # Disable Spring Boot's default static resource mappings.
@@ -49,3 +48,22 @@ management:
       exposure:
         # Expose health and Prometheus endpoints for readiness and metrics scraping.
         include: health,prometheus
+
+# OpenAPI / Swagger UI baseline, shared by every web service (auth, manager,
+# data, agentic, single) through the auto-activated "web" profile. Document
+# content (groups, scanned packages) is defined per business module by
+# GroupedOpenApi beans; the global info/contact/license/security scheme lives in
+# SpringDocConfig. The webflux base-path of each service (/auth, /manager, ...)
+# prefixes these paths, e.g. auth docs are served at /auth/swagger-ui.html.
+# Production disables these endpoints in each service's application-pro.yml.
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # Stable, reviewable ordering of operations and tags.
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+  # Flatten query/path parameter objects (e.g. *Query DTOs) into discrete params.
+  default-flat-param-object: true

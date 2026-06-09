@@ -36,6 +36,12 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/");
+        // Spring Boot's default static mappings are disabled (spring.web.resources.add-mappings=false),
+        // so the Swagger UI webjar assets must be served explicitly; otherwise /swagger-ui/** 404s.
+        registry.addResourceHandler("/swagger-ui/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
     @Override

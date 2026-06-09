@@ -70,7 +70,15 @@
         <spring.boot.version>4.0.6</spring.boot.version>
         <spring.cloud.version>2025.1.1</spring.cloud.version>
         <spring-ai.version>2.0.0-M8</spring-ai.version>
-        <springdoc-openapi.version>2.8.6</springdoc-openapi.version>
+        <!-- springdoc 3.x targets Spring Boot 4.0 / Spring Framework 7; the 2.8.x
+             line is for Spring Boot 3.x and crashes the Swagger UI on SF7
+             (UriComponentsBuilder.fromHttpRequest NoSuchMethodError). -->
+        <springdoc-openapi.version>3.0.3</springdoc-openapi.version>
+        <!-- swagger-core version required by springdoc 3.0.3 (has Schema.$dynamicRef()).
+             spring-ai-bom is imported before springdoc-openapi-bom and pulls an older
+             swagger-core, which causes a NoSuchMethodError during OpenAPI generation on
+             modules that include Spring AI (agentic). Pin it explicitly so it wins. -->
+        <swagger-core.version>2.2.47</swagger-core.version>
 
         <!-- RPC and messaging -->
         <grpc.version>1.81.0</grpc.version>
@@ -203,6 +211,40 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Pin swagger-core to the version springdoc 3.0.3 requires. Declared
+                 before the BOM imports so it takes precedence over the older
+                 swagger-core that spring-ai-bom would otherwise contribute, which
+                 breaks OpenAPI generation (Schema.$dynamicRef NoSuchMethodError). -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-core-jakarta</artifactId>
+                <version>${swagger-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-models-jakarta</artifactId>
+                <version>${swagger-core.version}</version>
+            </dependency>
+            <!-- The non-jakarta swagger-annotations (pulled by Spring AI's
+                 jsonschema-module-swagger-2) ships the SAME io.swagger.v3.oas.annotations
+                 classes as the jakarta artifact. Pin it to the same version so the
+                 classpath can't resolve an older Schema without $dynamicRef(). -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-core.version}</version>
+            </dependency>
+
             <!-- BOM imports -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -227,7 +269,7 @@
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi</artifactId>
+                <artifactId>springdoc-openapi-bom</artifactId>
                 <version>${springdoc-openapi.version}</version>
                 <type>pom</type>
                 <scope>import</scope>

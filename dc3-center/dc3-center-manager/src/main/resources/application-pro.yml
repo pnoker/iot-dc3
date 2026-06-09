@@ -43,3 +43,11 @@ spring:
           enable-keep-alive: true
           keep-alive-without-calls: true
           negotiation-type: PLAINTEXT
+
+# OpenAPI / Swagger UI are disabled in production. The endpoints simply do not
+# exist here, so the doc-path whitelist in WebFluxSecurityConfig exposes nothing.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

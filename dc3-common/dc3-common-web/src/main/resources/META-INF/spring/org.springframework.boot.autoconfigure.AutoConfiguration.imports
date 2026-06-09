@@ -16,5 +16,6 @@
 #
 
 io.github.pnoker.common.config.ExceptionConfig
-io.github.pnoker.common.config.WebFilterConfig
 io.github.pnoker.common.config.WebFluxConfig
+io.github.pnoker.common.config.WebFluxSecurityConfig
+io.github.pnoker.common.config.SpringDocConfig
